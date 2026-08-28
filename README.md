@@ -278,3 +278,5 @@ próprio conjunto.
 
 A arte é original. O estilo é inspirado em ícones de RPG 2D, sem cópia de nenhum
 material existente. O personagem continua sem imagem, com as iniciais na ficha.
+#   l u m n i - w i z o l d  
+ 
