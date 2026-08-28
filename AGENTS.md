@@ -714,6 +714,25 @@ own switch is on; with everything off, the loops stop the way they always did.
 is no hunt, no duel and no turning. Turning is refused in `toggleForm`, not only
 on a screen, because a body that far gone does not survive it.
 
+## Database
+
+The server side lives in PostgreSQL, database `wizold-prod`, schema in English
+snake_case. `migrations/` holds numbered SQL files applied in filename order by
+`npm run migrate`, which creates the database when missing, runs each pending
+file in its own transaction and records it in `schema_migrations`. An applied
+file is immutable: a schema change is always a new numbered file. The
+connection reads the `PG*` variables from `.env.local`, never committed;
+`.env.example` shows the shape.
+
+Catalogs (items, species, sets, exercises, territories, store packs) stay in
+code, and the tables store player state referencing catalog ids, so the
+database never duplicates what a build already knows. Ids that may point at
+roster hunters or roster listings carry no foreign key, because that side
+lives in code too. Money is integer centavos with a movement row per wallet
+change, bronze is `bigint`, and every timestamp is `timestamptz` written by
+the server: once a run lives here, the client clock owns nothing, which is
+what closes the clock-forward exploits the localStorage era tolerated.
+
 ## Commands
 
 ```bash
@@ -721,6 +740,7 @@ npm run dev       # local environment
 npm run build     # production build
 npm run lint      # eslint
 npm test          # the audit bench: every documented rule proven against the code
+npm run migrate   # apply pending SQL migrations to wizold-prod (status: migrate:status)
 npx tsc --noEmit  # type check
 
 node scripts/balance.mjs          # the difficulty curve, band by band (npm run bench)
