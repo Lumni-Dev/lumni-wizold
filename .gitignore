@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# scratch output of scripts/balance.mjs, scripts/audit.mjs and scripts/forge-sounds.mjs
+.sim
+.sim-audit
+.sound-forge

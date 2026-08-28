@@ -1,26 +1,198 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+  Single palette for the whole game: black, grey and white.
+  Any new colour must be declared here and never written inline in a component.
+*/
+@theme {
+  --color-base: #050506;
+  --color-charcoal: #0a0a0c;
+  --color-surface: #0f0f12;
+  --color-surface-high: #16161a;
+  --color-surface-top: #1d1d22;
+  --color-edge: #26262c;
+  --color-edge-strong: #3a3a43;
+  --color-ink: #ededf0;
+  --color-ink-soft: #a2a2ac;
+  --color-ink-faint: #6b6b76;
+  --color-highlight: #fafafa;
+  /* Blood for health, fury for rage; ember is the amber of the forged chrome,
+     worn by the energy bars and by the primary action of every screen. */
+  --color-blood: #d60932;
+  --color-ember: #e0993d;
+  --color-fury: #7d4fa8;
+  --color-vigor: #32a864;
+
+  --font-sans: var(--font-sans-stack), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-stack), ui-monospace, "SFMono-Regular", monospace;
+  /* Worn only by the game logo. */
+  --font-logo: var(--font-logo-stack), var(--font-sans-stack), sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  * {
+    border-color: var(--color-edge);
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  html {
+    color-scheme: dark;
+  }
+
+  /*
+    One wallpaper behind every page, kept almost invisible: a veil of the base
+    colour sits over it and thickens on the way down, until the picture has
+    fully dissolved into the page background at the bottom.
+  */
+  body {
+    background-color: var(--color-base);
+    color: var(--color-ink);
+    background-image:
+      linear-gradient(
+        to bottom,
+        rgba(5, 5, 6, 0.55) 0%,
+        rgba(5, 5, 6, 0.64) 30%,
+        rgba(5, 5, 6, 0.76) 55%,
+        rgba(5, 5, 6, 0.88) 75%,
+        rgba(5, 5, 6, 0.96) 90%,
+        var(--color-base) 100%
+      ),
+      url("/assets/ui/background.jpg?v=1");
+    background-size: auto, 100% auto;
+    background-position: center top;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background-color: var(--color-highlight);
+    color: var(--color-base);
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-charcoal);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-edge-strong);
+    border-radius: 9999px;
+    border: 2px solid var(--color-charcoal);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-ink-faint);
+  }
+
+  :focus-visible {
+    outline: 1px solid var(--color-ink-soft);
+    outline-offset: 2px;
+  }
+
+  /* Tailwind v4 drops the default pointer on buttons: put it back everywhere. */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  summary,
+  a[href] {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@utility heading {
+  font-family: var(--font-sans);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+/* The inside of every slot: grey light pooling in the middle, black in the corners. */
+@utility slot-well {
+  background-image: radial-gradient(
+    circle at 50% 45%,
+    color-mix(in oklab, var(--color-ember) 12%, var(--color-edge-strong)) 0%,
+    color-mix(in oklab, var(--color-ember) 5%, var(--color-surface-high)) 42%,
+    var(--color-base) 82%
+  );
+}
+
+/* Subtle scratched texture used by the resource bars. */
+@utility striped {
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.28) 0px,
+    rgba(0, 0, 0, 0.28) 2px,
+    transparent 2px,
+    transparent 6px
+  );
+}
+
+
+/* The light that passes over the filled part of a vital while rest refills it. */
+@keyframes bar-glow {
+  0% {
+    transform: translateX(-100%);
+  }
+  60%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@utility bar-glow {
+  background-image: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgba(250, 250, 250, 0.1) 42%,
+    rgba(250, 250, 250, 0.45) 50%,
+    rgba(250, 250, 250, 0.1) 58%,
+    transparent 70%
+  );
+  animation: bar-glow 2200ms ease-in-out infinite;
+}
+
+/* The shine an item answers with when the cursor lands on its card: the same
+   light the bars use, running from the bottom left corner to the top right. */
+@keyframes item-glow {
+  0% {
+    transform: translate(-100%, 100%);
+  }
+  60%,
+  100% {
+    transform: translate(100%, -100%);
+  }
+}
+
+@utility item-glow {
+  background-image: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(250, 250, 250, 0.1) 42%,
+    rgba(250, 250, 250, 0.45) 50%,
+    rgba(250, 250, 250, 0.1) 58%,
+    transparent 70%
+  );
+  animation: item-glow 2200ms ease-in-out infinite;
+}
+
+/* The corner where the game talks: each line slides in from the right. */
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@utility toast-in {
+  animation: toast-in 220ms ease-out;
 }

@@ -1,0 +1,56 @@
+"use client";
+
+import { useGame } from "@/controllers/game.context";
+import { rageCriticalDamageBonus } from "@/models/rules/combat";
+import { formatNumber } from "@/shared/utils/format";
+import { Bar } from "../components/bar";
+import { RestSeconds } from "../components/rest-seconds";
+
+export function ResourceBar() {
+  const { character, stats, activity } = useGame();
+  if (!character || !stats) return null;
+
+  const resting = activity?.kind === "rest";
+
+  return (
+    <header className="sticky top-0 z-20 border-b border-edge bg-base/85 backdrop-blur">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 p-4 md:px-8 lg:h-20 lg:flex-row lg:items-center">
+        <div className="grid flex-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <Bar
+            label={
+              resting ? (
+                <>
+                  Vida (Recuperando-se...{" "}
+                  <RestSeconds key={character.health + "-" + character.rage} />)
+                </>
+              ) : (
+                "Vida"
+              )
+            }
+            current={character.health}
+            maximum={stats.maxHealth}
+            glows={resting && character.health < stats.maxHealth}
+            tone="blood"
+          />
+          <Bar
+            label={
+              "Fúria (+" +
+              Math.round(rageCriticalDamageBonus(character.rage) * 100) +
+              "% de dano no crítico)"
+            }
+            current={character.rage}
+            maximum={stats.maxRage}
+            glows={resting && character.rage < stats.maxRage}
+            tone="fury"
+          />
+          <Bar
+            label={"Experiência (NV. " + formatNumber(character.level) + ")"}
+            current={character.experience}
+            maximum={stats.experienceNeeded}
+            wraps
+          />
+        </div>
+      </div>
+    </header>
+  );
+}

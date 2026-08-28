@@ -1,0 +1,55 @@
+export const GAME_NAME = "Wizold";
+export const GAME_TAGLINE = "Crônica de Lumni e Luna";
+
+export const STORAGE_KEY = "lumni-wizold:state";
+export const STATE_VERSION = 1;
+
+export const LOG_LIMIT = 120;
+export const MAX_CHARACTER_LEVEL = 1000;
+export const MAX_ATTRIBUTE_VALUE = 1000;
+export const BASE_ATTRIBUTE_VALUE = 4;
+export const BASE_VITAL = 100;
+export const HEALTH_PER_ENDURANCE = 14;
+export const RAGE_PER_WILLPOWER = 2;
+export const WEREWOLF_STRENGTH_BONUS = 0.35;
+export const STARTING_BRONZE = 100;
+export const TRANSFORM_RAGE_COST = 40;
+export const TRANSFORM_DURATION_MS = 15 * 60_000;
+export const REST_TICK_MS = 60_000;
+export const REST_RECOVERY_RATIO = 0.05;
+export const RENAME_COOLDOWN_DAYS = 15;
+export const RENAME_BASE_PRICE = 500;
+export const MIN_HEALTH_RATIO_TO_ACT = 0.2;
+export const AUTOMATION_TICK_MS = 2000;
+export const HUNT_TICK_MS = 1000;
+export const HUNT_TICKS = 8;
+export const MAX_COMBAT_ROUNDS = 24;
+export const RAGE_CRITICAL_DAMAGE_BONUS = 0.5;
+export const MIN_AGE = 18;
+export const NAME_MAX_LENGTH = 25;
+export const NAME_MIN_LENGTH = 3;
+
+export const PET_PRICE = 1200;
+export const PET_RENAME_PRICE = 10_000;
+export const PET_MAX_LEVEL = 100;
+export const PET_EXERCISE_ID = "pet-training";
+export const PET_BASE_BONUS = 5;
+export const PET_BASE_ENERGY = 100;
+export const PET_ENERGY_PER_LEVEL = 4;
+export const PET_ENERGY_PER_HUNT = 4;
+export const PET_ENERGY_PER_BLOW = 2;
+export const PET_BITE_ENERGY = 6;
+export const PET_REST_RATIO = 0.1;
+export const PET_ATTACK_RATIO = 0.25;
+export const PET_TARGET_CHANCE = 0.2;
+
+export const MAX_ENHANCEMENT = 1000;
+export const ENHANCEMENT_STEP = 0.002;
+export const TRAINING_TICK_MS = 1000;
+export const TRAINING_TICKS = 4;
+export const MINING_TICK_MS = 1000;
+export const MINING_TICKS = 4;
+export const MINING_CYCLE_MS = MINING_TICK_MS * (MINING_TICKS + 1);
+export const FORGE_TICKS = 4;
+export const FORGE_BASE_MS = 4000;
+export const FORGE_MS_PER_LEVEL = 10;

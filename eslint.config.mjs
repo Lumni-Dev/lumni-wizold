@@ -12,6 +12,11 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Scratch output of the scripts: the bench compiles the model into .sim to
+    // read the real rules, and the sound forge renders through .sound-forge.
+    ".sim/**",
+    ".sim-audit/**",
+    ".sound-forge/**",
   ]),
 ]);
 

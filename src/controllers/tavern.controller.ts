@@ -1,0 +1,343 @@
+import { generateId } from "@/shared/utils/id";
+import {
+  isPrivateTable,
+  isRoomFull,
+  MAX_ROOM_MEMBERS,
+  MAX_ROOM_MESSAGES,
+  MESSAGE_MAX_LENGTH,
+  MEMBER_TIMEOUT_MS,
+  validateRoomName,
+  type TavernIdentity,
+  type TavernResult,
+  type TavernRoom,
+  type TavernState,
+} from "@/models/entities/tavern";
+
+function fail(state: TavernState, message: string): TavernResult {
+  return { ok: false, message, state };
+}
+
+function done(state: TavernState, message: string, roomId?: string): TavernResult {
+  return { ok: true, message, state, roomId };
+}
+
+function replaceRoom(state: TavernState, room: TavernRoom): TavernState {
+  return {
+    ...state,
+    rooms: state.rooms.map((current) => (current.id === room.id ? room : current)),
+  };
+}
+
+export function findRoom(state: TavernState, roomId: string): TavernRoom | undefined {
+  return state.rooms.find((room) => room.id === roomId);
+}
+
+export function pruneTavern(state: TavernState, now: number): TavernState {
+  const rooms = state.rooms
+    .map((room) =>
+      isPrivateTable(room)
+        ? room
+        : {
+            ...room,
+            members: room.members.filter(
+              (member) => now - new Date(member.lastSeen).getTime() < MEMBER_TIMEOUT_MS,
+            ),
+          },
+    )
+    .filter((room) => isPrivateTable(room) || room.members.length > 0);
+
+  const changed =
+    rooms.length !== state.rooms.length ||
+    rooms.some((room, index) => room.members.length !== state.rooms[index]?.members.length);
+
+  return changed ? { ...state, rooms } : state;
+}
+
+export interface RoomSummary {
+  room: TavernRoom;
+  locked: boolean;
+  full: boolean;
+  memberCount: number;
+  isMember: boolean;
+  isPrivate: boolean;
+}
+
+export function listRooms(state: TavernState, identity: TavernIdentity | null): RoomSummary[] {
+  return state.rooms
+    .filter(
+      (room) =>
+        !isPrivateTable(room) ||
+        (identity !== null && (room.privateFor ?? []).includes(identity.id)),
+    )
+    .map((room) => ({
+      room,
+      locked: room.password !== null,
+      full: isRoomFull(room),
+      memberCount: room.members.length,
+      isMember: identity !== null && room.members.some((member) => member.id === identity.id),
+      isPrivate: isPrivateTable(room),
+    }))
+    .sort((a, b) =>
+      a.isPrivate === b.isPrivate
+        ? a.room.name.localeCompare(b.room.name, "pt-BR")
+        : Number(b.isPrivate) - Number(a.isPrivate),
+    );
+}
+
+export function createRoom(
+  state: TavernState,
+  identity: TavernIdentity,
+  name: string,
+  password: string,
+): TavernResult {
+  const problem = validateRoomName(name);
+  if (problem) return fail(state, problem);
+
+  if (state.rooms.some((room) => !isPrivateTable(room) && room.ownerId === identity.id)) {
+    return fail(state, "Você já tem uma mesa aberta. Feche a sua antes de abrir outra.");
+  }
+
+  const cleanName = name.trim();
+  const taken = state.rooms.some(
+    (room) => !isPrivateTable(room) && room.name.toLowerCase() === cleanName.toLowerCase(),
+  );
+  if (taken) return fail(state, "Já existe uma sala com esse nome.");
+
+  const now = new Date().toISOString();
+  const room: TavernRoom = {
+    id: generateId("room"),
+    name: cleanName,
+    password: password.trim().length > 0 ? password.trim() : null,
+    ownerId: identity.id,
+    createdAt: now,
+    members: [{ id: identity.id, name: identity.name, joinedAt: now, lastSeen: now }],
+    messages: [
+      {
+        id: generateId("msg"),
+        authorId: "system",
+        authorName: "Taverna",
+        text: identity.name + " abriu a sala.",
+        at: now,
+      },
+    ],
+  };
+
+  return done({ ...state, rooms: [...state.rooms, room] }, "Sala aberta.", room.id);
+}
+
+export function joinRoom(
+  state: TavernState,
+  roomId: string,
+  identity: TavernIdentity,
+  password: string,
+): TavernResult {
+  const room = findRoom(state, roomId);
+  if (!room) return fail(state, "Essa sala não existe mais.");
+
+  if (isPrivateTable(room) && !(room.privateFor ?? []).includes(identity.id)) {
+    return fail(state, "Essa mesa está reservada.");
+  }
+
+  const already = room.members.some((member) => member.id === identity.id);
+  if (!already) {
+    if (isRoomFull(room))
+      return fail(state, "A sala está cheia (" + MAX_ROOM_MEMBERS + " pessoas).");
+    if (room.password !== null && room.password !== password.trim()) {
+      return fail(state, "Senha incorreta.");
+    }
+  }
+
+  const now = new Date().toISOString();
+  const members = already
+    ? room.members.map((member) =>
+        member.id === identity.id ? { ...member, name: identity.name, lastSeen: now } : member,
+      )
+    : [...room.members, { id: identity.id, name: identity.name, joinedAt: now, lastSeen: now }];
+
+  const messages = already
+    ? room.messages
+    : [
+        ...room.messages,
+        {
+          id: generateId("msg"),
+          authorId: "system",
+          authorName: "Taverna",
+          text: identity.name + " entrou.",
+          at: now,
+        },
+      ].slice(-MAX_ROOM_MESSAGES);
+
+  return done(
+    replaceRoom(state, { ...room, members, messages }),
+    already ? "Mesa aberta." : "Você entrou em " + room.name + ".",
+    room.id,
+  );
+}
+
+export function leaveRoom(
+  state: TavernState,
+  roomId: string,
+  identity: TavernIdentity,
+): TavernResult {
+  const room = findRoom(state, roomId);
+  if (!room) return fail(state, "Essa sala não existe mais.");
+
+  const members = room.members.filter((member) => member.id !== identity.id);
+  if (members.length === 0) {
+    return done(
+      { ...state, rooms: state.rooms.filter((current) => current.id !== roomId) },
+      "Você saiu e a sala fechou.",
+    );
+  }
+
+  const now = new Date().toISOString();
+  const messages = [
+    ...room.messages,
+    {
+      id: generateId("msg"),
+      authorId: "system",
+      authorName: "Taverna",
+      text: identity.name + " saiu.",
+      at: now,
+    },
+  ].slice(-MAX_ROOM_MESSAGES);
+
+  return done(
+    replaceRoom(state, { ...room, members, messages }),
+    "Você saiu de " + room.name + ".",
+  );
+}
+
+export function closeRoom(
+  state: TavernState,
+  roomId: string,
+  identity: TavernIdentity,
+): TavernResult {
+  const room = findRoom(state, roomId);
+  if (!room) return fail(state, "Essa sala não existe mais.");
+
+  const owns = isPrivateTable(room)
+    ? (room.privateFor ?? []).includes(identity.id)
+    : room.ownerId === identity.id;
+
+  if (!owns) return fail(state, "Só quem abriu a mesa pode fechá-la.");
+
+  return done(
+    { ...state, rooms: state.rooms.filter((current) => current.id !== roomId) },
+    isPrivateTable(room) ? "A mesa reservada fechou." : room.name + " fechou.",
+  );
+}
+
+export function openDirect(
+  state: TavernState,
+  identity: TavernIdentity,
+  other: TavernIdentity,
+): TavernResult {
+  if (other.id === identity.id) return fail(state, "Não dá para reservar mesa consigo mesmo.");
+
+  const now = new Date().toISOString();
+  const tableName = [identity.name, other.name]
+    .sort((a, b) => a.localeCompare(b, "pt-BR"))
+    .join(" e ");
+
+  const existing = state.rooms.find(
+    (room) =>
+      isPrivateTable(room) &&
+      (room.privateFor ?? []).includes(identity.id) &&
+      (room.privateFor ?? []).includes(other.id),
+  );
+
+  if (existing) {
+    const seated = existing.members.some((member) => member.id === identity.id);
+    const members = seated
+      ? existing.members.map((member) =>
+          member.id === identity.id ? { ...member, name: identity.name, lastSeen: now } : member,
+        )
+      : [
+          ...existing.members,
+          { id: identity.id, name: identity.name, joinedAt: now, lastSeen: now },
+        ];
+
+    return done(
+      replaceRoom(state, { ...existing, name: tableName, members }),
+      "Mesa com " + other.name + " aberta.",
+      existing.id,
+    );
+  }
+
+  const room: TavernRoom = {
+    id: generateId("room"),
+    name: tableName,
+    password: null,
+    ownerId: identity.id,
+    createdAt: now,
+    members: [{ id: identity.id, name: identity.name, joinedAt: now, lastSeen: now }],
+    privateFor: [identity.id, other.id],
+    messages: [
+      {
+        id: generateId("msg"),
+        authorId: "system",
+        authorName: "Taverna",
+        text: "Mesa reservada para " + identity.name + " e " + other.name + ".",
+        at: now,
+      },
+    ],
+  };
+
+  return done(
+    { ...state, rooms: [...state.rooms, room] },
+    "Mesa com " + other.name + " aberta.",
+    room.id,
+  );
+}
+
+export function sendMessage(
+  state: TavernState,
+  roomId: string,
+  identity: TavernIdentity,
+  text: string,
+): TavernResult {
+  const room = findRoom(state, roomId);
+  if (!room) return fail(state, "Essa sala não existe mais.");
+  if (!room.members.some((member) => member.id === identity.id)) {
+    return fail(state, "Entre na sala antes de falar.");
+  }
+
+  const clean = text.trim().slice(0, MESSAGE_MAX_LENGTH);
+  if (clean.length === 0) return fail(state, "Escreva alguma coisa antes de enviar.");
+
+  const now = new Date().toISOString();
+  const messages = [
+    ...room.messages,
+    {
+      id: generateId("msg"),
+      authorId: identity.id,
+      authorName: identity.name,
+      text: clean,
+      at: now,
+    },
+  ].slice(-MAX_ROOM_MESSAGES);
+
+  const members = room.members.map((member) =>
+    member.id === identity.id ? { ...member, name: identity.name, lastSeen: now } : member,
+  );
+
+  return done(replaceRoom(state, { ...room, members, messages }), "Mensagem enviada.", room.id);
+}
+
+export function touchMember(
+  state: TavernState,
+  roomId: string,
+  identity: TavernIdentity,
+): TavernState {
+  const room = findRoom(state, roomId);
+  if (!room) return state;
+
+  const now = new Date().toISOString();
+  return replaceRoom(state, {
+    ...room,
+    members: room.members.map((member) =>
+      member.id === identity.id ? { ...member, name: identity.name, lastSeen: now } : member,
+    ),
+  });
+}

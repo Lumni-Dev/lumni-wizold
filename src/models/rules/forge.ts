@@ -1,0 +1,35 @@
+import { ENHANCEMENT_STEP, FORGE_BASE_MS, FORGE_MS_PER_LEVEL } from "@/shared/constants/game";
+import type { Item, ItemEffect } from "../entities/item";
+
+export function enhancementCost(nextLevel: number): number {
+  return Math.max(1, Math.ceil(nextLevel / 5));
+}
+
+export function enhancedEffect(item: Item, level: number): ItemEffect {
+  if (level <= 0) return item.effect;
+
+  const forged = (value: number) => value + level + Math.round(value * ENHANCEMENT_STEP * level);
+
+  const attributes = item.effect.attributes
+    ? Object.fromEntries(
+        Object.entries(item.effect.attributes).map(([key, value]) => [key, forged(value)]),
+      )
+    : undefined;
+
+  return { ...item.effect, attributes: attributes as ItemEffect["attributes"] };
+}
+
+export function forgeDurationMs(level: number): number {
+  return FORGE_BASE_MS + Math.max(0, level) * FORGE_MS_PER_LEVEL;
+}
+
+export function enhancementOf(
+  enhancements: Record<string, number> | undefined,
+  itemId: string,
+): number {
+  return enhancements?.[itemId] ?? 0;
+}
+
+export function enhancedName(name: string, level: number): string {
+  return level > 0 ? name + " +" + level : name;
+}

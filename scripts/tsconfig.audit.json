@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "outDir": "../.sim-audit",
+    "rootDir": "../src",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "noEmitOnError": false,
+    "baseUrl": "..",
+    "paths": { "@/*": ["src/*"] }
+  },
+  "include": [
+    "../src/models/entities/**/*.ts",
+    "../src/models/data/**/*.ts",
+    "../src/models/rules/**/*.ts",
+    "../src/models/factories/**/*.ts",
+    "../src/models/repositories/game.repository.ts",
+    "../src/shared/**/*.ts",
+    "../src/controllers/*.controller.ts"
+  ]
+}
