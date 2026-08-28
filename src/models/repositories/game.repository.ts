@@ -231,6 +231,9 @@ function normalize(data: Partial<GameState>): GameState {
       const bought = finiteInt(value, 0);
       return bought >= 1 ? bought : null;
     }),
+    bazaarFinds: Array.isArray(data.bazaarFinds)
+      ? [...new Set(data.bazaarFinds.filter((id): id is string => typeof id === "string"))]
+      : [],
     arenaDuels: normalizeRecord(data.arenaDuels, (value) =>
       typeof value === "string" ? value : null,
     ),

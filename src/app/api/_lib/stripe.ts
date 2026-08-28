@@ -67,6 +67,7 @@ export async function createCheckoutSession(input: {
   metadata: Record<string, string>;
   successUrl: string;
   cancelUrl: string;
+  paymentMethods?: readonly string[];
 }): Promise<StripeSession> {
   const data: Record<string, string> = {
     mode: "payment",
@@ -77,6 +78,9 @@ export async function createCheckoutSession(input: {
     "line_items[0][price_data][unit_amount]": String(input.amountCents),
     "line_items[0][price_data][product_data][name]": input.name,
   };
+  for (const [index, method] of (input.paymentMethods ?? []).entries()) {
+    data["payment_method_types[" + index + "]"] = method;
+  }
   for (const [key, value] of Object.entries(input.metadata)) {
     data["metadata[" + key + "]"] = value;
   }

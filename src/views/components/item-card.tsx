@@ -12,6 +12,7 @@ interface ItemCardProps {
   footer?: ReactNode;
   note?: string | null;
   highlighted?: boolean;
+  fromBazaar?: boolean;
 }
 
 export function ItemCard({
@@ -21,6 +22,7 @@ export function ItemCard({
   footer,
   note,
   highlighted = false,
+  fromBazaar = false,
 }: ItemCardProps) {
   const effects = summarizeEffect(item, enhancement);
 
@@ -44,8 +46,13 @@ export function ItemCard({
       <CardBody>
         <p className="grow text-xs leading-relaxed text-ink-faint">{item.description}</p>
 
-        {effects.length > 0 || enhancement > 0 ? (
+        {effects.length > 0 || enhancement > 0 || fromBazaar ? (
           <ul className="flex flex-wrap gap-2">
+            {fromBazaar ? (
+              <li>
+                <Tag tone="light">Bazar</Tag>
+              </li>
+            ) : null}
             {enhancement > 0 ? (
               <li>
                 <Tag tone="neutral">Forjado +{enhancement}</Tag>

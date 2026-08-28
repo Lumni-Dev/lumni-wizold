@@ -24,23 +24,31 @@ export async function POST(request: Request) {
       return failure(state, item.name + " exige NV. " + item.minLevel + ".");
     }
     const origin = new URL(request.url).origin;
+    const order = {
+      name:
+        enhancedName(item.name, listing.enhancement) +
+        (quantity > 1 ? " x" + quantity : "") +
+        " · Bazar Wizold",
+      amountCents: listing.priceCents * quantity,
+      metadata: {
+        kind: "bazaar",
+        userId: context.userId,
+        characterId: context.characterId,
+        listingId: listing.id,
+        quantity: String(quantity),
+      },
+      successUrl: origin + "/bazaar?session_id={CHECKOUT_SESSION_ID}",
+      cancelUrl: origin + "/bazaar",
+    };
     try {
-      const session = await createCheckoutSession({
-        name:
-          enhancedName(item.name, listing.enhancement) +
-          (quantity > 1 ? " x" + quantity : "") +
-          " · Bazar Wizold",
-        amountCents: listing.priceCents * quantity,
-        metadata: {
-          kind: "bazaar",
-          userId: context.userId,
-          characterId: context.characterId,
-          listingId: listing.id,
-          quantity: String(quantity),
-        },
-        successUrl: origin + "/bazaar?session_id={CHECKOUT_SESSION_ID}",
-        cancelUrl: origin + "/bazaar",
-      });
+      let session;
+      try {
+        session = await createCheckoutSession({ ...order, paymentMethods: ["pix"] });
+      } catch (refusal) {
+        const reason = refusal instanceof Error ? refusal.message : String(refusal);
+        if (!reason.toLowerCase().includes("pix")) throw refusal;
+        session = await createCheckoutSession(order);
+      }
       if (!session.url) return failure(state, "O Stripe não abriu o checkout. Tente de novo.");
       return success(state, "", { url: session.url });
     } catch (error) {

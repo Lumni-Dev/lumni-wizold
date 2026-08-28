@@ -96,6 +96,10 @@ export async function loadGame(
     "select listing_id, quantity from bazaar_purchases where character_id = $1",
     [characterId],
   );
+  const finds = await client.query(
+    "select item_id from bazaar_finds where character_id = $1 order by item_id",
+    [characterId],
+  );
   const duels = await client.query(
     "select opponent_id, dueled_at from arena_duels where character_id = $1",
     [characterId],
@@ -157,6 +161,7 @@ export async function loadGame(
     bazaarPurchases: Object.fromEntries(
       purchases.rows.map((entry) => [entry.listing_id, int(entry.quantity)]),
     ),
+    bazaarFinds: finds.rows.map((entry) => String(entry.item_id)),
     arenaDuels: Object.fromEntries(
       duels.rows.map((entry) => [entry.opponent_id, iso(entry.dueled_at)]),
     ),
@@ -347,6 +352,15 @@ async function savePieces(
         { name: "quantity", cast: "integer" },
       ],
       Object.entries(after.bazaarPurchases).map(([listing, quantity]) => [listing, quantity]),
+    );
+  }
+  if (after.bazaarFinds !== before.bazaarFinds) {
+    await replace(
+      client,
+      "bazaar_finds",
+      characterId,
+      [{ name: "item_id", cast: "text" }],
+      after.bazaarFinds.map((itemId) => [itemId]),
     );
   }
   if (after.wallet !== before.wallet) await saveWallet(client, characterId, after);

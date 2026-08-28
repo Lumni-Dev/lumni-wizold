@@ -1004,6 +1004,10 @@ sec("bazar");
     "forja maior viaja com a peça",
     bought.ok && bought.state.enhancements["gold-claw"] === offer.enhancement,
   );
+  ok(
+    "compra grava a insígnia do bazar",
+    bought.ok && bought.state.bazaarFinds.includes("gold-claw"),
+  );
   ok("além do anúncio recusa", bazaarCtrl.purchaseListing(rich, offer, 3).ok === false);
   const low = baseState({ level: 1 });
   ok(

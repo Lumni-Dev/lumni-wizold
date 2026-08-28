@@ -16,6 +16,7 @@ export interface GameState {
   enhancements: Record<string, number>;
   bazaarListings: BazaarListing[];
   bazaarPurchases: Record<string, number>;
+  bazaarFinds: string[];
   arenaDuels: Record<string, string>;
   pack: PackMate[];
   wallet: Wallet;
@@ -34,6 +35,7 @@ export function initialState(): GameState {
     enhancements: {},
     bazaarListings: [],
     bazaarPurchases: {},
+    bazaarFinds: [],
     arenaDuels: {},
     pack: [],
     wallet: initialWallet(),

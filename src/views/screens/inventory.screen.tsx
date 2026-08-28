@@ -174,6 +174,7 @@ export function InventoryScreen() {
                 item={item}
                 quantity={quantity}
                 enhancement={enhancement}
+                fromBazaar={state.bazaarFinds.includes(item.id)}
                 note={levelTooLow ? "Requer NV. " + item.minLevel : null}
                 footer={
                   <>

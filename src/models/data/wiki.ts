@@ -369,6 +369,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "Anunciar tira as peças da mochila; remover o anúncio devolve tudo.",
       "Quem compra é gente de verdade: o anúncio fica no quadro até outro caçador pagar por ele, e o preço é você quem decide.",
       "A compra é paga no checkout do Stripe, com dinheiro de verdade; assim que o pagamento confirma, o item entra na mochila e o vendedor recebe no Alforje, já sem a taxa da casa.",
+      "O que veio do bazar carrega a insígnia Bazar na mochila: uma marca de origem, sem regra presa a ela, e a peça vende no mercado ou se descarta como qualquer outra.",
       "Ninguém compra o próprio anúncio.",
       "A casa fica com " +
         Math.round(BAZAAR_FEE_RATIO * 100) +

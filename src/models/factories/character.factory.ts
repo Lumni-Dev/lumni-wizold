@@ -65,6 +65,7 @@ export function createRun(name: string, gender: Gender): GameState {
     enhancements: {},
     bazaarListings: [],
     bazaarPurchases: {},
+    bazaarFinds: [],
     arenaDuels: {},
     pack: [],
     automation: noAutomation(),

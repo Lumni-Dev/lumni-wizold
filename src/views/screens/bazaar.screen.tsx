@@ -332,7 +332,7 @@ export function BazaarScreen() {
                 variant="primary"
                 onClick={() => purchaseListing(buying.listing.id, buyQuantity)}
               >
-                Pagar {formatReais(buyTotal)} no Stripe
+                Pagar {formatReais(buyTotal)}
               </Button>
             </div>
           ) : undefined
@@ -364,7 +364,8 @@ export function BazaarScreen() {
 
             <p className="px-4 pb-4 text-xs leading-relaxed text-ink-faint">
               O pagamento abre no checkout do Stripe. Assim que ele confirma, o item entra na sua
-              mochila e o vendedor recebe no Alforje, já sem a taxa da casa.
+              mochila com a insígnia do bazar e o vendedor recebe no Alforje, já sem a taxa da
+              casa.
             </p>
           </>
         ) : null}

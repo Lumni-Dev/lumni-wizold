@@ -185,6 +185,9 @@ export function purchaseListing(
     ...state,
     inventory: addToInventory(state.inventory, listing.itemId, quantity),
     bazaarPurchases: { ...state.bazaarPurchases, [listing.id]: bought + quantity },
+    bazaarFinds: state.bazaarFinds.includes(listing.itemId)
+      ? state.bazaarFinds
+      : [...state.bazaarFinds, listing.itemId],
     enhancements,
   };
 
