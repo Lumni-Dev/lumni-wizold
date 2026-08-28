@@ -83,6 +83,7 @@ interface GameContextValue {
   purchaseListing: (listingId: string, quantity: number) => Promise<boolean>;
   requestWithdraw: (pixKey: string, fullName: string, cpf: string) => Promise<boolean>;
   buyPack: (packId: string) => Promise<boolean>;
+  confirmPayment: (sessionId: string) => Promise<boolean>;
   mine: (oreId: string) => Promise<boolean>;
   enhance: (slot: EquipmentSlot) => Promise<boolean>;
   adoptPet: (gender: PetGender, name: string) => Promise<void>;
@@ -522,14 +523,17 @@ export function GameProvider({ children }: { children: ReactNode }) {
         await act("POST", "/api/bazaar/cancel", { listingId }, "Bazar", () => playSound("ui"));
       },
       purchaseListing: async (listingId, quantity) => {
-        const answer = await act(
+        const answer = await act<{ url: string }>(
           "POST",
-          "/api/bazaar/purchase",
+          "/api/bazaar/checkout",
           { listingId, quantity },
           "Bazar",
-          () => playSound("buy"),
         );
-        return answer.ok;
+        if (answer.ok && answer.data?.url) {
+          window.location.assign(answer.data.url);
+          return true;
+        }
+        return false;
       },
       requestWithdraw: async (pixKey, fullName, cpf) => {
         const answer = await act(
@@ -542,7 +546,15 @@ export function GameProvider({ children }: { children: ReactNode }) {
         return answer.ok;
       },
       buyPack: async (packId) => {
-        const answer = await act("POST", "/api/store/purchase", { packId }, "Loja", () =>
+        const answer = await act<{ url: string }>("POST", "/api/store/checkout", { packId }, "Loja");
+        if (answer.ok && answer.data?.url) {
+          window.location.assign(answer.data.url);
+          return true;
+        }
+        return false;
+      },
+      confirmPayment: async (sessionId) => {
+        const answer = await act("POST", "/api/stripe/confirm", { sessionId }, "Pagamento", () =>
           playSound("buy"),
         );
         return answer.ok;

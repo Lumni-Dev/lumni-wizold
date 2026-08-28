@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useGame } from "@/controllers/game.context";
 import { listPacks } from "@/controllers/store.controller";
 import { formatNumber, formatReais, formatBronze } from "@/shared/utils/format";
@@ -9,20 +9,23 @@ import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
 import { PackIcon } from "../components/pack-icon";
 import { DataRow } from "../components/data-row";
 import { List } from "../components/list";
-import { PaymentModal } from "../components/payment-modal";
 import { Panel } from "../components/panel";
 import { Tag } from "../components/tag";
 import { PageHeader } from "../layout/page-header";
 
 export function StoreScreen() {
-  const { state, character, buyPack } = useGame();
-  const [buying, setBuying] = useState<string | null>(null);
+  const { state, character, buyPack, confirmPayment } = useGame();
 
   const offers = useMemo(() => listPacks(state), [state]);
 
-  if (!character) return null;
+  useEffect(() => {
+    const sessionId = new URLSearchParams(window.location.search).get("session_id");
+    if (!sessionId) return;
+    window.history.replaceState(null, "", "/store");
+    void confirmPayment(sessionId);
+  }, [confirmPayment]);
 
-  const chosen = buying ? (offers.find((offer) => offer.pack.id === buying) ?? null) : null;
+  if (!character) return null;
 
   return (
     <>
@@ -34,7 +37,7 @@ export function StoreScreen() {
 
       <Panel
         title="Como o preço é feito"
-        description="O mesmo Pix do bazar, e a mesma conta da economia."
+        description="Pagamento pelo Stripe, e a mesma conta da economia."
       >
         <p className="text-xs leading-relaxed text-ink-soft">
           Cada pacote vale um número de caçadas da sua faixa, não um número solto de bronze. Uma
@@ -77,46 +80,15 @@ export function StoreScreen() {
               {pack.highlight ? (
                 <Tag tone="neutral">Melhor troca</Tag>
               ) : (
-                <span className="text-[11px] text-ink-faint">Pix de demonstração</span>
+                <span className="text-[11px] text-ink-faint">Checkout do Stripe</span>
               )}
-              <Button variant="primary" onClick={() => setBuying(pack.id)}>
+              <Button variant="primary" onClick={() => buyPack(pack.id)}>
                 Comprar
               </Button>
             </CardFooter>
           </Card>
         ))}
       </div>
-
-      <PaymentModal
-        open={chosen !== null}
-        title={chosen ? chosen.pack.name : ""}
-        mode="charge"
-        amountCents={chosen ? chosen.pack.priceCents : 0}
-        amountLabel="Total a pagar"
-        qrValue={chosen ? chosen.pack.id + ":" + chosen.bronze + ":" + chosen.pack.priceCents : ""}
-        confirmLabel={chosen ? "Pagar " + formatReais(chosen.pack.priceCents) : "Pagar"}
-        note="Pix de demonstração: o QR não vale pagamento. Quando a API entrar, é ele que cobra. Por enquanto, confirmar abaixo simula a aprovação e credita o bronze, e nada do que você digitar é guardado."
-        detail={
-          chosen ? (
-            <div className="flex items-center gap-3 border-b border-edge p-4">
-              <PackIcon pack={chosen.pack} />
-              <div className="min-w-0">
-                <p className="truncate text-sm text-ink">{formatBronze(chosen.bronze)}</p>
-                <p className="truncate text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                  {formatNumber(chosen.pack.hunts)} caçadas da sua faixa
-                </p>
-              </div>
-            </div>
-          ) : null
-        }
-        onClose={() => setBuying(null)}
-        onConfirm={() => {
-          if (!chosen) return;
-          return buyPack(chosen.pack.id).then((ok) => {
-            if (ok) setBuying(null);
-          });
-        }}
-      />
     </>
   );
 }

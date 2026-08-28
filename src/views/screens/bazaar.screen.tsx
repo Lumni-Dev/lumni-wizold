@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useGame } from "@/controllers/game.context";
 import { listBoard, listSellable } from "@/controllers/bazaar.controller";
 import {
@@ -24,7 +24,6 @@ import { Modal } from "../components/modal";
 import { PaymentModal } from "../components/payment-modal";
 import { Pagination } from "../components/pagination";
 import { Panel } from "../components/panel";
-import { PixQr } from "../components/pix-qr";
 import { Tag } from "../components/tag";
 import { PageHeader } from "../layout/page-header";
 
@@ -34,12 +33,25 @@ const FEE_LABEL = Math.round(BAZAAR_FEE_RATIO * 100) + "%";
 
 type Flow =
   | { kind: "announce"; itemId: string | null; quantity: string; price: string }
-  | { kind: "buy"; listingId: string; quantity: string; step: "amount" | "pix" }
+  | { kind: "buy"; listingId: string; quantity: string }
   | { kind: "withdraw"; pixKey: string };
 
 export function BazaarScreen() {
-  const { state, character, announceListing, cancelListing, purchaseListing, requestWithdraw } =
-    useGame();
+  const {
+    state,
+    character,
+    announceListing,
+    cancelListing,
+    purchaseListing,
+    requestWithdraw,
+    confirmPayment,
+  } = useGame();
+  useEffect(() => {
+    const sessionId = new URLSearchParams(window.location.search).get("session_id");
+    if (!sessionId) return;
+    window.history.replaceState(null, "", "/bazaar");
+    void confirmPayment(sessionId);
+  }, [confirmPayment]);
   const [page, setPage] = useState(1);
   const [flow, setFlow] = useState<Flow | null>(null);
   const [cancelling, setCancelling] = useState<string | null>(null);
@@ -172,7 +184,6 @@ export function BazaarScreen() {
                         kind: "buy",
                         listingId: entry.listing.id,
                         quantity: "1",
-                        step: "amount",
                       })
                     }
                   >
@@ -254,8 +265,8 @@ export function BazaarScreen() {
               />
 
               <p className="text-xs leading-relaxed text-ink-faint">
-                A plataforma fica com {FEE_LABEL} da transação. Preço até a sugestão vende em
-                minutos; até o dobro dela, em algumas horas; acima disso, ninguém morde.
+                A plataforma fica com {FEE_LABEL} da transação. O anúncio fica no quadro até outro
+                caçador pagar por ele: o preço é seu, e a espera também.
               </p>
 
               {askedCents !== null && askedCents >= MIN_LISTING_CENTS ? (
@@ -313,32 +324,17 @@ export function BazaarScreen() {
         onClose={() => setFlow(null)}
         footer={
           flow?.kind === "buy" && buying ? (
-            flow.step === "amount" ? (
-              <div className="flex items-center justify-end gap-2">
-                <Button variant="ghost" onClick={() => setFlow(null)}>
-                  Cancelar
-                </Button>
-                <Button variant="primary" onClick={() => setFlow({ ...flow, step: "pix" })}>
-                  Gerar Pix de {formatReais(buyTotal)}
-                </Button>
-              </div>
-            ) : (
-              <div className="flex items-center justify-end gap-2">
-                <Button variant="ghost" onClick={() => setFlow({ ...flow, step: "amount" })}>
-                  Voltar
-                </Button>
-                <Button
-                  variant="primary"
-                  onClick={() =>
-                    purchaseListing(buying.listing.id, buyQuantity).then((ok) => {
-                      if (ok) setFlow(null);
-                    })
-                  }
-                >
-                  Pagar {formatReais(buyTotal)} (simulação)
-                </Button>
-              </div>
-            )
+            <div className="flex items-center justify-end gap-2">
+              <Button variant="ghost" onClick={() => setFlow(null)}>
+                Cancelar
+              </Button>
+              <Button
+                variant="primary"
+                onClick={() => purchaseListing(buying.listing.id, buyQuantity)}
+              >
+                Pagar {formatReais(buyTotal)} no Stripe
+              </Button>
+            </div>
           ) : undefined
         }
       >
@@ -352,30 +348,24 @@ export function BazaarScreen() {
               />
             </div>
 
-            {flow.step === "amount" ? (
-              buying.available > 1 ? (
-                <div className="p-4">
-                  <Field
-                    compact
-                    numeric
-                    label="Quantidade"
-                    hint={"Disponíveis: " + formatNumber(buying.available) + "."}
-                    className="font-mono"
-                    value={flow.quantity}
-                    onChange={(event) => setFlow({ ...flow, quantity: event.target.value })}
-                  />
-                </div>
-              ) : null
-            ) : (
-              <div className="space-y-3 p-4">
-                <PixQr value={buying.listing.id + ":" + buyQuantity + ":" + buyTotal} />
-                <p className="text-center font-mono text-sm text-ink">{formatReais(buyTotal)}</p>
-                <p className="text-xs leading-relaxed text-ink-faint">
-                  Pix de demonstração: o QR não vale pagamento. Quando a API entrar, é ele que
-                  cobra. Por enquanto, confirmar abaixo simula a aprovação e entrega o item.
-                </p>
+            {buying.available > 1 ? (
+              <div className="p-4">
+                <Field
+                  compact
+                  numeric
+                  label="Quantidade"
+                  hint={"Disponíveis: " + formatNumber(buying.available) + "."}
+                  className="font-mono"
+                  value={flow.quantity}
+                  onChange={(event) => setFlow({ ...flow, quantity: event.target.value })}
+                />
               </div>
-            )}
+            ) : null}
+
+            <p className="px-4 pb-4 text-xs leading-relaxed text-ink-faint">
+              O pagamento abre no checkout do Stripe. Assim que ele confirma, o item entra na sua
+              mochila e o vendedor recebe no Alforje, já sem a taxa da casa.
+            </p>
           </>
         ) : null}
       </Modal>

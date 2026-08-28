@@ -117,6 +117,18 @@ check(
   "plantel real lista o caçador",
   Array.isArray(roster?.hunters) && roster.hunters.some((hunter) => hunter.name === "Fumaca"),
 );
+const checkout = await call("POST", "/api/store/checkout", { packId: "one-pouch" });
+check(
+  "checkout do Stripe abre",
+  String(checkout.payload?.data?.url ?? "").startsWith("https://checkout.stripe.com"),
+  checkout.payload?.message,
+);
+const hook = await fetch(BASE + "/api/stripe/webhook", {
+  method: "POST",
+  headers: { "content-type": "application/json" },
+  body: "{}",
+});
+check("webhook recusa sem assinatura", hook.status === 400);
 const user = (await rows("select id from users where email = $1", [EMAIL]))[0];
 check("usuário na tabela", Boolean(user));
 const character = (await rows("select * from characters where user_id = $1", [user?.id]))[0];

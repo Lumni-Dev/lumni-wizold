@@ -175,13 +175,6 @@ export function purchaseListing(
   }
 
   const total = listing.priceCents * quantity;
-  if (state.wallet.cents < total) {
-    return failure(
-      state,
-      "O Alforje não cobre " + formatReais(total) + ": venda algo ou carregue-o antes.",
-    );
-  }
-
   const carried = Math.min(MAX_ENHANCEMENT, listing.enhancement);
   const current = enhancementOf(state.enhancements, listing.itemId);
   const enhancements =
@@ -193,15 +186,14 @@ export function purchaseListing(
     inventory: addToInventory(state.inventory, listing.itemId, quantity),
     bazaarPurchases: { ...state.bazaarPurchases, [listing.id]: bought + quantity },
     enhancements,
-    wallet: { cents: state.wallet.cents - total },
   };
 
   const message =
     enhancedName(item.name, listing.enhancement) +
     (quantity > 1 ? " x" + quantity : "") +
-    " chegou do bazar por " +
+    " chegou do bazar: " +
     formatReais(total) +
-    ", pago pelo Alforje.";
+    " pagos no checkout.";
 
   return success(addLog(next, "market", message), message, { totalCents: total });
 }

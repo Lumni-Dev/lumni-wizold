@@ -368,7 +368,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "O que o mercado vende igual não entra: peça sem forja fica de fora.",
       "Anunciar tira as peças da mochila; remover o anúncio devolve tudo.",
       "Quem compra é gente de verdade: o anúncio fica no quadro até outro caçador pagar por ele, e o preço é você quem decide.",
-      "A compra sai do Alforje do comprador na hora, e o vendedor recebe na mesma hora, já sem a taxa da casa.",
+      "A compra é paga no checkout do Stripe, com dinheiro de verdade; assim que o pagamento confirma, o item entra na mochila e o vendedor recebe no Alforje, já sem a taxa da casa.",
       "Ninguém compra o próprio anúncio.",
       "A casa fica com " +
         Math.round(BAZAAR_FEE_RATIO * 100) +
@@ -394,7 +394,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       ),
       "Subir de faixa aumenta o que o mesmo pacote entrega, então comprar cedo nunca vira atalho: o que está à venda é tempo, sempre o mesmo tempo.",
       "A loja não vende nível, atributo nem equipamento: experiência só a caça dá, e ponto de atributo só o treino dá.",
-      "O pagamento é o mesmo Pix do bazar, e nesta versão ele é de demonstração: o QR não cobra nada.",
+      "O pagamento abre no checkout do Stripe e o bronze cai na conta assim que ele confirma.",
     ],
   },
   {
