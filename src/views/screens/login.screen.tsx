@@ -53,7 +53,6 @@ export function LoginScreen() {
   const router = useRouter();
   const [birth, setBirth] = useState(EMPTY_BIRTH);
   const [email, setEmail] = useState("");
-  const [entering, setEntering] = useState(false);
 
   const age = ageOf(birth);
   const complete = isRealBirth(birth);
@@ -80,10 +79,7 @@ export function LoginScreen() {
   }, [ready, character, router]);
 
   async function submit() {
-    if (entering) return;
-    setEntering(true);
     const answer = await enter(email.trim(), birth);
-    setEntering(false);
     if (!answer) return;
 
     playSound("door");
@@ -163,10 +159,10 @@ export function LoginScreen() {
               variant="primary"
               size="medium"
               fullWidth
-              disabled={!oldEnough || !emailFine || entering}
-              onClick={() => void submit()}
+              disabled={!oldEnough || !emailFine}
+              onClick={submit}
             >
-              {entering ? "Abrindo a noite..." : "Entrar com Google"}
+              Entrar com Google
             </Button>
 
             <p className="text-xs leading-relaxed text-ink-faint">

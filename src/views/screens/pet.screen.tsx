@@ -387,12 +387,12 @@ export function PetScreen() {
         detail={pet.name + " → " + newPetName.trim() + " · " + formatBronze(PET_RENAME_PRICE)}
         confirmLabel="Renomear"
         onCancel={() => setConfirmingRename(false)}
-        onConfirm={() => {
-          void renamePet(newPetName).then((ok) => {
+        onConfirm={() =>
+          renamePet(newPetName).then((ok) => {
             if (ok) setNewPetName("");
-          });
-          setConfirmingRename(false);
-        }}
+            setConfirmingRename(false);
+          })
+        }
       />
 
       <ConfirmDialog

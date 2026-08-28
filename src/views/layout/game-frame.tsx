@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
 import { useGame } from "@/controllers/game.context";
+import { Spinner } from "../components/spinner";
 import { GameFooter } from "./game-footer";
 import { Toast } from "./toast";
 import { MobileNavigation, Sidebar } from "./sidebar";
@@ -10,8 +11,9 @@ import { ResourceBar } from "./resource-bar";
 
 function Loading() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <p className="heading text-[11px] text-ink-faint">Abrindo a noite...</p>
+    <div className="flex min-h-screen flex-col items-center justify-center gap-3 text-ink-faint">
+      <Spinner size="medium" />
+      <p className="heading text-[11px]">Abrindo a noite...</p>
     </div>
   );
 }

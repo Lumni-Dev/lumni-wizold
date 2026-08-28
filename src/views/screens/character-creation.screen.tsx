@@ -21,6 +21,7 @@ export function CharacterCreationScreen() {
   const [name, setName] = useState("");
   const [gender, setGender] = useState<Gender | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
     if (ready && character) router.replace("/character");
@@ -41,8 +42,13 @@ export function CharacterCreationScreen() {
     }
 
     setError(null);
+    setCreating(true);
     void startRun(name, gender).then((ok) => {
-      if (ok) router.push("/character");
+      if (ok) {
+        router.push("/character");
+        return;
+      }
+      setCreating(false);
     });
   }
 
@@ -132,6 +138,7 @@ export function CharacterCreationScreen() {
             variant="primary"
             size="medium"
             fullWidth
+            busy={creating}
             disabled={!gender || name.trim().length === 0}
           >
             Começar a primeira noite

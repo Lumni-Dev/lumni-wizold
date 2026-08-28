@@ -39,7 +39,7 @@ export function PaymentModal({
   confirmLabel: string;
   qrValue?: string;
   onClose: () => void;
-  onConfirm: (payer: PayerIdentity) => void;
+  onConfirm: (payer: PayerIdentity) => void | Promise<unknown>;
 }) {
   const [payer, setPayer] = useState<PayerIdentity>(EMPTY);
 
@@ -49,8 +49,10 @@ export function PaymentModal({
   };
 
   const confirm = () => {
+    const outcome = onConfirm(payer);
+    if (outcome instanceof Promise) return outcome.finally(() => setPayer(EMPTY));
     setPayer(EMPTY);
-    onConfirm(payer);
+    return outcome;
   };
 
   const needsPix = mode === "payout";

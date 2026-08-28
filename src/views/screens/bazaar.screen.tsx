@@ -207,7 +207,7 @@ export function BazaarScreen() {
                 disabled={askedCents === null || askedCents < MIN_LISTING_CENTS}
                 onClick={() => {
                   if (askedCents === null) return;
-                  void announceListing(announcing.item.id, askedQuantity, askedCents).then(
+                  return announceListing(announcing.item.id, askedQuantity, askedCents).then(
                     (ok) => {
                       if (ok) setFlow(null);
                     },
@@ -329,11 +329,11 @@ export function BazaarScreen() {
                 </Button>
                 <Button
                   variant="primary"
-                  onClick={() => {
-                    void purchaseListing(buying.listing.id, buyQuantity).then((ok) => {
+                  onClick={() =>
+                    purchaseListing(buying.listing.id, buyQuantity).then((ok) => {
                       if (ok) setFlow(null);
-                    });
-                  }}
+                    })
+                  }
                 >
                   Pagar {formatReais(buyTotal)} (simulação)
                 </Button>
@@ -389,11 +389,11 @@ export function BazaarScreen() {
         confirmLabel="Solicitar"
         note="O saque é de demonstração até a API de pagamento entrar: nada sai daqui por enquanto, e nem o CPF nem o nome são guardados."
         onClose={() => setFlow(null)}
-        onConfirm={(payer) => {
-          void requestWithdraw(payer.pixKey, payer.name, payer.cpf).then((ok) => {
+        onConfirm={(payer) =>
+          requestWithdraw(payer.pixKey, payer.name, payer.cpf).then((ok) => {
             if (ok) setFlow(null);
-          });
-        }}
+          })
+        }
       />
 
       <ConfirmDialog

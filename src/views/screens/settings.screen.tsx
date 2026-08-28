@@ -215,12 +215,12 @@ export function SettingsScreen() {
         detail={character.name + " → " + newName.trim() + " · " + formatBronze(cost)}
         confirmLabel="Alterar"
         onCancel={() => setConfirmingRename(false)}
-        onConfirm={() => {
-          void renameCharacter(newName).then((ok) => {
+        onConfirm={() =>
+          renameCharacter(newName).then((ok) => {
             if (ok) setNewName("");
-          });
-          setConfirmingRename(false);
-        }}
+            setConfirmingRename(false);
+          })
+        }
       />
 
       <ConfirmDialog

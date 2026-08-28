@@ -152,7 +152,7 @@ export function TavernScreen() {
 
   function submitNick(event: FormEvent) {
     event.preventDefault();
-    void addToPackByNick(nick).then((ok) => {
+    return addToPackByNick(nick).then((ok) => {
       if (ok) setNick("");
     });
   }
@@ -546,7 +546,7 @@ export function TavernScreen() {
         onCancel={() => setClosingRoomId(null)}
         onConfirm={() => {
           if (closingRoomId) {
-            void closeRoom(closingRoomId).then((result) => {
+            return closeRoom(closingRoomId).then((result) => {
               if (result) notify(result.message, result.ok, "Taverna");
               if (result?.ok) {
                 playSound("door");
