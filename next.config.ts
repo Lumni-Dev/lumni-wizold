@@ -8,6 +8,9 @@ const nextConfig: NextConfig = {
    * machine, and they only affect development.
    */
   allowedDevOrigins: ["127.0.0.1", "192.168.15.6", "*.local"],
+
+  // pg carries optional native requires the bundler must not chase.
+  serverExternalPackages: ["pg"],
 };
 
 export default nextConfig;
