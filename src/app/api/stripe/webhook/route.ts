@@ -27,6 +27,7 @@ export async function POST(request: Request) {
     payment_status: String(raw.payment_status ?? ""),
     payment_intent: typeof raw.payment_intent === "string" ? raw.payment_intent : null,
     amount_total: typeof raw.amount_total === "number" ? raw.amount_total : null,
+    currency: String(raw.currency ?? ""),
     metadata: (raw.metadata ?? {}) as Record<string, string>,
   };
   try {

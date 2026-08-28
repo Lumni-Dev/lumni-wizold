@@ -75,38 +75,38 @@ export function LandingScreen() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <main className="mx-auto w-full max-w-5xl space-y-16 px-4 py-16 md:px-8 md:py-24">
-        <header className="space-y-6 text-center">
-          <div className="space-y-2">
-            <p className="font-logo text-lg uppercase tracking-[0.22em] text-highlight md:text-2xl">
-              {GAME_NAME}
-            </p>
-            <p className="text-[11px] uppercase tracking-[0.24em] text-ink-faint">{GAME_TAGLINE}</p>
-          </div>
-
-          <p className="mx-auto max-w-xl text-sm leading-relaxed text-ink-soft">
-            Dois se encontraram numa noite de lua cheia e desceram a serra sendo outra coisa. A
-            matilha que eles começaram ainda caça, e a lua que decide o preço de cada noite é a que
-            está no céu agora, lá fora.
+      <header className="flex min-h-screen flex-col items-center justify-center gap-6 px-4 text-center">
+        <div className="space-y-2">
+          <p className="font-logo text-lg uppercase tracking-[0.22em] text-highlight md:text-2xl">
+            {GAME_NAME}
           </p>
+          <p className="text-[11px] uppercase tracking-[0.24em] text-ink-faint">{GAME_TAGLINE}</p>
+        </div>
 
-          <div className="flex flex-col items-center gap-3">
-            {hasRun ? (
-              <>
-                <PlayButton href="/character" label={"Continuar com " + character.name} />
-                <Link
-                  href="/create"
-                  className="text-[11px] uppercase tracking-[0.16em] text-ink-faint transition-colors hover:text-ink"
-                >
-                  Começar outra partida
-                </Link>
-              </>
-            ) : (
-              <PlayButton href="/login" label="Jogar grátis" />
-            )}
-          </div>
-        </header>
+        <p className="mx-auto max-w-xl text-sm leading-relaxed text-ink-soft">
+          Dois se encontraram numa noite de lua cheia e desceram a serra sendo outra coisa. A
+          matilha que eles começaram ainda caça, e a lua que decide o preço de cada noite é a que
+          está no céu agora, lá fora.
+        </p>
 
+        <div className="flex flex-col items-center gap-3">
+          {hasRun ? (
+            <>
+              <PlayButton href="/character" label={"Continuar com " + character.name} />
+              <Link
+                href="/create"
+                className="text-[11px] uppercase tracking-[0.16em] text-ink-faint transition-colors hover:text-ink"
+              >
+                Começar outra partida
+              </Link>
+            </>
+          ) : (
+            <PlayButton href="/login" label="Jogar grátis" />
+          )}
+        </div>
+      </header>
+
+      <main className="mx-auto w-full max-w-5xl space-y-16 px-4 py-16 md:px-8 md:py-24">
         <section className="relative rounded-lg border border-edge bg-surface/80 p-6 md:p-10">
           <div className="space-y-8">
             <div className="grid gap-6 sm:grid-cols-2">

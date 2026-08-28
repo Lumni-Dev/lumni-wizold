@@ -55,7 +55,7 @@ export function formatDay(iso: string): string {
     pad(date.getMonth() + 1) +
     "/" +
     date.getFullYear() +
-    " " +
+    " - " +
     formatTime(iso)
   );
 }

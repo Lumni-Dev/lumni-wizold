@@ -47,6 +47,7 @@ export interface StripeSession {
   payment_status: string;
   payment_intent: string | null;
   amount_total: number | null;
+  currency: string;
   metadata: Record<string, string>;
 }
 
@@ -57,6 +58,7 @@ function asSession(body: Record<string, unknown>): StripeSession {
     payment_status: String(body.payment_status ?? ""),
     payment_intent: typeof body.payment_intent === "string" ? body.payment_intent : null,
     amount_total: typeof body.amount_total === "number" ? body.amount_total : null,
+    currency: String(body.currency ?? ""),
     metadata: (body.metadata ?? {}) as Record<string, string>,
   };
 }

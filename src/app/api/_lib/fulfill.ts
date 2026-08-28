@@ -2,6 +2,7 @@ import type { PoolClient } from "pg";
 import { generateId } from "@/shared/utils/id";
 import { formatReais } from "@/shared/utils/format";
 import { findItem } from "@/models/data/items";
+import { findPack } from "@/models/data/store-packs";
 import { sellerNet } from "@/models/rules/bazaar";
 import { enhancedName } from "@/models/rules/forge";
 import * as bazaarController from "@/controllers/bazaar.controller";
@@ -28,6 +29,25 @@ async function claim(client: PoolClient, session: StripeSession): Promise<boolea
   return (claimed.rowCount ?? 0) > 0;
 }
 
+async function returnMoney(
+  client: PoolClient,
+  session: StripeSession,
+  characterId: string | null,
+): Promise<string> {
+  if (session.payment_intent && (await refundPayment(session.payment_intent))) {
+    return "valor devolvido";
+  }
+  if (characterId && session.amount_total && session.amount_total > 0) {
+    await client.query("update wallets set cents = cents + $2 where character_id = $1", [
+      characterId,
+      session.amount_total,
+    ]);
+    await recordWalletMovement(client, characterId, session.amount_total, "adjustment", session.id);
+    return "valor creditado no Alforje";
+  }
+  return "procure o suporte para a devolução";
+}
+
 export async function fulfillSession(
   client: PoolClient,
   session: StripeSession,
@@ -51,15 +71,25 @@ export async function fulfillSession(
     return { ok: true, message: "Pagamento já creditado." };
   }
 
+  if (session.currency !== "brl") {
+    const returned = await returnMoney(client, session, characterId);
+    return { ok: false, message: "Pagamento em moeda estranha ao jogo: " + returned + "." };
+  }
+
   if (session.metadata.kind === "store") {
-    const result = storeController.purchasePack(loaded.state, session.metadata.packId ?? "");
+    const pack = findPack(session.metadata.packId ?? "");
+    if (!pack || session.amount_total !== pack.priceCents) {
+      const returned = await returnMoney(client, session, characterId);
+      return { ok: false, message: "Pagamento não bate com o pacote: " + returned + "." };
+    }
+    const result = storeController.purchasePack(loaded.state, pack.id);
     if (!result.ok || !result.data) {
-      if (session.payment_intent) await refundPayment(session.payment_intent);
+      const returned = await returnMoney(client, session, characterId);
       await client.query(
         "update store_purchases set status = 'refunded', settled_at = now() where id = $1",
         [session.id],
       );
-      return { ok: false, message: result.message };
+      return { ok: false, message: result.message + " " + returned + "." };
     }
     await saveGame(client, characterId, loaded.state, result.state);
     await client.query(
@@ -67,7 +97,7 @@ export async function fulfillSession(
        values ($1, $2, $3, $4, $5, 'approved', now())
        on conflict (id) do update set
          bronze_granted = excluded.bronze_granted, status = 'approved', settled_at = now()`,
-      [session.id, characterId, result.data.pack.id, result.data.pack.priceCents, result.data.bronze],
+      [session.id, characterId, pack.id, pack.priceCents, result.data.bronze],
     );
     return { ok: true, message: result.message };
   }
@@ -76,16 +106,20 @@ export async function fulfillSession(
     const quantity = Math.max(1, Math.min(999, Number(session.metadata.quantity ?? 1) || 1));
     const listing = await lockListing(client, session.metadata.listingId ?? "");
     if (!listing || listing.quantity < quantity) {
-      if (session.payment_intent) await refundPayment(session.payment_intent);
+      const returned = await returnMoney(client, session, characterId);
       return {
         ok: false,
-        message: "O anúncio saiu do quadro antes do pagamento chegar: valor devolvido.",
+        message: "O anúncio saiu do quadro antes do pagamento chegar: " + returned + ".",
       };
+    }
+    if (session.amount_total !== listing.priceCents * quantity) {
+      const returned = await returnMoney(client, session, characterId);
+      return { ok: false, message: "Pagamento não bate com o anúncio: " + returned + "." };
     }
     const result = bazaarController.purchaseListing(loaded.state, listing, quantity);
     if (!result.ok || !result.data) {
-      if (session.payment_intent) await refundPayment(session.payment_intent);
-      return { ok: false, message: result.message + " Valor devolvido." };
+      const returned = await returnMoney(client, session, characterId);
+      return { ok: false, message: result.message + " " + returned + "." };
     }
     const total = result.data.totalCents;
     const net = sellerNet(total);
