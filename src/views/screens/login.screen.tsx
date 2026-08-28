@@ -6,12 +6,47 @@ import { useEffect, useState } from "react";
 import { useGame } from "@/controllers/game.context";
 import { playSound } from "@/controllers/sound";
 import { GAME_NAME, GAME_TAGLINE, MIN_AGE } from "@/shared/constants/game";
-import { ageOf, digitsOnly, EMPTY_BIRTH, isRealBirth } from "@/shared/utils/birth";
+import { ageOf, EMPTY_BIRTH, isRealBirth } from "@/shared/utils/birth";
 import { Button } from "../components/button";
 import { CornerAccents } from "../components/corner-accents";
 import { Field } from "../components/field";
+import { Select, type SelectOption } from "../components/select";
 
 const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const MONTHS = [
+  "Janeiro",
+  "Fevereiro",
+  "Março",
+  "Abril",
+  "Maio",
+  "Junho",
+  "Julho",
+  "Agosto",
+  "Setembro",
+  "Outubro",
+  "Novembro",
+  "Dezembro",
+];
+
+const two = (value: number) => String(value).padStart(2, "0");
+
+const MONTH_OPTIONS: SelectOption[] = MONTHS.map((name, index) => ({
+  value: two(index + 1),
+  label: name,
+}));
+
+const THIS_YEAR = new Date().getFullYear();
+
+const YEAR_OPTIONS: SelectOption[] = Array.from({ length: 110 }, (_, index) => {
+  const year = THIS_YEAR - index;
+  return { value: String(year), label: String(year) };
+});
+
+function daysInMonth(month: string, year: string): number {
+  if (!month) return 31;
+  return new Date(Number(year || "2000"), Number(month), 0).getDate();
+}
 
 export function LoginScreen() {
   const { ready, character, enter } = useGame();
@@ -24,6 +59,21 @@ export function LoginScreen() {
   const complete = isRealBirth(birth);
   const oldEnough = age !== null && age >= MIN_AGE;
   const emailFine = EMAIL_SHAPE.test(email.trim());
+
+  const dayCount = daysInMonth(birth.month, birth.year);
+  const dayOptions: SelectOption[] = Array.from({ length: dayCount }, (_, index) => ({
+    value: two(index + 1),
+    label: two(index + 1),
+  }));
+
+  // Changing the month can shrink the calendar under a chosen day; the day
+  // slides to the last one the month still has instead of going stale.
+  function setBirthPart(part: Partial<typeof birth>) {
+    const next = { ...birth, ...part };
+    const limit = daysInMonth(next.month, next.year);
+    if (next.day && Number(next.day) > limit) next.day = two(limit);
+    setBirth(next);
+  }
 
   useEffect(() => {
     if (ready && character) router.replace("/character");
@@ -75,38 +125,29 @@ export function LoginScreen() {
                 Data de nascimento
               </p>
               <div className="grid grid-cols-3 gap-2">
-                <Field
+                <Select
                   compact
                   aria-label="Dia"
                   placeholder="Dia"
-                  inputMode="numeric"
-                  autoComplete="off"
                   value={birth.day}
-                  onChange={(event) =>
-                    setBirth({ ...birth, day: digitsOnly(event.target.value, 2) })
-                  }
+                  options={dayOptions}
+                  onChange={(day) => setBirthPart({ day })}
                 />
-                <Field
+                <Select
                   compact
                   aria-label="Mês"
                   placeholder="Mês"
-                  inputMode="numeric"
-                  autoComplete="off"
                   value={birth.month}
-                  onChange={(event) =>
-                    setBirth({ ...birth, month: digitsOnly(event.target.value, 2) })
-                  }
+                  options={MONTH_OPTIONS}
+                  onChange={(month) => setBirthPart({ month })}
                 />
-                <Field
+                <Select
                   compact
                   aria-label="Ano"
                   placeholder="Ano"
-                  inputMode="numeric"
-                  autoComplete="off"
                   value={birth.year}
-                  onChange={(event) =>
-                    setBirth({ ...birth, year: digitsOnly(event.target.value, 4) })
-                  }
+                  options={YEAR_OPTIONS}
+                  onChange={(year) => setBirthPart({ year })}
                 />
               </div>
               <p className="text-[11px] leading-relaxed text-ink-faint">
