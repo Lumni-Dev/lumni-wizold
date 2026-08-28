@@ -48,6 +48,10 @@ export function bad(message: string, status: number): NextResponse {
 }
 const MAX_BODY_BYTES = 16384;
 export function clientIp(request: Request): string {
+  const cloudflare = request.headers.get("cf-connecting-ip");
+  if (cloudflare) return cloudflare.trim();
+  const real = request.headers.get("x-real-ip");
+  if (real) return real.trim();
   const forwarded = request.headers.get("x-forwarded-for") ?? "";
   return forwarded.split(",")[0].trim() || "local";
 }
