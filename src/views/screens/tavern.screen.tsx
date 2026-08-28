@@ -189,9 +189,10 @@ export function TavernScreen() {
         description="Leia antes de combinar encontro com alguém."
       >
         <p className="text-xs leading-relaxed text-ink-soft">
-          As salas agora vivem no servidor: quem estiver jogando, de qualquer máquina, senta nas
-          em outras máquinas exige um servidor, que este projeto ainda não tem. A senha de sala é
-          apenas uma combinação entre jogadores, guardada em texto puro: não use nada sigiloso nela.
+          As salas vivem no servidor: quem estiver jogando, de qualquer máquina, senta nas mesmas
+          mesas e lê as mesmas falas. A senha de sala é uma combinação entre jogadores, guardada
+          cifrada; ainda assim, invente uma só para a mesa, nunca uma senha que você usa em outro
+          lugar.
         </p>
       </Panel>
 
