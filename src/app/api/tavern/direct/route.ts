@@ -33,5 +33,5 @@ export async function POST(request: Request) {
       message: result.message,
       data: result.roomId ? { roomId: result.roomId } : null,
     });
-  });
+  }, { write: true });
 }

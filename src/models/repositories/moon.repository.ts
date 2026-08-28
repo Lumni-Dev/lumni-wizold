@@ -35,7 +35,7 @@ function notify(): void {
 async function read(): Promise<MoonState> {
   let state: MoonState;
   try {
-    const response = await fetch("/api/moon");
+    const response = await fetch("/api/moon", { method: "POST" });
     if (!response.ok) throw new Error("resposta " + response.status);
 
     const data: MoonResponse = await response.json();

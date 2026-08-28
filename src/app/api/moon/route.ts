@@ -41,7 +41,7 @@ function today(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-export async function GET() {
+async function moonAnswer() {
   try {
     const response = await fetch(MOON_API, { next: { revalidate: CACHE_SECONDS } });
     if (!response.ok) throw new Error("resposta " + response.status);
@@ -80,4 +80,14 @@ export async function GET() {
       source: "local",
     });
   }
+}
+
+export async function GET() {
+  return moonAnswer();
+}
+
+// The client reads the moon through POST: the zone's firewall blocks GETs
+// under /api/ and the upstream fetch cache works the same either way.
+export async function POST() {
+  return moonAnswer();
 }

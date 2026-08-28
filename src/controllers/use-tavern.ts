@@ -37,7 +37,7 @@ export function useTavern(activeRoomId: string | null) {
 
   const refresh = useCallback(async () => {
     if (!enabled) return;
-    const answer = await api<TavernBoard>("GET", "/api/tavern");
+    const answer = await api<TavernBoard>("POST", "/api/tavern");
     if (answer.ok && answer.data) setBoard(answer.data);
   }, [enabled]);
 

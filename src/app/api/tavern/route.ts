@@ -4,8 +4,9 @@ import { withTavern } from "../_lib/api";
 
 // The tavern, now truly cross-machine: the same listRooms the browser ran
 // against localStorage runs here against the shared tables, private tables
-// invisible to third ids included.
-export async function GET(request: Request) {
+// invisible to third ids included. The board answers to POST as well,
+// because the zone's firewall swallows GETs under /api/.
+async function board(request: Request) {
   return withTavern(request, async (state, _body, context) => {
     return NextResponse.json({
       ok: true,
@@ -16,4 +17,12 @@ export async function GET(request: Request) {
       },
     });
   });
+}
+
+export async function GET(request: Request) {
+  return board(request);
+}
+
+export async function POST(request: Request) {
+  return board(request);
 }

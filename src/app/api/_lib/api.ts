@@ -234,6 +234,7 @@ async function guardTavern(request: Request): Promise<{ userId: string } | NextR
 export async function withTavern(
   request: Request,
   action: TavernAction,
+  options: { write?: boolean } = {},
 ): Promise<NextResponse> {
   const guarded = await guardTavern(request);
   if (guarded instanceof NextResponse) return guarded;
@@ -245,7 +246,7 @@ export async function withTavern(
       const identity = await tavernIdentity(client, guarded.userId);
       if (!identity) return bad("Nenhum personagem ativo.", 404);
 
-      if (request.method !== "GET") await lockTavern(client);
+      if (options.write) await lockTavern(client);
       await pruneStale(client);
       const tavern = await loadTavern(client);
 
