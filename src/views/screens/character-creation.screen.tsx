@@ -15,7 +15,7 @@ import { Tag } from "../components/tag";
 import { Toast } from "../layout/toast";
 
 export function CharacterCreationScreen() {
-  const { ready, character, startRun } = useGame();
+  const { ready, authenticated, character, startRun } = useGame();
   const router = useRouter();
 
   const [name, setName] = useState("");
@@ -24,7 +24,8 @@ export function CharacterCreationScreen() {
 
   useEffect(() => {
     if (ready && character) router.replace("/character");
-  }, [ready, character, router]);
+    if (ready && !authenticated) router.replace("/login");
+  }, [ready, authenticated, character, router]);
 
   function submit(event: FormEvent) {
     event.preventDefault();
@@ -40,7 +41,9 @@ export function CharacterCreationScreen() {
     }
 
     setError(null);
-    if (startRun(name, gender)) router.push("/character");
+    void startRun(name, gender).then((ok) => {
+      if (ok) router.push("/character");
+    });
   }
 
   if (!ready || character) {

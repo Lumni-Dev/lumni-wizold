@@ -17,29 +17,26 @@ import type { EquipmentSlot } from "@/models/entities/item";
 import { initialState, type GameState } from "@/models/entities/game-state";
 import type { Character, Gender } from "@/models/entities/character";
 import type { Pet, PetGender } from "@/models/entities/pet";
-import type { Result } from "@/models/entities/result";
 import { activityRepository } from "@/models/repositories/activity.repository";
-import { gameRepository } from "@/models/repositories/game.repository";
 import { moonRepository } from "@/models/repositories/moon.repository";
-import { tavernRepository } from "@/models/repositories/tavern.repository";
 import type { MoonState } from "@/models/rules/moon";
 import { AUTOMATION_TICK_MS, PET_EXERCISE_ID, REST_TICK_MS } from "@/shared/constants/game";
+import { formatReais } from "@/shared/utils/format";
 import { deriveStats, type DerivedStats } from "@/models/rules/stats";
-import type { Hunter } from "@/models/entities/ranking";
+import type { BirthDate } from "@/shared/utils/birth";
 import type { TavernIdentity } from "@/models/entities/tavern";
-import * as characterController from "./character.controller";
-import * as packController from "./pack.controller";
-import { playSound, preloadSounds, setVoiceProfile } from "./sound";
-import * as arenaController from "./arena.controller";
-import * as huntController from "./hunt.controller";
+import type { HuntReport } from "./hunt.controller";
+import type { ArenaResolution } from "./arena.controller";
+import type { TrainingReport } from "./training.controller";
 import * as automationController from "./automation.controller";
-import * as bazaarController from "./bazaar.controller";
-import * as forgeController from "./forge.controller";
-import * as inventoryController from "./inventory.controller";
-import * as marketController from "./market.controller";
-import * as petController from "./pet.controller";
-import * as storeController from "./store.controller";
-import * as trainingController from "./training.controller";
+import * as characterController from "./character.controller";
+import { api, type ApiAnswer } from "./api.client";
+import { playSound, preloadSounds, setVoiceProfile } from "./sound";
+
+// The run lives on the server now. Every mutation is an API call, every
+// answer carries the newest whole state, and this provider's job is to adopt
+// that truth in arrival order, keep the client-side clocks beating, and let
+// the hunt and the arena hold their landed state until the bar fills.
 
 export interface Notice {
   id: number;
@@ -52,6 +49,7 @@ export type { Activity };
 
 interface GameContextValue {
   ready: boolean;
+  authenticated: boolean;
   state: GameState;
   character: Character | null;
   pet: Pet | null;
@@ -60,48 +58,44 @@ interface GameContextValue {
   notices: Notice[];
   dismissNotice: (id: number) => void;
   notify: (text: string, ok: boolean, source: string) => void;
-  startRun: (name: string, gender: Gender) => boolean;
-  renameCharacter: (name: string) => boolean;
-  deleteRun: () => void;
-  toggleForm: () => void;
-  rest: () => void;
+  enter: (email: string, birth: BirthDate) => Promise<{ hasCharacter: boolean } | null>;
+  startRun: (name: string, gender: Gender) => Promise<boolean>;
+  renameCharacter: (name: string) => Promise<boolean>;
+  deleteRun: () => Promise<void>;
+  toggleForm: () => Promise<void>;
+  rest: () => Promise<void>;
   activity: Activity | null;
   setActivity: (activity: Activity | null) => void;
-  train: (exerciseId: string) => boolean;
-  resolveHunt: (territoryId: string) => huntController.HuntResolution | null;
+  train: (exerciseId: string) => Promise<boolean>;
+  hunt: (territoryId: string) => Promise<HuntReport | null>;
+  landHunt: () => void;
   sufferBlow: (damage: number) => void;
-  commitHunt: (
-    resolution: huntController.HuntResolution,
-    alreadyBled: number,
-  ) => huntController.HuntReport | null;
-  drawOpponent: () => Hunter | null;
-  resolveArena: (hunterId: string) => arenaController.ArenaResolution | null;
-  commitArena: (
-    resolution: arenaController.ArenaResolution,
-    alreadyBled: number,
-  ) => arenaController.ArenaResolution | null;
-  equipItem: (itemId: string) => void;
-  unequipItem: (slot: EquipmentSlot) => void;
-  consumeItem: (itemId: string) => void;
-  discardItem: (itemId: string, quantity?: number) => void;
-  buyItem: (itemId: string, quantity?: number) => void;
-  sellItem: (itemId: string, quantity?: number) => void;
-  announceListing: (itemId: string, quantity: number, priceCents: number) => boolean;
-  cancelListing: (listingId: string) => void;
-  purchaseListing: (listingId: string, quantity: number) => boolean;
-  requestWithdraw: (pixKey: string) => boolean;
-  buyPack: (packId: string) => boolean;
-  mine: (oreId: string) => boolean;
-  enhance: (slot: EquipmentSlot) => void;
-  adoptPet: (gender: PetGender, name: string) => void;
-  releasePet: () => void;
+  drawOpponent: () => Promise<{ hunterId: string; name: string } | null>;
+  challengeArena: (hunterId: string) => Promise<ArenaResolution | null>;
+  landArena: () => void;
+  equipItem: (itemId: string) => Promise<void>;
+  unequipItem: (slot: EquipmentSlot) => Promise<void>;
+  consumeItem: (itemId: string) => Promise<void>;
+  discardItem: (itemId: string, quantity?: number) => Promise<void>;
+  buyItem: (itemId: string, quantity?: number) => Promise<void>;
+  sellItem: (itemId: string, quantity?: number) => Promise<void>;
+  announceListing: (itemId: string, quantity: number, priceCents: number) => Promise<boolean>;
+  cancelListing: (listingId: string) => Promise<void>;
+  purchaseListing: (listingId: string, quantity: number) => Promise<boolean>;
+  requestWithdraw: (pixKey: string, fullName: string, cpf: string) => Promise<boolean>;
+  buyPack: (packId: string) => Promise<boolean>;
+  mine: (oreId: string) => Promise<boolean>;
+  enhance: (slot: EquipmentSlot) => Promise<boolean>;
+  adoptPet: (gender: PetGender, name: string) => Promise<void>;
+  releasePet: () => Promise<void>;
   setAutomation: (key: AutomationKey, on: boolean) => void;
-  addToPack: (person: TavernIdentity) => boolean;
-  addToPackByNick: (nick: string, atTables: readonly TavernIdentity[]) => boolean;
-  removeFromPack: (id: string) => void;
-  renamePet: (name: string) => boolean;
-  feedPet: (itemId: string) => void;
-  setPetActive: (active: boolean) => void;
+  addToPack: (person: TavernIdentity) => Promise<boolean>;
+  addToPackByNick: (nick: string) => Promise<boolean>;
+  removeFromPack: (id: string) => Promise<void>;
+  renamePet: (name: string) => Promise<boolean>;
+  feedPet: (itemId: string) => Promise<void>;
+  setPetActive: (active: boolean) => Promise<void>;
+  refresh: () => Promise<void>;
 }
 
 const GameContext = createContext<GameContextValue | null>(null);
@@ -110,34 +104,32 @@ function subscribeToClient() {
   return () => undefined;
 }
 
+interface HeldLanding {
+  state: GameState;
+  seq: number;
+  report: HuntReport | null;
+}
+
 export function GameProvider({ children }: { children: ReactNode }) {
-  const ready = useSyncExternalStore(
+  const hydrated = useSyncExternalStore(
     subscribeToClient,
     () => true,
     () => false,
   );
 
-  const [stateInMemory, setState] = useState<GameState | null>(null);
+  const [state, setState] = useState<GameState>(initialState());
+  const [booted, setBooted] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
   const [notices, setNotices] = useState<Notice[]>([]);
   const [activity, setActivityState] = useState<Activity | null>(null);
   const noticeCounter = useRef(0);
+
+  const ready = hydrated && booted;
 
   const setActivity = useCallback((next: Activity | null) => {
     activityRepository.save(next);
     setActivityState(next);
   }, []);
-
-  const savedState = useMemo(() => (ready ? gameRepository.load() : initialState()), [ready]);
-  const state = stateInMemory ?? savedState;
-
-  useEffect(() => {
-    if (!ready || !stateInMemory) return;
-    if (!stateInMemory.character) {
-      gameRepository.clear();
-      return;
-    }
-    gameRepository.save(stateInMemory);
-  }, [stateInMemory, ready]);
 
   const moon = useSyncExternalStore(
     moonRepository.subscribe,
@@ -175,152 +167,226 @@ export function GameProvider({ children }: { children: ReactNode }) {
     activityRef.current = activity;
   }, [state, activity]);
 
+  // Answers are adopted in arrival order: each applied state gets a growing
+  // stamp, and a held landing (hunt, arena) only lands if nothing newer
+  // arrived while the bar was filling.
+  const mintRef = useRef(0);
+  const appliedRef = useRef(0);
+  const heldHuntRef = useRef<HeldLanding | null>(null);
+  const heldArenaRef = useRef<HeldLanding | null>(null);
+
+  const applyState = useCallback((next: GameState, seq: number) => {
+    if (seq <= appliedRef.current) return;
+    appliedRef.current = seq;
+    setState(next);
+  }, []);
+
+  const request = useCallback(
+    async <T,>(
+      method: "GET" | "POST" | "PATCH" | "PUT" | "DELETE",
+      path: string,
+      body?: unknown,
+      defer?: "hunt" | "arena",
+    ): Promise<ApiAnswer<T>> => {
+      const answer = await api<T>(method, path, body);
+      if (answer.status === 401) {
+        setAuthenticated(false);
+        return answer;
+      }
+      if (answer.state) {
+        const seq = ++mintRef.current;
+        if (defer === "hunt" && answer.ok) {
+          heldHuntRef.current = { state: answer.state, seq, report: answer.data as HuntReport };
+        } else if (defer === "arena" && answer.ok) {
+          heldArenaRef.current = { state: answer.state, seq, report: null };
+        } else {
+          applyState(answer.state, seq);
+        }
+      }
+      return answer;
+    },
+    [applyState],
+  );
+
+  // The spoken lane: announces the answer and plays the action's own sound.
+  const act = useCallback(
+    async <T,>(
+      method: "GET" | "POST" | "PATCH" | "PUT" | "DELETE",
+      path: string,
+      body: unknown,
+      source: string,
+      celebrate?: (data: T | null) => void,
+    ): Promise<ApiAnswer<T>> => {
+      const answer = await request<T>(method, path, body);
+      if (answer.message) announce(answer.message, answer.ok, source);
+      if (answer.ok) celebrate?.(answer.data);
+      return answer;
+    },
+    [request, announce],
+  );
+
+  // Boot: one settling POST tells everything — session, character, fresh run.
+  useEffect(() => {
+    if (!hydrated) return;
+    void (async () => {
+      const answer = await request("POST", "/api/state");
+      if (answer.status !== 401) setAuthenticated(true);
+      setBooted(true);
+    })();
+  }, [hydrated, request]);
+
   useEffect(() => {
     if (!ready) return;
     const saved = activityRepository.load();
     if (saved && stateRef.current.character) setActivityState(saved);
   }, [ready]);
 
+  // The wolf recovers on the server clock: each real minute at home pays a
+  // tick, and opening the game after a night away collects the whole night.
   const petResting = state.pet !== null && state.pet.active === false;
   useEffect(() => {
-    if (!petResting) return;
+    if (!ready || !petResting) return;
 
-    const timer = window.setInterval(() => {
-      const result = petController.restPetTick(stateRef.current);
-      if (!result.ok) return;
-      setState(result.state);
-      if (result.message) announce(result.message, true, "Mascote");
-    }, REST_TICK_MS);
+    const collect = () =>
+      void act<{ whole: boolean }>("POST", "/api/pet/rest-collect", undefined, "Mascote");
 
+    collect();
+    const timer = window.setInterval(collect, REST_TICK_MS);
     return () => window.clearInterval(timer);
-  }, [petResting, announce]);
+  }, [ready, petResting, act]);
 
+  // Resting works the same way: the stamp lives on the server, the PATCH
+  // collects entitled minutes, and done hands the body back to the job the
+  // automation interrupted.
+  const resting = activity?.kind === "rest";
   useEffect(() => {
-    if (activity?.kind !== "rest") return;
+    if (!ready || !resting) return;
 
-    const timer = window.setInterval(() => {
-      const result = characterController.restTick(stateRef.current);
-      setState(result.state);
-
-      if (result.ok && result.message) announce(result.message, true, "Recuperação");
-      if (!result.ok || result.data?.done) {
-        const back = result.data?.done
-          ? automationController.resumeAfterRest(result.state, activityRef.current)
-          : null;
-        setActivity(back);
+    const collect = async () => {
+      const answer = await request<{ done: boolean; ticks: number }>(
+        "PATCH",
+        "/api/character/rest",
+      );
+      if (!answer.ok) {
+        setActivity(null);
+        return;
       }
-    }, REST_TICK_MS);
-
-    return () => window.clearInterval(timer);
-  }, [activity?.kind, announce, setActivity]);
-
-  useEffect(() => {
-    if (!ready) return;
-
-    const beat = () => {
-      const step = automationController.nextAutomationStep(stateRef.current, activityRef.current);
-      if (!step) return;
-
-      switch (step.kind) {
-        case "potion": {
-          const result = inventoryController.consumeItem(stateRef.current, step.itemId);
-          setState(result.state);
-          if (result.ok) {
-            announce(result.message, true, "Inventário");
-            playSound("potion");
-          }
-          return;
-        }
-        case "transform": {
-          const result = characterController.toggleForm(stateRef.current);
-          setState(result.state);
-          if (result.ok) {
-            announce(result.message, true, "Personagem");
-            playSound("transform");
-          }
-          return;
-        }
-        case "rest": {
-          const result = characterController.startRest(stateRef.current);
-          setState(result.state);
-          if (result.ok) {
-            announce(result.message, true, "Recuperação");
-            playSound("rest");
-            const interrupted = activityRef.current;
-            setActivity({
-              kind: "rest",
-              resume:
-                interrupted && interrupted.kind !== "rest"
-                  ? { kind: interrupted.kind, id: interrupted.id }
-                  : undefined,
-            });
-          }
-          return;
-        }
-        case "feed": {
-          const result = petController.feedPet(stateRef.current, step.itemId);
-          setState(result.state);
-          if (result.ok) {
-            announce(result.message, true, "Mascote");
-            playSound("pet-along");
-          }
-          return;
-        }
-        case "kennel": {
-          const result = petController.setPetActive(stateRef.current, step.active);
-          setState(result.state);
-          if (result.ok) {
-            announce(result.message, true, "Mascote");
-            playSound(step.active ? "pet-along" : "pet-rest");
-          }
-          return;
-        }
-        case "work":
-          setActivity(step.activity);
-          return;
+      if ((answer.data?.ticks ?? 0) > 0 && !answer.data?.done) {
+        announce("O corpo se recompõe aos poucos.", true, "Recuperação");
+      }
+      if (answer.data?.done) {
+        announce("Recuperação completa: vida e fúria inteiras.", true, "Recuperação");
+        setActivity(automationController.resumeAfterRest(stateRef.current, activityRef.current));
       }
     };
 
-    const timer = window.setInterval(beat, AUTOMATION_TICK_MS);
+    void collect();
+    const timer = window.setInterval(() => void collect(), REST_TICK_MS);
     return () => window.clearInterval(timer);
-  }, [ready, announce, setActivity]);
+  }, [ready, resting, request, setActivity, announce]);
 
+  // The automation switchboard still decides locally over the newest state,
+  // and every decision goes through the same doors a click uses.
+  useEffect(() => {
+    if (!ready) return;
+
+    let busy = false;
+    const beat = async () => {
+      if (busy) return;
+      busy = true;
+      try {
+        const step = automationController.nextAutomationStep(
+          stateRef.current,
+          activityRef.current,
+        );
+        if (!step) return;
+
+        switch (step.kind) {
+          case "potion":
+            await act("POST", "/api/inventory/consume", { itemId: step.itemId }, "Inventário", () =>
+              playSound("potion"),
+            );
+            return;
+          case "transform":
+            await act("POST", "/api/character/transform", undefined, "Personagem", () =>
+              playSound("transform"),
+            );
+            return;
+          case "rest": {
+            const answer = await act("POST", "/api/character/rest", undefined, "Recuperação", () =>
+              playSound("rest"),
+            );
+            if (answer.ok) {
+              const interrupted = activityRef.current;
+              setActivity({
+                kind: "rest",
+                resume:
+                  interrupted && interrupted.kind !== "rest"
+                    ? { kind: interrupted.kind, id: interrupted.id }
+                    : undefined,
+              });
+            }
+            return;
+          }
+          case "feed":
+            await act("POST", "/api/pet/feed", { itemId: step.itemId }, "Mascote", () =>
+              playSound("pet-along"),
+            );
+            return;
+          case "kennel":
+            await act("POST", "/api/pet/active", { active: step.active }, "Mascote", () =>
+              playSound(step.active ? "pet-along" : "pet-rest"),
+            );
+            return;
+          case "work":
+            setActivity(step.activity);
+            return;
+        }
+      } finally {
+        busy = false;
+      }
+    };
+
+    const timer = window.setInterval(() => void beat(), AUTOMATION_TICK_MS);
+    return () => window.clearInterval(timer);
+  }, [ready, act, setActivity]);
+
+  // The fury deadline: when the stamp runs out the server reverts on the next
+  // settling call; this timer just makes that call the moment it is due.
   const character = state.character;
   useEffect(() => {
-    if (!character || character.form !== "werewolf") return;
+    if (!ready || !character || character.form !== "werewolf") return;
 
     const timer = window.setTimeout(() => {
-      const result = characterController.expireTransformation(stateRef.current);
-      setState(result.state);
-      if (result.message) announce(result.message, true, "Personagem");
+      announce("A fúria se esgota. " + character.name + " volta à forma humana.", true, "Personagem");
+      void request("POST", "/api/state");
     }, characterController.transformationRemainingMs(character));
 
     return () => window.clearTimeout(timer);
-  }, [character, announce]);
+  }, [ready, character, request, announce]);
 
+  // The settling minute: bazaar sales land server-side; when the Alforje
+  // grows while nobody clicked, the toast says so.
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || !authenticated) return;
 
-    const settle = () => {
-      const result = bazaarController.settleListings(stateRef.current);
-      if (result.state === stateRef.current) return;
-      setState(result.state);
-      if (result.message) announce(result.message, true, "Bazar");
+    const settle = async () => {
+      const before = stateRef.current.wallet.cents;
+      const answer = await request("POST", "/api/state");
+      const after = answer.state?.wallet.cents ?? before;
+      if (answer.ok && after > before) {
+        announce(
+          "O Alforje recebeu " + formatReais(after - before) + " de vendas no bazar.",
+          true,
+          "Bazar",
+        );
+        playSound("sell");
+      }
     };
 
-    settle();
-    const timer = window.setInterval(settle, 60_000);
+    const timer = window.setInterval(() => void settle(), 60_000);
     return () => window.clearInterval(timer);
-  }, [ready, announce]);
-
-  const apply = useCallback(
-    <T,>(result: Result<T>, source: string): T | null => {
-      setState(result.state);
-      announce(result.message, result.ok, source);
-      return result.ok ? (result.data ?? null) : null;
-    },
-    [announce],
-  );
+  }, [ready, authenticated, request, announce]);
 
   const value = useMemo<GameContextValue>(() => {
     const stats = state.character
@@ -329,6 +395,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
     return {
       ready,
+      authenticated,
       state,
       character: state.character,
       pet: state.pet,
@@ -338,206 +405,308 @@ export function GameProvider({ children }: { children: ReactNode }) {
       dismissNotice,
       notify: announce,
 
-      startRun: (name, gender) => {
-        const result = characterController.startRun(name, gender);
-        if (!result.ok) {
-          announce(result.message, false, "Personagem");
-          return false;
+      enter: async (email, birth) => {
+        const answer = await api<{ hasCharacter: boolean }>("POST", "/api/auth/enter", {
+          email,
+          birth,
+        });
+        if (!answer.ok) {
+          announce(answer.message, false, "Conta");
+          return null;
         }
-        setState(result.state);
-        announce(result.message, true, "Personagem");
-        playSound("transform");
-        return true;
+        setAuthenticated(true);
+        announce(answer.message, true, "Conta");
+        await request("POST", "/api/state");
+        return { hasCharacter: answer.data?.hasCharacter === true };
       },
 
-      renameCharacter: (name) => {
-        const result = characterController.renameCharacter(state, name);
-        apply(result, "Personagem");
-        return result.ok;
+      startRun: async (name, gender) => {
+        const answer = await act("POST", "/api/characters", { name, gender }, "Personagem", () =>
+          playSound("transform"),
+        );
+        if (answer.ok) await request("POST", "/api/state");
+        return answer.ok;
       },
-      deleteRun: () => {
-        gameRepository.clear();
-        tavernRepository.clear();
-        setState(initialState());
+
+      renameCharacter: async (name) => {
+        const answer = await act("POST", "/api/character/rename", { name }, "Personagem");
+        return answer.ok;
+      },
+
+      deleteRun: async () => {
+        const answer = await api("DELETE", "/api/characters");
+        announce(answer.message, answer.ok, "Personagem");
+        applyState(initialState(), ++mintRef.current);
         setActivity(null);
       },
-      toggleForm: () => {
+
+      toggleForm: async () => {
         const wasHuman = state.character?.form === "human";
-        const result = characterController.toggleForm(state);
-        apply(result, "Personagem");
-        if (result.ok) playSound(wasHuman ? "transform" : "revert");
+        await act("POST", "/api/character/transform", undefined, "Personagem", () =>
+          playSound(wasHuman ? "transform" : "revert"),
+        );
       },
-      rest: () => {
-        const result = characterController.startRest(state);
-        apply(result, "Recuperação");
-        if (result.ok) {
-          playSound("rest");
-          setActivity({ kind: "rest" });
-        }
+
+      rest: async () => {
+        const answer = await act("POST", "/api/character/rest", undefined, "Recuperação", () =>
+          playSound("rest"),
+        );
+        if (answer.ok) setActivity({ kind: "rest" });
       },
+
       activity,
       setActivity,
-      train: (exerciseId) => {
+
+      train: async (exerciseId) => {
         if (exerciseId === PET_EXERCISE_ID) {
-          const report = apply(petController.trainPet(state), "Treino");
-          if (!report) return false;
-          if (report.leveled) playSound("pet-up", 320);
-          return true;
+          const answer = await act<{ leveled: boolean }>(
+            "POST",
+            "/api/training/pet",
+            undefined,
+            "Treino",
+            (data) => {
+              if (data?.leveled) playSound("pet-up", 320);
+            },
+          );
+          return answer.ok;
         }
 
-        const report = apply(trainingController.train(state, exerciseId), "Treino");
-        if (!report) return false;
-        if (report.attributeRaised) playSound("point", 320);
-        return true;
+        const answer = await act<TrainingReport>(
+          "POST",
+          "/api/training/session",
+          { exerciseId },
+          "Treino",
+          (data) => {
+            if (data?.attributeRaised) playSound("point", 320);
+          },
+        );
+        return answer.ok;
       },
-      resolveHunt: (territoryId) => {
-        const result = huntController.resolveHunt(state, territoryId);
-        if (!result.ok || !result.data) {
-          announce(result.message, false, "Caça");
+
+      hunt: async (territoryId) => {
+        const answer = await request<HuntReport>("POST", "/api/hunt", { territoryId }, "hunt");
+        if (!answer.ok) {
+          if (answer.message) announce(answer.message, false, "Caça");
           return null;
         }
-        return result.data;
+        return answer.data;
       },
+
+      landHunt: () => {
+        const held = heldHuntRef.current;
+        heldHuntRef.current = null;
+        if (!held) return;
+        applyState(held.state, held.seq);
+        const report = held.report;
+        if (!report) return;
+        if (report.combat.victory) playSound("spoils");
+        if (report.levelsGained > 0) playSound("levelup", 700);
+        if (report.petLeveled) playSound("pet-up", 1100);
+      },
+
       sufferBlow: (damage) => {
-        const result = characterController.sufferBlow(state, damage);
-        if (result.ok) setState(result.state);
+        setState((current) =>
+          current.character
+            ? {
+                ...current,
+                character: {
+                  ...current.character,
+                  health: Math.max(
+                    1,
+                    current.character.health - Math.max(0, Math.round(damage)),
+                  ),
+                },
+              }
+            : current,
+        );
       },
-      commitHunt: (resolution, alreadyBled) => {
-        const report = apply(huntController.landHunt(state, resolution, alreadyBled), "Caça");
-        if (report?.combat.victory) playSound("spoils");
-        if (report && report.levelsGained > 0) playSound("levelup", 700);
-        if (report?.petLeveled) playSound("pet-up", 1100);
-        return report;
+
+      drawOpponent: async () => {
+        const answer = await request<{ hunterId: string; name: string }>(
+          "POST",
+          "/api/arena/draw",
+        );
+        if (!answer.ok && answer.message) announce(answer.message, false, "Arena");
+        return answer.ok ? answer.data : null;
       },
-      drawOpponent: () => arenaController.drawOpponent(state),
-      resolveArena: (hunterId) => {
-        const result = arenaController.resolveArena(state, hunterId);
-        if (!result.ok || !result.data) {
-          announce(result.message, false, "Arena");
+
+      challengeArena: async (hunterId) => {
+        const answer = await request<ArenaResolution>(
+          "POST",
+          "/api/arena/challenge",
+          { hunterId },
+          "arena",
+        );
+        if (!answer.ok) {
+          if (answer.message) announce(answer.message, false, "Arena");
           return null;
         }
-        return result.data;
+        return answer.data;
       },
-      commitArena: (resolution, alreadyBled) =>
-        apply(arenaController.landArena(state, resolution, alreadyBled), "Arena"),
-      equipItem: (itemId) => {
-        const result = inventoryController.equipItem(state, itemId);
-        apply(result, "Inventário");
-        if (result.ok) playSound("equip");
+
+      landArena: () => {
+        const held = heldArenaRef.current;
+        heldArenaRef.current = null;
+        if (!held) return;
+        applyState(held.state, held.seq);
       },
-      unequipItem: (slot) => {
-        const result = inventoryController.unequipItem(state, slot);
-        apply(result, "Inventário");
-        if (result.ok) playSound("equip");
+
+      equipItem: async (itemId) => {
+        await act("POST", "/api/inventory/equip", { itemId }, "Inventário", () =>
+          playSound("equip"),
+        );
       },
-      consumeItem: (itemId) => {
-        const result = inventoryController.consumeItem(state, itemId);
-        apply(result, "Inventário");
-        if (result.ok) playSound("potion");
+      unequipItem: async (slot) => {
+        await act("POST", "/api/inventory/unequip", { slot }, "Inventário", () =>
+          playSound("equip"),
+        );
       },
-      discardItem: (itemId, quantity = 1) => {
-        const result = inventoryController.discardItem(state, itemId, quantity);
-        apply(result, "Inventário");
-        if (result.ok) playSound("discard");
+      consumeItem: async (itemId) => {
+        await act("POST", "/api/inventory/consume", { itemId }, "Inventário", () =>
+          playSound("potion"),
+        );
       },
-      buyItem: (itemId, quantity = 1) => {
-        const result = marketController.buyItem(state, itemId, quantity);
-        apply(result, "Mercado");
-        if (result.ok) playSound("buy");
+      discardItem: async (itemId, quantity = 1) => {
+        await act("POST", "/api/inventory/discard", { itemId, quantity }, "Inventário", () =>
+          playSound("discard"),
+        );
       },
-      sellItem: (itemId, quantity = 1) => {
-        const result = marketController.sellItem(state, itemId, quantity);
-        apply(result, "Mercado");
-        if (result.ok) playSound("sell");
+      buyItem: async (itemId, quantity = 1) => {
+        await act("POST", "/api/market/buy", { itemId, quantity }, "Mercado", () =>
+          playSound("buy"),
+        );
       },
-      announceListing: (itemId, quantity, priceCents) => {
-        const result = bazaarController.announceListing(state, itemId, quantity, priceCents);
-        apply(result, "Bazar");
-        if (result.ok) playSound("ui");
-        return result.ok;
+      sellItem: async (itemId, quantity = 1) => {
+        await act("POST", "/api/market/sell", { itemId, quantity }, "Mercado", () =>
+          playSound("sell"),
+        );
       },
-      cancelListing: (listingId) => {
-        const result = bazaarController.cancelListing(state, listingId);
-        apply(result, "Bazar");
-        if (result.ok) playSound("ui");
+      announceListing: async (itemId, quantity, priceCents) => {
+        const answer = await act(
+          "POST",
+          "/api/bazaar/announce",
+          { itemId, quantity, priceCents },
+          "Bazar",
+          () => playSound("ui"),
+        );
+        return answer.ok;
       },
-      purchaseListing: (listingId, quantity) => {
-        const result = bazaarController.purchaseListing(state, listingId, quantity);
-        apply(result, "Bazar");
-        if (result.ok) playSound("buy");
-        return result.ok;
+      cancelListing: async (listingId) => {
+        await act("POST", "/api/bazaar/cancel", { listingId }, "Bazar", () => playSound("ui"));
       },
-      requestWithdraw: (pixKey) => {
-        const result = bazaarController.requestWithdraw(state, pixKey);
-        apply(result, "Bazar");
-        if (result.ok) playSound("sell");
-        return result.ok;
+      purchaseListing: async (listingId, quantity) => {
+        const answer = await act(
+          "POST",
+          "/api/bazaar/purchase",
+          { listingId, quantity },
+          "Bazar",
+          () => playSound("buy"),
+        );
+        return answer.ok;
       },
-      buyPack: (packId) => {
-        const result = storeController.purchasePack(state, packId);
-        apply(result, "Loja");
-        if (result.ok) playSound("buy");
-        return result.ok;
+      requestWithdraw: async (pixKey, fullName, cpf) => {
+        const answer = await act(
+          "POST",
+          "/api/bazaar/withdraw",
+          { pixKey, fullName, cpf },
+          "Bazar",
+          () => playSound("sell"),
+        );
+        return answer.ok;
       },
-      mine: (oreId) => {
-        const result = forgeController.mine(state, oreId);
-        apply(result, "Mina");
-        if (result.ok && (result.data?.levelsGained ?? 0) > 0) playSound("vein", 220);
-        return result.ok;
+      buyPack: async (packId) => {
+        const answer = await act("POST", "/api/store/purchase", { packId }, "Loja", () =>
+          playSound("buy"),
+        );
+        return answer.ok;
       },
-      enhance: (slot) => apply(forgeController.enhance(state, slot), "Bigorna"),
-      adoptPet: (gender, name) => {
-        const result = petController.adoptPet(state, gender, name);
-        apply(result, "Mascote");
-        if (result.ok) {
+      mine: async (oreId) => {
+        const answer = await act<{ levelsGained: number }>(
+          "POST",
+          "/api/mine",
+          { oreId },
+          "Mina",
+          (data) => {
+            if ((data?.levelsGained ?? 0) > 0) playSound("vein", 220);
+          },
+        );
+        return answer.ok;
+      },
+      enhance: async (slot) => {
+        const answer = await act("POST", "/api/forge", { slot }, "Bigorna");
+        return answer.ok;
+      },
+      adoptPet: async (gender, name) => {
+        await act("POST", "/api/pet/adopt", { gender, name }, "Mascote", () => {
           playSound("buy");
           playSound("howl", 240);
-        }
+        });
       },
-      releasePet: () => {
-        const result = petController.releasePet(state);
-        apply(result, "Mascote");
-        if (result.ok) playSound("beast");
+      releasePet: async () => {
+        await act("POST", "/api/pet/release", undefined, "Mascote", () => playSound("beast"));
       },
       setAutomation: (key, on) => {
-        setState({ ...state, automation: { ...state.automation, [key]: on } });
+        setState((current) => ({
+          ...current,
+          automation: { ...current.automation, [key]: on },
+        }));
         playSound("ui");
+        void request("PUT", "/api/automation", { key, on });
       },
-      addToPack: (person) => {
-        const result = packController.addMate(state, person);
-        apply(result, "Matilha");
-        if (result.ok) playSound("chat");
-        return result.ok;
+      addToPack: async (person) => {
+        const answer = await act(
+          "POST",
+          "/api/pack",
+          { id: person.id, name: person.name },
+          "Matilha",
+          () => playSound("chat"),
+        );
+        return answer.ok;
       },
-      addToPackByNick: (nick, atTables) => {
-        const result = packController.addByNick(state, nick, atTables);
-        apply(result, "Matilha");
-        if (result.ok) playSound("chat");
-        return result.ok;
+      addToPackByNick: async (nick) => {
+        const answer = await act("POST", "/api/pack", { nick }, "Matilha", () =>
+          playSound("chat"),
+        );
+        return answer.ok;
       },
-      removeFromPack: (id) => {
-        const result = packController.removeMate(state, id);
-        apply(result, "Matilha");
-        if (result.ok) playSound("discard");
+      removeFromPack: async (id) => {
+        await act("DELETE", "/api/pack/" + encodeURIComponent(id), undefined, "Matilha", () =>
+          playSound("discard"),
+        );
       },
-      renamePet: (name) => {
-        const result = petController.renamePet(state, name);
-        apply(result, "Mascote");
-        if (result.ok) playSound("buy");
-        return result.ok;
+      renamePet: async (name) => {
+        const answer = await act("POST", "/api/pet/rename", { name }, "Mascote", () =>
+          playSound("buy"),
+        );
+        return answer.ok;
       },
-      feedPet: (itemId) => {
-        const result = petController.feedPet(state, itemId);
-        apply(result, "Mascote");
-        if (result.ok) playSound("beast");
+      feedPet: async (itemId) => {
+        await act("POST", "/api/pet/feed", { itemId }, "Mascote", () => playSound("beast"));
       },
-      setPetActive: (active) => {
-        const result = petController.setPetActive(state, active);
-        apply(result, "Mascote");
-        if (result.ok) playSound(active ? "pet-along" : "pet-rest");
+      setPetActive: async (active) => {
+        await act("POST", "/api/pet/active", { active }, "Mascote", () =>
+          playSound(active ? "pet-along" : "pet-rest"),
+        );
+      },
+
+      refresh: async () => {
+        await request("POST", "/api/state");
       },
     };
-  }, [state, ready, notices, activity, moon, dismissNotice, apply, announce, setActivity]);
+  }, [
+    state,
+    ready,
+    authenticated,
+    notices,
+    activity,
+    moon,
+    dismissNotice,
+    announce,
+    act,
+    request,
+    applyState,
+    setActivity,
+  ]);
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
 }

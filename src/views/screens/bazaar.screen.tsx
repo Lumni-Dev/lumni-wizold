@@ -207,9 +207,11 @@ export function BazaarScreen() {
                 disabled={askedCents === null || askedCents < MIN_LISTING_CENTS}
                 onClick={() => {
                   if (askedCents === null) return;
-                  if (announceListing(announcing.item.id, askedQuantity, askedCents)) {
-                    setFlow(null);
-                  }
+                  void announceListing(announcing.item.id, askedQuantity, askedCents).then(
+                    (ok) => {
+                      if (ok) setFlow(null);
+                    },
+                  );
                 }}
               >
                 Anunciar
@@ -328,7 +330,9 @@ export function BazaarScreen() {
                 <Button
                   variant="primary"
                   onClick={() => {
-                    if (purchaseListing(buying.listing.id, buyQuantity)) setFlow(null);
+                    void purchaseListing(buying.listing.id, buyQuantity).then((ok) => {
+                      if (ok) setFlow(null);
+                    });
                   }}
                 >
                   Pagar {formatReais(buyTotal)} (simulação)
@@ -386,7 +390,9 @@ export function BazaarScreen() {
         note="O saque é de demonstração até a API de pagamento entrar: nada sai daqui por enquanto, e nem o CPF nem o nome são guardados."
         onClose={() => setFlow(null)}
         onConfirm={(payer) => {
-          if (requestWithdraw(payer.pixKey)) setFlow(null);
+          void requestWithdraw(payer.pixKey, payer.name, payer.cpf).then((ok) => {
+            if (ok) setFlow(null);
+          });
         }}
       />
 

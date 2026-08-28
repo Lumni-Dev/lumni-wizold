@@ -67,7 +67,7 @@ export function TavernScreen() {
     identity,
     rooms,
     activeRoom,
-    atTables,
+   
     createRoom,
     joinRoom,
     leaveRoom,
@@ -106,8 +106,8 @@ export function TavernScreen() {
   const pages = pageCount(rooms.length, PAGE_SIZE);
   const roomsOnPage = pageOf(rooms, currentPage, PAGE_SIZE);
 
-  function open(roomId: string, password: string) {
-    const result = joinRoom(roomId, password);
+  async function open(roomId: string, password: string) {
+    const result = await joinRoom(roomId, password);
     if (!result) return;
     notify(result.message, result.ok, "Taverna");
     if (result.ok) {
@@ -117,8 +117,8 @@ export function TavernScreen() {
     }
   }
 
-  function leave(roomId: string) {
-    const result = leaveRoom(roomId);
+  async function leave(roomId: string) {
+    const result = await leaveRoom(roomId);
     if (!result) return;
 
     notify(result.message, result.ok, "Taverna");
@@ -128,9 +128,9 @@ export function TavernScreen() {
     }
   }
 
-  function submitRoom(event: FormEvent) {
+  async function submitRoom(event: FormEvent) {
     event.preventDefault();
-    const result = createRoom(roomName, roomPassword);
+    const result = await createRoom(roomName, roomPassword);
     if (!result) return;
     if (!result.ok) notify(result.message, false, "Taverna");
     if (result.ok) {
@@ -139,10 +139,10 @@ export function TavernScreen() {
     }
   }
 
-  function submitMessage(event: FormEvent) {
+  async function submitMessage(event: FormEvent) {
     event.preventDefault();
     if (!activeRoomId) return;
-    const result = sendMessage(activeRoomId, draft);
+    const result = await sendMessage(activeRoomId, draft);
     if (!result) return;
     if (result.ok) {
       playSound("chat");
@@ -152,11 +152,13 @@ export function TavernScreen() {
 
   function submitNick(event: FormEvent) {
     event.preventDefault();
-    if (addToPackByNick(nick, atTables)) setNick("");
+    void addToPackByNick(nick).then((ok) => {
+      if (ok) setNick("");
+    });
   }
 
-  function speakTo(mate: PackMate) {
-    const result = openDirect({ id: mate.id, name: mate.name });
+  async function speakTo(mate: PackMate) {
+    const result = await openDirect({ id: mate.id, name: mate.name });
     if (!result) return;
 
     notify(result.message, result.ok, "Taverna");
@@ -187,7 +189,7 @@ export function TavernScreen() {
         description="Leia antes de combinar encontro com alguém."
       >
         <p className="text-xs leading-relaxed text-ink-soft">
-          As salas são compartilhadas entre as abas e janelas deste navegador. Conversar com pessoas
+          As salas agora vivem no servidor: quem estiver jogando, de qualquer máquina, senta nas
           em outras máquinas exige um servidor, que este projeto ainda não tem. A senha de sala é
           apenas uma combinação entre jogadores, guardada em texto puro: não use nada sigiloso nela.
         </p>
@@ -543,12 +545,13 @@ export function TavernScreen() {
         onCancel={() => setClosingRoomId(null)}
         onConfirm={() => {
           if (closingRoomId) {
-            const result = closeRoom(closingRoomId);
-            if (result) notify(result.message, result.ok, "Taverna");
-            if (result?.ok) {
-              playSound("door");
-              if (activeRoomId === closingRoomId) setActiveRoomId(null);
-            }
+            void closeRoom(closingRoomId).then((result) => {
+              if (result) notify(result.message, result.ok, "Taverna");
+              if (result?.ok) {
+                playSound("door");
+                if (activeRoomId === closingRoomId) setActiveRoomId(null);
+              }
+            });
           }
           setClosingRoomId(null);
         }}

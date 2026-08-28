@@ -43,11 +43,14 @@ type GameAction<T> = (
   context: ApiContext,
 ) => Result<T> | Promise<Result<T>>;
 
+// Every game answer carries the whole run as the server now knows it: the
+// client never guesses a delta, it just adopts the newest truth it received.
 export function reply<T>(result: Result<T>, extra?: Record<string, unknown>): NextResponse {
   return NextResponse.json({
     ok: result.ok,
     message: result.message,
     data: result.data ?? null,
+    state: result.state,
     ...extra,
   });
 }

@@ -388,7 +388,9 @@ export function PetScreen() {
         confirmLabel="Renomear"
         onCancel={() => setConfirmingRename(false)}
         onConfirm={() => {
-          if (renamePet(newPetName)) setNewPetName("");
+          void renamePet(newPetName).then((ok) => {
+            if (ok) setNewPetName("");
+          });
           setConfirmingRename(false);
         }}
       />

@@ -111,7 +111,10 @@ export function StoreScreen() {
         }
         onClose={() => setBuying(null)}
         onConfirm={() => {
-          if (chosen && buyPack(chosen.pack.id)) setBuying(null);
+          if (!chosen) return;
+          void buyPack(chosen.pack.id).then((ok) => {
+            if (ok) setBuying(null);
+          });
         }}
       />
     </>

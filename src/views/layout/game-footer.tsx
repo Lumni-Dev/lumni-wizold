@@ -10,7 +10,7 @@ export function GameFooter() {
         </div>
 
         <p className="text-[11px] text-ink-faint">
-          A partida inteira vive neste navegador: nada aqui foi para servidor nenhum.
+          A partida vive no servidor de Wizold e te espera em qualquer navegador.
         </p>
       </div>
     </footer>

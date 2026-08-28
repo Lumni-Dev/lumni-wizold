@@ -127,10 +127,9 @@ export function ArenaScreen() {
     pet,
     moon,
     drawOpponent,
-    resolveArena,
+    challengeArena,
     sufferBlow,
-    commitArena,
-    notify,
+    landArena,
   } = useGame();
 
   const [search, setSearch] = useState("");
@@ -147,10 +146,10 @@ export function ArenaScreen() {
   const bledRef = useRef({ last: 0, total: 0 });
 
   const sufferRef = useRef(sufferBlow);
-  const commitRef = useRef(commitArena);
+  const landRef = useRef(landArena);
   useEffect(() => {
     sufferRef.current = sufferBlow;
-    commitRef.current = commitArena;
+    landRef.current = landArena;
   });
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -181,12 +180,10 @@ export function ArenaScreen() {
       if (beatRef.current > scriptRef.current.length && pendingRef.current) {
         const held = pendingRef.current;
         pendingRef.current = null;
-        const landed = commitRef.current(held, bledRef.current.total);
-        if (landed) {
-          setReport(landed);
-          if (landed.combat.victory) playSound("victory");
-          else if (!landed.combat.retreated) playSound("defeat");
-        }
+        landRef.current();
+        setReport(held);
+        if (held.combat.victory) playSound("victory");
+        else if (!held.combat.retreated) playSound("defeat");
         setFighting(null);
       }
     }, HUNT_TICK_MS);
@@ -198,10 +195,10 @@ export function ArenaScreen() {
 
   const busy = fighting !== null;
 
-  function challenge(hunterId: string) {
+  async function challenge(hunterId: string) {
     if (pendingRef.current || !character) return;
 
-    const resolution = resolveArena(hunterId);
+    const resolution = await challengeArena(hunterId);
     if (!resolution) return;
 
     pendingRef.current = resolution;
@@ -219,13 +216,10 @@ export function ArenaScreen() {
     setFighting(resolution);
   }
 
-  function challengeDrawn() {
-    const opponent = drawOpponent();
-    if (!opponent) {
-      notify("Ninguém livre na sua faixa agora: todos ainda descansam.", false, "Arena");
-      return;
-    }
-    challenge(opponent.id);
+  async function challengeDrawn() {
+    const opponent = await drawOpponent();
+    if (!opponent) return;
+    await challenge(opponent.hunterId);
   }
 
   const currentPage = clampPage(page, view.rivals.length, PAGE_SIZE);

@@ -2,11 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useGame } from "@/controllers/game.context";
-import {
-  listTerritories,
-  type HuntReport,
-  type HuntResolution,
-} from "@/controllers/hunt.controller";
+import { listTerritories, type HuntReport } from "@/controllers/hunt.controller";
 import { playSound } from "@/controllers/sound";
 import { petLevelOf, petMaxEnergy } from "@/models/rules/pet";
 import { emphasizeDamage, narrationOf, type NarrationLine } from "../presenters/hunt.presenter";
@@ -142,9 +138,9 @@ export function HuntScreen() {
     state,
     character,
     pet,
-    resolveHunt,
+    hunt,
     sufferBlow,
-    commitHunt,
+    landHunt,
     toggleForm,
     activity,
     setActivity,
@@ -158,8 +154,9 @@ export function HuntScreen() {
   const [progress, setProgress] = useState<{ id: string; beat: number }>({ id: "", beat: 0 });
   const beatRef = useRef(0);
 
-  const [pending, setPending] = useState<HuntResolution | null>(null);
-  const pendingRef = useRef<HuntResolution | null>(null);
+  const [pending, setPending] = useState<HuntReport | null>(null);
+  const pendingRef = useRef<HuntReport | null>(null);
+  const requestingRef = useRef(false);
   const bledRef = useRef({ last: 0, total: 0 });
 
   const territories = useMemo(() => listTerritories(state), [state]);
@@ -168,16 +165,16 @@ export function HuntScreen() {
   const scriptRef = useRef<NarrationLine[]>([]);
 
   const autoRef = useRef(state.automation.hunt);
-  const resolveRef = useRef(resolveHunt);
+  const huntRef = useRef(hunt);
   const sufferRef = useRef(sufferBlow);
-  const commitRef = useRef(commitHunt);
+  const landRef = useRef(landHunt);
   const stateRef = useRef(state);
   const nameRef = useRef("");
   useEffect(() => {
     autoRef.current = state.automation.hunt;
-    resolveRef.current = resolveHunt;
+    huntRef.current = hunt;
     sufferRef.current = sufferBlow;
-    commitRef.current = commitHunt;
+    landRef.current = landHunt;
     stateRef.current = state;
     nameRef.current = character?.name ?? "";
   });
@@ -191,25 +188,30 @@ export function HuntScreen() {
       beatRef.current = beatRef.current >= lap ? 0 : beatRef.current + 1;
       setProgress({ id: activeId, beat: beatRef.current });
 
-      if (beatRef.current === 1) {
-        const fight = resolveRef.current(activeId);
-        if (!fight) {
-          beatRef.current = 0;
-          scriptRef.current = [];
-          setScript([]);
-          setProgress({ id: activeId, beat: 0 });
-          setActivity(autoRef.current ? { kind: "hunt", id: activeId, paused: true } : null);
-          return;
-        }
-        pendingRef.current = fight;
-        bledRef.current = { last: stateRef.current.character?.health ?? 0, total: 0 };
-        scriptRef.current = narrationOf(
-          { foe: fight.creature, combat: fight.combat },
-          HUNT_TICKS,
-          nameRef.current,
-        );
-        setScript(scriptRef.current);
-        setPending(fight);
+      // The first beat fires the server hunt; the answer lands within the
+      // beat and the lap narrates a fight the server already settled.
+      if (beatRef.current === 1 && !pendingRef.current && !requestingRef.current) {
+        requestingRef.current = true;
+        void huntRef.current(activeId).then((fight) => {
+          requestingRef.current = false;
+          if (!fight) {
+            beatRef.current = 0;
+            scriptRef.current = [];
+            setScript([]);
+            setProgress({ id: activeId, beat: 0 });
+            setActivity(autoRef.current ? { kind: "hunt", id: activeId, paused: true } : null);
+            return;
+          }
+          pendingRef.current = fight;
+          bledRef.current = { last: stateRef.current.character?.health ?? 0, total: 0 };
+          scriptRef.current = narrationOf(
+            { foe: fight.creature, combat: fight.combat },
+            HUNT_TICKS,
+            nameRef.current,
+          );
+          setScript(scriptRef.current);
+          setPending(fight);
+        });
       }
 
       const line = scriptRef.current[Math.min(beatRef.current, scriptRef.current.length) - 1];
@@ -232,12 +234,10 @@ export function HuntScreen() {
         const held = pendingRef.current;
         pendingRef.current = null;
         setPending(null);
-        const landed = commitRef.current(held, bledRef.current.total);
-        if (landed) {
-          setReport(landed);
-          setSession((current) => accumulate(current, landed));
-          if (!landed.combat.victory && !landed.combat.retreated) playSound("defeat");
-        }
+        landRef.current();
+        setReport(held);
+        setSession((current) => accumulate(current, held));
+        if (!held.combat.victory && !held.combat.retreated) playSound("defeat");
         if (!autoRef.current) {
           beatRef.current = 0;
           scriptRef.current = [];
@@ -251,8 +251,11 @@ export function HuntScreen() {
     return () => {
       window.clearInterval(timer);
       if (pendingRef.current) {
+        // The server already settled this fight: interrupting the lap only
+        // interrupts the theater, so the landed truth is adopted right away.
         pendingRef.current = null;
         setPending(null);
+        landRef.current();
         beatRef.current = 0;
         scriptRef.current = [];
         setScript([]);

@@ -16,7 +16,6 @@ const HUNTS = 6;
 
 const latencies = [];
 let errors = 0;
-let limited = 0;
 
 async function call(cookieBox, method, path, body) {
   const startedAt = performance.now();
@@ -30,8 +29,7 @@ async function call(cookieBox, method, path, body) {
   for (const line of response.headers.getSetCookie?.() ?? []) {
     if (line.startsWith("wizold_session=")) cookieBox.value = line.split(";")[0];
   }
-  if (response.status === 429) limited += 1;
-  else if (response.status >= 500) errors += 1;
+  if (response.status >= 500) errors += 1;
 
   try {
     return { status: response.status, payload: await response.json() };

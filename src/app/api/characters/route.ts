@@ -6,6 +6,30 @@ import { asText, bad, readBody, refuseAbuse, reply } from "../_lib/api";
 import { rateLimit } from "../_lib/rate-limit";
 import { sessionUserId } from "../_lib/session";
 
+// Ends the run: the character row goes and the cascade takes everything the
+// run owned. The account stays; a new character can rise from the same door.
+export async function DELETE(request: Request) {
+  const refused = refuseAbuse(request);
+  if (refused) return refused;
+
+  const userId = await sessionUserId();
+  if (!userId) return bad("Entre para jogar.", 401);
+
+  try {
+    return await withTransaction(async (client) => {
+      const gone = await client.query("delete from characters where user_id = $1", [userId]);
+      return Response.json({
+        ok: gone.rowCount === 1,
+        message: gone.rowCount === 1 ? "A partida foi encerrada." : "Não havia partida para encerrar.",
+        data: null,
+      });
+    });
+  } catch (error) {
+    console.error("[api] DELETE /api/characters", error);
+    return bad("O servidor tropeçou. Tente de novo.", 500);
+  }
+}
+
 // Creates the run. The name rule and the single-run-per-user rule are both
 // enforced here; the unique index on characters(user_id) backs the second
 // one even against a race.

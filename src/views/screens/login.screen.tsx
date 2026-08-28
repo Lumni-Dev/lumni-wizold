@@ -11,22 +11,33 @@ import { Button } from "../components/button";
 import { CornerAccents } from "../components/corner-accents";
 import { Field } from "../components/field";
 
+const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export function LoginScreen() {
-  const { ready, character } = useGame();
+  const { ready, character, enter } = useGame();
   const router = useRouter();
   const [birth, setBirth] = useState(EMPTY_BIRTH);
+  const [email, setEmail] = useState("");
+  const [entering, setEntering] = useState(false);
 
   const age = ageOf(birth);
   const complete = isRealBirth(birth);
   const oldEnough = age !== null && age >= MIN_AGE;
+  const emailFine = EMAIL_SHAPE.test(email.trim());
 
   useEffect(() => {
     if (ready && character) router.replace("/character");
   }, [ready, character, router]);
 
-  function enter() {
+  async function submit() {
+    if (entering) return;
+    setEntering(true);
+    const answer = await enter(email.trim(), birth);
+    setEntering(false);
+    if (!answer) return;
+
     playSound("door");
-    router.push("/create");
+    router.push(answer.hasCharacter ? "/character" : "/create");
   }
 
   return (
@@ -49,6 +60,16 @@ export function LoginScreen() {
           </div>
 
           <div className="space-y-4 p-4">
+            <Field
+              compact
+              label="E-mail"
+              placeholder="voce@exemplo.com"
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+            />
+
             <div className="space-y-2">
               <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                 Data de nascimento
@@ -97,14 +118,19 @@ export function LoginScreen() {
               </p>
             </div>
 
-            <Button variant="primary" size="medium" fullWidth disabled={!oldEnough} onClick={enter}>
-              Entrar com Google
+            <Button
+              variant="primary"
+              size="medium"
+              fullWidth
+              disabled={!oldEnough || !emailFine || entering}
+              onClick={() => void submit()}
+            >
+              {entering ? "Abrindo a noite..." : "Entrar com Google"}
             </Button>
 
             <p className="text-xs leading-relaxed text-ink-faint">
-              Este login é uma demonstração, como o Pix do bazar: a partida vive só neste navegador.
-              Quando o jogo ganhar servidor, a conta de verdade entra aqui e o que você já jogou
-              sobe junto.
+              O login por e-mail é a demonstração do botão do Google: a conta e a partida já vivem
+              no servidor, e quando o login de verdade entrar, ele assume esta mesma porta.
             </p>
           </div>
           <CornerAccents />

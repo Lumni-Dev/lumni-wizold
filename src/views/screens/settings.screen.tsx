@@ -79,7 +79,7 @@ export function SettingsScreen() {
           </div>
           <div className="space-y-3 p-4">
             <p className="text-xs leading-relaxed text-ink-faint">
-              O login é uma demonstração, como o Pix do bazar: a partida vive só neste navegador.
+              O login por e-mail é a demonstração do botão do Google, e a partida já vive no servidor.
               Quando o jogo ganhar servidor, a conta real entra aqui.
             </p>
             <Button
@@ -185,7 +185,7 @@ export function SettingsScreen() {
 
         <Panel
           title="Excluir conta"
-          description="Apaga a partida inteira deste navegador. Não tem volta."
+          description="Apaga a partida inteira do servidor. Não tem volta."
           footer={
             <div className="flex flex-wrap items-center justify-between gap-3">
               <span className="text-[11px] text-ink-faint">
@@ -199,7 +199,7 @@ export function SettingsScreen() {
         >
           <p className="text-xs leading-relaxed text-ink-faint">
             Personagem, inventário, forja, lobo, carteira e anúncios: tudo some de uma vez, e o
-            navegador volta para a criação de personagem.
+            conta volta para a criação de personagem.
           </p>
         </Panel>
       </div>
@@ -216,7 +216,9 @@ export function SettingsScreen() {
         confirmLabel="Alterar"
         onCancel={() => setConfirmingRename(false)}
         onConfirm={() => {
-          if (renameCharacter(newName)) setNewName("");
+          void renameCharacter(newName).then((ok) => {
+            if (ok) setNewName("");
+          });
           setConfirmingRename(false);
         }}
       />
@@ -224,7 +226,7 @@ export function SettingsScreen() {
       <ConfirmDialog
         open={confirmingDelete}
         title="Excluir conta"
-        description="A partida inteira deste navegador some agora e para sempre. Não há como recuperar."
+        description="A partida inteira some do servidor agora e para sempre. Não há como recuperar."
         detail={character.name + " · NV. " + formatNumber(character.level)}
         confirmLabel="Excluir tudo"
         onCancel={() => setConfirmingDelete(false)}
