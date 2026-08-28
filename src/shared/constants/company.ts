@@ -13,11 +13,5 @@ export const COMPANY = {
       value: "contact@lumni.dev.br",
       href: "mailto:contact@lumni.dev.br",
     },
-    {
-      kind: "message" as const,
-      label: "WhatsApp",
-      value: "+55 (16) 99244-7672",
-      href: "https://wa.me/5516992447672",
-    },
   ],
 };
