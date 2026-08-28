@@ -1,3 +1,4 @@
+import { createHmac, randomBytes } from "node:crypto";
 import { createRequire } from "node:module";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -29,20 +30,47 @@ async function call(method, path, body) {
   } catch {}
   return { status: response.status, payload };
 }
+for (const line of readFileSync(join(ROOT, ".env.local"), "utf8").split(/\r?\n/)) {
+  const m = line.match(/^([A-Z0-9_]+)\s*=\s*"?(.*?)"?\s*$/);
+  if (m && process.env[m[1]] === undefined) process.env[m[1]] = m[2];
+}
+const require = createRequire(import.meta.url);
+const pg = require(process.cwd() + "/node_modules/pg");
+const client = new pg.Client({
+  database: "postgres",
+  ssl: { ca: readFileSync(join(ROOT, "certs/supabase-ca.crt"), "utf8"), rejectUnauthorized: true },
+});
+await client.connect();
+const rows = async (sql, params) => (await client.query(sql, params)).rows;
 const anonymous = await call("GET", "/api/state");
 check("sem sessão é 401", anonymous.status === 401);
 const minor = await call("POST", "/api/auth/enter", {
-  email: "menor@wizold.test",
+  credential: "qualquer.coisa.aqui",
   birth: { day: "01", month: "01", year: "2012" },
 });
 check("menor de 18 é 403", minor.status === 403, minor.payload?.message);
-cookie = "";
-const entered = await call("POST", "/api/auth/enter", {
-  email: EMAIL,
+const forged = await call("POST", "/api/auth/enter", {
+  credential: "cabeca.corpo.assinatura-forjada",
   birth: { day: "01", month: "01", year: "1990" },
 });
-check("conta criada e sessão emitida", entered.status === 200 && cookie.length > 20);
-check("ainda sem personagem", entered.payload?.data?.hasCharacter === false);
+check("credencial forjada é 401", forged.status === 401, forged.payload?.message);
+const secret = process.env.SESSION_SECRET ?? "";
+check("segredo da sessão à mão", secret.length >= 32);
+const userId = "usr_" + Date.now().toString(36) + "_smk" + randomBytes(2).toString("hex");
+await client.query("insert into users (id, email, birth_date) values ($1, $2, $3)", [
+  userId,
+  EMAIL,
+  "1990-01-01",
+]);
+const payload = userId + "." + (Date.now() + 3600000);
+cookie =
+  "wizold_session=" +
+  payload +
+  "." +
+  createHmac("sha256", secret).update(payload).digest("base64url");
+const me = await call("GET", "/api/auth/me");
+check("sessão assinada abre a porta", me.payload?.data?.userId === userId);
+check("ainda sem personagem", me.payload?.data?.hasCharacter === false);
 const badName = await call("POST", "/api/characters", { name: "dois nomes", gender: "female" });
 check("nome com espaço recusa", badName.payload?.ok === false);
 const created = await call("POST", "/api/characters", { name: "Fumaca", gender: "female" });
@@ -84,18 +112,6 @@ check(
 );
 const bazaar = (await call("GET", "/api/bazaar")).payload?.data;
 check("quadro do bazar vem do elenco", Array.isArray(bazaar?.board) && bazaar.board.length > 0);
-const require = createRequire(import.meta.url);
-const pg = require(process.cwd() + "/node_modules/pg");
-for (const line of readFileSync(".env.local", "utf8").split(/\r?\n/)) {
-  const m = line.match(/^([A-Z0-9_]+)\s*=\s*"?(.*?)"?\s*$/);
-  if (m && process.env[m[1]] === undefined) process.env[m[1]] = m[2];
-}
-const client = new pg.Client({
-  database: "postgres",
-  ssl: { ca: readFileSync(join(ROOT, "certs/supabase-ca.crt"), "utf8"), rejectUnauthorized: true },
-});
-await client.connect();
-const rows = async (sql, params) => (await client.query(sql, params)).rows;
 const user = (await rows("select id from users where email = $1", [EMAIL]))[0];
 check("usuário na tabela", Boolean(user));
 const character = (await rows("select * from characters where user_id = $1", [user?.id]))[0];
@@ -112,7 +128,7 @@ const diary = await rows("select count(*)::int as n from log_entries where chara
 check("diário persistido", diary[0]?.n > 0);
 const table = await rows("select name from tavern_rooms where owner_id = $1", [character?.id]);
 check("mesa na tabela", table[0]?.name === "Fogueira");
-await client.query("delete from users where email in ($1, $2)", [EMAIL, "menor@wizold.test"]);
+await client.query("delete from users where email = $1", [EMAIL]);
 const leftovers = await rows(
   "select (select count(*) from characters where user_id = $1)::int + (select count(*) from tavern_rooms where owner_id = $2)::int as n",
   [user?.id, character?.id],

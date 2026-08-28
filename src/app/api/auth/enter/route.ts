@@ -5,6 +5,7 @@ import { withTransaction } from "@/models/repositories/server/database";
 import { createUser, findUserByEmail } from "@/models/repositories/server/user.store";
 import { loadGame } from "@/models/repositories/server/game.store";
 import { asText, bad, clientIp, readBody, refuseAbuse } from "../../_lib/api";
+import { verifyGoogleCredential } from "../../_lib/google";
 import { rateLimit } from "../../_lib/rate-limit";
 import { attachSession } from "../../_lib/session";
 export async function POST(request: Request) {
@@ -17,32 +18,34 @@ export async function POST(request: Request) {
     return response;
   }
   const body = await readBody(request);
-  const email = asText(body.email, 254).trim().toLowerCase();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return bad("Informe um e-mail válido.", 400);
+  const credential = asText(body.credential, 4096).trim();
+  if (!credential) {
+    return bad("Entre com o Google para abrir a porta.", 400);
   }
   const birth = {
     day: asText((body.birth as Record<string, unknown> | undefined)?.day, 2),
     month: asText((body.birth as Record<string, unknown> | undefined)?.month, 2),
     year: asText((body.birth as Record<string, unknown> | undefined)?.year, 4),
   };
+  const age = ageOf(birth);
+  if (isRealBirth(birth) && age !== null && age < MIN_AGE) {
+    return bad("A caçada é para maiores de " + MIN_AGE + " anos.", 403);
+  }
+  const identity = await verifyGoogleCredential(credential);
+  if (!identity) {
+    return bad("O Google não confirmou a entrada. Tente de novo.", 401);
+  }
   try {
     return await withTransaction(async (client) => {
-      const existing = await findUserByEmail(client, email);
-      if (!existing) {
-        const age = ageOf(birth);
-        if (!isRealBirth(birth) || age === null) {
-          return bad("Preencha a data de nascimento.", 400);
-        }
-        if (age < MIN_AGE) {
-          return bad("A caçada é para maiores de " + MIN_AGE + " anos.", 403);
-        }
+      const existing = await findUserByEmail(client, identity.email);
+      if (!existing && (!isRealBirth(birth) || age === null)) {
+        return bad("Preencha a data de nascimento.", 400);
       }
       const user =
         existing ??
         (await createUser(
           client,
-          email,
+          identity.email,
           birth.year.padStart(4, "0") +
             "-" +
             birth.month.padStart(2, "0") +

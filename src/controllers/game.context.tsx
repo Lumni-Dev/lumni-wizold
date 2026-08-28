@@ -50,7 +50,7 @@ interface GameContextValue {
   dismissNotice: (id: number) => void;
   notify: (text: string, ok: boolean, source: string) => void;
   enter: (
-    email: string,
+    credential: string,
     birth: BirthDate,
   ) => Promise<{
     hasCharacter: boolean;
@@ -352,11 +352,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
       notices,
       dismissNotice,
       notify: announce,
-      enter: async (email, birth) => {
+      enter: async (credential, birth) => {
         const answer = await api<{
           hasCharacter: boolean;
         }>("POST", "/api/auth/enter", {
-          email,
+          credential,
           birth,
         });
         if (!answer.ok) {

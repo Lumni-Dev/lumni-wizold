@@ -1,16 +1,45 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useGame } from "@/controllers/game.context";
 import { playSound } from "@/controllers/sound";
 import { GAME_NAME, GAME_TAGLINE, MIN_AGE } from "@/shared/constants/game";
 import { ageOf, EMPTY_BIRTH, isRealBirth } from "@/shared/utils/birth";
 import { Button } from "../components/button";
 import { CornerAccents } from "../components/corner-accents";
-import { Field } from "../components/field";
 import { Select, type SelectOption } from "../components/select";
-const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { Spinner } from "../components/spinner";
+
+const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
+const GOOGLE_SCRIPT_SRC = "https://accounts.google.com/gsi/client";
+
+interface GoogleIdentity {
+  initialize: (config: {
+    client_id: string;
+    callback: (answer: { credential: string }) => void;
+  }) => void;
+  renderButton: (
+    parent: HTMLElement,
+    options: {
+      type: "standard";
+      theme: "filled_black";
+      size: "large";
+      text: "continue_with";
+      shape: "rect";
+      logo_alignment: "left";
+      width: number;
+      locale: string;
+    },
+  ) => void;
+}
+
+declare global {
+  interface Window {
+    google?: { accounts: { id: GoogleIdentity } };
+  }
+}
+
 const MONTHS = [
   "Janeiro",
   "Fevereiro",
@@ -43,11 +72,12 @@ export function LoginScreen() {
   const { ready, character, enter } = useGame();
   const router = useRouter();
   const [birth, setBirth] = useState(EMPTY_BIRTH);
-  const [email, setEmail] = useState("");
+  const [entering, setEntering] = useState(false);
+  const birthRef = useRef(birth);
+  const buttonHost = useRef<HTMLDivElement>(null);
   const age = ageOf(birth);
   const complete = isRealBirth(birth);
   const oldEnough = age !== null && age >= MIN_AGE;
-  const emailFine = EMAIL_SHAPE.test(email.trim());
   const dayCount = daysInMonth(birth.month, birth.year);
   const dayOptions: SelectOption[] = Array.from({ length: dayCount }, (_, index) => ({
     value: two(index + 1),
@@ -62,12 +92,65 @@ export function LoginScreen() {
   useEffect(() => {
     if (ready && character) router.replace("/character");
   }, [ready, character, router]);
-  async function submit() {
-    const answer = await enter(email.trim(), birth);
-    if (!answer) return;
-    playSound("door");
-    router.push(answer.hasCharacter ? "/character" : "/create");
-  }
+  useEffect(() => {
+    birthRef.current = birth;
+  }, [birth]);
+  useEffect(() => {
+    if (!oldEnough || !GOOGLE_CLIENT_ID) return;
+    let alive = true;
+    const arm = () => {
+      const host = buttonHost.current;
+      const identity = window.google?.accounts?.id;
+      if (!alive || !host || !identity) return;
+      identity.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: (answer) => {
+          void (async () => {
+            setEntering(true);
+            try {
+              const opened = await enter(answer.credential, birthRef.current);
+              if (!opened) return;
+              playSound("door");
+              router.push(opened.hasCharacter ? "/character" : "/create");
+            } finally {
+              setEntering(false);
+            }
+          })();
+        },
+      });
+      host.replaceChildren();
+      identity.renderButton(host, {
+        type: "standard",
+        theme: "filled_black",
+        size: "large",
+        text: "continue_with",
+        shape: "rect",
+        logo_alignment: "left",
+        width: Math.min(400, Math.max(200, host.offsetWidth)),
+        locale: "pt_BR",
+      });
+    };
+    if (window.google?.accounts?.id) {
+      arm();
+      return () => {
+        alive = false;
+      };
+    }
+    const existing = document.querySelector<HTMLScriptElement>(
+      'script[src="' + GOOGLE_SCRIPT_SRC + '"]',
+    );
+    const script = existing ?? document.createElement("script");
+    script.addEventListener("load", arm);
+    if (!existing) {
+      script.src = GOOGLE_SCRIPT_SRC;
+      script.async = true;
+      document.head.appendChild(script);
+    }
+    return () => {
+      alive = false;
+      script.removeEventListener("load", arm);
+    };
+  }, [oldEnough, enter, router]);
   return (
     <main className="flex min-h-screen items-center justify-center p-4 md:p-8">
       <div className="w-full max-w-md space-y-6">
@@ -88,16 +171,6 @@ export function LoginScreen() {
           </div>
 
           <div className="space-y-4 p-4">
-            <Field
-              compact
-              label="E-mail"
-              placeholder="voce@exemplo.com"
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-            />
-
             <div className="space-y-2">
               <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                 Data de nascimento
@@ -137,19 +210,24 @@ export function LoginScreen() {
               </p>
             </div>
 
-            <Button
-              variant="primary"
-              size="medium"
-              fullWidth
-              disabled={!oldEnough || !emailFine}
-              onClick={submit}
-            >
-              Entrar com Google
-            </Button>
+            {oldEnough && GOOGLE_CLIENT_ID ? (
+              <div className="relative">
+                <div ref={buttonHost} className="flex min-h-10 justify-center" />
+                {entering ? (
+                  <div className="absolute inset-0 flex items-center justify-center rounded-md bg-surface/80 text-ink">
+                    <Spinner size="medium" />
+                  </div>
+                ) : null}
+              </div>
+            ) : (
+              <Button variant="primary" size="medium" fullWidth disabled>
+                Entrar com Google
+              </Button>
+            )}
 
             <p className="text-xs leading-relaxed text-ink-faint">
-              O login por e-mail é a demonstração do botão do Google: a conta e a partida já vivem
-              no servidor, e quando o login de verdade entrar, ele assume esta mesma porta.
+              A porta é a conta Google: nada de senha nova para lembrar. Na primeira entrada a data
+              de nascimento fica guardada, e nas seguintes basta o botão.
             </p>
           </div>
           <CornerAccents />
