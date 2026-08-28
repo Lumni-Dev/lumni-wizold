@@ -720,11 +720,11 @@ on a screen, because a body that far gone does not survive it.
 npm run dev       # local environment
 npm run build     # production build
 npm run lint      # eslint
+npm test          # the audit bench: every documented rule proven against the code
 npx tsc --noEmit  # type check
 
-node scripts/balance.mjs          # the difficulty curve, band by band
+node scripts/balance.mjs          # the difficulty curve, band by band (npm run bench)
 node scripts/balance.mjs 340      # one level, with a night of hunting
-node scripts/audit.mjs            # every documented rule proven against the code
 node scripts/forge-sounds.mjs     # re-render every synthesised effect
 node scripts/forge-sounds.mjs hit # just one of them
 ```
