@@ -1294,9 +1294,9 @@ sec("personagem");
   const tick = characterCtrl.restTick(resting.state);
   const max = stats.deriveStats(resting.state.character, state.equipment, null, {}).maxHealth;
   ok(
-    "tique devolve 5%",
+    "tique devolve 10%",
     tick.ok &&
-      tick.state.character.health === Math.min(max, 50 + Math.max(1, Math.ceil(max * 0.05))),
+      tick.state.character.health === Math.min(max, 50 + Math.max(1, Math.ceil(max * 0.1))),
   );
   const whole = baseState({ level: 10 });
   ok("inteiro não repousa", characterCtrl.startRest(whole).ok === false);
