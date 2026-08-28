@@ -88,27 +88,52 @@ export async function loadGame(
   const characterId = row.id;
   const character = rowToCharacter(row);
 
-  const [pet, equipped, inventory, enhancements, listings, purchases, duels, pack, wallet, automation, log, activity] =
-    await Promise.all([
-      client.query("select * from pets where character_id = $1", [characterId]),
-      client.query("select slot, item_id from equipped_items where character_id = $1", [characterId]),
-      client.query("select item_id, quantity from inventory_items where character_id = $1", [characterId]),
-      client.query("select item_id, level from enhancements where character_id = $1", [characterId]),
-      client.query(
-        "select * from bazaar_listings where seller_id = $1 and status = 'active' order by announced_at",
-        [characterId],
-      ),
-      client.query("select listing_id, quantity from bazaar_purchases where character_id = $1", [characterId]),
-      client.query("select opponent_id, dueled_at from arena_duels where character_id = $1", [characterId]),
-      client.query("select mate_id, mate_name, added_at from pack_mates where character_id = $1", [characterId]),
-      client.query("select cents from wallets where character_id = $1", [characterId]),
-      client.query("select * from automation_settings where character_id = $1", [characterId]),
-      client.query(
-        "select id, kind, message, created_at from log_entries where character_id = $1 order by created_at desc limit 120",
-        [characterId],
-      ),
-      client.query("select started_at from activities where character_id = $1", [characterId]),
-    ]);
+  // One client is one wire: parallel query() on the same connection only
+  // queues internally and pg@9 will refuse it, so the reads go in file.
+  const pet = await client.query("select * from pets where character_id = $1", [characterId]);
+  const equipped = await client.query(
+    "select slot, item_id from equipped_items where character_id = $1",
+    [characterId],
+  );
+  const inventory = await client.query(
+    "select item_id, quantity from inventory_items where character_id = $1",
+    [characterId],
+  );
+  const enhancements = await client.query(
+    "select item_id, level from enhancements where character_id = $1",
+    [characterId],
+  );
+  const listings = await client.query(
+    "select * from bazaar_listings where seller_id = $1 and status = 'active' order by announced_at",
+    [characterId],
+  );
+  const purchases = await client.query(
+    "select listing_id, quantity from bazaar_purchases where character_id = $1",
+    [characterId],
+  );
+  const duels = await client.query(
+    "select opponent_id, dueled_at from arena_duels where character_id = $1",
+    [characterId],
+  );
+  const pack = await client.query(
+    "select mate_id, mate_name, added_at from pack_mates where character_id = $1",
+    [characterId],
+  );
+  const wallet = await client.query("select cents from wallets where character_id = $1", [
+    characterId,
+  ]);
+  const automation = await client.query(
+    "select * from automation_settings where character_id = $1",
+    [characterId],
+  );
+  const log = await client.query(
+    "select id, kind, message, created_at from log_entries where character_id = $1 order by created_at desc limit 120",
+    [characterId],
+  );
+  const activity = await client.query(
+    "select started_at from activities where character_id = $1",
+    [characterId],
+  );
 
   const equipment = emptyEquipment();
   for (const entry of equipped.rows) equipment[entry.slot as EquipmentSlot] = entry.item_id;

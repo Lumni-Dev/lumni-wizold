@@ -60,10 +60,14 @@ export async function loadRoomState(
   const row = rooms.rows[0];
   if (!row) return { state: { version: TAVERN_VERSION, rooms: [] }, hashes };
 
-  const [members, messages] = await Promise.all([
-    client.query("select * from tavern_members where room_id = $1 order by joined_at", [roomId]),
-    client.query("select * from tavern_messages where room_id = $1 order by sent_at", [roomId]),
-  ]);
+  const members = await client.query(
+    "select * from tavern_members where room_id = $1 order by joined_at",
+    [roomId],
+  );
+  const messages = await client.query(
+    "select * from tavern_messages where room_id = $1 order by sent_at",
+    [roomId],
+  );
 
   if (row.password_hash) hashes.set(row.id, row.password_hash);
   const state: TavernState = {
@@ -97,11 +101,9 @@ export async function loadRoomState(
 }
 
 export async function loadTavern(client: PoolClient): Promise<LoadedTavern> {
-  const [rooms, members, messages] = await Promise.all([
-    client.query("select * from tavern_rooms order by created_at"),
-    client.query("select * from tavern_members order by joined_at"),
-    client.query("select * from tavern_messages order by sent_at"),
-  ]);
+  const rooms = await client.query("select * from tavern_rooms order by created_at");
+  const members = await client.query("select * from tavern_members order by joined_at");
+  const messages = await client.query("select * from tavern_messages order by sent_at");
 
   const hashes = new Map<string, string>();
   const byRoom = <T extends { room_id: string }>(roomId: string, rows: T[]): T[] =>
