@@ -14,6 +14,8 @@ function createPool(): Pool {
     max: 10,
     idleTimeoutMillis: 30_000,
     database: process.env.PGDATABASE ?? "wizold-prod",
+    // Managed Postgres (Supabase) refuses plain connections.
+    ssl: process.env.PGSSLMODE ? { rejectUnauthorized: false } : undefined,
   });
 }
 

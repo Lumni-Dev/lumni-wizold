@@ -28,8 +28,12 @@ function loadEnv() {
 loadEnv();
 const DATABASE = process.env.PGDATABASE ?? "wizold-prod";
 
+// Managed Postgres (Supabase) refuses plain connections; PGSSLMODE=require
+// in .env.local turns this on.
+const ssl = process.env.PGSSLMODE ? { rejectUnauthorized: false } : undefined;
+
 async function ensureDatabase() {
-  const client = new pg.Client({ database: "postgres" });
+  const client = new pg.Client({ database: "postgres", ssl });
   await client.connect();
   try {
     const found = await client.query("select 1 from pg_database where datname = $1", [DATABASE]);
@@ -53,7 +57,7 @@ async function run() {
   const command = process.argv[2] ?? "apply";
 
   await ensureDatabase();
-  const client = new pg.Client({ database: DATABASE });
+  const client = new pg.Client({ database: DATABASE, ssl });
   await client.connect();
 
   try {

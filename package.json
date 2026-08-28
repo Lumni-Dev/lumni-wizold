@@ -10,7 +10,8 @@
     "test": "node scripts/audit.mjs",
     "bench": "node scripts/balance.mjs",
     "migrate": "node scripts/migrate.mjs",
-    "migrate:status": "node scripts/migrate.mjs status"
+    "migrate:status": "node scripts/migrate.mjs status",
+    "smoke": "node scripts/smoke.mjs"
   },
   "dependencies": {
     "lucide-react": "^1.34.0",
