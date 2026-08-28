@@ -2,7 +2,6 @@ import { MIN_HEALTH_RATIO_TO_ACT } from "@/shared/constants/game";
 import { formatNumber, formatBronze } from "@/shared/utils/format";
 import { defaultRandom, pickOne, type Random } from "@/shared/utils/random";
 import { normalizeText } from "@/shared/utils/text";
-import { findRival, RIVALS } from "@/models/data/rivals";
 import type { LevelBand } from "@/models/entities/creature";
 import type { GameState } from "@/models/entities/game-state";
 import type { Hunter } from "@/models/entities/ranking";
@@ -55,7 +54,12 @@ function asRival(hunter: Hunter, band: LevelBand, state: GameState, now: number)
     spoils: arenaSpoilsRange(hunter.level),
   };
 }
-export function listArena(state: GameState, search = "", now = Date.now()): ArenaView {
+export function listArena(
+  state: GameState,
+  roster: readonly Hunter[],
+  search = "",
+  now = Date.now(),
+): ArenaView {
   const character = state.character;
   if (!character) {
     return {
@@ -77,10 +81,11 @@ export function listArena(state: GameState, search = "", now = Date.now()): Aren
   const transformed = character.form === "werewolf";
   const charges = arenaCharges(state.arenaDuels, now);
   const ready = healthy && charges.left > 0;
+  const pit = roster.filter((hunter) => hunter.id !== character.id);
   const term = normalizeText(search);
   const found = term
-    ? RIVALS.filter((hunter) => normalizeText(hunter.name).includes(term))
-    : RIVALS.filter((hunter) => isInBand(band, hunter.level));
+    ? pit.filter((hunter) => normalizeText(hunter.name).includes(term))
+    : pit.filter((hunter) => isInBand(band, hunter.level));
   const rivals = found
     .map((hunter) => asRival(hunter, band, state, now))
     .sort((first, second) => {
@@ -96,7 +101,7 @@ export function listArena(state: GameState, search = "", now = Date.now()): Aren
   return {
     band,
     rivals,
-    bandSize: RIVALS.filter((hunter) => isInBand(band, hunter.level)).length,
+    bandSize: pit.filter((hunter) => isInBand(band, hunter.level)).length,
     spoils: arenaSpoilsRange(character.level),
     charges,
     hasHealth: healthy,
@@ -114,22 +119,24 @@ export function listArena(state: GameState, search = "", now = Date.now()): Aren
           : null,
   };
 }
-function nearestByLevel(level: number, amount: number): Hunter[] {
-  return [...RIVALS]
+function nearestByLevel(pit: readonly Hunter[], level: number, amount: number): Hunter[] {
+  return [...pit]
     .sort((first, second) => Math.abs(first.level - level) - Math.abs(second.level - level))
     .slice(0, amount);
 }
 export function drawOpponent(
   state: GameState,
+  roster: readonly Hunter[],
   random: Random = defaultRandom,
   now = Date.now(),
 ): Hunter | null {
   const character = state.character;
   if (!character) return null;
+  const pit = roster.filter((hunter) => hunter.id !== character.id);
   const rested = (hunter: Hunter) => arenaCooldownLeft(state.arenaDuels[hunter.id], now) === 0;
   const band = arenaBand(character.level);
-  const inBand = RIVALS.filter((hunter) => isInBand(band, hunter.level) && rested(hunter));
-  const pool = inBand.length > 0 ? inBand : nearestByLevel(character.level, 5).filter(rested);
+  const inBand = pit.filter((hunter) => isInBand(band, hunter.level) && rested(hunter));
+  const pool = inBand.length > 0 ? inBand : nearestByLevel(pit, character.level, 5).filter(rested);
   return pool.length > 0 ? pickOne(pool, random) : null;
 }
 export interface ArenaResolution {
@@ -141,13 +148,16 @@ export interface ArenaResolution {
 }
 export function resolveArena(
   state: GameState,
+  roster: readonly Hunter[],
   hunterId: string,
   random: Random = defaultRandom,
   now = Date.now(),
 ): Result<ArenaResolution> {
   const character = state.character;
   if (!character) return failure(state, "Nenhum personagem ativo.");
-  const hunter = findRival(hunterId);
+  const hunter = roster.find(
+    (candidate) => candidate.id === hunterId && candidate.id !== character.id,
+  );
   if (!hunter) return failure(state, "Esse caçador não está no fosso.");
   const charges = arenaCharges(state.arenaDuels, now);
   if (charges.left === 0) {

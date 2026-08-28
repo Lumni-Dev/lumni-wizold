@@ -1,5 +1,4 @@
 import { normalizeText } from "@/shared/utils/text";
-import { RIVALS } from "@/models/data/rivals";
 import type { GameState } from "@/models/entities/game-state";
 import { MAX_PACK, type PackMate } from "@/models/entities/pack";
 import { failure, success, type Result } from "@/models/entities/result";
@@ -51,10 +50,7 @@ export function addByNick(
   const term = normalizeText(nick);
   if (term.length === 0) return failure(state, "Escreva o nick de alguém.");
 
-  const people: TavernIdentity[] = [
-    ...atTables,
-    ...RIVALS.map((hunter) => ({ id: hunter.id, name: hunter.name })),
-  ];
+  const people: TavernIdentity[] = [...atTables];
 
   const exact = people.find((person) => normalizeText(person.name) === term);
   if (exact) return addMate(state, exact);

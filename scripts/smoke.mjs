@@ -111,7 +111,12 @@ check(
   seat?.room?.messages?.some((m) => m.text === "Uivo de teste") === true,
 );
 const bazaar = (await call("GET", "/api/bazaar")).payload?.data;
-check("quadro do bazar vem do elenco", Array.isArray(bazaar?.board) && bazaar.board.length > 0);
+check("quadro do bazar é real", Array.isArray(bazaar?.board));
+const roster = (await call("GET", "/api/roster")).payload?.data;
+check(
+  "plantel real lista o caçador",
+  Array.isArray(roster?.hunters) && roster.hunters.some((hunter) => hunter.name === "Fumaca"),
+);
 const user = (await rows("select id from users where email = $1", [EMAIL]))[0];
 check("usuário na tabela", Boolean(user));
 const character = (await rows("select * from characters where user_id = $1", [user?.id]))[0];

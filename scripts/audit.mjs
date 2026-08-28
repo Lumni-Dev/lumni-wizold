@@ -39,8 +39,6 @@ const sets = load("models/data/equipment-sets.js");
 const items = load("models/data/items.js");
 const creaturesData = load("models/data/creatures.js");
 const territoriesData = load("models/data/territories.js");
-const rivalsData = load("models/data/rivals.js");
-const listingsData = load("models/data/bazaar-listings.js");
 const packsData = load("models/data/store-packs.js");
 const exercisesData = load("models/data/exercises.js");
 const entItem = load("models/entities/item.js");
@@ -118,6 +116,33 @@ function baseState({ level = 1, gender = "male", bronze = 1000000, form = "human
   state.character.health = derived.maxHealth;
   state.character.rage = derived.maxRage;
   return state;
+}
+function benchHunter(id, level, over = {}) {
+  const trained = clamp(Math.round(level * 0.55), CONST.BASE_ATTRIBUTE_VALUE, 1000);
+  return {
+    id,
+    name: "Par" + id.replaceAll(/[^A-Za-z0-9]/g, ""),
+    gender: "male",
+    level,
+    attributes: {
+      strength: trained,
+      agility: trained,
+      endurance: trained,
+      instinct: trained,
+      willpower: trained,
+    },
+    hunts: 10,
+    wins: 6,
+    losses: 4,
+    arena: 0,
+    bronze: 5000,
+    forge: 0,
+    enhancements: {},
+    mining: 1,
+    pet: null,
+    equipment: entItem.emptyEquipment(),
+    ...over,
+  };
 }
 sec("stats");
 {
@@ -526,16 +551,27 @@ sec("arena");
     }
     ok("bolsa vazia não paga nada NV " + level, arena.arenaSpoils(level, 0, random) === 0);
   }
-  const rival = rivalsData.RIVALS.find((hunter) => hunter.level <= 6) ?? rivalsData.RIVALS[0];
-  const inBand = baseState({ level: rival.level, form: "werewolf" });
+  const inBand = baseState({ level: 5, form: "werewolf" });
+  const rival = benchHunter("pit-near", 5);
+  const pit = [rival, benchHunter("pit-far", 500)];
   const human = { ...inBand, character: { ...inBand.character, form: "human" } };
-  ok("humano não desce ao fosso", arenaCtrl.resolveArena(human, rival.id, random).ok === false);
-  const far = rivalsData.RIVALS.find(
-    (hunter) => !arena.isInBand(arena.arenaBand(inBand.character.level), hunter.level),
+  ok(
+    "humano não desce ao fosso",
+    arenaCtrl.resolveArena(human, pit, rival.id, random).ok === false,
   );
-  ok("fora da banda é recusado", arenaCtrl.resolveArena(inBand, far.id, random).ok === false);
+  ok(
+    "fora da banda é recusado",
+    arenaCtrl.resolveArena(inBand, pit, "pit-far", random).ok === false,
+  );
+  ok(
+    "desafiar a si mesmo é recusado",
+    arenaCtrl.resolveArena(inBand, [...pit, { ...rival, id: inBand.character.id }], inBand.character.id, random).ok === false,
+  );
   const cooling = { ...inBand, arenaDuels: { [rival.id]: new Date().toISOString() } };
-  ok("descanso de 24h é recusado", arenaCtrl.resolveArena(cooling, rival.id, random).ok === false);
+  ok(
+    "descanso de 24h é recusado",
+    arenaCtrl.resolveArena(cooling, pit, rival.id, random).ok === false,
+  );
   const drained = {
     ...inBand,
     arenaDuels: {
@@ -546,11 +582,14 @@ sec("arena");
   };
   ok(
     "sem ataques do dia é recusado",
-    arenaCtrl.resolveArena(drained, rival.id, random).ok === false,
+    arenaCtrl.resolveArena(drained, pit, rival.id, random).ok === false,
   );
   const bleeding = { ...inBand, character: { ...inBand.character, health: 1 } };
-  ok("vida no chão é recusada", arenaCtrl.resolveArena(bleeding, rival.id, random).ok === false);
-  const duel = arenaCtrl.resolveArena(inBand, rival.id, seededRandom(7));
+  ok(
+    "vida no chão é recusada",
+    arenaCtrl.resolveArena(bleeding, pit, rival.id, random).ok === false,
+  );
+  const duel = arenaCtrl.resolveArena(inBand, pit, rival.id, seededRandom(7));
   ok("duelo válido resolve", duel.ok === true);
   if (duel.ok) {
     const landed = arenaCtrl.landArena(inBand, duel.data, 0);
@@ -911,10 +950,6 @@ sec("bazar");
   ok("peça forjada entra", bazaarRules.checkTrade(plain, 1).tradable === true);
   ok("peça lisa de mercado não entra", bazaarRules.checkTrade(plain, 0).tradable === false);
   ok("material de caça não entra", bazaarRules.checkTrade(material, 0).tradable === false);
-  ok("preço no anúncio vira 5min", bazaarRules.saleDelayMs(105, 100) === 5 * 60000);
-  ok("50% acima vira 30min", bazaarRules.saleDelayMs(150, 100) === 30 * 60000);
-  ok("o dobro vira 3h", bazaarRules.saleDelayMs(200, 100) === 3 * 60 * 60000);
-  ok("acima do dobro nunca vende", bazaarRules.saleDelayMs(201, 100) === null);
   const state = baseState({ level: 1 });
   state.enhancements["bronze-claw"] = 2;
   state.inventory = [
@@ -936,7 +971,7 @@ sec("bazar");
     const mine = announced.state.bazaarListings[0];
     ok(
       "comprar de si mesmo recusa",
-      bazaarCtrl.purchaseListing(announced.state, mine.id, 1).ok === false,
+      bazaarCtrl.purchaseListing(announced.state, mine, 1).ok === false,
     );
     const cancelled = bazaarCtrl.cancelListing(announced.state, mine.id);
     ok(
@@ -944,53 +979,39 @@ sec("bazar");
       cancelled.ok &&
         inventoryCtrl.countInInventory(cancelled.state.inventory, "bronze-fragment") === 30,
     );
-    const suggested = bazaarRules.suggestedPriceCents(fragment, 0);
-    const fair = bazaarCtrl.announceListing(state, "bronze-fragment", 10, suggested);
-    if (fair.ok) {
-      const listing = fair.state.bazaarListings[0];
-      const later = Date.parse(listing.announcedAt) + 5 * 60000 + 1000;
-      const early = bazaarCtrl.settleListings(fair.state, Date.parse(listing.announcedAt) + 1000);
-      ok("antes do atraso não vende", early.data.sold === 0);
-      const settled = bazaarCtrl.settleListings(fair.state, later);
-      ok("depois do atraso vende", settled.data.sold === 1);
-      ok(
-        "a casa fica com 10%",
-        settled.state.wallet.cents === state.wallet.cents + bazaarRules.sellerNet(suggested * 10),
-      );
-      ok("anúncio some do quadro", settled.state.bazaarListings.length === 0);
-      const greedy = bazaarCtrl.announceListing(state, "bronze-fragment", 10, suggested * 3);
-      const never = bazaarCtrl.settleListings(greedy.state, Date.now() + 365 * 86400000);
-      ok("acima do dobro nunca liquida", never.data.sold === 0);
-    }
   }
-  const roster = listingsData.ROSTER_LISTINGS;
-  ok("quadro do elenco existe", roster.length > 0 && roster.length <= 60);
-  for (const listing of roster) {
-    ok("anúncio do elenco resolve " + listing.id, Boolean(items.findItem(listing.itemId)));
-    ok("preço inteiro " + listing.id, isInt(listing.priceCents) && listing.priceCents >= 100);
-  }
-  const gearListing = roster.find(
-    (listing) =>
-      Boolean(items.findItem(listing.itemId)?.set) &&
-      listing.enhancement > 0 &&
-      !items.findItem(listing.itemId).lineage,
+  const goldClaw = items.findItem("gold-claw");
+  const offer = {
+    id: "listing_bench",
+    sellerId: "chr_bench_seller",
+    sellerName: "Vendedor",
+    itemId: "gold-claw",
+    enhancement: 3,
+    quantity: 2,
+    priceCents: 500,
+    announcedAt: new Date().toISOString(),
+  };
+  const rich = baseState({ level: 1000 });
+  const bought = bazaarCtrl.purchaseListing(rich, offer, 1);
+  ok(
+    "compra entrega e cobra o Alforje",
+    bought.ok &&
+      bought.state.wallet.cents === rich.wallet.cents - offer.priceCents &&
+      inventoryCtrl.countInInventory(bought.state.inventory, "gold-claw") === 1,
   );
-  if (gearListing) {
-    const rich = baseState({ level: 1000 });
-    const bought = bazaarCtrl.purchaseListing(rich, gearListing.id, 1);
-    ok("compra do quadro entrega", bought.ok === true);
-    ok("compra lembra o anúncio", bought.ok && bought.state.bazaarPurchases[gearListing.id] === 1);
-    ok(
-      "forja maior viaja com a peça",
-      bought.ok && bought.state.enhancements[gearListing.itemId] === gearListing.enhancement,
-    );
-    const again = bazaarCtrl.purchaseListing(bought.state, gearListing.id, gearListing.quantity);
-    ok("comprado não volta ao quadro", again.ok === false);
-    const low = baseState({ level: 1 });
-    const gated = bazaarCtrl.purchaseListing(low, gearListing.id, 1);
-    const needs = items.findItem(gearListing.itemId).minLevel;
-    ok("compra respeita o nível", needs <= 1 ? gated.ok === true : gated.ok === false);
-  }
+  ok("compra lembra o anúncio", bought.ok && bought.state.bazaarPurchases[offer.id] === 1);
+  ok(
+    "forja maior viaja com a peça",
+    bought.ok && bought.state.enhancements["gold-claw"] === offer.enhancement,
+  );
+  ok("além do anúncio recusa", bazaarCtrl.purchaseListing(rich, offer, 3).ok === false);
+  const low = baseState({ level: 1 });
+  ok(
+    "compra respeita o nível",
+    goldClaw.minLevel > 1 && bazaarCtrl.purchaseListing(low, offer, 1).ok === false,
+  );
+  const broke = { ...rich, wallet: { cents: offer.priceCents - 1 } };
+  ok("Alforje curto recusa a compra", bazaarCtrl.purchaseListing(broke, offer, 1).ok === false);
   const poor = { ...state, wallet: { cents: 9999 } };
   ok(
     "saque abaixo do piso recusa",
@@ -1173,75 +1194,52 @@ sec("nomes");
   ok("curto é recusado", characterCtrl.validateName("ab") !== null);
   ok("número entra", characterCtrl.validateName("Lobo77") === null);
 }
-sec("elenco e ranking");
+sec("ranking");
 {
-  const roster = rivalsData.RIVALS;
-  ok("120 caçadores", roster.length === 120);
-  ok("ids únicos", new Set(roster.map((hunter) => hunter.id)).size === 120);
-  ok("nomes únicos", new Set(roster.map((hunter) => hunter.name)).size === 120);
-  for (const hunter of roster) {
-    const attrs = Object.values(hunter.attributes);
-    const fine =
-      hunter.level >= 1 &&
-      hunter.level <= 1000 &&
-      isInt(hunter.level) &&
-      attrs.every((value) => isInt(value) && value >= 4 && value <= 1000) &&
-      isInt(hunter.bronze) &&
-      hunter.bronze >= 0 &&
-      hunter.wins + hunter.losses === hunter.hunts &&
-      hunter.mining >= 1 &&
-      hunter.mining <= entMining.MINING_MAX_LEVEL &&
-      Object.entries(hunter.enhancements).every(
-        ([itemId, level]) => Boolean(items.findItem(itemId)) && level >= 1 && level <= 1000,
-      );
-    if (!fine) {
-      ok("caçador são: " + hunter.id, false, json(hunter).slice(0, 120));
-      break;
-    }
-    for (const slot of entItem.EQUIPMENT_SLOTS) {
-      const itemId = hunter.equipment[slot];
-      if (itemId && !items.findItem(itemId)) {
-        ok("peça do elenco existe: " + itemId, false);
-        break;
-      }
-    }
-  }
-  const genderByFirst = new Map();
-  let steady = true;
-  for (const hunter of roster) {
-    const first = hunter.name.split(" ")[0];
-    if (genderByFirst.has(first) && genderByFirst.get(first) !== hunter.gender) steady = false;
-    genderByFirst.set(first, hunter.gender);
-  }
-  ok("cada primeiro nome tem um só lobo", steady);
+  const roster = Array.from({ length: 25 }, (_, index) =>
+    benchHunter("bench-" + index, 10 + index * 37, {
+      gender: index % 3 === 0 ? "female" : "male",
+    }),
+  );
   const board = rankingRules.buildBoard(
     roster,
     { key: "level", label: "", description: "", value: (hunter) => hunter.level },
     null,
   );
-  ok("posições 1..120", board[0].position === 1 && board[119].position === 120);
+  ok("posições 1..25", board[0].position === 1 && board[24].position === 25);
   let sorted = true;
   for (let index = 1; index < board.length; index += 1) {
     if (board[index].value > board[index - 1].value) sorted = false;
   }
   ok("quadro ordena do maior para o menor", sorted);
   const state = baseState({ level: 500 });
-  const view = rankingCtrl.listRanking(state, "level", 1);
-  ok("jogador entra no quadro", view.playerPosition !== null && view.boardSize === 121);
-  const searched = rankingCtrl.listRanking(state, "level", 1, "Teste");
+  const view = rankingCtrl.listRanking(state, roster, "level", 1);
+  ok("jogador entra no quadro", view.playerPosition !== null && view.boardSize === 26);
+  const searched = rankingCtrl.listRanking(state, roster, "level", 1, "Teste");
   ok("busca acha o jogador", searched.total >= 1);
   ok(
     "busca preserva a posição verdadeira",
     searched.entries.find((entry) => entry.isPlayer)?.position === view.playerPosition,
   );
-  const profile = rankingCtrl.profileOf(state, "rival-0");
-  ok("perfil do rival abre", profile !== null && profile.positions.length === 12);
+  const cut = rankingCtrl.listRanking(state, roster, "level", 1, "", "female");
+  ok(
+    "corte por gênero filtra sem renumerar",
+    cut.entries.length > 0 &&
+      cut.entries.every((entry) => entry.hunter.gender === "female") &&
+      cut.entries.every(
+        (entry) => board.find((line) => line.hunter.id === entry.hunter.id)?.position !== undefined,
+      ),
+  );
+  const profile = rankingCtrl.profileOf(state, roster, "bench-0");
+  ok("perfil de outro caçador abre", profile !== null && profile.positions.length === 12);
   ok("perfil sem NaN", profile !== null && Number.isFinite(profile.stats.maxHealth));
-  const cachePath = require.resolve(join(SIM, "models/data/rivals.js"));
-  const before = json(roster);
-  delete require.cache[cachePath];
-  const reloaded = require(join(SIM, "models/data/rivals.js"));
-  ok("elenco é determinístico", json(reloaded.RIVALS) === before);
+  const own = rankingCtrl.profileOf(state, roster, state.character.id);
+  ok("a própria ficha se reconhece", own !== null && own.isPlayer === true);
+  const empty = rankingCtrl.listRanking(state, [], "level", 1);
+  ok(
+    "quadro vazio ainda mostra o jogador",
+    empty.boardSize === 1 && empty.playerPosition === 1,
+  );
 }
 sec("personagem");
 {
@@ -1472,11 +1470,16 @@ sec("taverna");
 sec("matilha");
 {
   const state = baseState({ level: 1 });
-  const added = packCtrl.addMate(state, { id: "rival-3", name: rivalsData.RIVALS[3].name });
+  const board = [
+    { id: "mate-3", name: "Loba" },
+    { id: "mate-5", name: "Aluado" },
+    { id: "mate-6", name: "Aluada" },
+  ];
+  const added = packCtrl.addMate(state, { id: "mate-3", name: board[0].name });
   ok("guardar um nome funciona", added.ok === true);
   ok(
     "guardar de novo recusa",
-    added.ok && packCtrl.addMate(added.state, { id: "rival-3", name: "x" }).ok === false,
+    added.ok && packCtrl.addMate(added.state, { id: "mate-3", name: "x" }).ok === false,
   );
   ok(
     "guardar a si recusa",
@@ -1487,11 +1490,13 @@ sec("matilha");
     full = packCtrl.addMate(full, { id: "amigo-" + index, name: "Amigo" + index }).state;
   }
   ok("a matilha para em 20", full.pack.length === 20);
-  const byNick = packCtrl.addByNick(state, normalizeText(rivalsData.RIVALS[5].name), []);
+  const byNick = packCtrl.addByNick(state, normalizeText("Loba"), board);
   ok("nick exato acha", byNick.ok === true);
-  const vague = packCtrl.addByNick(state, "a", []);
+  const vague = packCtrl.addByNick(state, "alua", board);
   ok("pedaço ambíguo recusa", vague.ok === false);
-  const removed = packCtrl.removeMate(added.state, "rival-3");
+  const nobody = packCtrl.addByNick(state, "Fantasma", board);
+  ok("nick sem dono recusa", nobody.ok === false);
+  const removed = packCtrl.removeMate(added.state, "mate-3");
   ok("excluir devolve a vaga", removed.ok && removed.state.pack.length === 0);
 }
 sec("imutabilidade");
@@ -1520,9 +1525,18 @@ sec("imutabilidade");
   state.enhancements["bronze-claw"] = 1;
   state.bazaarListings = [];
   deepFreeze(state);
-  const rival = rivalsData.RIVALS.find((hunter) =>
-    arena.isInBand(arena.arenaBand(170), hunter.level),
-  );
+  const rival = benchHunter("pit-immut", 170);
+  const pit = deepFreeze([rival, benchHunter("pit-immut-far", 900)]);
+  const offer = deepFreeze({
+    id: "listing_immut",
+    sellerId: "chr_immut_seller",
+    sellerName: "Vendedor",
+    itemId: "bronze-claw",
+    enhancement: 2,
+    quantity: 2,
+    priceCents: 300,
+    announcedAt: new Date().toISOString(),
+  });
   const calls = [
     ["listTerritories", () => huntCtrl.listTerritories(state)],
     [
@@ -1532,16 +1546,15 @@ sec("imutabilidade");
         if (resolved.ok) huntCtrl.landHunt(state, deepFreeze(resolved.data), 10);
       },
     ],
-    ["listArena", () => arenaCtrl.listArena(state)],
+    ["listArena", () => arenaCtrl.listArena(state, pit)],
     [
       "resolveArena+landArena",
       () => {
-        if (!rival) return;
-        const resolved = arenaCtrl.resolveArena(state, rival.id, random);
+        const resolved = arenaCtrl.resolveArena(state, pit, rival.id, random);
         if (resolved.ok) arenaCtrl.landArena(state, deepFreeze(resolved.data), 0);
       },
     ],
-    ["drawOpponent", () => arenaCtrl.drawOpponent(state, random)],
+    ["drawOpponent", () => arenaCtrl.drawOpponent(state, pit, random)],
     ["train", () => trainingCtrl.train(state, "ice-bath")],
     ["listExercises", () => trainingCtrl.listExercises(state)],
     ["trainPet", () => petCtrl.trainPet(state)],
@@ -1563,8 +1576,8 @@ sec("imutabilidade");
     ["listMining", () => forgeCtrl.listMining(state)],
     ["announce+cancel", () => bazaarCtrl.announceListing(state, "silver-fragment", 3, 500)],
     ["listSellable", () => bazaarCtrl.listSellable(state)],
-    ["listBoard", () => bazaarCtrl.listBoard(state)],
-    ["settleListings", () => bazaarCtrl.settleListings(state)],
+    ["listBoard", () => bazaarCtrl.listBoard(state, [offer])],
+    ["purchaseListing", () => bazaarCtrl.purchaseListing(state, offer, 1)],
     ["requestWithdraw", () => bazaarCtrl.requestWithdraw(state, "chave-pix")],
     ["purchasePack", () => storeCtrl.purchasePack(state, "one-pouch")],
     ["toggleForm", () => characterCtrl.toggleForm(state)],
@@ -1578,10 +1591,10 @@ sec("imutabilidade");
       "nextAutomationStep",
       () => automationCtrl.nextAutomationStep(state, deepFreeze({ kind: "hunt", paused: true })),
     ],
-    ["listRanking", () => rankingCtrl.listRanking(state, "bronze", 1, "a", "female")],
-    ["profileOf", () => rankingCtrl.profileOf(state, "rival-1")],
-    ["addMate", () => packCtrl.addMate(state, { id: "rival-9", name: "Alguém" })],
-    ["removeMate", () => packCtrl.removeMate(state, "rival-9")],
+    ["listRanking", () => rankingCtrl.listRanking(state, pit, "bronze", 1, "a", "female")],
+    ["profileOf", () => rankingCtrl.profileOf(state, pit, rival.id)],
+    ["addMate", () => packCtrl.addMate(state, { id: "mate-9", name: "Alguém" })],
+    ["removeMate", () => packCtrl.removeMate(state, "mate-9")],
     ["addLog", () => logCtrl.addLog(state, "system", "eco")],
     ["detailInventory", () => inventoryCtrl.detailInventory(state)],
   ];

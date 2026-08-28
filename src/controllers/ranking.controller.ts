@@ -1,4 +1,3 @@
-import { RIVALS } from "@/models/data/rivals";
 import type { Gender } from "@/models/entities/character";
 import type { GameState } from "@/models/entities/game-state";
 import {
@@ -60,23 +59,28 @@ function playerAsHunter(state: GameState): Hunter | null {
   };
 }
 
-function huntersOf(state: GameState): { hunters: Hunter[]; playerId: string | null } {
+function huntersOf(
+  state: GameState,
+  roster: readonly Hunter[],
+): { hunters: Hunter[]; playerId: string | null } {
   const player = playerAsHunter(state);
+  const others = roster.filter((hunter) => hunter.id !== player?.id);
   return {
-    hunters: player ? [...RIVALS, player] : [...RIVALS],
+    hunters: player ? [...others, player] : [...others],
     playerId: player?.id ?? null,
   };
 }
 
 export function listRanking(
   state: GameState,
+  roster: readonly Hunter[],
   key: RankingKey,
   page: number,
   search = "",
   gender: Gender | "all" = "all",
 ): RankingView {
   const board = findBoard(key);
-  const { hunters, playerId } = huntersOf(state);
+  const { hunters, playerId } = huntersOf(state, roster);
 
   const entries = buildBoard(hunters, board, playerId);
   const playerEntry = entries.find((entry) => entry.isPlayer) ?? null;
@@ -120,8 +124,12 @@ export interface HunterProfile {
   gear: { slot: EquipmentSlot; item: Item | null; level: number }[];
 }
 
-export function profileOf(state: GameState, hunterId: string): HunterProfile | null {
-  const { hunters, playerId } = huntersOf(state);
+export function profileOf(
+  state: GameState,
+  roster: readonly Hunter[],
+  hunterId: string,
+): HunterProfile | null {
+  const { hunters, playerId } = huntersOf(state, roster);
   const hunter = hunters.find((candidate) => candidate.id === hunterId);
   if (!hunter) return null;
 

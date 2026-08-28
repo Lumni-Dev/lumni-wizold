@@ -298,7 +298,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "A busca filtra pelo nome sem renumerar: a posição é sempre a do quadro inteiro.",
       "Clicar em um nome abre a ficha de leitura dele: atributos, equipamento com o +X de cada peça, mascote e posições.",
       "O seu nome leva para a sua própria ficha, que é a mesma pessoa com mais detalhe.",
-      "A partida vive no servidor, e a sua linha é a única viva do quadro por enquanto: os outros caçadores são o elenco fixo do jogo, com os mesmos nomes e números sempre.",
+      "O quadro só tem gente de verdade: cada linha é um caçador que entrou pela mesma porta que você, e o quadro cresce a cada novo nome que a lua conhece.",
     ],
   },
   {
@@ -367,7 +367,8 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "Só entra o que a forja tocou: peça +1 ou mais fora do corpo, e fragmentos da mina.",
       "O que o mercado vende igual não entra: peça sem forja fica de fora.",
       "Anunciar tira as peças da mochila; remover o anúncio devolve tudo.",
-      "Preço até a sugestão vende em minutos; até o dobro, em algumas horas; acima disso, encalha.",
+      "Quem compra é gente de verdade: o anúncio fica no quadro até outro caçador pagar por ele, e o preço é você quem decide.",
+      "A compra sai do Alforje do comprador na hora, e o vendedor recebe na mesma hora, já sem a taxa da casa.",
       "Ninguém compra o próprio anúncio.",
       "A casa fica com " +
         Math.round(BAZAAR_FEE_RATIO * 100) +

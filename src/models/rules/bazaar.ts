@@ -56,11 +56,3 @@ export function suggestedPriceCents(item: Item, enhancement: number): number {
 
   return Math.max(MIN_LISTING_CENTS, Math.round(reais * 10) * 10);
 }
-
-export function saleDelayMs(priceCents: number, suggestedCents: number): number | null {
-  const ratio = priceCents / Math.max(1, suggestedCents);
-  if (ratio <= 1.05) return 5 * 60_000;
-  if (ratio <= 1.5) return 30 * 60_000;
-  if (ratio <= 2) return 3 * 60 * 60_000;
-  return null;
-}

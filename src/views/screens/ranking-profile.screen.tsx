@@ -1,9 +1,11 @@
 "use client";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { api } from "@/controllers/api.client";
 import { useGame } from "@/controllers/game.context";
 import { profileOf } from "@/controllers/ranking.controller";
 import { ATTRIBUTES } from "@/models/entities/attribute";
+import type { Hunter } from "@/models/entities/ranking";
 import { SLOT_LABEL } from "@/models/entities/item";
 import { findPet } from "@/models/entities/pet";
 import { formatNumber, formatBronze } from "@/shared/utils/format";
@@ -21,9 +23,22 @@ import { Tag } from "../components/tag";
 import { PageHeader } from "../layout/page-header";
 export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
   const { state, character, moon } = useGame();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const profile = useMemo(() => profileOf(state, hunterId), [state, hunterId, moon]);
+  const [roster, setRoster] = useState<Hunter[] | null>(null);
+  useEffect(() => {
+    let alive = true;
+    void api<{ hunters: Hunter[] }>("GET", "/api/roster").then((answer) => {
+      if (alive && answer.ok && answer.data) setRoster(answer.data.hunters);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+  const profile = useMemo(() => {
+    void moon;
+    return roster ? profileOf(state, roster, hunterId) : null;
+  }, [state, roster, hunterId, moon]);
   if (!character) return null;
+  if (roster === null) return null;
   if (!profile) {
     return (
       <>

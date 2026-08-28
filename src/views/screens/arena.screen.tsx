@@ -1,10 +1,12 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { api } from "@/controllers/api.client";
 import { useGame } from "@/controllers/game.context";
 import { formatCooldown, listArena, type ArenaResolution } from "@/controllers/arena.controller";
 import { ATTRIBUTES } from "@/models/entities/attribute";
 import type { Gender } from "@/models/entities/character";
+import type { Hunter } from "@/models/entities/ranking";
 import { ARENA_COOLDOWN_HOURS, ARENA_DAILY_ATTACKS, arenaSpoilsRange } from "@/models/rules/arena";
 import { playSound } from "@/controllers/sound";
 import { HUNT_TICK_MS, HUNT_TICKS } from "@/shared/constants/game";
@@ -126,6 +128,7 @@ export function ArenaScreen() {
   } = useGame();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [roster, setRoster] = useState<Hunter[]>([]);
   const [fighting, setFighting] = useState<ArenaResolution | null>(null);
   const [script, setScript] = useState<NarrationLine[]>([]);
   const [beat, setBeat] = useState(0);
@@ -140,8 +143,17 @@ export function ArenaScreen() {
     sufferRef.current = sufferBlow;
     landRef.current = landArena;
   });
+  useEffect(() => {
+    let alive = true;
+    void api<{ hunters: Hunter[] }>("GET", "/api/roster").then((answer) => {
+      if (alive && answer.ok && answer.data) setRoster(answer.data.hunters);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [report]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const view = useMemo(() => listArena(state, search), [state, search, moon]);
+  const view = useMemo(() => listArena(state, roster, search), [state, roster, search, moon]);
   useEffect(() => {
     if (!fighting) return;
     const timer = window.setInterval(() => {

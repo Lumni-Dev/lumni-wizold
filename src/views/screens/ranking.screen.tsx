@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { api } from "@/controllers/api.client";
 import { useGame } from "@/controllers/game.context";
 import { listRanking } from "@/controllers/ranking.controller";
 import type { Gender } from "@/models/entities/character";
-import { RANKING_BOARDS, type RankingKey } from "@/models/entities/ranking";
+import { RANKING_BOARDS, type Hunter, type RankingKey } from "@/models/entities/ranking";
 import { cn } from "@/shared/utils/class-names";
 import { formatNumber } from "@/shared/utils/format";
 import { GenderSymbol } from "../components/app-icon";
@@ -25,10 +26,21 @@ export function RankingScreen() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [gender, setGender] = useState<Gender | "all">("all");
+  const [roster, setRoster] = useState<Hunter[]>([]);
+
+  useEffect(() => {
+    let alive = true;
+    void api<{ hunters: Hunter[] }>("GET", "/api/roster").then((answer) => {
+      if (alive && answer.ok && answer.data) setRoster(answer.data.hunters);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const view = useMemo(
-    () => listRanking(state, key, page, search, gender),
-    [state, key, page, search, gender],
+    () => listRanking(state, roster, key, page, search, gender),
+    [state, roster, key, page, search, gender],
   );
 
   if (!character) return null;

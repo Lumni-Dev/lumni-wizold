@@ -515,7 +515,7 @@ export async function recordWalletMovement(
   client: PoolClient,
   characterId: string,
   centsDelta: number,
-  reason: "starting_balance" | "bazaar_sale" | "withdrawal" | "adjustment",
+  reason: "starting_balance" | "bazaar_sale" | "bazaar_purchase" | "withdrawal" | "adjustment",
   referenceId: string | null,
 ): Promise<void> {
   if (centsDelta === 0) return;

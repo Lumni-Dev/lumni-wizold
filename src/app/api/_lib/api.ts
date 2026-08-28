@@ -3,17 +3,9 @@ import type { PoolClient } from "pg";
 import type { GameState } from "@/models/entities/game-state";
 import type { Result } from "@/models/entities/result";
 import type { TavernIdentity, TavernState } from "@/models/entities/tavern";
-import { sellerNet } from "@/models/rules/bazaar";
 import { expireTransformation } from "@/controllers/character.controller";
-import { settleListings } from "@/controllers/bazaar.controller";
 import { withTransaction } from "@/models/repositories/server/database";
-import {
-  loadGame,
-  markListingsSold,
-  recordWalletMovement,
-  saveGame,
-  type LoadedGame,
-} from "@/models/repositories/server/game.store";
+import { loadGame, saveGame, type LoadedGame } from "@/models/repositories/server/game.store";
 import {
   loadRoomState,
   loadTavern,
@@ -91,30 +83,6 @@ export const asText = (value: unknown, maximum = 200): string =>
 export const asInt = (value: unknown, fallback = 0): number =>
   typeof value === "number" && Number.isFinite(value) ? Math.round(value) : fallback;
 export const asQuantity = (value: unknown): number => Math.min(999, Math.max(1, asInt(value, 1)));
-async function applyClock(
-  client: PoolClient,
-  characterId: string,
-  state: GameState,
-): Promise<GameState> {
-  let current = expireTransformation(state).state;
-  const settled = settleListings(current);
-  if (settled.state !== current) {
-    const after = new Set(settled.state.bazaarListings.map((listing) => listing.id));
-    const sold = current.bazaarListings.filter((listing) => !after.has(listing.id));
-    const netById = Object.fromEntries(
-      sold.map((listing) => [listing.id, sellerNet(listing.priceCents * listing.quantity)]),
-    );
-    await markListingsSold(
-      client,
-      sold.map((listing) => listing.id),
-      netById,
-    );
-    const delta = settled.state.wallet.cents - current.wallet.cents;
-    await recordWalletMovement(client, characterId, delta, "bazaar_sale", null);
-    current = settled.state;
-  }
-  return current;
-}
 export async function withGame<T>(request: Request, action: GameAction<T>): Promise<NextResponse> {
   const refused = refuseAbuse(request);
   if (refused) return refused;
@@ -129,9 +97,7 @@ export async function withGame<T>(request: Request, action: GameAction<T>): Prom
       const loaded = await loadGame(client, userId, request.method !== "GET");
       if (!loaded) return bad("Nenhum personagem ativo.", 404);
       const baseline =
-        request.method === "GET"
-          ? loaded.state
-          : await applyClock(client, loaded.characterId, loaded.state);
+        request.method === "GET" ? loaded.state : expireTransformation(loaded.state).state;
       const context: ApiContext = { client, userId, characterId: loaded.characterId, loaded };
       const result = await action(baseline, body, context);
       if (request.method !== "GET") {

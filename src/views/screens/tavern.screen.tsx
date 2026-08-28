@@ -6,7 +6,6 @@ import { useGame } from "@/controllers/game.context";
 import { isInPack, listPack } from "@/controllers/pack.controller";
 import { playSound } from "@/controllers/sound";
 import { useTavern } from "@/controllers/use-tavern";
-import { findRival } from "@/models/data/rivals";
 import { MAX_PACK, type PackMate } from "@/models/entities/pack";
 import {
   MAX_ROOM_MEMBERS,
@@ -100,7 +99,7 @@ export function TavernScreen() {
   const pack = listPack(state);
 
   const profileHref = (memberId: string): string | null =>
-    memberId === identity.id ? "/character" : findRival(memberId) ? "/ranking/" + memberId : null;
+    memberId === identity.id ? "/character" : "/ranking/" + memberId;
 
   const currentPage = clampPage(page, rooms.length, PAGE_SIZE);
   const pages = pageCount(rooms.length, PAGE_SIZE);
