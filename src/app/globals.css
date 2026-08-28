@@ -54,6 +54,18 @@
     background-repeat: no-repeat;
     background-attachment: fixed;
     -webkit-font-smoothing: antialiased;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  input,
+  textarea {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  img {
+    -webkit-user-drag: none;
   }
 
   ::selection {

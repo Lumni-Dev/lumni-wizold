@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Orbitron } from "next/font/google";
 import { GameProvider } from "@/controllers/game.context";
 import { GAME_NAME } from "@/shared/constants/game";
+import { Shield } from "@/views/layout/shield";
 import "./globals.css";
 
 const sans = Geist({ variable: "--font-sans-stack", subsets: ["latin"] });
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           sans.variable + " " + mono.variable + " " + logo.variable + " font-sans antialiased"
         }
       >
+        <Shield />
         <GameProvider>{children}</GameProvider>
       </body>
     </html>

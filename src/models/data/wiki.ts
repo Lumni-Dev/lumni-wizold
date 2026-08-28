@@ -30,7 +30,8 @@ import {
 } from "../rules/arena";
 import { MINING_MAX_LEVEL, ORES } from "../entities/mining";
 import { RANKING_BOARDS } from "../entities/ranking";
-import { BAZAAR_FEE_RATIO } from "../rules/bazaar";
+import { BAZAAR_FEE_RATIO, MIN_WITHDRAW_CENTS } from "../rules/bazaar";
+import { initialWallet } from "../entities/bazaar";
 import { enhancementCost } from "../rules/forge";
 import { experienceForLevel } from "../rules/progression";
 import { FULL_MOON_ATTRIBUTE_BONUS, MOON_PHASES, SYNODIC_MONTH_DAYS } from "../rules/moon";
@@ -118,7 +119,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "Fúria: 100, mais 2 por ponto de Vontade acima de 4. Sobe no combate e no descanso, e paga a transformação.",
       "Um poço fundo de fúria segura o bônus de dano do crítico mesmo depois de transformar: é para isso que serve a Vontade.",
       "Poções de vida e fúria recuperam uma porcentagem do próprio máximo.",
-      "Zerou a vida na caçada, você escapa com 1 de vida e registra uma derrota.",
+      "Zerou a vida na caçada, você escapa com 1 de vida, registra uma derrota e a fera não se sustenta: derrotado, você volta à forma humana na hora.",
       "Luta que se arrasta até o teto de rodadas termina em recuo: a caçada conta, mas ninguém vence nem perde.",
     ],
   },
@@ -135,6 +136,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         TRANSFORM_DURATION_MS / 60_000 +
         " minutos: passado o tempo, o corpo volta sozinho à forma humana.",
       "Voltar ao humano é gratuito e não devolve a fúria gasta.",
+      "Perder uma caçada ou um duelo recolhe a fera sozinho: a derrota devolve a forma humana e apaga o selo da fúria.",
       "Um botão só comanda o corpo: Recuperar-se para todas as atividades e devolve um vigésimo da vida e da fúria por minuto; o corpo inteiro volta em cerca de vinte minutos, em qualquer nível. Inteiro, o botão vira Transformar; transformado, recolhe a fera.",
     ],
   },
@@ -196,10 +198,11 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     title: "Equipamento",
     summary: "Sete espaços, cinco conjuntos, um item por espaço.",
     lines: [
-      "Espaços: capacete, colar, armadura, calças, botas, garras e anel.",
+      "Espaços: gorro, colar, casaco, calças, botas, garras e anel.",
       setRequirementsLine(),
       "Toda peça dá atributo, e nada além de atributo: o que o card promete é exatamente o que soma na ficha.",
-      "Garras e anel dão Força; peitoral, calças e elmo dão Resistência; botas dão Agilidade; colar dá Instinto e Vontade.",
+      "Garras e anel dão Força; casaco, calças e gorro dão Resistência; botas dão Agilidade; colar dá Instinto e Vontade.",
+      "O casaco tem corte de linhagem: o de Lumni veste Lumni, o de Luna veste Luna. O mercado mostra os dois e o botão avisa qual é o seu.",
       "Equipar um item com o espaço ocupado devolve o anterior ao inventário.",
       "O conjunto lunar é o teto: caro no mercado e também sorteado de vampiros e unicórnios.",
       "Cada peça equipada pode ser forjada, e o +X viaja com ela para dentro e fora do inventário.",
@@ -295,7 +298,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "A busca filtra pelo nome sem renumerar: a posição é sempre a do quadro inteiro.",
       "Clicar em um nome abre a ficha de leitura dele: atributos, equipamento com o +X de cada peça, mascote e posições.",
       "O seu nome leva para a sua própria ficha, que é a mesma pessoa com mais detalhe.",
-      "A partida roda só nesta máquina, então os outros caçadores são gerados: os mesmos nomes e números voltam toda sessão.",
+      "A partida vive no servidor, e a sua linha é a única viva do quadro por enquanto: os outros caçadores são o elenco fixo do jogo, com os mesmos nomes e números sempre.",
     ],
   },
   {
@@ -330,7 +333,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         "% a " +
         Math.round(ARENA_SPOILS_MAX_SHARE * 100) +
         "% do que o perdedor carrega, então quem está duro paga pouco.",
-      "Perder custa a mesma coisa: sai da sua bolsa e vai para a dele, e você deixa o fosso com 1 de vida.",
+      "Perder custa a mesma coisa: sai da sua bolsa e vai para a dele, e você deixa o fosso com 1 de vida e de volta à forma humana.",
       "Duelo que chega ao teto de rodadas termina empatado: ninguém leva bronze e ninguém marca ponto.",
       "Os duelos ganhos têm quadro próprio no ranking.",
     ],
@@ -352,7 +355,8 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "Chamar alguém da matilha abre uma mesa reservada para vocês dois, que só vocês veem.",
       "A mesa reservada nunca é varrida: a mensagem espera até que o outro nome apareça.",
       "Excluir um nome não custa nada e guardar de novo também não; a mesa reservada continua até alguém fechá-la.",
-      "As salas são desta máquina: conversa entre máquinas diferentes precisa de um servidor.",
+      "As salas vivem no servidor: quem estiver jogando, de qualquer máquina, senta nas mesmas mesas e lê as mesmas falas.",
+      "A senha da mesa fica guardada cifrada; ainda assim, invente uma só para a mesa, nunca uma senha que você usa em outro lugar.",
     ],
   },
   {
@@ -368,6 +372,11 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "A casa fica com " +
         Math.round(BAZAAR_FEE_RATIO * 100) +
         "% de cada venda; o resto cai no Alforje, a carteira do bazar.",
+      "O Alforje nasce com " +
+        formatReais(initialWallet().cents) +
+        " e o saque mínimo é " +
+        formatReais(MIN_WITHDRAW_CENTS) +
+        ", pedido com nome completo, CPF e chave Pix.",
       "O saque do Alforje sai por Pix. Nesta versão o Pix é de demonstração e o QR não vale pagamento.",
       "Comprar uma peça mais forjada que a sua eleva a sua ao nível dela: a forja pertence à peça.",
     ],

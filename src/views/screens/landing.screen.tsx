@@ -102,12 +102,7 @@ export function LandingScreen() {
                 </Link>
               </>
             ) : (
-              <>
-                <PlayButton href="/login" label="Jogar grátis" />
-                <p className="text-[11px] uppercase tracking-[0.16em] text-ink-faint">
-                  Sem instalar nada, direto no navegador
-                </p>
-              </>
+              <PlayButton href="/login" label="Jogar grátis" />
             )}
           </div>
         </header>
