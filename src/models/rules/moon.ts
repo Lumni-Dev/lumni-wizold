@@ -97,7 +97,7 @@ export function applyMoonState(state: MoonState): void {
   currentState = state;
 }
 
-export function currentMoon(now = Date.now()): MoonState {
+function currentMoon(now = Date.now()): MoonState {
   return currentState ?? computeMoonLocally(now);
 }
 

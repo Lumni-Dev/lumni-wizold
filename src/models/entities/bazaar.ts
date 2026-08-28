@@ -13,7 +13,7 @@ export interface Wallet {
   cents: number;
 }
 
-export const STARTING_WALLET_CENTS = 1_000;
+const STARTING_WALLET_CENTS = 1_000;
 
 export function initialWallet(): Wallet {
   return { cents: STARTING_WALLET_CENTS };

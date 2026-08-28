@@ -203,7 +203,7 @@ export function setForLevel(level: number): SetDefinition {
   return owned;
 }
 
-export const LINEAGE_SLOT: EquipmentSlot = "armor";
+const LINEAGE_SLOT: EquipmentSlot = "armor";
 
 export function pieceId(set: EquipmentSet, slot: EquipmentSlot, lineage?: Gender): string {
   const base = set + "-" + slot;
