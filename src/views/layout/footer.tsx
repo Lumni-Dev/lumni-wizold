@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { COMPANY } from "@/shared/constants/company";
 import { GAME_NAME, GAME_TAGLINE } from "@/shared/constants/game";
 import { ActionIcon } from "../components/app-icon";
+import { BackToTop } from "./back-to-top";
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -63,12 +63,7 @@ export function Footer() {
               © {year} {COMPANY.name}. Todos os direitos reservados.
             </p>
           </div>
-          <Link
-            href="/"
-            className="text-[10px] uppercase tracking-[0.16em] text-ink-faint transition-colors hover:text-ink"
-          >
-            A lenda de {GAME_NAME}
-          </Link>
+          <BackToTop />
         </div>
       </div>
     </footer>
