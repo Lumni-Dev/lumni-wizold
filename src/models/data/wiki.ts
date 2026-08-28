@@ -381,6 +381,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         ", pedido com nome completo, CPF e chave Pix.",
       "O saque do Alforje sai por Pix. Nesta versão o Pix é de demonstração e o QR não vale pagamento.",
       "Comprar uma peça mais forjada que a sua eleva a sua ao nível dela: a forja pertence à peça.",
+      "Qualquer dúvida com um pagamento, escreva para o suporte: wizold@lumni.dev.br.",
     ],
   },
   {
@@ -397,6 +398,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "A loja não vende nível, atributo nem equipamento: experiência só a caça dá, e ponto de atributo só o treino dá.",
       "O pagamento abre no checkout do Stripe e o bronze cai na conta assim que ele confirma.",
       "O histórico de compras fica na própria loja, cinco por página: valor, data e o status de cada pacote, de aguardando pagamento a aprovado, expirado ou devolvido.",
+      "Qualquer dúvida com um pagamento, escreva para o suporte: wizold@lumni.dev.br.",
     ],
   },
   {

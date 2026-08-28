@@ -9,9 +9,20 @@ export function GameFooter() {
           <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">{GAME_TAGLINE}</p>
         </div>
 
-        <p className="text-[11px] text-ink-faint">
-          A partida vive no servidor de Wizold e te espera em qualquer navegador.
-        </p>
+        <div className="space-y-1 sm:text-right">
+          <p className="text-[11px] text-ink-faint">
+            A partida vive no servidor de Wizold e te espera em qualquer navegador.
+          </p>
+          <p className="text-[11px] text-ink-faint">
+            Suporte:{" "}
+            <a
+              href="mailto:wizold@lumni.dev.br"
+              className="text-ink-soft transition-colors hover:text-ink"
+            >
+              wizold@lumni.dev.br
+            </a>
+          </p>
+        </div>
       </div>
     </footer>
   );
