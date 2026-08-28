@@ -73,10 +73,13 @@ export function Button({
     }
   };
 
+  // While waiting, the label goes invisible but keeps holding its own width
+  // and the spinner sits centered over it: the button swaps content without
+  // ever changing size.
   return (
     <button
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-md font-medium uppercase tracking-[0.16em]",
+        "relative inline-flex items-center justify-center gap-2 rounded-md font-medium uppercase tracking-[0.16em]",
         "transition-colors duration-150 disabled:pointer-events-none disabled:opacity-35",
         VARIANTS[variant],
         icon ? ICON_SIZES[size] : SIZES[size],
@@ -88,8 +91,14 @@ export function Button({
       onClick={press}
       {...rest}
     >
-      {pending ? <Spinner /> : null}
-      {icon && pending ? null : children}
+      {pending ? (
+        <span className="absolute inset-0 flex items-center justify-center">
+          <Spinner />
+        </span>
+      ) : null}
+      <span className={cn("inline-flex items-center gap-2", pending && "invisible")}>
+        {children}
+      </span>
     </button>
   );
 }
