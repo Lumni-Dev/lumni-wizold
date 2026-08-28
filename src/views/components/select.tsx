@@ -1,19 +1,11 @@
 "use client";
-
 import { useEffect, useId, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/shared/utils/class-names";
-
-// The game's own dropdown, dressed exactly like Field: the native select
-// wears the colours of the system, and nothing in this interface does. The
-// button keeps focus the whole time and the list speaks through
-// aria-activedescendant, so the keyboard works the way a native one would.
-
 export interface SelectOption {
   value: string;
   label: string;
 }
-
 interface SelectProps {
   label?: string;
   placeholder: string;
@@ -24,9 +16,7 @@ interface SelectProps {
   disabled?: boolean;
   "aria-label"?: string;
 }
-
 const TYPE_RESET_MS = 800;
-
 export function Select({
   label,
   placeholder,
@@ -43,54 +33,44 @@ export function Select({
   const listRef = useRef<HTMLUListElement>(null);
   const typedRef = useRef({ text: "", at: 0 });
   const baseId = useId();
-
   const selectedIndex = options.findIndex((option) => option.value === value);
   const selected = selectedIndex >= 0 ? options[selectedIndex] : null;
-
   useEffect(() => {
     if (!open) return;
-
     const close = (event: MouseEvent) => {
       if (rootRef.current && !rootRef.current.contains(event.target as Node)) setOpen(false);
     };
     document.addEventListener("mousedown", close);
     return () => document.removeEventListener("mousedown", close);
   }, [open]);
-
   useEffect(() => {
     if (!open || highlighted < 0) return;
     listRef.current
       ?.querySelector('[data-index="' + highlighted + '"]')
       ?.scrollIntoView({ block: "nearest" });
   }, [open, highlighted]);
-
   const show = () => {
     setHighlighted(selectedIndex >= 0 ? selectedIndex : 0);
     setOpen(true);
   };
-
   const pick = (index: number) => {
     const option = options[index];
     if (!option) return;
     onChange(option.value);
     setOpen(false);
   };
-
   const jumpTo = (typed: string) => {
     const now = Date.now();
     const previous = now - typedRef.current.at < TYPE_RESET_MS ? typedRef.current.text : "";
     const text = previous + typed.toLowerCase();
     typedRef.current = { text, at: now };
-
     const index = options.findIndex((option) => option.label.toLowerCase().startsWith(text));
     if (index < 0) return;
     if (open) setHighlighted(index);
     else pick(index);
   };
-
   const onKeyDown = (event: React.KeyboardEvent) => {
     if (disabled) return;
-
     if (event.key === "Escape" && open) {
       event.preventDefault();
       setOpen(false);
@@ -113,9 +93,7 @@ export function Select({
         return;
       }
       const step = event.key === "ArrowDown" ? 1 : -1;
-      setHighlighted((current) =>
-        Math.min(options.length - 1, Math.max(0, current + step)),
-      );
+      setHighlighted((current) => Math.min(options.length - 1, Math.max(0, current + step)));
       return;
     }
     if (event.key === "Home" && open) {
@@ -132,7 +110,6 @@ export function Select({
       jumpTo(event.key);
     }
   };
-
   return (
     <div className="block space-y-2">
       {label ? (

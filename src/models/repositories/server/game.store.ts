@@ -8,19 +8,11 @@ import type { LogEntry, LogKind } from "../../entities/log-entry";
 import type { PackMate } from "../../entities/pack";
 import type { Pet, PetGender } from "../../entities/pet";
 import { fillAutomation } from "../../entities/automation";
-
-// Translates GameState to rows and back. The database is the save file now:
-// collections are replaced wholesale inside the surrounding transaction, and
-// the character row is loaded FOR UPDATE so two requests from the same player
-// can never interleave. bigint columns arrive as strings from pg; every one
-// passes through Number() on the way in.
-
 const int = (value: unknown): number => Number(value ?? 0);
 const iso = (value: unknown): string =>
   value instanceof Date ? value.toISOString() : String(value ?? new Date().toISOString());
 const stamp = (value: unknown): string | undefined =>
   value instanceof Date ? value.toISOString() : undefined;
-
 interface CharacterRow {
   id: string;
   user_id: string;
@@ -29,7 +21,6 @@ interface CharacterRow {
   form: Form;
   [key: string]: unknown;
 }
-
 function rowToCharacter(row: CharacterRow): Character {
   return {
     id: row.id,
@@ -65,14 +56,12 @@ function rowToCharacter(row: CharacterRow): Character {
     transformedAt: stamp(row.transformed_at),
   };
 }
-
 export interface LoadedGame {
   characterId: string;
   state: GameState;
   petRestCollectedAt: string | null;
   activityStartedAt: string | null;
 }
-
 export async function loadGame(
   client: PoolClient,
   userId: string,
@@ -83,13 +72,9 @@ export async function loadGame(
     [userId],
   );
   if (found.rowCount === 0) return null;
-
   const row = found.rows[0] as CharacterRow;
   const characterId = row.id;
   const character = rowToCharacter(row);
-
-  // One client is one wire: parallel query() on the same connection only
-  // queues internally and pg@9 will refuse it, so the reads go in file.
   const pet = await client.query("select * from pets where character_id = $1", [characterId]);
   const equipped = await client.query(
     "select slot, item_id from equipped_items where character_id = $1",
@@ -130,18 +115,14 @@ export async function loadGame(
     "select id, kind, message, created_at from log_entries where character_id = $1 order by created_at desc limit 120",
     [characterId],
   );
-  const activity = await client.query(
-    "select started_at from activities where character_id = $1",
-    [characterId],
-  );
-
+  const activity = await client.query("select started_at from activities where character_id = $1", [
+    characterId,
+  ]);
   const equipment = emptyEquipment();
   for (const entry of equipped.rows) equipment[entry.slot as EquipmentSlot] = entry.item_id;
-
   const petRow = pet.rows[0];
   const automationRow = automation.rows[0] ?? {};
   const walletValue: Wallet = { cents: int(wallet.rows[0]?.cents) };
-
   const state: GameState = {
     version: STATE_VERSION,
     character,
@@ -176,9 +157,15 @@ export async function loadGame(
     bazaarPurchases: Object.fromEntries(
       purchases.rows.map((entry) => [entry.listing_id, int(entry.quantity)]),
     ),
-    arenaDuels: Object.fromEntries(duels.rows.map((entry) => [entry.opponent_id, iso(entry.dueled_at)])),
+    arenaDuels: Object.fromEntries(
+      duels.rows.map((entry) => [entry.opponent_id, iso(entry.dueled_at)]),
+    ),
     pack: pack.rows.map(
-      (entry): PackMate => ({ id: entry.mate_id, name: entry.mate_name, addedAt: iso(entry.added_at) }),
+      (entry): PackMate => ({
+        id: entry.mate_id,
+        name: entry.mate_name,
+        addedAt: iso(entry.added_at),
+      }),
     ),
     wallet: walletValue,
     automation: fillAutomation({
@@ -192,7 +179,10 @@ export async function loadGame(
       petFeed: automationRow.pet_feed,
       petRest: automationRow.pet_rest,
     }),
-    inventory: inventory.rows.map((entry) => ({ itemId: entry.item_id, quantity: int(entry.quantity) })),
+    inventory: inventory.rows.map((entry) => ({
+      itemId: entry.item_id,
+      quantity: int(entry.quantity),
+    })),
     equipment,
     log: log.rows.map(
       (entry): LogEntry => ({
@@ -203,7 +193,6 @@ export async function loadGame(
       }),
     ),
   };
-
   return {
     characterId,
     state,
@@ -211,12 +200,10 @@ export async function loadGame(
     activityStartedAt: stamp(activity.rows[0]?.started_at) ?? null,
   };
 }
-
 interface ReplaceColumn {
   name: string;
   cast: "text" | "integer" | "timestamptz" | "log_kind";
 }
-
 async function replace(
   client: PoolClient,
   table: string,
@@ -226,26 +213,17 @@ async function replace(
 ): Promise<void> {
   await client.query(`delete from ${table} where character_id = $1`, [characterId]);
   if (rows.length === 0) return;
-
   const arrays = columns.map((_, column) => rows.map((entry) => String(entry[column])));
   const sources = columns.map((_, index) => `$${index + 2}::text[]`).join(", ");
   const names = columns.map((column) => column.name).join(", ");
-  const projection = columns
-    .map((column, index) => `c${index}::${column.cast}`)
-    .join(", ");
+  const projection = columns.map((column, index) => `c${index}::${column.cast}`).join(", ");
   const aliases = columns.map((_, index) => `c${index}`).join(", ");
-
   await client.query(
     `insert into ${table} (character_id, ${names})
      select $1, ${projection} from unnest(${sources}) as source (${aliases})`,
     [characterId, ...arrays],
   );
 }
-
-// The pure controllers keep the reference of every branch they did not touch,
-// so reference inequality IS the dirty flag: a hunt writes character, bag,
-// diary and maybe the wolf, and never rewrites pack, duels or listings. This
-// is what keeps one action a handful of statements instead of a full dump.
 export async function saveGame(
   client: PoolClient,
   characterId: string,
@@ -254,12 +232,10 @@ export async function saveGame(
 ): Promise<void> {
   const character = after.character;
   if (!character) return;
-
   if (character === before.character && after.mining === before.mining) {
     await savePieces(client, characterId, before, after);
     return;
   }
-
   await client.query(
     `update characters set
        name = $2, gender = $3, form = $4, level = $5, experience = $6,
@@ -302,10 +278,8 @@ export async function saveGame(
       character.transformedAt ?? null,
     ],
   );
-
   await savePieces(client, characterId, before, after);
 }
-
 async function savePieces(
   client: PoolClient,
   characterId: string,
@@ -314,37 +288,42 @@ async function savePieces(
 ): Promise<void> {
   if (after.pet !== before.pet) await savePet(client, characterId, before, after);
   if (after.equipment !== before.equipment) await saveEquipment(client, characterId, after);
-
   if (after.inventory !== before.inventory) {
     await replace(
       client,
       "inventory_items",
       characterId,
-      [{ name: "item_id", cast: "text" }, { name: "quantity", cast: "integer" }],
+      [
+        { name: "item_id", cast: "text" },
+        { name: "quantity", cast: "integer" },
+      ],
       after.inventory.map((slot) => [slot.itemId, slot.quantity]),
     );
   }
-
   if (after.enhancements !== before.enhancements) {
     await replace(
       client,
       "enhancements",
       characterId,
-      [{ name: "item_id", cast: "text" }, { name: "level", cast: "integer" }],
+      [
+        { name: "item_id", cast: "text" },
+        { name: "level", cast: "integer" },
+      ],
       Object.entries(after.enhancements).map(([itemId, level]) => [itemId, level]),
     );
   }
-
   if (after.arenaDuels !== before.arenaDuels) {
     await replace(
       client,
       "arena_duels",
       characterId,
-      [{ name: "opponent_id", cast: "text" }, { name: "dueled_at", cast: "timestamptz" }],
+      [
+        { name: "opponent_id", cast: "text" },
+        { name: "dueled_at", cast: "timestamptz" },
+      ],
       Object.entries(after.arenaDuels).map(([opponent, at]) => [opponent, at]),
     );
   }
-
   if (after.pack !== before.pack) {
     await replace(
       client,
@@ -358,17 +337,18 @@ async function savePieces(
       after.pack.map((mate) => [mate.id, mate.name, mate.addedAt]),
     );
   }
-
   if (after.bazaarPurchases !== before.bazaarPurchases) {
     await replace(
       client,
       "bazaar_purchases",
       characterId,
-      [{ name: "listing_id", cast: "text" }, { name: "quantity", cast: "integer" }],
+      [
+        { name: "listing_id", cast: "text" },
+        { name: "quantity", cast: "integer" },
+      ],
       Object.entries(after.bazaarPurchases).map(([listing, quantity]) => [listing, quantity]),
     );
   }
-
   if (after.wallet !== before.wallet) await saveWallet(client, characterId, after);
   if (after.automation !== before.automation) await saveAutomation(client, characterId, after);
   if (after.bazaarListings !== before.bazaarListings) {
@@ -376,7 +356,6 @@ async function savePieces(
   }
   if (after.log !== before.log) await saveDiary(client, characterId, before, after);
 }
-
 async function savePet(
   client: PoolClient,
   characterId: string,
@@ -405,7 +384,6 @@ async function savePet(
     await client.query("delete from pets where character_id = $1", [characterId]);
   }
 }
-
 async function saveEquipment(
   client: PoolClient,
   characterId: string,
@@ -422,7 +400,6 @@ async function saveEquipment(
     );
   }
 }
-
 async function saveWallet(
   client: PoolClient,
   characterId: string,
@@ -434,7 +411,6 @@ async function saveWallet(
     [characterId, after.wallet.cents],
   );
 }
-
 async function saveAutomation(
   client: PoolClient,
   characterId: string,
@@ -461,9 +437,6 @@ async function saveAutomation(
     ],
   );
 }
-
-// Listings: gone from the state after the action means cancelled (the sold
-// ones were already marked by the settle step before the action ran).
 async function saveListings(
   client: PoolClient,
   characterId: string,
@@ -496,12 +469,7 @@ async function saveListings(
       ],
     );
   }
-
 }
-
-// The diary is append-only: an action writes its one to three new lines and
-// one delete trims whatever fell off the 120-line window, instead of the
-// old full rewrite of the whole diary on every action.
 async function saveDiary(
   client: PoolClient,
   characterId: string,
@@ -510,7 +478,6 @@ async function saveDiary(
 ): Promise<void> {
   const known = new Set(before.log.map((entry) => entry.id));
   const fresh = after.log.filter((entry) => !known.has(entry.id));
-
   if (fresh.length > 0) {
     await client.query(
       `insert into log_entries (character_id, id, kind, message, created_at)
@@ -526,13 +493,11 @@ async function saveDiary(
       ],
     );
   }
-
-  await client.query(
-    "delete from log_entries where character_id = $1 and id <> all($2::text[])",
-    [characterId, after.log.map((entry) => entry.id)],
-  );
+  await client.query("delete from log_entries where character_id = $1 and id <> all($2::text[])", [
+    characterId,
+    after.log.map((entry) => entry.id),
+  ]);
 }
-
 export async function markListingsSold(
   client: PoolClient,
   soldIds: readonly string[],
@@ -546,7 +511,6 @@ export async function markListingsSold(
     );
   }
 }
-
 export async function recordWalletMovement(
   client: PoolClient,
   characterId: string,
@@ -561,7 +525,6 @@ export async function recordWalletMovement(
     [characterId, centsDelta, reason, referenceId],
   );
 }
-
 export async function insertNewGame(
   client: PoolClient,
   userId: string,
@@ -569,7 +532,6 @@ export async function insertNewGame(
 ): Promise<void> {
   const character = state.character;
   if (!character) throw new Error("Estado sem personagem.");
-
   await client.query(
     `insert into characters
        (id, user_id, name, gender, form, level, experience, health, rage, bronze,
@@ -597,13 +559,9 @@ export async function insertNewGame(
       character.createdAt,
     ],
   );
-
-  // initialState() carries fresh references for every branch, so the diff in
-  // saveGame writes each piece of the newborn run instead of skipping it.
   await saveGame(client, character.id, initialState(), state);
   await recordWalletMovement(client, character.id, state.wallet.cents, "starting_balance", null);
 }
-
 export async function updateActivity(
   client: PoolClient,
   characterId: string,
@@ -638,7 +596,6 @@ export async function updateActivity(
     ],
   );
 }
-
 export async function setPetRestCollectedAt(
   client: PoolClient,
   characterId: string,

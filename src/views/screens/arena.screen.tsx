@@ -1,5 +1,4 @@
 "use client";
-
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useGame } from "@/controllers/game.context";
@@ -27,9 +26,7 @@ import { Panel } from "../components/panel";
 import { Tag } from "../components/tag";
 import { Tooltip } from "../components/tooltip";
 import { PageHeader } from "../layout/page-header";
-
 const PAGE_SIZE = 6;
-
 function Fighter({
   gender,
   name,
@@ -46,7 +43,6 @@ function Fighter({
   maximum: number;
 }) {
   const left = Math.max(0, Math.round(health));
-
   return (
     <div className="flex items-center gap-3 p-4">
       <GenderIcon gender={gender} size="large" />
@@ -67,11 +63,9 @@ function Fighter({
     </div>
   );
 }
-
 function DuelReport({ report }: { report: ArenaResolution }) {
   const { combat, hunter } = report;
   const outcome = combat.victory ? "Vitória" : combat.retreated ? "Empate" : "Derrota";
-
   return (
     <Panel
       title="Último duelo"
@@ -118,7 +112,6 @@ function DuelReport({ report }: { report: ArenaResolution }) {
     </Panel>
   );
 }
-
 export function ArenaScreen() {
   const {
     state,
@@ -131,41 +124,32 @@ export function ArenaScreen() {
     sufferBlow,
     landArena,
   } = useGame();
-
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-
   const [fighting, setFighting] = useState<ArenaResolution | null>(null);
   const [script, setScript] = useState<NarrationLine[]>([]);
   const [beat, setBeat] = useState(0);
   const [report, setReport] = useState<ArenaResolution | null>(null);
-
   const beatRef = useRef(0);
   const scriptRef = useRef<NarrationLine[]>([]);
   const pendingRef = useRef<ArenaResolution | null>(null);
   const bledRef = useRef({ last: 0, total: 0 });
-
   const sufferRef = useRef(sufferBlow);
   const landRef = useRef(landArena);
   useEffect(() => {
     sufferRef.current = sufferBlow;
     landRef.current = landArena;
   });
-
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const view = useMemo(() => listArena(state, search), [state, search, moon]);
-
   useEffect(() => {
     if (!fighting) return;
-
     const timer = window.setInterval(() => {
       beatRef.current += 1;
       setBeat(beatRef.current);
-
       const line = scriptRef.current[Math.min(beatRef.current, scriptRef.current.length) - 1];
       if (line?.blow === "ours") playSound(line.critical ? "crit" : "hit");
       if (line?.blow === "theirs") playSound("hurt");
-
       if (pendingRef.current && line?.characterHealth !== undefined) {
         const delta = bledRef.current.last - line.characterHealth;
         if (delta > 0) {
@@ -176,7 +160,6 @@ export function ArenaScreen() {
           };
         }
       }
-
       if (beatRef.current > scriptRef.current.length && pendingRef.current) {
         const held = pendingRef.current;
         pendingRef.current = null;
@@ -187,20 +170,14 @@ export function ArenaScreen() {
         setFighting(null);
       }
     }, HUNT_TICK_MS);
-
     return () => window.clearInterval(timer);
   }, [fighting]);
-
   if (!character || !stats) return null;
-
   const busy = fighting !== null;
-
   async function challenge(hunterId: string) {
     if (pendingRef.current || !character) return;
-
     const resolution = await challengeArena(hunterId);
     if (!resolution) return;
-
     pendingRef.current = resolution;
     scriptRef.current = narrationOf(
       { foe: resolution.foe, combat: resolution.combat },
@@ -209,27 +186,22 @@ export function ArenaScreen() {
     );
     bledRef.current = { last: character.health, total: 0 };
     beatRef.current = 0;
-
     setScript(scriptRef.current);
     setBeat(0);
     setReport(null);
     setFighting(resolution);
   }
-
   async function challengeDrawn() {
     const opponent = await drawOpponent();
     if (!opponent) return;
     await challenge(opponent.hunterId);
   }
-
   const currentPage = clampPage(page, view.rivals.length, PAGE_SIZE);
   const pages = pageCount(view.rivals.length, PAGE_SIZE);
   const onPage = pageOf(view.rivals, currentPage, PAGE_SIZE);
-
   const told = Math.min(beat, script.length);
   const line = script.length > 0 ? script[Math.max(1, told) - 1] : null;
   const foe = fighting ?? report ?? null;
-
   return (
     <>
       <PageHeader
@@ -385,7 +357,6 @@ export function ArenaScreen() {
           <List>
             {onPage.map(({ hunter, stats: rival, inBand, cooldownLeft, spoils }) => {
               const resting = cooldownLeft > 0;
-
               return (
                 <ListRow key={hunter.id} layout="column" padding="art">
                   <div className="flex items-center gap-3">

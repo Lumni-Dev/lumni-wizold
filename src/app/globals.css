@@ -1,9 +1,6 @@
 @import "tailwindcss";
 
-/*
-  Single palette for the whole game: black, grey and white.
-  Any new colour must be declared here and never written inline in a component.
-*/
+
 @theme {
   --color-base: #050506;
   --color-charcoal: #0a0a0c;
@@ -16,8 +13,7 @@
   --color-ink-soft: #a2a2ac;
   --color-ink-faint: #6b6b76;
   --color-highlight: #fafafa;
-  /* Blood for health, fury for rage; ember is the amber of the forged chrome,
-     worn by the energy bars and by the primary action of every screen. */
+  
   --color-blood: #d60932;
   --color-ember: #e0993d;
   --color-fury: #7d4fa8;
@@ -25,7 +21,7 @@
 
   --font-sans: var(--font-sans-stack), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono-stack), ui-monospace, "SFMono-Regular", monospace;
-  /* Worn only by the game logo. */
+  
   --font-logo: var(--font-logo-stack), var(--font-sans-stack), sans-serif;
 }
 
@@ -38,11 +34,7 @@
     color-scheme: dark;
   }
 
-  /*
-    One wallpaper behind every page, kept almost invisible: a veil of the base
-    colour sits over it and thickens on the way down, until the picture has
-    fully dissolved into the page background at the bottom.
-  */
+  
   body {
     background-color: var(--color-base);
     color: var(--color-ink);
@@ -93,7 +85,7 @@
     outline-offset: 2px;
   }
 
-  /* Tailwind v4 drops the default pointer on buttons: put it back everywhere. */
+  
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
   summary,
@@ -112,7 +104,7 @@
   text-transform: uppercase;
 }
 
-/* The inside of every slot: grey light pooling in the middle, black in the corners. */
+
 @utility slot-well {
   background-image: radial-gradient(
     circle at 50% 45%,
@@ -122,7 +114,7 @@
   );
 }
 
-/* Subtle scratched texture used by the resource bars. */
+
 @utility striped {
   background-image: repeating-linear-gradient(
     135deg,
@@ -134,7 +126,7 @@
 }
 
 
-/* The light that passes over the filled part of a vital while rest refills it. */
+
 @keyframes bar-glow {
   0% {
     transform: translateX(-100%);
@@ -157,8 +149,7 @@
   animation: bar-glow 2200ms ease-in-out infinite;
 }
 
-/* The shine an item answers with when the cursor lands on its card: the same
-   light the bars use, running from the bottom left corner to the top right. */
+
 @keyframes item-glow {
   0% {
     transform: translate(-100%, 100%);
@@ -181,7 +172,7 @@
   animation: item-glow 2200ms ease-in-out infinite;
 }
 
-/* The corner where the game talks: each line slides in from the right. */
+
 @keyframes toast-in {
   from {
     opacity: 0;

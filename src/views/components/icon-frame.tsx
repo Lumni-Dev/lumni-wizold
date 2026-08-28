@@ -1,21 +1,13 @@
 "use client";
-
 import { useState, type ReactNode } from "react";
 import { cn } from "@/shared/utils/class-names";
 import { CornerAccents } from "./corner-accents";
-
 export type IconSize = "mini" | "small" | "medium" | "large" | "huge";
-
 const MINI = "h-8 w-8";
-
 const SMALL = "h-15 w-15";
-
 const MEDIUM = "h-18 w-18";
-
 const LARGE = "h-22 w-22";
-
 const HUGE = "h-28 w-28";
-
 const ICON_BOX: Record<IconSize, string> = {
   mini: MINI,
   small: SMALL,
@@ -23,7 +15,6 @@ const ICON_BOX: Record<IconSize, string> = {
   large: LARGE,
   huge: HUGE,
 };
-
 const FRAME_ROOM: Record<IconSize, string> = {
   mini: "m-1",
   small: "m-2",
@@ -31,7 +22,6 @@ const FRAME_ROOM: Record<IconSize, string> = {
   large: "m-4",
   huge: "m-5",
 };
-
 const ICON_TEXT: Record<IconSize, string> = {
   mini: "text-[10px]",
   small: "text-sm",
@@ -39,14 +29,11 @@ const ICON_TEXT: Record<IconSize, string> = {
   large: "text-xl",
   huge: "text-2xl",
 };
-
 type FrameTone = "default" | "strong";
-
 const TONES: Record<FrameTone, string> = {
   default: "border-edge bg-base text-ink-faint",
   strong: "border-edge-strong bg-charcoal text-ink-soft",
 };
-
 export function IconFrame({
   size = "medium",
   tone = "default",
@@ -76,11 +63,8 @@ export function IconFrame({
     </span>
   );
 }
-
 const PREVIEW_SIZE = 220;
-
 const ICON_PAD = "p-[5px]";
-
 export function IconArt({
   source,
   padded = true,
@@ -90,8 +74,10 @@ export function IconArt({
   padded?: boolean;
   inset?: string;
 }) {
-  const [preview, setPreview] = useState<{ left: number; top: number } | null>(null);
-
+  const [preview, setPreview] = useState<{
+    left: number;
+    top: number;
+  } | null>(null);
   const place = (event: { clientX: number; clientY: number }) => {
     const gap = 16;
     setPreview({
@@ -102,7 +88,6 @@ export function IconArt({
       ),
     });
   };
-
   return (
     <>
       {/* eslint-disable-next-line @next/next/no-img-element */}

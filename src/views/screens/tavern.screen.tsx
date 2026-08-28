@@ -67,7 +67,7 @@ export function TavernScreen() {
     identity,
     rooms,
     activeRoom,
-   
+
     createRoom,
     joinRoom,
     leaveRoom,

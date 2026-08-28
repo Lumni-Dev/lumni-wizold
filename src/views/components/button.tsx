@@ -1,22 +1,17 @@
 "use client";
-
 import { useEffect, useRef, useState, type ButtonHTMLAttributes, type MouseEvent } from "react";
 import { playClick } from "@/controllers/sound";
 import { cn } from "@/shared/utils/class-names";
 import { Spinner } from "./spinner";
-
 type ButtonVariant = "primary" | "secondary" | "ghost" | "outline";
 type ButtonSize = "small" | "medium";
-
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
   fullWidth?: boolean;
   icon?: boolean;
-  /** Explicit pending state, for forms that own their own submit flow. */
   busy?: boolean;
 }
-
 const VARIANTS: Record<ButtonVariant, string> = {
   primary:
     "border border-ember bg-ember text-base " +
@@ -25,17 +20,14 @@ const VARIANTS: Record<ButtonVariant, string> = {
   ghost: "text-ink-soft hover:bg-surface-high hover:text-ink",
   outline: "border border-edge-strong text-ink-soft hover:bg-surface-high hover:text-ink",
 };
-
 const SIZES: Record<ButtonSize, string> = {
   small: "h-8 px-3 text-[11px]",
   medium: "h-10 px-4 text-xs",
 };
-
 const ICON_SIZES: Record<ButtonSize, string> = {
   small: "h-8 w-8",
   medium: "h-10 w-10",
 };
-
 export function Button({
   variant = "secondary",
   size = "small",
@@ -47,9 +39,6 @@ export function Button({
   onClick,
   ...rest
 }: ButtonProps) {
-  // Every async action in the game returns a Promise: when a click hands one
-  // back, the button holds itself busy until it settles, wears the theme's
-  // circle and refuses a second click, so no screen wires a loading by hand.
   const [waiting, setWaiting] = useState(false);
   const aliveRef = useRef(true);
   useEffect(() => {
@@ -58,9 +47,7 @@ export function Button({
       aliveRef.current = false;
     };
   }, []);
-
   const pending = busy || waiting;
-
   const press = (event: MouseEvent<HTMLButtonElement>) => {
     if (pending) return;
     playClick();
@@ -72,10 +59,6 @@ export function Button({
       });
     }
   };
-
-  // While waiting, the label goes invisible but keeps holding its own width
-  // and the spinner sits centered over it: the button swaps content without
-  // ever changing size.
   return (
     <button
       className={cn(

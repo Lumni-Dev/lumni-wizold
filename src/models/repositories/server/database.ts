@@ -1,43 +1,23 @@
 import { Pool, type PoolClient } from "pg";
-
-// One pool per server process. The PG* variables come from .env.local, which
-// Next loads before this module ever runs. Server-only: importing this from a
-// client component would drag pg into the bundle and fail the build, which is
-// exactly the alarm we want.
-
+import { SUPABASE_CA } from "./supabase-ca";
 declare global {
   var wizoldPool: Pool | undefined;
 }
-
 function createPool(): Pool {
   const pool = new Pool({
     max: 10,
-    idleTimeoutMillis: 30_000,
-    connectionTimeoutMillis: 10_000,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 10000,
     database: process.env.PGDATABASE ?? "wizold-prod",
-    // Managed Postgres (Supabase) refuses plain connections.
-    ssl: process.env.PGSSLMODE ? { rejectUnauthorized: false } : undefined,
+    ssl: process.env.PGSSLMODE ? { ca: SUPABASE_CA, rejectUnauthorized: true } : undefined,
   });
-
-  // A stuck statement must die before it drags the pool down with it: ten
-  // seconds is an eternity for any query this game runs.
   pool.on("connect", (client) => {
     client.query("set statement_timeout = '10s'").catch(() => {});
   });
-
   return pool;
 }
-
-// In dev, Next re-evaluates modules on edit; the global keeps one pool alive
-// instead of leaking a new one per reload.
 export const pool: Pool = globalThis.wizoldPool ?? createPool();
 globalThis.wizoldPool = pool;
-
-/**
- * Runs work inside one transaction and always releases the client. Every
- * game action goes through here: the row lock taken by the loader keeps two
- * requests from the same player strictly ordered.
- */
 export async function withTransaction<T>(work: (client: PoolClient) => Promise<T>): Promise<T> {
   const client = await pool.connect();
   try {

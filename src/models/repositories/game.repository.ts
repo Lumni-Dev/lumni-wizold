@@ -22,11 +22,9 @@ import type { PackMate } from "../entities/pack";
 import type { Pet } from "../entities/pet";
 import { findItem, itemIdFor } from "../data/items";
 import { petLevelOf, petMaxEnergy } from "../rules/pet";
-
 function available(): boolean {
   return typeof window !== "undefined" && typeof window.localStorage !== "undefined";
 }
-
 function isValid(data: unknown): data is Partial<GameState> {
   if (typeof data !== "object" || data === null) return false;
   const state = data as Partial<GameState>;
@@ -39,25 +37,18 @@ function isValid(data: unknown): data is Partial<GameState> {
     state.equipment !== null
   );
 }
-
-// typeof NaN é "number", então todo campo numérico passa por aqui: um save
-// rasgado vira o padrão em vez de envenenar as fórmulas para sempre.
 function finiteNumber(value: unknown, fallback: number): number {
   return typeof value === "number" && Number.isFinite(value) ? value : fallback;
 }
-
 function finiteInt(value: unknown, fallback: number): number {
   return Math.round(finiteNumber(value, fallback));
 }
-
 function text(value: unknown, fallback: string): string {
   return typeof value === "string" && value.length > 0 ? value : fallback;
 }
-
 function stamp(value: unknown): string | undefined {
   return typeof value === "string" ? value : undefined;
 }
-
 function fillAttributes(shape: Partial<Attributes> | undefined, fallback: number): Attributes {
   return {
     strength: finiteInt(shape?.strength, fallback),
@@ -67,10 +58,10 @@ function fillAttributes(shape: Partial<Attributes> | undefined, fallback: number
     willpower: finiteInt(shape?.willpower, fallback),
   };
 }
-
 function normalizeCharacter(character: Character): Character {
-  const { silver } = character as Character & { silver?: number };
-
+  const { silver } = character as Character & {
+    silver?: number;
+  };
   return {
     id: text(character.id, generateId("chr")),
     name: text(character.name, "Errante"),
@@ -93,7 +84,6 @@ function normalizeCharacter(character: Character): Character {
     transformedAt: stamp(character.transformedAt),
   };
 }
-
 function normalizePet(pet: Pet): Pet {
   const level =
     typeof pet.level === "number" && Number.isFinite(pet.level)
@@ -109,27 +99,27 @@ function normalizePet(pet: Pet): Pet {
     trainingProgress: Math.max(0, finiteInt(pet.trainingProgress, 0)),
     adoptedAt: text(pet.adoptedAt, new Date().toISOString()),
   };
-
   normalized.energy = clamp(finiteInt(pet.energy, 0), 0, petMaxEnergy(petLevelOf(normalized)));
   return normalized;
 }
-
 function normalizeInventory(inventory: GameState["inventory"]): GameState["inventory"] {
   return inventory
-    .filter((slot): slot is { itemId: string; quantity: number } =>
-      Boolean(slot) && typeof slot.itemId === "string",
+    .filter(
+      (
+        slot,
+      ): slot is {
+        itemId: string;
+        quantity: number;
+      } => Boolean(slot) && typeof slot.itemId === "string",
     )
     .map((slot) => ({ itemId: slot.itemId, quantity: finiteInt(slot.quantity, 0) }))
     .filter((slot) => slot.quantity > 0);
 }
-
 function normalizeListings(listings: BazaarListing[]): BazaarListing[] {
   return listings
     .filter(
       (listing): listing is BazaarListing =>
-        Boolean(listing) &&
-        typeof listing.itemId === "string" &&
-        typeof listing.id === "string",
+        Boolean(listing) && typeof listing.itemId === "string" && typeof listing.id === "string",
     )
     .map((listing) => ({
       id: listing.id,
@@ -143,7 +133,6 @@ function normalizeListings(listings: BazaarListing[]): BazaarListing[] {
     }))
     .filter((listing) => listing.quantity > 0 && listing.priceCents > 0);
 }
-
 function normalizeRecord<T>(
   record: Record<string, T> | undefined,
   keep: (value: unknown) => T | null,
@@ -155,7 +144,6 @@ function normalizeRecord<T>(
   }
   return clean;
 }
-
 const LOG_KINDS: readonly string[] = [
   "system",
   "character",
@@ -165,7 +153,6 @@ const LOG_KINDS: readonly string[] = [
   "market",
   "inventory",
 ];
-
 function normalizeLog(log: LogEntry[]): LogEntry[] {
   return log
     .filter(
@@ -180,20 +167,16 @@ function normalizeLog(log: LogEntry[]): LogEntry[] {
     }))
     .slice(0, LOG_LIMIT);
 }
-
 function normalizePack(pack: PackMate[]): PackMate[] {
   return pack.filter(
     (mate): mate is PackMate =>
       Boolean(mate) && typeof mate.id === "string" && typeof mate.name === "string",
   );
 }
-
 function migrateLineage(state: GameState): GameState {
   const lineage = state.character?.gender;
   if (!lineage) return state;
-
   const moved = (id: string) => itemIdFor(id, lineage);
-
   return {
     ...state,
     inventory: state.inventory.map((slot) => ({ ...slot, itemId: moved(slot.itemId) })),
@@ -209,18 +192,12 @@ function migrateLineage(state: GameState): GameState {
     })),
   };
 }
-
-// Depois das migrações, o que o catálogo não reconhece sai do save: um id
-// morto ficaria invisível em toda tela e ainda assim preso no estado.
 function pruneUnknown(state: GameState): GameState {
   return {
     ...state,
     inventory: state.inventory.filter((slot) => Boolean(findItem(slot.itemId))),
     equipment: Object.fromEntries(
-      Object.entries(state.equipment).map(([slot, id]) => [
-        slot,
-        id && findItem(id) ? id : null,
-      ]),
+      Object.entries(state.equipment).map(([slot, id]) => [slot, id && findItem(id) ? id : null]),
     ) as GameState["equipment"],
     enhancements: Object.fromEntries(
       Object.entries(state.enhancements).filter(([id]) => Boolean(findItem(id))),
@@ -228,7 +205,6 @@ function pruneUnknown(state: GameState): GameState {
     bazaarListings: state.bazaarListings.filter((listing) => Boolean(findItem(listing.itemId))),
   };
 }
-
 function normalize(data: Partial<GameState>): GameState {
   const base = initialState();
   const mining = data.mining as Partial<GameState["mining"]> | undefined;
@@ -265,32 +241,23 @@ function normalize(data: Partial<GameState>): GameState {
     log: Array.isArray(data.log) ? normalizeLog(data.log) : [],
     pet: data.pet ? normalizePet(data.pet) : null,
   };
-
   const migrated = state.character
     ? migrateLineage({ ...state, character: normalizeCharacter(state.character) })
     : state;
-
   return pruneUnknown(migrated);
 }
-
-// Um save que este build não consegue ler é estacionado nesta chave em vez de
-// destruído: a próxima gravação sobrescreveria a única cópia da partida.
 const RESCUE_KEY = STORAGE_KEY + ":rescue";
-
 function rescue(raw: string): void {
   try {
     window.localStorage.setItem(RESCUE_KEY, raw);
   } catch {}
 }
-
 export const gameRepository = {
   load(): GameState {
     if (!available()) return initialState();
-
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (!raw) return initialState();
-
       let data: unknown;
       try {
         data = JSON.parse(raw);
@@ -298,25 +265,21 @@ export const gameRepository = {
         rescue(raw);
         return initialState();
       }
-
       if (!isValid(data)) {
         rescue(raw);
         return initialState();
       }
-
       return normalize(data);
     } catch {
       return initialState();
     }
   },
-
   save(state: GameState): void {
     if (!available()) return;
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     } catch {}
   },
-
   clear(): void {
     if (!available()) return;
     try {

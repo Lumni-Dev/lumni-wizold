@@ -1,9 +1,4 @@
 import type { GameState } from "@/models/entities/game-state";
-
-// The client's one door to the server. Every answer is the same envelope the
-// API speaks: ok/message/data, plus the whole run's state on game endpoints,
-// which the provider adopts as the newest truth.
-
 export interface ApiAnswer<T> {
   ok: boolean;
   status: number;
@@ -11,7 +6,6 @@ export interface ApiAnswer<T> {
   data: T | null;
   state: GameState | null;
 }
-
 export async function api<T = unknown>(
   method: "GET" | "POST" | "PATCH" | "PUT" | "DELETE",
   path: string,
@@ -23,7 +17,6 @@ export async function api<T = unknown>(
       headers: body === undefined ? undefined : { "content-type": "application/json" },
       body: body === undefined ? undefined : JSON.stringify(body),
     });
-
     let payload: {
       ok?: boolean;
       message?: string;
@@ -33,7 +26,6 @@ export async function api<T = unknown>(
     try {
       payload = await response.json();
     } catch {}
-
     return {
       ok: payload?.ok === true,
       status: response.status,

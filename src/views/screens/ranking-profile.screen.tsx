@@ -1,5 +1,4 @@
 "use client";
-
 import Link from "next/link";
 import { useMemo } from "react";
 import { useGame } from "@/controllers/game.context";
@@ -20,14 +19,11 @@ import { List, ListRow, RowText } from "../components/list";
 import { Panel } from "../components/panel";
 import { Tag } from "../components/tag";
 import { PageHeader } from "../layout/page-header";
-
 export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
   const { state, character, moon } = useGame();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const profile = useMemo(() => profileOf(state, hunterId), [state, hunterId, moon]);
-
   if (!character) return null;
-
   if (!profile) {
     return (
       <>
@@ -44,11 +40,9 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
       </>
     );
   }
-
   const { hunter, isPlayer, positions, boardSize, stats, gear } = profile;
   const best = positions.reduce((first, next) => (next.position < first.position ? next : first));
   const wolf = hunter.pet ? findPet(hunter.pet.gender) : null;
-
   return (
     <>
       <PageHeader
@@ -137,7 +131,6 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
               {ATTRIBUTES.map((definition) => {
                 const base = hunter.attributes[definition.key];
                 const bonus = stats.totalAttributes[definition.key] - base;
-
                 return (
                   <ListRow key={definition.key} padding="art">
                     <AttributeIcon attribute={definition.key} />

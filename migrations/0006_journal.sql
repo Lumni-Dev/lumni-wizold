@@ -1,7 +1,3 @@
--- The diary, the single job slot and the automation switchboard. The
--- activity gains the started_at stamp the client never had, so a refresh
--- resumes an honest clock once the server owns time.
-
 create table log_entries (
   id text primary key,
   character_id text not null references characters (id) on delete cascade,

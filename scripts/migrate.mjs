@@ -1,21 +1,10 @@
-// Migration runner: creates the database when missing, applies every pending
-// file in migrations/ in filename order, one transaction each, and records
-// the applied ones in schema_migrations. An applied file is immutable; a
-// schema change is always a new numbered file.
-//
-//   node scripts/migrate.mjs          applies what is pending
-//   node scripts/migrate.mjs status   lists applied and pending
-//
-// Connection comes from PG* variables, read from .env.local when present.
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import pg from "pg";
-
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
 const MIGRATIONS = join(ROOT, "migrations");
-
 function loadEnv() {
   const file = join(ROOT, ".env.local");
   if (!existsSync(file)) return;
@@ -24,14 +13,11 @@ function loadEnv() {
     if (match && process.env[match[1]] === undefined) process.env[match[1]] = match[2];
   }
 }
-
 loadEnv();
 const DATABASE = process.env.PGDATABASE ?? "wizold-prod";
-
-// Managed Postgres (Supabase) refuses plain connections; PGSSLMODE=require
-// in .env.local turns this on.
-const ssl = process.env.PGSSLMODE ? { rejectUnauthorized: false } : undefined;
-
+const ssl = process.env.PGSSLMODE
+  ? { ca: readFileSync(join(ROOT, "certs/supabase-ca.crt"), "utf8"), rejectUnauthorized: true }
+  : undefined;
 async function ensureDatabase() {
   const client = new pg.Client({ database: "postgres", ssl });
   await client.connect();
@@ -45,21 +31,17 @@ async function ensureDatabase() {
     await client.end();
   }
 }
-
 function pendingOf(applied) {
   return readdirSync(MIGRATIONS)
     .filter((file) => file.endsWith(".sql"))
     .sort()
     .map((file) => ({ file, applied: applied.has(file) }));
 }
-
 async function run() {
   const command = process.argv[2] ?? "apply";
-
   await ensureDatabase();
   const client = new pg.Client({ database: DATABASE, ssl });
   await client.connect();
-
   try {
     await client.query(
       "create table if not exists schema_migrations (" +
@@ -68,7 +50,6 @@ async function run() {
     const rows = await client.query("select name from schema_migrations");
     const applied = new Set(rows.rows.map((row) => row.name));
     const files = pendingOf(applied);
-
     if (command === "status") {
       for (const { file, applied: done } of files) {
         console.log((done ? "aplicada " : "pendente ") + " " + file);
@@ -77,7 +58,6 @@ async function run() {
       for (const name of missing) console.log("aplicada, mas o arquivo sumiu: " + name);
       return;
     }
-
     let count = 0;
     for (const { file, applied: done } of files) {
       if (done) continue;
@@ -102,7 +82,6 @@ async function run() {
     await client.end();
   }
 }
-
 run().catch((error) => {
   console.error(String(error.message ?? error));
   process.exitCode = 1;

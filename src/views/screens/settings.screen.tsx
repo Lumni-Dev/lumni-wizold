@@ -79,8 +79,8 @@ export function SettingsScreen() {
           </div>
           <div className="space-y-3 p-4">
             <p className="text-xs leading-relaxed text-ink-faint">
-              O login por e-mail é a demonstração do botão do Google, e a partida já vive no servidor.
-              Quando o jogo ganhar servidor, a conta real entra aqui.
+              O login por e-mail é a demonstração do botão do Google, e a partida já vive no
+              servidor. Quando o jogo ganhar servidor, a conta real entra aqui.
             </p>
             <Button
               variant="outline"

@@ -1,25 +1,17 @@
 export const MAX_ROOM_MEMBERS = 10;
-
 export const MAX_ROOM_MESSAGES = 12;
 const ROOM_NAME_MIN_LENGTH = 3;
 export const ROOM_NAME_MAX_LENGTH = 25;
 export const MESSAGE_MAX_LENGTH = 240;
-
-// Uma aba em segundo plano tem os timers estrangulados para um disparo por
-// minuto, então o prazo precisa caber mais de um batimento estrangulado:
-// 45s derrubava a própria cadeira de quem só trocou de aba.
-export const MEMBER_TIMEOUT_MS = 150_000;
-
+export const MEMBER_TIMEOUT_MS = 150000;
 export interface TavernIdentity {
   id: string;
   name: string;
 }
-
 export interface TavernMember extends TavernIdentity {
   joinedAt: string;
   lastSeen: string;
 }
-
 export interface TavernMessage {
   id: string;
   authorId: string;
@@ -27,47 +19,36 @@ export interface TavernMessage {
   text: string;
   at: string;
 }
-
 export interface TavernRoom {
   id: string;
   name: string;
-
   password: string | null;
   ownerId: string;
   createdAt: string;
   members: TavernMember[];
   messages: TavernMessage[];
-
   privateFor?: string[];
 }
-
 export function isPrivateTable(room: TavernRoom): boolean {
   return Array.isArray(room.privateFor);
 }
-
 export interface TavernState {
   version: number;
   rooms: TavernRoom[];
 }
-
 export const TAVERN_VERSION = 1;
-
 export function emptyTavern(): TavernState {
   return { version: TAVERN_VERSION, rooms: [] };
 }
-
 export interface TavernResult {
   ok: boolean;
   message: string;
   state: TavernState;
-
   roomId?: string;
 }
-
 export function isRoomFull(room: TavernRoom): boolean {
   return room.members.length >= MAX_ROOM_MEMBERS;
 }
-
 export function validateRoomName(name: string): string | null {
   const clean = name.trim();
   if (clean.length < ROOM_NAME_MIN_LENGTH) {

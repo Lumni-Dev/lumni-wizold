@@ -212,7 +212,6 @@ const FOLDERS = {
 };
 
 const RECIPES = {
-
   ui: {
     peak: 0.42,
     forge() {
@@ -306,7 +305,6 @@ const RECIPES = {
       });
     },
   },
-
 
   transform: {
     peak: 0.94,

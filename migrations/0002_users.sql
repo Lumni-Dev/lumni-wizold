@@ -1,6 +1,3 @@
--- Accounts. The login flow collects the birth date before anything else:
--- the game is 18+ (blood, PvP, open chat, real-money Pix both ways).
-
 create table users (
   id text primary key,
   email text unique,

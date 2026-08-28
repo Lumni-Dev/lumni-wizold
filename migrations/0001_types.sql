@@ -1,7 +1,3 @@
--- Shared enums and helpers. Catalogs (items, species, sets, exercises,
--- territories, store packs) stay in code: the database stores player state
--- referencing catalog ids, never a copy of what the build already knows.
-
 create type gender as enum ('male', 'female');
 
 create type character_form as enum ('human', 'werewolf');

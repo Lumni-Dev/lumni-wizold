@@ -27,7 +27,14 @@ export interface Hunter {
 }
 
 export type RankingKey =
-  AttributeKey | "level" | "wins" | "hunts" | "arena" | "bronze" | "forge" | "mining";
+  | AttributeKey
+  | "level"
+  | "wins"
+  | "hunts"
+  | "arena"
+  | "bronze"
+  | "forge"
+  | "mining";
 
 export interface RankingBoard {
   key: RankingKey;

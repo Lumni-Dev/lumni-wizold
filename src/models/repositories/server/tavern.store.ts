@@ -5,23 +5,10 @@ import {
   type TavernState,
   TAVERN_VERSION,
 } from "../../entities/tavern";
-
-// The tavern controllers are pure over a whole TavernState, so the server
-// loads the whole tavern, runs the same code the browser ran, and persists
-// only the rooms the call touched. A single advisory lock serializes tavern
-// writers: the tavern is one small table of tables, and correctness beats
-// concurrency here.
-//
-// Passwords never enter the controller state: the hash stays in its column,
-// and a room loads with password "" (locked, already verified upstream) or
-// null (open). The endpoint checks the hash before the controller runs.
-
 const TAVERN_LOCK = 0x77697a01;
-
 export async function lockTavern(client: PoolClient): Promise<void> {
   await client.query("select pg_advisory_xact_lock($1)", [TAVERN_LOCK]);
 }
-
 export async function pruneStale(client: PoolClient): Promise<void> {
   await client.query(
     `delete from tavern_members using tavern_rooms
@@ -30,23 +17,14 @@ export async function pruneStale(client: PoolClient): Promise<void> {
        and tavern_members.last_seen < now() - make_interval(secs => $1)`,
     [MEMBER_TIMEOUT_MS / 1000],
   );
-  await client.query(
-    `delete from tavern_rooms
+  await client.query(`delete from tavern_rooms
      where private_for is null
-       and not exists (select 1 from tavern_members where room_id = tavern_rooms.id)`,
-  );
+       and not exists (select 1 from tavern_members where room_id = tavern_rooms.id)`);
 }
-
 export interface LoadedTavern {
   state: TavernState;
   hashes: Map<string, string>;
 }
-
-/**
- * Loads a single table, taking its row lock when asked: join, leave, close
- * and speak only ever touch one room, so the room row is lock enough and two
- * tables never queue behind each other.
- */
 export async function loadRoomState(
   client: PoolClient,
   roomId: string,
@@ -59,7 +37,6 @@ export async function loadRoomState(
   const hashes = new Map<string, string>();
   const row = rooms.rows[0];
   if (!row) return { state: { version: TAVERN_VERSION, rooms: [] }, hashes };
-
   const members = await client.query(
     "select * from tavern_members where room_id = $1 order by joined_at",
     [roomId],
@@ -68,7 +45,6 @@ export async function loadRoomState(
     "select * from tavern_messages where room_id = $1 order by sent_at",
     [roomId],
   );
-
   if (row.password_hash) hashes.set(row.id, row.password_hash);
   const state: TavernState = {
     version: TAVERN_VERSION,
@@ -96,19 +72,21 @@ export async function loadRoomState(
       },
     ],
   };
-
   return { state, hashes };
 }
-
 export async function loadTavern(client: PoolClient): Promise<LoadedTavern> {
   const rooms = await client.query("select * from tavern_rooms order by created_at");
   const members = await client.query("select * from tavern_members order by joined_at");
   const messages = await client.query("select * from tavern_messages order by sent_at");
-
   const hashes = new Map<string, string>();
-  const byRoom = <T extends { room_id: string }>(roomId: string, rows: T[]): T[] =>
-    rows.filter((row) => row.room_id === roomId);
-
+  const byRoom = <
+    T extends {
+      room_id: string;
+    },
+  >(
+    roomId: string,
+    rows: T[],
+  ): T[] => rows.filter((row) => row.room_id === roomId);
   const state: TavernState = {
     version: TAVERN_VERSION,
     rooms: rooms.rows.map((row): TavernRoom => {
@@ -136,10 +114,8 @@ export async function loadTavern(client: PoolClient): Promise<LoadedTavern> {
       };
     }),
   };
-
   return { state, hashes };
 }
-
 async function saveRoom(
   client: PoolClient,
   room: TavernRoom,
@@ -151,7 +127,6 @@ async function saveRoom(
      on conflict (id) do update set name = $2`,
     [room.id, room.name, passwordHash, room.ownerId, room.privateFor ?? null, room.createdAt],
   );
-
   await client.query("delete from tavern_members where room_id = $1", [room.id]);
   for (const member of room.members) {
     await client.query(
@@ -160,7 +135,6 @@ async function saveRoom(
       [room.id, member.id, member.name, member.joinedAt, member.lastSeen],
     );
   }
-
   await client.query("delete from tavern_messages where room_id = $1", [room.id]);
   for (const message of room.messages) {
     await client.query(
@@ -170,12 +144,6 @@ async function saveRoom(
     );
   }
 }
-
-/**
- * Persists the difference between two tavern states: rooms that vanished are
- * deleted, rooms whose reference changed are rewritten. Untouched rooms keep
- * their reference through the pure controllers, so this stays cheap.
- */
 export async function saveTavernDiff(
   client: PoolClient,
   before: TavernState,
@@ -189,7 +157,6 @@ export async function saveTavernDiff(
       await client.query("delete from tavern_rooms where id = $1", [room.id]);
     }
   }
-
   const previous = new Map(before.rooms.map((room) => [room.id, room]));
   for (const room of after.rooms) {
     if (previous.get(room.id) === room) continue;
@@ -197,7 +164,6 @@ export async function saveTavernDiff(
     await saveRoom(client, room, hash);
   }
 }
-
 export async function heartbeat(
   client: PoolClient,
   roomId: string,

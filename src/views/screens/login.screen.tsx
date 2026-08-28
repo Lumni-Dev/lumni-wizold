@@ -1,5 +1,4 @@
 "use client";
-
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -11,9 +10,7 @@ import { Button } from "../components/button";
 import { CornerAccents } from "../components/corner-accents";
 import { Field } from "../components/field";
 import { Select, type SelectOption } from "../components/select";
-
 const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 const MONTHS = [
   "Janeiro",
   "Fevereiro",
@@ -28,64 +25,49 @@ const MONTHS = [
   "Novembro",
   "Dezembro",
 ];
-
 const two = (value: number) => String(value).padStart(2, "0");
-
 const MONTH_OPTIONS: SelectOption[] = MONTHS.map((name, index) => ({
   value: two(index + 1),
   label: name,
 }));
-
 const THIS_YEAR = new Date().getFullYear();
-
 const YEAR_OPTIONS: SelectOption[] = Array.from({ length: 110 }, (_, index) => {
   const year = THIS_YEAR - index;
   return { value: String(year), label: String(year) };
 });
-
 function daysInMonth(month: string, year: string): number {
   if (!month) return 31;
   return new Date(Number(year || "2000"), Number(month), 0).getDate();
 }
-
 export function LoginScreen() {
   const { ready, character, enter } = useGame();
   const router = useRouter();
   const [birth, setBirth] = useState(EMPTY_BIRTH);
   const [email, setEmail] = useState("");
-
   const age = ageOf(birth);
   const complete = isRealBirth(birth);
   const oldEnough = age !== null && age >= MIN_AGE;
   const emailFine = EMAIL_SHAPE.test(email.trim());
-
   const dayCount = daysInMonth(birth.month, birth.year);
   const dayOptions: SelectOption[] = Array.from({ length: dayCount }, (_, index) => ({
     value: two(index + 1),
     label: two(index + 1),
   }));
-
-  // Changing the month can shrink the calendar under a chosen day; the day
-  // slides to the last one the month still has instead of going stale.
   function setBirthPart(part: Partial<typeof birth>) {
     const next = { ...birth, ...part };
     const limit = daysInMonth(next.month, next.year);
     if (next.day && Number(next.day) > limit) next.day = two(limit);
     setBirth(next);
   }
-
   useEffect(() => {
     if (ready && character) router.replace("/character");
   }, [ready, character, router]);
-
   async function submit() {
     const answer = await enter(email.trim(), birth);
     if (!answer) return;
-
     playSound("door");
     router.push(answer.hasCharacter ? "/character" : "/create");
   }
-
   return (
     <main className="flex min-h-screen items-center justify-center p-4 md:p-8">
       <div className="w-full max-w-md space-y-6">

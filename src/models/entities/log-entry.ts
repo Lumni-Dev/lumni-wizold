@@ -1,5 +1,11 @@
 export type LogKind =
-  "system" | "character" | "training" | "hunt" | "arena" | "market" | "inventory";
+  | "system"
+  | "character"
+  | "training"
+  | "hunt"
+  | "arena"
+  | "market"
+  | "inventory";
 
 export interface LogEntry {
   id: string;

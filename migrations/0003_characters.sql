@@ -1,8 +1,3 @@
--- The run itself: one character per user, the wolf, what is worn, carried
--- and forged. Attribute columns hold the TRAINED values only (cap 1000, the
--- documented ceiling); gear, pet and moon ride over them in the rules layer.
--- Mining has no upper check because its ceiling derives from the ore table.
-
 create table characters (
   id text primary key,
   user_id text not null references users (id) on delete cascade,
@@ -75,8 +70,6 @@ create table inventory_items (
   primary key (character_id, item_id)
 );
 
--- The forge level belongs to the item id, not to the slot: unequipping keeps
--- what was beaten into the piece.
 create table enhancements (
   character_id text not null references characters (id) on delete cascade,
   item_id text not null,

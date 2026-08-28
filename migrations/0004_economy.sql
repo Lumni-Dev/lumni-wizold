@@ -1,8 +1,3 @@
--- Real money and the bazaar. Money is integer centavos everywhere, and every
--- wallet change leaves a movement row: the Alforje pays out through Pix, so
--- this is the part of the schema that must audit cleanly. Server timestamps
--- are the authority here; the client clock never mints a sale.
-
 create table wallets (
   character_id text primary key references characters (id) on delete cascade,
   cents bigint not null default 1000 check (cents >= 0),
@@ -51,8 +46,6 @@ create table store_purchases (
 create index store_purchases_character
   on store_purchases (character_id, purchased_at desc);
 
--- The player's own listings keep their whole lifecycle instead of vanishing
--- when sold; seller name comes from the join, never from a copied column.
 create table bazaar_listings (
   id text primary key,
   seller_id text not null references characters (id) on delete cascade,
@@ -70,8 +63,6 @@ create table bazaar_listings (
 create index bazaar_listings_board on bazaar_listings (status, announced_at);
 create index bazaar_listings_seller on bazaar_listings (seller_id);
 
--- Purchases from the roster board are remembered by listing id so nothing
--- bought ever comes back; roster listing ids live in code, hence no FK.
 create table bazaar_purchases (
   character_id text not null references characters (id) on delete cascade,
   listing_id text not null,

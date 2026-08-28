@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useGame } from "@/controllers/game.context";
 import { listTerritories, type HuntReport } from "@/controllers/hunt.controller";
@@ -22,7 +21,6 @@ import { List, ListRow } from "../components/list";
 import { Panel } from "../components/panel";
 import { EmptyState } from "../components/empty-state";
 import { PageHeader } from "../layout/page-header";
-
 interface HuntSession {
   hunts: number;
   wins: number;
@@ -30,9 +28,14 @@ interface HuntSession {
   retreats: number;
   bronze: number;
   experience: number;
-  drops: Record<string, { name: string; quantity: number }>;
+  drops: Record<
+    string,
+    {
+      name: string;
+      quantity: number;
+    }
+  >;
 }
-
 const EMPTY_SESSION: HuntSession = {
   hunts: 0,
   wins: 0,
@@ -42,7 +45,6 @@ const EMPTY_SESSION: HuntSession = {
   experience: 0,
   drops: {},
 };
-
 function accumulate(session: HuntSession, report: HuntReport): HuntSession {
   const drops = { ...session.drops };
   for (const drop of report.drops) {
@@ -52,7 +54,6 @@ function accumulate(session: HuntSession, report: HuntReport): HuntSession {
       quantity: (current?.quantity ?? 0) + drop.quantity,
     };
   }
-
   const lost = !report.combat.victory && !report.combat.retreated;
   return {
     hunts: session.hunts + 1,
@@ -64,11 +65,9 @@ function accumulate(session: HuntSession, report: HuntReport): HuntSession {
     drops,
   };
 }
-
 function CombatReport({ report }: { report: HuntReport }) {
   const { combat, creature, territory } = report;
   const outcome = combat.victory ? "Vitória" : combat.retreated ? "Recuo" : "Derrota";
-
   return (
     <Panel
       title="Última caçada"
@@ -132,38 +131,27 @@ function CombatReport({ report }: { report: HuntReport }) {
     </Panel>
   );
 }
-
 export function HuntScreen() {
-  const {
-    state,
-    character,
-    pet,
-    hunt,
-    sufferBlow,
-    landHunt,
-    toggleForm,
-    activity,
-    setActivity,
-  } = useGame();
+  const { state, character, pet, hunt, sufferBlow, landHunt, toggleForm, activity, setActivity } =
+    useGame();
   const paused = activity?.paused === true;
   const activeId = activity?.kind === "hunt" && !paused ? (activity.id ?? null) : null;
   const waitingId = activity?.kind === "hunt" && paused ? (activity.id ?? null) : null;
   const petAlong = isPetHunting(pet) ? pet : null;
   const [report, setReport] = useState<HuntReport | null>(null);
   const [session, setSession] = useState<HuntSession>(EMPTY_SESSION);
-  const [progress, setProgress] = useState<{ id: string; beat: number }>({ id: "", beat: 0 });
+  const [progress, setProgress] = useState<{
+    id: string;
+    beat: number;
+  }>({ id: "", beat: 0 });
   const beatRef = useRef(0);
-
   const [pending, setPending] = useState<HuntReport | null>(null);
   const pendingRef = useRef<HuntReport | null>(null);
   const requestingRef = useRef(false);
   const bledRef = useRef({ last: 0, total: 0 });
-
   const territories = useMemo(() => listTerritories(state), [state]);
-
   const [script, setScript] = useState<NarrationLine[]>([]);
   const scriptRef = useRef<NarrationLine[]>([]);
-
   const autoRef = useRef(state.automation.hunt);
   const huntRef = useRef(hunt);
   const sufferRef = useRef(sufferBlow);
@@ -178,18 +166,13 @@ export function HuntScreen() {
     stateRef.current = state;
     nameRef.current = character?.name ?? "";
   });
-
   useEffect(() => {
     if (!activeId) return;
-
     const timer = window.setInterval(() => {
       const told = scriptRef.current.length;
       const lap = told > 0 ? told + 1 : HUNT_TICKS;
       beatRef.current = beatRef.current >= lap ? 0 : beatRef.current + 1;
       setProgress({ id: activeId, beat: beatRef.current });
-
-      // The first beat fires the server hunt; the answer lands within the
-      // beat and the lap narrates a fight the server already settled.
       if (beatRef.current === 1 && !pendingRef.current && !requestingRef.current) {
         requestingRef.current = true;
         void huntRef.current(activeId).then((fight) => {
@@ -213,12 +196,10 @@ export function HuntScreen() {
           setPending(fight);
         });
       }
-
       const line = scriptRef.current[Math.min(beatRef.current, scriptRef.current.length) - 1];
       if (line?.blow === "ours") playSound(line.critical ? "crit" : "hit");
       if (line?.blow === "pet") playSound("snap");
       if (line?.blow === "theirs") playSound("hurt");
-
       if (pendingRef.current && line?.characterHealth !== undefined) {
         const delta = bledRef.current.last - line.characterHealth;
         if (delta > 0) {
@@ -229,7 +210,6 @@ export function HuntScreen() {
           };
         }
       }
-
       if (beatRef.current === scriptRef.current.length + 1 && pendingRef.current) {
         const held = pendingRef.current;
         pendingRef.current = null;
@@ -247,12 +227,9 @@ export function HuntScreen() {
         }
       }
     }, HUNT_TICK_MS);
-
     return () => {
       window.clearInterval(timer);
       if (pendingRef.current) {
-        // The server already settled this fight: interrupting the lap only
-        // interrupts the theater, so the landed truth is adopted right away.
         pendingRef.current = null;
         setPending(null);
         landRef.current();
@@ -263,28 +240,22 @@ export function HuntScreen() {
       }
     };
   }, [activeId, setActivity]);
-
   if (!character) return null;
-
   const drops = Object.entries(session.drops);
-
   function toggleHunt(territoryId: string, available: boolean) {
     beatRef.current = 0;
     scriptRef.current = [];
     setScript([]);
     setProgress({ id: territoryId, beat: 0 });
-
     if (activeId === territoryId) {
       setActivity(null);
       return;
     }
     if (!available) return;
-
     setSession(EMPTY_SESSION);
     setReport(null);
     setActivity({ kind: "hunt", id: territoryId });
   }
-
   return (
     <>
       <PageHeader
@@ -328,7 +299,6 @@ export function HuntScreen() {
             const shownHealth =
               line && foe ? line.creatureHealth : unlocked ? (prey?.health ?? 0) : 0;
             const fightingId = line && foe ? foe.creature.id : null;
-
             return (
               <Card
                 key={territory.id}

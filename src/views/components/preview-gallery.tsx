@@ -1,14 +1,11 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import type { PreviewShot } from "@/models/data/preview";
 import { cn } from "@/shared/utils/class-names";
 import { ActionIcon } from "./app-icon";
 import { Chip } from "./chip";
 import { CornerAccents } from "./corner-accents";
-
 const ROTATION_MS = 7000;
-
 function Arrow({
   action,
   label,
@@ -36,25 +33,19 @@ function Arrow({
     </button>
   );
 }
-
 export function PreviewGallery({ shots }: { shots: readonly PreviewShot[] }) {
   const [index, setIndex] = useState(0);
   const [held, setHeld] = useState(false);
-
   useEffect(() => {
     if (held) return;
-
     const timer = window.setTimeout(() => {
       setIndex((current) => (current + 1) % shots.length);
     }, ROTATION_MS);
-
     return () => window.clearTimeout(timer);
   }, [held, index, shots.length]);
-
   const shot = shots[index];
   const step = (amount: number) =>
     setIndex((current) => (current + amount + shots.length) % shots.length);
-
   return (
     <div
       className="relative rounded-lg border border-edge bg-surface/80"

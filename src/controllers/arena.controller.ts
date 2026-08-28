@@ -23,7 +23,6 @@ import { simulateCombat, type CombatOpponent, type CombatOutcome } from "@/model
 import { deriveStats, type DerivedStats } from "@/models/rules/stats";
 import { syncCharacter } from "./character.controller";
 import { addLog } from "./log.controller";
-
 export interface ArenaRival {
   hunter: Hunter;
   stats: DerivedStats;
@@ -31,12 +30,10 @@ export interface ArenaRival {
   cooldownLeft: number;
   spoils: SpoilsRange;
 }
-
 export function formatCooldown(milliseconds: number): string {
-  const minutes = Math.ceil(milliseconds / 60_000);
+  const minutes = Math.ceil(milliseconds / 60000);
   return minutes >= 60 ? Math.ceil(minutes / 60) + "h" : minutes + "min";
 }
-
 export interface ArenaView {
   band: LevelBand;
   rivals: ArenaRival[];
@@ -44,13 +41,11 @@ export interface ArenaView {
   spoils: SpoilsRange;
   charges: ArenaCharges;
   hasHealth: boolean;
-  /** Body and attacks in order: everything the duel asks for except the fur. */
   ready: boolean;
   transformed: boolean;
   canFight: boolean;
   reason: string | null;
 }
-
 function asRival(hunter: Hunter, band: LevelBand, state: GameState, now: number): ArenaRival {
   return {
     hunter,
@@ -60,7 +55,6 @@ function asRival(hunter: Hunter, band: LevelBand, state: GameState, now: number)
     spoils: arenaSpoilsRange(hunter.level),
   };
 }
-
 export function listArena(state: GameState, search = "", now = Date.now()): ArenaView {
   const character = state.character;
   if (!character) {
@@ -77,34 +71,28 @@ export function listArena(state: GameState, search = "", now = Date.now()): Aren
       reason: "Nenhum personagem ativo.",
     };
   }
-
   const band = arenaBand(character.level);
   const stats = deriveStats(character, state.equipment, state.pet, state.enhancements);
   const healthy = character.health > stats.maxHealth * MIN_HEALTH_RATIO_TO_ACT;
   const transformed = character.form === "werewolf";
   const charges = arenaCharges(state.arenaDuels, now);
   const ready = healthy && charges.left > 0;
-
   const term = normalizeText(search);
   const found = term
     ? RIVALS.filter((hunter) => normalizeText(hunter.name).includes(term))
     : RIVALS.filter((hunter) => isInBand(band, hunter.level));
-
   const rivals = found
     .map((hunter) => asRival(hunter, band, state, now))
     .sort((first, second) => {
       if (first.inBand !== second.inBand) return first.inBand ? -1 : 1;
-
       const firstResting = first.cooldownLeft > 0;
       const secondResting = second.cooldownLeft > 0;
       if (firstResting !== secondResting) return firstResting ? 1 : -1;
-
       return (
         Math.abs(first.hunter.level - character.level) -
         Math.abs(second.hunter.level - character.level)
       );
     });
-
   return {
     band,
     rivals,
@@ -126,13 +114,11 @@ export function listArena(state: GameState, search = "", now = Date.now()): Aren
           : null,
   };
 }
-
 function nearestByLevel(level: number, amount: number): Hunter[] {
   return [...RIVALS]
     .sort((first, second) => Math.abs(first.level - level) - Math.abs(second.level - level))
     .slice(0, amount);
 }
-
 export function drawOpponent(
   state: GameState,
   random: Random = defaultRandom,
@@ -140,25 +126,19 @@ export function drawOpponent(
 ): Hunter | null {
   const character = state.character;
   if (!character) return null;
-
   const rested = (hunter: Hunter) => arenaCooldownLeft(state.arenaDuels[hunter.id], now) === 0;
-
   const band = arenaBand(character.level);
   const inBand = RIVALS.filter((hunter) => isInBand(band, hunter.level) && rested(hunter));
   const pool = inBand.length > 0 ? inBand : nearestByLevel(character.level, 5).filter(rested);
-
   return pool.length > 0 ? pickOne(pool, random) : null;
 }
-
 export interface ArenaResolution {
   hunter: Hunter;
   foe: CombatOpponent;
   combat: CombatOutcome;
-  /** Silver changing hands: positive when you win it, negative when you lose it. */
   spoils: number;
   healthLost: number;
 }
-
 export function resolveArena(
   state: GameState,
   hunterId: string,
@@ -167,10 +147,8 @@ export function resolveArena(
 ): Result<ArenaResolution> {
   const character = state.character;
   if (!character) return failure(state, "Nenhum personagem ativo.");
-
   const hunter = findRival(hunterId);
   if (!hunter) return failure(state, "Esse caçador não está no fosso.");
-
   const charges = arenaCharges(state.arenaDuels, now);
   if (charges.left === 0) {
     return failure(
@@ -180,11 +158,9 @@ export function resolveArena(
         ".",
     );
   }
-
   if (character.form !== "werewolf") {
     return failure(state, "Só a fera desce ao fosso. Transforme-se antes de descer.");
   }
-
   const band = arenaBand(character.level);
   if (!isInBand(band, hunter.level)) {
     return failure(
@@ -196,7 +172,6 @@ export function resolveArena(
         ".",
     );
   }
-
   const resting = arenaCooldownLeft(state.arenaDuels[hunter.id], now);
   if (resting > 0) {
     return failure(
@@ -204,12 +179,10 @@ export function resolveArena(
       hunter.name + " ainda se recupera do último duelo: faltam " + formatCooldown(resting) + ".",
     );
   }
-
   const stats = deriveStats(character, state.equipment, state.pet, state.enhancements);
   if (character.health <= stats.maxHealth * MIN_HEALTH_RATIO_TO_ACT) {
     return failure(state, "Vida baixa demais para subir na arena. Recupere-se ou use uma poção.");
   }
-
   const foe = arenaCombatant(hunter);
   const combat = simulateCombat({
     characterName: character.name,
@@ -220,7 +193,6 @@ export function resolveArena(
     pet: null,
     random,
   });
-
   return success<ArenaResolution>(state, "", {
     hunter,
     foe,
@@ -233,7 +205,6 @@ export function resolveArena(
     healthLost: character.health - Math.max(1, combat.finalHealth),
   });
 }
-
 export function landArena(
   state: GameState,
   resolution: ArenaResolution,
@@ -242,17 +213,14 @@ export function landArena(
 ): Result<ArenaResolution> {
   const character = state.character;
   if (!character) return failure(state, "Nenhum personagem ativo.");
-
   const { combat, hunter, spoils } = resolution;
   const remainingLoss = Math.max(0, resolution.healthLost - Math.max(0, alreadyBled));
   const lost = !combat.victory && !combat.retreated;
-
   const duels: Record<string, string> = {};
   for (const [id, at] of Object.entries(state.arenaDuels)) {
     if (arenaCooldownLeft(at, now) > 0) duels[id] = at;
   }
   duels[hunter.id] = new Date(now).toISOString();
-
   let next: GameState = {
     ...state,
     arenaDuels: duels,
@@ -265,9 +233,7 @@ export function landArena(
       arenaLosses: character.arenaLosses + (lost ? 1 : 0),
     },
   };
-
   next = syncCharacter(next);
-
   const message = combat.victory
     ? spoils > 0
       ? hunter.name + " cai no fosso, e a bolsa vem junto: " + formatBronze(spoils) + "."
@@ -280,8 +246,6 @@ export function landArena(
           formatBronze(-spoils) +
           " da sua bolsa."
         : hunter.name + " leva a melhor no fosso. Sua bolsa estava vazia, e foi o que ele levou.";
-
   next = addLog(next, "arena", message);
-
   return success<ArenaResolution>(next, message, resolution);
 }

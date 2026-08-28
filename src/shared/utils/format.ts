@@ -1,76 +1,59 @@
 export function clamp(value: number, minimum: number, maximum: number): number {
   return Math.max(minimum, Math.min(maximum, value));
 }
-
 export function percentage(current: number, maximum: number): number {
   if (maximum <= 0) return 0;
   return clamp(Math.round((current / maximum) * 100), 0, 100);
 }
-
-const COMPACT_FLOOR = 10_000;
-
+const COMPACT_FLOOR = 10000;
 const COMPACT_UNITS = [
   { limit: 1e12, suffix: "T" },
   { limit: 1e9, suffix: "B" },
   { limit: 1e6, suffix: "M" },
   { limit: 1e3, suffix: "K" },
 ];
-
 function decimalsFor(scaled: number): number {
   return Math.abs(scaled) < 100 ? 1 : 0;
 }
-
 function toText(value: number, decimals: number): string {
   return new Intl.NumberFormat("pt-BR", {
     minimumFractionDigits: 0,
     maximumFractionDigits: decimals,
   }).format(value);
 }
-
 function formatExact(value: number): string {
   return new Intl.NumberFormat("pt-BR").format(Math.round(value));
 }
-
 export function formatNumber(value: number): string {
   const rounded = Math.round(value);
   if (Math.abs(rounded) < COMPACT_FLOOR) return formatExact(rounded);
-
   for (const unit of COMPACT_UNITS) {
     const scaled = rounded / unit.limit;
     const decimals = decimalsFor(scaled);
     const factor = 10 ** decimals;
     const snapped = Math.round(scaled * factor) / factor;
-
     if (Math.abs(snapped) >= 1 && Math.abs(snapped) < 1000) {
       return toText(snapped, decimals) + unit.suffix;
     }
   }
-
   return formatExact(rounded);
 }
-
 export function formatBronze(value: number): string {
   return formatNumber(value) + " de bronze";
 }
-
 export function formatTime(iso: string): string {
   const date = new Date(iso);
   const pad = (value: number) => value.toString().padStart(2, "0");
   return pad(date.getHours()) + ":" + pad(date.getMinutes());
 }
-
 export function formatReais(cents: number): string {
   return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(
     Math.round(cents) / 100,
   );
 }
-
 export function parseReais(text: string): number | null {
   const clean = text.replace(/[Rr$\s]/g, "");
   if (clean.length === 0) return null;
-
-  // Sem vírgula, um ponto agrupando casas de milhar é milhar ("1.500" é
-  // 1500), e qualquer outro ponto é decimal ("1.5" é um e meio).
   const normalized = clean.includes(",")
     ? clean.replace(/\./g, "").replace(",", ".")
     : /^\d{1,3}(\.\d{3})+$/.test(clean)
@@ -78,6 +61,5 @@ export function parseReais(text: string): number | null {
       : clean;
   const value = Number(normalized);
   if (!Number.isFinite(value) || value < 0) return null;
-
   return Math.round(value * 100);
 }

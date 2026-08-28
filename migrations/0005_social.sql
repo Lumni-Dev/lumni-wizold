@@ -1,8 +1,3 @@
--- Arena stamps, the pack and the tavern. Opponent and mate ids may point at
--- roster hunters that live in code, so they carry no FK. Tavern rules that
--- the controller enforces per row (ten seats, twelve messages) stay in the
--- rules layer; the schema keeps the structural ones as partial indexes.
-
 create table arena_duels (
   character_id text not null references characters (id) on delete cascade,
   opponent_id text not null,
@@ -27,8 +22,6 @@ create table tavern_rooms (
   created_at timestamptz not null default now()
 );
 
--- One open table per owner, and no two open tables under the same name;
--- reserved tables (private_for) sit outside both rules, as documented.
 create unique index tavern_rooms_one_per_owner
   on tavern_rooms (owner_id) where private_for is null;
 create unique index tavern_rooms_open_name
@@ -43,7 +36,6 @@ create table tavern_members (
   primary key (room_id, member_id)
 );
 
--- author_id has no FK because the tavern itself speaks ("system" lines).
 create table tavern_messages (
   id text primary key,
   room_id text not null references tavern_rooms (id) on delete cascade,
