@@ -42,6 +42,60 @@ export interface LoadedTavern {
   hashes: Map<string, string>;
 }
 
+/**
+ * Loads a single table, taking its row lock when asked: join, leave, close
+ * and speak only ever touch one room, so the room row is lock enough and two
+ * tables never queue behind each other.
+ */
+export async function loadRoomState(
+  client: PoolClient,
+  roomId: string,
+  lock: boolean,
+): Promise<LoadedTavern> {
+  const rooms = await client.query(
+    "select * from tavern_rooms where id = $1" + (lock ? " for update" : ""),
+    [roomId],
+  );
+  const hashes = new Map<string, string>();
+  const row = rooms.rows[0];
+  if (!row) return { state: { version: TAVERN_VERSION, rooms: [] }, hashes };
+
+  const [members, messages] = await Promise.all([
+    client.query("select * from tavern_members where room_id = $1 order by joined_at", [roomId]),
+    client.query("select * from tavern_messages where room_id = $1 order by sent_at", [roomId]),
+  ]);
+
+  if (row.password_hash) hashes.set(row.id, row.password_hash);
+  const state: TavernState = {
+    version: TAVERN_VERSION,
+    rooms: [
+      {
+        id: row.id,
+        name: row.name,
+        password: row.password_hash ? "" : null,
+        ownerId: row.owner_id,
+        createdAt: new Date(row.created_at).toISOString(),
+        privateFor: row.private_for ?? undefined,
+        members: members.rows.map((member) => ({
+          id: member.member_id,
+          name: member.member_name,
+          joinedAt: new Date(member.joined_at).toISOString(),
+          lastSeen: new Date(member.last_seen).toISOString(),
+        })),
+        messages: messages.rows.map((message) => ({
+          id: message.id,
+          authorId: message.author_id,
+          authorName: message.author_name,
+          text: message.body,
+          at: new Date(message.sent_at).toISOString(),
+        })),
+      },
+    ],
+  };
+
+  return { state, hashes };
+}
+
 export async function loadTavern(client: PoolClient): Promise<LoadedTavern> {
   const [rooms, members, messages] = await Promise.all([
     client.query("select * from tavern_rooms order by created_at"),

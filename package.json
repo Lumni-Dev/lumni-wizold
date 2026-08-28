@@ -11,7 +11,8 @@
     "bench": "node scripts/balance.mjs",
     "migrate": "node scripts/migrate.mjs",
     "migrate:status": "node scripts/migrate.mjs status",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "load": "node scripts/load.mjs"
   },
   "dependencies": {
     "lucide-react": "^1.34.0",

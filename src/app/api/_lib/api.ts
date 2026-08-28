@@ -14,7 +14,14 @@ import {
   saveGame,
   type LoadedGame,
 } from "@/models/repositories/server/game.store";
-import { loadTavern, lockTavern, pruneStale, type LoadedTavern } from "@/models/repositories/server/tavern.store";
+import {
+  loadRoomState,
+  loadTavern,
+  lockTavern,
+  pruneStale,
+  type LoadedTavern,
+} from "@/models/repositories/server/tavern.store";
+import { rateLimit } from "./rate-limit";
 import { sessionUserId } from "./session";
 
 // Every game endpoint is the same sandwich: verify the session, open one
@@ -49,6 +56,44 @@ export function bad(message: string, status: number): NextResponse {
   return NextResponse.json({ ok: false, message, data: null }, { status });
 }
 
+const MAX_BODY_BYTES = 16_384;
+
+export function clientIp(request: Request): string {
+  const forwarded = request.headers.get("x-forwarded-for") ?? "";
+  return forwarded.split(",")[0].trim() || "local";
+}
+
+function tooMany(retryAfterMs: number): NextResponse {
+  const response = bad("Calma, lobo: muitas requisições. Respire um instante.", 429);
+  response.headers.set("retry-after", String(Math.max(1, Math.ceil(retryAfterMs / 1000))));
+  return response;
+}
+
+/**
+ * Refuses what no legitimate client ever sends before any work happens: a
+ * cross-origin mutation (CSRF armor on top of the sameSite cookie) and a body
+ * beyond any real payload of this game. Returns null when the shape is sane.
+ */
+export function refuseAbuse(request: Request): NextResponse | null {
+  if (request.method !== "GET" && request.method !== "HEAD") {
+    const origin = request.headers.get("origin");
+    if (origin) {
+      try {
+        if (new URL(origin).host !== new URL(request.url).host) {
+          return bad("Origem não permitida.", 403);
+        }
+      } catch {
+        return bad("Origem não permitida.", 403);
+      }
+    }
+  }
+
+  const length = Number(request.headers.get("content-length") ?? 0);
+  if (length > MAX_BODY_BYTES) return bad("Corpo da requisição grande demais.", 413);
+
+  return null;
+}
+
 export async function readBody(request: Request): Promise<Record<string, unknown>> {
   if (request.method === "GET" || request.method === "HEAD") return {};
   try {
@@ -66,6 +111,11 @@ export const asText = (value: unknown, maximum = 200): string =>
 
 export const asInt = (value: unknown, fallback = 0): number =>
   typeof value === "number" && Number.isFinite(value) ? Math.round(value) : fallback;
+
+// One call moves at most 999 of anything: enough for any honest trade, small
+// enough that nobody inflates a state (or a non-stackable bag) in one request.
+export const asQuantity = (value: unknown): number =>
+  Math.min(999, Math.max(1, asInt(value, 1)));
 
 /**
  * The server clock lands what already happened before the action runs: an
@@ -97,8 +147,19 @@ async function applyClock(
 }
 
 export async function withGame<T>(request: Request, action: GameAction<T>): Promise<NextResponse> {
+  const refused = refuseAbuse(request);
+  if (refused) return refused;
+
   const userId = await sessionUserId();
   if (!userId) return bad("Entre para jogar.", 401);
+
+  const mutating = request.method !== "GET";
+  const gate = rateLimit(
+    (mutating ? "act:" : "read:") + userId,
+    mutating ? 30 : 60,
+    10_000,
+  );
+  if (!gate.allowed) return tooMany(gate.retryAfterMs);
 
   const body = await readBody(request);
 
@@ -134,36 +195,110 @@ export interface TavernContext {
   tavern: LoadedTavern;
 }
 
-export async function withTavern(
-  request: Request,
-  action: (
-    state: TavernState,
-    body: Record<string, unknown>,
-    context: TavernContext,
-  ) => Promise<NextResponse>,
-): Promise<NextResponse> {
+type TavernAction = (
+  state: TavernState,
+  body: Record<string, unknown>,
+  context: TavernContext,
+) => Promise<NextResponse>;
+
+async function tavernIdentity(
+  client: PoolClient,
+  userId: string,
+): Promise<TavernIdentity | null> {
+  const found = await client.query("select id, name from characters where user_id = $1", [userId]);
+  const row = found.rows[0];
+  return row ? { id: row.id, name: row.name } : null;
+}
+
+async function guardTavern(request: Request): Promise<{ userId: string } | NextResponse> {
+  const refused = refuseAbuse(request);
+  if (refused) return refused;
+
   const userId = await sessionUserId();
   if (!userId) return bad("Entre para jogar.", 401);
+
+  const gate = rateLimit("tavern:" + userId, 30, 10_000);
+  if (!gate.allowed) return tooMany(gate.retryAfterMs);
+
+  return { userId };
+}
+
+/**
+ * Whole-tavern operations: creating a table and reserving a direct one need
+ * the global view (name clash, one table per owner, the pair lookup), so they
+ * serialize under the advisory lock. Reads skip the lock entirely.
+ */
+export async function withTavern(
+  request: Request,
+  action: TavernAction,
+): Promise<NextResponse> {
+  const guarded = await guardTavern(request);
+  if (guarded instanceof NextResponse) return guarded;
 
   const body = await readBody(request);
 
   try {
     return await withTransaction(async (client) => {
-      const found = await client.query("select id, name from characters where user_id = $1", [
-        userId,
-      ]);
-      const row = found.rows[0];
-      if (!row) return bad("Nenhum personagem ativo.", 404);
+      const identity = await tavernIdentity(client, guarded.userId);
+      if (!identity) return bad("Nenhum personagem ativo.", 404);
 
-      await lockTavern(client);
+      if (request.method !== "GET") await lockTavern(client);
       await pruneStale(client);
       const tavern = await loadTavern(client);
 
-      return action(tavern.state, body, {
-        client,
-        identity: { id: row.id, name: row.name },
-        tavern,
-      });
+      return action(tavern.state, body, { client, identity, tavern });
+    });
+  } catch (error) {
+    console.error("[api]", request.method, new URL(request.url).pathname, error);
+    return bad("O servidor tropeçou. Tente de novo.", 500);
+  }
+}
+
+/**
+ * Single-room operations (join, leave, close, speak): the room row itself is
+ * the lock, so two tables never wait for each other and the chat scales by
+ * room instead of by tavern.
+ */
+export async function withTavernRoom(
+  request: Request,
+  roomId: string,
+  action: TavernAction,
+): Promise<NextResponse> {
+  const guarded = await guardTavern(request);
+  if (guarded instanceof NextResponse) return guarded;
+
+  const body = await readBody(request);
+
+  try {
+    return await withTransaction(async (client) => {
+      const identity = await tavernIdentity(client, guarded.userId);
+      if (!identity) return bad("Nenhum personagem ativo.", 404);
+
+      const tavern = await loadRoomState(client, roomId, true);
+      return action(tavern.state, body, { client, identity, tavern });
+    });
+  } catch (error) {
+    console.error("[api]", request.method, new URL(request.url).pathname, error);
+    return bad("O servidor tropeçou. Tente de novo.", 500);
+  }
+}
+
+/**
+ * The lightest lane: identity only, for the heartbeat that must cost close
+ * to nothing under load.
+ */
+export async function withIdentity(
+  request: Request,
+  action: (identity: TavernIdentity, client: PoolClient) => Promise<NextResponse>,
+): Promise<NextResponse> {
+  const guarded = await guardTavern(request);
+  if (guarded instanceof NextResponse) return guarded;
+
+  try {
+    return await withTransaction(async (client) => {
+      const identity = await tavernIdentity(client, guarded.userId);
+      if (!identity) return bad("Nenhum personagem ativo.", 404);
+      return action(identity, client);
     });
   } catch (error) {
     console.error("[api]", request.method, new URL(request.url).pathname, error);

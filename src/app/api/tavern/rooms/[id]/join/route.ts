@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import * as tavernController from "@/controllers/tavern.controller";
 import { saveTavernDiff } from "@/models/repositories/server/tavern.store";
-import { asText, withTavern } from "../../../../_lib/api";
+import { asText, withTavernRoom } from "../../../../_lib/api";
 import { verifySecret } from "../../../../_lib/session";
 
 // The hash check happens before the controller runs; a verified guest walks
@@ -11,7 +11,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  return withTavern(request, async (state, body, context) => {
+  return withTavernRoom(request, id.slice(0, 80), async (state, body, context) => {
     const roomId = id.slice(0, 80);
     const hash = context.tavern.hashes.get(roomId);
     const room = tavernController.findRoom(state, roomId);

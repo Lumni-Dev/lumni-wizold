@@ -4,13 +4,24 @@ import { ageOf, isRealBirth } from "@/shared/utils/birth";
 import { withTransaction } from "@/models/repositories/server/database";
 import { createUser, findUserByEmail } from "@/models/repositories/server/user.store";
 import { loadGame } from "@/models/repositories/server/game.store";
-import { asText, bad, readBody } from "../../_lib/api";
+import { asText, bad, clientIp, readBody, refuseAbuse } from "../../_lib/api";
+import { rateLimit } from "../../_lib/rate-limit";
 import { attachSession } from "../../_lib/session";
 
 // The door. A demo of the Google login with the same contract the real one
 // will honor: the age gate is enforced HERE, not only on the screen, because
 // a field is not a guarantee.
 export async function POST(request: Request) {
+  const refused = refuseAbuse(request);
+  if (refused) return refused;
+
+  const gate = rateLimit("enter:" + clientIp(request), 20, 300_000);
+  if (!gate.allowed) {
+    const response = bad("Muitas tentativas. Espere um pouco antes de entrar de novo.", 429);
+    response.headers.set("retry-after", String(Math.ceil(gate.retryAfterMs / 1000)));
+    return response;
+  }
+
   const body = await readBody(request);
   const email = asText(body.email, 254).trim().toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {

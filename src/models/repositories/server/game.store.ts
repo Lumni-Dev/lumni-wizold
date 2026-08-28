@@ -3,7 +3,7 @@ import { STATE_VERSION } from "@/shared/constants/game";
 import { emptyEquipment, EQUIPMENT_SLOTS, type EquipmentSlot } from "../../entities/item";
 import type { BazaarListing, Wallet } from "../../entities/bazaar";
 import type { Character, Form, Gender } from "../../entities/character";
-import type { GameState } from "../../entities/game-state";
+import { initialState, type GameState } from "../../entities/game-state";
 import type { LogEntry, LogKind } from "../../entities/log-entry";
 import type { PackMate } from "../../entities/pack";
 import type { Pet, PetGender } from "../../entities/pet";
@@ -217,6 +217,10 @@ async function replace(
   );
 }
 
+// The pure controllers keep the reference of every branch they did not touch,
+// so reference inequality IS the dirty flag: a hunt writes character, bag,
+// diary and maybe the wolf, and never rewrites pack, duels or listings. This
+// is what keeps one action a handful of statements instead of a full dump.
 export async function saveGame(
   client: PoolClient,
   characterId: string,
@@ -225,6 +229,11 @@ export async function saveGame(
 ): Promise<void> {
   const character = after.character;
   if (!character) return;
+
+  if (character === before.character && after.mining === before.mining) {
+    await savePieces(client, characterId, before, after);
+    return;
+  }
 
   await client.query(
     `update characters set
@@ -269,6 +278,86 @@ export async function saveGame(
     ],
   );
 
+  await savePieces(client, characterId, before, after);
+}
+
+async function savePieces(
+  client: PoolClient,
+  characterId: string,
+  before: GameState,
+  after: GameState,
+): Promise<void> {
+  if (after.pet !== before.pet) await savePet(client, characterId, before, after);
+  if (after.equipment !== before.equipment) await saveEquipment(client, characterId, after);
+
+  if (after.inventory !== before.inventory) {
+    await replace(
+      client,
+      "inventory_items",
+      characterId,
+      [{ name: "item_id", cast: "text" }, { name: "quantity", cast: "integer" }],
+      after.inventory.map((slot) => [slot.itemId, slot.quantity]),
+    );
+  }
+
+  if (after.enhancements !== before.enhancements) {
+    await replace(
+      client,
+      "enhancements",
+      characterId,
+      [{ name: "item_id", cast: "text" }, { name: "level", cast: "integer" }],
+      Object.entries(after.enhancements).map(([itemId, level]) => [itemId, level]),
+    );
+  }
+
+  if (after.arenaDuels !== before.arenaDuels) {
+    await replace(
+      client,
+      "arena_duels",
+      characterId,
+      [{ name: "opponent_id", cast: "text" }, { name: "dueled_at", cast: "timestamptz" }],
+      Object.entries(after.arenaDuels).map(([opponent, at]) => [opponent, at]),
+    );
+  }
+
+  if (after.pack !== before.pack) {
+    await replace(
+      client,
+      "pack_mates",
+      characterId,
+      [
+        { name: "mate_id", cast: "text" },
+        { name: "mate_name", cast: "text" },
+        { name: "added_at", cast: "timestamptz" },
+      ],
+      after.pack.map((mate) => [mate.id, mate.name, mate.addedAt]),
+    );
+  }
+
+  if (after.bazaarPurchases !== before.bazaarPurchases) {
+    await replace(
+      client,
+      "bazaar_purchases",
+      characterId,
+      [{ name: "listing_id", cast: "text" }, { name: "quantity", cast: "integer" }],
+      Object.entries(after.bazaarPurchases).map(([listing, quantity]) => [listing, quantity]),
+    );
+  }
+
+  if (after.wallet !== before.wallet) await saveWallet(client, characterId, after);
+  if (after.automation !== before.automation) await saveAutomation(client, characterId, after);
+  if (after.bazaarListings !== before.bazaarListings) {
+    await saveListings(client, characterId, before, after);
+  }
+  if (after.log !== before.log) await saveDiary(client, characterId, before, after);
+}
+
+async function savePet(
+  client: PoolClient,
+  characterId: string,
+  before: GameState,
+  after: GameState,
+): Promise<void> {
   if (after.pet) {
     await client.query(
       `insert into pets (id, character_id, name, gender, energy, active, level, training_progress, adopted_at)
@@ -290,7 +379,13 @@ export async function saveGame(
   } else if (before.pet) {
     await client.query("delete from pets where character_id = $1", [characterId]);
   }
+}
 
+async function saveEquipment(
+  client: PoolClient,
+  characterId: string,
+  after: GameState,
+): Promise<void> {
   await client.query("delete from equipped_items where character_id = $1", [characterId]);
   const worn = EQUIPMENT_SLOTS.filter((slot) => after.equipment[slot]);
   if (worn.length > 0) {
@@ -301,57 +396,25 @@ export async function saveGame(
       [characterId, worn, worn.map((slot) => after.equipment[slot])],
     );
   }
+}
 
-  await replace(
-    client,
-    "inventory_items",
-    characterId,
-    [{ name: "item_id", cast: "text" }, { name: "quantity", cast: "integer" }],
-    after.inventory.map((slot) => [slot.itemId, slot.quantity]),
-  );
-
-  await replace(
-    client,
-    "enhancements",
-    characterId,
-    [{ name: "item_id", cast: "text" }, { name: "level", cast: "integer" }],
-    Object.entries(after.enhancements).map(([itemId, level]) => [itemId, level]),
-  );
-
-  await replace(
-    client,
-    "arena_duels",
-    characterId,
-    [{ name: "opponent_id", cast: "text" }, { name: "dueled_at", cast: "timestamptz" }],
-    Object.entries(after.arenaDuels).map(([opponent, at]) => [opponent, at]),
-  );
-
-  await replace(
-    client,
-    "pack_mates",
-    characterId,
-    [
-      { name: "mate_id", cast: "text" },
-      { name: "mate_name", cast: "text" },
-      { name: "added_at", cast: "timestamptz" },
-    ],
-    after.pack.map((mate) => [mate.id, mate.name, mate.addedAt]),
-  );
-
-  await replace(
-    client,
-    "bazaar_purchases",
-    characterId,
-    [{ name: "listing_id", cast: "text" }, { name: "quantity", cast: "integer" }],
-    Object.entries(after.bazaarPurchases).map(([listing, quantity]) => [listing, quantity]),
-  );
-
+async function saveWallet(
+  client: PoolClient,
+  characterId: string,
+  after: GameState,
+): Promise<void> {
   await client.query(
     `insert into wallets (character_id, cents) values ($1, $2)
      on conflict (character_id) do update set cents = $2`,
     [characterId, after.wallet.cents],
   );
+}
 
+async function saveAutomation(
+  client: PoolClient,
+  characterId: string,
+  after: GameState,
+): Promise<void> {
   await client.query(
     `insert into automation_settings
        (character_id, hunt, train, mine, forge, rest, transform, potion, pet_feed, pet_rest)
@@ -372,9 +435,16 @@ export async function saveGame(
       after.automation.petRest,
     ],
   );
+}
 
-  // Listings: gone from the state after the action means cancelled (the sold
-  // ones were already marked by the settle step before the action ran).
+// Listings: gone from the state after the action means cancelled (the sold
+// ones were already marked by the settle step before the action ran).
+async function saveListings(
+  client: PoolClient,
+  characterId: string,
+  before: GameState,
+  after: GameState,
+): Promise<void> {
   const kept = new Set(after.bazaarListings.map((listing) => listing.id));
   const dropped = before.bazaarListings.filter((listing) => !kept.has(listing.id));
   for (const listing of dropped) {
@@ -402,19 +472,39 @@ export async function saveGame(
     );
   }
 
-  // The diary appends and trims; replacing the kept window is the same story
-  // the client told, now in rows.
-  await replace(
-    client,
-    "log_entries",
-    characterId,
-    [
-      { name: "id", cast: "text" },
-      { name: "kind", cast: "log_kind" },
-      { name: "message", cast: "text" },
-      { name: "created_at", cast: "timestamptz" },
-    ],
-    after.log.map((entry) => [entry.id, entry.kind, entry.message, entry.date]),
+}
+
+// The diary is append-only: an action writes its one to three new lines and
+// one delete trims whatever fell off the 120-line window, instead of the
+// old full rewrite of the whole diary on every action.
+async function saveDiary(
+  client: PoolClient,
+  characterId: string,
+  before: GameState,
+  after: GameState,
+): Promise<void> {
+  const known = new Set(before.log.map((entry) => entry.id));
+  const fresh = after.log.filter((entry) => !known.has(entry.id));
+
+  if (fresh.length > 0) {
+    await client.query(
+      `insert into log_entries (character_id, id, kind, message, created_at)
+       select $1, id, kind::log_kind, message, at::timestamptz
+       from unnest($2::text[], $3::text[], $4::text[], $5::text[]) as entries (id, kind, message, at)
+       on conflict (id) do nothing`,
+      [
+        characterId,
+        fresh.map((entry) => entry.id),
+        fresh.map((entry) => entry.kind),
+        fresh.map((entry) => entry.message),
+        fresh.map((entry) => entry.date),
+      ],
+    );
+  }
+
+  await client.query(
+    "delete from log_entries where character_id = $1 and id <> all($2::text[])",
+    [characterId, after.log.map((entry) => entry.id)],
   );
 }
 
@@ -483,7 +573,9 @@ export async function insertNewGame(
     ],
   );
 
-  await saveGame(client, character.id, { ...state, bazaarListings: [] }, state);
+  // initialState() carries fresh references for every branch, so the diff in
+  // saveGame writes each piece of the newborn run instead of skipping it.
+  await saveGame(client, character.id, initialState(), state);
   await recordWalletMovement(client, character.id, state.wallet.cents, "starting_balance", null);
 }
 

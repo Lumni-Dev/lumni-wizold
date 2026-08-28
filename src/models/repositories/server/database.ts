@@ -10,13 +10,22 @@ declare global {
 }
 
 function createPool(): Pool {
-  return new Pool({
+  const pool = new Pool({
     max: 10,
     idleTimeoutMillis: 30_000,
+    connectionTimeoutMillis: 10_000,
     database: process.env.PGDATABASE ?? "wizold-prod",
     // Managed Postgres (Supabase) refuses plain connections.
     ssl: process.env.PGSSLMODE ? { rejectUnauthorized: false } : undefined,
   });
+
+  // A stuck statement must die before it drags the pool down with it: ten
+  // seconds is an eternity for any query this game runs.
+  pool.on("connect", (client) => {
+    client.query("set statement_timeout = '10s'").catch(() => {});
+  });
+
+  return pool;
 }
 
 // In dev, Next re-evaluates modules on edit; the global keeps one pool alive
