@@ -395,6 +395,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "Subir de faixa aumenta o que o mesmo pacote entrega, então comprar cedo nunca vira atalho: o que está à venda é tempo, sempre o mesmo tempo.",
       "A loja não vende nível, atributo nem equipamento: experiência só a caça dá, e ponto de atributo só o treino dá.",
       "O pagamento abre no checkout do Stripe e o bronze cai na conta assim que ele confirma.",
+      "O histórico de compras fica na própria loja, cinco por página: valor, data e o status de cada pacote, de aguardando pagamento a aprovado, expirado ou devolvido.",
     ],
   },
   {

@@ -55,13 +55,18 @@ export async function fulfillSession(
     const result = storeController.purchasePack(loaded.state, session.metadata.packId ?? "");
     if (!result.ok || !result.data) {
       if (session.payment_intent) await refundPayment(session.payment_intent);
+      await client.query(
+        "update store_purchases set status = 'refunded', settled_at = now() where id = $1",
+        [session.id],
+      );
       return { ok: false, message: result.message };
     }
     await saveGame(client, characterId, loaded.state, result.state);
     await client.query(
-      `insert into store_purchases (id, character_id, pack_id, price_cents, bronze_granted)
-       values ($1, $2, $3, $4, $5)
-       on conflict (id) do nothing`,
+      `insert into store_purchases (id, character_id, pack_id, price_cents, bronze_granted, status, settled_at)
+       values ($1, $2, $3, $4, $5, 'approved', now())
+       on conflict (id) do update set
+         bronze_granted = excluded.bronze_granted, status = 'approved', settled_at = now()`,
       [session.id, characterId, result.data.pack.id, result.data.pack.priceCents, result.data.bronze],
     );
     return { ok: true, message: result.message };

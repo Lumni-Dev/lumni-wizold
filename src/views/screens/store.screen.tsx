@@ -1,20 +1,56 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { api } from "@/controllers/api.client";
 import { useGame } from "@/controllers/game.context";
 import { listPacks } from "@/controllers/store.controller";
-import { formatNumber, formatReais, formatBronze } from "@/shared/utils/format";
+import { findPack } from "@/models/data/store-packs";
+import { formatDay, formatNumber, formatReais, formatBronze } from "@/shared/utils/format";
 import { Button } from "../components/button";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
 import { PackIcon } from "../components/pack-icon";
 import { DataRow } from "../components/data-row";
-import { List } from "../components/list";
+import { EmptyState } from "../components/empty-state";
+import { List, ListRow, RowText } from "../components/list";
+import { Pagination } from "../components/pagination";
 import { Panel } from "../components/panel";
 import { Tag } from "../components/tag";
 import { PageHeader } from "../layout/page-header";
 
+interface HistoryEntry {
+  id: string;
+  packId: string;
+  priceCents: number;
+  status: string;
+  at: string;
+}
+
+interface HistoryView {
+  entries: HistoryEntry[];
+  page: number;
+  pages: number;
+  total: number;
+}
+
+const STATUS_LABEL: Record<string, string> = {
+  opened: "Aguardando pagamento",
+  approved: "Aprovado",
+  expired: "Expirado",
+  refunded: "Devolvido",
+};
+
+const STATUS_TONE: Record<string, "light" | "neutral" | "faint"> = {
+  opened: "neutral",
+  approved: "light",
+  expired: "faint",
+  refunded: "faint",
+};
+
 export function StoreScreen() {
   const { state, character, buyPack, confirmPayment } = useGame();
+  const [historyPage, setHistoryPage] = useState(1);
+  const [historyStamp, setHistoryStamp] = useState(0);
+  const [history, setHistory] = useState<HistoryView | null>(null);
 
   const offers = useMemo(() => listPacks(state), [state]);
 
@@ -22,8 +58,18 @@ export function StoreScreen() {
     const sessionId = new URLSearchParams(window.location.search).get("session_id");
     if (!sessionId) return;
     window.history.replaceState(null, "", "/store");
-    void confirmPayment(sessionId);
+    void confirmPayment(sessionId).then(() => setHistoryStamp((stamp) => stamp + 1));
   }, [confirmPayment]);
+
+  useEffect(() => {
+    let alive = true;
+    void api<HistoryView>("GET", "/api/store/history?page=" + historyPage).then((answer) => {
+      if (alive && answer.ok && answer.data) setHistory(answer.data);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [historyPage, historyStamp]);
 
   if (!character) return null;
 
@@ -89,6 +135,50 @@ export function StoreScreen() {
           </Card>
         ))}
       </div>
+
+      <Panel
+        title="Histórico de compras"
+        description={
+          history && history.total > 0
+            ? formatNumber(history.total) +
+              (history.total === 1 ? " compra registrada." : " compras registradas.")
+            : "Cada pacote pago aparece aqui, com valor, data e status."
+        }
+        padding="none"
+        footer={
+          history && history.pages > 1 ? (
+            <Pagination page={history.page} pages={history.pages} onChange={setHistoryPage} />
+          ) : undefined
+        }
+      >
+        {history === null ? null : history.entries.length === 0 ? (
+          <div className="p-4">
+            <EmptyState
+              title="Nenhuma compra ainda"
+              description="A primeira Bolsa de Bronze que você pagar abre esta lista."
+            />
+          </div>
+        ) : (
+          <List>
+            {history.entries.map((entry) => (
+              <ListRow key={entry.id} className="justify-between">
+                <RowText
+                  title={findPack(entry.packId)?.name ?? entry.packId}
+                  description={formatDay(entry.at)}
+                />
+                <span className="flex shrink-0 items-center gap-3">
+                  <span className="font-mono text-[11px] text-ink-soft">
+                    {formatReais(entry.priceCents)}
+                  </span>
+                  <Tag tone={STATUS_TONE[entry.status] ?? "neutral"}>
+                    {STATUS_LABEL[entry.status] ?? entry.status}
+                  </Tag>
+                </span>
+              </ListRow>
+            ))}
+          </List>
+        )}
+      </Panel>
     </>
   );
 }

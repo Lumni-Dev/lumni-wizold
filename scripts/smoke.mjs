@@ -123,6 +123,11 @@ check(
   String(checkout.payload?.data?.url ?? "").startsWith("https://checkout.stripe.com"),
   checkout.payload?.message,
 );
+const history = (await call("GET", "/api/store/history")).payload?.data;
+check(
+  "histórico registra a sessão aberta",
+  history?.total === 1 && history?.entries?.[0]?.status === "opened",
+);
 const hook = await fetch(BASE + "/api/stripe/webhook", {
   method: "POST",
   headers: { "content-type": "application/json" },

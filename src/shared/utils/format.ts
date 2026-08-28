@@ -46,6 +46,19 @@ export function formatTime(iso: string): string {
   const pad = (value: number) => value.toString().padStart(2, "0");
   return pad(date.getHours()) + ":" + pad(date.getMinutes());
 }
+export function formatDay(iso: string): string {
+  const date = new Date(iso);
+  const pad = (value: number) => value.toString().padStart(2, "0");
+  return (
+    pad(date.getDate()) +
+    "/" +
+    pad(date.getMonth() + 1) +
+    "/" +
+    date.getFullYear() +
+    " " +
+    formatTime(iso)
+  );
+}
 export function formatReais(cents: number): string {
   return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(
     Math.round(cents) / 100,
