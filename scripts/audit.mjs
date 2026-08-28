@@ -574,6 +574,21 @@ sec("arena");
       "experiência não vem do fosso",
       after.experience === before.experience && after.level === before.level,
     );
+
+    const beaten = {
+      ...duel.data,
+      combat: { ...duel.data.combat, victory: false, retreated: false },
+      spoils: 0,
+    };
+    const humbled = arenaCtrl.landArena(inBand, beaten, 0);
+    ok("derrota no fosso volta ao humano", humbled.state.character.form === "human");
+    ok("derrota no fosso limpa o selo", humbled.state.character.transformedAt === undefined);
+    const winner = arenaCtrl.landArena(
+      inBand,
+      { ...duel.data, combat: { ...duel.data.combat, victory: true, retreated: false } },
+      0,
+    );
+    ok("vitória mantém a fera de pé", winner.state.character.form === "werewolf");
   }
 }
 sec("caçada");
@@ -593,6 +608,16 @@ sec("caçada");
   const resolved = huntCtrl.resolveHunt(state, "dew-woods", random);
   ok("caçada válida resolve", resolved.ok === true);
   if (resolved.ok) {
+    const beaten = {
+      ...resolved.data,
+      combat: { ...resolved.data.combat, victory: false, retreated: false },
+      bronze: 0,
+      drops: [],
+    };
+    const humbledHunt = huntCtrl.landHunt(state, beaten, 0);
+    ok("derrota na caçada volta ao humano", humbledHunt.state.character.form === "human");
+    ok("derrota na caçada limpa o selo", humbledHunt.state.character.transformedAt === undefined);
+
     const landed = huntCtrl.landHunt(state, resolved.data, 0);
     const before = state.character;
     const after = landed.state.character;

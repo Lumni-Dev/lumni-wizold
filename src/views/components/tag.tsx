@@ -5,7 +5,7 @@ type TagTone = "neutral" | "light" | "faint";
 
 const TONES: Record<TagTone, string> = {
   neutral: "border-edge-strong bg-surface-high text-ink-soft",
-  light: "border-transparent bg-highlight text-base",
+  light: "border-edge-strong bg-surface-top text-ink",
   faint: "border-edge bg-transparent text-ink-faint",
 };
 

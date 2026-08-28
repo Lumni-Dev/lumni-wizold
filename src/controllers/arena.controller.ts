@@ -226,6 +226,8 @@ export function landArena(
     arenaDuels: duels,
     character: {
       ...character,
+      form: lost ? "human" : character.form,
+      transformedAt: lost ? undefined : character.transformedAt,
       health: Math.max(1, character.health - remainingLoss),
       rage: character.rage + combat.rageGained,
       bronze: Math.max(0, character.bronze + spoils),
@@ -246,6 +248,7 @@ export function landArena(
           formatBronze(-spoils) +
           " da sua bolsa."
         : hunter.name + " leva a melhor no fosso. Sua bolsa estava vazia, e foi o que ele levou.";
-  next = addLog(next, "arena", message);
-  return success<ArenaResolution>(next, message, resolution);
+  const humbled = lost ? message + " A fera não se sustentou: você volta à forma humana." : message;
+  next = addLog(next, "arena", humbled);
+  return success<ArenaResolution>(next, humbled, resolution);
 }

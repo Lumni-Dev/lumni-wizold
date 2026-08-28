@@ -208,6 +208,8 @@ export function landHunt(
     ...state,
     character: {
       ...character,
+      form: lost ? "human" : character.form,
+      transformedAt: lost ? undefined : character.transformedAt,
       health: Math.max(1, character.health - remainingLoss),
       rage: character.rage + combat.rageGained,
       bronze: character.bronze + bronze,
@@ -248,7 +250,7 @@ export function landHunt(
       : creature.name +
         " venceu a disputa. Você escapou por pouco de " +
         territory.name +
-        ". Pelo esforço: " +
+        ", e a fera não se sustentou: você volta à forma humana. Pelo esforço: " +
         formatNumber(granted) +
         " de experiência.";
 
