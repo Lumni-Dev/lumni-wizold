@@ -123,7 +123,7 @@ export function StoreScreen() {
             </List>
 
             <CardFooter>
-              {pack.highlight ? <Tag tone="neutral">Melhor troca</Tag> : <span />}
+              <span />
               <Button variant="primary" onClick={() => buyPack(pack.id)}>
                 Comprar
               </Button>
