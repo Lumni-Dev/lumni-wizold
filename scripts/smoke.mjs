@@ -42,7 +42,7 @@ const client = new pg.Client({
 });
 await client.connect();
 const rows = async (sql, params) => (await client.query(sql, params)).rows;
-const anonymous = await call("GET", "/api/state");
+const anonymous = await call("POST", "/api/state");
 check("sem sessão é 401", anonymous.status === 401);
 const warm = await call("GET", "/api/cron/warm");
 check(
@@ -81,7 +81,7 @@ const badName = await call("POST", "/api/characters", { name: "dois nomes", gend
 check("nome com espaço recusa", badName.payload?.ok === false);
 const created = await call("POST", "/api/characters", { name: "Fumaca", gender: "female" });
 check("personagem criado", created.payload?.ok === true, created.payload?.message);
-const state1 = (await call("GET", "/api/state")).payload?.data;
+const state1 = (await call("POST", "/api/state")).payload?.data;
 check("nasce com 100 de bronze", state1?.character?.bronze === 100);
 check("carteira nasce com R$ 10", state1?.wallet?.cents === 1000);
 check("dez poções na mochila", state1?.inventory?.[0]?.quantity === 10);
@@ -90,19 +90,23 @@ check("transformação cobra 40 de fúria", turned.payload?.ok === true);
 const hunt = await call("POST", "/api/hunt", { territoryId: "village-field" });
 const report = hunt.payload?.data;
 check("caçada resolve e pousa", hunt.payload?.ok === true && Array.isArray(report?.combat?.rounds));
-const state2 = (await call("GET", "/api/state")).payload?.data;
+const state2 = (await call("POST", "/api/state")).payload?.data;
 check("caçada contou", state2?.character?.hunts === 1);
 const bought = await call("POST", "/api/market/buy", {
   itemId: "health-potion-small",
   quantity: 1,
 });
 check("compra no mercado", bought.payload?.ok === true, bought.payload?.message);
-const state3 = (await call("GET", "/api/state")).payload?.data;
+const state3 = (await call("POST", "/api/state")).payload?.data;
 check("bronze desceu o preço", state3?.character?.bronze === state2?.character?.bronze - 60);
 const trained = await call("POST", "/api/training/session", { exerciseId: "ice-bath" });
 check("sessão de treino", trained.payload?.ok === true, trained.payload?.message);
-const arena = (await call("GET", "/api/arena")).payload?.data;
-check("arena abre com três ataques", arena?.charges?.left === 3);
+check(
+  "arena nasce sem duelo gasto",
+  state3?.arenaDuels !== null &&
+    typeof state3?.arenaDuels === "object" &&
+    Object.keys(state3.arenaDuels).length === 0,
+);
 const room = await call("POST", "/api/tavern/rooms", { name: "Fogueira", password: "" });
 check("mesa aberta", room.payload?.ok === true, room.payload?.message);
 const roomId = room.payload?.data?.roomId;
@@ -110,7 +114,7 @@ const spoke = await call("POST", "/api/tavern/rooms/" + roomId + "/messages", {
   text: "Uivo de teste",
 });
 check("fala registrada", spoke.payload?.ok === true);
-const tavern = (await call("GET", "/api/tavern")).payload?.data;
+const tavern = (await call("POST", "/api/tavern")).payload?.data;
 const seat = tavern?.rooms?.find((entry) => entry.room.id === roomId);
 check(
   "mesa listada com a fala",
