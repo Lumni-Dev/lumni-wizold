@@ -87,6 +87,16 @@ check("carteira nasce com R$ 10", state1?.wallet?.cents === 1000);
 check("dez poções na mochila", state1?.inventory?.[0]?.quantity === 10);
 const turned = await call("POST", "/api/character/transform");
 check("transformação cobra 40 de fúria", turned.payload?.ok === true);
+const laidDown = await call("POST", "/api/character/rest");
+check("repouso aceito com a fúria gasta", laidDown.payload?.ok === true, laidDown.payload?.message);
+const turnedAgain = await call("POST", "/api/character/transform");
+check("virar a fera de novo", turnedAgain.payload?.ok === true, turnedAgain.payload?.message);
+const staleCollect = await call("PATCH", "/api/character/rest");
+check(
+  "atividade derruba o repouso no servidor",
+  staleCollect.payload?.ok === false,
+  staleCollect.payload?.message,
+);
 const hunt = await call("POST", "/api/hunt", { territoryId: "village-field" });
 const report = hunt.payload?.data;
 check("caçada resolve e pousa", hunt.payload?.ok === true && Array.isArray(report?.combat?.rounds));

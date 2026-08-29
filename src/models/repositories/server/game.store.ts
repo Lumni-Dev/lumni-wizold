@@ -60,6 +60,7 @@ export interface LoadedGame {
   characterId: string;
   state: GameState;
   petRestCollectedAt: string | null;
+  activityKind: string | null;
   activityStartedAt: string | null;
 }
 export async function loadGame(
@@ -119,9 +120,10 @@ export async function loadGame(
     "select id, kind, message, created_at from log_entries where character_id = $1 order by created_at desc limit 120",
     [characterId],
   );
-  const activity = await client.query("select started_at from activities where character_id = $1", [
-    characterId,
-  ]);
+  const activity = await client.query(
+    "select kind, started_at from activities where character_id = $1",
+    [characterId],
+  );
   const equipment = emptyEquipment();
   for (const entry of equipped.rows) equipment[entry.slot as EquipmentSlot] = entry.item_id;
   const petRow = pet.rows[0];
@@ -202,8 +204,15 @@ export async function loadGame(
     characterId,
     state,
     petRestCollectedAt: stamp(petRow?.rest_collected_at) ?? null,
+    activityKind: activity.rows[0]?.kind ?? null,
     activityStartedAt: stamp(activity.rows[0]?.started_at) ?? null,
   };
+}
+
+export async function interruptRest(client: PoolClient, characterId: string): Promise<void> {
+  await client.query("delete from activities where character_id = $1 and kind = 'rest'", [
+    characterId,
+  ]);
 }
 interface ReplaceColumn {
   name: string;

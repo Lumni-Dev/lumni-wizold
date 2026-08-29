@@ -18,7 +18,9 @@ export async function POST(request: Request) {
 export async function PATCH(request: Request) {
   return withGame(request, async (state, _body, context) => {
     const startedAt = context.loaded.activityStartedAt;
-    if (!startedAt) return { ok: false, message: "Você não está repousando.", state };
+    if (!startedAt || context.loaded.activityKind !== "rest") {
+      return { ok: false, message: "Você não está repousando.", state };
+    }
     const elapsed = Date.now() - Date.parse(startedAt);
     const entitled = Math.floor(elapsed / REST_TICK_MS);
     if (entitled <= 0) {

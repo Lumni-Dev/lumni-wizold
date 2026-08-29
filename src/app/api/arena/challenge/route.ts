@@ -1,5 +1,6 @@
 import { loadHunters } from "@/models/repositories/server/roster.store";
 import { recordArenaDuel } from "@/models/repositories/server/arena.store";
+import { interruptRest } from "@/models/repositories/server/game.store";
 import * as arenaController from "@/controllers/arena.controller";
 import { asText, withGame } from "../../_lib/api";
 export async function POST(request: Request) {
@@ -8,6 +9,7 @@ export async function POST(request: Request) {
     const resolved = arenaController.resolveArena(state, roster, asText(body.hunterId, 80));
     if (!resolved.ok || !resolved.data) return resolved;
     const landed = arenaController.landArena(state, resolved.data, 0);
+    if (landed.ok) await interruptRest(context.client, context.characterId);
     if (landed.ok && landed.data && state.character) {
       const { combat, hunter, spoils } = landed.data;
       await recordArenaDuel(context.client, {
