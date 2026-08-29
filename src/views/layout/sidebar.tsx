@@ -22,7 +22,7 @@ function Brand() {
       className="flex h-16 flex-col justify-center gap-1 border-b border-edge px-3"
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/assets/ui/logo.webp?v=1" alt={GAME_NAME} className="h-6 w-auto self-start" />
+      <img src="/assets/ui/logo.webp?v=2" alt={GAME_NAME} className="h-6 w-auto self-start" />
       <p className="text-[10px] tracking-[0.16em] text-ink-faint">{GAME_TAGLINE}</p>
     </Link>
   );
