@@ -477,23 +477,26 @@ export function TavernScreen() {
                 const kept = isInPack(state, member.id);
 
                 return (
-                  <Tag key={member.id} tone={yourself ? "neutral" : "faint"} className="gap-2">
-                    <MemberName href={profileHref(member.id)} name={member.name} />
-                    {yourself ? null : kept ? (
-                      <span className="text-ink-faint">na matilha</span>
-                    ) : (
+                  <span key={member.id} className="flex items-center gap-1">
+                    <Tag tone={yourself ? "neutral" : "faint"} className="gap-2">
+                      <MemberName href={profileHref(member.id)} name={member.name} />
+                      {kept && !yourself ? (
+                        <span className="text-ink-faint">· na matilha</span>
+                      ) : null}
+                    </Tag>
+                    {!yourself && !kept ? (
                       <Tooltip label={"Guardar " + member.name + " na sua matilha"}>
                         <button
                           type="button"
                           aria-label={"Guardar " + member.name + " na sua matilha"}
-                          className="text-ink-faint transition-colors hover:text-highlight"
+                          className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-edge text-ink-faint transition-colors hover:border-edge-strong hover:text-highlight"
                           onClick={() => addToPack({ id: member.id, name: member.name })}
                         >
                           <ActionIcon action="keep" className="h-3 w-3" />
                         </button>
                       </Tooltip>
-                    )}
-                  </Tag>
+                    ) : null}
+                  </span>
                 );
               })}
             </div>
