@@ -76,7 +76,7 @@ export function Button({
     >
       {pending ? (
         <span className="absolute inset-0 flex items-center justify-center">
-          <Spinner />
+          <Spinner tone={variant === "primary" ? "dark" : "ember"} />
         </span>
       ) : null}
       <span className={cn("inline-flex items-center gap-2", pending && "invisible")}>
