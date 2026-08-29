@@ -116,7 +116,7 @@ export function LandingScreen() {
             preload="auto"
             onTimeUpdate={(event) => {
               const video = event.currentTarget;
-              if (video.duration && video.duration - video.currentTime <= 1) setHeroShown(true);
+              if (video.duration && video.duration - video.currentTime <= 1.5) setHeroShown(true);
             }}
             onEnded={finishIntro}
             onError={finishIntro}
