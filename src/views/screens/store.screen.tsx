@@ -123,11 +123,7 @@ export function StoreScreen() {
             </List>
 
             <CardFooter>
-              {pack.highlight ? (
-                <Tag tone="neutral">Melhor troca</Tag>
-              ) : (
-                <span className="text-[11px] text-ink-faint">Checkout do Stripe</span>
-              )}
+              {pack.highlight ? <Tag tone="neutral">Melhor troca</Tag> : <span />}
               <Button variant="primary" onClick={() => buyPack(pack.id)}>
                 Comprar
               </Button>
