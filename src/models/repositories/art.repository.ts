@@ -20,7 +20,7 @@ const STORE_ROOT = "store";
 
 const IMAGE_EXTENSIONS = new Set([".png", ".webp", ".gif", ".jpg", ".jpeg", ".svg", ".avif"]);
 
-const ART_VERSION = "?v=18";
+const ART_VERSION = "?v=19";
 
 const ITEM_IDS = new Set(ITEMS.map((item) => item.id));
 const SET_ALIASES: Record<string, string> = {
