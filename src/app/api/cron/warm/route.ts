@@ -11,6 +11,7 @@ export async function GET(request: Request) {
   }
   try {
     await pool.query("select 1");
+    await pool.query("delete from rate_limits where window_start < now() - interval '1 hour'");
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("[api] GET /api/cron/warm", error);

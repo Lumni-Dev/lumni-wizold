@@ -372,7 +372,8 @@ async function savePieces(
       after.bazaarFinds.map((itemId) => [itemId]),
     );
   }
-  if (after.wallet !== before.wallet) await saveWallet(client, characterId, after);
+  if (after.wallet !== before.wallet)
+    await saveWallet(client, characterId, after.wallet.cents - before.wallet.cents);
   if (after.automation !== before.automation) await saveAutomation(client, characterId, after);
   if (after.bazaarListings !== before.bazaarListings) {
     await saveListings(client, characterId, before, after);
@@ -426,12 +427,18 @@ async function saveEquipment(
 async function saveWallet(
   client: PoolClient,
   characterId: string,
-  after: GameState,
+  centsDelta: number,
 ): Promise<void> {
+  // Applied as a relative delta, never an absolute overwrite: a sale credited
+  // by fulfillment (cents = cents + credit) that lands between this run's load
+  // and save must survive. Both writes are atomic row updates, so a withdrawal
+  // draining the wallet and an incoming sale compose instead of clobbering.
+  if (centsDelta === 0) return;
   await client.query(
-    `insert into wallets (character_id, cents) values ($1, $2)
-     on conflict (character_id) do update set cents = $2`,
-    [characterId, after.wallet.cents],
+    `insert into wallets (character_id, cents) values ($1, greatest(0, $2))
+     on conflict (character_id) do update
+       set cents = greatest(0, wallets.cents + $2)`,
+    [characterId, centsDelta],
   );
 }
 async function saveAutomation(

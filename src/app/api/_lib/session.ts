@@ -12,15 +12,22 @@ function secret(): string {
 function sign(payload: string): string {
   return createHmac("sha256", secret()).update(payload).digest("base64url");
 }
-export function mintSession(userId: string): {
+export interface SessionClaims {
+  userId: string;
+  epoch: number;
+}
+export function mintSession(
+  userId: string,
+  epoch: number,
+): {
   value: string;
   maxAge: number;
 } {
   const expiry = Date.now() + SESSION_DAYS * 86400000;
-  const payload = userId + "." + expiry;
+  const payload = userId + "." + epoch + "." + expiry;
   return { value: payload + "." + sign(payload), maxAge: SESSION_DAYS * 86400 };
 }
-export function verifySession(token: string | undefined): string | null {
+export function verifySession(token: string | undefined): SessionClaims | null {
   if (!token) return null;
   const at = token.lastIndexOf(".");
   if (at <= 0) return null;
@@ -30,17 +37,27 @@ export function verifySession(token: string | undefined): string | null {
   const a = Buffer.from(given);
   const b = Buffer.from(wanted);
   if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
-  const [userId, expiry] = payload.split(".");
-  if (!userId || !Number.isFinite(Number(expiry)) || Number(expiry) < Date.now()) return null;
-  return userId;
+  const parts = payload.split(".");
+  // Old tokens are userId.expiry (epoch defaults to 0, matching the column
+  // default); new tokens are userId.epoch.expiry.
+  const userId = parts[0];
+  const epoch = parts.length >= 3 ? Number(parts[1]) : 0;
+  const expiry = parts.length >= 3 ? Number(parts[2]) : Number(parts[1]);
+  if (!userId || !Number.isFinite(epoch) || !Number.isFinite(expiry) || expiry < Date.now()) {
+    return null;
+  }
+  return { userId, epoch };
 }
-export async function sessionUserId(): Promise<string | null> {
+export async function sessionClaims(): Promise<SessionClaims | null> {
   const jar = await cookies();
   return verifySession(jar.get(SESSION_COOKIE)?.value);
 }
-export async function attachSession(userId: string): Promise<void> {
+export async function sessionUserId(): Promise<string | null> {
+  return (await sessionClaims())?.userId ?? null;
+}
+export async function attachSession(userId: string, epoch: number): Promise<void> {
   const jar = await cookies();
-  const minted = mintSession(userId);
+  const minted = mintSession(userId, epoch);
   jar.set(SESSION_COOKIE, minted.value, {
     httpOnly: true,
     sameSite: "lax",

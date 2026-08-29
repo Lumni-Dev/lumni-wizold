@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import * as tavernController from "@/controllers/tavern.controller";
 import { saveTavernDiff } from "@/models/repositories/server/tavern.store";
 import { asText, withTavernRoom } from "../../../../_lib/api";
-import { rateLimit } from "../../../../_lib/rate-limit";
+import { rateLimit, rateLimitShared } from "../../../../_lib/rate-limit";
 import { verifySecret } from "../../../../_lib/session";
 export async function POST(
   request: Request,
@@ -21,7 +21,8 @@ export async function POST(
     const room = tavernController.findRoom(state, roomId);
     const seated = room?.members.some((member) => member.id === context.identity.id) === true;
     if (hash && !seated) {
-      if (!rateLimit("tavern-pw:" + context.identity.id + ":" + roomId, 6, 60000).allowed) {
+      const key = "tavern-pw:" + context.identity.id + ":" + roomId;
+      if (!rateLimit(key, 6, 60000).allowed || !(await rateLimitShared(key, 6, 60))) {
         return NextResponse.json(
           { ok: false, message: "Senha errada demais. Espere um minuto.", data: null },
           { status: 429 },

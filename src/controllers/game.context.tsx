@@ -62,6 +62,7 @@ interface GameContextValue {
   requestDeleteCode: () => Promise<boolean>;
   deleteRun: (code: string) => Promise<boolean>;
   logout: () => Promise<void>;
+  logoutEverywhere: () => Promise<void>;
   toggleForm: () => Promise<void>;
   rest: () => Promise<void>;
   activity: Activity | null;
@@ -428,6 +429,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
       },
       logout: async () => {
         await api("POST", "/api/auth/logout");
+        heldHuntRef.current = null;
+        heldArenaRef.current = null;
+        applyState(initialState(), ++mintRef.current);
+        setActivity(null);
+        setAuthenticated(false);
+      },
+      logoutEverywhere: async () => {
+        await api("POST", "/api/auth/logout-all");
         heldHuntRef.current = null;
         heldArenaRef.current = null;
         applyState(initialState(), ++mintRef.current);

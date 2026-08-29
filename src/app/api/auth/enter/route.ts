@@ -8,15 +8,16 @@ import { loadGame } from "@/models/repositories/server/game.store";
 import { asText, bad, clientIp, readBody, refuseAbuse } from "../../_lib/api";
 import { verifyGoogleCredential } from "../../_lib/google";
 import { sendAccessEmail, sendWelcomeEmail } from "../../_lib/mail";
-import { rateLimit } from "../../_lib/rate-limit";
+import { rateLimit, rateLimitShared } from "../../_lib/rate-limit";
 import { attachSession } from "../../_lib/session";
 export async function POST(request: Request) {
   const refused = refuseAbuse(request);
   if (refused) return refused;
   const gate = rateLimit("enter:" + clientIp(request), 10, 300000);
-  if (!gate.allowed) {
+  const gateShared = await rateLimitShared("enter:" + clientIp(request), 10, 300);
+  if (!gate.allowed || !gateShared) {
     const response = bad("Muitas tentativas. Espere um pouco antes de entrar de novo.", 429);
-    response.headers.set("retry-after", String(Math.ceil(gate.retryAfterMs / 1000)));
+    response.headers.set("retry-after", "300");
     return response;
   }
   const body = await readBody(request);
@@ -72,7 +73,7 @@ export async function POST(request: Request) {
         user.id,
         identity.picture,
       ]);
-      await attachSession(user.id);
+      await attachSession(user.id, user.epoch);
       const loaded = await loadGame(client, user.id, false);
       if (!identity.email.endsWith("@wizold.test")) {
         await client.query(

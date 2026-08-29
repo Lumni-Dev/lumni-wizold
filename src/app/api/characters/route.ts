@@ -4,15 +4,16 @@ import * as characterController from "@/controllers/character.controller";
 import type { Gender } from "@/models/entities/character";
 import { withTransaction } from "@/models/repositories/server/database";
 import { insertNewGame, loadGame } from "@/models/repositories/server/game.store";
-import { asText, bad, readBody, refuseAbuse, reply } from "../_lib/api";
+import { asText, bad, readBody, refuseAbuse, reply, sessionIsLive } from "../_lib/api";
 import { sendDepartureNoticeEmail, sendFarewellEmail } from "../_lib/mail";
 import { rateLimit } from "../_lib/rate-limit";
-import { deletionCodeHash, dropSession, sessionUserId } from "../_lib/session";
+import { deletionCodeHash, dropSession, sessionClaims } from "../_lib/session";
 export async function DELETE(request: Request) {
   const refused = refuseAbuse(request);
   if (refused) return refused;
-  const userId = await sessionUserId();
-  if (!userId) return bad("Entre para jogar.", 401);
+  const claims = await sessionClaims();
+  if (!claims) return bad("Entre para jogar.", 401);
+  const userId = claims.userId;
   if (!rateLimit("delete:" + userId, 10, 600000).allowed) {
     return bad("Muitas tentativas. Espere um pouco.", 429);
   }
@@ -27,6 +28,7 @@ export async function DELETE(request: Request) {
   }
   try {
     return await withTransaction(async (client) => {
+      if (!(await sessionIsLive(client, claims))) return bad("Sessão encerrada.", 401);
       const pending = await client.query(
         `select code_hash, attempts, expires_at > now() as alive
            from deletion_codes where user_id = $1 for update`,
@@ -107,8 +109,9 @@ export async function DELETE(request: Request) {
 export async function POST(request: Request) {
   const refused = refuseAbuse(request);
   if (refused) return refused;
-  const userId = await sessionUserId();
-  if (!userId) return bad("Entre para jogar.", 401);
+  const claims = await sessionClaims();
+  if (!claims) return bad("Entre para jogar.", 401);
+  const userId = claims.userId;
   const gate = rateLimit("create:" + userId, 3, 60000);
   if (!gate.allowed) return bad("Calma: criação de personagem tem ritmo.", 429);
   const body = await readBody(request);
@@ -116,6 +119,7 @@ export async function POST(request: Request) {
   const gender: Gender = body.gender === "female" ? "female" : "male";
   try {
     return await withTransaction(async (client) => {
+      if (!(await sessionIsLive(client, claims))) return bad("Sessão encerrada.", 401);
       const existing = await loadGame(client, userId, true);
       if (existing) {
         return reply({

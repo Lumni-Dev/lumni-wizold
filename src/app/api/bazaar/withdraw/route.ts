@@ -4,6 +4,7 @@ import * as bazaarController from "@/controllers/bazaar.controller";
 import { failure } from "@/models/entities/result";
 import { recordWalletMovement } from "@/models/repositories/server/game.store";
 import { asText, withGame } from "../../_lib/api";
+import { sealPII } from "../../_lib/secret-box";
 export async function POST(request: Request) {
   return withGame(request, async (state, body, context) => {
     const pixKey = asText(body.pixKey, 120).trim();
@@ -18,7 +19,7 @@ export async function POST(request: Request) {
     await context.client.query(
       `insert into withdrawals (id, character_id, amount_cents, pix_key, full_name, cpf)
        values ($1, $2, $3, $4, $5, $6)`,
-      [withdrawalId, context.characterId, amount, pixKey, fullName, cpf],
+      [withdrawalId, context.characterId, amount, sealPII(pixKey), sealPII(fullName), sealPII(cpf)],
     );
     await recordWalletMovement(
       context.client,

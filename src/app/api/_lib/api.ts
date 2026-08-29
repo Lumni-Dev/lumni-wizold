@@ -15,7 +15,18 @@ import {
 } from "@/models/repositories/server/tavern.store";
 import { syncServerMoon } from "./moon";
 import { rateLimit } from "./rate-limit";
-import { sessionUserId } from "./session";
+import { sessionClaims, type SessionClaims } from "./session";
+
+// A token is only live while its epoch still matches the user's stored epoch;
+// "sair de todos os aparelhos" bumps the column and instantly retires every
+// token minted before it. Old tokens carry epoch 0, matching the default.
+export async function sessionIsLive(client: PoolClient, claims: SessionClaims): Promise<boolean> {
+  const found = await client.query("select session_epoch from users where id = $1", [
+    claims.userId,
+  ]);
+  const row = found.rows[0];
+  return Boolean(row) && Number(row.session_epoch) === claims.epoch;
+}
 export interface ApiContext {
   client: PoolClient;
   userId: string;
@@ -89,8 +100,9 @@ export const asQuantity = (value: unknown): number => Math.min(999, Math.max(1, 
 export async function withGame<T>(request: Request, action: GameAction<T>): Promise<NextResponse> {
   const refused = refuseAbuse(request);
   if (refused) return refused;
-  const userId = await sessionUserId();
-  if (!userId) return bad("Entre para jogar.", 401);
+  const claims = await sessionClaims();
+  if (!claims) return bad("Entre para jogar.", 401);
+  const userId = claims.userId;
   const mutating = request.method !== "GET";
   const gate = rateLimit((mutating ? "act:" : "read:") + userId, mutating ? 30 : 60, 10000);
   if (!gate.allowed) return tooMany(gate.retryAfterMs);
@@ -98,6 +110,7 @@ export async function withGame<T>(request: Request, action: GameAction<T>): Prom
   await syncServerMoon();
   try {
     return await withTransaction(async (client) => {
+      if (!(await sessionIsLive(client, claims))) return bad("Sessão encerrada.", 401);
       const loaded = await loadGame(client, userId, request.method !== "GET");
       if (!loaded) return bad("Nenhum personagem ativo.", 404);
       const baseline = syncCharacter(
@@ -130,19 +143,14 @@ async function tavernIdentity(client: PoolClient, userId: string): Promise<Taver
   const row = found.rows[0];
   return row ? { id: row.id, name: row.name } : null;
 }
-async function guardTavern(request: Request): Promise<
-  | {
-      userId: string;
-    }
-  | NextResponse
-> {
+async function guardTavern(request: Request): Promise<SessionClaims | NextResponse> {
   const refused = refuseAbuse(request);
   if (refused) return refused;
-  const userId = await sessionUserId();
-  if (!userId) return bad("Entre para jogar.", 401);
-  const gate = rateLimit("tavern:" + userId, 30, 10000);
+  const claims = await sessionClaims();
+  if (!claims) return bad("Entre para jogar.", 401);
+  const gate = rateLimit("tavern:" + claims.userId, 30, 10000);
   if (!gate.allowed) return tooMany(gate.retryAfterMs);
-  return { userId };
+  return claims;
 }
 export async function withTavern(
   request: Request,
@@ -156,6 +164,7 @@ export async function withTavern(
   const body = await readBody(request);
   try {
     return await withTransaction(async (client) => {
+      if (!(await sessionIsLive(client, guarded))) return bad("Sessão encerrada.", 401);
       const identity = await tavernIdentity(client, guarded.userId);
       if (!identity) return bad("Nenhum personagem ativo.", 404);
       if (options.write) await lockTavern(client);
@@ -178,6 +187,7 @@ export async function withTavernRoom(
   const body = await readBody(request);
   try {
     return await withTransaction(async (client) => {
+      if (!(await sessionIsLive(client, guarded))) return bad("Sessão encerrada.", 401);
       const identity = await tavernIdentity(client, guarded.userId);
       if (!identity) return bad("Nenhum personagem ativo.", 404);
       const tavern = await loadRoomState(client, roomId, true);
@@ -196,6 +206,7 @@ export async function withIdentity(
   if (guarded instanceof NextResponse) return guarded;
   try {
     return await withTransaction(async (client) => {
+      if (!(await sessionIsLive(client, guarded))) return bad("Sessão encerrada.", 401);
       const identity = await tavernIdentity(client, guarded.userId);
       if (!identity) return bad("Nenhum personagem ativo.", 404);
       return action(identity, client);

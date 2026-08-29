@@ -32,6 +32,7 @@ export function SettingsScreen() {
     requestDeleteCode,
     deleteRun,
     logout,
+    logoutEverywhere,
     setAutomation,
   } = useGame();
   const router = useRouter();
@@ -150,18 +151,31 @@ export function SettingsScreen() {
           <div className="space-y-3 p-4">
             <p className="text-xs leading-relaxed text-ink-faint">
               A porta é a conta Google, e a partida vive no servidor: saia quando quiser, e o mesmo
-              botão de entrar devolve tudo como estava.
+              botão de entrar devolve tudo como estava. Sair de todos os aparelhos derruba qualquer
+              sessão aberta em outro lugar na hora.
             </p>
-            <Button
-              variant="outline"
-              onClick={() =>
-                logout().then(() => {
-                  router.push("/");
-                })
-              }
-            >
-              Sair da conta
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                onClick={() =>
+                  logout().then(() => {
+                    router.push("/");
+                  })
+                }
+              >
+                Sair da conta
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() =>
+                  logoutEverywhere().then(() => {
+                    router.push("/");
+                  })
+                }
+              >
+                Sair de todos os aparelhos
+              </Button>
+            </div>
           </div>
         </Panel>
 

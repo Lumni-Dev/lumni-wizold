@@ -1,3 +1,5 @@
+import { pool } from "@/models/repositories/server/database";
+
 interface Window {
   count: number;
   resetAt: number;
@@ -26,4 +28,33 @@ export function rateLimit(key: string, limit: number, windowMs: number): RateVer
   window.count += 1;
   if (window.count <= limit) return { allowed: true, retryAfterMs: 0 };
   return { allowed: false, retryAfterMs: window.resetAt - now };
+}
+
+// A fixed-window limiter that lives in Postgres, so it holds across every
+// serverless instance where the in-memory Map would not. Reserved for the
+// low-volume security gates (login, deletion code, room password) that a
+// horizontal fan-out could otherwise multiply; the high-frequency game
+// budgets stay in memory. Fails open on a DB hiccup, falling back to the
+// in-memory guard the caller already applied.
+export async function rateLimitShared(
+  key: string,
+  limit: number,
+  windowSeconds: number,
+): Promise<boolean> {
+  try {
+    const found = await pool.query(
+      `insert into rate_limits (bucket, window_start, hits) values ($1, now(), 1)
+       on conflict (bucket) do update set
+         hits = case when rate_limits.window_start < now() - make_interval(secs => $2)
+                     then 1 else rate_limits.hits + 1 end,
+         window_start = case when rate_limits.window_start < now() - make_interval(secs => $2)
+                             then now() else rate_limits.window_start end
+       returning hits`,
+      [key, windowSeconds],
+    );
+    return Number(found.rows[0]?.hits ?? 1) <= limit;
+  } catch (error) {
+    console.error("[rate-limit] shared", error);
+    return true;
+  }
 }

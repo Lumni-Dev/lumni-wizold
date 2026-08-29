@@ -1,23 +1,26 @@
 import { randomInt } from "node:crypto";
 import { NextResponse } from "next/server";
 import { withTransaction } from "@/models/repositories/server/database";
-import { bad, refuseAbuse } from "../../_lib/api";
+import { bad, refuseAbuse, sessionIsLive } from "../../_lib/api";
 import { sendDeletionCodeEmail } from "../../_lib/mail";
-import { rateLimit } from "../../_lib/rate-limit";
-import { deletionCodeHash, sessionUserId } from "../../_lib/session";
+import { rateLimit, rateLimitShared } from "../../_lib/rate-limit";
+import { deletionCodeHash, sessionClaims } from "../../_lib/session";
 
 export async function POST(request: Request) {
   const refused = refuseAbuse(request);
   if (refused) return refused;
-  const userId = await sessionUserId();
+  const claims = await sessionClaims();
+  const userId = claims?.userId ?? null;
   if (!userId) return bad("Entre para jogar.", 401);
   const gate = rateLimit("delcode:" + userId, 3, 600000);
-  if (!gate.allowed) {
+  const gateShared = await rateLimitShared("delcode:" + userId, 3, 600);
+  if (!gate.allowed || !gateShared) {
     return bad("Um código já foi enviado. Confira o e-mail antes de pedir outro.", 429);
   }
   try {
     const code = String(randomInt(0, 10000)).padStart(4, "0");
     const email = await withTransaction(async (client) => {
+      if (claims && !(await sessionIsLive(client, claims))) return undefined;
       const found = await client.query("select email from users where id = $1", [userId]);
       const to = found.rows[0]?.email as string | undefined;
       if (!to) return null;
