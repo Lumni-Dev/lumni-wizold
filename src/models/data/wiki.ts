@@ -1,6 +1,7 @@
 import { formatReais } from "@/shared/utils/format";
 import {
   ENHANCEMENT_STEP,
+  FORGE_BRONZE_RATIO,
   FORGE_SUCCESS_RATIO,
   MAX_ENHANCEMENT,
   RAGE_CRITICAL_DAMAGE_BONUS,
@@ -253,7 +254,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         " no último: a escada da mina sobe como a de nível.",
       "A cada 20 níveis de mineração cada golpe rende um múltiplo a mais de fragmentos, então a forja continua alimentada.",
       "A forja só aceita a peça equipada, e só o fragmento do conjunto dela.",
-      "Preço do próximo nível: um fragmento a cada cinco níveis, então +" +
+      "Preço do próximo nível: um fragmento a cada três níveis, então +" +
         5 +
         " custa " +
         enhancementCost(5) +
@@ -266,7 +267,9 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "A bigorna acerta " +
         Math.round(FORGE_SUCCESS_RATIO * 100) +
         "% das marteladas. Quando falha, o que foi pago se perde e a peça segue como está: o risco faz parte do preço.",
-      "Cada martelada também cobra bronze: um décimo da bolsa de caçada do seu nível, mais um por nível já forjado da peça. O ferreiro não trabalha de graça.",
+      "Cada martelada também cobra bronze: " +
+        Math.round(FORGE_BRONZE_RATIO * 100) +
+        "% da bolsa de caçada do seu nível, mais um por nível já forjado da peça. O ferreiro não trabalha de graça.",
       "O teto é +" + MAX_ENHANCEMENT + ", e o nível fica com a peça, não com o espaço.",
     ],
   },

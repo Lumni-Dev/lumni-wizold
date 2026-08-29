@@ -456,11 +456,16 @@ sec("economia");
     "preços dos pacotes",
     json(packsData.STORE_PACKS.map((pack) => pack.priceCents)) === json([490, 1990, 4990]),
   );
-  const bronzeSetTotal = entItem.EQUIPMENT_SLOTS.reduce(
-    (total, slot) => total + sets.piecePrice(sets.EQUIPMENT_SETS[0], slot),
-    0,
-  );
-  ok("conjunto de bronze custa 570", bronzeSetTotal === 570);
+  const setTotal = (definition) =>
+    entItem.EQUIPMENT_SLOTS.reduce((total, slot) => total + sets.piecePrice(definition, slot), 0);
+  ok("conjunto de bronze custa 1140", setTotal(sets.EQUIPMENT_SETS[0]) === 1140);
+  let setsClimb = true;
+  for (let index = 1; index < sets.EQUIPMENT_SETS.length; index += 1) {
+    if (setTotal(sets.EQUIPMENT_SETS[index]) <= setTotal(sets.EQUIPMENT_SETS[index - 1])) {
+      setsClimb = false;
+    }
+  }
+  ok("o preço dos conjuntos sobe a cada banda", setsClimb);
   for (const level of [100, 340, 670, 1000]) {
     const value = Math.round(level * 0.55);
     const sessions = Math.ceil(
@@ -1023,7 +1028,7 @@ sec("mascote");
 sec("forja e mina");
 {
   for (let level = 1; level <= 1000; level += 1) {
-    if (forgeRules.enhancementCost(level) !== Math.max(1, Math.ceil(level / 5))) {
+    if (forgeRules.enhancementCost(level) !== Math.max(1, Math.ceil(level / 3))) {
       ok("custo de forja no nível " + level, false);
       break;
     }

@@ -111,7 +111,7 @@ export const EQUIPMENT_SETS: readonly SetDefinition[] = [
       "Bronze bruto, martelado sem capricho nenhum. O ferreiro do vilarejo faz um por " +
       "tarde e nunca pergunta por que a encomenda vem sempre dois números maior.",
     power: 6,
-    priceMultiplier: 1,
+    priceMultiplier: 2,
   },
   {
     key: "silver",
@@ -126,7 +126,7 @@ export const EQUIPMENT_SETS: readonly SetDefinition[] = [
       "Chapa batida a frio e forrada de couro por dentro, sem uma linha de prata em lugar " +
       "nenhum. Foi arrancada dos caçadores e refundida até não sobrar nada do que ardia.",
     power: 160,
-    priceMultiplier: 6,
+    priceMultiplier: 8,
   },
   {
     key: "gold",
@@ -141,7 +141,7 @@ export const EQUIPMENT_SETS: readonly SetDefinition[] = [
       "Ouro trabalhado, mais firme do que a fama sugere e o único que a fera não tenta " +
       "arrancar do corpo na virada. Só desce da serra o que a serra devolve.",
     power: 750,
-    priceMultiplier: 6,
+    priceMultiplier: 11,
   },
   {
     key: "diamond",
@@ -156,7 +156,7 @@ export const EQUIPMENT_SETS: readonly SetDefinition[] = [
       "Cravejado de diamante, devolve a lua inteira no meio da mata e corta a luz antes " +
       "de cortar carne. É o limite do que o vilarejo monta sem começar a perguntar.",
     power: 1150,
-    priceMultiplier: 8,
+    priceMultiplier: 15,
   },
   {
     key: "lunar",
@@ -172,7 +172,7 @@ export const EQUIPMENT_SETS: readonly SetDefinition[] = [
       "Forjado sob lua cheia, com a fera acordada segurando o martelo. Responde ao céu: " +
       "brilha fraco no escuro e respira junto com quem veste, na noite da virada.",
     power: 2400,
-    priceMultiplier: 5,
+    priceMultiplier: 18,
   },
 ];
 

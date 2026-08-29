@@ -8,7 +8,7 @@ import { huntPurse } from "../data/species";
 import type { Item, ItemEffect } from "../entities/item";
 
 export function enhancementCost(nextLevel: number): number {
-  return Math.max(1, Math.ceil(nextLevel / 5));
+  return Math.max(1, Math.ceil(nextLevel / 3));
 }
 
 export function forgeBronzeCost(characterLevel: number, level: number): number {
