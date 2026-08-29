@@ -215,6 +215,29 @@
   animation: art-shimmer 1400ms linear infinite;
 }
 
+@keyframes bar-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-3px);
+  }
+  40% {
+    transform: translateX(3px);
+  }
+  60% {
+    transform: translateX(-2px);
+  }
+  80% {
+    transform: translateX(2px);
+  }
+}
+
+@utility bar-shake {
+  animation: bar-shake 350ms ease-in-out;
+}
+
 @keyframes toast-in {
   from {
     opacity: 0;

@@ -26,6 +26,7 @@ interface BarProps {
   wraps?: boolean;
   tone?: BarTone;
   glows?: boolean;
+  jolt?: number;
   className?: string;
 }
 
@@ -42,11 +43,22 @@ export function Bar({
   wraps = false,
   tone = "light",
   glows = false,
+  jolt = 0,
   className,
 }: BarProps) {
   const target = percentage(current, maximum);
   const [paint, setPaint] = useState<BarPaint>({ value: target, instant: false });
   const previous = useRef(target);
+  const [shaking, setShaking] = useState(false);
+
+  useEffect(() => {
+    if (!jolt) return;
+    const timers = [
+      window.setTimeout(() => setShaking(true), 0),
+      window.setTimeout(() => setShaking(false), 380),
+    ];
+    return () => timers.forEach((timer) => window.clearTimeout(timer));
+  }, [jolt]);
 
   useEffect(() => {
     const from = previous.current;
@@ -77,7 +89,12 @@ export function Bar({
           <span className="text-ink-faint">/{formatNumber(maximum)}</span>
         </span>
       </div>
-      <div className="relative h-2 w-full overflow-hidden rounded-full border border-ember/45 bg-charcoal">
+      <div
+        className={cn(
+          "relative h-2 w-full overflow-hidden rounded-full border border-ember/45 bg-charcoal",
+          shaking && "bar-shake",
+        )}
+      >
         <div
           className={cn(
             "striped absolute inset-y-0 left-0 overflow-hidden rounded-full transition-[width] ease-out",

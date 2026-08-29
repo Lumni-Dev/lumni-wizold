@@ -163,6 +163,8 @@ export function HuntScreen() {
     id: string;
     beat: number;
   }>({ id: "", beat: 0 });
+  const [preyJolt, setPreyJolt] = useState(0);
+  const [lapJolt, setLapJolt] = useState(0);
   const beatRef = useRef(0);
   const [pending, setPending] = useState<HuntReport | null>(null);
   const pendingRef = useRef<HuntReport | null>(null);
@@ -224,6 +226,10 @@ export function HuntScreen() {
       if (line?.blow === "ours") playSound(line.critical ? "crit" : "hit");
       if (line?.blow === "pet") playSound("snap");
       if (line?.blow === "theirs") playSound("hurt");
+      if (line?.critical) {
+        if (line.blow === "theirs") setLapJolt((count) => count + 1);
+        else setPreyJolt((count) => count + 1);
+      }
       if (pendingRef.current && line?.characterHealth !== undefined) {
         const delta = bledRef.current.last - line.characterHealth;
         if (delta > 0) {
@@ -430,6 +436,7 @@ export function HuntScreen() {
                         current={shownHealth}
                         maximum={shownPrey.health}
                         tone={shownHealth > shownPrey.health / 2 ? "blood" : "ember"}
+                        jolt={preyJolt}
                       />
                     </div>
                   ) : null}
@@ -445,6 +452,7 @@ export function HuntScreen() {
                       maximum={
                         progress.id === territory.id ? script.length || HUNT_TICKS : HUNT_TICKS
                       }
+                      jolt={progress.id === territory.id ? lapJolt : 0}
                       wraps
                     />
                   </div>

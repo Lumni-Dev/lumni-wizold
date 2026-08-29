@@ -43,6 +43,7 @@ function Fighter({
   side,
   health,
   maximum,
+  jolt = 0,
 }: {
   gender: Gender;
   name: string;
@@ -50,6 +51,7 @@ function Fighter({
   side: string;
   health: number;
   maximum: number;
+  jolt?: number;
 }) {
   const left = Math.max(0, Math.round(health));
   return (
@@ -67,6 +69,7 @@ function Fighter({
           current={left}
           maximum={maximum}
           tone={left > maximum / 2 ? "blood" : "ember"}
+          jolt={jolt}
         />
       </div>
     </div>
@@ -140,6 +143,8 @@ export function ArenaScreen() {
   const [script, setScript] = useState<NarrationLine[]>([]);
   const [beat, setBeat] = useState(0);
   const [report, setReport] = useState<ArenaResolution | null>(null);
+  const [myJolt, setMyJolt] = useState(0);
+  const [foeJolt, setFoeJolt] = useState(0);
   const beatRef = useRef(0);
   const scriptRef = useRef<NarrationLine[]>([]);
   const pendingRef = useRef<ArenaResolution | null>(null);
@@ -186,6 +191,10 @@ export function ArenaScreen() {
       if (line?.blow === "ours") playSound(line.critical ? "crit" : "hit");
       if (line?.blow === "pet") playSound("snap");
       if (line?.blow === "theirs") playSound("hurt");
+      if (line?.critical) {
+        if (line.blow === "theirs") setMyJolt((count) => count + 1);
+        else setFoeJolt((count) => count + 1);
+      }
       if (pendingRef.current && line?.characterHealth !== undefined) {
         const delta = bledRef.current.last - line.characterHealth;
         if (delta > 0) {
@@ -350,6 +359,7 @@ export function ArenaScreen() {
               side="Você"
               health={character.health}
               maximum={stats.maxHealth}
+              jolt={myJolt}
             />
             <Fighter
               gender={foe.hunter.gender}
@@ -358,6 +368,7 @@ export function ArenaScreen() {
               side="Desafiado"
               health={line ? line.creatureHealth : foe.foe.health}
               maximum={foe.foe.health}
+              jolt={foeJolt}
             />
           </div>
 
