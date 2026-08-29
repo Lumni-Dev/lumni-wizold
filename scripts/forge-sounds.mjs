@@ -207,6 +207,7 @@ const FOLDERS = {
   growl: "wolf",
   howl: "wolf",
   beast: "wolf",
+  "pet-eat": "wolf",
   door: "tavern",
   chat: "tavern",
 };
@@ -373,6 +374,30 @@ const RECIPES = {
         gain: 0.9,
       });
       mix(out, osc(0.9, { freq: 64, gain: swell(0.2, 0.12, 0.4) }), { gain: 0.35 });
+      return out;
+    },
+  },
+
+  "pet-eat": {
+    peak: 0.5,
+    forge() {
+      const out = make(0.9);
+      mix(out, shape(filter(noise(0.9), { cutoff: 480, q: 0.8 }), swell(0.18, 0.1, 0.32)), {
+        gain: 0.5,
+      });
+      mix(out, osc(0.9, { freq: 72, gain: swell(0.16, 0.1, 0.36) }), { gain: 0.28 });
+      for (const [at, cutoff] of [
+        [0.08, 760],
+        [0.3, 640],
+        [0.52, 820],
+        [0.72, 700],
+      ]) {
+        mix(
+          out,
+          filter(noise(0.12, { gain: perc(0.004, 0.05) }), { cutoff, q: 1.4, mode: "bp" }),
+          { at, gain: 0.8 },
+        );
+      }
       return out;
     },
   },

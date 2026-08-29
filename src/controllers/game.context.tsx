@@ -10,6 +10,7 @@ import {
   useSyncExternalStore,
   type ReactNode,
 } from "react";
+import { findItem } from "@/models/data/items";
 import type { Activity } from "@/models/entities/activity";
 import type { AutomationKey } from "@/models/entities/automation";
 import type { EquipmentSlot } from "@/models/entities/item";
@@ -313,7 +314,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
           }
           case "feed":
             await act("POST", "/api/pet/feed", { itemId: step.itemId }, "Mascote", () =>
-              playSound("pet-along"),
+              playSound("pet-eat"),
             );
             return;
           case "kennel":
@@ -541,7 +542,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       },
       consumeItem: async (itemId) => {
         await act("POST", "/api/inventory/consume", { itemId }, "Inventário", () =>
-          playSound("potion"),
+          playSound(findItem(itemId)?.category === "pet" ? "pet-eat" : "potion"),
         );
       },
       discardItem: async (itemId, quantity = 1) => {
@@ -677,7 +678,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         return answer.ok;
       },
       feedPet: async (itemId) => {
-        await act("POST", "/api/pet/feed", { itemId }, "Mascote", () => playSound("beast"));
+        await act("POST", "/api/pet/feed", { itemId }, "Mascote", () => playSound("pet-eat"));
       },
       setPetActive: async (active) => {
         await act("POST", "/api/pet/active", { active }, "Mascote", () =>

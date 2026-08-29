@@ -29,6 +29,7 @@ const SOURCES = {
   "blind-tracking": "/assets/sounds/training/blind-tracking.mp3",
   "lunar-meditation": "/assets/sounds/training/lunar-meditation.mp3",
   growl: "/assets/sounds/wolf/growl.mp3",
+  "pet-eat": "/assets/sounds/wolf/pet-eat.ogg",
   "pet-along": "/assets/sounds/wolf/pet-along.mp3",
   "pet-rest": "/assets/sounds/wolf/pet-rest.mp3",
   "pet-up": "/assets/sounds/wolf/pet-up.mp3",
