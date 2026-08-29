@@ -310,6 +310,7 @@ export function MarketScreen() {
                         numeric
                         compact
                         aria-label={"Quantidade de " + item.name + " para vender"}
+                        maxLength={10}
                         className="w-24 text-right font-mono"
                         value={typed ?? String(quantity)}
                         onChange={(event) =>
@@ -371,6 +372,7 @@ export function MarketScreen() {
                   label="Quantidade"
                   hint={"Você consegue pagar por " + formatNumber(affordableAmount) + "."}
                   aria-label={"Quantidade de " + deal.item.name + " para comprar"}
+                  maxLength={10}
                   className="w-full font-mono"
                   value={buying}
                   onChange={(event) => setBuying(event.target.value)}
