@@ -42,14 +42,12 @@ export function TrainingScreen() {
   const trainRef = useRef(train);
   const chargesRef = useRef(false);
   const paidLapRef = useRef(false);
-  const deadLapRef = useRef(false);
   useEffect(() => {
     autoRef.current = state.automation.train;
     trainRef.current = train;
     let fresh = false;
     if (!activeExercise) {
       paidLapRef.current = false;
-      deadLapRef.current = false;
     } else if (activeExercise === PET_EXERCISE_ID) {
       fresh = petTraining !== null && !petTraining.maxed && petTraining.progress === 0;
     } else {
@@ -71,29 +69,14 @@ export function TrainingScreen() {
     if (activeExercise === PET_EXERCISE_ID && petGone) return;
 
     const timer = window.setInterval(() => {
-      if (deadLapRef.current) {
-        beatRef.current += 1;
-        if (beatRef.current >= TRAINING_TICKS) {
-          deadLapRef.current = false;
-          beatRef.current = 0;
-        }
-        return;
-      }
-
       beatRef.current = beatRef.current >= TRAINING_TICKS ? 0 : beatRef.current + 1;
+      setSession({ id: activeExercise, beat: beatRef.current });
 
       if (beatRef.current === 1 && chargesRef.current) {
         chargesRef.current = false;
         paidLapRef.current = true;
-        deadLapRef.current = true;
         playSound("buy");
-        beatRef.current = 0;
-        setSession({ id: activeExercise, beat: 0 });
-        return;
-      }
-
-      setSession({ id: activeExercise, beat: beatRef.current });
-      if (beatRef.current > 0) {
+      } else if (beatRef.current > 0) {
         const effort = activeExercise === PET_EXERCISE_ID ? "growl" : activeExercise;
         if (isGameSound(effort)) playSound(effort);
       }
@@ -120,7 +103,6 @@ export function TrainingScreen() {
   function toggleTraining(exerciseId: string, ready: boolean) {
     beatRef.current = 0;
     paidLapRef.current = false;
-    deadLapRef.current = false;
     setSession({ id: exerciseId, beat: 0 });
 
     if (activeExercise === exerciseId) {
@@ -128,20 +110,6 @@ export function TrainingScreen() {
       return;
     }
     if (!ready) return;
-
-    let fresh = false;
-    if (exerciseId === PET_EXERCISE_ID) {
-      fresh = petTraining !== null && !petTraining.maxed && petTraining.progress === 0;
-    } else {
-      const entry = exercises.find((candidate) => candidate.exercise.id === exerciseId);
-      const row = progress.find((line) => line.key === entry?.exercise.attribute);
-      fresh = row !== undefined && row.progress === 0 && row.value < MAX_ATTRIBUTE_VALUE;
-    }
-    if (fresh) {
-      paidLapRef.current = true;
-      deadLapRef.current = true;
-      playSound("buy");
-    }
 
     setActivity({ kind: "train", id: exerciseId });
   }

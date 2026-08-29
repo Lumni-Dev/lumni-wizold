@@ -38,6 +38,17 @@
   body {
     background-color: var(--color-base);
     color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
     background-image:
       linear-gradient(
         to bottom,
@@ -52,10 +63,7 @@
     background-size: auto, 100% auto;
     background-position: center top;
     background-repeat: no-repeat;
-    background-attachment: fixed;
-    -webkit-font-smoothing: antialiased;
-    -webkit-user-select: none;
-    user-select: none;
+    filter: sepia(0.4) hue-rotate(-8deg) saturate(1.05);
   }
 
   input,
