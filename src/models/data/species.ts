@@ -399,7 +399,7 @@ const PREY_STRENGTH_SHARE = 0.85;
 const PREY_ENDURANCE_SHARE = 0.5;
 const PREY_HEALTH_SHARE = 0.3;
 
-const BRONZE_PER_STRENGTH = 1.2;
+const BRONZE_PER_STRENGTH = 0.9;
 
 const TRAINED_PER_LEVEL = 0.55;
 
@@ -470,7 +470,7 @@ export function speciesNumbers(key: SpeciesKey, level: number) {
       hunter.endurance * PREY_ENDURANCE_SHARE * definition.profile.endurance * difficulty,
     ),
     agility: Math.round((4 + level * 0.5) * definition.profile.agility),
-    experience: Math.round(15 + level * 11),
+    experience: Math.round(12 + level * 7),
     minBronze: Math.round(purse * 0.7),
     maxBronze: Math.round(purse * 1.3),
   };

@@ -387,7 +387,7 @@ sec("bandas e presas");
     ok("bolsa mínima <= máxima " + creature.id, creature.minBronze <= creature.maxBronze);
     ok(
       "experiência linear " + creature.id,
-      creature.experience === Math.round(15 + creature.level * 11),
+      creature.experience === Math.round(12 + creature.level * 7),
     );
     for (const drop of creature.drops) {
       ok("chance válida " + creature.id + "/" + drop.itemId, drop.chance > 0 && drop.chance <= 1);
@@ -833,6 +833,29 @@ sec("caçada");
     ok(
       "lobo fora da luta não aprende",
       shortLanded.state.pet.trainingProgress === 0 && shortLanded.state.pet.level === 1,
+    );
+  }
+  // Full cycle: a wolf that enters with just enough breath fights one hunt,
+  // burns below the threshold, and is barred from the next hunt on its own.
+  const oneMore = {
+    ...withPet,
+    pet: {
+      ...withPet.pet,
+      energy: CONST.PET_ENERGY_PER_HUNT + CONST.PET_ENERGY_PER_BLOW,
+    },
+  };
+  const firstHunt = huntCtrl.resolveHunt(oneMore, "village-field", seededRandom(9));
+  ok("lobo com fôlego justo entra na luta", firstHunt.ok && firstHunt.data.combat.petSpent > 0);
+  if (firstHunt.ok) {
+    const afterOne = huntCtrl.landHunt(oneMore, firstHunt.data, 0);
+    ok(
+      "a caçada esgota o fôlego do lobo",
+      afterOne.state.pet.energy < CONST.PET_ENERGY_PER_HUNT + CONST.PET_ENERGY_PER_BLOW,
+    );
+    const nextHunt = huntCtrl.resolveHunt(afterOne.state, "village-field", seededRandom(10));
+    ok(
+      "no recomeço o lobo esgotado fica de fora",
+      nextHunt.ok && nextHunt.data.combat.petSpent === 0 && nextHunt.data.combat.petBlows === 0,
     );
   }
   const homePet = { ...withPet, pet: { ...withPet.pet, active: false } };

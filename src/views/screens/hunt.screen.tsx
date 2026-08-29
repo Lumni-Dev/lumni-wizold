@@ -446,11 +446,16 @@ export function HuntScreen() {
                       label="Caçada"
                       current={
                         progress.id === territory.id
-                          ? Math.min(progress.beat, script.length || HUNT_TICKS)
+                          ? Math.min(
+                              Math.max(0, progress.beat - 1),
+                              (script.length || HUNT_TICKS) - 1,
+                            )
                           : 0
                       }
                       maximum={
-                        progress.id === territory.id ? script.length || HUNT_TICKS : HUNT_TICKS
+                        progress.id === territory.id
+                          ? (script.length || HUNT_TICKS) - 1
+                          : HUNT_TICKS - 1
                       }
                       jolt={progress.id === territory.id ? lapJolt : 0}
                       wraps

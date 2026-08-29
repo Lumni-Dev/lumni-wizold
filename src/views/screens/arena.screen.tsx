@@ -375,7 +375,11 @@ export function ArenaScreen() {
           </div>
 
           <div className="space-y-3 p-4">
-            <Bar label="Duelo" current={told} maximum={script.length || HUNT_TICKS} />
+            <Bar
+              label="Duelo"
+              current={Math.min(Math.max(0, told - 1), Math.max(1, script.length - 1))}
+              maximum={Math.max(1, (script.length || HUNT_TICKS) - 1)}
+            />
             {line ? (
               <p
                 className={cn(

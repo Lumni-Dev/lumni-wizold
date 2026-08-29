@@ -57,7 +57,7 @@ export function narrationOf(
 ): NarrationLine[] {
   const prey = report.foe.name;
   const full = report.foe.health;
-  const slots = Math.max(1, maxBeats - 3);
+  const slots = Math.max(1, maxBeats - 2);
   const rounds = sampleRounds(report.combat.rounds, slots);
 
   const middle: NarrationLine[] = rounds.map((round) => ({
@@ -76,10 +76,13 @@ export function narrationOf(
 
   const last = middle[middle.length - 1]?.creatureHealth ?? full;
 
+  // The first beat is presentation only: the prey's bar fills from empty to its
+  // full health and nothing else moves. The lap bar (see hunt.screen) does not
+  // count this beat, so the hunt's turns only start climbing once the prey is
+  // whole. The blows and the closer follow.
   return [
-    { text: openerOf(hunter, prey), blow: null, critical: false, creatureHealth: 0 },
     {
-      text: prey + " se ergue inteiro: a luta vai começar.",
+      text: openerOf(hunter, prey) + " " + prey + " se ergue inteiro.",
       blow: null,
       critical: false,
       creatureHealth: full,

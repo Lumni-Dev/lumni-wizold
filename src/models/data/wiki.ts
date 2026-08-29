@@ -179,7 +179,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         " no 10 e " +
         experienceForLevel(100) +
         " no 100.",
-      "A curva sobe mais rápido do que a experiência que a presa dá, então cada nível custa mais caçadas que o anterior: cerca de 4 no começo e 293 no teto.",
+      "A curva sobe mais rápido do que a experiência que a presa dá, então cada nível custa mais caçadas que o anterior: cerca de 5 no começo e 585 no teto.",
       "O teto da progressão é o nível 1000, e cada atributo treinado também para em 1000.",
       "Subir de nível não dá poder nenhum de graça: o que o nível abre é o próximo território, o próximo conjunto e a próxima veia da mina. A força vem do treino e do que você veste.",
       "Subir de nível restaura a vida por completo.",
