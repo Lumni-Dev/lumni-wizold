@@ -130,8 +130,8 @@ export function IconArt({
               )}
             />
             <span className="item-glow pointer-events-none absolute -inset-1/2" />
-            <CornerAccents />
           </span>
+          <CornerAccents />
         </span>
       ) : null}
     </>

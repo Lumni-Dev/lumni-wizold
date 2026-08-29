@@ -22,27 +22,53 @@ const SIZES: Record<AccentScale, string> = {
 
 const CORNERS: Record<AccentScale, Record<string, string>> = {
   section: {
-    tl: "-left-px -top-px rounded-tl-lg border-l border-t",
-    tr: "-right-px -top-px rounded-tr-lg border-r border-t",
-    bl: "-bottom-px -left-px rounded-bl-lg border-b border-l",
-    br: "-bottom-px -right-px rounded-br-lg border-b border-r",
+    tl: "rounded-tl-lg border-l border-t",
+    tr: "rounded-tr-lg border-r border-t",
+    bl: "rounded-bl-lg border-b border-l",
+    br: "rounded-br-lg border-b border-r",
   },
   icon: {
-    tl: "-left-px -top-px rounded-tl-md border-l border-t",
-    tr: "-right-px -top-px rounded-tr-md border-r border-t",
-    bl: "-bottom-px -left-px rounded-bl-md border-b border-l",
-    br: "-bottom-px -right-px rounded-br-md border-b border-r",
+    tl: "rounded-tl-md border-l border-t",
+    tr: "rounded-tr-md border-r border-t",
+    bl: "rounded-bl-md border-b border-l",
+    br: "rounded-br-md border-b border-r",
   },
 };
 
-export function CornerAccents({ scale = "section" }: { scale?: AccentScale }) {
+const OFFSETS: Record<"outside" | "inside", Record<string, string>> = {
+  outside: {
+    tl: "left-0 top-0",
+    tr: "right-0 top-0",
+    bl: "bottom-0 left-0",
+    br: "bottom-0 right-0",
+  },
+  inside: {
+    tl: "-left-px -top-px",
+    tr: "-right-px -top-px",
+    bl: "-bottom-px -left-px",
+    br: "-bottom-px -right-px",
+  },
+};
+
+export function CornerAccents({
+  scale = "section",
+  inside = false,
+}: {
+  scale?: AccentScale;
+  inside?: boolean;
+}) {
   return (
     <>
       {Object.entries(CORNERS[scale]).map(([key, spot]) => (
         <span
           key={key}
           aria-hidden="true"
-          className={cn("pointer-events-none absolute border-ember", SIZES[scale], spot)}
+          className={cn(
+            "pointer-events-none absolute border-ember",
+            SIZES[scale],
+            spot,
+            OFFSETS[inside ? "inside" : "outside"][key],
+          )}
         />
       ))}
     </>

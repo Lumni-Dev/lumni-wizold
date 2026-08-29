@@ -275,7 +275,7 @@ export function LoginScreen() {
               de nascimento fica guardada, e nas seguintes basta o botão.
             </p>
           </div>
-          <CornerAccents />
+          <CornerAccents inside />
         </div>
 
         <div className="flex items-center justify-center">

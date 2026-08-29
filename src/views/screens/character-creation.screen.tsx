@@ -143,7 +143,7 @@ export function CharacterCreationScreen() {
           >
             Começar a primeira noite
           </Button>
-          <CornerAccents />
+          <CornerAccents inside />
         </form>
       </div>
 

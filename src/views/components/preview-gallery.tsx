@@ -92,7 +92,7 @@ export function PreviewGallery({ shots }: { shots: readonly PreviewShot[] }) {
         ))}
       </div>
 
-      <CornerAccents />
+      <CornerAccents inside />
     </div>
   );
 }

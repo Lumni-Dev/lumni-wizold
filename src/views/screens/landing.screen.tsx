@@ -141,7 +141,7 @@ export function LandingScreen() {
               ))}
             </div>
           </div>
-          <CornerAccents />
+          <CornerAccents inside />
         </section>
 
         <section className="space-y-6">
@@ -171,7 +171,7 @@ export function LandingScreen() {
               >
                 <h3 className="heading text-[11px] text-ink">{pillar.title}</h3>
                 <p className="mt-2 text-xs leading-relaxed text-ink-soft">{pillar.text}</p>
-                <CornerAccents />
+                <CornerAccents inside />
               </article>
             ))}
           </div>
