@@ -1276,6 +1276,15 @@ sec("personagem");
   ok("sem fúria não vira", characterCtrl.toggleForm(angry).ok === false);
   const dying = { ...state, character: { ...state.character, health: 1, rage: 100 } };
   ok("no chão não vira", characterCtrl.toggleForm(dying).ok === false);
+  const bloated = { ...state, character: { ...state.character, health: 99999, rage: 99999 } };
+  const squeezed = characterCtrl.syncCharacter(bloated);
+  const ceiling = stats.deriveStats(state.character, state.equipment, null, {});
+  ok(
+    "teto encolhido aperta os vitais",
+    squeezed.character.health === ceiling.maxHealth &&
+      squeezed.character.rage === ceiling.maxRage,
+  );
+  ok("corpo em dia não troca referência", characterCtrl.syncCharacter(state) === state);
   const stale = {
     ...turned.state,
     character: {

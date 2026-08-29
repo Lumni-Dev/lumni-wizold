@@ -23,7 +23,8 @@ import { addLog } from "./log.controller";
 export function syncCharacter(state: GameState): GameState {
   if (!state.character) return state;
   const stats = deriveStats(state.character, state.equipment, state.pet, state.enhancements);
-  return { ...state, character: clampVitals(state.character, stats) };
+  const clamped = clampVitals(state.character, stats);
+  return clamped === state.character ? state : { ...state, character: clamped };
 }
 
 export function updateCharacter(

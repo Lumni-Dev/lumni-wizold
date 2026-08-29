@@ -127,9 +127,8 @@ export function deriveStatsOf(subject: StatSubject, equipment: Equipment): Deriv
 }
 
 export function clampVitals(character: Character, stats: DerivedStats): Character {
-  return {
-    ...character,
-    health: clamp(Math.round(character.health), 0, stats.maxHealth),
-    rage: clamp(Math.round(character.rage), 0, stats.maxRage),
-  };
+  const health = clamp(Math.round(character.health), 0, stats.maxHealth);
+  const rage = clamp(Math.round(character.rage), 0, stats.maxRage);
+  if (health === character.health && rage === character.rage) return character;
+  return { ...character, health, rage };
 }

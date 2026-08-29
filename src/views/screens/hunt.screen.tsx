@@ -341,7 +341,7 @@ export function HuntScreen() {
                         >
                           <span
                             className={cn(
-                              creature.id === fightingId
+                              creature.id === fightingId || creature.id === prey?.id
                                 ? "text-ember"
                                 : character.level >= creature.level
                                   ? "text-ink-soft"
@@ -353,7 +353,9 @@ export function HuntScreen() {
                           <span
                             className={cn(
                               "font-mono text-[11px]",
-                              creature.id === fightingId ? "text-ember" : "text-ink-faint",
+                              creature.id === fightingId || creature.id === prey?.id
+                                ? "text-ember"
+                                : "text-ink-faint",
                             )}
                           >
                             NV. {formatNumber(creature.level)}
