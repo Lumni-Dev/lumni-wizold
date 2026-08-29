@@ -76,24 +76,26 @@ export function LandingScreen() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="flex min-h-screen flex-col items-center justify-center gap-6 px-4 text-center">
-        <div className="space-y-3">
+      <header className="flex min-h-screen flex-col items-center justify-center gap-8 px-4 text-center">
+        <div className="space-y-5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/assets/ui/logo.webp?v=2"
             alt={GAME_NAME}
             className="mx-auto w-72 max-w-full md:w-96"
           />
-          <p className="text-[11px] uppercase tracking-[0.24em] text-ink-faint">{GAME_TAGLINE}</p>
+          <p className="text-[11px] uppercase leading-relaxed tracking-[0.24em] text-ink-faint">
+            {GAME_TAGLINE}
+          </p>
         </div>
 
-        <p className="mx-auto max-w-xl text-sm leading-relaxed text-ink-soft">
+        <p className="mx-auto max-w-xl text-sm leading-7 text-ink-soft">
           Dois se encontraram numa noite de lua cheia e desceram a serra sendo outra coisa. A
           matilha que eles começaram ainda caça, e a lua que decide o preço de cada noite é a que
           está no céu agora, lá fora.
         </p>
 
-        <div className="flex flex-col items-center gap-3">
+        <div className="flex flex-col items-center gap-4">
           {hasRun ? (
             <>
               <PlayButton href="/character" label={"Continuar com " + character.name} />
