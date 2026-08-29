@@ -1628,6 +1628,46 @@ sec("automação");
     "retomar volta ao mesmo trabalho",
     work?.activity.kind === "hunt" && work?.activity.id === "village-field",
   );
+  const bothKeys = { ...low, automation: { ...low.automation, potion: true, rest: true } };
+  ok(
+    "com frasco na mochila a poção vence o descanso",
+    automationCtrl.nextAutomationStep(bothKeys, null)?.kind === "potion",
+  );
+  const floorTurn = {
+    ...low,
+    character: { ...low.character, rage: 100 },
+    automation: { ...low.automation, transform: true },
+  };
+  ok(
+    "no chão a fúria não vira sozinha",
+    automationCtrl.nextAutomationStep(floorTurn, null) === null,
+  );
+  ok(
+    "descansando não deita de novo",
+    automationCtrl.nextAutomationStep(noFlask, { kind: "rest" }) === null,
+  );
+  const trainKeyed = baseState({ level: 10, form: "werewolf" });
+  trainKeyed.character.bronze = 100000;
+  trainKeyed.automation = { ...trainKeyed.automation, train: true };
+  const wokenUp = automationCtrl.resumeAfterRest(trainKeyed, {
+    kind: "rest",
+    resume: { kind: "train", id: "ice-bath" },
+  });
+  ok(
+    "descanso completo devolve o trabalho interrompido",
+    wokenUp?.kind === "train" && wokenUp.id === "ice-bath",
+  );
+  ok(
+    "sem a chave o descanso não devolve nada",
+    automationCtrl.resumeAfterRest(baseState({ level: 10 }), {
+      kind: "rest",
+      resume: { kind: "train", id: "ice-bath" },
+    }) === null,
+  );
+  ok(
+    "descanso sem lembrança não devolve nada",
+    automationCtrl.resumeAfterRest(trainKeyed, { kind: "rest" }) === null,
+  );
 }
 sec("taverna");
 {
