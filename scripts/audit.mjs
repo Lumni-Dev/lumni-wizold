@@ -395,7 +395,15 @@ sec("bandas e presas");
       const female = items.itemIdFor(drop.itemId, "female");
       ok("drop resolve para macho " + drop.itemId, Boolean(items.findItem(male)));
       ok("drop resolve para fêmea " + drop.itemId, Boolean(items.findItem(female)));
+      const dropped = items.findItem(items.itemIdFor(drop.itemId, "male"));
+      ok(
+        "a caça não larga equipamento " + drop.itemId,
+        !entItem.EQUIPMENT_SLOTS.includes(dropped.category),
+      );
     }
+  }
+  for (const definition of species.SPECIES) {
+    ok("nenhuma espécie larga peça de conjunto " + definition.key, definition.gearDrops.length === 0);
   }
   let previous = 0;
   let monotone = true;

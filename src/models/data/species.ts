@@ -278,11 +278,7 @@ export const SPECIES: readonly SpeciesDefinition[] = [
         chance: 0.11,
       },
     ],
-    gearDrops: [
-      { itemId: "lunar-helmet", chance: 0.004 },
-      { itemId: "lunar-boots", chance: 0.004 },
-      { itemId: "lunar-ring", chance: 0.0025 },
-    ],
+    gearDrops: [],
     territory: {
       id: "stone-necropolis",
       name: "Necrópole de Pedra",
@@ -329,12 +325,7 @@ export const SPECIES: readonly SpeciesDefinition[] = [
         chance: 0.1,
       },
     ],
-    gearDrops: [
-      { itemId: "lunar-claw", chance: 0.004 },
-      { itemId: "lunar-armor", chance: 0.004 },
-      { itemId: "lunar-pants", chance: 0.004 },
-      { itemId: "lunar-necklace", chance: 0.0025 },
-    ],
+    gearDrops: [],
     territory: {
       id: "white-clearing",
       name: "Clareira Branca",
