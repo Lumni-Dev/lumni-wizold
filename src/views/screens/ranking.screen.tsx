@@ -9,7 +9,6 @@ import type { Gender } from "@/models/entities/character";
 import { RANKING_BOARDS, type Hunter, type RankingKey } from "@/models/entities/ranking";
 import { cn } from "@/shared/utils/class-names";
 import { formatNumber } from "@/shared/utils/format";
-import { GenderSymbol } from "../components/app-icon";
 import { Chip } from "../components/chip";
 import { Field } from "../components/field";
 import { List, ListRow } from "../components/list";
@@ -17,7 +16,6 @@ import { EmptyState } from "../components/empty-state";
 import { Pagination } from "../components/pagination";
 import { Panel } from "../components/panel";
 import { Tag } from "../components/tag";
-import { Tooltip } from "../components/tooltip";
 import { PageHeader } from "../layout/page-header";
 
 export function RankingScreen() {
@@ -158,10 +156,8 @@ export function RankingScreen() {
                 >
                   {entry.hunter.name}
                 </Link>
-                <span className="hidden w-6 shrink-0 sm:flex sm:justify-center">
-                  <Tooltip label={entry.hunter.gender === "male" ? "Macho" : "Fêmea"}>
-                    <GenderSymbol gender={entry.hunter.gender} className="text-ink-faint" />
-                  </Tooltip>
+                <span className="hidden shrink-0 text-[10px] uppercase tracking-[0.16em] text-ink-faint sm:block">
+                  {entry.hunter.gender === "male" ? "Lumni" : "Luna"}
                 </span>
                 {view.board.key === "level" ? null : (
                   <span className="hidden shrink-0 text-[10px] uppercase tracking-[0.16em] text-ink-faint sm:block">
