@@ -31,6 +31,16 @@ export function Modal({
   }, [open]);
 
   useEffect(() => {
+    if (!open) return undefined;
+
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [open]);
+
+  useEffect(() => {
     if (!open || !dismissible) return undefined;
 
     const onKey = (event: KeyboardEvent) => {

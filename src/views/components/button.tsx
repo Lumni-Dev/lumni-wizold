@@ -17,7 +17,7 @@ const VARIANTS: Record<ButtonVariant, string> = {
     "border border-ember bg-ember text-base " +
     "shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)] hover:brightness-110",
   secondary: "border border-edge-strong bg-surface-high text-ink hover:bg-surface-top",
-  ghost: "text-ink-soft hover:bg-surface-high hover:text-ink",
+  ghost: "border border-edge-strong text-ink-soft hover:bg-surface-high hover:text-ink",
   outline: "border border-edge-strong text-ink-soft hover:bg-surface-high hover:text-ink",
 };
 const SIZES: Record<ButtonSize, string> = {
