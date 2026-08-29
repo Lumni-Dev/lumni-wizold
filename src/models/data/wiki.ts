@@ -211,6 +211,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "O casaco tem corte de linhagem: o de Lumni veste Lumni, o de Luna veste Luna. O mercado mostra os dois e o botão avisa qual é o seu.",
       "Equipar um item com o espaço ocupado devolve o anterior ao inventário.",
       "O conjunto lunar é o teto: caro no mercado e também sorteado de vampiros e unicórnios.",
+      "O mercado vende uma peça de cada: o que já está na mochila ou no corpo não se compra de novo. Uma segunda cópia só vem de sorte na caçada.",
       "Cada peça equipada pode ser forjada, e o +X viaja com ela para dentro e fora do inventário.",
     ],
   },

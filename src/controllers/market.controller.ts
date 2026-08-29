@@ -2,7 +2,7 @@ import { formatBronze } from "@/shared/utils/format";
 import { isValidQuantity } from "@/shared/utils/quantity";
 import { findItem, lineageName, marketItems, servesLineage } from "@/models/data/items";
 import type { GameState } from "@/models/entities/game-state";
-import type { Item } from "@/models/entities/item";
+import { EQUIPMENT_SLOTS, type EquipmentSlot, type Item } from "@/models/entities/item";
 import { failure, success, type Result } from "@/models/entities/result";
 import { isForgeMaterial } from "@/models/rules/bazaar";
 import {
@@ -26,7 +26,14 @@ export interface MarketOffer {
   affordable: boolean;
   ofLineage: boolean;
   ownedQuantity: number;
+  alreadyOwned: boolean;
   reason: string | null;
+}
+
+function ownsWearable(state: GameState, item: Item): boolean {
+  if (!(EQUIPMENT_SLOTS as readonly string[]).includes(item.category)) return false;
+  if (state.equipment[item.category as EquipmentSlot] === item.id) return true;
+  return countInInventory(state.inventory, item.id) > 0;
 }
 
 export function listOffers(state: GameState): MarketOffer[] {
@@ -37,6 +44,7 @@ export function listOffers(state: GameState): MarketOffer[] {
       const levelAllowed = character !== null && character.level >= item.minLevel;
       const affordable = character !== null && character.bronze >= item.price;
       const ofLineage = character !== null && servesLineage(item, character.gender);
+      const alreadyOwned = ownsWearable(state, item);
 
       return {
         item,
@@ -44,13 +52,16 @@ export function listOffers(state: GameState): MarketOffer[] {
         affordable,
         ofLineage,
         ownedQuantity: countInInventory(state.inventory, item.id),
+        alreadyOwned,
         reason: !ofLineage
           ? "Apenas " + lineageName(item)
           : !levelAllowed
             ? "Requer NV. " + item.minLevel
-            : !affordable
-              ? "Bronze insuficiente"
-              : null,
+            : alreadyOwned
+              ? "Uma peça basta: a forja sobe na bigorna"
+              : !affordable
+                ? "Bronze insuficiente"
+                : null,
       };
     })
     .sort((a, b) => a.item.price - b.item.price);
@@ -76,6 +87,12 @@ export function buyItem(state: GameState, itemId: string, quantity = 1): Result 
   }
   if (item.category === "pet" && !state.pet) {
     return failure(state, "Sem mascote para alimentar: adote um lobo antes.");
+  }
+  if ((EQUIPMENT_SLOTS as readonly string[]).includes(item.category) && quantity > 1) {
+    return failure(state, item.name + " se compra uma por vez: uma peça basta.");
+  }
+  if (ownsWearable(state, item)) {
+    return failure(state, item.name + " já é do seu corpo: uma peça basta.");
   }
 
   const cost = item.price * quantity;

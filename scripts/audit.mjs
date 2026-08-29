@@ -1192,11 +1192,20 @@ sec("inventário e mercado");
     inventory.every((slot) => slot.quantity > 0),
   );
   const state = baseState({ level: 1, gender: "female" });
-  const bought = marketCtrl.buyItem(state, "bronze-claw", 2);
+  const bought = marketCtrl.buyItem(state, "bronze-claw", 1);
   const clawPrice = items.findItem("bronze-claw").price;
   ok(
     "compra desconta o preço",
-    bought.ok && bought.state.character.bronze === state.character.bronze - clawPrice * 2,
+    bought.ok && bought.state.character.bronze === state.character.bronze - clawPrice,
+  );
+  ok("peça em dupla recusa", marketCtrl.buyItem(state, "bronze-claw", 2).ok === false);
+  ok(
+    "peça já na mochila recusa",
+    bought.ok && marketCtrl.buyItem(bought.state, "bronze-claw", 1).ok === false,
+  );
+  ok(
+    "poção compra em quantidade",
+    marketCtrl.buyItem(state, "health-potion-small", 3).ok === true,
   );
   const maleCoat = marketCtrl.buyItem(state, "bronze-armor-male", 1);
   ok("Luna não compra casaco de Lumni", maleCoat.ok === false);
@@ -1233,10 +1242,17 @@ sec("inventário e mercado");
   ok(
     "equipar tira da mochila",
     dressed.ok &&
-      inventoryCtrl.countInInventory(dressed.state.inventory, "bronze-claw") === 1 &&
+      inventoryCtrl.countInInventory(dressed.state.inventory, "bronze-claw") === 0 &&
       dressed.state.equipment.claw === "bronze-claw",
   );
-  const swapped = inventoryCtrl.equipItem(dressed.state, "bronze-claw");
+  ok(
+    "peça no corpo recusa comprar de novo",
+    dressed.ok && marketCtrl.buyItem(dressed.state, "bronze-claw", 1).ok === false,
+  );
+  const spareState = dressed.ok
+    ? { ...dressed.state, inventory: [...dressed.state.inventory, { itemId: "bronze-claw", quantity: 1 }] }
+    : dressed.state;
+  const swapped = inventoryCtrl.equipItem(spareState, "bronze-claw");
   ok(
     "trocar pela mesma peça conserva",
     swapped.ok && inventoryCtrl.countInInventory(swapped.state.inventory, "bronze-claw") === 1,

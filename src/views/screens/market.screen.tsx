@@ -9,6 +9,7 @@ import {
   EQUIPMENT_SET_KEYS,
   ITEM_CATEGORIES,
   POTION_SIZES,
+  EQUIPMENT_SLOTS,
   SET_LABEL,
   SIZE_LABEL,
   type EquipmentSet,
@@ -26,7 +27,7 @@ import { Chip } from "../components/chip";
 import { Pagination } from "../components/pagination";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { Field } from "../components/field";
-import { enhancedName, enhancementOf } from "@/models/rules/forge";
+import { enhancedName } from "@/models/rules/forge";
 import { ItemCard } from "../components/item-card";
 import { List, ListRow } from "../components/list";
 import { ItemIcon } from "../components/item-icon";
@@ -124,9 +125,15 @@ export function MarketScreen() {
 
   const affordableAmount =
     deal && deal.kind === "buy" ? Math.floor(character.bronze / deal.item.price) : 0;
+  const dealWearable =
+    deal !== null &&
+    deal.kind === "buy" &&
+    (EQUIPMENT_SLOTS as readonly string[]).includes(deal.item.category);
   const dealQuantity =
     deal && deal.kind === "buy"
-      ? clampAmount(Number(buying), Math.max(1, affordableAmount))
+      ? dealWearable
+        ? 1
+        : clampAmount(Number(buying), Math.max(1, affordableAmount))
       : (deal?.quantity ?? 1);
   const dealTotal =
     deal && deal.kind === "buy" ? deal.item.price * dealQuantity : (deal?.total ?? 0);
@@ -213,13 +220,12 @@ export function MarketScreen() {
 
           <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
             {offersOnPage.map(
-              ({ item, levelAllowed, affordable, ofLineage, ownedQuantity, reason }) => {
+              ({ item, levelAllowed, affordable, ofLineage, ownedQuantity, alreadyOwned, reason }) => {
                 const petless = item.category === "pet" && !state.pet;
                 return (
                   <ItemCard
                     key={item.id}
                     item={item}
-                    enhancement={enhancementOf(state.enhancements, item.id)}
                     note={
                       ofLineage
                         ? (reason ??
@@ -231,7 +237,7 @@ export function MarketScreen() {
                         <Button
                           fullWidth
                           variant={
-                            ofLineage && levelAllowed && affordable && !petless
+                            ofLineage && levelAllowed && affordable && !petless && !alreadyOwned
                               ? "primary"
                               : "outline"
                           }
@@ -239,13 +245,17 @@ export function MarketScreen() {
                             setBuying("1");
                             setDeal({ kind: "buy", item, quantity: 1, total: item.price });
                           }}
-                          disabled={!ofLineage || !levelAllowed || !affordable || petless}
+                          disabled={
+                            !ofLineage || !levelAllowed || !affordable || petless || alreadyOwned
+                          }
                         >
                           {petless
                             ? "Sem mascote"
-                            : ofLineage
-                              ? "Comprar por " + formatBronze(item.price)
-                              : "Apenas " + lineageName(item)}
+                            : alreadyOwned
+                              ? "Você já tem"
+                              : ofLineage
+                                ? "Comprar por " + formatBronze(item.price)
+                                : "Apenas " + lineageName(item)}
                         </Button>
                       </div>
                     }
@@ -352,7 +362,7 @@ export function MarketScreen() {
             : null
         }
         confirmLabel={deal?.kind === "sell" ? "Vender" : "Pagar " + formatBronze(dealTotal)}
-        {...(deal?.kind === "buy"
+        {...(deal?.kind === "buy" && !dealWearable
           ? {
               children: (
                 <Field
