@@ -123,9 +123,7 @@ function Kennel({ bronze }: { bronze: number }) {
             fullWidth
             disabled={!affordable || name.trim().length === 0}
           >
-            {affordable
-              ? "Adotar por " + formatBronze(PET_PRICE)
-              : "Faltam " + formatBronze(PET_PRICE - bronze)}
+            Adotar por {formatBronze(PET_PRICE)}
           </Button>
         </form>
       </Panel>
