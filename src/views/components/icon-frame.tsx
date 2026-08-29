@@ -37,13 +37,11 @@ const TONES: Record<FrameTone, string> = {
 export function IconFrame({
   size = "medium",
   tone = "default",
-  shine = false,
   className,
   children,
 }: {
   size?: IconSize;
   tone?: FrameTone;
-  shine?: boolean;
   className?: string;
   children: ReactNode;
 }) {
@@ -60,7 +58,6 @@ export function IconFrame({
         )}
       >
         {children}
-        {shine ? <span className="item-glow pointer-events-none absolute -inset-1/2" /> : null}
       </span>
       <CornerAccents scale="icon" />
     </span>
@@ -71,10 +68,12 @@ const ICON_PAD = "p-[5px]";
 export function IconArt({
   source,
   padded = true,
+  glow = false,
   inset,
 }: {
   source: string;
   padded?: boolean;
+  glow?: boolean;
   inset?: string;
 }) {
   const [preview, setPreview] = useState<{
@@ -106,7 +105,9 @@ export function IconArt({
         onMouseMove={place}
         onMouseLeave={() => setPreview(null)}
       />
-      <span className="item-glow pointer-events-none absolute -inset-1/2 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+      {glow ? (
+        <span className="item-glow pointer-events-none absolute -inset-1/2 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+      ) : null}
 
       {preview ? (
         <span
@@ -129,7 +130,7 @@ export function IconArt({
                 inset ? "p-[16px]" : padded && "p-[14px]",
               )}
             />
-            <span className="item-glow pointer-events-none absolute -inset-1/2" />
+            {glow ? <span className="item-glow pointer-events-none absolute -inset-1/2" /> : null}
           </span>
           <CornerAccents />
         </span>

@@ -155,7 +155,7 @@ export function TrainingScreen() {
                 tone={active ? "highlighted" : "default"}
               >
                 <CardHeader>
-                  <TrainingIcon attribute={exercise.attribute} size="medium" shine={active} />
+                  <TrainingIcon attribute={exercise.attribute} size="medium" />
                   <div className="min-w-0 flex-1">
                     <h3 className="truncate text-sm text-ink">{row?.name ?? exercise.name}</h3>
                     <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
@@ -225,7 +225,7 @@ export function TrainingScreen() {
           {petTraining ? (
             <Card height="fill" interactive={petReady} tone={petActive ? "highlighted" : "default"}>
               <CardHeader>
-                <PetIcon gender={petTraining.pet.gender} size="medium" shine={petActive} />
+                <PetIcon gender={petTraining.pet.gender} size="medium" />
                 <div className="min-w-0 flex-1">
                   <h3 className="truncate text-sm text-ink">{petTraining.pet.name}</h3>
                   <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">

@@ -353,7 +353,7 @@ export function HuntScreen() {
                 className={cn(!available && !active && "opacity-70")}
               >
                 {art.territories[territory.id] ? (
-                  <div className="relative aspect-video w-full overflow-hidden border-b border-edge">
+                  <div className="aspect-video w-full overflow-hidden border-b border-edge">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={art.territories[territory.id]}
@@ -361,9 +361,6 @@ export function HuntScreen() {
                       loading="lazy"
                       className="h-full w-full object-cover"
                     />
-                    {active ? (
-                      <span className="item-glow pointer-events-none absolute -inset-1/2" />
-                    ) : null}
                   </div>
                 ) : null}
                 <CardHeader>

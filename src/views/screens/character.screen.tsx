@@ -3,7 +3,6 @@
 import { useGame } from "@/controllers/game.context";
 import { criticalMultiplierOf } from "@/models/rules/combat";
 import { ATTRIBUTES, type Attributes } from "@/models/entities/attribute";
-import { findExercise } from "@/models/data/exercises";
 import { findItem } from "@/models/data/items";
 import { enhancedName, enhancementOf } from "@/models/rules/forge";
 import { EQUIPMENT_SLOTS, SLOT_LABEL } from "@/models/entities/item";
@@ -35,10 +34,6 @@ export function CharacterScreen() {
 
   const genderDefinition = findGender(character.gender);
   const resting = activity?.kind === "rest";
-  const trainingAttribute =
-    activity?.kind === "train" && !activity.paused
-      ? (findExercise(activity.id ?? "")?.attribute ?? null)
-      : null;
 
   const vitals = [
     {
@@ -175,10 +170,7 @@ export function CharacterScreen() {
                 return (
                   <ListRow key={definition.key} layout="column" padding="art">
                     <div className="flex min-w-0 items-center gap-3">
-                      <AttributeIcon
-                        attribute={definition.key}
-                        shine={definition.key === trainingAttribute}
-                      />
+                      <AttributeIcon attribute={definition.key} />
                       <RowText title={definition.name} description={definition.description} />
                     </div>
                     <div className="grid w-full grid-cols-4 divide-x divide-y divide-edge sm:grid-cols-7 sm:divide-y-0 overflow-hidden rounded-md border border-edge">
