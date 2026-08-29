@@ -28,7 +28,7 @@ const { EQUIPMENT_SETS, pieceId, piecePrice, setForLevel } = require(
   join(BUILD, "models/data/equipment-sets.js"),
 );
 const { findItem } = require(join(BUILD, "models/data/items.js"));
-const { trainingCost } = require(join(BUILD, "models/rules/training.js"));
+const { trainingPointCost } = require(join(BUILD, "models/rules/training.js"));
 const { buildCreatures } = require(join(BUILD, "models/data/species.js"));
 const { EQUIPMENT_SLOTS } = require(join(BUILD, "models/entities/item.js"));
 const { BASE_ATTRIBUTE_VALUE, MAX_ATTRIBUTE_VALUE, MIN_HEALTH_RATIO_TO_ACT } = require(
@@ -183,7 +183,7 @@ function economy(level) {
   const set = setForLevel(level);
   const setPrice = EQUIPMENT_SLOTS.reduce((total, slot) => total + piecePrice(set, slot), 0);
 
-  const session = trainingCost(level);
+  const point = trainingPointCost(level);
   const perHunt = bronze + loot;
 
   return {
@@ -191,9 +191,9 @@ function economy(level) {
     bronze,
     loot,
     setPrice,
-    session,
+    point,
     huntsForSet: setPrice / perHunt,
-    huntsPerPoint: (session * 5) / perHunt,
+    huntsPerPoint: point / perHunt,
   };
 }
 
@@ -257,7 +257,7 @@ if (Number.isFinite(single) && single > 0) {
         "loot " + Math.round(money.loot).toString().padStart(6) + ")",
         "conjunto " + Math.round(money.setPrice).toString().padStart(9),
         "= " + money.huntsForSet.toFixed(0).padStart(5) + " caçadas",
-        "treino " + Math.round(money.session).toString().padStart(6),
+        "ponto " + Math.round(money.point).toString().padStart(7),
         "= " + money.huntsPerPoint.toFixed(1).padStart(5) + " caçadas por ponto",
       ].join("  "),
     );

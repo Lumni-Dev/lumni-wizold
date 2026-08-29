@@ -14,7 +14,7 @@ import {
   petRationOf,
   petRestStep,
   petLevelOf,
-  petTrainingCost,
+  petTrainingPointCost,
   petTrainingEffort,
   petTrainingNeeded,
   restPet,
@@ -127,8 +127,8 @@ export function petTrainingView(state: GameState): PetTrainingView | null {
 
   const level = petLevelOf(pet);
   const maxed = level >= PET_MAX_LEVEL;
-  const cost = petTrainingCost(level, character.level);
-  const affordable = character.bronze >= cost;
+  const cost = petTrainingPointCost(level, character.level);
+  const affordable = (pet.trainingProgress ?? 0) > 0 || character.bronze >= cost;
   const needed = petTrainingNeeded(level);
   const transformed = character.form === "werewolf";
 
@@ -164,11 +164,12 @@ export function trainPet(state: GameState): Result<{ leveled: boolean }> {
     return failure(state, pet.name + " já está no teto de NV. " + PET_MAX_LEVEL + ".");
   }
 
-  const cost = petTrainingCost(level, character.level);
+  const starting = (pet.trainingProgress ?? 0) === 0;
+  const cost = starting ? petTrainingPointCost(level, character.level) : 0;
   if (character.bronze < cost) {
     return failure(
       state,
-      "A sessão custa " +
+      "O ponto é pago adiantado: custa " +
         formatBronze(cost) +
         " e faltam " +
         formatBronze(cost - character.bronze) +

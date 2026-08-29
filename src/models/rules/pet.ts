@@ -31,8 +31,8 @@ export function petTrainingNeeded(level: number): number {
   return Math.round(20 * level * (1 + level / 25));
 }
 
-export function petTrainingCost(level: number, hunterLevel: number): number {
-  return Math.max(1, Math.round(huntPurse(hunterLevel) * 0.6 * (1 + level / 50)));
+export function petTrainingPointCost(level: number, hunterLevel: number): number {
+  return Math.max(1, Math.round(huntPurse(hunterLevel) * 3 * (1 + level / 50)));
 }
 
 export function petTrainingEffort(level: number): number {

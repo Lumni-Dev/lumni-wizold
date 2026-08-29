@@ -5,7 +5,7 @@ import type { GameState } from "@/models/entities/game-state";
 import { failure, success, type Result } from "@/models/entities/result";
 import type { Exercise } from "@/models/entities/exercise";
 import { applyTrainingProgress, progressNeeded } from "@/models/rules/progression";
-import { trainingCost, trainingEffort, type TrainingEffort } from "@/models/rules/training";
+import { trainingPointCost, trainingEffort, type TrainingEffort } from "@/models/rules/training";
 import { formatBronze } from "@/shared/utils/format";
 import { syncCharacter } from "./character.controller";
 import { addLog } from "./log.controller";
@@ -38,8 +38,9 @@ export function listExercises(state: GameState): AvailableExercise[] {
   return EXERCISES.map((exercise) => {
     const maxed =
       character !== null && character.attributes[exercise.attribute] >= MAX_ATTRIBUTE_VALUE;
-    const cost = trainingCost(character?.level ?? 1);
-    const affordable = character !== null && character.bronze >= cost;
+    const cost = trainingPointCost(character?.level ?? 1);
+    const starting = character !== null && character.trainingProgress[exercise.attribute] === 0;
+    const affordable = character !== null && (!starting || character.bronze >= cost);
 
     return {
       exercise,
@@ -102,11 +103,12 @@ export function train(state: GameState, exerciseId: string): Result<TrainingRepo
     );
   }
 
-  const cost = trainingCost(character.level);
+  const starting = character.trainingProgress[exercise.attribute] === 0;
+  const cost = starting ? trainingPointCost(character.level) : 0;
   if (character.bronze < cost) {
     return failure(
       state,
-      "A sessão custa " +
+      "O ponto é pago adiantado: custa " +
         formatBronze(cost) +
         " e faltam " +
         formatBronze(cost - character.bronze) +

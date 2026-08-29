@@ -149,7 +149,7 @@ export function TrainingScreen() {
 
                   <div className="flex flex-wrap gap-2">
                     <Tag>+{effort.progress} de progresso por treinamento</Tag>
-                    <Tag>{formatBronze(cost)} por treinamento</Tag>
+                    <Tag>Ponto por {formatBronze(cost)}, pago adiantado</Tag>
                   </div>
 
                   {row ? (
@@ -221,7 +221,7 @@ export function TrainingScreen() {
 
                 <div className="flex flex-wrap gap-2">
                   <Tag>+{petTraining.effort.progress} de progresso por treinamento</Tag>
-                  <Tag>{formatBronze(petTraining.cost)} por treinamento</Tag>
+                  <Tag>Nível por {formatBronze(petTraining.cost)}, pago adiantado</Tag>
                 </div>
 
                 <Bar

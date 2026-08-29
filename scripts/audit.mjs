@@ -422,8 +422,8 @@ sec("economia");
   for (const level of [1, 100, 340, 670, 1000]) {
     const purse = species.huntPurse(level);
     ok(
-      "treino custa 0,6 caçada NV " + level,
-      training.trainingCost(level) === Math.max(1, Math.round(purse * 0.6)),
+      "ponto custa 3 caçadas adiantadas NV " + level,
+      training.trainingPointCost(level) === Math.max(1, Math.round(purse * 3)),
     );
     for (const pack of packsData.STORE_PACKS) {
       ok(
@@ -451,7 +451,7 @@ sec("economia");
       progression.progressNeeded(value) / training.trainingEffort(level).progress,
     );
     ok("ponto sai em 3..7 sessões NV " + level, sessions >= 3 && sessions <= 7, sessions);
-    const perPoint = (training.trainingCost(level) * sessions) / species.huntPurse(level);
+    const perPoint = training.trainingPointCost(level) / species.huntPurse(level);
     ok("ponto custa 1..4 caçadas NV " + level, perPoint >= 1 && perPoint <= 4, perPoint.toFixed(2));
   }
   ok(
@@ -743,12 +743,20 @@ sec("treinamento");
   const session = trainingCtrl.train(state, "trunk-punches");
   ok("sessão válida treina", session.ok === true);
   if (session.ok) {
-    const cost = training.trainingCost(100);
-    ok("sessão cobra o preço", session.state.character.bronze === state.character.bronze - cost);
+    const cost = training.trainingPointCost(100);
+    ok(
+      "ponto novo cobra adiantado",
+      session.state.character.bronze === state.character.bronze - cost,
+    );
     const gained =
       session.state.character.trainingProgress.strength > 0 ||
       session.state.character.attributes.strength > state.character.attributes.strength;
     ok("sessão rende progresso", gained);
+    const second = trainingCtrl.train(session.state, "trunk-punches");
+    ok(
+      "sessão no meio do ponto é de graça",
+      second.ok && second.state.character.bronze === session.state.character.bronze,
+    );
   }
   ok(
     "cada exercício treina um atributo",
@@ -776,9 +784,9 @@ sec("treinamento");
   const petSession = petCtrl.trainPet(withPet);
   ok("sessão do lobo funciona", petSession.ok === true);
   if (petSession.ok) {
-    const cost = petRules.petTrainingCost(1, 100);
+    const cost = petRules.petTrainingPointCost(1, 100);
     ok(
-      "sessão do lobo cobra",
+      "nível novo do lobo cobra adiantado",
       petSession.state.character.bronze === withPet.character.bronze - cost,
     );
     ok(

@@ -4,10 +4,10 @@ export interface TrainingEffort {
   progress: number;
 }
 
-const TRAINING_COST_IN_HUNTS = 0.6;
+const TRAINING_POINT_COST_IN_HUNTS = 3;
 
-export function trainingCost(level: number): number {
-  return Math.max(1, Math.round(huntPurse(level) * TRAINING_COST_IN_HUNTS));
+export function trainingPointCost(level: number): number {
+  return Math.max(1, Math.round(huntPurse(level) * TRAINING_POINT_COST_IN_HUNTS));
 }
 
 export function trainingEffort(level: number): TrainingEffort {
