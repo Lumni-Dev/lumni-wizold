@@ -7,6 +7,7 @@ import { findItem } from "@/models/data/items";
 import { enhancedName, enhancementOf } from "@/models/rules/forge";
 import { EQUIPMENT_SLOTS, SLOT_LABEL } from "@/models/entities/item";
 import { findGender, FORM_LABEL } from "@/models/entities/character";
+import { BASE_ATTRIBUTE_VALUE } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
 import { formatNumber } from "@/shared/utils/format";
 import { Bar } from "../components/bar";
@@ -112,11 +113,6 @@ export function CharacterScreen() {
                 value={"×" + criticalMultiplierOf(character.rage).toFixed(2).replace(".", ",")}
               />
             </List>
-            <p className="border-t border-edge px-4 py-3 text-xs leading-relaxed text-ink-faint">
-              Cada golpe seu tira Força × Força ÷ (Força + Resistência do alvo). Contra uma presa de{" "}
-              {formatNumber(Math.round(endurance))} de Resistência, isso dá{" "}
-              {formatNumber(Math.round((strength * strength) / (strength + endurance)))} de dano.
-            </p>
           </Panel>
         </div>
 
@@ -155,8 +151,15 @@ export function CharacterScreen() {
                 const lent = (from: Attributes) => from[definition.key];
                 const total = stats.totalAttributes[definition.key];
 
+                const natural =
+                  BASE_ATTRIBUTE_VALUE + (genderDefinition.bonus[definition.key] ?? 0);
                 const cells = [
-                  { label: "Treino", value: formatNumber(lent(stats.sources.trained)), sum: false },
+                  { label: "Natural", value: formatNumber(natural), sum: false },
+                  {
+                    label: "Treino",
+                    value: plus(lent(stats.sources.trained) - natural),
+                    sum: false,
+                  },
                   { label: "Equip.", value: plus(lent(stats.sources.equipment)), sum: false },
                   { label: "Lobo", value: plus(lent(stats.sources.pet)), sum: false },
                   { label: "Lua", value: plus(lent(stats.sources.moon)), sum: false },
@@ -170,7 +173,7 @@ export function CharacterScreen() {
                       <AttributeIcon attribute={definition.key} />
                       <RowText title={definition.name} description={definition.description} />
                     </div>
-                    <div className="grid w-full shrink-0 grid-cols-3 divide-x divide-y divide-edge sm:grid-cols-6 sm:divide-y-0 overflow-hidden rounded-md border border-edge sm:w-[26rem]">
+                    <div className="grid w-full shrink-0 grid-cols-4 divide-x divide-y divide-edge sm:grid-cols-7 sm:divide-y-0 overflow-hidden rounded-md border border-edge sm:w-[30rem]">
                       {cells.map((cell) => (
                         <div
                           key={cell.label}

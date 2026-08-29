@@ -106,7 +106,9 @@ interface HeldLanding {
   state: GameState;
   seq: number;
   report: HuntReport | null;
+  at: number;
 }
+const HELD_LANDING_TTL_MS = 30000;
 export function GameProvider({ children }: { children: ReactNode }) {
   const hydrated = useSyncExternalStore(
     subscribeToClient,
@@ -169,6 +171,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
       body?: unknown,
       defer?: "hunt" | "arena",
     ): Promise<ApiAnswer<T>> => {
+      for (const ref of [heldHuntRef, heldArenaRef]) {
+        const held = ref.current;
+        if (held && Date.now() - held.at > HELD_LANDING_TTL_MS) {
+          ref.current = null;
+          applyState(held.state, held.seq);
+        }
+      }
       const answer = await api<T>(method, path, body);
       if (answer.status === 401) {
         setAuthenticated(false);
@@ -177,9 +186,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
       if (answer.state) {
         const seq = ++mintRef.current;
         if (defer === "hunt" && answer.ok) {
-          heldHuntRef.current = { state: answer.state, seq, report: answer.data as HuntReport };
+          heldHuntRef.current = {
+            state: answer.state,
+            seq,
+            report: answer.data as HuntReport,
+            at: Date.now(),
+          };
         } else if (defer === "arena" && answer.ok) {
-          heldArenaRef.current = { state: answer.state, seq, report: null };
+          heldArenaRef.current = { state: answer.state, seq, report: null, at: Date.now() };
         } else if (heldHuntRef.current) {
           heldHuntRef.current = { ...heldHuntRef.current, state: answer.state, seq };
         } else if (heldArenaRef.current) {
