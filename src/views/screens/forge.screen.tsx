@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useGame } from "@/controllers/game.context";
-import { listForge, listMining } from "@/controllers/forge.controller";
+import { listForge, listMining, type ForgeSlot } from "@/controllers/forge.controller";
 import { usePageActivity } from "@/controllers/use-page-activity";
 import { playSound } from "@/controllers/sound";
 import { SLOT_LABEL, type EquipmentSlot } from "@/models/entities/item";
@@ -25,7 +25,7 @@ import { Tag } from "../components/tag";
 import { PageHeader } from "../layout/page-header";
 
 export function ForgeScreen() {
-  const { state, character, mine, enhance, activity, setActivity } = useGame();
+  const { state, character, mine, enhance, activity, setActivity, notify } = useGame();
   usePageActivity(["mine", "forge"]);
   const paused = activity?.paused === true;
   const activeOre = activity?.kind === "mine" && !paused ? (activity.id ?? null) : null;
@@ -39,50 +39,72 @@ export function ForgeScreen() {
   const autoRef = useRef(state.automation);
   const mineRef = useRef(mine);
   const enhanceRef = useRef(enhance);
+  const notifyRef = useRef(notify);
+  const slotsRef = useRef(slots);
   useEffect(() => {
     autoRef.current = state.automation;
     mineRef.current = mine;
     enhanceRef.current = enhance;
+    notifyRef.current = notify;
+    slotsRef.current = slots;
   });
 
-  const [forging, setForging] = useState<{ beat: number; tickMs: number } | null>(null);
+  const [strike, setStrike] = useState<{ id: string; beat: number }>({ id: "", beat: 0 });
+  const strikeRef = useRef(0);
+  const paidRef = useRef(false);
+  const landedRef = useRef<{ message: string; raised: boolean } | null>(null);
+  const [heldSlot, setHeldSlot] = useState<ForgeSlot | null>(null);
 
   const [confirmingSlot, setConfirmingSlot] = useState<EquipmentSlot | null>(null);
 
   useEffect(() => {
-    if (!activeSlot || !forging) return;
+    if (!activeSlot) return;
 
-    const timer = window.setTimeout(() => {
-      const beat = forging.beat + 1;
-      playSound("forge");
-      if (beat >= FORGE_TICKS) {
-        void enhanceRef.current(activeSlot as EquipmentSlot);
-        setForging(null);
-        setActivity(autoRef.current.forge ? { kind: "forge", id: activeSlot, paused: true } : null);
-      } else {
-        setForging({ ...forging, beat });
-      }
-    }, forging.tickMs);
+    const level = slotsRef.current.find((entry) => entry.slot === activeSlot)?.level ?? 0;
+    const tickMs = forgeDurationMs(level) / FORGE_TICKS;
+    const timer = window.setInterval(() => {
+      strikeRef.current = strikeRef.current >= FORGE_TICKS ? 0 : strikeRef.current + 1;
+      setStrike({ id: activeSlot, beat: strikeRef.current });
 
-    return () => window.clearTimeout(timer);
-  }, [activeSlot, forging, setActivity]);
-
-  const pendingLevel = activeSlot
-    ? (slots.find((entry) => entry.slot === activeSlot)?.level ?? 0)
-    : 0;
-  useEffect(() => {
-    if (!activeSlot || forging) return;
-
-    const timer = window.setTimeout(
-      () => {
+      if (strikeRef.current === 1) {
+        paidRef.current = false;
+        landedRef.current = null;
+        setHeldSlot(slotsRef.current.find((entry) => entry.slot === activeSlot) ?? null);
+        void enhanceRef.current(activeSlot as EquipmentSlot).then((landed) => {
+          if (landed) {
+            paidRef.current = true;
+            landedRef.current = landed;
+            playSound("buy");
+            return;
+          }
+          strikeRef.current = 0;
+          setStrike({ id: activeSlot, beat: 0 });
+          setHeldSlot(null);
+          setActivity(
+            autoRef.current.forge ? { kind: "forge", id: activeSlot, paused: true } : null,
+          );
+        });
+      } else if (strikeRef.current > 1 && paidRef.current) {
         playSound("forge");
-        setForging({ beat: 1, tickMs: forgeDurationMs(pendingLevel) / FORGE_TICKS });
-      },
-      forgeDurationMs(pendingLevel) / FORGE_TICKS,
-    );
+      }
 
-    return () => window.clearTimeout(timer);
-  }, [activeSlot, forging, pendingLevel]);
+      if (strikeRef.current < FORGE_TICKS) return;
+      setHeldSlot(null);
+      const landed = landedRef.current;
+      landedRef.current = null;
+      if (landed) {
+        if (landed.message) notifyRef.current(landed.message, true, "Bigorna");
+        playSound(landed.raised ? "point" : "denied");
+      }
+      if (!autoRef.current.forge) {
+        strikeRef.current = 0;
+        setStrike({ id: activeSlot, beat: 0 });
+        setActivity(null);
+      }
+    }, tickMs);
+
+    return () => window.clearInterval(timer);
+  }, [activeSlot, setActivity]);
 
   const [swing, setSwing] = useState<{ id: string; beat: number }>({ id: "", beat: 0 });
   const swingRef = useRef(0);
@@ -226,7 +248,8 @@ export function ForgeScreen() {
           padding="none"
         >
           <List>
-            {slots.map((entry) => {
+            {slots.map((row) => {
+              const entry = activeSlot === row.slot && heldSlot?.slot === row.slot ? heldSlot : row;
               const maxed = entry.level >= MAX_ENHANCEMENT;
 
               return (
@@ -271,14 +294,14 @@ export function ForgeScreen() {
                     </Button>
                   </div>
 
-                  {(activeSlot === entry.slot && forging) ||
+                  {(activeSlot === entry.slot && strike.id === entry.slot) ||
                   waitingSlot === entry.slot ||
                   entry.reason ? (
                     <div className="space-y-1 pt-2">
-                      {activeSlot === entry.slot && forging ? (
+                      {activeSlot === entry.slot && strike.id === entry.slot ? (
                         <Bar
-                          label="Forjando..."
-                          current={forging.beat}
+                          label={strike.beat === 1 ? "Cobrando..." : "Forjando..."}
+                          current={strike.beat}
                           maximum={FORGE_TICKS}
                           wraps
                         />
@@ -320,7 +343,11 @@ export function ForgeScreen() {
         onCancel={() => setConfirmingSlot(null)}
         onConfirm={() => {
           if (confirming) {
-            setForging({ beat: 0, tickMs: forgeDurationMs(confirming.level) / FORGE_TICKS });
+            strikeRef.current = 0;
+            paidRef.current = false;
+            landedRef.current = null;
+            setStrike({ id: confirming.slot, beat: 0 });
+            setHeldSlot(null);
             setActivity({ kind: "forge", id: confirming.slot });
           }
           setConfirmingSlot(null);

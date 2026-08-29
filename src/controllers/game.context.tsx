@@ -88,7 +88,7 @@ interface GameContextValue {
   buyPack: (packId: string) => Promise<boolean>;
   confirmPayment: (sessionId: string) => Promise<boolean>;
   mine: (oreId: string) => Promise<boolean>;
-  enhance: (slot: EquipmentSlot) => Promise<boolean>;
+  enhance: (slot: EquipmentSlot) => Promise<{ message: string; raised: boolean } | null>;
   adoptPet: (gender: PetGender, name: string) => Promise<void>;
   releasePet: () => Promise<void>;
   setAutomation: (key: AutomationKey, on: boolean) => void;
@@ -618,14 +618,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
         return answer.ok;
       },
       enhance: async (slot) => {
-        const answer = await act<{ raised: boolean }>(
-          "POST",
-          "/api/forge",
-          { slot },
-          "Bigorna",
-          (data) => playSound(data?.raised ? "point" : "denied"),
-        );
-        return answer.ok;
+        const answer = await request<{ raised: boolean }>("POST", "/api/forge", { slot });
+        if (!answer.ok) {
+          if (answer.message) announce(answer.message, false, "Bigorna");
+          return null;
+        }
+        return { message: answer.message, raised: answer.data?.raised === true };
       },
       adoptPet: async (gender, name) => {
         await act("POST", "/api/pet/adopt", { gender, name }, "Mascote", () => {
