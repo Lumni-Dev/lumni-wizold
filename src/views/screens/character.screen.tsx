@@ -180,7 +180,7 @@ export function CharacterScreen() {
                             cell.sum && "bg-surface-high/40",
                           )}
                         >
-                          <p className="truncate text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                          <p className="truncate text-[10px] uppercase tracking-normal text-ink-faint">
                             {cell.label}
                           </p>
                           <p
