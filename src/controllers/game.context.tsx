@@ -180,6 +180,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
           heldHuntRef.current = { state: answer.state, seq, report: answer.data as HuntReport };
         } else if (defer === "arena" && answer.ok) {
           heldArenaRef.current = { state: answer.state, seq, report: null };
+        } else if (heldHuntRef.current) {
+          heldHuntRef.current = { ...heldHuntRef.current, state: answer.state, seq };
+        } else if (heldArenaRef.current) {
+          heldArenaRef.current = { ...heldArenaRef.current, state: answer.state, seq };
         } else {
           applyState(answer.state, seq);
         }

@@ -192,11 +192,14 @@ export function HuntScreen() {
             HUNT_TICKS,
             nameRef.current,
           );
+          beatRef.current = Math.min(beatRef.current, 1);
           setScript(scriptRef.current);
           setPending(fight);
         });
       }
-      const line = scriptRef.current[Math.min(beatRef.current, scriptRef.current.length) - 1];
+      const line = pendingRef.current
+        ? scriptRef.current[Math.min(beatRef.current, scriptRef.current.length) - 1]
+        : null;
       if (line?.blow === "ours") playSound(line.critical ? "crit" : "hit");
       if (line?.blow === "pet") playSound("snap");
       if (line?.blow === "theirs") playSound("hurt");
