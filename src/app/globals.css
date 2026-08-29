@@ -185,6 +185,19 @@
 }
 
 
+@keyframes art-active {
+  from {
+    filter: drop-shadow(0 0 3px var(--color-ember));
+  }
+  to {
+    filter: drop-shadow(0 0 10px var(--color-ember));
+  }
+}
+
+@utility art-active {
+  animation: art-active 1400ms ease-in-out infinite alternate;
+}
+
 @keyframes toast-in {
   from {
     opacity: 0;

@@ -160,7 +160,11 @@ export function ForgeScreen() {
               return (
                 <ListRow key={ore.id} layout="column" padding="art">
                   <div className="flex items-center gap-3">
-                    {fragment ? <ItemIcon item={fragment} /> : <IconFrame>--</IconFrame>}
+                    {fragment ? (
+                      <ItemIcon item={fragment} className={active ? "art-active" : undefined} />
+                    ) : (
+                      <IconFrame>--</IconFrame>
+                    )}
                     <RowText
                       title={ore.label}
                       description={
@@ -216,7 +220,14 @@ export function ForgeScreen() {
               return (
                 <ListRow key={entry.slot} layout="column" padding="art">
                   <div className="flex items-center gap-3">
-                    {entry.item ? <ItemIcon item={entry.item} /> : <IconFrame>--</IconFrame>}
+                    {entry.item ? (
+                      <ItemIcon
+                        item={entry.item}
+                        className={activeSlot === entry.slot ? "art-active" : undefined}
+                      />
+                    ) : (
+                      <IconFrame>--</IconFrame>
+                    )}
                     {entry.item ? (
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm text-ink">

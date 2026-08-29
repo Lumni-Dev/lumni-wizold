@@ -352,7 +352,10 @@ export function HuntScreen() {
                 className={cn(!available && !active && "opacity-70")}
               >
                 <CardHeader>
-                  <TerritoryIcon territory={territory} />
+                  <TerritoryIcon
+                    territory={territory}
+                    className={active ? "art-active" : undefined}
+                  />
                   <div className="min-w-0 flex-1">
                     <h2 className="truncate text-sm text-ink">{territory.name}</h2>
                     <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
