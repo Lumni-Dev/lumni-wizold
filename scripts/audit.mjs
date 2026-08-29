@@ -794,7 +794,7 @@ sec("treinamento");
       (petSession.state.pet.trainingProgress ?? 0) > 0 || petSession.state.pet.level > 1,
     );
   }
-  const petMaxed = { ...withPet, pet: { ...withPet.pet, level: 100 } };
+  const petMaxed = { ...withPet, pet: { ...withPet.pet, level: 1000 } };
   ok("lobo no teto recusa", petCtrl.trainPet(petMaxed).ok === false);
 }
 sec("mascote");

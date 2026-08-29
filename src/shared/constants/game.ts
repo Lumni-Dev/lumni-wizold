@@ -31,7 +31,7 @@ export const NAME_MIN_LENGTH = 3;
 
 export const PET_PRICE = 1200;
 export const PET_RENAME_PRICE = 10_000;
-export const PET_MAX_LEVEL = 100;
+export const PET_MAX_LEVEL = 1000;
 export const PET_EXERCISE_ID = "pet-training";
 export const PET_BASE_BONUS = 5;
 export const PET_BASE_ENERGY = 100;
