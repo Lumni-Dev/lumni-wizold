@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useGame } from "@/controllers/game.context";
 import { playSound } from "@/controllers/sound";
+import { loadBirth, saveBirth } from "@/models/repositories/birth.repository";
 import { GAME_NAME, GAME_TAGLINE, MIN_AGE } from "@/shared/constants/game";
 import { ageOf, EMPTY_BIRTH, isRealBirth } from "@/shared/utils/birth";
 import { cn } from "@/shared/utils/class-names";
@@ -116,6 +117,12 @@ export function LoginScreen() {
     if (ready && character) router.replace("/character");
   }, [ready, character, router]);
   useEffect(() => {
+    const saved = loadBirth();
+    if (!saved) return;
+    const timer = window.setTimeout(() => setBirth(saved), 0);
+    return () => window.clearTimeout(timer);
+  }, []);
+  useEffect(() => {
     birthRef.current = birth;
   }, [birth]);
   useEffect(() => {
@@ -133,6 +140,7 @@ export function LoginScreen() {
             try {
               const opened = await enter(answer.credential, birthRef.current);
               if (!opened) return;
+              saveBirth(birthRef.current);
               playSound("door");
               router.push(opened.hasCharacter ? "/character" : "/create");
             } finally {
