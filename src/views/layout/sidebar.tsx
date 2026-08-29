@@ -17,9 +17,13 @@ import { NavIcon } from "../components/app-icon";
 
 function Brand() {
   return (
-    <Link href="/character" className="flex h-16 flex-col justify-center border-b border-edge px-3">
-      <p className="font-logo text-sm uppercase tracking-[0.22em] text-highlight">{GAME_NAME}</p>
-      <p className="mt-0.5 text-[10px] tracking-[0.16em] text-ink-faint">{GAME_TAGLINE}</p>
+    <Link
+      href="/character"
+      className="flex h-16 flex-col justify-center gap-1 border-b border-edge px-3"
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/assets/ui/logo.webp?v=1" alt={GAME_NAME} className="h-6 w-auto self-start" />
+      <p className="text-[10px] tracking-[0.16em] text-ink-faint">{GAME_TAGLINE}</p>
     </Link>
   );
 }

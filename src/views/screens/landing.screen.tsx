@@ -77,10 +77,13 @@ export function LandingScreen() {
   return (
     <div className="flex min-h-screen flex-col">
       <header className="flex min-h-screen flex-col items-center justify-center gap-6 px-4 text-center">
-        <div className="space-y-2">
-          <p className="font-logo text-lg uppercase tracking-[0.22em] text-highlight md:text-2xl">
-            {GAME_NAME}
-          </p>
+        <div className="space-y-3">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/assets/ui/logo.webp?v=1"
+            alt={GAME_NAME}
+            className="mx-auto w-72 max-w-full md:w-96"
+          />
           <p className="text-[11px] uppercase tracking-[0.24em] text-ink-faint">{GAME_TAGLINE}</p>
         </div>
 
