@@ -44,9 +44,3 @@ export async function PATCH(request: Request) {
     return success(current, "", { done, ticks, nextInMs: REST_TICK_MS });
   });
 }
-export async function DELETE(request: Request) {
-  return withGame(request, async (state, _body, context) => {
-    await updateActivity(context.client, context.characterId, null);
-    return success(state, "Você se levanta.", null);
-  });
-}

@@ -136,6 +136,7 @@ export function ArenaScreen() {
   const beatRef = useRef(0);
   const scriptRef = useRef<NarrationLine[]>([]);
   const pendingRef = useRef<ArenaResolution | null>(null);
+  const requestingRef = useRef(false);
   const bledRef = useRef({ last: 0, total: 0 });
   const sufferRef = useRef(sufferBlow);
   const landRef = useRef(landArena);
@@ -182,13 +183,22 @@ export function ArenaScreen() {
         setFighting(null);
       }
     }, HUNT_TICK_MS);
-    return () => window.clearInterval(timer);
+    return () => {
+      window.clearInterval(timer);
+      if (pendingRef.current) {
+        pendingRef.current = null;
+        landRef.current();
+      }
+    };
   }, [fighting]);
   if (!character || !stats) return null;
   const busy = fighting !== null;
   async function challenge(hunterId: string) {
-    if (pendingRef.current || !character) return;
-    const resolution = await challengeArena(hunterId);
+    if (requestingRef.current || pendingRef.current || !character) return;
+    requestingRef.current = true;
+    const resolution = await challengeArena(hunterId).finally(() => {
+      requestingRef.current = false;
+    });
     if (!resolution) return;
     pendingRef.current = resolution;
     scriptRef.current = narrationOf(

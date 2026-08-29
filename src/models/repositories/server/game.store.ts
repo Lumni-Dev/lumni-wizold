@@ -512,19 +512,6 @@ async function saveDiary(
     after.log.map((entry) => entry.id),
   ]);
 }
-export async function markListingsSold(
-  client: PoolClient,
-  soldIds: readonly string[],
-  netCentsById: Readonly<Record<string, number>>,
-): Promise<void> {
-  for (const id of soldIds) {
-    await client.query(
-      `update bazaar_listings set status = 'sold', settled_at = now(), net_cents = $2
-       where id = $1 and status = 'active'`,
-      [id, netCentsById[id] ?? null],
-    );
-  }
-}
 export async function recordWalletMovement(
   client: PoolClient,
   characterId: string,

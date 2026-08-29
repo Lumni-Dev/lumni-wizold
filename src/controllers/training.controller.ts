@@ -53,10 +53,10 @@ export function listExercises(state: GameState): AvailableExercise[] {
       transformed,
       reason: maxed
         ? "Atributo no teto"
-        : !affordable
-          ? "Bronze insuficiente"
-          : !transformed
-            ? "Só a fera treina"
+        : !transformed
+          ? "Só a fera treina"
+          : !affordable
+            ? "Bronze insuficiente"
             : null,
     };
   });
@@ -105,6 +105,10 @@ export function train(state: GameState, exerciseId: string): Result<TrainingRepo
     );
   }
 
+  if (character.form !== "werewolf") {
+    return failure(state, "Só a fera treina. Transforme-se antes de subir no pátio.");
+  }
+
   const cost = trainingSessionCost(character.level, character.attributes[exercise.attribute]);
   if (character.bronze < cost) {
     return failure(
@@ -115,10 +119,6 @@ export function train(state: GameState, exerciseId: string): Result<TrainingRepo
         formatBronze(cost - character.bronze) +
         ".",
     );
-  }
-
-  if (character.form !== "werewolf") {
-    return failure(state, "Só a fera treina. Transforme-se antes de subir no pátio.");
   }
 
   const { character: trained, pointsGained } = applyTrainingProgress(

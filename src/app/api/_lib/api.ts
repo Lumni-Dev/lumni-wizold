@@ -13,6 +13,7 @@ import {
   pruneStale,
   type LoadedTavern,
 } from "@/models/repositories/server/tavern.store";
+import { syncServerMoon } from "./moon";
 import { rateLimit } from "./rate-limit";
 import { sessionUserId } from "./session";
 export interface ApiContext {
@@ -72,7 +73,9 @@ export function refuseAbuse(request: Request): NextResponse | null {
 export async function readBody(request: Request): Promise<Record<string, unknown>> {
   if (request.method === "GET" || request.method === "HEAD") return {};
   try {
-    const parsed: unknown = await request.json();
+    const raw = await request.text();
+    if (raw.length > MAX_BODY_BYTES) return {};
+    const parsed: unknown = JSON.parse(raw);
     return typeof parsed === "object" && parsed !== null ? (parsed as Record<string, unknown>) : {};
   } catch {
     return {};
@@ -92,6 +95,7 @@ export async function withGame<T>(request: Request, action: GameAction<T>): Prom
   const gate = rateLimit((mutating ? "act:" : "read:") + userId, mutating ? 30 : 60, 10000);
   if (!gate.allowed) return tooMany(gate.retryAfterMs);
   const body = await readBody(request);
+  await syncServerMoon();
   try {
     return await withTransaction(async (client) => {
       const loaded = await loadGame(client, userId, request.method !== "GET");
@@ -102,7 +106,7 @@ export async function withGame<T>(request: Request, action: GameAction<T>): Prom
       const context: ApiContext = { client, userId, characterId: loaded.characterId, loaded };
       const result = await action(baseline, body, context);
       if (request.method !== "GET") {
-        await saveGame(client, loaded.characterId, baseline, result.state);
+        await saveGame(client, loaded.characterId, loaded.state, result.state);
       }
       return reply(result);
     });

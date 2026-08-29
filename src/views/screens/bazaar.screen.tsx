@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useGame } from "@/controllers/game.context";
-import { listBoard, listSellable } from "@/controllers/bazaar.controller";
+import { listBoard, listSellable, type BoardEntry } from "@/controllers/bazaar.controller";
+import { api } from "@/controllers/api.client";
 import {
   BAZAAR_FEE_RATIO,
   feeOf,
@@ -56,7 +57,21 @@ export function BazaarScreen() {
   const [flow, setFlow] = useState<Flow | null>(null);
   const [cancelling, setCancelling] = useState<string | null>(null);
 
-  const board = useMemo(() => listBoard(state), [state]);
+  const ownListings = state.bazaarListings;
+  const [board, setBoard] = useState<BoardEntry[]>(() => listBoard(state));
+  useEffect(() => {
+    let alive = true;
+    const load = () =>
+      void api<{ board: BoardEntry[] }>("GET", "/api/bazaar").then((answer) => {
+        if (alive && answer.ok && answer.data) setBoard(answer.data.board);
+      });
+    load();
+    const timer = window.setInterval(load, 30000);
+    return () => {
+      alive = false;
+      window.clearInterval(timer);
+    };
+  }, [ownListings]);
   const sellable = useMemo(() => listSellable(state), [state]);
 
   if (!character) return null;

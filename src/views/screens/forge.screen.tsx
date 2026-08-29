@@ -54,7 +54,7 @@ export function ForgeScreen() {
       const beat = forging.beat + 1;
       playSound("forge");
       if (beat >= FORGE_TICKS) {
-        enhanceRef.current(activeSlot as EquipmentSlot);
+        void enhanceRef.current(activeSlot as EquipmentSlot);
         setForging(null);
         setActivity(autoRef.current.forge ? { kind: "forge", id: activeSlot, paused: true } : null);
       } else {
@@ -95,15 +95,19 @@ export function ForgeScreen() {
       if (swingRef.current > 0) playSound("mine");
 
       if (swingRef.current < MINING_TICKS) return;
-      if (!mineRef.current(activeOre)) {
-        setActivity(autoRef.current.mine ? { kind: "mine", id: activeOre, paused: true } : null);
-        return;
-      }
-      if (!autoRef.current.mine) {
-        swingRef.current = 0;
-        setSwing({ id: activeOre, beat: 0 });
-        setActivity(null);
-      }
+      void mineRef.current(activeOre).then((mined) => {
+        if (!mined) {
+          swingRef.current = 0;
+          setSwing({ id: activeOre, beat: 0 });
+          setActivity(autoRef.current.mine ? { kind: "mine", id: activeOre, paused: true } : null);
+          return;
+        }
+        if (!autoRef.current.mine) {
+          swingRef.current = 0;
+          setSwing({ id: activeOre, beat: 0 });
+          setActivity(null);
+        }
+      });
     }, MINING_TICK_MS);
 
     return () => window.clearInterval(timer);

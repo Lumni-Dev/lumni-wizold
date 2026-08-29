@@ -22,6 +22,7 @@ import {
   PET_MAX_LEVEL,
   PET_PRICE,
   PET_RENAME_PRICE,
+  REST_TICK_MS,
 } from "@/shared/constants/game";
 import { formatNumber, formatBronze } from "@/shared/utils/format";
 import { sanitizeName } from "@/shared/utils/text";
@@ -251,7 +252,9 @@ export function PetScreen() {
                       : pet.name +
                         " recupera " +
                         formatNumber(petRestStep(pet)) +
-                        " de energia por minuto em casa."}
+                        " de energia a cada " +
+                        REST_TICK_MS / 1000 +
+                        " segundos em casa."}
                 </span>
                 {active ? (
                   <Button variant="secondary" onClick={() => setPetActive(false)}>
@@ -296,7 +299,11 @@ export function PetScreen() {
 
           <Panel
             title="Suprimentos"
-            description="O alimento devolve metade do fôlego na hora. Sem ele, o repouso faz o mesmo de graça, num minuto de cada vez."
+            description={
+              "O alimento devolve metade do fôlego na hora. Sem ele, o repouso faz o mesmo de graça, um passo a cada " +
+              REST_TICK_MS / 1000 +
+              " segundos."
+            }
             padding="none"
           >
             {supplies.length === 0 ? (

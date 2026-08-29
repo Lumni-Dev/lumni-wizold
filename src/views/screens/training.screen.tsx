@@ -40,9 +40,18 @@ export function TrainingScreen() {
 
   const autoRef = useRef(state.automation.train);
   const trainRef = useRef(train);
+  const rowProgressRef = useRef(0);
+  const [heldProgress, setHeldProgress] = useState<{ id: string; progress: number } | null>(null);
   useEffect(() => {
     autoRef.current = state.automation.train;
     trainRef.current = train;
+    if (activeExercise === PET_EXERCISE_ID) {
+      rowProgressRef.current = petTraining?.progress ?? 0;
+    } else if (activeExercise) {
+      const entry = exercises.find((candidate) => candidate.exercise.id === activeExercise);
+      const row = progress.find((line) => line.key === entry?.exercise.attribute);
+      rowProgressRef.current = row?.progress ?? 0;
+    }
   });
 
   const petGone = petTraining === null;
@@ -60,20 +69,22 @@ export function TrainingScreen() {
 
       if (beatRef.current === 1) {
         playSound("buy");
-        if (!trainRef.current(activeExercise)) {
+        setHeldProgress({ id: activeExercise, progress: rowProgressRef.current });
+        void trainRef.current(activeExercise).then((trained) => {
+          if (trained) return;
           beatRef.current = 0;
           setSession({ id: activeExercise, beat: 0 });
           setActivity(
             autoRef.current ? { kind: "train", id: activeExercise, paused: true } : null,
           );
-          return;
-        }
+        });
       } else if (beatRef.current > 1) {
         const effort = activeExercise === PET_EXERCISE_ID ? "growl" : activeExercise;
         if (isGameSound(effort)) playSound(effort);
       }
 
       if (beatRef.current < TRAINING_TICKS) return;
+      setHeldProgress(null);
       if (!autoRef.current) {
         beatRef.current = 0;
         setSession({ id: activeExercise, beat: 0 });
@@ -161,7 +172,11 @@ export function TrainingScreen() {
                   {row ? (
                     <Bar
                       label="Progresso"
-                      current={row.progress}
+                      current={
+                        active && heldProgress?.id === exercise.id
+                          ? heldProgress.progress
+                          : row.progress
+                      }
                       maximum={row.needed}
                       wraps
                       className="mt-auto"
@@ -234,7 +249,11 @@ export function TrainingScreen() {
 
                 <Bar
                   label="Progresso"
-                  current={petTraining.progress}
+                  current={
+                    petActive && heldProgress?.id === PET_EXERCISE_ID
+                      ? heldProgress.progress
+                      : petTraining.progress
+                  }
                   maximum={petTraining.needed}
                   wraps
                   className="mt-auto"

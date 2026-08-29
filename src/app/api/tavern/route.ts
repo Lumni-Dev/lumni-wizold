@@ -13,9 +13,6 @@ async function board(request: Request) {
     });
   });
 }
-export async function GET(request: Request) {
-  return board(request);
-}
 export async function POST(request: Request) {
   return board(request);
 }

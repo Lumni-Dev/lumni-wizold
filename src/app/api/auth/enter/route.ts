@@ -12,7 +12,7 @@ import { attachSession } from "../../_lib/session";
 export async function POST(request: Request) {
   const refused = refuseAbuse(request);
   if (refused) return refused;
-  const gate = rateLimit("enter:" + clientIp(request), 20, 300000);
+  const gate = rateLimit("enter:" + clientIp(request), 10, 300000);
   if (!gate.allowed) {
     const response = bad("Muitas tentativas. Espere um pouco antes de entrar de novo.", 429);
     response.headers.set("retry-after", String(Math.ceil(gate.retryAfterMs / 1000)));

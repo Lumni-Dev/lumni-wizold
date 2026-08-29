@@ -6,10 +6,6 @@ export interface BirthDate {
 
 export const EMPTY_BIRTH: BirthDate = { day: "", month: "", year: "" };
 
-export function digitsOnly(value: string, maximum: number): string {
-  return value.replace(/\D/g, "").slice(0, maximum);
-}
-
 function parsed(birth: BirthDate): Date | null {
   const day = Number(birth.day);
   const month = Number(birth.month);

@@ -21,7 +21,7 @@ import {
   servesPet,
 } from "@/models/rules/pet";
 import type { TrainingEffort } from "@/models/rules/training";
-import { capitalizeName, validateName } from "./character.controller";
+import { capitalizeName, syncCharacter, validateName } from "./character.controller";
 import { countInInventory, removeFromInventory } from "./inventory.controller";
 import { addLog } from "./log.controller";
 
@@ -48,11 +48,11 @@ export function adoptPet(state: GameState, gender: PetGender, name: string): Res
     adoptedAt: new Date().toISOString(),
   };
 
-  const next: GameState = {
+  const next: GameState = syncCharacter({
     ...state,
     character: { ...character, bronze: character.bronze - PET_PRICE },
     pet,
-  };
+  });
 
   const message = pet.name + " agora caça com você. Treine para o lobo render na caçada.";
   return success(addLog(next, "character", message), message);
@@ -65,7 +65,7 @@ export function setPetActive(state: GameState, active: boolean): Result {
     return failure(state, pet.name + (active ? " já está na caçada." : " já está fora da caçada."));
   }
 
-  const next: GameState = { ...state, pet: { ...pet, active } };
+  const next: GameState = syncCharacter({ ...state, pet: { ...pet, active } });
   const message = active
     ? pet.name + " se levanta e volta a caçar com você."
     : pet.name + " fica de fora das próximas caçadas.";
@@ -144,10 +144,10 @@ export function petTrainingView(state: GameState): PetTrainingView | null {
     transformed,
     reason: maxed
       ? "Mascote no teto"
-      : !affordable
-        ? "Bronze insuficiente"
-        : !transformed
-          ? "Só a fera treina"
+      : !transformed
+        ? "Só a fera treina"
+        : !affordable
+          ? "Bronze insuficiente"
           : null,
   };
 }
@@ -164,6 +164,10 @@ export function trainPet(state: GameState): Result<{ leveled: boolean }> {
     return failure(state, pet.name + " já está no teto de NV. " + PET_MAX_LEVEL + ".");
   }
 
+  if (character.form !== "werewolf") {
+    return failure(state, "Só a fera treina. Transforme-se antes de subir no pátio.");
+  }
+
   const cost = petTrainingSessionCost(level, character.level);
   if (character.bronze < cost) {
     return failure(
@@ -176,17 +180,13 @@ export function trainPet(state: GameState): Result<{ leveled: boolean }> {
     );
   }
 
-  if (character.form !== "werewolf") {
-    return failure(state, "Só a fera treina. Transforme-se antes de subir no pátio.");
-  }
-
   const { pet: grown, leveled } = growPet(pet, petTrainingEffort(level));
 
-  const next: GameState = {
+  const next: GameState = syncCharacter({
     ...state,
     character: { ...character, bronze: character.bronze - cost },
     pet: grown,
-  };
+  });
 
   const message = leveled
     ? pet.name + " termina a sessão maior do que entrou: NV. " + petLevelOf(grown) + "."
@@ -204,7 +204,7 @@ export function restPetTick(state: GameState): Result<{ whole: boolean }> {
   const whole = isPetWhole(rested);
   const message = whole ? rested.name + " está de pé, inteiro e pronto." : "";
 
-  return success({ ...state, pet: rested }, message, { whole });
+  return success(syncCharacter({ ...state, pet: rested }), message, { whole });
 }
 
 export function releasePet(state: GameState): Result {
@@ -214,7 +214,7 @@ export function releasePet(state: GameState): Result {
   const pet = state.pet;
   if (!pet) return failure(state, "Você não tem mascote para soltar.");
 
-  const next: GameState = { ...state, pet: null };
+  const next: GameState = syncCharacter({ ...state, pet: null });
 
   const message = pet.name + " foi solto e parte sem olhar para trás.";
   return success(addLog(next, "character", message), message);
@@ -237,11 +237,11 @@ export function feedPet(state: GameState, itemId: string): Result {
   }
 
   const fed = restPet(pet, energy);
-  const next: GameState = {
+  const next: GameState = syncCharacter({
     ...state,
     pet: fed,
     inventory: removeFromInventory(state.inventory, itemId, 1),
-  };
+  });
 
   const woke = !isPetAwake(pet) && isPetAwake(fed);
   const message = woke

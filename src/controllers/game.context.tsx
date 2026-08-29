@@ -21,6 +21,7 @@ import { moonRepository } from "@/models/repositories/moon.repository";
 import type { MoonState } from "@/models/rules/moon";
 import { AUTOMATION_TICK_MS, PET_EXERCISE_ID, REST_TICK_MS } from "@/shared/constants/game";
 import { formatReais } from "@/shared/utils/format";
+import { petLevelOf, petMaxEnergy } from "@/models/rules/pet";
 import { deriveStats, type DerivedStats } from "@/models/rules/stats";
 import type { BirthDate } from "@/shared/utils/birth";
 import type { TavernIdentity } from "@/models/entities/tavern";
@@ -235,7 +236,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
     const saved = activityRepository.load();
     if (saved && stateRef.current.character) setActivityState(saved);
   }, [ready]);
-  const petResting = state.pet !== null && state.pet.active === false;
+  const petResting =
+    state.pet !== null &&
+    state.pet.active === false &&
+    state.pet.energy < petMaxEnergy(petLevelOf(state.pet));
   useEffect(() => {
     if (!ready || !petResting) return;
     const collect = () =>
@@ -331,14 +335,17 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const character = state.character;
   useEffect(() => {
     if (!ready || !character || character.form !== "werewolf") return;
-    const timer = window.setTimeout(() => {
-      announce(
-        "A fúria se esgota. " + character.name + " volta à forma humana.",
-        true,
-        "Personagem",
-      );
-      void request("POST", "/api/state");
-    }, characterController.transformationRemainingMs(character));
+    const timer = window.setTimeout(
+      () => {
+        announce(
+          "A fúria se esgota. " + character.name + " volta à forma humana.",
+          true,
+          "Personagem",
+        );
+        void request("POST", "/api/state");
+      },
+      Math.max(5000, characterController.transformationRemainingMs(character)),
+    );
     return () => window.clearTimeout(timer);
   }, [ready, character, request, announce]);
   useEffect(() => {
@@ -626,6 +633,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         await act("POST", "/api/pet/release", undefined, "Mascote", () => playSound("beast"));
       },
       setAutomation: (key, on) => {
+        const previous = stateRef.current.automation[key];
         setState((current) => ({
           ...current,
           automation: { ...current.automation, [key]: on },
@@ -635,7 +643,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
           if (!answer.ok) {
             setState((current) => ({
               ...current,
-              automation: { ...current.automation, [key]: !on },
+              automation: { ...current.automation, [key]: previous },
             }));
             announce(answer.message, false, "Automação");
           }

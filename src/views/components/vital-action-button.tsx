@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { transformationRemainingMs } from "@/controllers/character.controller";
 import { useGame } from "@/controllers/game.context";
 import type { Character } from "@/models/entities/character";
-import { TRANSFORM_DURATION_MS, TRANSFORM_RAGE_COST } from "@/shared/constants/game";
+import { REST_TICK_MS, TRANSFORM_DURATION_MS, TRANSFORM_RAGE_COST } from "@/shared/constants/game";
 import { Button } from "./button";
 import { RecoveryButton } from "./recovery-button";
 import { Tooltip } from "./tooltip";
@@ -20,13 +20,17 @@ interface VitalAction {
 
 function TransformCountdown({ character }: { character: Character }) {
   const [remaining, setRemaining] = useState(() => transformationRemainingMs(character));
+  const characterRef = useRef(character);
+  useEffect(() => {
+    characterRef.current = character;
+  });
 
   useEffect(() => {
     const timer = window.setInterval(() => {
-      setRemaining(transformationRemainingMs(character));
+      setRemaining(transformationRemainingMs(characterRef.current));
     }, 1000);
     return () => window.clearInterval(timer);
-  }, [character]);
+  }, []);
 
   const seconds = Math.ceil(remaining / 1000);
   const pad = (value: number) => value.toString().padStart(2, "0");
@@ -63,7 +67,10 @@ export function VitalActionButton({ size = "medium" }: { size?: "small" | "mediu
       actions.push({
         key: "rest",
         label: "Recuperar-se",
-        title: "Recolhe a fera e recupera o corpo a cada minuto: a besta não dorme.",
+        title:
+          "Recolhe a fera e recupera um décimo do corpo a cada " +
+          REST_TICK_MS / 1000 +
+          " segundos: a besta não dorme.",
         variant: "outline",
         disabled: false,
         run: rest,
@@ -76,7 +83,9 @@ export function VitalActionButton({ size = "medium" }: { size?: "small" | "mediu
         beat={character.health + "-" + character.rage}
         recoveringLabel="Recuperando-se..."
         label="Recuperar-se"
-        tooltip="O corpo se recompõe a cada minuto. Clique para interromper."
+        tooltip={
+          "O corpo se recompõe a cada " + REST_TICK_MS / 1000 + " segundos. Clique para interromper."
+        }
         onClick={() => setActivity(null)}
       />
     );
@@ -99,7 +108,10 @@ export function VitalActionButton({ size = "medium" }: { size?: "small" | "mediu
       actions.push({
         key: "rest",
         label: "Recuperar-se",
-        title: "Para todas as atividades e recupera o corpo a cada minuto.",
+        title:
+          "Para todas as atividades e recupera um décimo do corpo a cada " +
+          REST_TICK_MS / 1000 +
+          " segundos.",
         variant: "outline",
         disabled: false,
         run: rest,

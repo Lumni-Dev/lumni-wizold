@@ -315,10 +315,10 @@ export function HuntScreen() {
             {pet ? (
               <Tag tone="neutral">
                 {petAlong
-                  ? pet.name + " acompanhando"
+                  ? "Mascote acompanhando"
                   : pet.energy <= 0
-                    ? pet.name + " sem fôlego"
-                    : pet.name + " em casa"}
+                    ? "Mascote sem fôlego"
+                    : "Mascote em casa"}
               </Tag>
             ) : null}
             <Tag tone="neutral">{formatBronze(character.bronze)}</Tag>
@@ -449,7 +449,7 @@ export function HuntScreen() {
                   {active && petAlong ? (
                     <div className="px-4 py-3">
                       <Bar
-                        label={petAlong.name + " · Energia"}
+                        label="Mascote · Energia"
                         current={petAlong.energy}
                         maximum={petMaxEnergy(petLevelOf(petAlong))}
                         tone="vigor"
@@ -484,7 +484,7 @@ export function HuntScreen() {
                   <span className="text-[11px] text-ink-faint">
                     {active
                       ? petAlong
-                        ? "Caçando com " + petAlong.name + "..."
+                        ? "Caçando com o mascote..."
                         : state.automation.hunt
                           ? "Caçando sem parar..."
                           : "Caçando..."

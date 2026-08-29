@@ -63,6 +63,9 @@ export async function fulfillSession(
 
   const loaded = await loadGame(client, userId, true);
   if (!loaded || loaded.characterId !== characterId) {
+    if (!(await claim(client, session))) {
+      return { ok: true, message: "Pagamento já tratado." };
+    }
     if (session.payment_intent) await refundPayment(session.payment_intent);
     return { ok: false, message: "A partida deste pagamento não existe mais: valor devolvido." };
   }
