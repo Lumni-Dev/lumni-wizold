@@ -15,7 +15,7 @@ import { EmptyState } from "../components/empty-state";
 import { AttributeIcon } from "../components/attribute-icon";
 import { GenderBanner } from "../components/gender-icon";
 import { IconFrame } from "../components/icon-frame";
-import { PetIcon } from "../components/pet-icon";
+import { PetBanner } from "../components/pet-icon";
 import { ItemIcon } from "../components/item-icon";
 import { List, ListRow, RowText } from "../components/list";
 import { Panel } from "../components/panel";
@@ -99,9 +99,9 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
           </Panel>
 
           <Panel title="Mascote" padding="none">
+            {wolf && hunter.pet ? <PetBanner gender={hunter.pet.gender} /> : null}
             {wolf && hunter.pet ? (
               <div className="flex items-center gap-3 p-4">
-                <PetIcon gender={hunter.pet.gender} size="large" />
                 <div className="min-w-0 space-y-2">
                   <div>
                     <p className="truncate text-sm text-ink">{hunter.pet.name}</p>

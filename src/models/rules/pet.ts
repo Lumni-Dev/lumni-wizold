@@ -39,6 +39,14 @@ export function petTrainingEffort(level: number): number {
   return Math.max(1, Math.round(petTrainingNeeded(level) / 5));
 }
 
+export function petTrainingSessionCost(level: number, hunterLevel: number): number {
+  const sessions = Math.max(
+    1,
+    Math.ceil(petTrainingNeeded(level) / petTrainingEffort(level)),
+  );
+  return Math.max(1, Math.round(petTrainingPointCost(level, hunterLevel) / sessions));
+}
+
 export const PET_HUNT_SHARE = 0.35;
 
 export function petHuntEffort(level: number): number {

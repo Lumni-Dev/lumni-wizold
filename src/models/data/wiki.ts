@@ -180,7 +180,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "Treinar acumula progresso: o próximo ponto custa 10 + valor atual x 4.",
       "Um exercício por atributo, e o rendimento da sessão cresce junto com o nível: um ponto fica perto de cinco sessões a corrida inteira.",
       "Só a fera treina: em forma humana o pátio recusa a sessão, a sua e a do lobo. Transforme-se antes de subir.",
-      "O ponto é pago adiantado, na primeira sessão: custa o que três caçadas da sua faixa pagam, do primeiro nível ao último, e as sessões seguintes enchem a barra de graça até fechar. É a caça que paga o corpo, sempre.",
+      "Cada treino é pago na hora: o ponto inteiro custa o que três caçadas da sua faixa pagam, fatiado pelas sessões que ele pede, e toda volta da barra começa cobrando a sua fatia. É a caça que paga o corpo, sempre.",
       "Equipamento soma por cima do teto: o limite vale para o valor treinado.",
     ],
   },
@@ -271,7 +271,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "O lobo sobe o próprio nível, até " +
         PET_MAX_LEVEL +
         ": cada nível soma 1 de Força, 1 de Agilidade e 1 de Instinto ao que ele empresta.",
-      "São dois caminhos para a mesma barra: a sessão no pátio, com o nível pago adiantado na primeira, e a caçada ao seu lado, que rende " +
+      "São dois caminhos para a mesma barra: a sessão no pátio, paga a cada treino, e a caçada ao seu lado, que rende " +
         Math.round(PET_HUNT_SHARE * 100) +
         "% de uma sessão. São cinco sessões por nível, ou cerca de quatorze caçadas.",
       "A experiência dele só entra acompanhando: em repouso ele não arrisca nada, não empresta nada e não aprende nada.",
