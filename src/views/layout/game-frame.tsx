@@ -1,8 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
 import { useGame } from "@/controllers/game.context";
+import { useTavernAlert } from "@/controllers/use-tavern-alert";
 import { Spinner } from "../components/spinner";
 import { GameFooter } from "./game-footer";
 import { Toast } from "./toast";
@@ -21,6 +22,8 @@ function Loading() {
 export function GameFrame({ children }: { children: ReactNode }) {
   const { ready, character } = useGame();
   const router = useRouter();
+  const pathname = usePathname();
+  useTavernAlert(!pathname.startsWith("/tavern"));
 
   useEffect(() => {
     if (ready && !character) router.replace("/");
