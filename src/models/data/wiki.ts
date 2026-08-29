@@ -1,6 +1,7 @@
 import { formatReais } from "@/shared/utils/format";
 import {
   ENHANCEMENT_STEP,
+  FORGE_SUCCESS_RATIO,
   MAX_ENHANCEMENT,
   RAGE_CRITICAL_DAMAGE_BONUS,
   MINING_CYCLE_MS,
@@ -255,6 +256,9 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "Cada nível soma um ponto em cada atributo da peça, mais " +
         (ENHANCEMENT_STEP * 100).toFixed(1).replace(".", ",") +
         "% do valor original. Em +1000 a peça vale três vezes o que valia.",
+      "A bigorna acerta " +
+        Math.round(FORGE_SUCCESS_RATIO * 100) +
+        "% das marteladas. Quando falha, os fragmentos se perdem e a peça segue como está: o risco faz parte do preço.",
       "O teto é +" + MAX_ENHANCEMENT + ", e o nível fica com a peça, não com o espaço.",
     ],
   },
@@ -330,7 +334,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         ARENA_COOLDOWN_HOURS +
         " horas antes de aceitar outro desafio seu.",
       "Só a fera desce ao fosso: sem se transformar a arena recusa o duelo, e os dois lutam com a Força da fera.",
-      "Os lobos ficam de fora: o duelo é entre os dois que desceram.",
+      "O mascote desce junto: ativo e com fôlego, ele morde no duelo como na caçada, o seu e o do rival. Só o seu gasta energia aqui; o do rival se cansa nos duelos do próprio dono.",
       "O fosso não paga experiência: quem sobe de nível é quem caça. O que se ganha aqui é a bolsa do outro.",
       "Quem vence tira da bolsa do vencido o que " +
         ARENA_SPOILS_MIN_HUNTS +

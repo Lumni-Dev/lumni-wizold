@@ -3,6 +3,8 @@ import {
   PET_BASE_BONUS,
   PET_BASE_ENERGY,
   PET_REST_RATIO,
+  PET_ENERGY_PER_BLOW,
+  PET_ENERGY_PER_HUNT,
   PET_ENERGY_PER_LEVEL,
   PET_MAX_LEVEL,
 } from "@/shared/constants/game";
@@ -21,6 +23,14 @@ export function isPetActive(pet: Pet | null | undefined): boolean {
 
 export function isPetHunting(pet: Pet | null | undefined): pet is Pet {
   return isPetAwake(pet) && isPetActive(pet);
+}
+
+export function petShortOfBreath(pet: Pet): boolean {
+  return pet.energy < PET_ENERGY_PER_HUNT + PET_ENERGY_PER_BLOW;
+}
+
+export function canPetFight(pet: Pet | null | undefined): pet is Pet {
+  return isPetHunting(pet) && !petShortOfBreath(pet);
 }
 
 export function petLevelOf(pet: Pet | null | undefined): number {

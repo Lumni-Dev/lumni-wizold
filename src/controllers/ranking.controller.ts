@@ -48,7 +48,14 @@ function playerAsHunter(state: GameState): Hunter | null {
     losses: character.losses,
     arena: character.arenaWins,
     bronze: character.bronze,
-    pet: state.pet ? { name: state.pet.name, gender: state.pet.gender } : null,
+    pet: state.pet
+      ? {
+          name: state.pet.name,
+          gender: state.pet.gender,
+          energy: state.pet.energy,
+          active: state.pet.active !== false,
+        }
+      : null,
     equipment: state.equipment,
     enhancements: state.enhancements ?? {},
     forge: EQUIPMENT_SLOTS.reduce((total, slot) => {

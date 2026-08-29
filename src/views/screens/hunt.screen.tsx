@@ -9,7 +9,7 @@ import { petLevelOf, petMaxEnergy } from "@/models/rules/pet";
 import { emphasizeDamage, narrationOf, type NarrationLine } from "../presenters/hunt.presenter";
 import { SPECIES_LABEL } from "@/models/entities/creature";
 import { DANGER_LABEL } from "@/models/entities/territory";
-import { isPetHunting } from "@/models/rules/pet";
+import { canPetFight, isPetActive } from "@/models/rules/pet";
 import { HUNT_TICK_MS, HUNT_TICKS } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
 import { formatNumber, formatBronze } from "@/shared/utils/format";
@@ -155,7 +155,7 @@ export function HuntScreen() {
   const paused = activity?.paused === true;
   const activeId = activity?.kind === "hunt" && !paused ? (activity.id ?? null) : null;
   const waitingId = activity?.kind === "hunt" && paused ? (activity.id ?? null) : null;
-  const petAlong = isPetHunting(pet) ? pet : null;
+  const petAlong = canPetFight(pet) ? pet : null;
   const [report, setReport] = useState<HuntReport | null>(null);
   const [reportLines, setReportLines] = useState<NarrationLine[]>([]);
   const [session, setSession] = useState<HuntSession>(EMPTY_SESSION);
@@ -325,7 +325,7 @@ export function HuntScreen() {
               <Tag tone="neutral">
                 {petAlong
                   ? "Mascote acompanhando"
-                  : pet.energy <= 0
+                  : isPetActive(pet)
                     ? "Mascote sem fôlego"
                     : "Mascote em casa"}
               </Tag>

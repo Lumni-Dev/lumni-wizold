@@ -6,6 +6,8 @@ import type { PetGender } from "./pet";
 export interface HunterPet {
   name: string;
   gender: PetGender;
+  energy: number;
+  active: boolean;
 }
 
 export interface Hunter {

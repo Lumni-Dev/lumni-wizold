@@ -13,7 +13,7 @@ import type { Territory } from "@/models/entities/territory";
 import { simulateCombat, type CombatOutcome } from "@/models/rules/combat";
 import {
   growPet,
-  isPetHunting,
+  canPetFight,
   petHuntEffort,
   petLevelOf,
   spendPetEnergy,
@@ -156,7 +156,7 @@ export function resolveHunt(
   const creature = scaledPrey(territory, character.level);
   if (!creature) return failure(state, "A trilha não levou a nada.");
 
-  const petJoining = isPetHunting(state.pet) ? state.pet : null;
+  const petJoining = canPetFight(state.pet) ? state.pet : null;
   const combat = simulateCombat({
     characterName: character.name,
     currentHealth: character.health,
@@ -200,7 +200,7 @@ export function landHunt(
   const tired =
     state.pet && combat.petSpent > 0 ? spendPetEnergy(state.pet, combat.petSpent) : state.pet;
 
-  const along = isPetHunting(state.pet);
+  const along = canPetFight(state.pet);
   const grown = along && tired ? growPet(tired, petHuntEffort(petLevelOf(tired))) : null;
   const pet = grown ? grown.pet : tired;
 

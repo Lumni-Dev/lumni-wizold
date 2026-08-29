@@ -1,5 +1,5 @@
-import { MAX_ENHANCEMENT } from "@/shared/constants/game";
-import { defaultRandom, intBetween, type Random } from "@/shared/utils/random";
+import { FORGE_SUCCESS_RATIO, MAX_ENHANCEMENT } from "@/shared/constants/game";
+import { chance, defaultRandom, intBetween, type Random } from "@/shared/utils/random";
 import { ATTRIBUTES, type AttributeKey } from "@/models/entities/attribute";
 import { findItem } from "@/models/data/items";
 import type { GameState } from "@/models/entities/game-state";
@@ -161,7 +161,11 @@ export function listForge(state: GameState): ForgeSlot[] {
   });
 }
 
-export function enhance(state: GameState, slot: EquipmentSlot): Result {
+export function enhance(
+  state: GameState,
+  slot: EquipmentSlot,
+  random: Random = defaultRandom,
+): Result<{ raised: boolean }> {
   const character = state.character;
   if (!character) return failure(state, "Nenhum personagem ativo.");
 
@@ -188,12 +192,17 @@ export function enhance(state: GameState, slot: EquipmentSlot): Result {
     );
   }
 
+  const struck = chance(FORGE_SUCCESS_RATIO, random);
   const next: GameState = {
     ...state,
     inventory: removeFromInventory(state.inventory, fragment.id, cost),
-    enhancements: { ...state.enhancements, [itemId]: level + 1 },
+    enhancements: struck ? { ...state.enhancements, [itemId]: level + 1 } : state.enhancements,
   };
 
-  const message = item.name + " sai da bigorna em +" + (level + 1) + ".";
-  return success(addLog(next, "system", message), message);
+  const message = struck
+    ? item.name + " sai da bigorna em +" + (level + 1) + "."
+    : "A martelada falha e os fragmentos se perdem: " +
+      item.name +
+      (level > 0 ? " segue em +" + level + "." : " segue como estava.");
+  return success(addLog(next, "system", message), message, { raised: struck });
 }

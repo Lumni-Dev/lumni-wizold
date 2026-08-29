@@ -162,6 +162,7 @@ export function ArenaScreen() {
       setBeat(beatRef.current);
       const line = scriptRef.current[Math.min(beatRef.current, scriptRef.current.length) - 1];
       if (line?.blow === "ours") playSound(line.critical ? "crit" : "hit");
+      if (line?.blow === "pet") playSound("snap");
       if (line?.blow === "theirs") playSound("hurt");
       if (pendingRef.current && line?.characterHealth !== undefined) {
         const delta = bledRef.current.last - line.characterHealth;
@@ -228,7 +229,7 @@ export function ArenaScreen() {
     <>
       <PageHeader
         title="Arena"
-        description="O fosso onde um lobisomem desafia outro. Sem lobos, sem presas: só os dois, transformados."
+        description="O fosso onde um lobisomem desafia outro, transformados os dois. Mascote ativo e com fôlego desce junto, o seu e o do rival."
         action={
           <div className="flex items-center gap-2">
             {pet ? <Tag tone="neutral">{pet.name + " fica fora do fosso"}</Tag> : null}

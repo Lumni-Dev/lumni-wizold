@@ -618,7 +618,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
         return answer.ok;
       },
       enhance: async (slot) => {
-        const answer = await act("POST", "/api/forge", { slot }, "Bigorna");
+        const answer = await act<{ raised: boolean }>(
+          "POST",
+          "/api/forge",
+          { slot },
+          "Bigorna",
+          (data) => playSound(data?.raised ? "point" : "denied"),
+        );
         return answer.ok;
       },
       adoptPet: async (gender, name) => {

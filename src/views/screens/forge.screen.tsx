@@ -227,12 +227,14 @@ export function ForgeScreen() {
               return (
                 <ListRow key={entry.slot} layout="column" padding="art">
                   <div className="flex items-center gap-3">
-                    {entry.item ? <ItemIcon item={entry.item} /> : <IconFrame>--</IconFrame>}
+                    {entry.item ? (
+                      <ItemIcon item={entry.item} enhancement={entry.level} />
+                    ) : (
+                      <IconFrame>--</IconFrame>
+                    )}
                     {entry.item ? (
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm text-ink">
-                          {enhancedName(entry.item.name, entry.level)}
-                        </p>
+                        <p className="truncate text-sm text-ink">{entry.item.name}</p>
                         {entry.fragment && !maxed ? (
                           <p className="font-mono text-[11px] text-ink-soft">
                             {formatNumber(entry.owned)} / {formatNumber(entry.cost)}{" "}

@@ -19,6 +19,7 @@ import {
   type SpoilsRange,
 } from "@/models/rules/arena";
 import { simulateCombat, type CombatOpponent, type CombatOutcome } from "@/models/rules/combat";
+import { canPetFight, spendPetEnergy } from "@/models/rules/pet";
 import { deriveStats, type DerivedStats } from "@/models/rules/stats";
 import { syncCharacter } from "./character.controller";
 import { addLog } from "./log.controller";
@@ -200,13 +201,16 @@ export function resolveArena(
     return failure(state, "Vida baixa demais para subir na arena. Recupere-se ou use uma poção.");
   }
   const foe = arenaCombatant(hunter);
+  const ally = canPetFight(state.pet) ? state.pet : null;
+  const foePet = hunter.pet && hunter.pet.active && hunter.pet.energy > 0 ? hunter.pet : null;
   const combat = simulateCombat({
     characterName: character.name,
     currentHealth: character.health,
     currentRage: character.rage,
     stats,
     creature: foe,
-    pet: null,
+    pet: ally ? { name: ally.name, energy: ally.energy } : null,
+    foePet: foePet ? { name: foePet.name, energy: foePet.energy } : null,
     random,
   });
   return success<ArenaResolution>(state, "", {
@@ -240,6 +244,7 @@ export function landArena(
   let next: GameState = {
     ...state,
     arenaDuels: duels,
+    pet: state.pet && combat.petSpent > 0 ? spendPetEnergy(state.pet, combat.petSpent) : state.pet,
     character: {
       ...character,
       form: lost ? "human" : character.form,

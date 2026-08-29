@@ -61,6 +61,7 @@ interface CombatInput {
   stats: DerivedStats;
   creature: CombatOpponent;
   pet?: CombatPet | null;
+  foePet?: CombatPet | null;
   random?: Random;
 }
 
@@ -130,6 +131,7 @@ export function simulateCombat({
   stats,
   creature,
   pet = null,
+  foePet = null,
   random = defaultRandom,
 }: CombatInput): CombatOutcome {
   const criticalChance = stats.critical;
@@ -151,6 +153,15 @@ export function simulateCombat({
   let petSpent = petFighting ? PET_ENERGY_PER_HUNT : 0;
   const petCanBite = () =>
     petFighting && pet !== null && petSpent + PET_ENERGY_PER_BLOW <= pet.energy;
+
+  const foePetStrength = Math.max(1, Math.round(creature.strength * PET_ATTACK_RATIO));
+  let foePetFighting =
+    foePet !== null &&
+    foePet !== undefined &&
+    foePet.energy >= PET_ENERGY_PER_HUNT + PET_ENERGY_PER_BLOW;
+  let foePetSpent = foePetFighting ? PET_ENERGY_PER_HUNT : 0;
+  const foePetCanBite = () =>
+    foePetFighting && foePet !== null && foePetSpent + PET_ENERGY_PER_BLOW <= foePet.energy;
 
   const characterStarts = stats.totalAttributes.agility >= creature.agility;
 
@@ -244,6 +255,49 @@ export function simulateCombat({
     });
   };
 
+  const foePetBlow = () => {
+    if (!foePet) return;
+    index += 1;
+    foePetSpent += PET_ENERGY_PER_BLOW;
+
+    if (chance(stats.dodge / 100, random)) {
+      rounds.push({
+        index,
+        author: "creature",
+        damage: 0,
+        critical: false,
+        dodged: true,
+        characterHealth,
+        creatureHealth,
+        text: characterName + " escapa do bote de " + foePet.name + ".",
+      });
+      return;
+    }
+
+    const critical = chance(PET_CRITICAL_CHANCE / 100, random);
+    const damage = calculateDamage(foePetStrength, endurance, critical, random);
+    characterHealth = Math.max(0, characterHealth - damage);
+    damageTaken += damage;
+
+    rounds.push({
+      index,
+      author: "creature",
+      damage,
+      critical,
+      dodged: false,
+      characterHealth,
+      creatureHealth,
+      text:
+        foePet.name +
+        pickOne(PET_HIT_VERBS, random) +
+        characterName +
+        " causando " +
+        damage +
+        " de dano" +
+        (critical ? " crítico." : "."),
+    });
+  };
+
   const creatureBlow = () => {
     index += 1;
 
@@ -324,12 +378,29 @@ export function simulateCombat({
       });
     }
 
+    if (foePetFighting && foePet && !foePetCanBite()) {
+      foePetFighting = false;
+      index += 1;
+      rounds.push({
+        index,
+        author: "creature",
+        damage: 0,
+        critical: false,
+        dodged: false,
+        characterHealth,
+        creatureHealth,
+        text: foePet.name + " recua ofegante, sem fôlego para seguir na luta.",
+      });
+    }
+
     if (characterStarts) {
       characterBlow();
       if (creatureHealth > 0 && petCanBite()) petBlow();
       if (creatureHealth > 0) creatureBlow();
+      if (characterHealth > 0 && creatureHealth > 0 && foePetCanBite()) foePetBlow();
     } else {
       creatureBlow();
+      if (characterHealth > 0 && foePetCanBite()) foePetBlow();
       if (characterHealth > 0) characterBlow();
       if (characterHealth > 0 && creatureHealth > 0 && petCanBite()) petBlow();
     }

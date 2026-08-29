@@ -647,6 +647,49 @@ sec("arena");
     );
     ok("vitória mantém a fera de pé", winner.state.character.form === "werewolf");
   }
+  const allyPet = {
+    id: "pet",
+    name: "Lobo",
+    gender: "male",
+    energy: 100,
+    active: true,
+    level: 1,
+    trainingProgress: 0,
+    adoptedAt: new Date().toISOString(),
+  };
+  const packState = { ...inBand, pet: allyPet };
+  const rivalWithWolf = {
+    ...rival,
+    pet: { name: "Brasa", gender: "female", energy: 100, active: true },
+  };
+  const packDuel = arenaCtrl.resolveArena(
+    packState,
+    [rivalWithWolf, pit[1]],
+    rival.id,
+    seededRandom(11),
+  );
+  ok("mascote do desafiante morde no fosso", packDuel.ok && packDuel.data.combat.petSpent > 0);
+  ok(
+    "mascote do rival morde no fosso",
+    packDuel.ok && packDuel.data.combat.rounds.some((round) => round.text.includes("Brasa")),
+  );
+  if (packDuel.ok) {
+    const packLanded = arenaCtrl.landArena(packState, packDuel.data, 0);
+    ok(
+      "fôlego do mascote pousa no duelo",
+      packLanded.state.pet.energy ===
+        clamp(100 - packDuel.data.combat.petSpent, 0, petRules.petMaxEnergy(1)),
+    );
+  }
+  const breathless = {
+    ...packState,
+    pet: { ...allyPet, energy: CONST.PET_ENERGY_PER_HUNT + CONST.PET_ENERGY_PER_BLOW - 1 },
+  };
+  const soloDuel = arenaCtrl.resolveArena(breathless, pit, rival.id, seededRandom(12));
+  ok(
+    "lobo sem fôlego fica fora do fosso",
+    soloDuel.ok && soloDuel.data.combat.petSpent === 0 && soloDuel.data.combat.petBlows === 0,
+  );
 }
 sec("caçada");
 {
@@ -730,6 +773,22 @@ sec("caçada");
     ok(
       "o lobo que caça aprende",
       landed.state.pet.trainingProgress > 0 || landed.state.pet.level > 1,
+    );
+  }
+  const shortWind = {
+    ...withPet,
+    pet: { ...withPet.pet, energy: CONST.PET_ENERGY_PER_HUNT + CONST.PET_ENERGY_PER_BLOW - 1 },
+  };
+  const shortHunt = huntCtrl.resolveHunt(shortWind, "village-field", seededRandom(6));
+  ok(
+    "lobo sem fôlego fica fora da caçada",
+    shortHunt.ok && shortHunt.data.combat.petSpent === 0 && shortHunt.data.combat.petBlows === 0,
+  );
+  if (shortHunt.ok) {
+    const shortLanded = huntCtrl.landHunt(shortWind, shortHunt.data, 0);
+    ok(
+      "lobo fora da luta não aprende",
+      shortLanded.state.pet.trainingProgress === 0 && shortLanded.state.pet.level === 1,
     );
   }
   const homePet = { ...withPet, pet: { ...withPet.pet, active: false } };
@@ -914,12 +973,24 @@ sec("forja e mina");
   state.equipment.claw = "bronze-claw";
   state.enhancements["bronze-claw"] = 4;
   state.inventory = [...state.inventory, { itemId: "bronze-fragment", quantity: 10 }];
-  const enhanced = forgeCtrl.enhance(state, "claw");
-  ok("forja sobe um nível", enhanced.ok && enhanced.state.enhancements["bronze-claw"] === 5);
+  const enhanced = forgeCtrl.enhance(state, "claw", () => 0);
+  ok("martelada certeira sobe um nível", enhanced.ok && enhanced.state.enhancements["bronze-claw"] === 5);
+  ok("martelada certeira responde raised", enhanced.ok && enhanced.data.raised === true);
   ok(
     "forja consome o fragmento do conjunto",
     enhanced.ok &&
       inventoryCtrl.countInInventory(enhanced.state.inventory, "bronze-fragment") ===
+        10 - forgeRules.enhancementCost(5),
+  );
+  const missed = forgeCtrl.enhance(state, "claw", () => 0.99);
+  ok(
+    "martelada falha mantém o nível",
+    missed.ok && missed.state.enhancements["bronze-claw"] === 4 && missed.data.raised === false,
+  );
+  ok(
+    "martelada falha ainda consome fragmentos",
+    missed.ok &&
+      inventoryCtrl.countInInventory(missed.state.inventory, "bronze-fragment") ===
         10 - forgeRules.enhancementCost(5),
   );
   const wrongFragments = { ...state, inventory: [{ itemId: "silver-fragment", quantity: 99 }] };
@@ -1410,6 +1481,18 @@ sec("automação");
   };
   const called = automationCtrl.nextAutomationStep(restedPet, null);
   ok("cheio volta para a caçada", called?.kind === "kennel" && called.active === true);
+  const shortPetState = {
+    ...petState,
+    pet: {
+      ...petState.pet,
+      energy: CONST.PET_ENERGY_PER_HUNT + CONST.PET_ENERGY_PER_BLOW - 1,
+    },
+    automation: { ...petState.automation, petFeed: true },
+  };
+  ok(
+    "lobo sem fôlego come antes de zerar",
+    automationCtrl.nextAutomationStep(shortPetState, null)?.kind === "feed",
+  );
   const paused = baseState({ level: 10, form: "werewolf" });
   const idle = { kind: "hunt", id: "village-field", paused: true };
   ok("pausado sem chave espera", automationCtrl.nextAutomationStep(paused, idle) === null);
