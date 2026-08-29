@@ -135,6 +135,19 @@ export function LandingScreen() {
             )}
           />
         ) : null}
+        {intro !== "done" ? (
+          <div
+            className={cn(
+              "pointer-events-none absolute inset-0 transition-opacity duration-700",
+              intro === "leaving" ? "opacity-0" : "opacity-100",
+            )}
+            style={{
+              background:
+                "radial-gradient(ellipse at center, transparent 38%, rgba(7, 5, 3, 0.88) 100%)",
+              boxShadow: "inset 0 0 18vmax rgba(7, 5, 3, 0.75)",
+            }}
+          />
+        ) : null}
 
         <div
           className={cn(
