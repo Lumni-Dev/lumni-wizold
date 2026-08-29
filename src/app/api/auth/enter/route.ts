@@ -60,6 +60,10 @@ export async function POST(request: Request) {
           ),
         );
       }
+      await client.query("update users set picture = $2 where id = $1", [
+        user.id,
+        identity.picture,
+      ]);
       await attachSession(user.id);
       const loaded = await loadGame(client, user.id, false);
       return NextResponse.json({

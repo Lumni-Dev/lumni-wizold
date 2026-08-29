@@ -45,6 +45,7 @@ function decodePart(part: string): Record<string, unknown> | null {
 
 export async function verifyGoogleCredential(credential: string): Promise<{
   email: string;
+  picture: string | null;
 } | null> {
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
   if (!clientId) return null;
@@ -76,5 +77,11 @@ export async function verifyGoogleCredential(credential: string): Promise<{
   const email = typeof claims.email === "string" ? claims.email.trim().toLowerCase() : "";
   const verified = claims.email_verified === true || claims.email_verified === "true";
   if (!email || !verified) return null;
-  return { email };
+  const picture =
+    typeof claims.picture === "string" &&
+    claims.picture.startsWith("https://") &&
+    claims.picture.length <= 1024
+      ? claims.picture
+      : null;
+  return { email, picture };
 }

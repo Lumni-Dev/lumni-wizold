@@ -191,7 +191,12 @@ export function ForgeScreen() {
 
                   {active || (swing.id === ore.id && swing.beat > 0) ? (
                     <div className="pt-2">
-                      <Bar label="Golpe" current={swing.beat} maximum={MINING_TICKS} wraps />
+                      <Bar
+                        label="Minerando..."
+                        current={swing.beat}
+                        maximum={MINING_TICKS}
+                        wraps
+                      />
                     </div>
                   ) : null}
                 </ListRow>
@@ -253,7 +258,12 @@ export function ForgeScreen() {
                   entry.reason ? (
                     <div className="space-y-1 pt-2">
                       {activeSlot === entry.slot && forging ? (
-                        <Bar label="Forjando" current={forging.beat} maximum={FORGE_TICKS} wraps />
+                        <Bar
+                          label="Forjando..."
+                          current={forging.beat}
+                          maximum={FORGE_TICKS}
+                          wraps
+                        />
                       ) : null}
                       {waitingSlot === entry.slot ? (
                         <p className="text-[11px] text-ink-faint">

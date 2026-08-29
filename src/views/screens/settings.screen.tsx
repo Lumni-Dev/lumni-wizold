@@ -17,6 +17,7 @@ import { ConfirmDialog } from "../components/confirm-dialog";
 import { Field } from "../components/field";
 import { Modal } from "../components/modal";
 import { GenderIcon } from "../components/gender-icon";
+import { IconFrame } from "../components/icon-frame";
 import { List, ListRow, RowText } from "../components/list";
 import { Panel } from "../components/panel";
 import { Tag } from "../components/tag";
@@ -35,11 +36,16 @@ export function SettingsScreen() {
   const router = useRouter();
 
   const [accountEmail, setAccountEmail] = useState<string | null>(null);
+  const [accountPicture, setAccountPicture] = useState<string | null>(null);
   useEffect(() => {
     let alive = true;
-    void api<{ email: string | null }>("GET", "/api/auth/me").then((answer) => {
-      if (alive && answer.ok) setAccountEmail(answer.data?.email ?? null);
-    });
+    void api<{ email: string | null; picture: string | null }>("GET", "/api/auth/me").then(
+      (answer) => {
+        if (!alive || !answer.ok) return;
+        setAccountEmail(answer.data?.email ?? null);
+        setAccountPicture(answer.data?.picture ?? null);
+      },
+    );
     return () => {
       alive = false;
     };
@@ -90,7 +96,19 @@ export function SettingsScreen() {
           padding="none"
         >
           <div className="flex items-center gap-3 border-b border-edge p-4">
-            <GenderIcon gender={character.gender} size="medium" />
+            {accountPicture ? (
+              <IconFrame size="medium" tone="strong">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={accountPicture}
+                  alt=""
+                  referrerPolicy="no-referrer"
+                  className="h-full w-full object-cover"
+                />
+              </IconFrame>
+            ) : (
+              <GenderIcon gender={character.gender} size="medium" />
+            )}
             <div className="min-w-0">
               <p className="truncate text-sm text-ink">Conectado com Google</p>
               <p className="truncate font-mono text-[11px] text-ink-faint">

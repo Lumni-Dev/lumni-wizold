@@ -10,7 +10,7 @@ export async function GET() {
 
   try {
     return await withTransaction(async (client) => {
-      const found = await client.query("select email from users where id = $1", [userId]);
+      const found = await client.query("select email, picture from users where id = $1", [userId]);
       const loaded = await loadGame(client, userId, false);
       return NextResponse.json({
         ok: true,
@@ -18,6 +18,7 @@ export async function GET() {
         data: {
           userId,
           email: found.rows[0]?.email ?? null,
+          picture: found.rows[0]?.picture ?? null,
           hasCharacter: loaded !== null,
         },
       });
