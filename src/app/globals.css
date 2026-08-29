@@ -215,6 +215,10 @@
   animation: art-shimmer 1400ms linear infinite;
 }
 
+button:not(:disabled) {
+  cursor: pointer;
+}
+
 @keyframes bar-shake {
   0%,
   100% {
