@@ -45,7 +45,7 @@ export const PET_TARGET_CHANCE = 0.2;
 
 export const MAX_ENHANCEMENT = 1000;
 export const ENHANCEMENT_STEP = 0.002;
-export const FORGE_SUCCESS_RATIO = 0.7;
+export const FORGE_SUCCESS_RATIO = 0.75;
 export const FORGE_BRONZE_RATIO = 0.1;
 export const TRAINING_TICK_MS = 1000;
 export const TRAINING_TICKS = 5;
