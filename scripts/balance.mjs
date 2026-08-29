@@ -248,7 +248,7 @@ if (Number.isFinite(single) && single > 0) {
   }
 
   console.log("");
-  console.log("ECONOMIA — o que uma caçada paga e o que ela compra");
+  console.log("ECONOMIA: o que uma caçada paga e o que ela compra");
   for (const level of levels) {
     const at = Math.max(1, level);
     const money = economy(at);
