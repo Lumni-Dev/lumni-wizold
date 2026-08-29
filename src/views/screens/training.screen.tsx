@@ -40,9 +40,19 @@ export function TrainingScreen() {
 
   const autoRef = useRef(state.automation.train);
   const trainRef = useRef(train);
+  const chargesRef = useRef(false);
   useEffect(() => {
     autoRef.current = state.automation.train;
     trainRef.current = train;
+    if (!activeExercise) {
+      chargesRef.current = false;
+    } else if (activeExercise === PET_EXERCISE_ID) {
+      chargesRef.current = petTraining !== null && !petTraining.maxed && petTraining.progress === 0;
+    } else {
+      const entry = exercises.find((candidate) => candidate.exercise.id === activeExercise);
+      const row = progress.find((line) => line.key === entry?.exercise.attribute);
+      chargesRef.current = row !== undefined && row.progress === 0 && row.value < MAX_ATTRIBUTE_VALUE;
+    }
   });
 
   const petGone = petTraining === null;
@@ -58,6 +68,10 @@ export function TrainingScreen() {
       beatRef.current = beatRef.current >= TRAINING_TICKS ? 0 : beatRef.current + 1;
       setSession({ id: activeExercise, beat: beatRef.current });
 
+      if (beatRef.current === 1 && chargesRef.current) {
+        chargesRef.current = false;
+        playSound("buy");
+      }
       if (beatRef.current > 0) {
         const effort = activeExercise === PET_EXERCISE_ID ? "growl" : activeExercise;
         if (isGameSound(effort)) playSound(effort);

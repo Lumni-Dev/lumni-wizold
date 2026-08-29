@@ -168,12 +168,12 @@ export function CharacterScreen() {
                 ];
 
                 return (
-                  <ListRow key={definition.key} layout="split" padding="art">
-                    <div className="flex min-w-0 flex-1 items-center gap-3">
+                  <ListRow key={definition.key} layout="column" padding="art">
+                    <div className="flex min-w-0 items-center gap-3">
                       <AttributeIcon attribute={definition.key} />
                       <RowText title={definition.name} description={definition.description} />
                     </div>
-                    <div className="grid w-full shrink-0 grid-cols-4 divide-x divide-y divide-edge sm:grid-cols-7 sm:divide-y-0 overflow-hidden rounded-md border border-edge sm:w-[30rem]">
+                    <div className="grid w-full grid-cols-4 divide-x divide-y divide-edge sm:grid-cols-7 sm:divide-y-0 overflow-hidden rounded-md border border-edge">
                       {cells.map((cell) => (
                         <div
                           key={cell.label}
