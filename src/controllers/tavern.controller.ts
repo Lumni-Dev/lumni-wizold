@@ -5,6 +5,7 @@ import {
   isRoomFull,
   MAX_ROOM_MEMBERS,
   MAX_ROOM_MESSAGES,
+  MESSAGE_COOLDOWN_MS,
   MESSAGE_MAX_LENGTH,
   MEMBER_TIMEOUT_MS,
   validateRoomName,
@@ -155,18 +156,16 @@ export function joinRoom(
       )
     : [...room.members, { id: identity.id, name: identity.name, joinedAt: now, lastSeen: now }];
 
-  const messages = already
-    ? room.messages
-    : [
-        ...room.messages,
-        {
-          id: generateId("msg"),
-          authorId: "system",
-          authorName: "Taverna",
-          text: identity.name + " entrou.",
-          at: now,
-        },
-      ].slice(-MAX_ROOM_MESSAGES);
+  const messages = [
+    ...room.messages,
+    {
+      id: generateId("msg"),
+      authorId: "system",
+      authorName: "Taverna",
+      text: identity.name + (already ? " retornou à sala." : " entrou."),
+      at: now,
+    },
+  ].slice(-MAX_ROOM_MESSAGES);
 
   return done(
     replaceRoom(state, { ...room, members, messages }),
@@ -198,7 +197,7 @@ export function leaveRoom(
       id: generateId("msg"),
       authorId: "system",
       authorName: "Taverna",
-      text: identity.name + " saiu.",
+      text: identity.name + " saiu da sala.",
       at: now,
     },
   ].slice(-MAX_ROOM_MESSAGES);
@@ -308,6 +307,23 @@ export function sendMessage(
   if (clean.length === 0) return fail(state, "Escreva alguma coisa antes de enviar.");
   if (containsLink(clean)) {
     return fail(state, "A taverna não aceita links: conversa se leva em palavras.");
+  }
+
+  const lastOwn = [...room.messages]
+    .reverse()
+    .find((message) => message.authorId === identity.id);
+  if (lastOwn) {
+    const elapsed = Date.now() - Date.parse(lastOwn.at);
+    if (elapsed >= 0 && elapsed < MESSAGE_COOLDOWN_MS) {
+      return fail(
+        state,
+        "Uma fala a cada " +
+          MESSAGE_COOLDOWN_MS / 1000 +
+          " segundos: espere " +
+          Math.ceil((MESSAGE_COOLDOWN_MS - elapsed) / 1000) +
+          "s.",
+      );
+    }
   }
 
   const now = new Date().toISOString();

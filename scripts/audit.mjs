@@ -1610,12 +1610,44 @@ sec("taverna");
     "a vigésima primeira cadeira não existe",
     tavernCtrl.joinRoom(tavern, opened.roomId, { id: "sobra", name: "Sobra" }, "").ok === false,
   );
+  const backdate = () => {
+    const seatRoom = tavernCtrl.findRoom(tavern, opened.roomId);
+    const last = seatRoom.messages[seatRoom.messages.length - 1];
+    if (last) last.at = new Date(Date.now() - 60000).toISOString();
+  };
   for (let index = 0; index < 50; index += 1) {
     tavern = tavernCtrl.sendMessage(tavern, opened.roomId, me, "eco " + index).state;
+    backdate();
   }
   ok(
     "mesa guarda 40 falas",
     tavernCtrl.findRoom(tavern, opened.roomId).messages.length === entTavern.MAX_ROOM_MESSAGES,
+  );
+  const rushedFirst = tavernCtrl.sendMessage(tavern, opened.roomId, me, "primeira do compasso");
+  ok("fala fora do compasso passa", rushedFirst.ok === true);
+  ok(
+    "uma fala a cada dez segundos",
+    tavernCtrl.sendMessage(rushedFirst.state, opened.roomId, me, "segunda imediata").ok === false,
+  );
+  const longTalk = tavernCtrl.sendMessage(tavern, opened.roomId, other, "a".repeat(200));
+  ok(
+    "fala é cortada em 150",
+    longTalk.ok &&
+      tavernCtrl
+        .findRoom(longTalk.state, opened.roomId)
+        .messages.at(-1).text.length === entTavern.MESSAGE_MAX_LENGTH,
+  );
+  const wentOut = tavernCtrl.leaveRoom(tavern, opened.roomId, { id: "x0", name: "Lobo0" });
+  ok(
+    "saída escreve na mesa",
+    tavernCtrl.findRoom(wentOut.state, opened.roomId).messages.at(-1).text ===
+      "Lobo0 saiu da sala.",
+  );
+  const cameBack = tavernCtrl.joinRoom(tavern, opened.roomId, me, "");
+  ok(
+    "retorno escreve na mesa",
+    tavernCtrl.findRoom(cameBack.state, opened.roomId).messages.at(-1).text ===
+      me.name + " retornou à sala.",
   );
   ok("fala vazia recusa", tavernCtrl.sendMessage(tavern, opened.roomId, me, "   ").ok === false);
   ok(

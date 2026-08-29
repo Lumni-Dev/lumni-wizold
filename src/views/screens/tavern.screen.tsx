@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useGame } from "@/controllers/game.context";
 import { isInPack, listPack } from "@/controllers/pack.controller";
 import { playSound } from "@/controllers/sound";
@@ -13,6 +13,7 @@ import {
 } from "@/models/repositories/tavern-read.repository";
 import {
   MAX_ROOM_MEMBERS,
+  MESSAGE_COOLDOWN_MS,
   MESSAGE_MAX_LENGTH,
   ROOM_NAME_MAX_LENGTH,
 } from "@/models/entities/tavern";
@@ -96,6 +97,80 @@ export function TavernScreen() {
   useEffect(() => {
     roomsRef.current = rooms;
   });
+
+  const selfId = identity?.id ?? "";
+  const unreadByRoom = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const { room } of rooms) {
+      const lastRead = readMap[room.id] ?? "";
+      counts.set(
+        room.id,
+        room.messages.filter(
+          (message) =>
+            message.at > lastRead &&
+            message.authorId !== "system" &&
+            message.authorId !== selfId,
+        ).length,
+      );
+    }
+    return counts;
+  }, [rooms, readMap, selfId]);
+  const totalUnread = useMemo(
+    () => [...unreadByRoom.values()].reduce((total, count) => total + count, 0),
+    [unreadByRoom],
+  );
+
+  useEffect(() => {
+    document.title = totalUnread > 0 ? "Wizold - Taverna [" + totalUnread + "]" : "Wizold - Taverna";
+    return () => {
+      document.title = "Wizold - Taverna";
+    };
+  }, [totalUnread]);
+
+  const heardRef = useRef<string | null>(null);
+  useEffect(() => {
+    let latest = "";
+    for (const { room } of rooms) {
+      for (const message of room.messages) {
+        if (message.authorId === "system" || message.authorId === selfId) continue;
+        if (message.at > latest) latest = message.at;
+      }
+    }
+    if (!latest) return;
+    if (heardRef.current === null) {
+      heardRef.current = latest;
+      return;
+    }
+    if (latest > heardRef.current) {
+      heardRef.current = latest;
+      if (document.hidden) playSound("chat");
+    }
+  }, [rooms, selfId]);
+
+  const lastMineAt = useMemo(() => {
+    if (!activeRoom) return null;
+    for (let index = activeRoom.messages.length - 1; index >= 0; index -= 1) {
+      if (activeRoom.messages[index].authorId === selfId) return activeRoom.messages[index].at;
+    }
+    return null;
+  }, [activeRoom, selfId]);
+  const [cooldownLeft, setCooldownLeft] = useState(0);
+  useEffect(() => {
+    if (!lastMineAt) return;
+    const compute = () =>
+      Math.max(0, MESSAGE_COOLDOWN_MS - (Date.now() - Date.parse(lastMineAt)));
+    if (compute() <= 0) return;
+    const tick = () => {
+      const left = compute();
+      setCooldownLeft(left);
+      if (left <= 0) window.clearInterval(timers[1]);
+    };
+    const timers = [window.setTimeout(tick, 0), window.setInterval(tick, 500)];
+    return () => {
+      window.clearTimeout(timers[0]);
+      window.clearInterval(timers[1]);
+    };
+  }, [lastMineAt]);
   const lastMessageAt = activeRoom?.messages[activeRoom.messages.length - 1]?.at ?? null;
   useEffect(() => {
     if (!openRoomId || !lastMessageAt) return;
@@ -351,13 +426,7 @@ export function TavernScreen() {
           ) : (
             <div className="grid gap-6 sm:grid-cols-2">
               {roomsOnPage.map(({ room, locked, full, memberCount, isMember, isPrivate }) => {
-                const lastRead = readMap[room.id] ?? "";
-                const unread = room.messages.filter(
-                  (message) =>
-                    message.at > lastRead &&
-                    message.authorId !== "system" &&
-                    message.authorId !== identity.id,
-                ).length;
+                const unread = unreadByRoom.get(room.id) ?? 0;
 
                 return (
                 <Card
@@ -505,8 +574,15 @@ export function TavernScreen() {
                 onChange={(event) => setDraft(event.target.value)}
               />
             </div>
-            <Button type="submit" variant="primary" disabled={draft.trim().length === 0}>
-              Enviar
+            <span className="shrink-0 font-mono text-[10px] text-ink-faint">
+              {draft.length}/{MESSAGE_MAX_LENGTH}
+            </span>
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={draft.trim().length === 0 || cooldownLeft > 0}
+            >
+              {cooldownLeft > 0 ? "Aguarde " + Math.ceil(cooldownLeft / 1000) + "s" : "Enviar"}
             </Button>
           </form>
         }

@@ -19,7 +19,12 @@ import {
 } from "@/shared/constants/game";
 import { SPECIES_LABEL } from "../entities/creature";
 import { MAX_PACK } from "../entities/pack";
-import { MAX_ROOM_MEMBERS, MAX_ROOM_MESSAGES } from "../entities/tavern";
+import {
+  MAX_ROOM_MEMBERS,
+  MAX_ROOM_MESSAGES,
+  MESSAGE_COOLDOWN_MS,
+  MESSAGE_MAX_LENGTH,
+} from "../entities/tavern";
 import { ARENA_HISTORY_SIZE } from "../entities/arena";
 import {
   ARENA_BAND_RATIO,
@@ -369,6 +374,11 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         MAX_ROOM_MESSAGES +
         " falas: o que veio antes a noite leva.",
       "A taverna não aceita links: fala que carrega endereço volta recusada.",
+      "Cada fala cabe em " +
+        MESSAGE_MAX_LENGTH +
+        " caracteres, e a mesa aceita uma sua a cada " +
+        MESSAGE_COOLDOWN_MS / 1000 +
+        " segundos: conversa tem compasso.",
       "Fechar a janela da conversa não é sair da mesa: o lugar continua seu e Entrar devolve a mesma cadeira.",
       "A mesa some do quadro quando a última pessoa sai, ou quando o dono a fecha.",
       "A matilha guarda até " +

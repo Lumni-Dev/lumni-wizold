@@ -2,7 +2,8 @@ export const MAX_ROOM_MEMBERS = 20;
 export const MAX_ROOM_MESSAGES = 40;
 const ROOM_NAME_MIN_LENGTH = 3;
 export const ROOM_NAME_MAX_LENGTH = 25;
-export const MESSAGE_MAX_LENGTH = 240;
+export const MESSAGE_MAX_LENGTH = 150;
+export const MESSAGE_COOLDOWN_MS = 10000;
 export const MEMBER_TIMEOUT_MS = 150000;
 export interface TavernIdentity {
   id: string;

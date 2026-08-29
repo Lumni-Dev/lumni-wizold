@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import * as tavernController from "@/controllers/tavern.controller";
+import { MESSAGE_MAX_LENGTH } from "@/models/entities/tavern";
 import { saveTavernDiff } from "@/models/repositories/server/tavern.store";
 import { asText, withTavernRoom } from "../../../../_lib/api";
 
@@ -10,7 +11,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       state,
       id.slice(0, 80),
       context.identity,
-      asText(body.text, 240),
+      asText(body.text, MESSAGE_MAX_LENGTH),
     );
     if (result.ok) {
       await saveTavernDiff(context.client, state, result.state, context.tavern.hashes);
