@@ -55,7 +55,7 @@ export function CharacterCreationScreen() {
   if (!ready || character) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p className="heading text-[11px] text-ink-faint">Abrindo a noite...</p>
+        <p className="heading text-[11px] text-ink-faint">Carregando...</p>
       </div>
     );
   }

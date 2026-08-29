@@ -13,7 +13,7 @@ function Loading() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-3 text-ink-faint">
       <Spinner size="medium" />
-      <p className="heading text-[11px]">Abrindo a noite...</p>
+      <p className="heading text-[11px]">Carregando...</p>
     </div>
   );
 }
