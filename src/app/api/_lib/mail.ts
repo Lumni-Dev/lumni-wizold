@@ -10,6 +10,7 @@ const EDGE = "#26262c";
 const INK = "#ededf0";
 const INK_SOFT = "#a2a2ac";
 const INK_FAINT = "#6b6b76";
+const HIGHLIGHT = "#fafafa";
 const EMBER = "#e0993d";
 
 function transporter() {
@@ -45,7 +46,7 @@ function layout(paragraphs: readonly string[], buttonLabel: string): string {
     "<tr><td>" +
     '<div style="text-align:center;padding:24px 0;">' +
     '<div style="font-size:22px;letter-spacing:6px;color:' +
-    EMBER +
+    HIGHLIGHT +
     ';font-weight:bold;">' +
     GAME_NAME +
     "</div>" +
