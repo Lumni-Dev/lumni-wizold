@@ -508,14 +508,16 @@ export function TavernScreen() {
                     {message.authorId === "system" ? (
                       <span className="mr-2 text-ink-faint">{message.authorName}</span>
                     ) : (
-                      <MemberName
-                        href={profileHref(message.authorId)}
-                        name={message.authorName}
-                        className={cn(
-                          "mr-2",
-                          message.authorId === identity.id ? "text-ink" : "text-ink-soft",
-                        )}
-                      />
+                      <>
+                        <MemberName
+                          href={profileHref(message.authorId)}
+                          name={message.authorName}
+                          className={cn(
+                            message.authorId === identity.id ? "text-ink" : "text-ink-soft",
+                          )}
+                        />
+                        <span className="mr-2 text-ink-faint">:</span>
+                      </>
                     )}
                     <span
                       className={cn(
