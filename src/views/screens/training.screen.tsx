@@ -38,19 +38,39 @@ export function TrainingScreen() {
   const [session, setSession] = useState<{ id: string; beat: number }>({ id: "", beat: 0 });
   const beatRef = useRef(0);
 
+  interface RowSnapshot {
+    progress: number;
+    needed: number;
+    value: number;
+    cost: number;
+  }
   const autoRef = useRef(state.automation.train);
   const trainRef = useRef(train);
-  const rowProgressRef = useRef(0);
-  const [heldProgress, setHeldProgress] = useState<{ id: string; progress: number } | null>(null);
+  const rowSnapshotRef = useRef<RowSnapshot>({ progress: 0, needed: 0, value: 0, cost: 0 });
+  const [heldRow, setHeldRow] = useState<(RowSnapshot & { id: string }) | null>(null);
   useEffect(() => {
     autoRef.current = state.automation.train;
     trainRef.current = train;
     if (activeExercise === PET_EXERCISE_ID) {
-      rowProgressRef.current = petTraining?.progress ?? 0;
+      if (petTraining) {
+        rowSnapshotRef.current = {
+          progress: petTraining.progress,
+          needed: petTraining.needed,
+          value: petTraining.level,
+          cost: petTraining.cost,
+        };
+      }
     } else if (activeExercise) {
       const entry = exercises.find((candidate) => candidate.exercise.id === activeExercise);
       const row = progress.find((line) => line.key === entry?.exercise.attribute);
-      rowProgressRef.current = row?.progress ?? 0;
+      if (entry && row) {
+        rowSnapshotRef.current = {
+          progress: row.progress,
+          needed: row.needed,
+          value: row.value,
+          cost: entry.cost,
+        };
+      }
     }
   });
 
@@ -69,11 +89,12 @@ export function TrainingScreen() {
 
       if (beatRef.current === 1) {
         playSound("buy");
-        setHeldProgress({ id: activeExercise, progress: rowProgressRef.current });
+        setHeldRow({ id: activeExercise, ...rowSnapshotRef.current });
         void trainRef.current(activeExercise).then((trained) => {
           if (trained) return;
           beatRef.current = 0;
           setSession({ id: activeExercise, beat: 0 });
+          setHeldRow(null);
           setActivity(
             autoRef.current ? { kind: "train", id: activeExercise, paused: true } : null,
           );
@@ -84,7 +105,7 @@ export function TrainingScreen() {
       }
 
       if (beatRef.current < TRAINING_TICKS) return;
-      setHeldProgress(null);
+      setHeldRow(null);
       if (!autoRef.current) {
         beatRef.current = 0;
         setSession({ id: activeExercise, beat: 0 });
@@ -102,6 +123,7 @@ export function TrainingScreen() {
   function toggleTraining(exerciseId: string, ready: boolean) {
     beatRef.current = 0;
     setSession({ id: exerciseId, beat: 0 });
+    setHeldRow(null);
 
     if (activeExercise === exerciseId) {
       setActivity(null);
@@ -135,6 +157,7 @@ export function TrainingScreen() {
             const row = progress.find((entry) => entry.key === exercise.attribute);
             const ready = !maxed && affordable;
             const active = activeExercise === exercise.id;
+            const held = active && heldRow?.id === exercise.id ? heldRow : null;
 
             return (
               <Card
@@ -152,7 +175,7 @@ export function TrainingScreen() {
                     </p>
                   </div>
                   <span className="shrink-0 font-mono text-sm text-ink">
-                    NV. {formatNumber(row?.value ?? 0)}
+                    NV. {formatNumber(held?.value ?? row?.value ?? 0)}
                     <span className="text-ink-faint">
                       {" / " + formatNumber(MAX_ATTRIBUTE_VALUE)}
                     </span>
@@ -166,18 +189,14 @@ export function TrainingScreen() {
 
                   <div className="flex flex-wrap gap-2">
                     <Tag>+{effort.progress} de progresso por treinamento</Tag>
-                    <Tag>Treino por {formatBronze(cost)}</Tag>
+                    <Tag>Treino por {formatBronze(held?.cost ?? cost)}</Tag>
                   </div>
 
                   {row ? (
                     <Bar
                       label="Progresso"
-                      current={
-                        active && heldProgress?.id === exercise.id
-                          ? heldProgress.progress
-                          : row.progress
-                      }
-                      maximum={row.needed}
+                      current={held?.progress ?? row.progress}
+                      maximum={held?.needed ?? row.needed}
                       wraps
                       className="mt-auto"
                     />
@@ -222,13 +241,17 @@ export function TrainingScreen() {
               <CardHeader>
                 <PetIcon gender={petTraining.pet.gender} size="medium" />
                 <div className="min-w-0 flex-1">
-                  <h3 className="truncate text-sm text-ink">{petTraining.pet.name}</h3>
+                  <h3 className="truncate text-sm text-ink">Mascote</h3>
                   <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                     Treino do mascote
                   </p>
                 </div>
                 <span className="shrink-0 font-mono text-sm text-ink">
-                  NV. {formatNumber(petTraining.level)}
+                  NV.{" "}
+                  {formatNumber(
+                    (petActive && heldRow?.id === PET_EXERCISE_ID ? heldRow.value : null) ??
+                      petTraining.level,
+                  )}
                   <span className="text-ink-faint">{" / " + formatNumber(PET_MAX_LEVEL)}</span>
                   {petTraining.maxed ? (
                     <span className="ml-1 text-[10px] text-ink-faint">teto</span>
@@ -238,23 +261,31 @@ export function TrainingScreen() {
 
               <CardBody>
                 <p className="text-xs leading-relaxed text-ink-soft">
-                  Cada nível soma 1 de Força, 1 de Agilidade e 1 de Instinto ao que{" "}
-                  {petTraining.pet.name} empresta enquanto caça com você.
+                  Cada nível soma 1 de Força, 1 de Agilidade e 1 de Instinto ao que o mascote
+                  empresta enquanto caça com você.
                 </p>
 
                 <div className="flex flex-wrap gap-2">
                   <Tag>+{petTraining.effort.progress} de progresso por treinamento</Tag>
-                  <Tag>Treino por {formatBronze(petTraining.cost)}</Tag>
+                  <Tag>
+                    Treino por{" "}
+                    {formatBronze(
+                      (petActive && heldRow?.id === PET_EXERCISE_ID ? heldRow.cost : null) ??
+                        petTraining.cost,
+                    )}
+                  </Tag>
                 </div>
 
                 <Bar
                   label="Progresso"
                   current={
-                    petActive && heldProgress?.id === PET_EXERCISE_ID
-                      ? heldProgress.progress
-                      : petTraining.progress
+                    (petActive && heldRow?.id === PET_EXERCISE_ID ? heldRow.progress : null) ??
+                    petTraining.progress
                   }
-                  maximum={petTraining.needed}
+                  maximum={
+                    (petActive && heldRow?.id === PET_EXERCISE_ID ? heldRow.needed : null) ??
+                    petTraining.needed
+                  }
                   wraps
                   className="mt-auto"
                 />
