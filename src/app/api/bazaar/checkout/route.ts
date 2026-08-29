@@ -41,14 +41,7 @@ export async function POST(request: Request) {
       cancelUrl: origin + "/bazaar",
     };
     try {
-      let session;
-      try {
-        session = await createCheckoutSession({ ...order, paymentMethods: ["pix"] });
-      } catch (refusal) {
-        const reason = refusal instanceof Error ? refusal.message : String(refusal);
-        if (!reason.toLowerCase().includes("pix")) throw refusal;
-        session = await createCheckoutSession(order);
-      }
+      const session = await createCheckoutSession(order);
       if (!session.url) return failure(state, "O Stripe não abriu o checkout. Tente de novo.");
       return success(state, "", { url: session.url });
     } catch (error) {

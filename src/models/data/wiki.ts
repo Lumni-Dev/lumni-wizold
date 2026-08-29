@@ -379,7 +379,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         " e o saque mínimo é " +
         formatReais(MIN_WITHDRAW_CENTS) +
         ", pedido com nome completo, CPF e chave Pix.",
-      "O saque do Alforje sai por Pix. Nesta versão o Pix é de demonstração e o QR não vale pagamento.",
+      "O saque desta versão é de demonstração: o pedido fica registrado com os dados informados e nada é transferido ainda.",
       "Comprar uma peça mais forjada que a sua eleva a sua ao nível dela: a forja pertence à peça.",
       "Qualquer dúvida com um pagamento, escreva para o suporte: wizold@lumni.dev.br.",
     ],

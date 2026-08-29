@@ -217,7 +217,7 @@ export function requestWithdraw(state: GameState, pixKey: string): Result {
   const message =
     "Saque de " +
     formatReais(amount) +
-    " solicitado (simulação): cai na conta quando a API de pagamento entrar.";
+    " solicitado: o pedido ficou registrado, e nesta versão nada é transferido ainda.";
 
   return success(addLog(next, "market", message), message);
 }

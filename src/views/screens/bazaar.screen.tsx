@@ -127,10 +127,9 @@ export function BazaarScreen() {
         }
       >
         <p className="text-xs leading-relaxed text-ink-faint">
-          A casa fica com {FEE_LABEL} de cada venda e o resto entra aqui. Anúncio com preço perto da
-          sugestão vende em minutos; muito acima da sugestão, encalha no quadro. O Pix desta versão
-          é de demonstração, o QR não vale pagamento, e o dinheiro só sai de verdade quando a API de
-          pagamento entrar.
+          A casa fica com {FEE_LABEL} de cada venda e o resto entra aqui. O anúncio fica no quadro
+          até outro caçador pagar por ele no checkout do Stripe. O saque desta versão é de
+          demonstração: o pedido fica registrado e nada é transferido ainda.
         </p>
       </Panel>
 
@@ -378,7 +377,7 @@ export function BazaarScreen() {
         amountCents={state.wallet.cents}
         amountLabel="Disponível para saque"
         confirmLabel="Solicitar"
-        note="O saque é de demonstração até a API de pagamento entrar: nada sai daqui por enquanto, e nem o CPF nem o nome são guardados."
+        note="O saque desta versão é de demonstração: o pedido fica registrado com estes dados e nada é transferido ainda."
         onClose={() => setFlow(null)}
         onConfirm={(payer) =>
           requestWithdraw(payer.pixKey, payer.name, payer.cpf).then((ok) => {
