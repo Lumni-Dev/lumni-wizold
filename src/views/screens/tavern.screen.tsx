@@ -630,7 +630,7 @@ export function TavernScreen() {
                   </span>
                   <p className="min-w-0 flex-1 text-xs leading-relaxed">
                     {message.authorId === "system" ? (
-                      <span className="mr-2 text-ink-faint">{message.authorName}</span>
+                      <span className="mr-2 text-ink-faint">{message.authorName}:</span>
                     ) : (
                       <>
                         <MemberName
