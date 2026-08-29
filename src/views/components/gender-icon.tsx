@@ -19,7 +19,7 @@ export function GenderIcon({
   return (
     <IconFrame size={size} tone="strong" className={className}>
       {source ? (
-        <IconArt source={source} padded={false} inset="p-[6px]" />
+        <IconArt source={source} padded={false} />
       ) : (
         findGender(gender).label.slice(0, 1)
       )}
