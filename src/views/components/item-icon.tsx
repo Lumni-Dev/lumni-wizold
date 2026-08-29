@@ -21,7 +21,7 @@ export function ItemIcon({
     <IconFrame size={size} className={source ? undefined : "tracking-widest"}>
       {source ? <IconArt source={source} glow /> : itemInitials(item.name)}
       {enhancement > 0 ? (
-        <span className="absolute right-1 top-1 rounded border border-edge-strong bg-base/90 px-1 font-mono text-[10px] leading-4 tracking-normal text-ink">
+        <span className="absolute right-1 top-1 rounded border border-ember bg-ember px-1 font-mono text-[10px] leading-4 tracking-normal text-base">
           +{enhancement}
         </span>
       ) : null}
