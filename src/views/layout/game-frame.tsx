@@ -23,7 +23,9 @@ export function GameFrame({ children }: { children: ReactNode }) {
   const { ready, character } = useGame();
   const router = useRouter();
   const pathname = usePathname();
-  useTavernAlert(!pathname.startsWith("/tavern"));
+  const inTavern = pathname.startsWith("/tavern");
+  const tavernUnread = useTavernAlert(!inTavern);
+  const asideUnread = inTavern ? 0 : tavernUnread;
 
   useEffect(() => {
     if (ready && !character) router.replace("/");
@@ -33,10 +35,10 @@ export function GameFrame({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
+      <Sidebar tavernUnread={asideUnread} />
       <div className="flex min-h-screen w-full min-w-0 flex-col">
         <ResourceBar />
-        <MobileNavigation />
+        <MobileNavigation tavernUnread={asideUnread} />
         <main className="mx-auto w-full max-w-6xl flex-1 space-y-6 p-4 md:p-8">{children}</main>
         <GameFooter />
       </div>

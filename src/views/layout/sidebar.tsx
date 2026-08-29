@@ -31,10 +31,12 @@ function NavLink({
   item,
   active,
   highlighted = false,
+  badge = 0,
 }: {
   item: NavigationItem;
   active: boolean;
   highlighted?: boolean;
+  badge?: number;
 }) {
   return (
     <Link
@@ -55,11 +57,16 @@ function NavLink({
       <span className="min-w-0 truncate px-3 text-[10px] uppercase tracking-[0.16em]">
         {item.label}
       </span>
+      {badge > 0 ? (
+        <span className="ml-auto mr-1 inline-flex h-6 min-w-6 shrink-0 items-center justify-center rounded-md border border-ember bg-ember px-2 font-mono text-[10px] font-bold tracking-normal text-base">
+          {badge > 9 ? "9+" : badge}
+        </span>
+      ) : null}
     </Link>
   );
 }
 
-export function Sidebar() {
+export function Sidebar({ tavernUnread = 0 }: { tavernUnread?: number }) {
   const pathname = usePathname();
 
   return (
@@ -70,7 +77,11 @@ export function Sidebar() {
         <ul className="space-y-3">
           {NAVIGATION.map((item) => (
             <li key={item.href}>
-              <NavLink item={item} active={pathname === item.href} />
+              <NavLink
+                item={item}
+                active={pathname === item.href}
+                badge={item.href === "/tavern" ? tavernUnread : 0}
+              />
             </li>
           ))}
         </ul>
@@ -85,7 +96,7 @@ export function Sidebar() {
   );
 }
 
-export function MobileNavigation() {
+export function MobileNavigation({ tavernUnread = 0 }: { tavernUnread?: number }) {
   const pathname = usePathname();
   const links = [...NAVIGATION, STORE_LINK, SETTINGS_LINK];
 
@@ -96,6 +107,7 @@ export function MobileNavigation() {
     >
       {links.map((item) => {
         const active = pathname === item.href;
+        const badge = item.href === "/tavern" ? tavernUnread : 0;
         return (
           <Link
             key={item.href}
@@ -104,6 +116,11 @@ export function MobileNavigation() {
             className={chipClass(active)}
           >
             {item.label}
+            {badge > 0 ? (
+              <span className="ml-1.5 inline-flex h-6 min-w-6 items-center justify-center rounded-md border border-ember bg-ember px-2 font-mono text-[10px] font-bold tracking-normal text-base">
+                {badge > 9 ? "9+" : badge}
+              </span>
+            ) : null}
           </Link>
         );
       })}

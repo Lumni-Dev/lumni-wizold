@@ -461,7 +461,7 @@ export function TavernScreen() {
                         <h3 className="truncate text-sm text-ink">{room.name}</h3>
                         <div className="flex shrink-0 items-center gap-2">
                           {unread > 0 ? (
-                            <span className="inline-flex h-4 min-w-4 items-center justify-center rounded border border-ember bg-ember px-1 font-mono text-[10px] font-bold tracking-normal text-base">
+                            <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-md border border-ember bg-ember px-2 font-mono text-[10px] font-bold tracking-normal text-base">
                               {unread > 9 ? "9+" : unread}
                             </span>
                           ) : null}
