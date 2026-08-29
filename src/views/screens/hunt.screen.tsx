@@ -67,7 +67,7 @@ function accumulate(session: HuntSession, report: HuntReport): HuntSession {
     drops,
   };
 }
-function CombatReport({ report }: { report: HuntReport }) {
+function CombatReport({ report, lines }: { report: HuntReport; lines: NarrationLine[] }) {
   const { combat, creature, territory } = report;
   const outcome = combat.victory ? "Vitória" : combat.retreated ? "Recuo" : "Derrota";
   return (
@@ -119,13 +119,17 @@ function CombatReport({ report }: { report: HuntReport }) {
       </div>
 
       <List className="max-h-64 overflow-y-auto">
-        {combat.rounds.map((round) => (
-          <ListRow key={round.index} className="items-start text-xs leading-relaxed">
+        {lines.map((line, index) => (
+          <ListRow key={index} className="items-start text-xs leading-relaxed">
             <span className="mt-1 font-mono text-[10px] text-ink-faint">
-              {round.index.toString().padStart(2, "0")}
+              {String(index + 1).padStart(2, "0")}
             </span>
-            <span className={cn(round.author === "character" ? "text-ink-soft" : "text-ink-faint")}>
-              {round.text}
+            <span
+              className={cn(
+                line.blow === "ours" || line.blow === "pet" ? "text-ink-soft" : "text-ink-faint",
+              )}
+            >
+              {line.text}
             </span>
           </ListRow>
         ))}
@@ -153,6 +157,7 @@ export function HuntScreen() {
   const waitingId = activity?.kind === "hunt" && paused ? (activity.id ?? null) : null;
   const petAlong = isPetHunting(pet) ? pet : null;
   const [report, setReport] = useState<HuntReport | null>(null);
+  const [reportLines, setReportLines] = useState<NarrationLine[]>([]);
   const [session, setSession] = useState<HuntSession>(EMPTY_SESSION);
   const [progress, setProgress] = useState<{
     id: string;
@@ -235,6 +240,7 @@ export function HuntScreen() {
         setPending(null);
         landRef.current();
         setReport(held);
+        setReportLines(scriptRef.current);
         setSession((current) => accumulate(current, held));
         if (held.combat.victory) {
           const spoils = held.drops
@@ -553,7 +559,7 @@ export function HuntScreen() {
       ) : null}
 
       {report ? (
-        <CombatReport report={report} />
+        <CombatReport report={report} lines={reportLines} />
       ) : (
         <EmptyState
           title="Nenhuma caçada nesta sessão"

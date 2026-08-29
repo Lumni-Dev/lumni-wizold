@@ -45,10 +45,19 @@ export function TrainingScreen() {
     needed: number;
     value: number;
     cost: number;
+    effort: number;
   }
   const autoRef = useRef(state.automation.train);
   const trainRef = useRef(train);
-  const rowSnapshotRef = useRef<RowSnapshot>({ progress: 0, needed: 0, value: 0, cost: 0 });
+  const paidRef = useRef(false);
+  const resumableRef = useRef(false);
+  const rowSnapshotRef = useRef<RowSnapshot>({
+    progress: 0,
+    needed: 0,
+    value: 0,
+    cost: 0,
+    effort: 0,
+  });
   const [heldRow, setHeldRow] = useState<(RowSnapshot & { id: string }) | null>(null);
   useEffect(() => {
     autoRef.current = state.automation.train;
@@ -60,7 +69,9 @@ export function TrainingScreen() {
           needed: petTraining.needed,
           value: petTraining.level,
           cost: petTraining.cost,
+          effort: petTraining.effort.progress,
         };
+        resumableRef.current = !petTraining.maxed && petTraining.transformed;
       }
     } else if (activeExercise) {
       const entry = exercises.find((candidate) => candidate.exercise.id === activeExercise);
@@ -71,7 +82,9 @@ export function TrainingScreen() {
           needed: row.needed,
           value: row.value,
           cost: entry.cost,
+          effort: entry.effort.progress,
         };
+        resumableRef.current = !entry.maxed && entry.transformed;
       }
     }
   });
@@ -90,18 +103,24 @@ export function TrainingScreen() {
       setSession({ id: activeExercise, beat: beatRef.current });
 
       if (beatRef.current === 1) {
-        playSound("buy");
+        paidRef.current = false;
         setHeldRow({ id: activeExercise, ...rowSnapshotRef.current });
         void trainRef.current(activeExercise).then((trained) => {
-          if (trained) return;
+          if (trained) {
+            paidRef.current = true;
+            playSound("buy");
+            return;
+          }
           beatRef.current = 0;
           setSession({ id: activeExercise, beat: 0 });
           setHeldRow(null);
           setActivity(
-            autoRef.current ? { kind: "train", id: activeExercise, paused: true } : null,
+            autoRef.current && resumableRef.current
+              ? { kind: "train", id: activeExercise, paused: true }
+              : null,
           );
         });
-      } else if (beatRef.current > 1) {
+      } else if (beatRef.current > 1 && paidRef.current) {
         const effort = activeExercise === PET_EXERCISE_ID ? "growl" : activeExercise;
         if (isGameSound(effort)) playSound(effort);
       }
@@ -124,6 +143,7 @@ export function TrainingScreen() {
 
   function toggleTraining(exerciseId: string, ready: boolean) {
     beatRef.current = 0;
+    paidRef.current = false;
     setSession({ id: exerciseId, beat: 0 });
     setHeldRow(null);
 
@@ -165,7 +185,7 @@ export function TrainingScreen() {
               <Card
                 key={exercise.id}
                 height="fill"
-                interactive={ready}
+                interactive={active || ready}
                 tone={active ? "highlighted" : "default"}
               >
                 <CardHeader>
@@ -181,7 +201,9 @@ export function TrainingScreen() {
                     <span className="text-ink-faint">
                       {" / " + formatNumber(MAX_ATTRIBUTE_VALUE)}
                     </span>
-                    {maxed ? <span className="ml-1 text-[10px] text-ink-faint">teto</span> : null}
+                    {(held?.value ?? row?.value ?? 0) >= MAX_ATTRIBUTE_VALUE ? (
+                      <span className="ml-1 text-[10px] text-ink-faint">teto</span>
+                    ) : null}
                   </span>
                 </CardHeader>
 
@@ -239,7 +261,11 @@ export function TrainingScreen() {
           })}
 
           {petTraining ? (
-            <Card height="fill" interactive={petReady} tone={petActive ? "highlighted" : "default"}>
+            <Card
+              height="fill"
+              interactive={petActive || petReady}
+              tone={petActive ? "highlighted" : "default"}
+            >
               <CardHeader>
                 <PetIcon gender={petTraining.pet.gender} size="medium" />
                 <div className="min-w-0 flex-1">
@@ -255,7 +281,8 @@ export function TrainingScreen() {
                       petTraining.level,
                   )}
                   <span className="text-ink-faint">{" / " + formatNumber(PET_MAX_LEVEL)}</span>
-                  {petTraining.maxed ? (
+                  {((petActive && heldRow?.id === PET_EXERCISE_ID ? heldRow.value : null) ??
+                    petTraining.level) >= PET_MAX_LEVEL ? (
                     <span className="ml-1 text-[10px] text-ink-faint">teto</span>
                   ) : null}
                 </span>
@@ -268,7 +295,12 @@ export function TrainingScreen() {
                 </p>
 
                 <div className="flex flex-wrap gap-2">
-                  <Tag>+{petTraining.effort.progress} de progresso por treinamento</Tag>
+                  <Tag>
+                    +
+                    {(petActive && heldRow?.id === PET_EXERCISE_ID ? heldRow.effort : null) ??
+                      petTraining.effort.progress}{" "}
+                    de progresso por treinamento
+                  </Tag>
                   <Tag>
                     Treino por{" "}
                     {formatBronze(

@@ -180,7 +180,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "Treinar acumula progresso: o próximo ponto custa 10 + valor atual x 4.",
       "Um exercício por atributo, e o rendimento da sessão cresce junto com o nível: um ponto fica perto de cinco sessões a corrida inteira.",
       "Só a fera treina: em forma humana o pátio recusa a sessão, a sua e a do lobo. Transforme-se antes de subir.",
-      "Cada treino é pago na hora: o ponto inteiro custa o que três caçadas da sua faixa pagam, fatiado pelas sessões que ele pede, e toda volta da barra começa cobrando a sua fatia. É a caça que paga o corpo, sempre.",
+      "Cada treino é pago na hora e custa um quinto do ponto da sua faixa: o mesmo preço nos cinco exercícios, cobrado no primeiro turno de cada volta. O progresso que passar do ponto se perde, e é a caça que paga o corpo, sempre.",
       "Equipamento soma por cima do teto: o limite vale para o valor treinado.",
     ],
   },

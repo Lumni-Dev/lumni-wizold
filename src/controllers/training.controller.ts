@@ -38,10 +38,7 @@ export function listExercises(state: GameState): AvailableExercise[] {
   return EXERCISES.map((exercise) => {
     const maxed =
       character !== null && character.attributes[exercise.attribute] >= MAX_ATTRIBUTE_VALUE;
-    const cost = trainingSessionCost(
-      character?.level ?? 1,
-      character?.attributes[exercise.attribute] ?? 1,
-    );
+    const cost = trainingSessionCost(character?.level ?? 1);
     const affordable = character !== null && character.bronze >= cost;
 
     return {
@@ -109,7 +106,7 @@ export function train(state: GameState, exerciseId: string): Result<TrainingRepo
     return failure(state, "Só a fera treina. Transforme-se antes de subir no pátio.");
   }
 
-  const cost = trainingSessionCost(character.level, character.attributes[exercise.attribute]);
+  const cost = trainingSessionCost(character.level);
   if (character.bronze < cost) {
     return failure(
       state,

@@ -28,7 +28,9 @@ const { EQUIPMENT_SETS, pieceId, piecePrice, setForLevel } = require(
   join(BUILD, "models/data/equipment-sets.js"),
 );
 const { findItem } = require(join(BUILD, "models/data/items.js"));
-const { trainingPointCost } = require(join(BUILD, "models/rules/training.js"));
+const { trainingSessionCost, trainingSessionsPerPoint } = require(
+  join(BUILD, "models/rules/training.js"),
+);
 const { buildCreatures } = require(join(BUILD, "models/data/species.js"));
 const { EQUIPMENT_SLOTS } = require(join(BUILD, "models/entities/item.js"));
 const { BASE_ATTRIBUTE_VALUE, MAX_ATTRIBUTE_VALUE, MIN_HEALTH_RATIO_TO_ACT } = require(
@@ -183,7 +185,8 @@ function economy(level) {
   const set = setForLevel(level);
   const setPrice = EQUIPMENT_SLOTS.reduce((total, slot) => total + piecePrice(set, slot), 0);
 
-  const point = trainingPointCost(level);
+  const point =
+    trainingSessionsPerPoint(level, Math.round(level * 0.55)) * trainingSessionCost(level);
   const perHunt = bronze + loot;
 
   return {
