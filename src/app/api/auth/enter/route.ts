@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { MIN_AGE } from "@/shared/constants/game";
 import { ageOf, isRealBirth } from "@/shared/utils/birth";
 import { withTransaction } from "@/models/repositories/server/database";
@@ -6,6 +6,7 @@ import { createUser, findUserByEmail } from "@/models/repositories/server/user.s
 import { loadGame } from "@/models/repositories/server/game.store";
 import { asText, bad, clientIp, readBody, refuseAbuse } from "../../_lib/api";
 import { verifyGoogleCredential } from "../../_lib/google";
+import { sendWelcomeEmail } from "../../_lib/mail";
 import { rateLimit } from "../../_lib/rate-limit";
 import { attachSession } from "../../_lib/session";
 export async function POST(request: Request) {
@@ -52,6 +53,13 @@ export async function POST(request: Request) {
             "-" +
             birth.day.padStart(2, "0"),
         ));
+      if (!existing) {
+        after(() =>
+          sendWelcomeEmail(identity.email).catch((error) =>
+            console.error("[mail] boas-vindas", error),
+          ),
+        );
+      }
       await attachSession(user.id);
       const loaded = await loadGame(client, user.id, false);
       return NextResponse.json({

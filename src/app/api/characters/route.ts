@@ -1,8 +1,10 @@
+import { after } from "next/server";
 import * as characterController from "@/controllers/character.controller";
 import type { Gender } from "@/models/entities/character";
 import { withTransaction } from "@/models/repositories/server/database";
 import { insertNewGame, loadGame } from "@/models/repositories/server/game.store";
 import { asText, bad, readBody, refuseAbuse, reply } from "../_lib/api";
+import { sendFarewellEmail } from "../_lib/mail";
 import { rateLimit } from "../_lib/rate-limit";
 import { sessionUserId } from "../_lib/session";
 export async function DELETE(request: Request) {
@@ -12,7 +14,21 @@ export async function DELETE(request: Request) {
   if (!userId) return bad("Entre para jogar.", 401);
   try {
     return await withTransaction(async (client) => {
+      const found = await client.query(
+        `select u.email, c.name from characters c
+           join users u on u.id = c.user_id
+          where c.user_id = $1`,
+        [userId],
+      );
       const gone = await client.query("delete from characters where user_id = $1", [userId]);
+      const row = found.rows[0];
+      if (gone.rowCount === 1 && row?.email) {
+        after(() =>
+          sendFarewellEmail(String(row.email), String(row.name)).catch((error) =>
+            console.error("[mail] despedida", error),
+          ),
+        );
+      }
       return Response.json({
         ok: gone.rowCount === 1,
         message:
