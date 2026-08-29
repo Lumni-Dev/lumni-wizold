@@ -179,9 +179,11 @@ export function TrainingScreen() {
                 <CardFooter>
                   <span className="text-[11px] text-ink-faint">
                     {active
-                      ? state.automation.train
-                        ? "Treinando sem parar..."
-                        : "Treinando..."
+                      ? session.id === exercise.id && session.beat <= 1
+                        ? "Cobrando..."
+                        : state.automation.train
+                          ? "Treinando sem parar..."
+                          : "Treinando..."
                       : waitingExercise === exercise.id
                         ? "Esperando bronze para continuar"
                         : reason}
@@ -249,9 +251,11 @@ export function TrainingScreen() {
               <CardFooter>
                 <span className="text-[11px] text-ink-faint">
                   {petActive
-                    ? state.automation.train
-                      ? "Treinando sem parar..."
-                      : "Treinando..."
+                    ? session.id === PET_EXERCISE_ID && session.beat <= 1
+                      ? "Cobrando..."
+                      : state.automation.train
+                        ? "Treinando sem parar..."
+                        : "Treinando..."
                     : petTraining.reason}
                 </span>
                 <BodyGate open={petReady && !petActive} reason="Só a fera treina.">
