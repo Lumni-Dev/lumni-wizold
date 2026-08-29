@@ -11,6 +11,7 @@ import {
   PET_MAX_LEVEL,
   PET_ENERGY_PER_HUNT,
   PET_REST_RATIO,
+  REST_TICK_MS,
   PET_PRICE,
   PET_RENAME_PRICE,
   TRANSFORM_DURATION_MS,
@@ -137,7 +138,11 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         " minutos: passado o tempo, o corpo volta sozinho à forma humana.",
       "Voltar ao humano é gratuito e não devolve a fúria gasta.",
       "Perder uma caçada ou um duelo recolhe a fera sozinho: a derrota devolve a forma humana e apaga o selo da fúria.",
-      "Um botão só comanda o corpo: Recuperar-se para todas as atividades e devolve um décimo da vida e da fúria a cada três segundos; o corpo inteiro volta em meio minuto, em qualquer nível. Inteiro, o botão vira Transformar; transformado, recolhe a fera.",
+      "Um botão só comanda o corpo: Recuperar-se para todas as atividades e devolve um décimo da vida e da fúria a cada " +
+        REST_TICK_MS / 1000 +
+        " segundos; o corpo inteiro volta em " +
+        (REST_TICK_MS / 1000) * 10 +
+        " segundos, em qualquer nível. Inteiro, o botão vira Transformar; transformado, recolhe a fera.",
     ],
   },
   {
@@ -285,7 +290,11 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "Sem energia ele para: sai da luta, não empresta nada e espera comida ou repouso.",
       "Acompanhar e Repousar, na página do mascote, é o que decide se ele desce com você. Em repouso ele devolve " +
         Math.round(PET_REST_RATIO * 100) +
-        "% da energia a cada três segundos, de graça: meio minuto do zero ao cheio em qualquer nível, e o alimento faz o mesmo na hora.",
+        "% da energia a cada " +
+        REST_TICK_MS / 1000 +
+        " segundos, de graça: " +
+        Math.round(1 / PET_REST_RATIO) * (REST_TICK_MS / 1000) +
+        " segundos do zero ao cheio em qualquer nível, e o alimento faz o mesmo na hora.",
       "Nas configurações, alimento automático e repouso automático cuidam disso sozinhos: come se houver comida na mochila, deita se não houver.",
     ],
   },
