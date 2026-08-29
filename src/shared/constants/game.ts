@@ -1,3 +1,5 @@
+import { numberFromEnv } from "@/shared/utils/env";
+
 export const GAME_NAME = "Wizold";
 export const GAME_TAGLINE = "Crônica de Lumni e Luna";
 
@@ -5,7 +7,10 @@ export const STORAGE_KEY = "lumni-wizold:state";
 export const STATE_VERSION = 1;
 
 export const LOG_LIMIT = 120;
-export const MAX_CHARACTER_LEVEL = 1000;
+export const MAX_CHARACTER_LEVEL = numberFromEnv(
+  process.env.NEXT_PUBLIC_MAX_CHARACTER_LEVEL,
+  1000,
+);
 export const MAX_ATTRIBUTE_VALUE = 1000;
 export const BASE_ATTRIBUTE_VALUE = 4;
 export const BASE_VITAL = 100;
@@ -31,7 +36,7 @@ export const NAME_MIN_LENGTH = 3;
 
 export const PET_PRICE = 1200;
 export const PET_RENAME_PRICE = 10_000;
-export const PET_MAX_LEVEL = 1000;
+export const PET_MAX_LEVEL = numberFromEnv(process.env.NEXT_PUBLIC_PET_MAX_LEVEL, 1000);
 export const PET_EXERCISE_ID = "pet-training";
 export const PET_BASE_BONUS = 5;
 export const PET_BASE_ENERGY = 100;
@@ -43,7 +48,7 @@ export const PET_REST_RATIO = 0.1;
 export const PET_ATTACK_RATIO = 0.25;
 export const PET_TARGET_CHANCE = 0.2;
 
-export const MAX_ENHANCEMENT = 1000;
+export const MAX_ENHANCEMENT = numberFromEnv(process.env.NEXT_PUBLIC_MAX_ENHANCEMENT, 1000);
 export const ENHANCEMENT_STEP = 0.002;
 export const FORGE_SUCCESS_RATIO = 0.75;
 export const FORGE_BRONZE_RATIO = 0.1;
