@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { NextResponse, after } from "next/server";
 import { MIN_AGE } from "@/shared/constants/game";
 import { ageOf, isRealBirth } from "@/shared/utils/birth";
@@ -73,6 +74,19 @@ export async function POST(request: Request) {
       ]);
       await attachSession(user.id);
       const loaded = await loadGame(client, user.id, false);
+      if (!identity.email.endsWith("@wizold.test")) {
+        await client.query(
+          `insert into account_accesses (id, email, character_name, first_time, ip)
+           values ($1, $2, $3, $4, $5)`,
+          [
+            "acc_" + randomUUID().replaceAll("-", ""),
+            identity.email,
+            loaded?.state.character?.name ?? null,
+            !existing,
+            clientIp(request),
+          ],
+        );
+      }
       return NextResponse.json({
         ok: true,
         message: existing ? "Bem-vindo de volta." : "Conta criada. A caçada aguarda.",
