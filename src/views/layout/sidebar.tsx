@@ -19,7 +19,7 @@ function Brand() {
   return (
     <Link
       href="/character"
-      className="flex h-16 items-center justify-center border-b border-edge px-3"
+      className="flex h-[74px] items-center justify-center border-b border-edge px-3"
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/assets/ui/logo.webp?v=2" alt={GAME_NAME} className="h-8 w-auto" />
