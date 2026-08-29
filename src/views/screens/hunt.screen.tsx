@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useArt } from "@/controllers/art.context";
 import { useGame } from "@/controllers/game.context";
 import { listTerritories, type HuntReport } from "@/controllers/hunt.controller";
 import { playSound } from "@/controllers/sound";
@@ -14,7 +15,6 @@ import { formatNumber, formatBronze } from "@/shared/utils/format";
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
 import { Card, CardFooter, CardHeader } from "../components/card";
-import { TerritoryIcon } from "../components/territory-icon";
 import { Tag } from "../components/tag";
 import { DataRow } from "../components/data-row";
 import { List, ListRow } from "../components/list";
@@ -144,6 +144,7 @@ export function HuntScreen() {
     activity,
     setActivity,
   } = useGame();
+  const art = useArt();
   const paused = activity?.paused === true;
   const activeId = activity?.kind === "hunt" && !paused ? (activity.id ?? null) : null;
   const waitingId = activity?.kind === "hunt" && paused ? (activity.id ?? null) : null;
@@ -351,8 +352,21 @@ export function HuntScreen() {
                 tone={active ? "highlighted" : "default"}
                 className={cn(!available && !active && "opacity-70")}
               >
+                {art.territories[territory.id] ? (
+                  <div className="relative aspect-video w-full overflow-hidden border-b border-edge">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={art.territories[territory.id]}
+                      alt=""
+                      loading="lazy"
+                      className="h-full w-full object-cover"
+                    />
+                    {active ? (
+                      <span className="item-glow pointer-events-none absolute -inset-1/2" />
+                    ) : null}
+                  </div>
+                ) : null}
                 <CardHeader>
-                  <TerritoryIcon territory={territory} shine={active} />
                   <div className="min-w-0 flex-1">
                     <h2 className="truncate text-sm text-ink">{territory.name}</h2>
                     <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
