@@ -91,6 +91,7 @@ export function PaymentModal({
           compact
           label="Nome completo"
           placeholder="Como está no documento"
+          maxLength={80}
           autoComplete="off"
           value={payer.name}
           onChange={(event) => setPayer({ ...payer, name: event.target.value })}
@@ -100,6 +101,7 @@ export function PaymentModal({
           label="CPF"
           placeholder="000.000.000-00"
           inputMode="numeric"
+          maxLength={14}
           autoComplete="off"
           value={payer.cpf}
           onChange={(event) => setPayer({ ...payer, cpf: formatCpf(event.target.value) })}
@@ -109,6 +111,7 @@ export function PaymentModal({
             compact
             label="Chave Pix"
             placeholder="e-mail, CPF ou chave aleatória"
+            maxLength={77}
             autoComplete="off"
             value={payer.pixKey}
             onChange={(event) => setPayer({ ...payer, pixKey: event.target.value })}

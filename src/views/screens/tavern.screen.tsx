@@ -342,6 +342,7 @@ export function TavernScreen() {
               <Field
                 label="Senha (opcional)"
                 type="password"
+                maxLength={60}
                 value={roomPassword}
                 placeholder="deixe vazio para sala aberta"
                 autoComplete="new-password"
@@ -507,6 +508,7 @@ export function TavernScreen() {
                       <Field
                         compact
                         type="password"
+                        maxLength={60}
                         aria-label={"Senha da sala " + room.name}
                         placeholder="senha da sala"
                         value={joinPasswords[room.id] ?? ""}

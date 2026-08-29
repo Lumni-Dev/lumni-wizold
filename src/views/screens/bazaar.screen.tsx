@@ -279,6 +279,7 @@ export function BazaarScreen() {
                   compact
                   numeric
                   label="Quantidade"
+                  maxLength={10}
                   className="font-mono"
                   value={flow.quantity}
                   onChange={(event) => setFlow({ ...flow, quantity: event.target.value })}
@@ -287,13 +288,16 @@ export function BazaarScreen() {
 
               <Field
                 compact
-                label="Preço por unidade (R$)"
-                placeholder="0,00"
-                inputMode="decimal"
+                label="Preço por unidade"
+                placeholder="R$ 0,00"
+                inputMode="numeric"
                 className="font-mono"
                 hint={"O mínimo é " + formatReais(MIN_LISTING_CENTS) + "."}
                 value={flow.price}
-                onChange={(event) => setFlow({ ...flow, price: event.target.value })}
+                onChange={(event) => {
+                  const digits = event.target.value.replace(/\D/g, "").slice(0, 7);
+                  setFlow({ ...flow, price: digits === "" ? "" : formatReais(Number(digits)) });
+                }}
               />
 
               <p className="text-xs leading-relaxed text-ink-faint">
@@ -386,6 +390,7 @@ export function BazaarScreen() {
                   compact
                   numeric
                   label="Quantidade"
+                  maxLength={10}
                   hint={"Disponíveis: " + formatNumber(buying.available) + "."}
                   className="font-mono"
                   value={flow.quantity}
