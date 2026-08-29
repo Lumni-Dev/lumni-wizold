@@ -104,10 +104,11 @@ export function LandingScreen() {
             preload="auto"
             onTimeUpdate={(event) => {
               const video = event.currentTarget;
-              if (video.duration && video.duration - video.currentTime <= 5) setHeroShown(true);
+              if (video.duration && video.duration - video.currentTime <= 2) setHeroShown(true);
             }}
             onEnded={finishIntro}
             onError={finishIntro}
+            style={{ filter: "sepia(0.4) hue-rotate(-8deg) saturate(1.05)" }}
             className={cn(
               "pointer-events-none absolute inset-0 h-full w-full object-cover transition-opacity duration-700",
               intro === "leaving" ? "opacity-0" : "opacity-100",
