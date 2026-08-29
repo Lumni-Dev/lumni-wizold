@@ -80,6 +80,7 @@ export function IconArt({
     left: number;
     top: number;
   } | null>(null);
+  const [loaded, setLoaded] = useState(false);
   const place = (event: { clientX: number; clientY: number }) => {
     const gap = 16;
     setPreview({
@@ -92,13 +93,21 @@ export function IconArt({
   };
   return (
     <>
+      {!loaded ? (
+        <span aria-hidden="true" className="art-shimmer pointer-events-none absolute inset-0" />
+      ) : null}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={source}
         alt=""
         loading="lazy"
+        ref={(img) => {
+          if (img && img.complete && img.naturalWidth > 0) setLoaded(true);
+        }}
+        onLoad={() => setLoaded(true)}
         className={cn(
-          "h-full w-full cursor-zoom-in object-cover drop-shadow-[0_2px_4px_rgba(0,0,0,0.55)]",
+          "h-full w-full cursor-zoom-in object-cover drop-shadow-[0_2px_4px_rgba(0,0,0,0.55)] transition-opacity duration-300",
+          loaded ? "opacity-100" : "opacity-0",
           inset ?? (padded && ICON_PAD),
         )}
         onMouseEnter={place}

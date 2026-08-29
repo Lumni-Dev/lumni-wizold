@@ -2,6 +2,7 @@
 
 import { useArt } from "@/controllers/art.context";
 import { findGender, type Gender } from "@/models/entities/character";
+import { ArtImage } from "./art-image";
 import { IconArt, IconFrame, type IconSize } from "./icon-frame";
 
 export function GenderIcon({
@@ -35,8 +36,7 @@ export function GenderBanner({ gender }: { gender: Gender }) {
 
   return (
     <div className="aspect-square w-full overflow-hidden border-b border-edge">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={source} alt="" loading="lazy" className="h-full w-full object-cover" />
+      <ArtImage source={source} />
     </div>
   );
 }

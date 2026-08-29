@@ -2,6 +2,7 @@
 
 import { useArt } from "@/controllers/art.context";
 import { findPet, type PetGender } from "@/models/entities/pet";
+import { ArtImage } from "./art-image";
 import { IconArt, IconFrame, type IconSize } from "./icon-frame";
 
 export function PetBanner({ gender }: { gender: PetGender }) {
@@ -12,8 +13,7 @@ export function PetBanner({ gender }: { gender: PetGender }) {
 
   return (
     <div className="aspect-square w-full overflow-hidden border-b border-edge">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={source} alt="" loading="lazy" className="h-full w-full object-cover" />
+      <ArtImage source={source} />
     </div>
   );
 }

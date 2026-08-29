@@ -12,6 +12,7 @@ import { isPetHunting } from "@/models/rules/pet";
 import { HUNT_TICK_MS, HUNT_TICKS } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
 import { formatNumber, formatBronze } from "@/shared/utils/format";
+import { ArtImage } from "../components/art-image";
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
 import { Card, CardFooter, CardHeader } from "../components/card";
@@ -354,13 +355,7 @@ export function HuntScreen() {
               >
                 {art.territories[territory.id] ? (
                   <div className="aspect-video w-full overflow-hidden border-b border-edge">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={art.territories[territory.id]}
-                      alt=""
-                      loading="lazy"
-                      className="h-full w-full object-cover"
-                    />
+                    <ArtImage source={art.territories[territory.id]} />
                   </div>
                 ) : null}
                 <CardHeader>

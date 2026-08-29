@@ -193,6 +193,28 @@
 }
 
 
+@keyframes art-shimmer {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@utility art-shimmer {
+  background-color: var(--color-surface-high);
+  background-image: linear-gradient(
+    100deg,
+    transparent 25%,
+    rgba(250, 245, 239, 0.07) 50%,
+    transparent 75%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: art-shimmer 1400ms linear infinite;
+}
+
 @keyframes toast-in {
   from {
     opacity: 0;
