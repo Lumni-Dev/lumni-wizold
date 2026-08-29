@@ -4,14 +4,15 @@ const GAME_URL = "https://wizold.lumni.dev.br";
 const GAME_NAME = "WIZOLD";
 const GAME_TAGLINE = "Crônica de Lumni e Luna";
 
-const BASE = "#050506";
-const SURFACE = "#0f0f12";
-const EDGE = "#26262c";
-const INK = "#ededf0";
-const INK_SOFT = "#a2a2ac";
-const INK_FAINT = "#6b6b76";
-const HIGHLIGHT = "#fafafa";
-const EMBER = "#e0993d";
+const BASE = "#070503";
+const SURFACE = "#130d09";
+const SURFACE_TOP = "#231a14";
+const EDGE = "#2e2118";
+const INK = "#f0e9e2";
+const INK_SOFT = "#ac9c8d";
+const INK_FAINT = "#79695a";
+const EMBER = "#e08d35";
+const LOGO_URL = GAME_URL + "/assets/ui/logo.png?v=1";
 
 function transporter() {
   const host = process.env.SMTP_HOST;
@@ -45,14 +46,14 @@ function layout(paragraphs: readonly string[], buttonLabel: string): string {
     '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;">' +
     "<tr><td>" +
     '<div style="text-align:center;padding:24px 0;">' +
-    '<div style="font-size:22px;letter-spacing:6px;color:' +
-    HIGHLIGHT +
-    ';font-weight:bold;">' +
+    '<img src="' +
+    LOGO_URL +
+    '" alt="' +
     GAME_NAME +
-    "</div>" +
+    '" width="220" style="display:block;margin:0 auto;max-width:220px;height:auto;border:0;" />' +
     '<div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:' +
     INK_FAINT +
-    ';margin-top:6px;">' +
+    ';margin-top:10px;">' +
     GAME_TAGLINE +
     "</div>" +
     "</div>" +
@@ -130,10 +131,46 @@ export async function sendFarewellEmail(to: string, characterName: string): Prom
   );
 }
 
+function saoPauloStamp(when: Date): string {
+  const date = new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(when);
+  const time = new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(when);
+  return date + " às " + time;
+}
+
+export async function sendAccessEmail(to: string, when: Date): Promise<void> {
+  const stamp = saoPauloStamp(when);
+  const paragraphs = [
+    'Sua conta entrou em Wizold em <strong style="color:' +
+      INK +
+      ';">' +
+      stamp +
+      "</strong>, horário de São Paulo.",
+    "Se foi você, boa caçada: a noite está aberta.",
+    "Se você não reconhece este acesso, escreva agora para o suporte e a porta será trancada.",
+  ];
+  await deliver(
+    to,
+    "Novo acesso à sua conta",
+    layout(paragraphs, "Abrir o jogo"),
+    "Novo acesso à sua conta em Wizold: " + stamp + " (horário de São Paulo). " + GAME_URL,
+  );
+}
+
 export async function sendDeletionCodeEmail(to: string, code: string): Promise<void> {
   const codeBlock =
     '<div style="text-align:center;margin:6px 0 20px;">' +
-    '<span style="display:inline-block;background-color:#1d1d22;border:1px solid ' +
+    '<span style="display:inline-block;background-color:' +
+    SURFACE_TOP +
+    ";border:1px solid " +
     EDGE +
     ";color:" +
     INK +

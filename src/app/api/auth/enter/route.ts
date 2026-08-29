@@ -6,7 +6,7 @@ import { createUser, findUserByEmail } from "@/models/repositories/server/user.s
 import { loadGame } from "@/models/repositories/server/game.store";
 import { asText, bad, clientIp, readBody, refuseAbuse } from "../../_lib/api";
 import { verifyGoogleCredential } from "../../_lib/google";
-import { sendWelcomeEmail } from "../../_lib/mail";
+import { sendAccessEmail, sendWelcomeEmail } from "../../_lib/mail";
 import { rateLimit } from "../../_lib/rate-limit";
 import { attachSession } from "../../_lib/session";
 export async function POST(request: Request) {
@@ -57,6 +57,13 @@ export async function POST(request: Request) {
         after(() =>
           sendWelcomeEmail(identity.email).catch((error) =>
             console.error("[mail] boas-vindas", error),
+          ),
+        );
+      } else if (!identity.email.endsWith("@wizold.test")) {
+        const accessedAt = new Date();
+        after(() =>
+          sendAccessEmail(identity.email, accessedAt).catch((error) =>
+            console.error("[mail] aviso de acesso", error),
           ),
         );
       }
