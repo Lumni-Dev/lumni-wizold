@@ -72,7 +72,9 @@ export function Modal({
         <header className="flex items-center justify-between gap-3 border-b border-edge bg-surface-high/40 px-4 py-3">
           <h2 className="heading truncate text-[11px] text-ink">{title}</h2>
           {action ? (
-            <span className="ml-auto shrink-0 font-mono text-[11px] text-ink-faint">{action}</span>
+            <span className="ml-auto inline-flex h-6 shrink-0 items-center justify-center rounded-md border border-edge px-2 font-mono text-[11px] text-ink-faint">
+              {action}
+            </span>
           ) : null}
           <button
             type="button"
