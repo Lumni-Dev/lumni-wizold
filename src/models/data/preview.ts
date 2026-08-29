@@ -12,8 +12,8 @@ export const PREVIEW_SHOTS: readonly PreviewShot[] = [
     label: "Personagem",
     title: "A ficha inteira, sem número escondido",
     text:
-      "Cada atributo mostra de onde veio cada ponto: treino, equipamento, lobo, lua e fera em " +
-      "colunas separadas. Some com o dedo e você chega no total.",
+      "Cada atributo mostra de onde veio cada ponto: treino, equipamento, mascote, lua e " +
+      "lobisomem em colunas separadas. Some com o dedo e você chega no total.",
     image: "/assets/landing/character.webp?v=2",
   },
   {

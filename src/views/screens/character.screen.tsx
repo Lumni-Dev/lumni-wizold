@@ -158,10 +158,10 @@ export function CharacterScreen() {
                     value: plus(lent(stats.sources.trained) - natural),
                     sum: false,
                   },
-                  { label: "Equip.", value: plus(lent(stats.sources.equipment)), sum: false },
-                  { label: "Lobo", value: plus(lent(stats.sources.pet)), sum: false },
+                  { label: "Equipamento", value: plus(lent(stats.sources.equipment)), sum: false },
+                  { label: "Mascote", value: plus(lent(stats.sources.pet)), sum: false },
                   { label: "Lua", value: plus(lent(stats.sources.moon)), sum: false },
-                  { label: "Fera", value: plus(lent(stats.sources.form)), sum: false },
+                  { label: "Lobisomem", value: plus(lent(stats.sources.form)), sum: false },
                   { label: "Total", value: formatNumber(total), sum: true },
                 ];
 
