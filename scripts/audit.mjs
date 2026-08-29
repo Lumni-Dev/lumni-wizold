@@ -1598,7 +1598,7 @@ sec("taverna");
   const joined = tavernCtrl.joinRoom(tavern, opened.roomId, other, "");
   ok("entrar funciona", joined.ok === true);
   tavern = joined.state;
-  for (let extra = 0; extra < 8; extra += 1) {
+  for (let extra = 0; extra < 18; extra += 1) {
     tavern = tavernCtrl.joinRoom(
       tavern,
       opened.roomId,
@@ -1607,17 +1607,33 @@ sec("taverna");
     ).state;
   }
   ok(
-    "a décima primeira cadeira não existe",
+    "a vigésima primeira cadeira não existe",
     tavernCtrl.joinRoom(tavern, opened.roomId, { id: "sobra", name: "Sobra" }, "").ok === false,
   );
-  for (let index = 0; index < 20; index += 1) {
+  for (let index = 0; index < 50; index += 1) {
     tavern = tavernCtrl.sendMessage(tavern, opened.roomId, me, "eco " + index).state;
   }
   ok(
-    "mesa guarda 12 falas",
+    "mesa guarda 40 falas",
     tavernCtrl.findRoom(tavern, opened.roomId).messages.length === entTavern.MAX_ROOM_MESSAGES,
   );
   ok("fala vazia recusa", tavernCtrl.sendMessage(tavern, opened.roomId, me, "   ").ok === false);
+  ok(
+    "link com https recusa",
+    tavernCtrl.sendMessage(tavern, opened.roomId, me, "olha https://exemplo.com/x").ok === false,
+  );
+  ok(
+    "link com www recusa",
+    tavernCtrl.sendMessage(tavern, opened.roomId, me, "entra em www.exemplo.io").ok === false,
+  );
+  ok(
+    "domínio pelado recusa",
+    tavernCtrl.sendMessage(tavern, opened.roomId, me, "acessa exemplo.com agora").ok === false,
+  );
+  ok(
+    "fala com pontuação passa",
+    tavernCtrl.sendMessage(tavern, opened.roomId, me, "Boa noite, matilha. Tudo bem?").ok === true,
+  );
   ok(
     "de fora não se fala",
     tavernCtrl.sendMessage(tavern, opened.roomId, { id: "fora", name: "Fora" }, "oi").ok === false,

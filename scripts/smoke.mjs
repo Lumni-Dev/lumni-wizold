@@ -124,6 +124,10 @@ const spoke = await call("POST", "/api/tavern/rooms/" + roomId + "/messages", {
   text: "Uivo de teste",
 });
 check("fala registrada", spoke.payload?.ok === true);
+const linked = await call("POST", "/api/tavern/rooms/" + roomId + "/messages", {
+  text: "vem ver https://exemplo.com",
+});
+check("link na mesa é recusado", linked.payload?.ok === false, linked.payload?.message);
 const tavern = (await call("POST", "/api/tavern")).payload?.data;
 const seat = tavern?.rooms?.find((entry) => entry.room.id === roomId);
 check(

@@ -1,5 +1,5 @@
-export const MAX_ROOM_MEMBERS = 10;
-export const MAX_ROOM_MESSAGES = 12;
+export const MAX_ROOM_MEMBERS = 20;
+export const MAX_ROOM_MESSAGES = 40;
 const ROOM_NAME_MIN_LENGTH = 3;
 export const ROOM_NAME_MAX_LENGTH = 25;
 export const MESSAGE_MAX_LENGTH = 240;

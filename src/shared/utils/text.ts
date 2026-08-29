@@ -13,3 +13,10 @@ export function normalizeText(value: string): string {
     .replace(/[\u0300-\u036f]/g, "")
     .trim();
 }
+
+const LINK_PATTERN =
+  /(https?:\/\/|www\.)\S+|\S+\.(com|com\.br|net|org|br|io|gg|app|dev|xyz|me|co|tv|site|online|link)(\/\S*)?(\s|$)/i;
+
+export function containsLink(value: string): boolean {
+  return LINK_PATTERN.test(value);
+}

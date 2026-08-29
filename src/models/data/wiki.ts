@@ -19,7 +19,7 @@ import {
 } from "@/shared/constants/game";
 import { SPECIES_LABEL } from "../entities/creature";
 import { MAX_PACK } from "../entities/pack";
-import { MAX_ROOM_MEMBERS } from "../entities/tavern";
+import { MAX_ROOM_MEMBERS, MAX_ROOM_MESSAGES } from "../entities/tavern";
 import { ARENA_HISTORY_SIZE } from "../entities/arena";
 import {
   ARENA_BAND_RATIO,
@@ -365,6 +365,10 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "Uma mesa aberta cabe " +
         MAX_ROOM_MEMBERS +
         " pessoas, com ou sem senha, e você mantém uma por vez.",
+      "Cada mesa guarda as últimas " +
+        MAX_ROOM_MESSAGES +
+        " falas: o que veio antes a noite leva.",
+      "A taverna não aceita links: fala que carrega endereço volta recusada.",
       "Fechar a janela da conversa não é sair da mesa: o lugar continua seu e Entrar devolve a mesma cadeira.",
       "A mesa some do quadro quando a última pessoa sai, ou quando o dono a fecha.",
       "A matilha guarda até " +

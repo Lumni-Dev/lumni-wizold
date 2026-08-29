@@ -8,6 +8,10 @@ import { playSound } from "@/controllers/sound";
 import { useTavern } from "@/controllers/use-tavern";
 import { MAX_PACK, type PackMate } from "@/models/entities/pack";
 import {
+  tavernReadRepository,
+  type TavernReadMap,
+} from "@/models/repositories/tavern-read.repository";
+import {
   MAX_ROOM_MEMBERS,
   MESSAGE_MAX_LENGTH,
   ROOM_NAME_MAX_LENGTH,
@@ -86,6 +90,29 @@ export function TavernScreen() {
   }, [lastMessageId]);
 
   const openRoomId = activeRoom ? activeRoomId : null;
+
+  const [readMap, setReadMap] = useState<TavernReadMap>(() => tavernReadRepository.load());
+  const roomsRef = useRef(rooms);
+  useEffect(() => {
+    roomsRef.current = rooms;
+  });
+  const lastMessageAt = activeRoom?.messages[activeRoom.messages.length - 1]?.at ?? null;
+  useEffect(() => {
+    if (!openRoomId || !lastMessageAt) return;
+    const timer = window.setTimeout(() => {
+      setReadMap((current) => {
+        if ((current[openRoomId] ?? "") >= lastMessageAt) return current;
+        const alive = new Set(roomsRef.current.map((summary) => summary.room.id));
+        const next: TavernReadMap = {};
+        for (const [roomId, at] of Object.entries({ ...current, [openRoomId]: lastMessageAt })) {
+          if (alive.has(roomId)) next[roomId] = at;
+        }
+        tavernReadRepository.save(next);
+        return next;
+      });
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [openRoomId, lastMessageAt]);
 
   if (!character || !identity) return null;
 
@@ -323,7 +350,16 @@ export function TavernScreen() {
             />
           ) : (
             <div className="grid gap-6 sm:grid-cols-2">
-              {roomsOnPage.map(({ room, locked, full, memberCount, isMember, isPrivate }) => (
+              {roomsOnPage.map(({ room, locked, full, memberCount, isMember, isPrivate }) => {
+                const lastRead = readMap[room.id] ?? "";
+                const unread = room.messages.filter(
+                  (message) =>
+                    message.at > lastRead &&
+                    message.authorId !== "system" &&
+                    message.authorId !== identity.id,
+                ).length;
+
+                return (
                 <Card
                   key={room.id}
                   height="fill"
@@ -335,6 +371,11 @@ export function TavernScreen() {
                       <div className="flex items-center justify-between gap-2">
                         <h3 className="truncate text-sm text-ink">{room.name}</h3>
                         <div className="flex shrink-0 items-center gap-2">
+                          {unread > 0 ? (
+                            <span className="inline-flex h-4 min-w-4 items-center justify-center rounded border border-ember bg-ember px-1 font-mono text-[10px] font-bold tracking-normal text-base">
+                              {unread > 9 ? "9+" : unread}
+                            </span>
+                          ) : null}
                           {isPrivate ? (
                             <Tag tone="neutral">Reservada</Tag>
                           ) : (
@@ -358,9 +399,9 @@ export function TavernScreen() {
                   </CardHeader>
 
                   <CardBody>
-                    <ul className="grow space-y-1">
+                    <ul className="flex grow items-start gap-3 overflow-x-auto pb-1">
                       {room.members.map((member) => (
-                        <li key={member.id} className="truncate text-xs">
+                        <li key={member.id} className="shrink-0 whitespace-nowrap text-xs">
                           <MemberName
                             href={profileHref(member.id)}
                             name={member.name}
@@ -433,7 +474,8 @@ export function TavernScreen() {
                     </div>
                   </CardFooter>
                 </Card>
-              ))}
+                );
+              })}
             </div>
           )}
 
@@ -471,13 +513,13 @@ export function TavernScreen() {
       >
         {activeRoom ? (
           <>
-            <div className="flex flex-wrap items-center gap-2 border-b border-edge px-4 py-3">
+            <div className="flex items-center gap-2 overflow-x-auto border-b border-edge px-4 py-3">
               {activeRoom.members.map((member) => {
                 const yourself = member.id === identity.id;
                 const kept = isInPack(state, member.id);
 
                 return (
-                  <span key={member.id} className="flex items-center gap-1">
+                  <span key={member.id} className="flex shrink-0 items-center gap-1">
                     <Tag tone={yourself ? "neutral" : "faint"} className="gap-2">
                       <MemberName href={profileHref(member.id)} name={member.name} />
                       {kept && !yourself ? (
@@ -502,8 +544,11 @@ export function TavernScreen() {
             </div>
 
             <List ref={messagesRef} className="h-80 overflow-y-auto">
-              {activeRoom.messages.map((message) => (
-                <ListRow key={message.id} className="items-start">
+              {activeRoom.messages.map((message, index) => (
+                <ListRow
+                  key={message.id}
+                  className={cn("items-start", index % 2 === 1 && "bg-surface-high/50")}
+                >
                   <span className="mt-1 font-mono text-[10px] text-ink-faint">
                     {formatTime(message.at)}
                   </span>
