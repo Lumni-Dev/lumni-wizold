@@ -116,13 +116,21 @@ export function LandingScreen() {
             preload="auto"
             onTimeUpdate={(event) => {
               const video = event.currentTarget;
-              if (video.duration && video.duration - video.currentTime <= 2) setHeroShown(true);
+              if (video.duration && video.duration - video.currentTime <= 1) setHeroShown(true);
             }}
             onEnded={finishIntro}
             onError={finishIntro}
-            style={{ filter: "sepia(0.4) hue-rotate(-8deg) saturate(1.05)" }}
+            style={{ filter: "sepia(0.7) hue-rotate(-10deg) saturate(1.4) brightness(0.85)" }}
             className={cn(
               "pointer-events-none absolute inset-0 h-full w-full object-cover transition-opacity duration-700",
+              intro === "leaving" ? "opacity-0" : "opacity-100",
+            )}
+          />
+        ) : null}
+        {intro !== "done" ? (
+          <div
+            className={cn(
+              "pointer-events-none absolute inset-0 bg-ember/15 mix-blend-overlay transition-opacity duration-700",
               intro === "leaving" ? "opacity-0" : "opacity-100",
             )}
           />
