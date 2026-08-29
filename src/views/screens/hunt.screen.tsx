@@ -132,8 +132,18 @@ function CombatReport({ report }: { report: HuntReport }) {
   );
 }
 export function HuntScreen() {
-  const { state, character, pet, hunt, sufferBlow, landHunt, toggleForm, activity, setActivity } =
-    useGame();
+  const {
+    state,
+    character,
+    pet,
+    hunt,
+    sufferBlow,
+    landHunt,
+    notify,
+    toggleForm,
+    activity,
+    setActivity,
+  } = useGame();
   const paused = activity?.paused === true;
   const activeId = activity?.kind === "hunt" && !paused ? (activity.id ?? null) : null;
   const waitingId = activity?.kind === "hunt" && paused ? (activity.id ?? null) : null;
@@ -156,6 +166,7 @@ export function HuntScreen() {
   const huntRef = useRef(hunt);
   const sufferRef = useRef(sufferBlow);
   const landRef = useRef(landHunt);
+  const notifyRef = useRef(notify);
   const stateRef = useRef(state);
   const nameRef = useRef("");
   useEffect(() => {
@@ -163,6 +174,7 @@ export function HuntScreen() {
     huntRef.current = hunt;
     sufferRef.current = sufferBlow;
     landRef.current = landHunt;
+    notifyRef.current = notify;
     stateRef.current = state;
     nameRef.current = character?.name ?? "";
   });
@@ -220,6 +232,35 @@ export function HuntScreen() {
         landRef.current();
         setReport(held);
         setSession((current) => accumulate(current, held));
+        if (held.combat.victory) {
+          const spoils = held.drops
+            .map((drop) => drop.name + (drop.quantity > 1 ? " x" + drop.quantity : ""))
+            .join(", ");
+          notifyRef.current(
+            held.creature.name +
+              " abatido: +" +
+              formatNumber(held.bronze) +
+              " de bronze e +" +
+              formatNumber(held.experience) +
+              " de experiência." +
+              (spoils ? " Espólio: " + spoils + "." : "") +
+              (held.levelsGained > 0 ? " Você subiu de nível!" : ""),
+            true,
+            "Caça",
+          );
+        } else if (held.combat.retreated) {
+          notifyRef.current(
+            "A caçada com " + held.creature.name + " se arrastou e os dois recuaram.",
+            true,
+            "Caça",
+          );
+        } else {
+          notifyRef.current(
+            held.creature.name + " levou a melhor: a caçada não pagou nada.",
+            false,
+            "Caça",
+          );
+        }
         if (!held.combat.victory && !held.combat.retreated) playSound("defeat");
         if (!autoRef.current) {
           beatRef.current = 0;
