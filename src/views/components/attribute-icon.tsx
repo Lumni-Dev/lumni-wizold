@@ -20,11 +20,7 @@ export function AttributeIcon({
 
   return (
     <IconFrame size={size} shine={shine} className={className}>
-      {source ? (
-        <IconArt source={source} padded={false} inset="p-[6px]" />
-      ) : (
-        (findAttribute(attribute)?.code ?? "")
-      )}
+      {source ? <IconArt source={source} padded={false} /> : (findAttribute(attribute)?.code ?? "")}
     </IconFrame>
   );
 }

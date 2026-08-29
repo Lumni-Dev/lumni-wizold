@@ -21,7 +21,7 @@ export function PetIcon({
   return (
     <IconFrame size={size} tone="strong" shine={shine} className={className}>
       {source ? (
-        <IconArt source={source} padded={false} inset="p-[6px]" />
+        <IconArt source={source} padded={false} />
       ) : (
         findPet(gender).label.slice(0, 2).toUpperCase()
       )}
