@@ -24,7 +24,7 @@ export function Toast() {
     <div
       role="status"
       aria-live="polite"
-      className="pointer-events-none fixed bottom-6 right-6 z-60 flex w-[min(22rem,calc(100vw-3rem))] flex-col items-end gap-6"
+      className="pointer-events-none fixed bottom-6 right-6 z-60 flex w-[min(22rem,calc(100vw-3rem))] flex-col items-end gap-2"
     >
       {notices.map((line) => (
         <div key={line.id} className="toast-in pointer-events-auto relative w-full">
