@@ -586,7 +586,15 @@ export function GameProvider({ children }: { children: ReactNode }) {
           automation: { ...current.automation, [key]: on },
         }));
         playSound("ui");
-        void request("PUT", "/api/automation", { key, on });
+        void api("PUT", "/api/automation", { key, on }).then((answer) => {
+          if (!answer.ok) {
+            setState((current) => ({
+              ...current,
+              automation: { ...current.automation, [key]: !on },
+            }));
+            announce(answer.message, false, "Automação");
+          }
+        });
       },
       addToPack: async (person) => {
         const answer = await act(
