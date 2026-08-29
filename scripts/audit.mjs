@@ -425,15 +425,18 @@ sec("economia");
       "ponto custa 3 caçadas NV " + level,
       training.trainingPointCost(level) === Math.max(1, Math.round(purse * 3)),
     );
+    const trainedValue = Math.max(1, Math.round(level * 0.55));
     ok(
-      "sessão custa a fatia do ponto mais o nível NV " + level,
-      training.trainingSessionCost(level) ===
-        Math.max(1, Math.round(training.trainingPointCost(level) / 5)) + Math.max(0, level - 1),
+      "sessão custa a fatia do ponto mais o nível do atributo NV " + level,
+      training.trainingSessionCost(level, trainedValue) ===
+        Math.max(1, Math.round(training.trainingPointCost(level) / 5)) +
+          Math.max(0, trainedValue - 1),
     );
-    if (level > 1) {
+    if (trainedValue > 1) {
       ok(
-        "treinar fica mais caro a cada nível NV " + level,
-        training.trainingSessionCost(level) > training.trainingSessionCost(level - 1),
+        "treinar fica mais caro a cada ponto do atributo NV " + level,
+        training.trainingSessionCost(level, trainedValue) >
+          training.trainingSessionCost(level, trainedValue - 1),
       );
     }
     for (const pack of packsData.STORE_PACKS) {
@@ -462,7 +465,7 @@ sec("economia");
       progression.progressNeeded(value) / training.trainingEffort(level).progress,
     );
     ok("ponto sai em 3..7 sessões NV " + level, sessions >= 3 && sessions <= 7, sessions);
-    const perPoint = (sessions * training.trainingSessionCost(level)) / species.huntPurse(level);
+    const perPoint = (sessions * training.trainingSessionCost(level, value)) / species.huntPurse(level);
     ok(
       "ponto custa 1..10 caçadas NV " + level,
       perPoint >= 1 && perPoint <= 10,
@@ -758,7 +761,7 @@ sec("treinamento");
   const session = trainingCtrl.train(state, "trunk-punches");
   ok("sessão válida treina", session.ok === true);
   if (session.ok) {
-    const cost = training.trainingSessionCost(100);
+    const cost = training.trainingSessionCost(100, state.character.attributes.strength);
     ok(
       "cada sessão cobra na hora",
       session.state.character.bronze === state.character.bronze - cost,
@@ -768,7 +771,7 @@ sec("treinamento");
       session.state.character.attributes.strength > state.character.attributes.strength;
     ok("sessão rende progresso", gained);
     const second = trainingCtrl.train(session.state, "trunk-punches");
-    const secondCost = training.trainingSessionCost(100);
+    const secondCost = training.trainingSessionCost(100, session.state.character.attributes.strength);
     ok(
       "a sessão seguinte cobra de novo",
       second.ok && second.state.character.bronze === session.state.character.bronze - secondCost,

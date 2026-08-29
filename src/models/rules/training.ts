@@ -20,9 +20,9 @@ export function trainingSessionsPerPoint(level: number, value: number): number {
   return Math.max(1, Math.ceil(progressNeeded(value) / trainingEffort(level).progress));
 }
 
-export function trainingSessionCost(level: number): number {
+export function trainingSessionCost(level: number, value: number): number {
   return (
     Math.max(1, Math.round(trainingPointCost(level) / TRAINING_SESSIONS_PER_POINT)) +
-    Math.max(0, level - 1)
+    Math.max(0, value - 1)
   );
 }

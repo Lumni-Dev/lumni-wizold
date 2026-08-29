@@ -186,7 +186,7 @@ function economy(level) {
   const setPrice = EQUIPMENT_SLOTS.reduce((total, slot) => total + piecePrice(set, slot), 0);
 
   const point =
-    trainingSessionsPerPoint(level, Math.round(level * 0.55)) * trainingSessionCost(level);
+    trainingSessionsPerPoint(level, Math.round(level * 0.55)) * trainingSessionCost(level, Math.round(level * 0.55));
   const perHunt = bronze + loot;
 
   return {
