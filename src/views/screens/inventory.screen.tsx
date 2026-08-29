@@ -93,7 +93,14 @@ export function InventoryScreen() {
             return (
               <Card key={slot} height="fill" tone={item ? "highlighted" : "empty"}>
                 <CardHeader>
-                  {item ? <ItemIcon item={item} /> : <IconFrame>--</IconFrame>}
+                  {item ? (
+                    <ItemIcon
+                      item={item}
+                      enhancement={enhancementOf(state.enhancements, item.id)}
+                    />
+                  ) : (
+                    <IconFrame>--</IconFrame>
+                  )}
                   <div className="min-w-0 flex-1">
                     <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                       {SLOT_LABEL[slot]}
@@ -107,11 +114,6 @@ export function InventoryScreen() {
                 {item ? (
                   <CardBody direction="row">
                     <div className="flex flex-wrap gap-2">
-                      {enhancementOf(state.enhancements, item.id) > 0 ? (
-                        <Tag tone="neutral">
-                          Forjado +{enhancementOf(state.enhancements, item.id)}
-                        </Tag>
-                      ) : null}
                       {summarizeEffect(item, enhancementOf(state.enhancements, item.id)).map(
                         (effect, index) => (
                           <Tag key={index} tone="neutral">

@@ -29,7 +29,7 @@ export function ItemCard({
   return (
     <Card tone={highlighted ? "highlighted" : "default"} height="fill" interactive>
       <CardHeader>
-        <ItemIcon item={item} />
+        <ItemIcon item={item} enhancement={enhancement} />
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
             <h3 className="truncate text-sm font-medium text-ink">{item.name}</h3>
@@ -46,16 +46,11 @@ export function ItemCard({
       <CardBody>
         <p className="grow text-xs leading-relaxed text-ink-faint">{item.description}</p>
 
-        {effects.length > 0 || enhancement > 0 || fromBazaar ? (
+        {effects.length > 0 || fromBazaar ? (
           <ul className="flex flex-wrap gap-2">
             {fromBazaar ? (
               <li>
                 <Tag tone="light">Bazar</Tag>
-              </li>
-            ) : null}
-            {enhancement > 0 ? (
-              <li>
-                <Tag tone="neutral">Forjado +{enhancement}</Tag>
               </li>
             ) : null}
             {effects.map((effect, index) => (
