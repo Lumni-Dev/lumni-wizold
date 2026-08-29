@@ -131,6 +131,37 @@ export async function sendFarewellEmail(to: string, characterName: string): Prom
   );
 }
 
+export async function sendDepartureNoticeEmail(
+  departedEmail: string,
+  characterName: string,
+  characterLevel: number,
+): Promise<void> {
+  const admin = process.env.SMTP_SENDER ?? process.env.SMTP_USER;
+  if (!admin) return;
+  const paragraphs = [
+    "Uma conta partiu de <strong style=\"color:" + INK + ';">Wizold</strong>.',
+    "E-mail: <strong style=\"color:" +
+      INK +
+      ';">' +
+      departedEmail +
+      "</strong><br/>Personagem: <strong style=\"color:" +
+      INK +
+      ';">' +
+      characterName +
+      "</strong> (NV. " +
+      characterLevel +
+      ")<br/>Quando: " +
+      saoPauloStamp(new Date()),
+    "O registro também fica na tabela account_departures.",
+  ];
+  await deliver(
+    admin,
+    "Uma conta partiu: " + characterName,
+    layout(paragraphs, "Abrir o jogo"),
+    "Conta excluída de Wizold: " + departedEmail + " (" + characterName + ").",
+  );
+}
+
 function saoPauloStamp(when: Date): string {
   const date = new Intl.DateTimeFormat("pt-BR", {
     timeZone: "America/Sao_Paulo",

@@ -199,6 +199,10 @@ const leftovers = await rows(
   [user?.id, character?.id],
 );
 check("nada sobra do usuário apagado", leftovers[0]?.n === 0);
+const ghosts = await rows(
+  "select count(*)::int as n from account_departures where email like '%@wizold.test'",
+);
+check("bancada não deixa rastro de partida", ghosts[0]?.n === 0);
 await client.end();
 console.log("");
 console.log(failures === 0 ? "SMOKE COMPLETO: tudo passou" : failures + " falha(s)");

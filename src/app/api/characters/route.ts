@@ -1,11 +1,11 @@
-import { timingSafeEqual } from "node:crypto";
+import { randomUUID, timingSafeEqual } from "node:crypto";
 import { after } from "next/server";
 import * as characterController from "@/controllers/character.controller";
 import type { Gender } from "@/models/entities/character";
 import { withTransaction } from "@/models/repositories/server/database";
 import { insertNewGame, loadGame } from "@/models/repositories/server/game.store";
 import { asText, bad, readBody, refuseAbuse, reply } from "../_lib/api";
-import { sendFarewellEmail } from "../_lib/mail";
+import { sendDepartureNoticeEmail, sendFarewellEmail } from "../_lib/mail";
 import { rateLimit } from "../_lib/rate-limit";
 import { deletionCodeHash, dropSession, sessionUserId } from "../_lib/session";
 export async function DELETE(request: Request) {
@@ -47,7 +47,7 @@ export async function DELETE(request: Request) {
         return Response.json({ ok: false, message: "Código errado. Confira o e-mail.", data: null });
       }
       const found = await client.query(
-        `select u.email, c.id as character_id, c.name from users u
+        `select u.email, c.id as character_id, c.name, c.level from users u
            left join characters c on c.user_id = u.id
           where u.id = $1`,
         [userId],
@@ -57,13 +57,32 @@ export async function DELETE(request: Request) {
         await client.query("delete from tavern_messages where author_id = $1", [row.character_id]);
         await client.query("delete from pack_mates where mate_id = $1", [row.character_id]);
       }
+      const testAccount = !row?.email || String(row.email).endsWith("@wizold.test");
+      if (!testAccount) {
+        await client.query(
+          `insert into account_departures (id, email, character_name, character_level)
+           values ($1, $2, $3, $4)`,
+          [
+            "dep_" + randomUUID().replaceAll("-", ""),
+            String(row.email),
+            row.name ?? null,
+            row.level === null || row.level === undefined ? null : Number(row.level),
+          ],
+        );
+      }
       const gone = await client.query("delete from users where id = $1", [userId]);
-      if (gone.rowCount === 1 && row?.email && !String(row.email).endsWith("@wizold.test")) {
+      if (gone.rowCount === 1 && !testAccount) {
         const farewell = String(row.email);
         const name = String(row.name ?? "Caçador");
+        const level = Number(row.level ?? 1);
         after(() =>
           sendFarewellEmail(farewell, name).catch((error) =>
             console.error("[mail] despedida", error),
+          ),
+        );
+        after(() =>
+          sendDepartureNoticeEmail(farewell, name, level).catch((error) =>
+            console.error("[mail] aviso de partida", error),
           ),
         );
       }
