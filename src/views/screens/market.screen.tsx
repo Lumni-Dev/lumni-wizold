@@ -213,36 +213,45 @@ export function MarketScreen() {
 
           <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
             {offersOnPage.map(
-              ({ item, levelAllowed, affordable, ofLineage, ownedQuantity, reason }) => (
-                <ItemCard
-                  key={item.id}
-                  item={item}
-                  enhancement={enhancementOf(state.enhancements, item.id)}
-                  note={
-                    ofLineage
-                      ? (reason ??
-                        (ownedQuantity > 0 ? formatNumber(ownedQuantity) + " na mochila" : null))
-                      : null
-                  }
-                  footer={
-                    <div className="w-full">
-                      <Button
-                        fullWidth
-                        variant={ofLineage && levelAllowed && affordable ? "primary" : "outline"}
-                        onClick={() => {
-                          setBuying("1");
-                          setDeal({ kind: "buy", item, quantity: 1, total: item.price });
-                        }}
-                        disabled={!ofLineage || !levelAllowed || !affordable}
-                      >
-                        {ofLineage
-                          ? "Comprar por " + formatBronze(item.price)
-                          : "Apenas " + lineageName(item)}
-                      </Button>
-                    </div>
-                  }
-                />
-              ),
+              ({ item, levelAllowed, affordable, ofLineage, ownedQuantity, reason }) => {
+                const petless = item.category === "pet" && !state.pet;
+                return (
+                  <ItemCard
+                    key={item.id}
+                    item={item}
+                    enhancement={enhancementOf(state.enhancements, item.id)}
+                    note={
+                      ofLineage
+                        ? (reason ??
+                          (ownedQuantity > 0 ? formatNumber(ownedQuantity) + " na mochila" : null))
+                        : null
+                    }
+                    footer={
+                      <div className="w-full">
+                        <Button
+                          fullWidth
+                          variant={
+                            ofLineage && levelAllowed && affordable && !petless
+                              ? "primary"
+                              : "outline"
+                          }
+                          onClick={() => {
+                            setBuying("1");
+                            setDeal({ kind: "buy", item, quantity: 1, total: item.price });
+                          }}
+                          disabled={!ofLineage || !levelAllowed || !affordable || petless}
+                        >
+                          {petless
+                            ? "Sem mascote"
+                            : ofLineage
+                              ? "Comprar por " + formatBronze(item.price)
+                              : "Apenas " + lineageName(item)}
+                        </Button>
+                      </div>
+                    }
+                  />
+                );
+              },
             )}
           </div>
 

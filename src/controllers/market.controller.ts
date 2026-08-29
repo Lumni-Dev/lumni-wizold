@@ -74,6 +74,9 @@ export function buyItem(state: GameState, itemId: string, quantity = 1): Result 
   if (character.level < item.minLevel) {
     return failure(state, item.name + " exige NV. " + item.minLevel + ".");
   }
+  if (item.category === "pet" && !state.pet) {
+    return failure(state, "Sem mascote para alimentar: adote um lobo antes.");
+  }
 
   const cost = item.price * quantity;
   if (character.bronze < cost) return failure(state, "Bronze insuficiente para " + item.name + ".");

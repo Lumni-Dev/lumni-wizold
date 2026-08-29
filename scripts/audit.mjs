@@ -1096,6 +1096,7 @@ sec("inventário e mercado");
   }
   const highSet = marketCtrl.buyItem(state, "lunar-claw", 1);
   ok("mercado respeita o nível", highSet.ok === false);
+  ok("ração sem lobo recusa", marketCtrl.buyItem(state, "pet-ration", 1).ok === false);
   const fragmentSale = marketCtrl.sellItem(
     { ...state, inventory: [{ itemId: "bronze-fragment", quantity: 5 }] },
     "bronze-fragment",
