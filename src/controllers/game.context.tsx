@@ -275,6 +275,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     const timer = window.setInterval(() => void collect(), REST_TICK_MS);
     return () => window.clearInterval(timer);
   }, [ready, resting, request, setActivity, announce]);
+  const automationBeatRef = useRef<() => void>(() => {});
   useEffect(() => {
     if (!ready) return;
     let busy = false;
@@ -330,8 +331,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
         busy = false;
       }
     };
+    automationBeatRef.current = () => void beat();
     const timer = window.setInterval(() => void beat(), AUTOMATION_TICK_MS);
-    return () => window.clearInterval(timer);
+    return () => {
+      automationBeatRef.current = () => {};
+      window.clearInterval(timer);
+    };
   }, [ready, act, setActivity]);
   const character = state.character;
   useEffect(() => {
@@ -637,11 +642,16 @@ export function GameProvider({ children }: { children: ReactNode }) {
       },
       setAutomation: (key, on) => {
         const previous = stateRef.current.automation[key];
+        stateRef.current = {
+          ...stateRef.current,
+          automation: { ...stateRef.current.automation, [key]: on },
+        };
         setState((current) => ({
           ...current,
           automation: { ...current.automation, [key]: on },
         }));
         playSound("ui");
+        if (on) window.setTimeout(() => automationBeatRef.current(), 0);
         void api("PUT", "/api/automation", { key, on }).then((answer) => {
           if (!answer.ok) {
             setState((current) => ({
