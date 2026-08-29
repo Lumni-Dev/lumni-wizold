@@ -59,6 +59,7 @@ interface GameContextValue {
   renameCharacter: (name: string) => Promise<boolean>;
   requestDeleteCode: () => Promise<boolean>;
   deleteRun: (code: string) => Promise<boolean>;
+  logout: () => Promise<void>;
   toggleForm: () => Promise<void>;
   rest: () => Promise<void>;
   activity: Activity | null;
@@ -403,6 +404,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
       requestDeleteCode: async () => {
         const answer = await act("POST", "/api/characters/delete-code", undefined, "Conta");
         return answer.ok;
+      },
+      logout: async () => {
+        await api("POST", "/api/auth/logout");
+        heldHuntRef.current = null;
+        heldArenaRef.current = null;
+        applyState(initialState(), ++mintRef.current);
+        setActivity(null);
+        setAuthenticated(false);
       },
       deleteRun: async (code) => {
         const answer = await api("DELETE", "/api/characters", { code });

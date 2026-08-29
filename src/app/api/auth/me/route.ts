@@ -10,11 +10,16 @@ export async function GET() {
 
   try {
     return await withTransaction(async (client) => {
+      const found = await client.query("select email from users where id = $1", [userId]);
       const loaded = await loadGame(client, userId, false);
       return NextResponse.json({
         ok: true,
         message: "",
-        data: { userId, hasCharacter: loaded !== null },
+        data: {
+          userId,
+          email: found.rows[0]?.email ?? null,
+          hasCharacter: loaded !== null,
+        },
       });
     });
   } catch (error) {

@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useSyncExternalStore, type FormEvent } from "react";
+import { useEffect, useState, useSyncExternalStore, type FormEvent } from "react";
+import { api } from "@/controllers/api.client";
 import { renameCost, renameDaysLeft } from "@/controllers/character.controller";
 import { AUTOMATIONS } from "@/models/entities/automation";
 import { useGame } from "@/controllers/game.context";
@@ -20,12 +21,30 @@ import { List, ListRow, RowText } from "../components/list";
 import { Panel } from "../components/panel";
 import { Tag } from "../components/tag";
 import { PageHeader } from "../layout/page-header";
-import { googleEmailOf } from "../presenters/account.presenter";
 
 export function SettingsScreen() {
-  const { state, character, renameCharacter, requestDeleteCode, deleteRun, notify, setAutomation } =
-    useGame();
+  const {
+    state,
+    character,
+    renameCharacter,
+    requestDeleteCode,
+    deleteRun,
+    logout,
+    notify,
+    setAutomation,
+  } = useGame();
   const router = useRouter();
+
+  const [accountEmail, setAccountEmail] = useState<string | null>(null);
+  useEffect(() => {
+    let alive = true;
+    void api<{ email: string | null }>("GET", "/api/auth/me").then((answer) => {
+      if (alive && answer.ok) setAccountEmail(answer.data?.email ?? null);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const [newName, setNewName] = useState("");
   const [confirmingRename, setConfirmingRename] = useState(false);
@@ -76,23 +95,21 @@ export function SettingsScreen() {
             <div className="min-w-0">
               <p className="truncate text-sm text-ink">Conectado com Google</p>
               <p className="truncate font-mono text-[11px] text-ink-faint">
-                {googleEmailOf(character.name)}
+                {accountEmail ?? "carregando..."}
               </p>
             </div>
           </div>
           <div className="space-y-3 p-4">
             <p className="text-xs leading-relaxed text-ink-faint">
-              O login por e-mail é a demonstração do botão do Google, e a partida já vive no
-              servidor. Quando o jogo ganhar servidor, a conta real entra aqui.
+              A porta é a conta Google, e a partida vive no servidor: saia quando quiser, e o mesmo
+              botão de entrar devolve tudo como estava.
             </p>
             <Button
               variant="outline"
               onClick={() =>
-                notify(
-                  "Login de demonstração: não há sessão no servidor para encerrar.",
-                  false,
-                  "Sistema",
-                )
+                logout().then(() => {
+                  router.push("/");
+                })
               }
             >
               Sair da conta
