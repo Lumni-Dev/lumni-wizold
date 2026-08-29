@@ -138,7 +138,7 @@ function Kennel({ bronze }: { bronze: number }) {
           formatBronze(PET_RENAME_PRICE) +
           " no canil."
         }
-        detail={findPet(gender).label + " · " + name.trim() + " · " + formatBronze(PET_PRICE)}
+        detail={findPet(gender).label + " - " + name.trim() + " - " + formatBronze(PET_PRICE)}
         confirmLabel="Adotar"
         onCancel={() => setConfirming(false)}
         onConfirm={() => {
@@ -389,7 +389,7 @@ export function PetScreen() {
         open={confirmingRename}
         title="Renomear o mascote"
         description="O bronze fica no canil e o apelido novo vale na hora, em todas as telas."
-        detail={pet.name + " → " + newPetName.trim() + " · " + formatBronze(PET_RENAME_PRICE)}
+        detail={pet.name + " → " + newPetName.trim() + " - " + formatBronze(PET_RENAME_PRICE)}
         confirmLabel="Renomear"
         onCancel={() => setConfirmingRename(false)}
         onConfirm={() =>

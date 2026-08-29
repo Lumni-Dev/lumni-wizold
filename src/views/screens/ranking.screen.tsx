@@ -68,7 +68,7 @@ export function RankingScreen() {
         action={
           view.playerPosition ? (
             <Tag tone="neutral">
-              {view.board.label} · {formatNumber(view.playerPosition)}º de{" "}
+              {view.board.label} - {formatNumber(view.playerPosition)}º de{" "}
               {formatNumber(view.boardSize)}
             </Tag>
           ) : null

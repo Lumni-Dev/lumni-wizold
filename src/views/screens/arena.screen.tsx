@@ -52,7 +52,7 @@ function Fighter({
         <div className="min-w-0">
           <p className="truncate text-sm text-ink">{name}</p>
           <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-            {side} · NV. {formatNumber(level)}
+            {side} - NV. {formatNumber(level)}
           </p>
         </div>
         <Bar
@@ -233,7 +233,7 @@ export function ArenaScreen() {
           <div className="flex items-center gap-2">
             {pet ? <Tag tone="neutral">{pet.name + " fica fora do fosso"}</Tag> : null}
             <Tag tone="neutral">
-              {formatNumber(character.arenaWins)}V · {formatNumber(character.arenaLosses)}D
+              {formatNumber(character.arenaWins)}V - {formatNumber(character.arenaLosses)}D
             </Tag>
             <Tag tone="neutral">{formatBronze(character.bronze)}</Tag>
           </div>
@@ -394,9 +394,9 @@ export function ArenaScreen() {
                         <GenderSymbol gender={hunter.gender} className="shrink-0 text-ink-faint" />
                       </p>
                       <p className="text-[11px] text-ink-faint">
-                        NV. {formatNumber(hunter.level)} · {formatNumber(hunter.arena)} duelos
-                        ganhos · bolsa de {formatNumber(spoils.min)} a {formatNumber(spoils.max)}
-                        {resting ? " · descansa por " + formatCooldown(cooldownLeft) : ""}
+                        NV. {formatNumber(hunter.level)} - {formatNumber(hunter.arena)} duelos
+                        ganhos - bolsa de {formatNumber(spoils.min)} a {formatNumber(spoils.max)}
+                        {resting ? " - descansa por " + formatCooldown(cooldownLeft) : ""}
                       </p>
                     </div>
                     <BodyGate

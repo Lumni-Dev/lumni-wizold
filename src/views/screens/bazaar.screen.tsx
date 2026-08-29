@@ -174,7 +174,7 @@ export function BazaarScreen() {
                         {entry.mine ? "Seu anúncio" : "por " + entry.listing.sellerName}
                       </Link>
                       {entry.mine
-                        ? " · " +
+                        ? " - " +
                           formatReais(entry.listing.priceCents) +
                           (entry.available > 1 ? " cada" : "")
                         : null}
@@ -285,8 +285,8 @@ export function BazaarScreen() {
 
               {askedCents !== null && askedCents >= MIN_LISTING_CENTS ? (
                 <p className="font-mono text-[11px] text-ink-soft">
-                  {formatNumber(askedQuantity)} x {formatReais(askedCents)} · taxa{" "}
-                  {formatReais(feeOf(askedCents * askedQuantity))} · você recebe{" "}
+                  {formatNumber(askedQuantity)} x {formatReais(askedCents)} - taxa{" "}
+                  {formatReais(feeOf(askedCents * askedQuantity))} - você recebe{" "}
                   {formatReais(sellerNet(askedCents * askedQuantity))}
                 </p>
               ) : null}
@@ -308,7 +308,7 @@ export function BazaarScreen() {
                     description={
                       "x" +
                       formatNumber(entry.quantity) +
-                      " · sugestão " +
+                      " - sugestão " +
                       formatReais(entry.suggestedCents)
                     }
                   />

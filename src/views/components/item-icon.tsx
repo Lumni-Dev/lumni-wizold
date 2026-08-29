@@ -19,9 +19,13 @@ export function ItemIcon({
 
   return (
     <IconFrame size={size} className={source ? undefined : "tracking-widest"}>
-      {source ? <IconArt source={source} glow /> : itemInitials(item.name)}
+      {source ? (
+        <IconArt source={source} glow badge={enhancement > 0 ? "+" + enhancement : undefined} />
+      ) : (
+        itemInitials(item.name)
+      )}
       {enhancement > 0 ? (
-        <span className="absolute right-1 top-1 rounded border border-ember bg-ember px-1 font-mono text-[10px] leading-4 tracking-normal text-base">
+        <span className="absolute right-1 top-1 inline-flex h-4 items-center justify-center rounded border border-ember bg-ember px-1 font-mono text-[10px] font-bold tracking-normal text-base">
           +{enhancement}
         </span>
       ) : null}

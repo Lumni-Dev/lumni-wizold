@@ -57,7 +57,7 @@ export function Footer() {
         <div className="mt-8 flex flex-col gap-2 border-t border-edge pt-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-[11px] text-ink-faint">
-              {COMPANY.legalName} · CNPJ {COMPANY.taxId}
+              {COMPANY.legalName} - CNPJ {COMPANY.taxId}
             </p>
             <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
               © {year} {COMPANY.name}. Todos os direitos reservados.

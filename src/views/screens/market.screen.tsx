@@ -286,7 +286,7 @@ export function MarketScreen() {
                         {enhancedName(item.name, enhancement)}
                       </p>
                       <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                        {formatNumber(quantity)} em estoque · {formatBronze(sellPrice(item))} cada
+                        {formatNumber(quantity)} em estoque - {formatBronze(sellPrice(item))} cada
                       </p>
                     </div>
                   </div>
@@ -347,7 +347,7 @@ export function MarketScreen() {
           deal
             ? deal.item.name +
               (dealQuantity > 1 ? " x" + formatNumber(dealQuantity) : "") +
-              " · " +
+              " - " +
               formatBronze(dealTotal)
             : null
         }

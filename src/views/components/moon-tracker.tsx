@@ -23,7 +23,7 @@ export function MoonTracker() {
           </p>
           <p className="text-[10px] text-ink-faint">
             {bonus > 0 ? "+" + bonus + "% de experiência" : "sem bônus"}
-            {attributes > 0 ? " · +" + attributes + " em todos os atributos" : ""}
+            {attributes > 0 ? " - +" + attributes + " em todos os atributos" : ""}
           </p>
         </div>
       </div>

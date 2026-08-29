@@ -481,7 +481,7 @@ export function TavernScreen() {
                     <Tag tone={yourself ? "neutral" : "faint"} className="gap-2">
                       <MemberName href={profileHref(member.id)} name={member.name} />
                       {kept && !yourself ? (
-                        <span className="text-ink-faint">· na matilha</span>
+                        <span className="text-ink-faint">- na matilha</span>
                       ) : null}
                     </Tag>
                     {!yourself && !kept ? (

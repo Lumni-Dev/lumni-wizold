@@ -226,7 +226,7 @@ export function SettingsScreen() {
           footer={
             <div className="flex flex-wrap items-center justify-between gap-3">
               <span className="text-[11px] text-ink-faint">
-                {character.name} · NV. {formatNumber(character.level)}
+                {character.name} - NV. {formatNumber(character.level)}
               </span>
               <Button
                 variant="outline"
@@ -255,7 +255,7 @@ export function SettingsScreen() {
           RENAME_COOLDOWN_DAYS +
           " dias, no ranking, na taverna e no bazar."
         }
-        detail={character.name + " → " + newName.trim() + " · " + formatBronze(cost)}
+        detail={character.name + " → " + newName.trim() + " - " + formatBronze(cost)}
         confirmLabel="Alterar"
         onCancel={() => setConfirmingRename(false)}
         onConfirm={() =>
@@ -312,7 +312,7 @@ export function SettingsScreen() {
       >
         <div className="space-y-3 p-4">
           <p className="text-xs leading-relaxed text-ink-soft">
-            {character.name} · NV. {formatNumber(character.level)}. A conta e tudo o que ela guarda
+            {character.name} - NV. {formatNumber(character.level)}. A conta e tudo o que ela guarda
             somem do servidor agora e para sempre: personagem, mochila, carteira, mesas e rastros.
             Não há como recuperar.
           </p>

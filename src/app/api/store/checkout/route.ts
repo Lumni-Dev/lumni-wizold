@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     const origin = new URL(request.url).origin;
     try {
       const session = await createCheckoutSession({
-        name: pack.name + " · Wizold",
+        name: pack.name + " - Wizold",
         amountCents: pack.priceCents,
         metadata: {
           kind: "store",

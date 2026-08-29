@@ -257,7 +257,7 @@ export function landHunt(
   next = addLog(next, "hunt", message);
 
   if (grown?.leveled && pet) {
-    const climbed = pet.name + " sobe para NV. " + formatNumber(petLevelOf(pet)) + ".";
+    const climbed = "O mascote sobe para NV. " + formatNumber(petLevelOf(pet)) + ".";
     next = addLog(next, "training", climbed);
   }
 

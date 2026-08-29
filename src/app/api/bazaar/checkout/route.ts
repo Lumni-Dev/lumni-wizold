@@ -28,7 +28,7 @@ export async function POST(request: Request) {
       name:
         enhancedName(item.name, listing.enhancement) +
         (quantity > 1 ? " x" + quantity : "") +
-        " · Bazar Wizold",
+        " - Bazar Wizold",
       amountCents: listing.priceCents * quantity,
       metadata: {
         kind: "bazaar",

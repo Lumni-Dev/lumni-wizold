@@ -69,7 +69,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
         }
         action={
           <Tag tone={isPlayer ? "light" : "neutral"}>
-            Melhor em {best.label} · {formatNumber(best.position)}º
+            Melhor em {best.label} - {formatNumber(best.position)}º
           </Tag>
         }
       />
@@ -106,7 +106,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
                   <div>
                     <p className="truncate text-sm text-ink">{hunter.pet.name}</p>
                     <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                      {wolf.label} · {wolf.title}
+                      {wolf.label} - {wolf.title}
                     </p>
                   </div>
                 </div>

@@ -69,11 +69,13 @@ export function IconArt({
   source,
   padded = true,
   glow = false,
+  badge,
   inset,
 }: {
   source: string;
   padded?: boolean;
   glow?: boolean;
+  badge?: string;
   inset?: string;
 }) {
   const [preview, setPreview] = useState<{
@@ -140,6 +142,11 @@ export function IconArt({
               )}
             />
             {glow ? <span className="item-glow pointer-events-none absolute -inset-1/2" /> : null}
+            {badge ? (
+              <span className="absolute right-2 top-2 inline-flex h-5 items-center justify-center rounded border border-ember bg-ember px-1.5 font-mono text-[11px] font-bold tracking-normal text-base">
+                {badge}
+              </span>
+            ) : null}
           </span>
           <CornerAccents />
         </span>

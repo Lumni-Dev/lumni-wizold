@@ -13,8 +13,8 @@ export function itemInitials(name: string): string {
 export function itemSubtitle(item: Item): string {
   const category = CATEGORY_LABEL[item.category];
   return item.set
-    ? category + " · " + SET_LABEL[item.set]
-    : category + " · " + RARITY_LABEL[item.rarity];
+    ? category + " - " + SET_LABEL[item.set]
+    : category + " - " + RARITY_LABEL[item.rarity];
 }
 
 function percent(ratio: number): string {

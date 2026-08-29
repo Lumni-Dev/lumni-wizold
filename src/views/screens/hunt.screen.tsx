@@ -72,7 +72,7 @@ function CombatReport({ report }: { report: HuntReport }) {
   return (
     <Panel
       title="Última caçada"
-      description={territory.name + " · " + creature.name + " (NV. " + creature.level + ")"}
+      description={territory.name + " - " + creature.name + " (NV. " + creature.level + ")"}
       action={<Tag tone={combat.victory ? "light" : "neutral"}>{outcome}</Tag>}
       padding="none"
     >
@@ -362,7 +362,7 @@ export function HuntScreen() {
                   <div className="min-w-0 flex-1">
                     <h2 className="truncate text-sm text-ink">{territory.name}</h2>
                     <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                      {SPECIES_LABEL[territory.species]} · {DANGER_LABEL[territory.danger]}
+                      {SPECIES_LABEL[territory.species]} - {DANGER_LABEL[territory.danger]}
                     </p>
                   </div>
                 </CardHeader>
@@ -444,7 +444,7 @@ export function HuntScreen() {
                   {active && petAlong ? (
                     <div className="px-4 py-3">
                       <Bar
-                        label="Mascote · Energia"
+                        label="Mascote - Energia"
                         current={petAlong.energy}
                         maximum={petMaxEnergy(petLevelOf(petAlong))}
                         tone="vigor"

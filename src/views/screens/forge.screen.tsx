@@ -150,7 +150,7 @@ export function ForgeScreen() {
             <ListRow layout="column">
               <Bar
                 label={
-                  "Mineração NV. " + formatNumber(mining.level) + (mining.maxed ? " · teto" : "")
+                  "Mineração NV. " + formatNumber(mining.level) + (mining.maxed ? " - teto" : "")
                 }
                 current={mining.progress}
                 maximum={mining.needed}
@@ -294,7 +294,7 @@ export function ForgeScreen() {
             ? enhancedName(confirming.item.name, confirming.level) +
               " → +" +
               formatNumber(confirming.level + 1) +
-              " · custa " +
+              " - custa " +
               formatNumber(confirming.cost) +
               " " +
               confirming.fragment.name
