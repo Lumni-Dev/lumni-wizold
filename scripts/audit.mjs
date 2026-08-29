@@ -44,6 +44,7 @@ const exercisesData = load("models/data/exercises.js");
 const entItem = load("models/entities/item.js");
 const entMining = load("models/entities/mining.js");
 const entTavern = load("models/entities/tavern.js");
+const entRanking = load("models/entities/ranking.js");
 const factory = load("models/factories/character.factory.js");
 const characterCtrl = load("controllers/character.controller.js");
 const huntCtrl = load("controllers/hunt.controller.js");
@@ -1405,34 +1406,18 @@ sec("ranking");
         (entry) => board.find((line) => line.hunter.id === entry.hunter.id)?.position !== undefined,
       ),
   );
-  const wolfed = roster.map((hunter, index) =>
-    index % 2 === 0
-      ? {
-          ...hunter,
-          pet: {
-            name: "Lobo" + index,
-            gender: index % 4 === 0 ? "male" : "female",
-            energy: 50,
-            active: true,
-          },
-        }
-      : hunter,
-  );
-  const petCutView = rankingCtrl.listRanking(state, wolfed, "level", 1, "", "all", "female");
+  const wolfBoard = entRanking.findBoard("pet");
   ok(
-    "corte por mascote filtra sem renumerar",
-    petCutView.entries.length > 0 &&
-      petCutView.entries.every((entry) => entry.hunter.pet?.gender === "female") &&
-      petCutView.entries.every((entry) => {
-        const alone = rankingCtrl.listRanking(state, wolfed, "level", 1, entry.hunter.name);
-        return (
-          alone.entries.find((line) => line.hunter.id === entry.hunter.id)?.position ===
-          entry.position
-        );
-      }),
+    "quadro do mascote lê o nível do lobo",
+    wolfBoard.key === "pet" &&
+      wolfBoard.value({
+        ...roster[0],
+        pet: { name: "Lobo", gender: "male", level: 7, energy: 50, active: true },
+      }) === 7,
   );
+  ok("sem lobo o quadro do mascote lê zero", wolfBoard.value(roster[0]) === 0);
   const profile = rankingCtrl.profileOf(state, roster, "bench-0");
-  ok("perfil de outro caçador abre", profile !== null && profile.positions.length === 12);
+  ok("perfil de outro caçador abre", profile !== null && profile.positions.length === 13);
   ok("perfil sem NaN", profile !== null && Number.isFinite(profile.stats.maxHealth));
   const own = rankingCtrl.profileOf(state, roster, state.character.id);
   ok("a própria ficha se reconhece", own !== null && own.isPlayer === true);

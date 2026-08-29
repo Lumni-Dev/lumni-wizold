@@ -6,7 +6,6 @@ import { api } from "@/controllers/api.client";
 import { useGame } from "@/controllers/game.context";
 import { listRanking } from "@/controllers/ranking.controller";
 import type { Gender } from "@/models/entities/character";
-import type { PetGender } from "@/models/entities/pet";
 import { RANKING_BOARDS, type Hunter, type RankingKey } from "@/models/entities/ranking";
 import { NAME_MAX_LENGTH } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
@@ -27,7 +26,6 @@ export function RankingScreen() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [gender, setGender] = useState<Gender | "all">("all");
-  const [petCut, setPetCut] = useState<PetGender | "all">("all");
   const [roster, setRoster] = useState<Hunter[]>([]);
 
   useEffect(() => {
@@ -41,8 +39,8 @@ export function RankingScreen() {
   }, []);
 
   const view = useMemo(
-    () => listRanking(state, roster, key, page, search, gender, petCut),
-    [state, roster, key, page, search, gender, petCut],
+    () => listRanking(state, roster, key, page, search, gender),
+    [state, roster, key, page, search, gender],
   );
 
   if (!character) return null;
@@ -54,11 +52,6 @@ export function RankingScreen() {
 
   const find = (term: string) => {
     setSearch(sanitizeName(term, NAME_MAX_LENGTH));
-    setPage(1);
-  };
-
-  const cutPet = (next: PetGender | "all") => {
-    setPetCut(next);
     setPage(1);
   };
 
@@ -106,21 +99,6 @@ export function RankingScreen() {
         </Chip>
         <Chip active={gender === "female"} onClick={() => cutGender("female")}>
           Luna
-        </Chip>
-      </div>
-
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="mr-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-          Mascote
-        </span>
-        <Chip active={petCut === "all"} onClick={() => cutPet("all")}>
-          Todos
-        </Chip>
-        <Chip active={petCut === "male"} onClick={() => cutPet("male")}>
-          Machos
-        </Chip>
-        <Chip active={petCut === "female"} onClick={() => cutPet("female")}>
-          Fêmeas
         </Chip>
       </div>
 

@@ -1,6 +1,5 @@
 import type { Gender } from "@/models/entities/character";
 import type { GameState } from "@/models/entities/game-state";
-import type { PetGender } from "@/models/entities/pet";
 import {
   findBoard,
   RANKING_BOARDS,
@@ -53,6 +52,7 @@ function playerAsHunter(state: GameState): Hunter | null {
       ? {
           name: state.pet.name,
           gender: state.pet.gender,
+          level: state.pet.level ?? 1,
           energy: state.pet.energy,
           active: state.pet.active !== false,
         }
@@ -86,7 +86,6 @@ export function listRanking(
   page: number,
   search = "",
   gender: Gender | "all" = "all",
-  petCut: PetGender | "all" = "all",
 ): RankingView {
   const board = findBoard(key);
   const { hunters, playerId } = huntersOf(state, roster);
@@ -98,8 +97,7 @@ export function listRanking(
   const found = entries.filter(
     (entry) =>
       (term ? normalizeText(entry.hunter.name).includes(term) : true) &&
-      (gender === "all" || entry.hunter.gender === gender) &&
-      (petCut === "all" || entry.hunter.pet?.gender === petCut),
+      (gender === "all" || entry.hunter.gender === gender),
   );
 
   const safePage = clampPage(page, found.length);

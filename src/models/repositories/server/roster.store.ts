@@ -6,7 +6,9 @@ import type { TavernIdentity } from "@/models/entities/tavern";
 
 export async function loadHunters(client: PoolClient): Promise<Hunter[]> {
   const characters = await client.query("select * from characters");
-  const pets = await client.query("select character_id, name, gender, energy, active from pets");
+  const pets = await client.query(
+    "select character_id, name, gender, level, energy, active from pets",
+  );
   const equipped = await client.query("select character_id, slot, item_id from equipped_items");
   const enhancements = await client.query("select character_id, item_id, level from enhancements");
   const petBy = new Map<string, HunterPet>();
@@ -14,6 +16,7 @@ export async function loadHunters(client: PoolClient): Promise<Hunter[]> {
     petBy.set(row.character_id, {
       name: row.name,
       gender: row.gender as PetGender,
+      level: Number(row.level),
       energy: Number(row.energy),
       active: row.active !== false,
     });

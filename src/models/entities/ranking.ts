@@ -6,6 +6,7 @@ import type { PetGender } from "./pet";
 export interface HunterPet {
   name: string;
   gender: PetGender;
+  level: number;
   energy: number;
   active: boolean;
 }
@@ -36,7 +37,8 @@ export type RankingKey =
   | "arena"
   | "bronze"
   | "forge"
-  | "mining";
+  | "mining"
+  | "pet";
 
 export interface RankingBoard {
   key: RankingKey;
@@ -87,6 +89,12 @@ export const RANKING_BOARDS: readonly RankingBoard[] = [
     label: "Mineração",
     description: "Nível de mineração: quem foi mais fundo na rocha.",
     value: (hunter) => hunter.mining,
+  },
+  {
+    key: "pet",
+    label: "Mascote",
+    description: "O lobo mais treinado da alcateia: o nível do mascote de cada caçador.",
+    value: (hunter) => hunter.pet?.level ?? 0,
   },
   {
     key: "strength",
