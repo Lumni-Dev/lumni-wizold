@@ -68,11 +68,13 @@ export function TrainingScreen() {
       beatRef.current = beatRef.current >= TRAINING_TICKS ? 0 : beatRef.current + 1;
       setSession({ id: activeExercise, beat: beatRef.current });
 
+      let charging = false;
       if (beatRef.current === 1 && chargesRef.current) {
         chargesRef.current = false;
+        charging = true;
         playSound("buy");
       }
-      if (beatRef.current > 0) {
+      if (beatRef.current > 0 && !charging) {
         const effort = activeExercise === PET_EXERCISE_ID ? "growl" : activeExercise;
         if (isGameSound(effort)) playSound(effort);
       }

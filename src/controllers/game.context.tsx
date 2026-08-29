@@ -274,6 +274,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     let busy = false;
     const beat = async () => {
       if (busy) return;
+      if (heldHuntRef.current || heldArenaRef.current) return;
       busy = true;
       try {
         const step = automationController.nextAutomationStep(stateRef.current, activityRef.current);
