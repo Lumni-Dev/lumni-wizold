@@ -70,7 +70,7 @@ function NarrationButton({ playing, onClick }: { playing: boolean; onClick: () =
   );
 }
 
-const INTRO_VIDEO = "/assets/ui/backvideo.mp4?v=2";
+const INTRO_VIDEO = "/assets/ui/backvideo.mp4?v=3";
 
 export function LandingScreen() {
   const { ready, character } = useGame();

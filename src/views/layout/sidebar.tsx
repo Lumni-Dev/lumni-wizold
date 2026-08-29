@@ -58,7 +58,7 @@ function NavLink({
         {item.label}
       </span>
       {badge > 0 ? (
-        <span className="ml-auto mr-1 inline-flex h-6 min-w-6 shrink-0 items-center justify-center rounded-md border border-ember bg-ember px-2 font-mono text-[10px] font-bold tracking-normal text-base">
+        <span className="ml-auto mr-2 inline-flex h-4 min-w-4 shrink-0 items-center justify-center self-center rounded border border-ember bg-ember px-1 font-mono text-[10px] font-bold tracking-normal text-base">
           {badge > 9 ? "9+" : badge}
         </span>
       ) : null}
