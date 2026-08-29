@@ -252,7 +252,7 @@ export function MarketScreen() {
                           {petless
                             ? "Sem mascote"
                             : alreadyOwned
-                              ? "Você já tem"
+                              ? "Já possuo"
                               : ofLineage
                                 ? "Comprar por " + formatBronze(item.price)
                                 : "Apenas " + lineageName(item)}
