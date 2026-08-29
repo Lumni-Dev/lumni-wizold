@@ -180,6 +180,7 @@ const leftovers = await rows(
         + (select count(*) from characters where user_id = $1)::int
         + (select count(*) from tavern_rooms where owner_id = $2)::int
         + (select count(*) from tavern_messages where author_id = $2)::int
+        + (select count(*) from arena_history where challenger_id = $2 or rival_id = $2)::int
         + (select count(*) from deletion_codes where user_id = $1)::int as n`,
   [user?.id, character?.id],
 );

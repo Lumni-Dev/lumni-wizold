@@ -2,6 +2,7 @@ import { MIN_HEALTH_RATIO_TO_ACT } from "@/shared/constants/game";
 import { formatNumber, formatBronze } from "@/shared/utils/format";
 import { defaultRandom, pickOne, type Random } from "@/shared/utils/random";
 import { normalizeText } from "@/shared/utils/text";
+import type { ArenaHistoryEntry, ArenaOutcome } from "@/models/entities/arena";
 import type { LevelBand } from "@/models/entities/creature";
 import type { GameState } from "@/models/entities/game-state";
 import type { Hunter } from "@/models/entities/ranking";
@@ -140,6 +141,40 @@ export function drawOpponent(
   const pool = inBand.length > 0 ? inBand : nearestByLevel(pit, character.level, 5).filter(rested);
   return pool.length > 0 ? pickOne(pool, random) : null;
 }
+export interface ArenaHistoryLine {
+  id: string;
+  rivalName: string;
+  mine: boolean;
+  outcome: ArenaOutcome;
+  spoils: number;
+  at: string;
+}
+
+export function describeArenaHistory(
+  entries: readonly ArenaHistoryEntry[],
+  characterId: string,
+): ArenaHistoryLine[] {
+  return entries.map((entry) => {
+    const mine = entry.challengerId === characterId;
+    const outcome: ArenaOutcome = mine
+      ? entry.outcome
+      : entry.outcome === "victory"
+        ? "defeat"
+        : entry.outcome === "defeat"
+          ? "victory"
+          : "draw";
+
+    return {
+      id: entry.id,
+      rivalName: mine ? entry.rivalName : entry.challengerName,
+      mine,
+      outcome,
+      spoils: entry.spoils,
+      at: entry.at,
+    };
+  });
+}
+
 export interface ArenaResolution {
   hunter: Hunter;
   foe: CombatOpponent;

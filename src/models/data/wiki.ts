@@ -20,6 +20,7 @@ import {
 import { SPECIES_LABEL } from "../entities/creature";
 import { MAX_PACK } from "../entities/pack";
 import { MAX_ROOM_MEMBERS } from "../entities/tavern";
+import { ARENA_HISTORY_SIZE } from "../entities/arena";
 import {
   ARENA_BAND_RATIO,
   ARENA_COOLDOWN_HOURS,
@@ -335,6 +336,9 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "Quem você enfrentou descansa as mesmas " +
         ARENA_COOLDOWN_HOURS +
         " horas antes de aceitar outro desafio seu.",
+      "O fosso tem memória: as " +
+        ARENA_HISTORY_SIZE +
+        " últimas lutas do seu nome ficam registradas, as que você marcou e as que marcaram contra você, com o resultado e o bronze que mudou de mãos.",
       "Só a fera desce ao fosso: sem se transformar a arena recusa o duelo, e os dois lutam com a Força da fera.",
       "O mascote desce junto: ativo e com fôlego, ele morde no duelo como na caçada, o seu e o do rival. Só o seu gasta energia aqui; o do rival se cansa nos duelos do próprio dono.",
       "O fosso não paga experiência: quem sobe de nível é quem caça. O que se ganha aqui é a bolsa do outro.",

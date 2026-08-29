@@ -3,7 +3,13 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { api } from "@/controllers/api.client";
 import { useGame } from "@/controllers/game.context";
-import { formatCooldown, listArena, type ArenaResolution } from "@/controllers/arena.controller";
+import {
+  describeArenaHistory,
+  formatCooldown,
+  listArena,
+  type ArenaResolution,
+} from "@/controllers/arena.controller";
+import { ARENA_HISTORY_SIZE, type ArenaHistoryEntry } from "@/models/entities/arena";
 import { ATTRIBUTES } from "@/models/entities/attribute";
 import type { Gender } from "@/models/entities/character";
 import type { Hunter } from "@/models/entities/ranking";
@@ -12,7 +18,7 @@ import { canPetFight, isPetActive } from "@/models/rules/pet";
 import { playSound } from "@/controllers/sound";
 import { HUNT_TICK_MS, HUNT_TICKS } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
-import { formatNumber, formatBronze } from "@/shared/utils/format";
+import { formatDay, formatNumber, formatBronze } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
 import { emphasizeDamage, narrationOf, type NarrationLine } from "../presenters/hunt.presenter";
 import { GenderSymbol } from "../components/app-icon";
@@ -23,7 +29,7 @@ import { DataRow } from "../components/data-row";
 import { EmptyState } from "../components/empty-state";
 import { Field } from "../components/field";
 import { GenderIcon } from "../components/gender-icon";
-import { List, ListRow } from "../components/list";
+import { List, ListRow, RowText } from "../components/list";
 import { Pagination } from "../components/pagination";
 import { Panel } from "../components/panel";
 import { Tag } from "../components/tag";
@@ -154,6 +160,21 @@ export function ArenaScreen() {
       alive = false;
     };
   }, [report]);
+  const [duelHistory, setDuelHistory] = useState<ArenaHistoryEntry[]>([]);
+  useEffect(() => {
+    let alive = true;
+    void api<{ history: ArenaHistoryEntry[] }>("GET", "/api/arena/history").then((answer) => {
+      if (alive && answer.ok && answer.data) setDuelHistory(answer.data.history);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [report]);
+  const characterId = character?.id ?? "";
+  const pastDuels = useMemo(
+    () => describeArenaHistory(duelHistory, characterId),
+    [duelHistory, characterId],
+  );
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const view = useMemo(() => listArena(state, roster, search), [state, roster, search, moon]);
   useEffect(() => {
@@ -486,6 +507,49 @@ export function ArenaScreen() {
           </List>
         </Panel>
       )}
+
+      <Panel
+        title="Últimas lutas"
+        description={
+          "As " +
+          ARENA_HISTORY_SIZE +
+          " mais recentes do seu nome no fosso: as que você marcou e as que marcaram contra você."
+        }
+        padding="none"
+      >
+        {pastDuels.length === 0 ? (
+          <p className="px-4 py-3 text-xs text-ink-faint">
+            Nenhum duelo registrado ainda: o fosso espera.
+          </p>
+        ) : (
+          <List>
+            {pastDuels.map((line) => (
+              <ListRow key={line.id}>
+                <RowText
+                  title={
+                    (line.outcome === "victory"
+                      ? "Vitória sobre "
+                      : line.outcome === "defeat"
+                        ? "Derrota para "
+                        : "Empate com ") + line.rivalName
+                  }
+                  description={(line.mine ? "Ataque seu" : "Ataque recebido") + " - " + formatDay(line.at)}
+                />
+                <span
+                  className={cn(
+                    "shrink-0 font-mono text-[11px]",
+                    line.outcome === "victory" ? "text-ink" : "text-ink-faint",
+                  )}
+                >
+                  {line.outcome === "draw" || line.spoils === 0
+                    ? "0 de bronze"
+                    : (line.outcome === "victory" ? "+" : "-") + formatBronze(line.spoils)}
+                </span>
+              </ListRow>
+            ))}
+          </List>
+        )}
+      </Panel>
     </>
   );
 }

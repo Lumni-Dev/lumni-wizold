@@ -690,6 +690,48 @@ sec("arena");
     "lobo sem fôlego fica fora do fosso",
     soloDuel.ok && soloDuel.data.combat.petSpent === 0 && soloDuel.data.combat.petBlows === 0,
   );
+  const pitMemory = [
+    {
+      id: "d1",
+      challengerId: "me",
+      challengerName: "Eu",
+      rivalId: "them",
+      rivalName: "Ele",
+      outcome: "victory",
+      spoils: 10,
+      at: "2026-01-01T00:00:00.000Z",
+    },
+    {
+      id: "d2",
+      challengerId: "them",
+      challengerName: "Ele",
+      rivalId: "me",
+      rivalName: "Eu",
+      outcome: "victory",
+      spoils: 5,
+      at: "2026-01-02T00:00:00.000Z",
+    },
+    {
+      id: "d3",
+      challengerId: "them",
+      challengerName: "Ele",
+      rivalId: "me",
+      rivalName: "Eu",
+      outcome: "draw",
+      spoils: 0,
+      at: "2026-01-03T00:00:00.000Z",
+    },
+  ];
+  const told = arenaCtrl.describeArenaHistory(pitMemory, "me");
+  ok(
+    "ataque meu fala do meu ponto de vista",
+    told[0].mine === true && told[0].outcome === "victory" && told[0].rivalName === "Ele",
+  );
+  ok(
+    "ataque recebido inverte o resultado",
+    told[1].mine === false && told[1].outcome === "defeat" && told[1].rivalName === "Ele",
+  );
+  ok("empate é empate dos dois lados", told[2].outcome === "draw");
 }
 sec("caçada");
 {
