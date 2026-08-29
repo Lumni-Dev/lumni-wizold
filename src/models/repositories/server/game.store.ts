@@ -576,6 +576,14 @@ export async function insertNewGame(
       character.createdAt,
     ],
   );
+  // Seed the wallet row directly: saveGame persists it as a delta and a fresh
+  // run's before/after both hold the starting balance, so the delta is zero and
+  // would never create the row.
+  await client.query(
+    `insert into wallets (character_id, cents) values ($1, $2)
+     on conflict (character_id) do update set cents = $2`,
+    [character.id, state.wallet.cents],
+  );
   await saveGame(client, character.id, initialState(), state);
   await recordWalletMovement(client, character.id, state.wallet.cents, "starting_balance", null);
 }
