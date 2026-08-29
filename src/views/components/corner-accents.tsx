@@ -22,16 +22,16 @@ const SIZES: Record<AccentScale, string> = {
 
 const CORNERS: Record<AccentScale, Record<string, string>> = {
   section: {
-    tl: "-left-px -top-px rounded-tl-lg border-l-2 border-t-2",
-    tr: "-right-px -top-px rounded-tr-lg border-r-2 border-t-2",
-    bl: "-bottom-px -left-px rounded-bl-lg border-b-2 border-l-2",
-    br: "-bottom-px -right-px rounded-br-lg border-b-2 border-r-2",
+    tl: "-left-px -top-px rounded-tl-lg border-l border-t",
+    tr: "-right-px -top-px rounded-tr-lg border-r border-t",
+    bl: "-bottom-px -left-px rounded-bl-lg border-b border-l",
+    br: "-bottom-px -right-px rounded-br-lg border-b border-r",
   },
   icon: {
-    tl: "-left-px -top-px rounded-tl-md border-l-2 border-t-2",
-    tr: "-right-px -top-px rounded-tr-md border-r-2 border-t-2",
-    bl: "-bottom-px -left-px rounded-bl-md border-b-2 border-l-2",
-    br: "-bottom-px -right-px rounded-br-md border-b-2 border-r-2",
+    tl: "-left-px -top-px rounded-tl-md border-l border-t",
+    tr: "-right-px -top-px rounded-tr-md border-r border-t",
+    bl: "-bottom-px -left-px rounded-bl-md border-b border-l",
+    br: "-bottom-px -right-px rounded-br-md border-b border-r",
   },
 };
 
