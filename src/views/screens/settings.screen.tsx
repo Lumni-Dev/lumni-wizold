@@ -16,7 +16,7 @@ import { Chip } from "../components/chip";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { Field } from "../components/field";
 import { Modal } from "../components/modal";
-import { IconFrame } from "../components/icon-frame";
+import { GenderIcon } from "../components/gender-icon";
 import { List, ListRow, RowText } from "../components/list";
 import { Panel } from "../components/panel";
 import { Tag } from "../components/tag";
@@ -90,7 +90,7 @@ export function SettingsScreen() {
           padding="none"
         >
           <div className="flex items-center gap-3 border-b border-edge p-4">
-            <IconFrame tone="strong">G</IconFrame>
+            <GenderIcon gender={character.gender} size="medium" />
             <div className="min-w-0">
               <p className="truncate text-sm text-ink">Conectado com Google</p>
               <p className="truncate font-mono text-[11px] text-ink-faint">

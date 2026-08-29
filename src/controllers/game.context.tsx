@@ -363,11 +363,19 @@ export function GameProvider({ children }: { children: ReactNode }) {
     const stats = state.character
       ? deriveStats(state.character, state.equipment, state.pet, state.enhancements)
       : null;
+    const character =
+      state.character && stats
+        ? {
+            ...state.character,
+            health: Math.min(state.character.health, stats.maxHealth),
+            rage: Math.min(state.character.rage, stats.maxRage),
+          }
+        : state.character;
     return {
       ready,
       authenticated,
       state,
-      character: state.character,
+      character,
       pet: state.pet,
       stats,
       moon,
