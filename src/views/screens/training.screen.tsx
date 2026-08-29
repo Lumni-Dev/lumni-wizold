@@ -41,18 +41,24 @@ export function TrainingScreen() {
   const autoRef = useRef(state.automation.train);
   const trainRef = useRef(train);
   const chargesRef = useRef(false);
+  const paidLapRef = useRef(false);
+  const deadLapRef = useRef(false);
   useEffect(() => {
     autoRef.current = state.automation.train;
     trainRef.current = train;
+    let fresh = false;
     if (!activeExercise) {
-      chargesRef.current = false;
+      paidLapRef.current = false;
+      deadLapRef.current = false;
     } else if (activeExercise === PET_EXERCISE_ID) {
-      chargesRef.current = petTraining !== null && !petTraining.maxed && petTraining.progress === 0;
+      fresh = petTraining !== null && !petTraining.maxed && petTraining.progress === 0;
     } else {
       const entry = exercises.find((candidate) => candidate.exercise.id === activeExercise);
       const row = progress.find((line) => line.key === entry?.exercise.attribute);
-      chargesRef.current = row !== undefined && row.progress === 0 && row.value < MAX_ATTRIBUTE_VALUE;
+      fresh = row !== undefined && row.progress === 0 && row.value < MAX_ATTRIBUTE_VALUE;
     }
+    if (!fresh) paidLapRef.current = false;
+    chargesRef.current = fresh && !paidLapRef.current;
   });
 
   const petGone = petTraining === null;
@@ -68,18 +74,22 @@ export function TrainingScreen() {
       beatRef.current = beatRef.current >= TRAINING_TICKS ? 0 : beatRef.current + 1;
       setSession({ id: activeExercise, beat: beatRef.current });
 
-      let charging = false;
       if (beatRef.current === 1 && chargesRef.current) {
         chargesRef.current = false;
-        charging = true;
+        paidLapRef.current = true;
+        deadLapRef.current = true;
         playSound("buy");
       }
-      if (beatRef.current > 0 && !charging) {
+      if (beatRef.current > 0 && !deadLapRef.current) {
         const effort = activeExercise === PET_EXERCISE_ID ? "growl" : activeExercise;
         if (isGameSound(effort)) playSound(effort);
       }
 
       if (beatRef.current < TRAINING_TICKS) return;
+      if (deadLapRef.current) {
+        deadLapRef.current = false;
+        return;
+      }
       if (!trainRef.current(activeExercise)) {
         setActivity(autoRef.current ? { kind: "train", id: activeExercise, paused: true } : null);
         return;
@@ -100,6 +110,8 @@ export function TrainingScreen() {
 
   function toggleTraining(exerciseId: string, ready: boolean) {
     beatRef.current = 0;
+    paidLapRef.current = false;
+    deadLapRef.current = false;
     setSession({ id: exerciseId, beat: 0 });
 
     if (activeExercise === exerciseId) {
