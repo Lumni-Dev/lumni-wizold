@@ -78,6 +78,7 @@ export function TavernScreen() {
     closeRoom,
     openDirect,
     sendMessage,
+    announceAway,
   } = useTavern(activeRoomId);
   const [closingRoomId, setClosingRoomId] = useState<string | null>(null);
 
@@ -557,7 +558,10 @@ export function TavernScreen() {
         title={activeRoom ? activeRoom.name : ""}
         dismissible={false}
         onClose={() => {
-          if (activeRoom) playSound("door");
+          if (activeRoom) {
+            playSound("door");
+            void announceAway(activeRoom.id);
+          }
           setActiveRoomId(null);
         }}
         className="max-w-lg"
@@ -582,7 +586,7 @@ export function TavernScreen() {
               variant="primary"
               disabled={draft.trim().length === 0 || cooldownLeft > 0}
             >
-              {cooldownLeft > 0 ? "Aguarde " + Math.ceil(cooldownLeft / 1000) + "s" : "Enviar"}
+              {cooldownLeft > 0 ? Math.ceil(cooldownLeft / 1000) : "Enviar"}
             </Button>
           </form>
         }

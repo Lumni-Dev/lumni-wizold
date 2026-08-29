@@ -97,5 +97,7 @@ export function useTavern(activeRoomId: string | null) {
       perform("POST", "/api/tavern/direct", { otherId: other.id }),
     sendMessage: (roomId: string, text: string) =>
       perform("POST", "/api/tavern/rooms/" + encodeURIComponent(roomId) + "/messages", { text }),
+    announceAway: (roomId: string) =>
+      perform("POST", "/api/tavern/rooms/" + encodeURIComponent(roomId) + "/away"),
   };
 }

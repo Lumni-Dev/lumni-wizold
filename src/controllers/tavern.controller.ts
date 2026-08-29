@@ -162,7 +162,7 @@ export function joinRoom(
       id: generateId("msg"),
       authorId: "system",
       authorName: "Taverna",
-      text: identity.name + (already ? " retornou à sala." : " entrou."),
+      text: identity.name + (already ? " retornou à mesa." : " entrou na mesa."),
       at: now,
     },
   ].slice(-MAX_ROOM_MESSAGES);
@@ -197,7 +197,7 @@ export function leaveRoom(
       id: generateId("msg"),
       authorId: "system",
       authorName: "Taverna",
-      text: identity.name + " saiu da sala.",
+      text: identity.name + " deixou a mesa.",
       at: now,
     },
   ].slice(-MAX_ROOM_MESSAGES);
@@ -289,6 +289,32 @@ export function openDirect(
     "Mesa com " + other.name + " aberta.",
     room.id,
   );
+}
+
+export function announceAway(
+  state: TavernState,
+  roomId: string,
+  identity: TavernIdentity,
+): TavernResult {
+  const room = findRoom(state, roomId);
+  if (!room) return fail(state, "Essa sala não existe mais.");
+  if (!room.members.some((member) => member.id === identity.id)) {
+    return fail(state, "Você não está nessa mesa.");
+  }
+
+  const now = new Date().toISOString();
+  const messages = [
+    ...room.messages,
+    {
+      id: generateId("msg"),
+      authorId: "system",
+      authorName: "Taverna",
+      text: identity.name + " saiu da mesa.",
+      at: now,
+    },
+  ].slice(-MAX_ROOM_MESSAGES);
+
+  return done(replaceRoom(state, { ...room, messages }), "", room.id);
 }
 
 export function sendMessage(

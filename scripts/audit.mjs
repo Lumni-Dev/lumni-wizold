@@ -1639,15 +1639,26 @@ sec("taverna");
   );
   const wentOut = tavernCtrl.leaveRoom(tavern, opened.roomId, { id: "x0", name: "Lobo0" });
   ok(
-    "saída escreve na mesa",
+    "entregar a cadeira escreve na mesa",
     tavernCtrl.findRoom(wentOut.state, opened.roomId).messages.at(-1).text ===
-      "Lobo0 saiu da sala.",
+      "Lobo0 deixou a mesa.",
+  );
+  const stepped = tavernCtrl.announceAway(tavern, opened.roomId, me);
+  ok(
+    "fechar a janela escreve saiu da mesa",
+    stepped.ok &&
+      tavernCtrl.findRoom(stepped.state, opened.roomId).messages.at(-1).text ===
+        me.name + " saiu da mesa.",
+  );
+  ok(
+    "de fora não se anuncia saída",
+    tavernCtrl.announceAway(tavern, opened.roomId, { id: "fora", name: "Fora" }).ok === false,
   );
   const cameBack = tavernCtrl.joinRoom(tavern, opened.roomId, me, "");
   ok(
     "retorno escreve na mesa",
     tavernCtrl.findRoom(cameBack.state, opened.roomId).messages.at(-1).text ===
-      me.name + " retornou à sala.",
+      me.name + " retornou à mesa.",
   );
   ok("fala vazia recusa", tavernCtrl.sendMessage(tavern, opened.roomId, me, "   ").ok === false);
   ok(
