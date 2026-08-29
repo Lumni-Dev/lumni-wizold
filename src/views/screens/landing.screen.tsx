@@ -90,6 +90,14 @@ export function LandingScreen() {
       setIntro("done");
     });
   }, []);
+  useEffect(() => {
+    if (intro === "done") return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [intro]);
 
   return (
     <div className="flex min-h-screen flex-col">
