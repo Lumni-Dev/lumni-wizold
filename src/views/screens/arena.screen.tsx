@@ -16,7 +16,8 @@ import type { Hunter } from "@/models/entities/ranking";
 import { ARENA_COOLDOWN_HOURS, ARENA_DAILY_ATTACKS, arenaSpoilsRange } from "@/models/rules/arena";
 import { canPetFight, isPetActive } from "@/models/rules/pet";
 import { playSound } from "@/controllers/sound";
-import { HUNT_TICK_MS, HUNT_TICKS } from "@/shared/constants/game";
+import { HUNT_TICK_MS, HUNT_TICKS, NAME_MAX_LENGTH } from "@/shared/constants/game";
+import { sanitizeName } from "@/shared/utils/text";
 import { cn } from "@/shared/utils/class-names";
 import { formatDay, formatNumber, formatBronze } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
@@ -328,9 +329,10 @@ export function ArenaScreen() {
           aria-label="Buscar caçador pelo nome"
           placeholder="Buscar caçador pelo nome"
           value={search}
+          maxLength={NAME_MAX_LENGTH}
           autoComplete="off"
           onChange={(event) => {
-            setSearch(event.target.value);
+            setSearch(sanitizeName(event.target.value, NAME_MAX_LENGTH));
             setPage(1);
           }}
         />

@@ -7,8 +7,10 @@ import { useGame } from "@/controllers/game.context";
 import { listRanking } from "@/controllers/ranking.controller";
 import type { Gender } from "@/models/entities/character";
 import { RANKING_BOARDS, type Hunter, type RankingKey } from "@/models/entities/ranking";
+import { NAME_MAX_LENGTH } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
 import { formatNumber } from "@/shared/utils/format";
+import { sanitizeName } from "@/shared/utils/text";
 import { Chip } from "../components/chip";
 import { Field } from "../components/field";
 import { List, ListRow } from "../components/list";
@@ -49,7 +51,7 @@ export function RankingScreen() {
   };
 
   const find = (term: string) => {
-    setSearch(term);
+    setSearch(sanitizeName(term, NAME_MAX_LENGTH));
     setPage(1);
   };
 
@@ -105,6 +107,7 @@ export function RankingScreen() {
         aria-label="Buscar caçador pelo nome"
         placeholder="Buscar caçador pelo nome"
         value={search}
+        maxLength={NAME_MAX_LENGTH}
         autoComplete="off"
         onChange={(event) => find(event.target.value)}
       />
