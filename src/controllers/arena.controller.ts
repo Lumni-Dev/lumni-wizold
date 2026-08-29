@@ -172,7 +172,13 @@ export function resolveArena(
     return failure(state, "Só a fera desce ao fosso. Transforme-se antes de descer.");
   }
   const band = arenaBand(character.level);
-  if (!isInBand(band, hunter.level)) {
+  const pit = roster.filter((candidate) => candidate.id !== character.id);
+  const bandHasRivals = pit.some((candidate) => isInBand(band, candidate.level));
+  const nearest = bandHasRivals ? [] : nearestByLevel(pit, character.level, 5);
+  if (
+    !isInBand(band, hunter.level) &&
+    !nearest.some((candidate) => candidate.id === hunter.id)
+  ) {
     return failure(
       state,
       "A arena só marca luta entre NV. " +
