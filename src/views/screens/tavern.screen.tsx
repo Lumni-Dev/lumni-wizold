@@ -556,6 +556,11 @@ export function TavernScreen() {
       <Modal
         open={Boolean(activeRoom)}
         title={activeRoom ? activeRoom.name : ""}
+        action={
+          activeRoom
+            ? activeRoom.members.length + "/" + (activeRoom.privateFor ? 2 : MAX_ROOM_MEMBERS)
+            : null
+        }
         dismissible={false}
         onClose={() => {
           if (activeRoom) {
