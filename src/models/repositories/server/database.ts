@@ -6,8 +6,9 @@ declare global {
 function createPool(): Pool {
   const pool = new Pool({
     max: 10,
-    idleTimeoutMillis: 30000,
+    idleTimeoutMillis: 300000,
     connectionTimeoutMillis: 10000,
+    keepAlive: true,
     database: process.env.PGDATABASE ?? "wizold-prod",
     ssl: process.env.PGSSLMODE ? { ca: SUPABASE_CA, rejectUnauthorized: true } : undefined,
   });
