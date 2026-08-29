@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { preload } from "react-dom";
 import { useGame } from "@/controllers/game.context";
 import { LORE_CHAPTERS, LORE_COUPLE, LORE_PILLARS } from "@/models/data/lore";
 import { PREVIEW_SHOTS } from "@/models/data/preview";
@@ -69,10 +70,13 @@ function NarrationButton({ playing, onClick }: { playing: boolean; onClick: () =
   );
 }
 
+const INTRO_VIDEO = "/assets/ui/backvideo.mp4?v=2";
+
 export function LandingScreen() {
   const { ready, character } = useGame();
   const hasRun = ready && character !== null;
   const narration = useNarration();
+  preload(INTRO_VIDEO, { as: "video" });
 
   const [heroShown, setHeroShown] = useState(false);
   const [intro, setIntro] = useState<"playing" | "leaving" | "done">("playing");
@@ -105,7 +109,7 @@ export function LandingScreen() {
         {intro !== "done" ? (
           <video
             ref={introRef}
-            src="/assets/ui/backvideo.mp4"
+            src={INTRO_VIDEO}
             autoPlay
             muted
             playsInline
