@@ -239,7 +239,7 @@ export function PetScreen() {
                 ? "Sem fôlego, ele para: não morde, não empresta nada e espera comida ou repouso."
                 : active
                   ? "Acompanhando, ele morde por você: cada bote gasta energia, a criatura às vezes revida nele, e a caçada rende experiência."
-                  : "Em repouso ele fica em casa recuperando fôlego: não arrisca nada, não empresta nada e não aprende nada."
+                  : "Em repouso ele recupera fôlego: não arrisca nada, não empresta nada e não aprende nada."
             }
             padding="none"
             footer={
@@ -254,7 +254,7 @@ export function PetScreen() {
                         formatNumber(petRestStep(pet)) +
                         " de energia a cada " +
                         REST_TICK_MS / 1000 +
-                        " segundos em casa."}
+                        " segundos em repouso."}
                 </span>
                 {active ? (
                   <Button variant="secondary" onClick={() => setPetActive(false)}>

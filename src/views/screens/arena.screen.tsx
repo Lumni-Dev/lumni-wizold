@@ -267,10 +267,10 @@ export function ArenaScreen() {
             {pet ? (
               <Tag tone="neutral">
                 {canPetFight(pet)
-                  ? "Mascote desce junto"
+                  ? "Mascote acompanhando"
                   : isPetActive(pet)
                     ? "Mascote sem fôlego"
-                    : "Mascote em casa"}
+                    : "Mascote em repouso"}
               </Tag>
             ) : null}
             <Tag tone="neutral">

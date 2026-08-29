@@ -333,7 +333,7 @@ export function HuntScreen() {
                   ? "Mascote acompanhando"
                   : isPetActive(pet)
                     ? "Mascote sem fôlego"
-                    : "Mascote em casa"}
+                    : "Mascote em repouso"}
               </Tag>
             ) : null}
             <Tag tone="neutral">{formatBronze(character.bronze)}</Tag>
