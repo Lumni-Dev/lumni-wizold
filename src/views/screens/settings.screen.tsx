@@ -30,7 +30,6 @@ export function SettingsScreen() {
     requestDeleteCode,
     deleteRun,
     logout,
-    notify,
     setAutomation,
   } = useGame();
   const router = useRouter();
