@@ -14,7 +14,7 @@ import { Bar } from "../components/bar";
 import { Tag } from "../components/tag";
 import { DataRow } from "../components/data-row";
 import { AttributeIcon } from "../components/attribute-icon";
-import { GenderIcon } from "../components/gender-icon";
+import { GenderBanner } from "../components/gender-icon";
 import { VitalActionButton } from "../components/vital-action-button";
 import { List, ListRow, RowText } from "../components/list";
 import { Panel } from "../components/panel";
@@ -69,17 +69,15 @@ export function CharacterScreen() {
       <div className="grid items-start gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-1">
           <Panel title="Ficha" padding="none">
-            <div className="flex items-center gap-3 border-b border-edge p-4">
-              <GenderIcon gender={character.gender} size="large" />
-              <div className="min-w-0 space-y-2">
-                <div>
-                  <p className="truncate text-sm text-ink">{character.name}</p>
-                  <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                    {genderDefinition.title}
-                  </p>
-                </div>
-                <Tag tone="neutral">{FORM_LABEL[character.form]}</Tag>
+            <GenderBanner gender={character.gender} />
+            <div className="space-y-2 border-b border-edge p-4">
+              <div className="min-w-0">
+                <p className="truncate text-sm text-ink">{character.name}</p>
+                <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                  {genderDefinition.title}
+                </p>
               </div>
+              <Tag tone="neutral">{FORM_LABEL[character.form]}</Tag>
             </div>
 
             <List>

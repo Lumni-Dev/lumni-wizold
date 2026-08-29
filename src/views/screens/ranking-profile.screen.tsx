@@ -13,7 +13,7 @@ import { Button } from "../components/button";
 import { DataRow } from "../components/data-row";
 import { EmptyState } from "../components/empty-state";
 import { AttributeIcon } from "../components/attribute-icon";
-import { GenderIcon } from "../components/gender-icon";
+import { GenderBanner } from "../components/gender-icon";
 import { IconFrame } from "../components/icon-frame";
 import { PetIcon } from "../components/pet-icon";
 import { ItemIcon } from "../components/item-icon";
@@ -77,17 +77,15 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
       <div className="grid items-start gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-1">
           <Panel title="Ficha" padding="none">
-            <div className="flex items-center gap-3 border-b border-edge p-4">
-              <GenderIcon gender={hunter.gender} size="large" />
-              <div className="min-w-0 space-y-2">
-                <div>
-                  <p className="truncate text-sm text-ink">{hunter.name}</p>
-                  <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                    {hunter.gender === "male" ? "Macho" : "Fêmea"}
-                  </p>
-                </div>
-                <Tag tone="neutral">NV. {formatNumber(hunter.level)}</Tag>
+            <GenderBanner gender={hunter.gender} />
+            <div className="space-y-2 border-b border-edge p-4">
+              <div className="min-w-0">
+                <p className="truncate text-sm text-ink">{hunter.name}</p>
+                <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                  {hunter.gender === "male" ? "Macho" : "Fêmea"}
+                </p>
               </div>
+              <Tag tone="neutral">NV. {formatNumber(hunter.level)}</Tag>
             </div>
 
             <List>

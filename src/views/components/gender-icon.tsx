@@ -26,3 +26,17 @@ export function GenderIcon({
     </IconFrame>
   );
 }
+
+export function GenderBanner({ gender }: { gender: Gender }) {
+  const art = useArt();
+  const source = art.genders[gender];
+
+  if (!source) return null;
+
+  return (
+    <div className="aspect-video w-full overflow-hidden border-b border-edge">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={source} alt="" loading="lazy" className="h-full w-full object-cover" />
+    </div>
+  );
+}
