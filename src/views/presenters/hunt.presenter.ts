@@ -57,7 +57,7 @@ export function narrationOf(
 ): NarrationLine[] {
   const prey = report.foe.name;
   const full = report.foe.health;
-  const slots = Math.max(1, maxBeats - 2);
+  const slots = Math.max(1, maxBeats - 3);
   const rounds = sampleRounds(report.combat.rounds, slots);
 
   const middle: NarrationLine[] = rounds.map((round) => ({
@@ -77,7 +77,13 @@ export function narrationOf(
   const last = middle[middle.length - 1]?.creatureHealth ?? full;
 
   return [
-    { text: openerOf(hunter, prey), blow: null, critical: false, creatureHealth: full },
+    { text: openerOf(hunter, prey), blow: null, critical: false, creatureHealth: 0 },
+    {
+      text: prey + " se ergue inteiro: a luta vai começar.",
+      blow: null,
+      critical: false,
+      creatureHealth: full,
+    },
     ...middle,
     { text: closerOf(report, prey), blow: null, critical: false, creatureHealth: last },
   ];
