@@ -37,11 +37,13 @@ const TONES: Record<FrameTone, string> = {
 export function IconFrame({
   size = "medium",
   tone = "default",
+  shine = false,
   className,
   children,
 }: {
   size?: IconSize;
   tone?: FrameTone;
+  shine?: boolean;
   className?: string;
   children: ReactNode;
 }) {
@@ -58,6 +60,7 @@ export function IconFrame({
         )}
       >
         {children}
+        {shine ? <span className="item-glow pointer-events-none absolute -inset-1/2" /> : null}
       </span>
       <CornerAccents scale="icon" />
     </span>

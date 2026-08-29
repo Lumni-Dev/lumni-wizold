@@ -161,7 +161,7 @@ export function ForgeScreen() {
                 <ListRow key={ore.id} layout="column" padding="art">
                   <div className="flex items-center gap-3">
                     {fragment ? (
-                      <ItemIcon item={fragment} className={active ? "art-active" : undefined} />
+                      <ItemIcon item={fragment} shine={active} />
                     ) : (
                       <IconFrame>--</IconFrame>
                     )}
@@ -221,10 +221,7 @@ export function ForgeScreen() {
                 <ListRow key={entry.slot} layout="column" padding="art">
                   <div className="flex items-center gap-3">
                     {entry.item ? (
-                      <ItemIcon
-                        item={entry.item}
-                        className={activeSlot === entry.slot ? "art-active" : undefined}
-                      />
+                      <ItemIcon item={entry.item} shine={activeSlot === entry.slot} />
                     ) : (
                       <IconFrame>--</IconFrame>
                     )}

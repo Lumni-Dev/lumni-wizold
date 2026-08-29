@@ -2,24 +2,23 @@
 
 import { useArt } from "@/controllers/art.context";
 import type { Item } from "@/models/entities/item";
-import { cn } from "@/shared/utils/class-names";
 import { itemInitials } from "../presenters/item.presenter";
 import { IconArt, IconFrame, type IconSize } from "./icon-frame";
 
 export function ItemIcon({
   item,
   size = "medium",
-  className,
+  shine,
 }: {
   item: Item;
   size?: IconSize;
-  className?: string;
+  shine?: boolean;
 }) {
   const art = useArt();
   const source = art.items[item.id];
 
   return (
-    <IconFrame size={size} className={cn(source ? undefined : "tracking-widest", className)}>
+    <IconFrame size={size} shine={shine} className={source ? undefined : "tracking-widest"}>
       {source ? <IconArt source={source} /> : itemInitials(item.name)}
     </IconFrame>
   );

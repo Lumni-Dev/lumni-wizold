@@ -177,9 +177,7 @@ export function CharacterScreen() {
                     <div className="flex min-w-0 items-center gap-3">
                       <AttributeIcon
                         attribute={definition.key}
-                        className={
-                          definition.key === trainingAttribute ? "art-active" : undefined
-                        }
+                        shine={definition.key === trainingAttribute}
                       />
                       <RowText title={definition.name} description={definition.description} />
                     </div>
