@@ -12,16 +12,18 @@ function createPool(): Pool {
     database: process.env.PGDATABASE ?? "wizold-prod",
     ssl: process.env.PGSSLMODE ? { ca: SUPABASE_CA, rejectUnauthorized: true } : undefined,
   });
-  pool.on("connect", (client) => {
-    client.query("set statement_timeout = '10s'").catch(() => {});
-  });
   return pool;
 }
 export const pool: Pool = globalThis.wizoldPool ?? createPool();
 globalThis.wizoldPool = pool;
+const prepared = new WeakSet<PoolClient>();
 export async function withTransaction<T>(work: (client: PoolClient) => Promise<T>): Promise<T> {
   const client = await pool.connect();
   try {
+    if (!prepared.has(client)) {
+      await client.query("set statement_timeout = '10s'");
+      prepared.add(client);
+    }
     await client.query("begin");
     const result = await work(client);
     await client.query("commit");
