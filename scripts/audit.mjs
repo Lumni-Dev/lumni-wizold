@@ -1405,6 +1405,32 @@ sec("ranking");
         (entry) => board.find((line) => line.hunter.id === entry.hunter.id)?.position !== undefined,
       ),
   );
+  const wolfed = roster.map((hunter, index) =>
+    index % 2 === 0
+      ? {
+          ...hunter,
+          pet: {
+            name: "Lobo" + index,
+            gender: index % 4 === 0 ? "male" : "female",
+            energy: 50,
+            active: true,
+          },
+        }
+      : hunter,
+  );
+  const petCutView = rankingCtrl.listRanking(state, wolfed, "level", 1, "", "all", "female");
+  ok(
+    "corte por mascote filtra sem renumerar",
+    petCutView.entries.length > 0 &&
+      petCutView.entries.every((entry) => entry.hunter.pet?.gender === "female") &&
+      petCutView.entries.every((entry) => {
+        const alone = rankingCtrl.listRanking(state, wolfed, "level", 1, entry.hunter.name);
+        return (
+          alone.entries.find((line) => line.hunter.id === entry.hunter.id)?.position ===
+          entry.position
+        );
+      }),
+  );
   const profile = rankingCtrl.profileOf(state, roster, "bench-0");
   ok("perfil de outro caçador abre", profile !== null && profile.positions.length === 12);
   ok("perfil sem NaN", profile !== null && Number.isFinite(profile.stats.maxHealth));

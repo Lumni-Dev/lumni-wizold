@@ -1,5 +1,6 @@
 import type { Gender } from "@/models/entities/character";
 import type { GameState } from "@/models/entities/game-state";
+import type { PetGender } from "@/models/entities/pet";
 import {
   findBoard,
   RANKING_BOARDS,
@@ -85,6 +86,7 @@ export function listRanking(
   page: number,
   search = "",
   gender: Gender | "all" = "all",
+  petCut: PetGender | "all" = "all",
 ): RankingView {
   const board = findBoard(key);
   const { hunters, playerId } = huntersOf(state, roster);
@@ -96,7 +98,8 @@ export function listRanking(
   const found = entries.filter(
     (entry) =>
       (term ? normalizeText(entry.hunter.name).includes(term) : true) &&
-      (gender === "all" || entry.hunter.gender === gender),
+      (gender === "all" || entry.hunter.gender === gender) &&
+      (petCut === "all" || entry.hunter.pet?.gender === petCut),
   );
 
   const safePage = clampPage(page, found.length);
