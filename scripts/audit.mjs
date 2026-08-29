@@ -45,6 +45,7 @@ const entItem = load("models/entities/item.js");
 const entMining = load("models/entities/mining.js");
 const entTavern = load("models/entities/tavern.js");
 const entRanking = load("models/entities/ranking.js");
+const entBazaar = load("models/entities/bazaar.js");
 const factory = load("models/factories/character.factory.js");
 const characterCtrl = load("controllers/character.controller.js");
 const huntCtrl = load("controllers/hunt.controller.js");
@@ -1124,8 +1125,47 @@ sec("bazar");
     announced.ok &&
       inventoryCtrl.countInInventory(announced.state.inventory, "bronze-fragment") === 20,
   );
+  const freshListing = {
+    id: "bz-1",
+    sellerId: "x",
+    sellerName: "X",
+    itemId: "bronze-fragment",
+    enhancement: 0,
+    quantity: 5,
+    priceCents: 500,
+    announcedAt: new Date(Date.now() - 2 * 86400000).toISOString(),
+  };
+  const staleListing = {
+    ...freshListing,
+    id: "bz-2",
+    announcedAt: new Date(Date.now() - 8 * 86400000).toISOString(),
+  };
+  ok(
+    "anúncio vence em sete dias",
+    entBazaar.isListingExpired(staleListing) === true &&
+      entBazaar.isListingExpired(freshListing) === false,
+  );
+  const shelf = bazaarCtrl.listBoard(state, [freshListing, staleListing]);
+  ok(
+    "vencido some da vitrine dos outros",
+    shelf.some((entry) => entry.listing.id === "bz-1") &&
+      shelf.every((entry) => entry.listing.id !== "bz-2"),
+  );
   if (announced.ok) {
     const mine = announced.state.bazaarListings[0];
+    const myShelf = bazaarCtrl.listBoard(
+      {
+        ...announced.state,
+        bazaarListings: [
+          { ...mine, announcedAt: new Date(Date.now() - 8 * 86400000).toISOString() },
+        ],
+      },
+      [],
+    );
+    ok(
+      "o dono ainda vê o próprio anúncio vencido",
+      myShelf.length === 1 && myShelf[0].expired === true,
+    );
     ok(
       "comprar de si mesmo recusa",
       bazaarCtrl.purchaseListing(announced.state, mine, 1).ok === false,

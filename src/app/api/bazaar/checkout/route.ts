@@ -1,3 +1,4 @@
+import { BAZAAR_LISTING_DAYS, isListingExpired } from "@/models/entities/bazaar";
 import { failure, success } from "@/models/entities/result";
 import { findItem } from "@/models/data/items";
 import { isEquippable } from "@/models/entities/item";
@@ -14,6 +15,12 @@ export async function POST(request: Request) {
       (candidate) => candidate.id === listingId,
     );
     if (!listing) return failure(state, "Esse anúncio já saiu do quadro.");
+    if (isListingExpired(listing)) {
+      return failure(
+        state,
+        "Esse anúncio venceu: o bazar guarda cada oferta por " + BAZAAR_LISTING_DAYS + " dias.",
+      );
+    }
     if (quantity > listing.quantity) {
       return failure(state, "Só restam " + listing.quantity + " nesse anúncio.");
     }

@@ -3,7 +3,7 @@ import { formatReais } from "@/shared/utils/format";
 import { generateId } from "@/shared/utils/id";
 import { isValidQuantity } from "@/shared/utils/quantity";
 import { findItem } from "@/models/data/items";
-import type { BazaarListing } from "@/models/entities/bazaar";
+import { isListingExpired, type BazaarListing } from "@/models/entities/bazaar";
 import type { GameState } from "@/models/entities/game-state";
 import { isEquippable, type Item } from "@/models/entities/item";
 import { failure, success, type Result } from "@/models/entities/result";
@@ -47,6 +47,7 @@ export interface BoardEntry {
   item: Item;
   mine: boolean;
   available: number;
+  expired: boolean;
 }
 
 export function listBoard(state: GameState, others: readonly BazaarListing[] = []): BoardEntry[] {
@@ -56,15 +57,18 @@ export function listBoard(state: GameState, others: readonly BazaarListing[] = [
       item: findItem(listing.itemId),
       mine: true,
       available: listing.quantity,
+      expired: isListingExpired(listing),
     }))
     .filter((entry): entry is BoardEntry => Boolean(entry.item));
 
   const board = others
+    .filter((listing) => !isListingExpired(listing))
     .map((listing) => ({
       listing,
       item: findItem(listing.itemId),
       mine: false,
       available: listing.quantity,
+      expired: false,
     }))
     .filter((entry): entry is BoardEntry => Boolean(entry.item) && entry.available > 0);
 

@@ -12,8 +12,9 @@ import {
   MIN_WITHDRAW_CENTS,
   sellerNet,
 } from "@/models/rules/bazaar";
+import { listingExpiresAt, type BazaarListing } from "@/models/entities/bazaar";
 import { enhancedName } from "@/models/rules/forge";
-import { formatNumber, formatReais, parseReais } from "@/shared/utils/format";
+import { formatNumber, formatReais, formatTime, parseReais } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
 import { Button } from "../components/button";
 import { ConfirmDialog } from "../components/confirm-dialog";
@@ -29,6 +30,18 @@ import { Tag } from "../components/tag";
 import { PageHeader } from "../layout/page-header";
 
 const PAGE_SIZE = 9;
+
+function expiryLine(listing: BazaarListing): string {
+  const expiresAt = listingExpiresAt(listing);
+  const daysLeft = Math.max(1, Math.ceil((expiresAt - Date.now()) / 86400000));
+  return (
+    "Expira em " +
+    daysLeft +
+    (daysLeft === 1 ? " dia" : " dias") +
+    ", às " +
+    formatTime(new Date(expiresAt).toISOString())
+  );
+}
 
 const FEE_LABEL = Math.round(BAZAAR_FEE_RATIO * 100) + "%";
 
@@ -178,6 +191,11 @@ export function BazaarScreen() {
                           formatReais(entry.listing.priceCents) +
                           (entry.available > 1 ? " cada" : "")
                         : null}
+                      <span className="block">
+                        {entry.expired
+                          ? "Vencido: remova para recolher as peças."
+                          : expiryLine(entry.listing)}
+                      </span>
                     </>
                   }
                 />

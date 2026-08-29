@@ -39,7 +39,7 @@ import {
 import { MINING_MAX_LEVEL, ORES } from "../entities/mining";
 import { RANKING_BOARDS } from "../entities/ranking";
 import { BAZAAR_FEE_RATIO, MIN_WITHDRAW_CENTS } from "../rules/bazaar";
-import { initialWallet } from "../entities/bazaar";
+import { BAZAAR_LISTING_DAYS, initialWallet } from "../entities/bazaar";
 import { enhancementCost } from "../rules/forge";
 import { experienceForLevel } from "../rules/progression";
 import { FULL_MOON_ATTRIBUTE_BONUS, MOON_PHASES, SYNODIC_MONTH_DAYS } from "../rules/moon";
@@ -401,6 +401,9 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "O que o mercado vende igual não entra: peça sem forja fica de fora.",
       "Anunciar tira as peças da mochila; remover o anúncio devolve tudo.",
       "Quem compra é gente de verdade: o anúncio fica no quadro até outro caçador pagar por ele, e o preço é você quem decide.",
+      "Todo anúncio dura " +
+        BAZAAR_LISTING_DAYS +
+        " dias: o quadro mostra quantos faltam e a hora em que vence, e o vencido sai da vitrine esperando o dono remover para recolher as peças.",
       "A compra é paga no checkout do Stripe, com dinheiro de verdade; assim que o pagamento confirma, o item entra na mochila e o vendedor recebe no Alforje, já sem a taxa da casa.",
       "O que veio do bazar carrega a insígnia Bazar na mochila: uma marca de origem, sem regra presa a ela, e a peça vende no mercado ou se descarta como qualquer outra.",
       "Ninguém compra o próprio anúncio.",

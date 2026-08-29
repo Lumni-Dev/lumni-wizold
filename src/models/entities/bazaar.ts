@@ -9,6 +9,18 @@ export interface BazaarListing {
   announcedAt?: string;
 }
 
+export const BAZAAR_LISTING_DAYS = 7;
+export const BAZAAR_LISTING_LIFETIME_MS = BAZAAR_LISTING_DAYS * 24 * 60 * 60 * 1000;
+
+export function listingExpiresAt(listing: BazaarListing): number {
+  const announced = listing.announcedAt ? Date.parse(listing.announcedAt) : Date.now();
+  return announced + BAZAAR_LISTING_LIFETIME_MS;
+}
+
+export function isListingExpired(listing: BazaarListing, now = Date.now()): boolean {
+  return now >= listingExpiresAt(listing);
+}
+
 export interface Wallet {
   cents: number;
 }
