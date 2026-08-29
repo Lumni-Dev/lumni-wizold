@@ -8,6 +8,7 @@ import { ATTRIBUTES } from "@/models/entities/attribute";
 import type { Gender } from "@/models/entities/character";
 import type { Hunter } from "@/models/entities/ranking";
 import { ARENA_COOLDOWN_HOURS, ARENA_DAILY_ATTACKS, arenaSpoilsRange } from "@/models/rules/arena";
+import { canPetFight, isPetActive } from "@/models/rules/pet";
 import { playSound } from "@/controllers/sound";
 import { HUNT_TICK_MS, HUNT_TICKS } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
@@ -232,7 +233,15 @@ export function ArenaScreen() {
         description="O fosso onde um lobisomem desafia outro, transformados os dois. Mascote ativo e com fôlego desce junto, o seu e o do rival."
         action={
           <div className="flex items-center gap-2">
-            {pet ? <Tag tone="neutral">{pet.name + " fica fora do fosso"}</Tag> : null}
+            {pet ? (
+              <Tag tone="neutral">
+                {canPetFight(pet)
+                  ? "Mascote desce junto"
+                  : isPetActive(pet)
+                    ? "Mascote sem fôlego"
+                    : "Mascote em casa"}
+              </Tag>
+            ) : null}
             <Tag tone="neutral">
               {formatNumber(character.arenaWins)}V - {formatNumber(character.arenaLosses)}D
             </Tag>
