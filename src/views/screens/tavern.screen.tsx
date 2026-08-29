@@ -674,16 +674,16 @@ export function TavernScreen() {
         confirmLabel="Fechar"
         onCancel={() => setClosingRoomId(null)}
         onConfirm={() => {
-          if (closingRoomId) {
-            return closeRoom(closingRoomId).then((result) => {
-              if (result) notify(result.message, result.ok, "Taverna");
-              if (result?.ok) {
-                playSound("door");
-                if (activeRoomId === closingRoomId) setActiveRoomId(null);
-              }
-            });
-          }
+          const roomId = closingRoomId;
           setClosingRoomId(null);
+          if (!roomId) return;
+          return closeRoom(roomId).then((result) => {
+            if (result) notify(result.message, result.ok, "Taverna");
+            if (result?.ok) {
+              playSound("door");
+              if (activeRoomId === roomId) setActiveRoomId(null);
+            }
+          });
         }}
       />
 
