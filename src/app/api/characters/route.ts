@@ -13,6 +13,9 @@ export async function DELETE(request: Request) {
   if (refused) return refused;
   const userId = await sessionUserId();
   if (!userId) return bad("Entre para jogar.", 401);
+  if (!rateLimit("delete:" + userId, 10, 600000).allowed) {
+    return bad("Muitas tentativas. Espere um pouco.", 429);
+  }
   const body = await readBody(request);
   const code = asText(body.code, 4).trim();
   if (!/^\d{4}$/.test(code)) {

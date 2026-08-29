@@ -10,7 +10,13 @@ function createPool(): Pool {
     connectionTimeoutMillis: 10000,
     keepAlive: true,
     database: process.env.PGDATABASE ?? "wizold-prod",
-    ssl: process.env.PGSSLMODE ? { ca: SUPABASE_CA, rejectUnauthorized: true } : undefined,
+    // TLS is on by default and verified against the pinned CA; a deploy must
+    // opt out loudly (PGSSLMODE=disable) rather than fall to cleartext by
+    // forgetting an env, since these rows carry sessions and payout PII.
+    ssl:
+      process.env.PGSSLMODE === "disable"
+        ? undefined
+        : { ca: SUPABASE_CA, rejectUnauthorized: true },
   });
   return pool;
 }

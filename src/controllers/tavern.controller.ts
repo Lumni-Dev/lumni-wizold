@@ -71,14 +71,25 @@ export function listRooms(state: TavernState, identity: TavernIdentity | null): 
         !isPrivateTable(room) ||
         (identity !== null && (room.privateFor ?? []).includes(identity.id)),
     )
-    .map((room) => ({
-      room,
-      locked: room.password !== null,
-      full: isRoomFull(room),
-      memberCount: room.members.length,
-      isMember: identity !== null && room.members.some((member) => member.id === identity.id),
-      isPrivate: isPrivateTable(room),
-    }))
+    .map((room) => {
+      const isMember =
+        identity !== null && room.members.some((member) => member.id === identity.id);
+      // The board never carries the password hash, and only members receive the
+      // message history: a locked room shows its name and seats, never its chat.
+      const safeRoom: TavernRoom = {
+        ...room,
+        password: null,
+        messages: isMember ? room.messages : [],
+      };
+      return {
+        room: safeRoom,
+        locked: room.password !== null,
+        full: isRoomFull(room),
+        memberCount: room.members.length,
+        isMember,
+        isPrivate: isPrivateTable(room),
+      };
+    })
     .sort((a, b) =>
       a.isPrivate === b.isPrivate
         ? a.room.name.localeCompare(b.room.name, "pt-BR")
@@ -181,6 +192,9 @@ export function leaveRoom(
 ): TavernResult {
   const room = findRoom(state, roomId);
   if (!room) return fail(state, "Essa sala não existe mais.");
+  if (!room.members.some((member) => member.id === identity.id)) {
+    return fail(state, "Você não está nessa mesa.");
+  }
 
   const members = room.members.filter((member) => member.id !== identity.id);
   if (members.length === 0) {

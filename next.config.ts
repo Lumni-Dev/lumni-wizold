@@ -21,6 +21,8 @@ const CSP = [
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1", "192.168.15.6", "*.local"],
 
+  poweredByHeader: false,
+
   serverExternalPackages: ["pg"],
 
   async headers() {

@@ -1,6 +1,21 @@
 export type Random = () => number;
 
-export const defaultRandom: Random = () => Math.random();
+// A float in [0, 1) drawn from the platform CSPRNG when it exists (Node's
+// global webcrypto on the server, window.crypto in the browser), so the rolls
+// that decide forge success, drops and spoils cannot be predicted from a run
+// of observed outputs the way Math.random's xorshift state can. Math.random is
+// only the fallback for an ancient runtime; the benches inject seededRandom.
+function secureFloat(): number {
+  const source = globalThis.crypto;
+  if (source && typeof source.getRandomValues === "function") {
+    const buffer = new Uint32Array(1);
+    source.getRandomValues(buffer);
+    return buffer[0] / 4294967296;
+  }
+  return Math.random();
+}
+
+export const defaultRandom: Random = secureFloat;
 
 export function intBetween(
   minimum: number,

@@ -1772,6 +1772,35 @@ sec("taverna");
     "de fora não se fala",
     tavernCtrl.sendMessage(tavern, opened.roomId, { id: "fora", name: "Fora" }, "oi").ok === false,
   );
+  {
+    let vault = entTavern.emptyTavern();
+    const boss = { id: "dono", name: "Dono" };
+    const nosy = { id: "xereta", name: "Xereta" };
+    const locked = tavernCtrl.createRoom(vault, boss, "Trancada", "segredo");
+    ok("mesa com senha abre", locked.ok === true);
+    vault = tavernCtrl.sendMessage(locked.state, locked.roomId, boss, "conversa secreta").state;
+    const stranger = tavernCtrl
+      .listRooms(vault, nosy)
+      .find((summary) => summary.room.id === locked.roomId);
+    ok(
+      "estranho vê a mesa trancada mas não a conversa",
+      Boolean(stranger) && stranger.locked === true && stranger.room.messages.length === 0,
+    );
+    ok("o quadro nunca entrega o hash da senha", stranger.room.password === null);
+    const owner = tavernCtrl
+      .listRooms(vault, boss)
+      .find((summary) => summary.room.id === locked.roomId);
+    ok(
+      "o dono lê a própria conversa sem o hash",
+      owner.room.messages.length === 2 && owner.room.password === null,
+    );
+    const forged = tavernCtrl.leaveRoom(vault, locked.roomId, nosy);
+    ok("estranho não força saída para varrer a mesa", forged.ok === false);
+    ok(
+      "a conversa da mesa trancada segue intacta",
+      tavernCtrl.findRoom(forged.state, locked.roomId).messages.length === 2,
+    );
+  }
   const direct = tavernCtrl.openDirect(tavern, me, other);
   ok("mesa reservada abre", direct.ok === true);
   tavern = direct.state;
