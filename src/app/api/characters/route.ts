@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "node:crypto";
 import { after } from "next/server";
 import * as characterController from "@/controllers/character.controller";
 import type { Gender } from "@/models/entities/character";
@@ -6,33 +7,73 @@ import { insertNewGame, loadGame } from "@/models/repositories/server/game.store
 import { asText, bad, readBody, refuseAbuse, reply } from "../_lib/api";
 import { sendFarewellEmail } from "../_lib/mail";
 import { rateLimit } from "../_lib/rate-limit";
-import { sessionUserId } from "../_lib/session";
+import { deletionCodeHash, dropSession, sessionUserId } from "../_lib/session";
 export async function DELETE(request: Request) {
   const refused = refuseAbuse(request);
   if (refused) return refused;
   const userId = await sessionUserId();
   if (!userId) return bad("Entre para jogar.", 401);
+  const body = await readBody(request);
+  const code = asText(body.code, 4).trim();
+  if (!/^\d{4}$/.test(code)) {
+    return Response.json({
+      ok: false,
+      message: "Informe o código de 4 dígitos enviado ao seu e-mail.",
+      data: null,
+    });
+  }
   try {
     return await withTransaction(async (client) => {
-      const found = await client.query(
-        `select u.email, c.name from characters c
-           join users u on u.id = c.user_id
-          where c.user_id = $1`,
+      const pending = await client.query(
+        `select code_hash, attempts, expires_at > now() as alive
+           from deletion_codes where user_id = $1 for update`,
         [userId],
       );
-      const gone = await client.query("delete from characters where user_id = $1", [userId]);
+      const ticket = pending.rows[0];
+      if (!ticket || ticket.alive !== true || Number(ticket.attempts) >= 5) {
+        return Response.json({
+          ok: false,
+          message: "O código expirou ou se gastou. Peça um novo.",
+          data: null,
+        });
+      }
+      const wanted = Buffer.from(String(ticket.code_hash));
+      const given = Buffer.from(deletionCodeHash(userId, code));
+      if (wanted.length !== given.length || !timingSafeEqual(wanted, given)) {
+        await client.query(
+          "update deletion_codes set attempts = attempts + 1 where user_id = $1",
+          [userId],
+        );
+        return Response.json({ ok: false, message: "Código errado. Confira o e-mail.", data: null });
+      }
+      const found = await client.query(
+        `select u.email, c.id as character_id, c.name from users u
+           left join characters c on c.user_id = u.id
+          where u.id = $1`,
+        [userId],
+      );
       const row = found.rows[0];
-      if (gone.rowCount === 1 && row?.email) {
+      if (row?.character_id) {
+        await client.query("delete from tavern_messages where author_id = $1", [row.character_id]);
+        await client.query("delete from pack_mates where mate_id = $1", [row.character_id]);
+      }
+      const gone = await client.query("delete from users where id = $1", [userId]);
+      if (gone.rowCount === 1 && row?.email && !String(row.email).endsWith("@wizold.test")) {
+        const farewell = String(row.email);
+        const name = String(row.name ?? "Caçador");
         after(() =>
-          sendFarewellEmail(String(row.email), String(row.name)).catch((error) =>
+          sendFarewellEmail(farewell, name).catch((error) =>
             console.error("[mail] despedida", error),
           ),
         );
       }
+      await dropSession();
       return Response.json({
         ok: gone.rowCount === 1,
         message:
-          gone.rowCount === 1 ? "A partida foi encerrada." : "Não havia partida para encerrar.",
+          gone.rowCount === 1
+            ? "A conta foi apagada por inteiro. A noite guarda a lembrança."
+            : "Não havia conta para apagar.",
         data: null,
       });
     });

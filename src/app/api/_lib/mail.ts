@@ -117,14 +117,38 @@ export async function sendFarewellEmail(to: string, characterName: string): Prom
       INK +
       ';">' +
       characterName +
-      "</strong> foi encerrada, e os registros dela deixaram o quadro.",
-    "A conta continua sua: se a lua chamar de novo, a mesma porta abre outra caçada, do primeiro uivo em diante.",
+      "</strong> foi encerrada, e a conta foi apagada por inteiro do servidor: personagem, mochila, carteira, mesas e rastros.",
+    "Se a lua chamar de novo, a mesma porta abre uma conta nova, do primeiro uivo em diante.",
     "Se a exclusão não foi você, escreva agora para o suporte.",
   ];
   await deliver(
     to,
     "A partida de " + characterName + " foi encerrada",
     layout(paragraphs, "Começar outra caçada"),
-    "A partida de " + characterName + " foi encerrada em Wizold. Voltar: " + GAME_URL,
+    "A conta de " + characterName + " foi apagada de Wizold. Voltar: " + GAME_URL,
+  );
+}
+
+export async function sendDeletionCodeEmail(to: string, code: string): Promise<void> {
+  const codeBlock =
+    '<div style="text-align:center;margin:6px 0 20px;">' +
+    '<span style="display:inline-block;background-color:#1d1d22;border:1px solid ' +
+    EDGE +
+    ";color:" +
+    INK +
+    ';font-size:28px;letter-spacing:12px;padding:14px 10px 14px 22px;border-radius:6px;font-family:Consolas,Menlo,monospace;">' +
+    code +
+    "</span></div>";
+  const paragraphs = [
+    "Você pediu para excluir a sua conta em Wizold. Este é o código de confirmação:",
+    codeBlock,
+    "Ele vale por 10 minutos. Confirmando, a conta e tudo o que ela guarda somem do servidor para sempre.",
+    "Se não foi você, ignore esta carta: sem o código, nada acontece.",
+  ];
+  await deliver(
+    to,
+    "Código para excluir a conta: " + code,
+    layout(paragraphs, "Voltar ao jogo"),
+    "Código para excluir a sua conta em Wizold: " + code + " (vale 10 minutos).",
   );
 }

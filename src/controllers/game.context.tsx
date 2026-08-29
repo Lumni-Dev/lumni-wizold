@@ -57,7 +57,8 @@ interface GameContextValue {
   } | null>;
   startRun: (name: string, gender: Gender) => Promise<boolean>;
   renameCharacter: (name: string) => Promise<boolean>;
-  deleteRun: () => Promise<void>;
+  requestDeleteCode: () => Promise<boolean>;
+  deleteRun: (code: string) => Promise<boolean>;
   toggleForm: () => Promise<void>;
   rest: () => Promise<void>;
   activity: Activity | null;
@@ -380,11 +381,19 @@ export function GameProvider({ children }: { children: ReactNode }) {
         const answer = await act("POST", "/api/character/rename", { name }, "Personagem");
         return answer.ok;
       },
-      deleteRun: async () => {
-        const answer = await api("DELETE", "/api/characters");
-        announce(answer.message, answer.ok, "Personagem");
-        applyState(initialState(), ++mintRef.current);
-        setActivity(null);
+      requestDeleteCode: async () => {
+        const answer = await act("POST", "/api/characters/delete-code", undefined, "Conta");
+        return answer.ok;
+      },
+      deleteRun: async (code) => {
+        const answer = await api("DELETE", "/api/characters", { code });
+        announce(answer.message, answer.ok, "Conta");
+        if (answer.ok) {
+          applyState(initialState(), ++mintRef.current);
+          setActivity(null);
+          setAuthenticated(false);
+        }
+        return answer.ok;
       },
       toggleForm: async () => {
         const wasHuman = state.character?.form === "human";

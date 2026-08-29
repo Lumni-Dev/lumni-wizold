@@ -156,12 +156,30 @@ const diary = await rows("select count(*)::int as n from log_entries where chara
 check("diário persistido", diary[0]?.n > 0);
 const table = await rows("select name from tavern_rooms where owner_id = $1", [character?.id]);
 check("mesa na tabela", table[0]?.name === "Fogueira");
+const blind = await call("DELETE", "/api/characters", { code: "0000" });
+check("exclusão sem código pedido recusa", blind.payload?.ok === false, blind.payload?.message);
+const deleteCode = "4321";
+await client.query(
+  `insert into deletion_codes (user_id, code_hash, expires_at, attempts)
+   values ($1, $2, now() + interval '10 minutes', 0)
+   on conflict (user_id) do update set
+     code_hash = $2, expires_at = now() + interval '10 minutes', attempts = 0`,
+  [userId, createHmac("sha256", secret).update(userId + ":" + deleteCode).digest("hex")],
+);
+const wrongCode = await call("DELETE", "/api/characters", { code: "9999" });
+check("código errado recusa", wrongCode.payload?.ok === false, wrongCode.payload?.message);
+const erased = await call("DELETE", "/api/characters", { code: deleteCode });
+check("código certo apaga a conta", erased.payload?.ok === true, erased.payload?.message);
 await client.query("delete from users where email = $1", [EMAIL]);
 const leftovers = await rows(
-  "select (select count(*) from characters where user_id = $1)::int + (select count(*) from tavern_rooms where owner_id = $2)::int as n",
+  `select (select count(*) from users where id = $1)::int
+        + (select count(*) from characters where user_id = $1)::int
+        + (select count(*) from tavern_rooms where owner_id = $2)::int
+        + (select count(*) from tavern_messages where author_id = $2)::int
+        + (select count(*) from deletion_codes where user_id = $1)::int as n`,
   [user?.id, character?.id],
 );
-check("limpeza em cascata completa", leftovers[0]?.n === 0);
+check("nada sobra do usuário apagado", leftovers[0]?.n === 0);
 await client.end();
 console.log("");
 console.log(failures === 0 ? "SMOKE COMPLETO: tudo passou" : failures + " falha(s)");

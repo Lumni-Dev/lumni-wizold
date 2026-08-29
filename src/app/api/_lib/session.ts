@@ -53,6 +53,9 @@ export async function dropSession(): Promise<void> {
   const jar = await cookies();
   jar.delete(SESSION_COOKIE);
 }
+export function deletionCodeHash(userId: string, code: string): string {
+  return createHmac("sha256", secret()).update(userId + ":" + code).digest("hex");
+}
 export function hashSecret(plain: string): string {
   const salt = randomBytes(16).toString("hex");
   return salt + ":" + scryptSync(plain, salt, 32).toString("hex");

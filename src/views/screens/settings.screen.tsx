@@ -14,6 +14,7 @@ import { Button } from "../components/button";
 import { Chip } from "../components/chip";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { Field } from "../components/field";
+import { Modal } from "../components/modal";
 import { IconFrame } from "../components/icon-frame";
 import { List, ListRow, RowText } from "../components/list";
 import { Panel } from "../components/panel";
@@ -22,12 +23,14 @@ import { PageHeader } from "../layout/page-header";
 import { googleEmailOf } from "../presenters/account.presenter";
 
 export function SettingsScreen() {
-  const { state, character, renameCharacter, deleteRun, notify, setAutomation } = useGame();
+  const { state, character, renameCharacter, requestDeleteCode, deleteRun, notify, setAutomation } =
+    useGame();
   const router = useRouter();
 
   const [newName, setNewName] = useState("");
   const [confirmingRename, setConfirmingRename] = useState(false);
-  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleting, setDeleting] = useState<"ask" | "code" | null>(null);
+  const [deleteCode, setDeleteCode] = useState("");
 
   const sound = useSyncExternalStore(
     soundRepository.subscribe,
@@ -191,7 +194,13 @@ export function SettingsScreen() {
               <span className="text-[11px] text-ink-faint">
                 {character.name} · NV. {formatNumber(character.level)}
               </span>
-              <Button variant="outline" onClick={() => setConfirmingDelete(true)}>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setDeleteCode("");
+                  setDeleting("ask");
+                }}
+              >
                 Excluir conta
               </Button>
             </div>
@@ -223,19 +232,76 @@ export function SettingsScreen() {
         }
       />
 
-      <ConfirmDialog
-        open={confirmingDelete}
+      <Modal
+        open={deleting !== null}
         title="Excluir conta"
-        description="A partida inteira some do servidor agora e para sempre. Não há como recuperar."
-        detail={character.name + " · NV. " + formatNumber(character.level)}
-        confirmLabel="Excluir tudo"
-        onCancel={() => setConfirmingDelete(false)}
-        onConfirm={() => {
-          setConfirmingDelete(false);
-          deleteRun();
-          router.push("/");
-        }}
-      />
+        onClose={() => setDeleting(null)}
+        footer={
+          deleting === "ask" ? (
+            <div className="flex items-center justify-end gap-2">
+              <Button variant="ghost" onClick={() => setDeleting(null)}>
+                Cancelar
+              </Button>
+              <Button
+                variant="primary"
+                onClick={() =>
+                  requestDeleteCode().then((sent) => {
+                    if (sent) setDeleting("code");
+                  })
+                }
+              >
+                Enviar código
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-end gap-2">
+              <Button variant="ghost" onClick={() => setDeleting(null)}>
+                Cancelar
+              </Button>
+              <Button
+                variant="primary"
+                disabled={!/^\d{4}$/.test(deleteCode)}
+                onClick={() =>
+                  deleteRun(deleteCode).then((gone) => {
+                    if (gone) {
+                      setDeleting(null);
+                      router.push("/");
+                    }
+                  })
+                }
+              >
+                Excluir tudo
+              </Button>
+            </div>
+          )
+        }
+      >
+        <div className="space-y-3 p-4">
+          <p className="text-xs leading-relaxed text-ink-soft">
+            {character.name} · NV. {formatNumber(character.level)}. A conta e tudo o que ela guarda
+            somem do servidor agora e para sempre: personagem, mochila, carteira, mesas e rastros.
+            Não há como recuperar.
+          </p>
+          {deleting === "ask" ? (
+            <p className="text-xs leading-relaxed text-ink-faint">
+              Para confirmar, enviaremos um código de 4 dígitos ao e-mail da conta. Ele vale por 10
+              minutos.
+            </p>
+          ) : (
+            <Field
+              compact
+              numeric
+              label="Código de 4 dígitos"
+              hint="Chegou no e-mail da conta e vale por 10 minutos."
+              placeholder="0000"
+              className="font-mono"
+              autoComplete="off"
+              value={deleteCode}
+              onChange={(event) => setDeleteCode(event.target.value.replace(/\D/g, "").slice(0, 4))}
+            />
+          )}
+        </div>
+      </Modal>
     </>
   );
 }
