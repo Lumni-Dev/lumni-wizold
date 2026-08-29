@@ -6,7 +6,13 @@ import type { GameState } from "@/models/entities/game-state";
 import { EQUIPMENT_SLOTS, type EquipmentSlot, type Item } from "@/models/entities/item";
 import { findOre, MINING_MAX_LEVEL, ORES, type Ore } from "@/models/entities/mining";
 import { failure, success, type Result } from "@/models/entities/result";
-import { enhancementCost, enhancementOf, enhancedEffect } from "@/models/rules/forge";
+import { formatBronze } from "@/shared/utils/format";
+import {
+  enhancementCost,
+  enhancementOf,
+  enhancedEffect,
+  forgeBronzeCost,
+} from "@/models/rules/forge";
 import { applyMiningProgress, miningNeeded, miningYieldBonus } from "@/models/rules/mining";
 import { addToInventory, countInInventory, removeFromInventory } from "./inventory.controller";
 import { addLog } from "./log.controller";
@@ -99,6 +105,7 @@ export interface ForgeSlot {
   fragment: Item | null;
   cost: number;
   owned: number;
+  bronzeCost: number;
   canForge: boolean;
   reason: string | null;
   attributes: { key: AttributeKey; name: string; value: number; nextValue: number }[];
@@ -109,6 +116,9 @@ function fragmentOf(item: Item): Item | null {
 }
 
 export function listForge(state: GameState): ForgeSlot[] {
+  const characterLevel = state.character?.level ?? 1;
+  const bronze = state.character?.bronze ?? 0;
+
   return EQUIPMENT_SLOTS.map((slot) => {
     const itemId = state.equipment[slot];
     const item = itemId ? (findItem(itemId) ?? null) : null;
@@ -122,6 +132,7 @@ export function listForge(state: GameState): ForgeSlot[] {
         fragment: null,
         cost: 0,
         owned: 0,
+        bronzeCost: 0,
         canForge: false,
         reason: null,
         attributes: [],
@@ -131,6 +142,7 @@ export function listForge(state: GameState): ForgeSlot[] {
     const fragment = fragmentOf(item);
     const cost = enhancementCost(level + 1);
     const owned = fragment ? countInInventory(state.inventory, fragment.id) : 0;
+    const bronzeCost = forgeBronzeCost(characterLevel, level);
     const maxed = level >= MAX_ENHANCEMENT;
 
     const current = enhancedEffect(item, level);
@@ -143,7 +155,8 @@ export function listForge(state: GameState): ForgeSlot[] {
       fragment,
       cost,
       owned,
-      canForge: Boolean(fragment) && !maxed && owned >= cost,
+      bronzeCost,
+      canForge: Boolean(fragment) && !maxed && owned >= cost && bronze >= bronzeCost,
       reason: maxed
         ? "No teto de +" + MAX_ENHANCEMENT
         : !fragment
@@ -192,9 +205,18 @@ export function enhance(
     );
   }
 
+  const bronzeCost = forgeBronzeCost(character.level, level);
+  if (character.bronze < bronzeCost) {
+    return failure(
+      state,
+      "A martelada pede " + formatBronze(bronzeCost) + " e a bolsa não cobre.",
+    );
+  }
+
   const struck = chance(FORGE_SUCCESS_RATIO, random);
   const next: GameState = {
     ...state,
+    character: { ...character, bronze: character.bronze - bronzeCost },
     inventory: removeFromInventory(state.inventory, fragment.id, cost),
     enhancements: struck ? { ...state.enhancements, [itemId]: level + 1 } : state.enhancements,
   };

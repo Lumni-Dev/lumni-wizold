@@ -973,6 +973,7 @@ sec("forja e mina");
   state.equipment.claw = "bronze-claw";
   state.enhancements["bronze-claw"] = 4;
   state.inventory = [...state.inventory, { itemId: "bronze-fragment", quantity: 10 }];
+  const strikeFee = forgeRules.forgeBronzeCost(state.character.level, 4);
   const enhanced = forgeCtrl.enhance(state, "claw", () => 0);
   ok("martelada certeira sobe um nível", enhanced.ok && enhanced.state.enhancements["bronze-claw"] === 5);
   ok("martelada certeira responde raised", enhanced.ok && enhanced.data.raised === true);
@@ -981,6 +982,10 @@ sec("forja e mina");
     enhanced.ok &&
       inventoryCtrl.countInInventory(enhanced.state.inventory, "bronze-fragment") ===
         10 - forgeRules.enhancementCost(5),
+  );
+  ok(
+    "martelada cobra bronze",
+    enhanced.ok && enhanced.state.character.bronze === state.character.bronze - strikeFee,
   );
   const missed = forgeCtrl.enhance(state, "claw", () => 0.99);
   ok(
@@ -992,6 +997,17 @@ sec("forja e mina");
     missed.ok &&
       inventoryCtrl.countInInventory(missed.state.inventory, "bronze-fragment") ===
         10 - forgeRules.enhancementCost(5),
+  );
+  ok(
+    "martelada falha também paga o ferreiro",
+    missed.ok && missed.state.character.bronze === state.character.bronze - strikeFee,
+  );
+  const broke = { ...state, character: { ...state.character, bronze: strikeFee - 1 } };
+  ok("sem bronze a bigorna recusa", forgeCtrl.enhance(broke, "claw", () => 0).ok === false);
+  ok(
+    "a martelada encarece com a peça e com a banda",
+    forgeRules.forgeBronzeCost(1, 5) > forgeRules.forgeBronzeCost(1, 4) &&
+      forgeRules.forgeBronzeCost(500, 4) > forgeRules.forgeBronzeCost(1, 4),
   );
   const wrongFragments = { ...state, inventory: [{ itemId: "silver-fragment", quantity: 99 }] };
   ok(

@@ -1,8 +1,20 @@
-import { ENHANCEMENT_STEP, FORGE_BASE_MS, FORGE_MS_PER_LEVEL } from "@/shared/constants/game";
+import {
+  ENHANCEMENT_STEP,
+  FORGE_BASE_MS,
+  FORGE_BRONZE_RATIO,
+  FORGE_MS_PER_LEVEL,
+} from "@/shared/constants/game";
+import { huntPurse } from "../data/species";
 import type { Item, ItemEffect } from "../entities/item";
 
 export function enhancementCost(nextLevel: number): number {
   return Math.max(1, Math.ceil(nextLevel / 5));
+}
+
+export function forgeBronzeCost(characterLevel: number, level: number): number {
+  return (
+    Math.max(1, Math.round(huntPurse(characterLevel) * FORGE_BRONZE_RATIO)) + Math.max(0, level)
+  );
 }
 
 export function enhancedEffect(item: Item, level: number): ItemEffect {

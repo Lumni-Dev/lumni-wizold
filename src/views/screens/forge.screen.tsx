@@ -13,7 +13,7 @@ import {
   MINING_TICK_MS,
   MINING_TICKS,
 } from "@/shared/constants/game";
-import { formatNumber } from "@/shared/utils/format";
+import { formatBronze, formatNumber } from "@/shared/utils/format";
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
 import { ConfirmDialog } from "../components/confirm-dialog";
@@ -139,7 +139,12 @@ export function ForgeScreen() {
       <PageHeader
         title="Forja"
         description="A bigorna não faz peça nova: ela bate de novo na que você já usa, e o que alimenta a marreta sai da rocha."
-        action={<Tag tone="neutral">Mineração NV. {formatNumber(mining.level)}</Tag>}
+        action={
+          <div className="flex items-center gap-2">
+            <Tag tone="neutral">Mineração NV. {formatNumber(mining.level)}</Tag>
+            <Tag tone="neutral">{formatBronze(character.bronze)}</Tag>
+          </div>
+        }
       />
 
       <div className="grid items-start gap-6 lg:grid-cols-2">
@@ -241,6 +246,11 @@ export function ForgeScreen() {
                             {entry.fragment.name}
                           </p>
                         ) : null}
+                        {entry.fragment && !maxed ? (
+                          <p className="font-mono text-[11px] text-ink-soft">
+                            {formatBronze(entry.bronzeCost)} por martelada
+                          </p>
+                        ) : null}
                         {entry.attributes.map((attribute) => (
                           <p key={attribute.key} className="font-mono text-[11px] text-ink-soft">
                             {attribute.name} {formatNumber(attribute.value)}
@@ -275,7 +285,7 @@ export function ForgeScreen() {
                       ) : null}
                       {waitingSlot === entry.slot ? (
                         <p className="text-[11px] text-ink-faint">
-                          Esperando fragmentos para a próxima martelada
+                          Esperando fragmentos e bronze para a próxima martelada
                         </p>
                       ) : entry.reason ? (
                         <p className="text-[11px] text-ink-faint">{entry.reason}</p>
@@ -292,7 +302,7 @@ export function ForgeScreen() {
       <ConfirmDialog
         open={confirming !== null && confirming.item !== null}
         title="Forjar"
-        description="A bigorna consome os fragmentos na hora, e marteladas não se desfazem."
+        description="A bigorna consome os fragmentos e o bronze na hora, e marteladas não se desfazem."
         detail={
           confirming && confirming.item && confirming.fragment
             ? enhancedName(confirming.item.name, confirming.level) +
@@ -301,7 +311,9 @@ export function ForgeScreen() {
               " - custa " +
               formatNumber(confirming.cost) +
               " " +
-              confirming.fragment.name
+              confirming.fragment.name +
+              " e " +
+              formatBronze(confirming.bronzeCost)
             : undefined
         }
         confirmLabel="Forjar"

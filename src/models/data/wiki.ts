@@ -258,7 +258,8 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         "% do valor original. Em +1000 a peça vale três vezes o que valia.",
       "A bigorna acerta " +
         Math.round(FORGE_SUCCESS_RATIO * 100) +
-        "% das marteladas. Quando falha, os fragmentos se perdem e a peça segue como está: o risco faz parte do preço.",
+        "% das marteladas. Quando falha, o que foi pago se perde e a peça segue como está: o risco faz parte do preço.",
+      "Cada martelada também cobra bronze: um décimo da bolsa de caçada do seu nível, mais um por nível já forjado da peça. O ferreiro não trabalha de graça.",
       "O teto é +" + MAX_ENHANCEMENT + ", e o nível fica com a peça, não com o espaço.",
     ],
   },
