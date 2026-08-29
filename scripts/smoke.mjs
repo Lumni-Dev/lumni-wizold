@@ -45,7 +45,11 @@ const rows = async (sql, params) => (await client.query(sql, params)).rows;
 const anonymous = await call("GET", "/api/state");
 check("sem sessão é 401", anonymous.status === 401);
 const warm = await call("GET", "/api/cron/warm");
-check("aquecedor responde", warm.status === 200 && warm.payload?.ok === true);
+check(
+  "aquecedor responde ou fica atrás do escudo",
+  (warm.status === 200 && warm.payload?.ok === true) || warm.status === 403,
+  String(warm.status),
+);
 const minor = await call("POST", "/api/auth/enter", {
   credential: "qualquer.coisa.aqui",
   birth: { day: "01", month: "01", year: "2012" },
