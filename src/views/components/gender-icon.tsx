@@ -34,7 +34,7 @@ export function GenderBanner({ gender }: { gender: Gender }) {
   if (!source) return null;
 
   return (
-    <div className="aspect-video w-full overflow-hidden border-b border-edge">
+    <div className="aspect-square w-full overflow-hidden border-b border-edge">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={source} alt="" loading="lazy" className="h-full w-full object-cover" />
     </div>

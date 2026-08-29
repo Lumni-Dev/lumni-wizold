@@ -6,9 +6,10 @@ import { useGame } from "@/controllers/game.context";
 import { LORE_CHAPTERS, LORE_COUPLE, LORE_PILLARS } from "@/models/data/lore";
 import { PREVIEW_SHOTS } from "@/models/data/preview";
 import { GAME_NAME, GAME_TAGLINE } from "@/shared/constants/game";
+import { cn } from "@/shared/utils/class-names";
 import { ActionIcon } from "../components/app-icon";
 import { CornerAccents } from "../components/corner-accents";
-import { GenderIcon } from "../components/gender-icon";
+import { GenderBanner } from "../components/gender-icon";
 import { PreviewGallery } from "../components/preview-gallery";
 import { Footer } from "../layout/footer";
 
@@ -107,13 +108,18 @@ export function LandingScreen() {
       </header>
 
       <main className="mx-auto w-full max-w-5xl space-y-16 px-4 py-16 md:px-8 md:py-24">
-        <section className="relative rounded-lg border border-edge bg-surface/80 p-6 md:p-10">
-          <div className="space-y-8">
-            <div className="grid gap-6 sm:grid-cols-2">
+        <section className="relative">
+          <div className="overflow-hidden rounded-lg border border-edge bg-surface/80">
+            <div className="grid border-b border-edge sm:grid-cols-2">
               {(["male", "female"] as const).map((key) => (
-                <div key={key} className="flex items-center gap-3">
-                  <GenderIcon gender={key} size="large" />
-                  <div>
+                <div
+                  key={key}
+                  className={cn(
+                    key === "female" && "border-t border-edge sm:border-l sm:border-t-0",
+                  )}
+                >
+                  <GenderBanner gender={key} />
+                  <div className="p-4">
                     <p className="text-sm text-ink">{LORE_COUPLE[key].name}</p>
                     <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                       {LORE_COUPLE[key].title}
@@ -123,9 +129,17 @@ export function LandingScreen() {
               ))}
             </div>
 
-            <div className="grid gap-6 sm:grid-cols-2">
+            <div className="grid sm:grid-cols-2">
               {LORE_CHAPTERS.map((chapter, index) => (
-                <article key={chapter.title} className="space-y-3 border-t border-edge pt-4">
+                <article
+                  key={chapter.title}
+                  className={cn(
+                    "space-y-3 border-edge p-6 md:p-8",
+                    index > 0 && "border-t",
+                    index === 1 && "sm:border-t-0",
+                    index % 2 === 1 && "sm:border-l",
+                  )}
+                >
                   <h2 className="heading text-[11px] text-ink">
                     <span className="text-ink-faint">
                       {(CHAPTER_NUMBERS[index] ?? index + 1) + "."}
@@ -141,7 +155,7 @@ export function LandingScreen() {
               ))}
             </div>
           </div>
-          <CornerAccents inside />
+          <CornerAccents />
         </section>
 
         <section className="space-y-6">
