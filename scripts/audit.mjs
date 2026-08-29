@@ -385,7 +385,7 @@ sec("bandas e presas");
     ok("bolsa mínima <= máxima " + creature.id, creature.minBronze <= creature.maxBronze);
     ok(
       "experiência linear " + creature.id,
-      creature.experience === Math.round(20 + creature.level * 14),
+      creature.experience === Math.round(15 + creature.level * 11),
     );
     for (const drop of creature.drops) {
       ok("chance válida " + creature.id + "/" + drop.itemId, drop.chance > 0 && drop.chance <= 1);
