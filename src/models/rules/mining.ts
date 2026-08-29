@@ -5,7 +5,10 @@ export function miningNeeded(level: number): number {
 }
 
 export function miningYieldBonus(level: number): number {
-  return 1 + Math.floor(level / 20);
+  // Every 40 mining levels adds one to the multiplier (was every 20), so the
+  // deep veins yield roughly half what they used to and feeding the pricier
+  // forge is a real grind instead of a fragment fountain.
+  return 1 + Math.floor(level / 40);
 }
 
 export interface MiningOutcome {

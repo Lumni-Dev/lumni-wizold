@@ -252,7 +252,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         " no 25 e " +
         miningNeeded(69) +
         " no último: a escada da mina sobe como a de nível.",
-      "A cada 20 níveis de mineração cada golpe rende um múltiplo a mais de fragmentos, então a forja continua alimentada.",
+      "A cada 40 níveis de mineração cada golpe rende um múltiplo a mais de fragmentos, então a forja continua alimentada sem virar chuva de fragmento.",
       "A forja só aceita a peça equipada, e só o fragmento do conjunto dela.",
       "Preço do próximo nível: um fragmento a cada três níveis, então +" +
         5 +

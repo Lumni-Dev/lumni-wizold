@@ -391,6 +391,10 @@ sec("bandas e presas");
     );
     for (const drop of creature.drops) {
       ok("chance válida " + creature.id + "/" + drop.itemId, drop.chance > 0 && drop.chance <= 1);
+      ok(
+        "material sai aparado em um quarto " + creature.id + "/" + drop.itemId,
+        drop.chance <= 0.225,
+      );
       const male = items.itemIdFor(drop.itemId, "male");
       const female = items.itemIdFor(drop.itemId, "female");
       ok("drop resolve para macho " + drop.itemId, Boolean(items.findItem(male)));
@@ -1127,7 +1131,13 @@ sec("forja e mina");
   const bonusSwing = forgeCtrl.mine(deep, "bronze-vein", seededRandom(2));
   const bonus = miningRules.miningYieldBonus(40);
   ok(
-    "rendimento multiplica a cada 20 níveis",
+    "rendimento multiplica a cada 40 níveis",
+    miningRules.miningYieldBonus(20) === 1 &&
+      miningRules.miningYieldBonus(40) === 2 &&
+      miningRules.miningYieldBonus(80) === 3,
+  );
+  ok(
+    "golpe fundo rende no múltiplo do bônus",
     bonusSwing.ok &&
       inventoryCtrl.countInInventory(bonusSwing.state.inventory, "bronze-fragment") % bonus === 0,
   );

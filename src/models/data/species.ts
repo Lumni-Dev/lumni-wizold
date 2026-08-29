@@ -368,10 +368,14 @@ function variantLevels(band: LevelBand): number[] {
   });
 }
 
+// Materials are the hunt's steady income (sold for bronze), trimmed a quarter so
+// the carcass does not over-pay on top of the purse.
+const MATERIAL_DROP_RATIO = 0.75;
+
 function creatureDrops(definition: SpeciesDefinition): CreatureDrop[] {
   const materials = definition.materials.map((material) => ({
     itemId: material.id,
-    chance: material.chance,
+    chance: Math.round(material.chance * MATERIAL_DROP_RATIO * 1000) / 1000,
     minimum: 1,
     maximum: 2,
   }));
