@@ -426,10 +426,16 @@ sec("economia");
       training.trainingPointCost(level) === Math.max(1, Math.round(purse * 3)),
     );
     ok(
-      "sessão custa um quinto do ponto NV " + level,
+      "sessão custa a fatia do ponto mais o nível NV " + level,
       training.trainingSessionCost(level) ===
-        Math.max(1, Math.round(training.trainingPointCost(level) / 5)),
+        Math.max(1, Math.round(training.trainingPointCost(level) / 5)) + Math.max(0, level - 1),
     );
+    if (level > 1) {
+      ok(
+        "treinar fica mais caro a cada nível NV " + level,
+        training.trainingSessionCost(level) > training.trainingSessionCost(level - 1),
+      );
+    }
     for (const pack of packsData.STORE_PACKS) {
       ok(
         "pacote " + pack.id + " NV " + level + " = bolsa x caçadas",
@@ -458,8 +464,8 @@ sec("economia");
     ok("ponto sai em 3..7 sessões NV " + level, sessions >= 3 && sessions <= 7, sessions);
     const perPoint = (sessions * training.trainingSessionCost(level)) / species.huntPurse(level);
     ok(
-      "ponto custa 1..4,5 caçadas NV " + level,
-      perPoint >= 1 && perPoint <= 4.5,
+      "ponto custa 1..10 caçadas NV " + level,
+      perPoint >= 1 && perPoint <= 10,
       perPoint.toFixed(2),
     );
   }
