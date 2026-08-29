@@ -65,7 +65,7 @@ interface GameContextValue {
   rest: () => Promise<void>;
   activity: Activity | null;
   setActivity: (activity: Activity | null) => void;
-  train: (exerciseId: string) => Promise<boolean>;
+  train: (exerciseId: string) => Promise<{ message: string; raised: boolean } | null>;
   hunt: (territoryId: string) => Promise<HuntReport | null>;
   landHunt: () => void;
   sufferBlow: (damage: number) => void;
@@ -454,23 +454,21 @@ export function GameProvider({ children }: { children: ReactNode }) {
       setActivity,
       train: async (exerciseId) => {
         if (exerciseId === PET_EXERCISE_ID) {
-          const answer = await act<{
-            leveled: boolean;
-          }>("POST", "/api/training/pet", undefined, "Treino", (data) => {
-            if (data?.leveled) playSound("pet-up", 320);
-          });
-          return answer.ok;
+          const answer = await request<{ leveled: boolean }>("POST", "/api/training/pet");
+          if (!answer.ok) {
+            if (answer.message) announce(answer.message, false, "Treino");
+            return null;
+          }
+          return { message: answer.message, raised: answer.data?.leveled === true };
         }
-        const answer = await act<TrainingReport>(
-          "POST",
-          "/api/training/session",
-          { exerciseId },
-          "Treino",
-          (data) => {
-            if (data?.attributeRaised) playSound("point", 320);
-          },
-        );
-        return answer.ok;
+        const answer = await request<TrainingReport>("POST", "/api/training/session", {
+          exerciseId,
+        });
+        if (!answer.ok) {
+          if (answer.message) announce(answer.message, false, "Treino");
+          return null;
+        }
+        return { message: answer.message, raised: answer.data?.attributeRaised === true };
       },
       hunt: async (territoryId) => {
         const answer = await request<HuntReport>("POST", "/api/hunt", { territoryId }, "hunt");

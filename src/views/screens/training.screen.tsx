@@ -25,7 +25,7 @@ import { Panel } from "../components/panel";
 import { PageHeader } from "../layout/page-header";
 
 export function TrainingScreen() {
-  const { state, character, stats, train, activity, setActivity } = useGame();
+  const { state, character, stats, train, notify, activity, setActivity } = useGame();
   usePageActivity(["train"]);
   const paused = activity?.paused === true;
   const activeExercise = activity?.kind === "train" && !paused ? (activity.id ?? null) : null;
@@ -49,8 +49,10 @@ export function TrainingScreen() {
   }
   const autoRef = useRef(state.automation.train);
   const trainRef = useRef(train);
+  const notifyRef = useRef(notify);
   const paidRef = useRef(false);
   const resumableRef = useRef(false);
+  const landedRef = useRef<{ message: string; raised: boolean } | null>(null);
   const rowSnapshotRef = useRef<RowSnapshot>({
     progress: 0,
     needed: 0,
@@ -62,6 +64,7 @@ export function TrainingScreen() {
   useEffect(() => {
     autoRef.current = state.automation.train;
     trainRef.current = train;
+    notifyRef.current = notify;
     if (activeExercise === PET_EXERCISE_ID) {
       if (petTraining) {
         rowSnapshotRef.current = {
@@ -104,10 +107,12 @@ export function TrainingScreen() {
 
       if (beatRef.current === 1) {
         paidRef.current = false;
+        landedRef.current = null;
         setHeldRow({ id: activeExercise, ...rowSnapshotRef.current });
-        void trainRef.current(activeExercise).then((trained) => {
-          if (trained) {
+        void trainRef.current(activeExercise).then((landed) => {
+          if (landed) {
             paidRef.current = true;
+            landedRef.current = landed;
             playSound("buy");
             return;
           }
@@ -127,6 +132,14 @@ export function TrainingScreen() {
 
       if (beatRef.current < TRAINING_TICKS) return;
       setHeldRow(null);
+      const landed = landedRef.current;
+      landedRef.current = null;
+      if (landed) {
+        if (landed.message) notifyRef.current(landed.message, true, "Treino");
+        if (landed.raised) {
+          playSound(activeExercise === PET_EXERCISE_ID ? "pet-up" : "point");
+        }
+      }
       if (!autoRef.current) {
         beatRef.current = 0;
         setSession({ id: activeExercise, beat: 0 });
@@ -144,6 +157,7 @@ export function TrainingScreen() {
   function toggleTraining(exerciseId: string, ready: boolean) {
     beatRef.current = 0;
     paidRef.current = false;
+    landedRef.current = null;
     setSession({ id: exerciseId, beat: 0 });
     setHeldRow(null);
 
