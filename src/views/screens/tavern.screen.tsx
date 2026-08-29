@@ -157,19 +157,18 @@ export function TavernScreen() {
   }, [activeRoom, selfId]);
   const [cooldownLeft, setCooldownLeft] = useState(0);
   useEffect(() => {
-    if (!lastMineAt) return;
     const compute = () =>
-      Math.max(0, MESSAGE_COOLDOWN_MS - (Date.now() - Date.parse(lastMineAt)));
-    if (compute() <= 0) return;
+      lastMineAt ? Math.max(0, MESSAGE_COOLDOWN_MS - (Date.now() - Date.parse(lastMineAt))) : 0;
     const tick = () => {
       const left = compute();
       setCooldownLeft(left);
-      if (left <= 0) window.clearInterval(timers[1]);
+      if (left <= 0) window.clearInterval(interval);
     };
-    const timers = [window.setTimeout(tick, 0), window.setInterval(tick, 500)];
+    const first = window.setTimeout(tick, 0);
+    const interval = window.setInterval(tick, 500);
     return () => {
-      window.clearTimeout(timers[0]);
-      window.clearInterval(timers[1]);
+      window.clearTimeout(first);
+      window.clearInterval(interval);
     };
   }, [lastMineAt]);
   const lastMessageAt = activeRoom?.messages[activeRoom.messages.length - 1]?.at ?? null;

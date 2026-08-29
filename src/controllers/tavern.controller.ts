@@ -197,7 +197,7 @@ export function leaveRoom(
       id: generateId("msg"),
       authorId: "system",
       authorName: "Taverna",
-      text: identity.name + " deixou a mesa.",
+      text: identity.name + " saiu da mesa.",
       at: now,
     },
   ].slice(-MAX_ROOM_MESSAGES);
@@ -309,7 +309,7 @@ export function announceAway(
       id: generateId("msg"),
       authorId: "system",
       authorName: "Taverna",
-      text: identity.name + " saiu da mesa.",
+      text: identity.name + " foi buscar uma bebida.",
       at: now,
     },
   ].slice(-MAX_ROOM_MESSAGES);
