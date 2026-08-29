@@ -272,33 +272,33 @@ export function SettingsScreen() {
             serve para quando alguma arte aparece errada ou desatualizada.
           </p>
         </Panel>
-
-        <Panel
-          title="Excluir conta"
-          description="Apaga a partida inteira do servidor. Não tem volta."
-          footer={
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <span className="text-[11px] text-ink-faint">
-                {character.name} - NV. {formatNumber(character.level)}
-              </span>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setDeleteCode("");
-                  setDeleting("ask");
-                }}
-              >
-                Excluir conta
-              </Button>
-            </div>
-          }
-        >
-          <p className="text-xs leading-relaxed text-ink-faint">
-            Personagem, inventário, forja, lobo, carteira e anúncios: tudo some de uma vez, e o
-            conta volta para a criação de personagem.
-          </p>
-        </Panel>
       </div>
+
+      <Panel
+        title="Excluir conta"
+        description="Apaga a partida inteira do servidor. Não tem volta."
+        footer={
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <span className="text-[11px] text-ink-faint">
+              {character.name} - NV. {formatNumber(character.level)}
+            </span>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setDeleteCode("");
+                setDeleting("ask");
+              }}
+            >
+              Excluir conta
+            </Button>
+          </div>
+        }
+      >
+        <p className="text-xs leading-relaxed text-ink-faint">
+          Personagem, inventário, forja, lobo, carteira e anúncios: tudo some de uma vez, e a
+          conta volta para a criação de personagem.
+        </p>
+      </Panel>
 
       <ConfirmDialog
         open={confirmingClear}
