@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useGame } from "@/controllers/game.context";
 import { listForge, listMining } from "@/controllers/forge.controller";
+import { usePageActivity } from "@/controllers/use-page-activity";
 import { playSound } from "@/controllers/sound";
 import { SLOT_LABEL, type EquipmentSlot } from "@/models/entities/item";
 import { enhancedName, forgeDurationMs } from "@/models/rules/forge";
@@ -25,6 +26,7 @@ import { PageHeader } from "../layout/page-header";
 
 export function ForgeScreen() {
   const { state, character, mine, enhance, activity, setActivity } = useGame();
+  usePageActivity(["mine", "forge"]);
   const paused = activity?.paused === true;
   const activeOre = activity?.kind === "mine" && !paused ? (activity.id ?? null) : null;
   const activeSlot = activity?.kind === "forge" && !paused ? (activity.id ?? null) : null;

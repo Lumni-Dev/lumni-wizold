@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useArt } from "@/controllers/art.context";
 import { useGame } from "@/controllers/game.context";
 import { listTerritories, type HuntReport } from "@/controllers/hunt.controller";
+import { usePageActivity } from "@/controllers/use-page-activity";
 import { playSound } from "@/controllers/sound";
 import { petLevelOf, petMaxEnergy } from "@/models/rules/pet";
 import { emphasizeDamage, narrationOf, type NarrationLine } from "../presenters/hunt.presenter";
@@ -145,6 +146,7 @@ export function HuntScreen() {
     activity,
     setActivity,
   } = useGame();
+  usePageActivity(["hunt"]);
   const art = useArt();
   const paused = activity?.paused === true;
   const activeId = activity?.kind === "hunt" && !paused ? (activity.id ?? null) : null;

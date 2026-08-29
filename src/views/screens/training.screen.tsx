@@ -5,6 +5,7 @@ import { useGame } from "@/controllers/game.context";
 import { isGameSound, playSound } from "@/controllers/sound";
 import { petTrainingView } from "@/controllers/pet.controller";
 import { listAttributeProgress, listExercises } from "@/controllers/training.controller";
+import { usePageActivity } from "@/controllers/use-page-activity";
 import {
   MAX_ATTRIBUTE_VALUE,
   PET_EXERCISE_ID,
@@ -25,6 +26,7 @@ import { PageHeader } from "../layout/page-header";
 
 export function TrainingScreen() {
   const { state, character, stats, train, activity, setActivity } = useGame();
+  usePageActivity(["train"]);
   const paused = activity?.paused === true;
   const activeExercise = activity?.kind === "train" && !paused ? (activity.id ?? null) : null;
   const waitingExercise = activity?.kind === "train" && paused ? (activity.id ?? null) : null;

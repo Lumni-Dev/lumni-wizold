@@ -122,7 +122,7 @@ export function toggleForm(state: GameState): Result {
       form: "human",
       transformedAt: undefined,
     }));
-    const message = character.name + " recolhe a fera e volta à forma humana.";
+    const message = "Você recolhe a fera e volta à forma humana.";
     return success(addLog(next, "character", message), message);
   }
 
@@ -146,7 +146,7 @@ export function toggleForm(state: GameState): Result {
     rage: current.rage - TRANSFORM_RAGE_COST,
     transformedAt: new Date().toISOString(),
   }));
-  const message = character.name + " se transforma. Ossos estalam, o pelo sobe.";
+  const message = "Você se transforma. Ossos estalam, o pelo sobe.";
   return success(addLog(next, "character", message), message);
 }
 
@@ -166,7 +166,7 @@ export function expireTransformation(state: GameState): Result {
     form: "human",
     transformedAt: undefined,
   }));
-  const message = "A fúria se esgota. " + character.name + " volta à forma humana.";
+  const message = "Sua fúria se esgotou, você voltou à forma humana.";
   return success(addLog(next, "character", message), message);
 }
 

@@ -338,7 +338,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     const timer = window.setTimeout(
       () => {
         announce(
-          "A fúria se esgota. " + character.name + " volta à forma humana.",
+          "Sua fúria se esgotou, você voltou à forma humana.",
           true,
           "Personagem",
         );
