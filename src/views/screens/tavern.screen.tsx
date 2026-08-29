@@ -156,9 +156,19 @@ export function TavernScreen() {
     return null;
   }, [activeRoom, selfId]);
   const [cooldownLeft, setCooldownLeft] = useState(0);
+  const localSentRef = useRef<{ roomId: string; at: number } | null>(null);
   useEffect(() => {
-    const compute = () =>
-      lastMineAt ? Math.max(0, MESSAGE_COOLDOWN_MS - (Date.now() - Date.parse(lastMineAt))) : 0;
+    const compute = () => {
+      const anchored =
+        localSentRef.current && localSentRef.current.roomId === activeRoomId
+          ? MESSAGE_COOLDOWN_MS - (Date.now() - localSentRef.current.at)
+          : null;
+      if (anchored !== null && anchored > 0) return anchored;
+      const stamped = lastMineAt
+        ? MESSAGE_COOLDOWN_MS - (Date.now() - Date.parse(lastMineAt))
+        : 0;
+      return Math.max(0, Math.min(MESSAGE_COOLDOWN_MS, stamped));
+    };
     const tick = () => {
       const left = compute();
       setCooldownLeft(left);
@@ -170,7 +180,7 @@ export function TavernScreen() {
       window.clearTimeout(first);
       window.clearInterval(interval);
     };
-  }, [lastMineAt]);
+  }, [lastMineAt, activeRoomId]);
   const lastMessageAt = activeRoom?.messages[activeRoom.messages.length - 1]?.at ?? null;
   useEffect(() => {
     if (!openRoomId || !lastMessageAt) return;
@@ -246,6 +256,7 @@ export function TavernScreen() {
     const result = await sendMessage(activeRoomId, draft);
     if (!result) return;
     if (result.ok) {
+      localSentRef.current = { roomId: activeRoomId, at: Date.now() };
       playSound("chat");
       setDraft("");
     } else notify(result.message, false, "Taverna");
