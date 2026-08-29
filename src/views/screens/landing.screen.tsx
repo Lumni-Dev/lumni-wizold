@@ -74,9 +74,53 @@ export function LandingScreen() {
   const hasRun = ready && character !== null;
   const narration = useNarration();
 
+  const [heroShown, setHeroShown] = useState(false);
+  const [intro, setIntro] = useState<"playing" | "leaving" | "done">("playing");
+  const introRef = useRef<HTMLVideoElement>(null);
+  const finishIntro = () => {
+    setHeroShown(true);
+    setIntro((current) => (current === "done" ? current : "leaving"));
+    window.setTimeout(() => setIntro("done"), 700);
+  };
+  useEffect(() => {
+    const video = introRef.current;
+    if (!video) return;
+    void video.play().catch(() => {
+      setHeroShown(true);
+      setIntro("done");
+    });
+  }, []);
+
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="flex min-h-screen flex-col items-center justify-center gap-8 px-4 text-center">
+      <header className="relative flex min-h-screen flex-col items-center justify-center px-4 text-center">
+        {intro !== "done" ? (
+          <video
+            ref={introRef}
+            src="/assets/ui/backvideo.mp4"
+            autoPlay
+            muted
+            playsInline
+            preload="auto"
+            onTimeUpdate={(event) => {
+              const video = event.currentTarget;
+              if (video.duration && video.duration - video.currentTime <= 5) setHeroShown(true);
+            }}
+            onEnded={finishIntro}
+            onError={finishIntro}
+            className={cn(
+              "pointer-events-none absolute inset-0 h-full w-full object-cover transition-opacity duration-700",
+              intro === "leaving" ? "opacity-0" : "opacity-100",
+            )}
+          />
+        ) : null}
+
+        <div
+          className={cn(
+            "relative z-10 flex flex-col items-center gap-8 transition-opacity duration-1000",
+            heroShown ? "opacity-100" : "opacity-0",
+          )}
+        >
         <div className="space-y-5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -101,6 +145,7 @@ export function LandingScreen() {
           ) : (
             <PlayButton href="/login" label="Jogar grátis" />
           )}
+        </div>
         </div>
       </header>
 
