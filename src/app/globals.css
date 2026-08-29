@@ -92,9 +92,9 @@
     background: var(--color-ink-faint);
   }
 
+  :focus,
   :focus-visible {
-    outline: 1px solid var(--color-ink-soft);
-    outline-offset: 2px;
+    outline: none;
   }
 
   
