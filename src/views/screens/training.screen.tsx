@@ -71,25 +71,34 @@ export function TrainingScreen() {
     if (activeExercise === PET_EXERCISE_ID && petGone) return;
 
     const timer = window.setInterval(() => {
+      if (deadLapRef.current) {
+        beatRef.current += 1;
+        if (beatRef.current >= TRAINING_TICKS) {
+          deadLapRef.current = false;
+          beatRef.current = 0;
+        }
+        return;
+      }
+
       beatRef.current = beatRef.current >= TRAINING_TICKS ? 0 : beatRef.current + 1;
-      setSession({ id: activeExercise, beat: beatRef.current });
 
       if (beatRef.current === 1 && chargesRef.current) {
         chargesRef.current = false;
         paidLapRef.current = true;
         deadLapRef.current = true;
         playSound("buy");
+        beatRef.current = 0;
+        setSession({ id: activeExercise, beat: 0 });
+        return;
       }
-      if (beatRef.current > 0 && !deadLapRef.current) {
+
+      setSession({ id: activeExercise, beat: beatRef.current });
+      if (beatRef.current > 0) {
         const effort = activeExercise === PET_EXERCISE_ID ? "growl" : activeExercise;
         if (isGameSound(effort)) playSound(effort);
       }
 
       if (beatRef.current < TRAINING_TICKS) return;
-      if (deadLapRef.current) {
-        deadLapRef.current = false;
-        return;
-      }
       if (!trainRef.current(activeExercise)) {
         setActivity(autoRef.current ? { kind: "train", id: activeExercise, paused: true } : null);
         return;
@@ -119,6 +128,20 @@ export function TrainingScreen() {
       return;
     }
     if (!ready) return;
+
+    let fresh = false;
+    if (exerciseId === PET_EXERCISE_ID) {
+      fresh = petTraining !== null && !petTraining.maxed && petTraining.progress === 0;
+    } else {
+      const entry = exercises.find((candidate) => candidate.exercise.id === exerciseId);
+      const row = progress.find((line) => line.key === entry?.exercise.attribute);
+      fresh = row !== undefined && row.progress === 0 && row.value < MAX_ATTRIBUTE_VALUE;
+    }
+    if (fresh) {
+      paidLapRef.current = true;
+      deadLapRef.current = true;
+      playSound("buy");
+    }
 
     setActivity({ kind: "train", id: exerciseId });
   }
