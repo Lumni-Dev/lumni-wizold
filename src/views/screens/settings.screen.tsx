@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useSyncExternalStore, type FormEvent } from "react";
 import { api } from "@/controllers/api.client";
+import { useArt } from "@/controllers/art.context";
 import { renameCost, renameDaysLeft } from "@/controllers/character.controller";
 import { AUTOMATIONS } from "@/models/entities/automation";
 import { useGame } from "@/controllers/game.context";
@@ -55,6 +56,36 @@ export function SettingsScreen() {
   const [confirmingRename, setConfirmingRename] = useState(false);
   const [deleting, setDeleting] = useState<"ask" | "code" | null>(null);
   const [deleteCode, setDeleteCode] = useState("");
+  const art = useArt();
+  const [confirmingClear, setConfirmingClear] = useState(false);
+  const [clearing, setClearing] = useState(false);
+
+  async function clearGameCache() {
+    setClearing(true);
+    try {
+      const urls = [
+        "/assets/ui/logo.webp?v=2",
+        "/assets/ui/logo.png?v=1",
+        "/assets/ui/background.jpg?v=1",
+        ...Object.values(art.items),
+        ...Object.values(art.attributes),
+        ...Object.values(art.training),
+        ...Object.values(art.territories),
+        ...Object.values(art.pets),
+        ...Object.values(art.genders),
+        ...Object.values(art.packs),
+      ];
+      await Promise.allSettled(urls.map((url) => fetch(url, { cache: "reload" })));
+      const doomed: string[] = [];
+      for (let index = 0; index < window.localStorage.length; index += 1) {
+        const key = window.localStorage.key(index);
+        if (key?.startsWith("lumni-wizold:")) doomed.push(key);
+      }
+      for (const key of doomed) window.localStorage.removeItem(key);
+    } finally {
+      window.location.reload();
+    }
+  }
 
   const sound = useSyncExternalStore(
     soundRepository.subscribe,
@@ -221,6 +252,28 @@ export function SettingsScreen() {
         </Panel>
 
         <Panel
+          title="Cache do jogo"
+          description="O que este aparelho guarda para abrir mais rápido."
+          footer={
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <span className="text-[11px] text-ink-faint">
+                {clearing ? "Limpando e recarregando..." : "A partida no servidor não muda"}
+              </span>
+              <Button variant="outline" busy={clearing} onClick={() => setConfirmingClear(true)}>
+                Limpar cache
+              </Button>
+            </div>
+          }
+        >
+          <p className="text-xs leading-relaxed text-ink-faint">
+            O navegador guarda cópias das imagens do jogo e as preferências deste aparelho: o som,
+            a data de nascimento lembrada na porta e o trabalho em andamento. Limpar o cache
+            descarta essas cópias, baixa as imagens de novo do servidor e recarrega a página;
+            serve para quando alguma arte aparece errada ou desatualizada.
+          </p>
+        </Panel>
+
+        <Panel
           title="Excluir conta"
           description="Apaga a partida inteira do servidor. Não tem volta."
           footer={
@@ -246,6 +299,19 @@ export function SettingsScreen() {
           </p>
         </Panel>
       </div>
+
+      <ConfirmDialog
+        open={confirmingClear}
+        title="Limpar cache"
+        description="As imagens serão baixadas de novo e as preferências deste aparelho (som, data de nascimento lembrada e trabalho em andamento) voltam ao padrão. A partida no servidor não é tocada."
+        detail="A página recarrega ao terminar."
+        confirmLabel="Limpar"
+        onCancel={() => setConfirmingClear(false)}
+        onConfirm={() => {
+          setConfirmingClear(false);
+          void clearGameCache();
+        }}
+      />
 
       <ConfirmDialog
         open={confirmingRename}
