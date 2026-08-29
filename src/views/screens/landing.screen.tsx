@@ -97,15 +97,7 @@ export function LandingScreen() {
 
         <div className="flex flex-col items-center gap-4">
           {hasRun ? (
-            <>
-              <PlayButton href="/character" label={"Continuar com " + character.name} />
-              <Link
-                href="/create"
-                className="text-[11px] uppercase tracking-[0.16em] text-ink-faint transition-colors hover:text-ink"
-              >
-                Começar outra partida
-              </Link>
-            </>
+            <PlayButton href="/character" label={"Continuar com " + character.name} />
           ) : (
             <PlayButton href="/login" label="Jogar grátis" />
           )}
