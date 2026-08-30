@@ -445,7 +445,7 @@ export function HuntScreen() {
 
                   <div className="px-4 py-3">
                     <Bar
-                      label="Caçada"
+                      label={active ? "Caçando..." : unlocked ? "Caçar" : "Nível insuficiente"}
                       current={onThis ? progress.beat : 0}
                       maximum={Math.max(1, script.length || HUNT_TICKS)}
                       wraps
