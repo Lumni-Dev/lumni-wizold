@@ -3,31 +3,7 @@ import type { Item } from "../entities/item";
 import { buildSetItems } from "./equipment-sets";
 import { ALL_MATERIALS } from "./items/materials";
 import { POTIONS, PET_SUPPLIES } from "./consumables";
-
-const FRAGMENT_LINES = [
-  { set: "bronze", label: "Bronze", price: 15, rarity: "common" as const },
-  { set: "silver", label: "Metal", price: 60, rarity: "uncommon" as const },
-  { set: "gold", label: "Ouro", price: 220, rarity: "rare" as const },
-  { set: "diamond", label: "Diamante", price: 700, rarity: "epic" as const },
-  { set: "lunar", label: "Lunar", price: 1800, rarity: "legendary" as const },
-];
-
-const FRAGMENTS: readonly Item[] = FRAGMENT_LINES.map((line) => ({
-  id: line.set + "-fragment",
-  name: "Fragmento de " + line.label,
-  description:
-    "Lasca arrancada do veio de " +
-    line.label.toLowerCase() +
-    ". Não serve de arma nem de enfeite: serve para a forja bater de novo na peça " +
-    "que você já usa, até ela responder melhor do que o corpo.",
-  category: "material" as const,
-  rarity: line.rarity,
-  price: line.price,
-  minLevel: 1,
-  stackable: true,
-  inMarket: false,
-  effect: {},
-}));
+import { FRAGMENTS } from "./items/fragments";
 
 export const ITEMS: readonly Item[] = [
   ...buildSetItems(),

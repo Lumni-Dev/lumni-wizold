@@ -7,18 +7,10 @@ import {
   MAX_ENHANCEMENT,
 } from "@/shared/constants/game";
 import { BALANCE } from "@/shared/constants/tuning/balance";
-import {
-  SPECIES_ORDER,
-  type Creature,
-  type CreatureDrop,
-  type LevelBand,
-  type SpeciesKey,
-} from "../entities/creature";
-import type { Item, Rarity } from "../entities/item";
-import type { DangerLevel, Territory } from "../entities/territory";
+import { SPECIES_ORDER, type LevelBand, type SpeciesKey } from "../entities/creature";
+import type { Rarity } from "../entities/item";
+import type { DangerLevel } from "../entities/territory";
 import { setAttributes, setForLevel } from "./equipment-sets";
-
-const VARIANTS_PER_SPECIES = 5;
 
 interface SpeciesProfile {
   health: number;
@@ -360,37 +352,6 @@ export function bandOf(key: SpeciesKey): LevelBand {
   return speciesBand(SPECIES_ORDER.indexOf(key));
 }
 
-function variantLevels(band: LevelBand): number[] {
-  const steps = VARIANTS_PER_SPECIES - 1;
-
-  return Array.from({ length: VARIANTS_PER_SPECIES }, (_, index) => {
-    if (index === 0) return band.start;
-    if (index === steps) return band.end;
-    return roundToStep(band.start + ((band.end - band.start) * index) / steps);
-  });
-}
-
-const MATERIAL_DROP_RATIO = 0.75;
-
-function creatureDrops(definition: SpeciesDefinition): CreatureDrop[] {
-  const materials = definition.materials.map((material) => ({
-    itemId: material.id,
-    chance: Math.round(material.chance * MATERIAL_DROP_RATIO * 1000) / 1000,
-    minimum: 1,
-    maximum: 2,
-  }));
-
-  const gear = definition.gearDrops.map((drop) => ({
-    itemId: drop.itemId,
-    chance: drop.chance,
-    minimum: 1,
-    maximum: 1,
-  }));
-
-  return [...materials, ...gear];
-}
-
-
 const AREA_LEVELS = MAX_CHARACTER_LEVEL / 10;
 
 export function referenceForge(level: number): number {
@@ -468,57 +429,3 @@ export function speciesNumbers(key: SpeciesKey, level: number) {
   };
 }
 
-export function buildCreatures(): Creature[] {
-  return SPECIES.flatMap((definition) => {
-    const band = bandOf(definition.key);
-    const drops = creatureDrops(definition);
-
-    return variantLevels(band).map((level, index) => ({
-      id: definition.key + "-" + (index + 1),
-      name: definition.variants[index],
-      description: definition.description,
-      species: definition.key,
-      level,
-      ...speciesNumbers(definition.key, level),
-      drops,
-    }));
-  });
-}
-
-export function buildTerritories(): Territory[] {
-  const creatures = buildCreatures();
-
-  return SPECIES.map((definition) => {
-    const band = bandOf(definition.key);
-
-    return {
-      id: definition.territory.id,
-      name: definition.territory.name,
-      description: definition.territory.description,
-      species: definition.key,
-      minLevel: band.start,
-      maxLevel: band.end,
-      danger: definition.territory.danger,
-      creatures: creatures
-        .filter((creature) => creature.species === definition.key)
-        .map((creature) => creature.id),
-    };
-  });
-}
-
-export function buildMaterials(): Item[] {
-  return SPECIES.flatMap((definition) =>
-    definition.materials.map((material) => ({
-      id: material.id,
-      name: material.name,
-      description: material.description,
-      category: "material" as const,
-      rarity: material.rarity,
-      price: material.price,
-      minLevel: 1,
-      stackable: true,
-      inMarket: false,
-      effect: {},
-    })),
-  );
-}

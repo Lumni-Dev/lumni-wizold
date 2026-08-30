@@ -2,6 +2,7 @@
 
 import { CREATURES } from "@/models/data/creatures";
 import { EQUIPMENT_SETS, pieceId, pieceName } from "@/models/data/equipment-sets";
+import { SLOT_ROLE } from "@/models/data/equipment/slots";
 import { EXERCISES } from "@/models/data/exercises";
 import { trainingEffort } from "@/models/rules/training";
 import { findItem, ITEMS } from "@/models/data/items";
@@ -27,16 +28,6 @@ import { chipClass } from "../components/chip";
 import { ItemIcon } from "../components/item-icon";
 import { PageHeader } from "../layout/page-header";
 import { summarizeEffect } from "../presenters/item.presenter";
-
-const SLOT_ROLE: Record<(typeof EQUIPMENT_SLOTS)[number], string> = {
-  helmet: "Resistência leve e atributos de percepção.",
-  necklace: "Somente atributos, sem resistência direta.",
-  armor: "A maior fatia de resistência do conjunto.",
-  pants: "Resistência média com ganho de agilidade.",
-  boots: "Resistência baixa, agilidade alta.",
-  claw: "Fonte principal de força.",
-  ring: "Somente atributos, sem resistência direta.",
-};
 
 const SECTIONS: readonly { id: string; label: string }[] = [
   ...WIKI_TOPICS.map((topic) => ({ id: topic.id, label: topic.title })),

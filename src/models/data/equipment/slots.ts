@@ -66,3 +66,13 @@ export const SLOTS: Record<EquipmentSlot, SlotBlueprint> = {
     priceFactor: 16,
   },
 };
+
+export const SLOT_ROLE: Record<EquipmentSlot, string> = {
+  helmet: "Resistência leve e atributos de percepção.",
+  necklace: "Somente atributos, sem resistência direta.",
+  armor: "A maior fatia de resistência do conjunto.",
+  pants: "Resistência média com ganho de agilidade.",
+  boots: "Resistência baixa, agilidade alta.",
+  claw: "Fonte principal de força.",
+  ring: "Somente atributos, sem resistência direta.",
+};

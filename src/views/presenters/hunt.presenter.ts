@@ -1,4 +1,5 @@
 import type { CombatOutcome } from "@/models/rules/combat";
+import { pickOne } from "@/shared/utils/random";
 
 export interface NarratedFight {
   foe: { name: string; health: number };
@@ -14,7 +15,7 @@ export interface NarrationLine {
 }
 
 function pick(pool: string[]): string {
-  return pool[Math.floor(Math.random() * pool.length)];
+  return pickOne(pool);
 }
 
 function openerOf(hunter: string, prey: string): string {
