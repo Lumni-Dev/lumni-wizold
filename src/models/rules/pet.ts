@@ -2,7 +2,7 @@ import { huntPurse } from "../data/species";
 import {
   PET_BASE_BONUS,
   PET_BASE_ENERGY,
-  PET_PRICE_IN_HUNTS,
+  PET_PRICE,
   PET_REST_RATIO,
   PET_ENERGY_PER_BLOW,
   PET_ENERGY_PER_HUNT,
@@ -14,11 +14,9 @@ import { emptyAttributes, type Attributes } from "../entities/attribute";
 import type { Item } from "../entities/item";
 import type { Pet } from "../entities/pet";
 
-// The wolf is priced like the rest of the game, in hunts: a fixed number of
-// carcasses of the buyer's level, so adopting always costs the same slice of
-// time and climbing a band raises the bronze without changing the wait.
-export function petPrice(level: number): number {
-  return Math.round(huntPurse(level) * PET_PRICE_IN_HUNTS);
+// The wolf costs a flat price, the same bronze at every level.
+export function petPrice(): number {
+  return PET_PRICE;
 }
 
 export function isPetAwake(pet: Pet | null | undefined): pet is Pet {

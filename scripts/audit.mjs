@@ -1033,10 +1033,8 @@ sec("mascote");
     "Neve",
   );
   ok(
-    "adoção cobra o preço em caçadas",
-    adopt.ok &&
-      adopt.state.character.bronze ===
-        1000000 - Math.round(species.huntPurse(adoptLevel) * CONST.PET_PRICE_IN_HUNTS),
+    "adoção cobra o preço fixo do lobo",
+    adopt.ok && adopt.state.character.bronze === 1000000 - CONST.PET_PRICE,
   );
   ok("segunda adoção recusa", petCtrl.adoptPet(adopt.state, "male", "Outro").ok === false);
   const released = petCtrl.releasePet(adopt.state);

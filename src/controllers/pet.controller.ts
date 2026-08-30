@@ -36,7 +36,7 @@ export function adoptPet(state: GameState, gender: PetGender, name: string): Res
   if (character.level < PET_MIN_LEVEL) {
     return failure(state, "O lobo só caça ao lado de um NV " + PET_MIN_LEVEL + " ou mais.");
   }
-  const price = petPrice(character.level);
+  const price = petPrice();
   if (character.bronze < price) {
     return failure(state, "Faltam " + formatBronze(price - character.bronze) + " para a adoção.");
   }

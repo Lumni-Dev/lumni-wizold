@@ -14,8 +14,10 @@ import {
   PET_ENERGY_PER_HUNT,
   PET_REST_RATIO,
   REST_TICK_MS,
+  REST_HEALTH_RATIO,
+  REST_RAGE_RATIO,
   PET_MIN_LEVEL,
-  PET_PRICE_IN_HUNTS,
+  PET_PRICE,
   PET_RENAME_PRICE,
   TRANSFORM_DURATION_MS,
 } from "@/shared/constants/game";
@@ -126,7 +128,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     summary: "Todo personagem nasce com 100 de vida e 100 de fúria.",
     lines: [
       "Vida: 100, mais 14 por ponto de Resistência acima de 4. O nível não entra aqui: quem engorda a barra é a Resistência, venha ela do treino, do equipamento, do mascote ou da lua.",
-      "Fúria: 100, mais 2 por ponto de Vontade acima de 4. Sobe no combate e no descanso, e paga a transformação.",
+      "Fúria: 100, mais 2 por ponto de Vontade acima de 4. Sobe só no descanso, nunca na luta, e paga a transformação.",
       "Um poço fundo de fúria segura o bônus de dano do crítico mesmo depois de transformar: é para isso que serve a Vontade.",
       "Poções de vida e fúria recuperam uma porcentagem do próprio máximo.",
       "Zerou a vida na caçada, você escapa com 1 de vida, registra uma derrota e a fera não se sustenta: derrotado, você volta à forma humana na hora.",
@@ -147,11 +149,17 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         " minutos: passado o tempo, o corpo volta sozinho à forma humana.",
       "Voltar ao humano é gratuito e não devolve a fúria gasta.",
       "Perder uma caçada ou um duelo recolhe a fera sozinho: a derrota devolve a forma humana e apaga o selo da fúria.",
-      "Um botão só comanda o corpo: Recuperar-se para todas as atividades e devolve um décimo da vida e da fúria a cada " +
+      "Um botão só comanda o corpo: Recuperar-se para todas as atividades. A cada " +
         REST_TICK_MS / 1000 +
-        " segundos; o corpo inteiro volta em " +
-        (REST_TICK_MS / 1000) * 10 +
-        " segundos, em qualquer nível. Inteiro, o botão vira Transformar; transformado, recolhe a fera.",
+        " segundos devolve " +
+        Math.round(REST_HEALTH_RATIO * 100) +
+        "% da vida e " +
+        Math.round(REST_RAGE_RATIO * 100) +
+        "% da fúria, então o corpo inteiro volta em " +
+        Math.round(REST_TICK_MS / 1000 / REST_HEALTH_RATIO) +
+        " segundos e a fúria em " +
+        Math.round(REST_TICK_MS / 1000 / REST_RAGE_RATIO) +
+        " segundos, em qualquer nível: a vida é a metade lenta de propósito, e a poção é o atalho pago. Inteiro, o botão vira Transformar; transformado, recolhe a fera.",
     ],
   },
   {
@@ -282,8 +290,8 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "A adoção exige NV " +
         PET_MIN_LEVEL +
         " e custa " +
-        PET_PRICE_IN_HUNTS +
-        " caçadas do seu nível em bronze. Soltar o lobo não paga nada: ele só parte.",
+        PET_PRICE +
+        " de bronze fixos. Soltar o lobo não paga nada: ele só parte.",
       "O lobo chega zerado: a linhagem é só identidade, e todo bônus nasce do treino.",
       "Trocar o apelido custa " +
         PET_RENAME_PRICE +

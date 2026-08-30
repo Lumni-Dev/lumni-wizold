@@ -48,7 +48,7 @@ function Kennel({ bronze, level }: { bronze: number; level: number }) {
   const [name, setName] = useState("");
   const [confirming, setConfirming] = useState(false);
 
-  const price = petPrice(level);
+  const price = petPrice();
   const oldEnough = level >= PET_MIN_LEVEL;
   const affordable = bronze >= price;
 

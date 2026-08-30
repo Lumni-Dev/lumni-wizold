@@ -108,7 +108,7 @@ export function Bar({
           {glows ? <div className="bar-glow absolute inset-0" /> : null}
         </div>
 
-        <span className="pointer-events-none absolute -inset-px rounded-full border-[3px] border-ember/0 [border-left-color:var(--color-ember)] [border-right-color:var(--color-ember)]" />
+        <span className="pointer-events-none absolute -inset-px rounded-full border border-ember/0 [border-left-color:var(--color-ember)] [border-right-color:var(--color-ember)]" />
       </div>
     </div>
   );
