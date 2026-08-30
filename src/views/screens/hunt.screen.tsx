@@ -356,8 +356,6 @@ export function HuntScreen() {
                 ? script[Math.min(progress.beat, script.length) - 1]
                 : null;
             const foe = pending ?? report;
-            const shownPrey = line && foe ? foe.creature : unlocked ? (prey ?? null) : null;
-            const shownHealth = line && foe ? line.creatureHealth : (shownPrey?.health ?? 0);
             const fightingId = line && foe ? foe.creature.id : (prey?.id ?? null);
             return (
               <Card
@@ -432,22 +430,12 @@ export function HuntScreen() {
                     </ul>
                   </div>
 
-                  {shownPrey ? (
-                    <div className="px-4 py-3">
-                      <Bar
-                        label={shownPrey.name}
-                        current={shownHealth}
-                        maximum={shownPrey.health}
-                        tone={shownHealth > shownPrey.health / 2 ? "blood" : "ember"}
-                      />
-                    </div>
-                  ) : null}
-
                   <div className="px-4 py-3">
                     <Bar
                       label={active ? "Caçando..." : unlocked ? "Caçar" : "Nível insuficiente"}
                       current={onThis ? progress.beat : 0}
                       maximum={Math.max(1, script.length || HUNT_TICKS)}
+                      glows={active}
                       wraps
                     />
                   </div>

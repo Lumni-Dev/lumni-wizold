@@ -27,7 +27,7 @@ export const RENAME_COOLDOWN_DAYS = 15;
 export const RENAME_PRICE = 50_000;
 export const MIN_HEALTH_RATIO_TO_ACT = 0.2;
 export const AUTOMATION_TICK_MS = 2000;
-export const HUNT_TICK_MS = 1000;
+export const HUNT_TICK_MS = 1400;
 export const HUNT_TICKS = 8;
 // The short approach a hunt or duel fills before the fight resolves: stopping
 // here cancels and banks the position, and only when it tops out does the server
