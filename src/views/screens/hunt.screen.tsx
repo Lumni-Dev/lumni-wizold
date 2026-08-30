@@ -44,7 +44,7 @@ interface HuntSession {
     }
   >;
 }
-const CREATURE_ART_VERSION = "?v=2";
+const CREATURE_ART_VERSION = "?v=3";
 
 const EMPTY_SESSION: HuntSession = {
   hunts: 0,
@@ -146,17 +146,8 @@ function CombatReport({ report, lines }: { report: HuntReport; lines: NarrationL
   );
 }
 export function HuntScreen() {
-  const {
-    state,
-    character,
-    pet,
-    hunt,
-    sufferBlow,
-    landHunt,
-    notify,
-    activity,
-    setActivity,
-  } = useGame();
+  const { state, character, pet, hunt, sufferBlow, landHunt, notify, activity, setActivity } =
+    useGame();
   usePageActivity(["hunt"]);
   const art = useArt();
   const paused = activity?.paused === true;
@@ -346,120 +337,117 @@ export function HuntScreen() {
       />
 
       <div className="space-y-6">
-        {territories.map(
-          ({ territory, creatures, prey, unlocked, hasHealth, reason }) => {
-            const ready = unlocked && hasHealth;
-            const available = ready;
-            const active = activeId === territory.id;
-            const selectedId = selection[territory.id] ?? prey?.id ?? null;
-            const onThis = active && progress.id === territory.id;
-            const line =
-              onThis && progress.beat > 0 && script.length > 0
-                ? script[Math.min(progress.beat, script.length) - 1]
-                : null;
-            const foe = pending ?? report;
-            const fightingId = line && foe ? foe.creature.id : selectedId;
-            return (
-              <Card
-                key={territory.id}
-                height="content"
-                interactive={available}
-                tone={active ? "highlighted" : "default"}
-                className={cn(
-                  !available && !active && "opacity-70",
-                  active && shaking && "card-shake",
-                )}
-              >
-                <div className="grid md:grid-cols-2 md:divide-x md:divide-edge">
-                  {}
-                  <div className="flex flex-col divide-y divide-edge">
-                    {art.territories[territory.id] ? (
-                      <div className="aspect-video w-full overflow-hidden">
-                        <ArtImage source={art.territories[territory.id]} />
-                      </div>
-                    ) : null}
-                    <div className="p-4">
-                      <h2 className="text-sm text-ink">{territory.name}</h2>
-                      <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                        {DANGER_LABEL[territory.danger]}
-                      </p>
+        {territories.map(({ territory, creatures, prey, unlocked, hasHealth, reason }) => {
+          const ready = unlocked && hasHealth;
+          const available = ready;
+          const active = activeId === territory.id;
+          const selectedId = selection[territory.id] ?? prey?.id ?? null;
+          const onThis = active && progress.id === territory.id;
+          const line =
+            onThis && progress.beat > 0 && script.length > 0
+              ? script[Math.min(progress.beat, script.length) - 1]
+              : null;
+          const foe = pending ?? report;
+          const fightingId = line && foe ? foe.creature.id : selectedId;
+          return (
+            <Card
+              key={territory.id}
+              height="content"
+              interactive={available}
+              tone={active ? "highlighted" : "default"}
+              className={cn(
+                !available && !active && "opacity-70",
+                active && shaking && "card-shake",
+              )}
+            >
+              <div className="grid md:grid-cols-2 md:divide-x md:divide-edge">
+                <div className="flex flex-col divide-y divide-edge">
+                  {art.territories[territory.id] ? (
+                    <div className="aspect-video w-full overflow-hidden">
+                      <ArtImage source={art.territories[territory.id]} />
                     </div>
-                    <div className="px-4 py-3">
-                      <p className="text-xs leading-relaxed text-ink-faint">
-                        {territory.description}
-                      </p>
-                    </div>
+                  ) : null}
+                  <div className="p-4">
+                    <h2 className="text-sm text-ink">{territory.name}</h2>
+                    <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                      {DANGER_LABEL[territory.danger]}
+                    </p>
+                  </div>
+                  <div className="px-4 py-3">
+                    <p className="text-xs leading-relaxed text-ink-faint">
+                      {territory.description}
+                    </p>
+                  </div>
+                  <div className="px-4 py-3">
+                    <Bar
+                      label={active ? "Caçando..." : "Caçar"}
+                      current={onThis ? progress.beat : 0}
+                      maximum={Math.max(1, script.length || HUNT_TICKS)}
+                      glows={active}
+                      wraps
+                    />
+                  </div>
+                  {active && petAlong ? (
                     <div className="px-4 py-3">
                       <Bar
-                        label={active ? "Caçando..." : "Caçar"}
-                        current={onThis ? progress.beat : 0}
-                        maximum={Math.max(1, script.length || HUNT_TICKS)}
-                        glows={active}
-                        wraps
+                        label="Mascote - Energia"
+                        current={petAlong.energy}
+                        maximum={petMaxEnergy(petLevelOf(petAlong))}
+                        tone="vigor"
                       />
                     </div>
-                    {active && petAlong ? (
-                      <div className="px-4 py-3">
-                        <Bar
-                          label="Mascote - Energia"
-                          current={petAlong.energy}
-                          maximum={petMaxEnergy(petLevelOf(petAlong))}
-                          tone="vigor"
-                        />
-                      </div>
-                    ) : null}
-                    {line ? (
-                      <p
-                        className={cn(
-                          "truncate px-4 py-3 font-mono text-[11px]",
-                          line.critical ? "text-ember" : "text-ink-faint",
-                        )}
-                      >
-                        {emphasizeDamage(line.text).map((part, index) =>
-                          typeof part === "string" ? (
-                            part
-                          ) : (
-                            <strong
-                              key={index}
-                              className={cn("font-bold", !line.critical && "text-ink")}
-                            >
-                              {part.damage}
-                            </strong>
-                          ),
-                        )}
-                      </p>
-                    ) : null}
-                    <div className="flex flex-wrap items-center justify-between gap-3 p-4">
-                      <span className="text-[11px] text-ink-faint">
-                        {active
-                          ? petAlong
-                            ? "Caçando com o mascote..."
-                            : state.automation.hunt
-                              ? "Caçando sem parar..."
-                              : "Caçando..."
-                          : waitingId === territory.id
-                            ? "Esperando o corpo para voltar a caçar"
-                            : (reason ?? "Trilha liberada")}
-                      </span>
-                      <Button
-                        variant={active ? "secondary" : available ? "primary" : "outline"}
-                        onClick={() => toggleHunt(territory.id, available)}
-                        disabled={!available && !active}
-                      >
-                        {active ? "Parar" : "Caçar"}
-                      </Button>
-                    </div>
+                  ) : null}
+                  {line ? (
+                    <p
+                      className={cn(
+                        "truncate px-4 py-3 font-mono text-[11px]",
+                        line.critical ? "text-ember" : "text-ink-faint",
+                      )}
+                    >
+                      {emphasizeDamage(line.text).map((part, index) =>
+                        typeof part === "string" ? (
+                          part
+                        ) : (
+                          <strong
+                            key={index}
+                            className={cn("font-bold", !line.critical && "text-ink")}
+                          >
+                            {part.damage}
+                          </strong>
+                        ),
+                      )}
+                    </p>
+                  ) : null}
+                  <div className="flex flex-wrap items-center justify-between gap-3 p-4">
+                    <span className="text-[11px] text-ink-faint">
+                      {active
+                        ? petAlong
+                          ? "Caçando com o mascote..."
+                          : state.automation.hunt
+                            ? "Caçando sem parar..."
+                            : "Caçando..."
+                        : waitingId === territory.id
+                          ? "Esperando o corpo para voltar a caçar"
+                          : (reason ?? "Trilha liberada")}
+                    </span>
+                    <Button
+                      variant={active ? "secondary" : available ? "primary" : "outline"}
+                      onClick={() => toggleHunt(territory.id, available)}
+                      disabled={!available && !active}
+                    >
+                      {active ? "Parar" : "Caçar"}
+                    </Button>
                   </div>
+                </div>
 
-                  {}
-                  <div className="flex flex-col border-t border-edge md:border-t-0">
-                    <div className="px-4 py-3">
-                      <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                        Criaturas da área
-                      </p>
-                    </div>
-                    {}
-                    <ul className="max-h-[560px] divide-y divide-edge overflow-y-auto border-t border-edge">
+                <div className="flex flex-col border-t border-edge md:border-t-0">
+                  <div className="px-4 py-3">
+                    <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                      Criaturas da área
+                    </p>
+                  </div>
+                  <div className="relative md:flex-1 md:min-h-0">
+                    <ul className="max-h-[560px] divide-y divide-edge overflow-y-auto border-t border-edge md:absolute md:inset-0 md:max-h-none">
                       {creatures.map((creature) => {
                         const isSelected = creature.id === selectedId;
                         const isPrey = creature.id === fightingId;
@@ -475,14 +463,13 @@ export function HuntScreen() {
                                 isSelected ? "bg-surface-high" : "hover:bg-surface-high/60",
                               )}
                             >
-                              {}
-                              <span
-                                aria-hidden="true"
-                                className="relative flex h-18 w-18 shrink-0"
-                              >
+                              <span aria-hidden="true" className="relative flex h-18 w-18 shrink-0">
                                 <span className="slot-well relative flex h-full w-full items-center justify-center overflow-hidden rounded-md border border-edge bg-base font-mono text-lg text-ink-faint">
                                   {creature.image ? (
-                                    <IconArt source={creature.image + CREATURE_ART_VERSION} fit="contain" />
+                                    <IconArt
+                                      source={creature.image + CREATURE_ART_VERSION}
+                                      fit="contain"
+                                    />
                                   ) : (
                                     "?"
                                   )}
@@ -524,10 +511,10 @@ export function HuntScreen() {
                     </ul>
                   </div>
                 </div>
-              </Card>
-            );
-          },
-        )}
+              </div>
+            </Card>
+          );
+        })}
       </div>
 
       {session.hunts > 0 ? (
