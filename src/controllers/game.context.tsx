@@ -267,7 +267,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
         setActivity(null);
         return;
       }
-      if ((answer.data?.ticks ?? 0) > 0 && !answer.data?.done) {
+      const ticks = answer.data?.ticks ?? 0;
+      // The breathing repeats with every rest tick, in step with the bars rising.
+      if (ticks > 0) playSound("rest");
+      if (ticks > 0 && !answer.data?.done) {
         announce("O corpo se recompõe aos poucos.", true, "Recuperação");
       }
       if (answer.data?.done) {
