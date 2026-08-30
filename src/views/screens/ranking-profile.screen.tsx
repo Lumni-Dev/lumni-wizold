@@ -82,7 +82,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
               <div className="min-w-0">
                 <p className="truncate text-sm text-ink">{hunter.name}</p>
                 <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                  {hunter.gender === "male" ? "Macho" : "Fêmea"}
+                  {hunter.gender === "male" ? "Lumni" : "Luna"}
                 </p>
               </div>
               <Tag tone="neutral">NV. {formatNumber(hunter.level)}</Tag>

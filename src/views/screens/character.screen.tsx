@@ -74,14 +74,13 @@ export function CharacterScreen() {
               <div className="min-w-0">
                 <p className="truncate text-sm text-ink">{character.name}</p>
                 <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                  {genderDefinition.title}
+                  {genderDefinition.label}
                 </p>
               </div>
               <Tag tone="neutral">{FORM_LABEL[character.form]}</Tag>
             </div>
 
             <List>
-              <DataRow label="Linhagem" value={genderDefinition.label} />
               <DataRow label="NV." value={formatNumber(character.level)} />
               <DataRow
                 label="Experiência"
