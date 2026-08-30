@@ -85,7 +85,7 @@ export const SIZE_LABEL: Record<PotionSize, string> = {
 };
 
 export const SLOT_LABEL: Record<EquipmentSlot, string> = {
-  claw: "Garras",
+  claw: "Luvas",
   helmet: "Gorro",
   armor: "Casaco",
   pants: "Calças",
@@ -95,7 +95,7 @@ export const SLOT_LABEL: Record<EquipmentSlot, string> = {
 };
 
 export const CATEGORY_LABEL: Record<ItemCategory, string> = {
-  claw: "Garras",
+  claw: "Luvas",
   helmet: "Gorro",
   armor: "Casaco",
   pants: "Calças",
@@ -108,7 +108,7 @@ export const CATEGORY_LABEL: Record<ItemCategory, string> = {
 };
 
 export const CATEGORY_PLURAL: Record<ItemCategory, string> = {
-  claw: "Garras",
+  claw: "Luvas",
   helmet: "Gorros",
   armor: "Casacos",
   pants: "Calças",

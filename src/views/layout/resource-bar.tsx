@@ -4,12 +4,14 @@ import { useGame } from "@/controllers/game.context";
 import { formatNumber } from "@/shared/utils/format";
 import { Bar } from "../components/bar";
 import { RestSeconds } from "../components/rest-seconds";
+import { TransformSeconds } from "../components/transform-seconds";
 
 export function ResourceBar() {
   const { character, stats, activity } = useGame();
   if (!character || !stats) return null;
 
   const resting = activity?.kind === "rest";
+  const transformed = character.form === "werewolf" && Boolean(character.transformedAt);
 
   return (
     <header className="sticky top-0 z-20 border-b border-edge bg-surface/40 backdrop-blur">
@@ -33,7 +35,15 @@ export function ResourceBar() {
             prominent
           />
           <Bar
-            label="Fúria (paga a transformação)"
+            label={
+              transformed ? (
+                <>
+                  Fúria (Fera <TransformSeconds transformedAt={character.transformedAt as string} />)
+                </>
+              ) : (
+                "Fúria"
+              )
+            }
             current={character.rage}
             maximum={stats.maxRage}
             glows={resting && character.rage < stats.maxRage}

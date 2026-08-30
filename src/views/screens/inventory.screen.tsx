@@ -73,7 +73,7 @@ export function InventoryScreen() {
 
       <Panel
         title="Equipado"
-        description="Sete espaços: capacete, colar, armadura, calças, botas, garras e anel."
+        description="Sete espaços: capacete, colar, armadura, calças, botas, luvas e anel."
       >
         <div className="grid auto-rows-fr gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {EQUIPMENT_SLOTS.map((slot) => {

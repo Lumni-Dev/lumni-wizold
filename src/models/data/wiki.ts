@@ -221,10 +221,10 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     title: "Equipamento",
     summary: "Sete espaços, cinco conjuntos, um item por espaço.",
     lines: [
-      "Espaços: gorro, colar, casaco, calças, botas, garras e anel.",
+      "Espaços: gorro, colar, casaco, calças, botas, luvas e anel.",
       setRequirementsLine(),
       "Toda peça dá atributo, e nada além de atributo: o que o card promete é exatamente o que soma na ficha.",
-      "Garras e anel dão Força; casaco, calças e gorro dão Resistência; botas dão Agilidade; colar dá Instinto e Vontade.",
+      "Luvas e anel dão Força; casaco, calças e gorro dão Resistência; botas dão Agilidade; colar dá Instinto e Vontade.",
       "O casaco tem corte de linhagem: o de Lumni veste Lumni, o de Luna veste Luna. O mercado mostra os dois e o botão avisa qual é o seu.",
       "Equipar um item com o espaço ocupado devolve o anterior ao inventário.",
       "O conjunto lunar é o teto: o mais forte e o mais caro, e só sai do mercado, nunca da caça.",

@@ -21,7 +21,7 @@ export const PREVIEW_SHOTS: readonly PreviewShot[] = [
     label: "Inventário",
     title: "Sete espaços e uma mochila honesta",
     text:
-      "Capacete, colar, armadura, calças, botas, garras e anel: uma peça por espaço, e o que a " +
+      "Capacete, colar, armadura, calças, botas, luvas e anel: uma peça por espaço, e o que a " +
       "peça promete é exatamente o que a ficha soma. O que foi forjado carrega o +X na arte.",
     image: "/assets/landing/inventory.webp?v=5",
   },

@@ -64,7 +64,7 @@ const SLOTS: Record<EquipmentSlot, SlotBlueprint> = {
     priceFactor: 10,
   },
   claw: {
-    noun: "Garras",
+    noun: "Luvas",
     feminine: true,
     flavor:
       "Presas de metal para os dedos, úteis nas noites em que as suas ainda não saíram. " +
