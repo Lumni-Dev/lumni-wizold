@@ -21,7 +21,7 @@ import {
 import { DANGER_LABEL } from "@/models/entities/territory";
 import { formatNumber, formatBronze } from "@/shared/utils/format";
 import { Tag } from "../components/tag";
-import { List, ListRow, RowText } from "../components/list";
+import { List, ListRow } from "../components/list";
 import { Panel } from "../components/panel";
 import { AttributeIcon } from "../components/attribute-icon";
 import { chipClass } from "../components/chip";
@@ -84,14 +84,22 @@ export function WikiScreen() {
 
       <div id="attributes" className="scroll-mt-28">
         <Panel title="Atributos" description="Cinco eixos, todos treináveis." padding="none">
-          <List>
+          <div className="grid gap-3 p-4 sm:grid-cols-2 xl:grid-cols-3">
             {ATTRIBUTES.map((attribute) => (
-              <ListRow key={attribute.key}>
+              <div
+                key={attribute.key}
+                className="flex items-start gap-3 rounded-md border border-edge p-3"
+              >
                 <AttributeIcon attribute={attribute.key} />
-                <RowText title={attribute.name} description={attribute.effect} />
-              </ListRow>
+                <div className="min-w-0">
+                  <p className="text-sm text-ink">{attribute.name}</p>
+                  <p className="mt-1 text-[11px] leading-relaxed text-ink-faint">
+                    {attribute.effect}
+                  </p>
+                </div>
+              </div>
             ))}
-          </List>
+          </div>
         </Panel>
       </div>
 
@@ -101,18 +109,18 @@ export function WikiScreen() {
           description="Um item por espaço, sete no total."
           padding="none"
         >
-          <List>
+          <div className="grid gap-3 p-4 sm:grid-cols-2 xl:grid-cols-3">
             {EQUIPMENT_SLOTS.map((slot) => (
-              <ListRow key={slot} className="justify-between">
-                <span className="text-sm text-ink">{SLOT_LABEL[slot]}</span>
-                <span className="text-right text-[11px] text-ink-faint">{SLOT_ROLE[slot]}</span>
-              </ListRow>
+              <div key={slot} className="rounded-md border border-edge p-3">
+                <p className="text-sm text-ink">{SLOT_LABEL[slot]}</p>
+                <p className="mt-1 text-[11px] leading-relaxed text-ink-faint">{SLOT_ROLE[slot]}</p>
+              </div>
             ))}
-          </List>
+          </div>
         </Panel>
       </div>
 
-      <div id="sets" className="scroll-mt-28 space-y-6">
+      <div id="sets" className="scroll-mt-28 grid gap-6 lg:grid-cols-2">
         {EQUIPMENT_SETS.map((definition) => (
           <Panel
             key={definition.key}
@@ -159,16 +167,21 @@ export function WikiScreen() {
           description="Um por atributo, do primeiro ao último nível."
           padding="none"
         >
-          <List>
+          <div className="grid gap-3 p-4 sm:grid-cols-2 xl:grid-cols-3">
             {EXERCISES.map((exercise) => (
-              <ListRow key={exercise.id} layout="split">
-                <RowText title={exercise.name} description={exercise.description} />
-                <p className="shrink-0 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                  {findAttribute(exercise.attribute)?.name ?? exercise.attribute}
+              <div key={exercise.id} className="rounded-md border border-edge p-3">
+                <div className="flex items-baseline justify-between gap-2">
+                  <p className="text-sm text-ink">{exercise.name}</p>
+                  <p className="shrink-0 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                    {findAttribute(exercise.attribute)?.name ?? exercise.attribute}
+                  </p>
+                </div>
+                <p className="mt-1 text-[11px] leading-relaxed text-ink-faint">
+                  {exercise.description}
                 </p>
-              </ListRow>
+              </div>
             ))}
-          </List>
+          </div>
           <div className="space-y-2 border-t border-edge px-4 py-3">
             <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
               Rendimento da sessão
@@ -191,9 +204,9 @@ export function WikiScreen() {
           description="Ordem natural de progressão da caça."
           padding="none"
         >
-          <List>
+          <div className="grid gap-3 p-4 lg:grid-cols-2">
             {TERRITORIES.map((territory) => (
-              <ListRow key={territory.id} layout="column">
+              <div key={territory.id} className="space-y-2 rounded-md border border-edge p-3">
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="text-sm text-ink">{territory.name}</p>
                   <Tag tone="faint">{DANGER_LABEL[territory.danger]}</Tag>
@@ -212,13 +225,13 @@ export function WikiScreen() {
                     .filter(Boolean)
                     .join(" - ")}
                 </p>
-              </ListRow>
+              </div>
             ))}
-          </List>
+          </div>
         </Panel>
       </div>
 
-      <div id="bestiary" className="scroll-mt-28 space-y-6">
+      <div id="bestiary" className="scroll-mt-28 grid gap-6 lg:grid-cols-2">
         {SPECIES_ORDER.map((species) => {
           const members = CREATURES.filter((creature) => creature.species === species);
           const band = members.length > 0 ? members[0].description : "";
@@ -290,9 +303,9 @@ export function WikiScreen() {
             description={itemsOfCategory(category).length + " itens no catálogo."}
             padding="none"
           >
-            <List>
+            <div className="grid gap-3 p-4 sm:grid-cols-2 xl:grid-cols-3">
               {itemsOfCategory(category).map((item) => (
-                <ListRow key={item.id}>
+                <div key={item.id} className="flex gap-3 rounded-md border border-edge p-3">
                   <ItemIcon item={item} />
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -308,9 +321,9 @@ export function WikiScreen() {
                       {summarizeEffect(item).join(" - ") || "Sem efeito, serve para venda."}
                     </p>
                   </div>
-                </ListRow>
+                </div>
               ))}
-            </List>
+            </div>
           </Panel>
         ))}
       </div>
