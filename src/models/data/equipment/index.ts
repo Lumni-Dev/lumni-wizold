@@ -84,7 +84,7 @@ function pieceEffect(definition: SetDefinition, slot: EquipmentSlot): ItemEffect
 }
 
 export function piecePrice(definition: SetDefinition, slot: EquipmentSlot): number {
-  return Math.round(SLOTS[slot].priceFactor * definition.power * definition.priceMultiplier);
+  return Math.round(SLOTS[slot].priceFactor * definition.priceBase);
 }
 
 function pieceOf(definition: SetDefinition, slot: EquipmentSlot, lineage?: Gender): Item {

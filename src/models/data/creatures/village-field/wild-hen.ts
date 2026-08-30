@@ -13,8 +13,8 @@ export const wildHen: Creature = {
   endurance: 29,
   agility: 24,
   experience: 194,
-  minBronze: 25,
-  maxBronze: 46,
+  minBronze: 41,
+  maxBronze: 77,
   drops: [
     { itemId: "feather", chance: 0.35, minimum: 1, maximum: 2 },
     { itemId: "poultry-meat", chance: 0.35, minimum: 1, maximum: 2 },

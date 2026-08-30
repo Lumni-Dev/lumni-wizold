@@ -13,8 +13,8 @@ export const scarletKnight: Creature = {
   endurance: 26769,
   agility: 295,
   experience: 5864,
-  minBronze: 10134,
-  maxBronze: 18820,
+  minBronze: 892,
+  maxBronze: 1656,
   drops: [
     { itemId: "scarlet-plate", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "cursed-plate", chance: 0.12, minimum: 1, maximum: 1 },

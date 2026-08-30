@@ -13,8 +13,8 @@ export const youngHydra: Creature = {
   endurance: 754,
   agility: 138,
   experience: 2714,
-  minBronze: 212,
-  maxBronze: 394,
+  minBronze: 419,
+  maxBronze: 779,
   drops: [
     { itemId: "hydra-scale", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "hydra-blood", chance: 0.07, minimum: 1, maximum: 1 },

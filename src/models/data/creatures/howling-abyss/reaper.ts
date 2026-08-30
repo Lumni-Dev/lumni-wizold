@@ -13,8 +13,8 @@ export const reaper: Creature = {
   endurance: 11793,
   agility: 510,
   experience: 5444,
-  minBronze: 2238,
-  maxBronze: 4156,
+  minBronze: 829,
+  maxBronze: 1539,
   drops: [
     { itemId: "reaper-scythe", chance: 0.04, minimum: 1, maximum: 1 },
     { itemId: "soul-shard", chance: 0.07, minimum: 1, maximum: 1 },

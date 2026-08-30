@@ -13,8 +13,8 @@ export const mosquitoSwarm: Creature = {
   endurance: 368,
   agility: 255,
   experience: 2504,
-  minBronze: 202,
-  maxBronze: 376,
+  minBronze: 388,
+  maxBronze: 720,
   drops: [
     { itemId: "mosquito-wing", chance: 0.35, minimum: 1, maximum: 2 },
     { itemId: "venom-gland", chance: 0.2, minimum: 1, maximum: 2 },

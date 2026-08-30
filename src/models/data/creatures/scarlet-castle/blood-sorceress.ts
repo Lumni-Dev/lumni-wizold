@@ -13,8 +13,8 @@ export const bloodSorceress: Creature = {
   endurance: 28018,
   agility: 427,
   experience: 5934,
-  minBronze: 10137,
-  maxBronze: 18825,
+  minBronze: 902,
+  maxBronze: 1676,
   drops: [
     { itemId: "blood-grimoire", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "black-blood", chance: 0.04, minimum: 1, maximum: 1 },

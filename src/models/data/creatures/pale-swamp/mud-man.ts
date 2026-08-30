@@ -13,8 +13,8 @@ export const mudMan: Creature = {
   endurance: 701,
   agility: 131,
   experience: 2574,
-  minBronze: 205,
-  maxBronze: 381,
+  minBronze: 398,
+  maxBronze: 740,
   drops: [
     { itemId: "swamp-mud", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "thick-hide", chance: 0.35, minimum: 1, maximum: 2 },

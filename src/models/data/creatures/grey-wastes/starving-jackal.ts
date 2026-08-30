@@ -13,8 +13,8 @@ export const starvingJackal: Creature = {
   endurance: 1972,
   agility: 326,
   experience: 3764,
-  minBronze: 580,
-  maxBronze: 1076,
+  minBronze: 577,
+  maxBronze: 1071,
   drops: [
     { itemId: "jackal-pelt", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "sharp-fang", chance: 0.35, minimum: 1, maximum: 2 },

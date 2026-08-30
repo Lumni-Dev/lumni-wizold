@@ -20,7 +20,9 @@ export interface SetDefinition {
   description: string;
   flavor: string;
   power: number;
-  priceMultiplier: number;
+  // The set's price unit, decoupled from `power` (which is huge for combat and would
+  // blow past the vault). A piece costs priceFactor x priceBase; a full set is 95 x it.
+  priceBase: number;
 }
 
 export type { EquipmentSet, EquipmentSlot, Rarity };

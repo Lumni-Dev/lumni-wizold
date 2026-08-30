@@ -9,9 +9,12 @@ export const BALANCE = {
   // Treino que o caçador de referência tem por nível (o resto vem do equipamento).
   trainedPerLevel: 0.55,
 
-  // Bronze que uma carcaça paga por ponto de Força do caçador (sem a forja, para o
-  // grind da forja não multiplicar o bronze da caça).
-  bronzePerStrength: 0.9,
+  // O bronze que uma carcaça paga, por NÍVEL, não pelo poder do equipamento (que é
+  // enorme para o combate e estouraria o baú): huntPurse = bronzeBase + nível x
+  // bronzePerLevel. Assim a economia inteira (venda, treino, poção, forja, drops,
+  // arena, loja) fica limitada e cabe no baú de 1M. No teto (NV 1000) rende ~1520.
+  bronzeBase: 20,
+  bronzePerLevel: 1.5,
 
   // Dano que uma criatura crava por golpe no caçador de 100 de vida. A Força da
   // criatura sai de sqrt(creatureHit x Resistência do caçador), então o dano por

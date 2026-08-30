@@ -13,8 +13,8 @@ export const noviceHunter: Creature = {
   endurance: 940,
   agility: 207,
   experience: 2854,
-  minBronze: 534,
-  maxBronze: 992,
+  minBronze: 440,
+  maxBronze: 818,
   drops: [
     { itemId: "steel-scrap", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "coin-purse", chance: 0.12, minimum: 1, maximum: 1 },

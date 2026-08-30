@@ -13,8 +13,8 @@ export const rivalWerewolf: Creature = {
   endurance: 29034,
   agility: 562,
   experience: 6004,
-  minBronze: 10140,
-  maxBronze: 18832,
+  minBronze: 913,
+  maxBronze: 1695,
   drops: [
     { itemId: "rival-pelt", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "wolf-fang", chance: 0.2, minimum: 1, maximum: 2 },

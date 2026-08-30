@@ -13,8 +13,8 @@ export const deadKnight: Creature = {
   endurance: 6159,
   agility: 229,
   experience: 4534,
-  minBronze: 2192,
-  maxBronze: 4072,
+  minBronze: 692,
+  maxBronze: 1286,
   drops: [
     { itemId: "cursed-plate", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "bone-shard", chance: 0.2, minimum: 1, maximum: 2 },

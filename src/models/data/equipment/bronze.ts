@@ -14,5 +14,5 @@ export const bronzeSet: SetDefinition = {
     "Bronze bruto, martelado sem capricho nenhum. O ferreiro do vilarejo faz um por " +
     "tarde e nunca pergunta por que a encomenda vem sempre dois números maior.",
   power: 20,
-  priceMultiplier: 2,
+  priceBase: 10,
 };

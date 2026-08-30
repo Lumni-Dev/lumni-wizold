@@ -13,8 +13,8 @@ export const wanderingKnight: Creature = {
   endurance: 1644,
   agility: 166,
   experience: 3274,
-  minBronze: 555,
-  maxBronze: 1031,
+  minBronze: 503,
+  maxBronze: 935,
   drops: [
     { itemId: "knight-plate", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "steel-scrap", chance: 0.2, minimum: 1, maximum: 2 },

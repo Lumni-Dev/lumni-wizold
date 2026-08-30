@@ -13,8 +13,8 @@ export const basilisk: Creature = {
   endurance: 2691,
   agility: 386,
   experience: 4114,
-  minBronze: 596,
-  maxBronze: 1108,
+  minBronze: 629,
+  maxBronze: 1169,
   drops: [
     { itemId: "basilisk-fang", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "basilisk-scale", chance: 0.07, minimum: 1, maximum: 1 },

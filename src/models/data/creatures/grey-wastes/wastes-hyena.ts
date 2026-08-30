@@ -13,8 +13,8 @@ export const wastesHyena: Creature = {
   endurance: 1793,
   agility: 314,
   experience: 3624,
-  minBronze: 573,
-  maxBronze: 1063,
+  minBronze: 556,
+  maxBronze: 1032,
   drops: [
     { itemId: "hyena-pelt", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "sharp-fang", chance: 0.35, minimum: 1, maximum: 2 },

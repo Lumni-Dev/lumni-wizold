@@ -13,8 +13,8 @@ export const hellhound: Creature = {
   endurance: 8938,
   agility: 471,
   experience: 5024,
-  minBronze: 2217,
-  maxBronze: 4117,
+  minBronze: 766,
+  maxBronze: 1422,
   drops: [
     { itemId: "hellhound-fang", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "ember-pelt", chance: 0.12, minimum: 1, maximum: 1 },

@@ -13,8 +13,8 @@ export const furiousBadger: Creature = {
   endurance: 114,
   agility: 33,
   experience: 614,
-  minBronze: 46,
-  maxBronze: 85,
+  minBronze: 104,
+  maxBronze: 194,
   drops: [
     { itemId: "badger-claw", chance: 0.35, minimum: 1, maximum: 2 },
     { itemId: "thick-hide", chance: 0.35, minimum: 1, maximum: 2 },

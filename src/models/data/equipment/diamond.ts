@@ -14,5 +14,5 @@ export const diamondSet: SetDefinition = {
     "Cravejado de diamante, devolve a lua inteira no meio da mata e corta a luz antes " +
     "de cortar carne. É o limite do que o vilarejo monta sem começar a perguntar.",
   power: 2500,
-  priceMultiplier: 5,
+  priceBase: 3000,
 };

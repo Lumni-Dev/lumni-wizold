@@ -13,8 +13,8 @@ export const youngBehemoth: Creature = {
   endurance: 12450,
   agility: 271,
   experience: 5374,
-  minBronze: 2234,
-  maxBronze: 4148,
+  minBronze: 818,
+  maxBronze: 1520,
   drops: [
     { itemId: "behemoth-hide", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "behemoth-horn", chance: 0.07, minimum: 1, maximum: 1 },

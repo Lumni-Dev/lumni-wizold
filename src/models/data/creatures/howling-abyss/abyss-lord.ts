@@ -13,8 +13,8 @@ export const abyssLord: Creature = {
   endurance: 13503,
   agility: 437,
   experience: 5514,
-  minBronze: 2241,
-  maxBronze: 4161,
+  minBronze: 839,
+  maxBronze: 1559,
   drops: [
     { itemId: "abyss-crown", chance: 0.04, minimum: 1, maximum: 1 },
     { itemId: "demon-horn", chance: 0.07, minimum: 1, maximum: 1 },

@@ -13,8 +13,8 @@ export const chimera: Creature = {
   endurance: 52713,
   agility: 330,
   experience: 6564,
-  minBronze: 10168,
-  maxBronze: 18884,
+  minBronze: 997,
+  maxBronze: 1851,
   drops: [
     { itemId: "chimera-mane", chance: 0.04, minimum: 1, maximum: 1 },
     { itemId: "chimera-fang", chance: 0.04, minimum: 1, maximum: 1 },

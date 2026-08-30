@@ -13,8 +13,8 @@ export const greyWolf: Creature = {
   endurance: 127,
   agility: 80,
   experience: 894,
-  minBronze: 59,
-  maxBronze: 111,
+  minBronze: 146,
+  maxBronze: 272,
   drops: [
     { itemId: "wolf-pelt", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "wolf-fang", chance: 0.2, minimum: 1, maximum: 2 },

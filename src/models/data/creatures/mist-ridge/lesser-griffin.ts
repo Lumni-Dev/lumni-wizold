@@ -13,8 +13,8 @@ export const lesserGriffin: Creature = {
   endurance: 514,
   agility: 167,
   experience: 2084,
-  minBronze: 181,
-  maxBronze: 337,
+  minBronze: 325,
+  maxBronze: 603,
   drops: [
     { itemId: "griffin-feather", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "eagle-talon", chance: 0.12, minimum: 1, maximum: 1 },

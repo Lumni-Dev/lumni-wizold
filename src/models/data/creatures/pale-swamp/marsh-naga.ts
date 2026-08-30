@@ -13,8 +13,8 @@ export const marshNaga: Creature = {
   endurance: 662,
   agility: 250,
   experience: 2644,
-  minBronze: 209,
-  maxBronze: 389,
+  minBronze: 409,
+  maxBronze: 759,
   drops: [
     { itemId: "naga-scale", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "venom-gland", chance: 0.2, minimum: 1, maximum: 2 },

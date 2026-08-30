@@ -13,8 +13,8 @@ export const stoneGolem: Creature = {
   endurance: 2849,
   agility: 204,
   experience: 4044,
-  minBronze: 594,
-  maxBronze: 1102,
+  minBronze: 619,
+  maxBronze: 1149,
   drops: [
     { itemId: "golem-core", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "stone-shard", chance: 0.2, minimum: 1, maximum: 2 },

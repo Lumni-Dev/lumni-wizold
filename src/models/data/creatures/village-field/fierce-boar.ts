@@ -13,8 +13,8 @@ export const fierceBoar: Creature = {
   endurance: 94,
   agility: 26,
   experience: 474,
-  minBronze: 39,
-  maxBronze: 72,
+  minBronze: 83,
+  maxBronze: 155,
   drops: [
     { itemId: "boar-tusk", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "thick-hide", chance: 0.35, minimum: 1, maximum: 2 },

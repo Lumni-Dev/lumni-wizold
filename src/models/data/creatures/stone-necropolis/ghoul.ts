@@ -13,8 +13,8 @@ export const ghoul: Creature = {
   endurance: 5125,
   agility: 419,
   experience: 4464,
-  minBronze: 2190,
-  maxBronze: 4066,
+  minBronze: 682,
+  maxBronze: 1266,
   drops: [
     { itemId: "ghoul-claw", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "rotten-flesh", chance: 0.2, minimum: 1, maximum: 2 },

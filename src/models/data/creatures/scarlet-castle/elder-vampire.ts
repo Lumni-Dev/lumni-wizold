@@ -13,8 +13,8 @@ export const elderVampire: Creature = {
   endurance: 31429,
   agility: 568,
   experience: 6074,
-  minBronze: 10144,
-  maxBronze: 18838,
+  minBronze: 923,
+  maxBronze: 1715,
   drops: [
     { itemId: "black-blood", chance: 0.04, minimum: 1, maximum: 1 },
     { itemId: "empty-fang", chance: 0.12, minimum: 1, maximum: 1 },

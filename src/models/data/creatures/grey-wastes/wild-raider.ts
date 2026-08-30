@@ -13,8 +13,8 @@ export const wildRaider: Creature = {
   endurance: 2511,
   agility: 282,
   experience: 3904,
-  minBronze: 587,
-  maxBronze: 1089,
+  minBronze: 598,
+  maxBronze: 1110,
   drops: [
     { itemId: "raider-loot", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "coin-purse", chance: 0.12, minimum: 1, maximum: 1 },

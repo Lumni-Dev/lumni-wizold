@@ -13,8 +13,8 @@ export const sphinx: Creature = {
   endurance: 55300,
   agility: 482,
   experience: 6704,
-  minBronze: 10175,
-  maxBronze: 18897,
+  minBronze: 1018,
+  maxBronze: 1890,
   drops: [
     { itemId: "sphinx-riddle", chance: 0.04, minimum: 1, maximum: 1 },
     { itemId: "golden-fur", chance: 0.07, minimum: 1, maximum: 1 },

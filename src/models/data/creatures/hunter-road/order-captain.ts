@@ -13,8 +13,8 @@ export const orderCaptain: Creature = {
   endurance: 1777,
   agility: 247,
   experience: 3414,
-  minBronze: 562,
-  maxBronze: 1044,
+  minBronze: 524,
+  maxBronze: 974,
   drops: [
     { itemId: "captain-medal", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "knight-plate", chance: 0.12, minimum: 1, maximum: 1 },

@@ -93,7 +93,7 @@ function deepFreeze(value) {
 }
 const json = (value) => JSON.stringify(value);
 const isInt = (value) => Number.isInteger(value);
-function baseState({ level = 1, gender = "male", bronze = 1000000 } = {}) {
+function baseState({ level = 1, gender = "male", bronze = 700000 } = {}) {
   const state = factory.createRun("Teste", gender);
   const trained = clamp(Math.round(level * 0.55), CONST.BASE_ATTRIBUTE_VALUE, 1000);
   state.character = {
@@ -459,7 +459,7 @@ sec("economia");
   );
   const setTotal = (definition) =>
     entItem.EQUIPMENT_SLOTS.reduce((total, slot) => total + sets.piecePrice(definition, slot), 0);
-  ok("conjunto de bronze custa 3800", setTotal(sets.EQUIPMENT_SETS[0]) === 3800);
+  ok("conjunto de bronze custa 950", setTotal(sets.EQUIPMENT_SETS[0]) === 950);
   let setsClimb = true;
   for (let index = 1; index < sets.EQUIPMENT_SETS.length; index += 1) {
     if (setTotal(sets.EQUIPMENT_SETS[index]) <= setTotal(sets.EQUIPMENT_SETS[index - 1])) {
@@ -1050,7 +1050,9 @@ sec("mascote");
   );
   ok(
     "adoção cobra o preço fixo do lobo",
-    adopt.ok && adopt.state.character.bronze === 1000000 - CONST.PET_PRICE,
+    adopt.ok &&
+      adopt.state.character.bronze ===
+        baseState({ level: adoptLevel }).character.bronze - CONST.PET_PRICE,
   );
   ok("segunda adoção recusa", petCtrl.adoptPet(adopt.state, "male", "Outro").ok === false);
   const released = petCtrl.releasePet(adopt.state);

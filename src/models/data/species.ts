@@ -441,9 +441,11 @@ function areaOf(level: number): number {
 
 // The purse rides the unforged gear, not the forged reference: forging is the
 // player's own grind and must never multiply the bronze a carcass pays.
+// The purse rides the level, not the forged (or even unforged) gear power: that power
+// is enormous for the combat math and would push the whole bronze economy past the
+// vault. Level-based keeps every price that is quoted in hunts bounded under the cap.
 export function huntPurse(level: number): number {
-  const gear = setAttributes(setForLevel(level));
-  return Math.round((trainedAt(level) + gear.strength) * BALANCE.bronzePerStrength);
+  return Math.round(BALANCE.bronzeBase + level * BALANCE.bronzePerLevel);
 }
 
 export function speciesNumbers(key: SpeciesKey, level: number) {

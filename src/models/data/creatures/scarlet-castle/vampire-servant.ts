@@ -13,8 +13,8 @@ export const vampireServant: Creature = {
   endurance: 17240,
   agility: 529,
   experience: 5654,
-  minBronze: 10123,
-  maxBronze: 18799,
+  minBronze: 860,
+  maxBronze: 1598,
   drops: [
     { itemId: "empty-fang", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "pale-blood", chance: 0.12, minimum: 1, maximum: 1 },

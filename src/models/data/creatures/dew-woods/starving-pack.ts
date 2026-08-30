@@ -13,8 +13,8 @@ export const starvingPack: Creature = {
   endurance: 217,
   agility: 102,
   experience: 1384,
-  minBronze: 84,
-  maxBronze: 156,
+  minBronze: 220,
+  maxBronze: 408,
   drops: [
     { itemId: "wolf-pelt", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "wolf-fang", chance: 0.2, minimum: 1, maximum: 2 },

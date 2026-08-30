@@ -13,8 +13,8 @@ export const giantScorpion: Creature = {
   endurance: 2092,
   agility: 347,
   experience: 3694,
-  minBronze: 576,
-  maxBronze: 1070,
+  minBronze: 566,
+  maxBronze: 1052,
   drops: [
     { itemId: "scorpion-stinger", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "chitin-plate", chance: 0.12, minimum: 1, maximum: 1 },

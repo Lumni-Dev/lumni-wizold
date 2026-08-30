@@ -13,8 +13,8 @@ export const lavaGolem: Creature = {
   endurance: 11406,
   agility: 264,
   experience: 5234,
-  minBronze: 2227,
-  maxBronze: 4137,
+  minBronze: 797,
+  maxBronze: 1481,
   drops: [
     { itemId: "lava-core", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "molten-rock", chance: 0.12, minimum: 1, maximum: 1 },

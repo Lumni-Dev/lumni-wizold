@@ -13,8 +13,8 @@ export const fallenSeraph: Creature = {
   endurance: 63102,
   agility: 541,
   experience: 6844,
-  minBronze: 10182,
-  maxBronze: 18910,
+  minBronze: 1039,
+  maxBronze: 1929,
   drops: [
     { itemId: "seraph-feather", chance: 0.04, minimum: 1, maximum: 1 },
     { itemId: "halo-shard", chance: 0.04, minimum: 1, maximum: 1 },

@@ -14,5 +14,5 @@ export const goldSet: SetDefinition = {
     "Ouro trabalhado, mais firme do que a fama sugere e o único que a fera não tenta " +
     "arrancar do corpo na virada. Só desce da serra o que a serra devolve.",
   power: 500,
-  priceMultiplier: 4,
+  priceBase: 950,
 };

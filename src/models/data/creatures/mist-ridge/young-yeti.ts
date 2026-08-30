@@ -13,8 +13,8 @@ export const youngYeti: Creature = {
   endurance: 433,
   agility: 96,
   experience: 1874,
-  minBronze: 171,
-  maxBronze: 317,
+  minBronze: 293,
+  maxBronze: 545,
   drops: [
     { itemId: "yeti-fur", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "frost-heart", chance: 0.07, minimum: 1, maximum: 1 },

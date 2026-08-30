@@ -13,8 +13,8 @@ export const youngDeer: Creature = {
   endurance: 110,
   agility: 68,
   experience: 754,
-  minBronze: 53,
-  maxBronze: 98,
+  minBronze: 125,
+  maxBronze: 233,
   drops: [
     { itemId: "deer-hide", chance: 0.35, minimum: 1, maximum: 2 },
     { itemId: "soft-antler", chance: 0.35, minimum: 1, maximum: 2 },

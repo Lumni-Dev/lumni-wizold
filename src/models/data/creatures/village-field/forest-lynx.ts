@@ -13,8 +13,8 @@ export const forestLynx: Creature = {
   endurance: 114,
   agility: 68,
   experience: 684,
-  minBronze: 49,
-  maxBronze: 91,
+  minBronze: 115,
+  maxBronze: 213,
   drops: [
     { itemId: "lynx-pelt", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "sharp-fang", chance: 0.35, minimum: 1, maximum: 2 },

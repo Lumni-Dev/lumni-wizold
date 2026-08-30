@@ -13,8 +13,8 @@ export const poisonToad: Creature = {
   endurance: 295,
   agility: 220,
   experience: 2154,
-  minBronze: 185,
-  maxBronze: 343,
+  minBronze: 335,
+  maxBronze: 623,
   drops: [
     { itemId: "toad-skin", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "venom-gland", chance: 0.2, minimum: 1, maximum: 2 },

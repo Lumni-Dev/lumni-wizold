@@ -13,8 +13,8 @@ export const giantBat: Creature = {
   endurance: 11754,
   agility: 577,
   experience: 5724,
-  minBronze: 10127,
-  maxBronze: 18807,
+  minBronze: 871,
+  maxBronze: 1617,
   drops: [
     { itemId: "bat-wing", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "bat-fang", chance: 0.2, minimum: 1, maximum: 2 },

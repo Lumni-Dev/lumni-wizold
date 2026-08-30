@@ -13,8 +13,8 @@ export const masterHunter: Creature = {
   endurance: 1792,
   agility: 328,
   experience: 3484,
-  minBronze: 566,
-  maxBronze: 1050,
+  minBronze: 535,
+  maxBronze: 993,
   drops: [
     { itemId: "master-trophy", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "silver-charm", chance: 0.12, minimum: 1, maximum: 1 },

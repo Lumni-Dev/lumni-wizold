@@ -13,8 +13,8 @@ export const giantLeech: Creature = {
   endurance: 540,
   agility: 217,
   experience: 2294,
-  minBronze: 192,
-  maxBronze: 356,
+  minBronze: 356,
+  maxBronze: 662,
   drops: [
     { itemId: "leech-blood", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "venom-gland", chance: 0.2, minimum: 1, maximum: 2 },

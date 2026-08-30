@@ -13,8 +13,8 @@ export const elderDragon: Creature = {
   endurance: 60517,
   agility: 341,
   experience: 6774,
-  minBronze: 10178,
-  maxBronze: 18902,
+  minBronze: 1028,
+  maxBronze: 1910,
   drops: [
     { itemId: "dragon-scale", chance: 0.04, minimum: 1, maximum: 1 },
     { itemId: "dragon-heart", chance: 0.04, minimum: 1, maximum: 1 },

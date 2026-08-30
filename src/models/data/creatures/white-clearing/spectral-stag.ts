@@ -13,8 +13,8 @@ export const spectralStag: Creature = {
   endurance: 38900,
   agility: 554,
   experience: 6424,
-  minBronze: 10161,
-  maxBronze: 18871,
+  minBronze: 976,
+  maxBronze: 1812,
   drops: [
     { itemId: "spectral-antler", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "ectoplasm", chance: 0.12, minimum: 1, maximum: 1 },

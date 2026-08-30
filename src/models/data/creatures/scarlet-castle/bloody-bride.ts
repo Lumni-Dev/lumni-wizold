@@ -13,8 +13,8 @@ export const bloodyBride: Creature = {
   endurance: 33779,
   agility: 575,
   experience: 6144,
-  minBronze: 10147,
-  maxBronze: 18845,
+  minBronze: 934,
+  maxBronze: 1734,
   drops: [
     { itemId: "bride-veil", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "pale-blood", chance: 0.12, minimum: 1, maximum: 1 },

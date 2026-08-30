@@ -13,8 +13,8 @@ export const sandWorm: Creature = {
   endurance: 2521,
   agility: 194,
   experience: 3834,
-  minBronze: 583,
-  maxBronze: 1083,
+  minBronze: 587,
+  maxBronze: 1091,
   drops: [
     { itemId: "worm-hide", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "sand-tooth", chance: 0.12, minimum: 1, maximum: 1 },

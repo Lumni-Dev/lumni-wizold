@@ -13,8 +13,8 @@ export const scarletCount: Creature = {
   endurance: 39740,
   agility: 492,
   experience: 6214,
-  minBronze: 10151,
-  maxBronze: 18851,
+  minBronze: 944,
+  maxBronze: 1754,
   drops: [
     { itemId: "count-crown", chance: 0.04, minimum: 1, maximum: 1 },
     { itemId: "black-blood", chance: 0.04, minimum: 1, maximum: 1 },

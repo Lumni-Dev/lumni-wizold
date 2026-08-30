@@ -13,8 +13,8 @@ export const caveDragon: Creature = {
   endurance: 14026,
   agility: 281,
   experience: 5584,
-  minBronze: 2245,
-  maxBronze: 4169,
+  minBronze: 850,
+  maxBronze: 1578,
   drops: [
     { itemId: "dragon-scale", chance: 0.04, minimum: 1, maximum: 1 },
     { itemId: "dragon-fang", chance: 0.04, minimum: 1, maximum: 1 },

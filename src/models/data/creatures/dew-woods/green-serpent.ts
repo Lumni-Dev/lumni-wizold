@@ -13,8 +13,8 @@ export const greenSerpent: Creature = {
   endurance: 160,
   agility: 100,
   experience: 1034,
-  minBronze: 67,
-  maxBronze: 124,
+  minBronze: 167,
+  maxBronze: 311,
   drops: [
     { itemId: "serpent-scale", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "venom-gland", chance: 0.2, minimum: 1, maximum: 2 },
