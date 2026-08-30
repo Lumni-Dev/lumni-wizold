@@ -24,10 +24,14 @@ export function applyExperience(character: Character, gain: number): ExperienceO
   let level = character.level;
   let levelsGained = 0;
 
-  if (level < MAX_CHARACTER_LEVEL && experience >= experienceForLevel(level)) {
-    experience = 0;
+  // The excess carries into the next level instead of being thrown away: what
+  // a level did not need becomes the head start of the next, so a hunt never
+  // wastes experience and the run never restarts a level from zero. A single
+  // fat gain can climb more than one level, carrying the remainder each time.
+  while (level < MAX_CHARACTER_LEVEL && experience >= experienceForLevel(level)) {
+    experience -= experienceForLevel(level);
     level += 1;
-    levelsGained = 1;
+    levelsGained += 1;
   }
 
   const capped = level >= MAX_CHARACTER_LEVEL ? experienceForLevel(level) : experience;

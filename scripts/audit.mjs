@@ -504,14 +504,22 @@ sec("progressão");
   const short = progression.applyExperience({ ...character, experience: 0 }, 10);
   ok("ganho curto acumula", short.character.experience === 10 && short.levelsGained === 0);
   const crossing = progression.applyExperience(
-    { ...character, experience: progression.experienceForLevel(5) - 1 },
-    1,
+    { ...character, experience: 0 },
+    progression.experienceForLevel(5) + 50,
   );
   ok(
     "cruzar o limiar sobe um nível",
     crossing.levelsGained === 1 && crossing.character.level === 6,
   );
-  ok("nível novo começa do zero", crossing.character.experience === 0);
+  ok("o excedente vira o começo do próximo nível", crossing.character.experience === 50);
+  const leaped = progression.applyExperience(
+    { ...character, experience: 0 },
+    progression.experienceForLevel(5) + progression.experienceForLevel(6) + 30,
+  );
+  ok(
+    "um ganho gordo sobe vários níveis carregando a sobra",
+    leaped.levelsGained === 2 && leaped.character.level === 7 && leaped.character.experience === 30,
+  );
   const atCap = progression.applyExperience({ ...character, level: 1000, experience: 0 }, 99999999);
   ok("teto de nível segura", atCap.character.level === 1000 && atCap.levelsGained === 0);
   ok(
