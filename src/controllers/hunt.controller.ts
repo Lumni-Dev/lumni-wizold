@@ -2,7 +2,6 @@ import { MIN_HEALTH_RATIO_TO_ACT } from "@/shared/constants/game";
 import { formatNumber, formatBronze } from "@/shared/utils/format";
 import { chance, defaultRandom, intBetween, type Random } from "@/shared/utils/random";
 import { findCreature } from "@/models/data/creatures";
-import { speciesNumbers } from "@/models/data/species";
 import { findItem, itemIdFor } from "@/models/data/items";
 import { findTerritory, TERRITORIES } from "@/models/data/territories";
 import type { Gender } from "@/models/entities/character";
@@ -71,14 +70,6 @@ function pickCreature(territory: Territory, level: number): Creature | undefined
   return eligible[eligible.length - 1] ?? creatures[0];
 }
 
-function scaledPrey(territory: Territory, level: number): Creature | undefined {
-  const variant = pickCreature(territory, level);
-  if (!variant) return undefined;
-
-  const preyLevel = Math.min(Math.max(level, variant.level), territory.maxLevel);
-  return { ...variant, level: preyLevel, ...speciesNumbers(variant.species, preyLevel) };
-}
-
 export function listTerritories(state: GameState): AvailableTerritory[] {
   const character = state.character;
   const stats = character
@@ -98,7 +89,7 @@ export function listTerritories(state: GameState): AvailableTerritory[] {
     return {
       territory,
       creatures,
-      prey: character ? (scaledPrey(territory, character.level) ?? null) : null,
+      prey: character ? (pickCreature(territory, character.level) ?? null) : null,
       unlocked,
       hasHealth,
       transformed,
@@ -153,7 +144,7 @@ export function resolveHunt(
     return failure(state, "Vida baixa demais para caçar. Recupere-se ou use uma poção.");
   }
 
-  const creature = scaledPrey(territory, character.level);
+  const creature = pickCreature(territory, character.level);
   if (!creature) return failure(state, "A trilha não levou a nada.");
 
   const petJoining = canPetFight(state.pet) ? state.pet : null;

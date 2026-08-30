@@ -8,7 +8,8 @@ import { ATTRIBUTES, type AttributeKey } from "@/models/entities/attribute";
 import { findItem } from "@/models/data/items";
 import type { GameState } from "@/models/entities/game-state";
 import { EQUIPMENT_SLOTS, isEquippable, type EquipmentSlot, type Item } from "@/models/entities/item";
-import { findOre, MINING_MAX_LEVEL, ORES, type MiningState, type Ore } from "@/models/entities/mining";
+import { type MiningState, type Ore } from "@/models/entities/mining";
+import { findOre, MINING_MAX_LEVEL, ORES } from "@/models/data/ores";
 import { failure, success, type Result } from "@/models/entities/result";
 import { formatBronze, formatCooldown } from "@/shared/utils/format";
 import {

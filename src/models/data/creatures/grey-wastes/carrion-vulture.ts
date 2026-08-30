@@ -1,0 +1,21 @@
+import type { Creature } from "../types";
+
+// Abutre Carniceiro (NV. 501 a 510) da área Ermo Cinza.
+export const carrionVulture: Creature = {
+  id: "carrion-vulture",
+  name: "Abutre Carniceiro",
+  description: "Pequenos, rápidos e em número maior do que parece. O primeiro sangue de qualquer lobisomem.",
+  species: "rabbit",
+  level: 501,
+  health: 5166,
+  strength: 880,
+  endurance: 460,
+  agility: 360,
+  experience: 3554,
+  minBronze: 766,
+  maxBronze: 1423,
+  drops: [
+    { itemId: "soft-fur", chance: 0.225, minimum: 1, maximum: 2 },
+    { itemId: "lucky-foot", chance: 0.112, minimum: 1, maximum: 2 },
+  ],
+};

@@ -2,6 +2,8 @@ import {
   BASE_ATTRIBUTE_VALUE,
   BASE_VITAL,
   HEALTH_PER_ENDURANCE,
+  HEALTH_PER_LEVEL,
+  RAGE_PER_LEVEL,
   RAGE_PER_WILLPOWER,
   WEREWOLF_STRENGTH_BONUS,
 } from "@/shared/constants/game";
@@ -109,10 +111,14 @@ export function deriveStatsOf(subject: StatSubject, equipment: Equipment): Deriv
   const total = addAttributes(body, form);
 
   const maxHealth = Math.round(
-    BASE_VITAL + (total.endurance - BASE_ATTRIBUTE_VALUE) * HEALTH_PER_ENDURANCE,
+    BASE_VITAL +
+      (total.endurance - BASE_ATTRIBUTE_VALUE) * HEALTH_PER_ENDURANCE +
+      subject.level * HEALTH_PER_LEVEL,
   );
   const maxRage = Math.round(
-    BASE_VITAL + (total.willpower - BASE_ATTRIBUTE_VALUE) * RAGE_PER_WILLPOWER,
+    BASE_VITAL +
+      (total.willpower - BASE_ATTRIBUTE_VALUE) * RAGE_PER_WILLPOWER +
+      subject.level * RAGE_PER_LEVEL,
   );
 
   return {

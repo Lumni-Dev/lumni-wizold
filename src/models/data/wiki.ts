@@ -41,7 +41,7 @@ import {
   ARENA_SPOILS_MIN_HUNTS,
   ARENA_SPOILS_MIN_SHARE,
 } from "../rules/arena";
-import { MINING_MAX_LEVEL, ORES } from "../entities/mining";
+import { MINING_MAX_LEVEL, ORES } from "./ores";
 import { RANKING_BOARDS } from "../entities/ranking";
 import { BAZAAR_FEE_RATIO, BAZAAR_LISTING_FEE, MIN_WITHDRAW_CENTS } from "../rules/bazaar";
 import { BAZAAR_LISTING_DAYS, initialWallet } from "../entities/bazaar";

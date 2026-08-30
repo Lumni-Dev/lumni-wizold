@@ -1,5 +1,6 @@
 import { MINING_DAILY_MININGS, MINING_RESET_HOUR_UTC } from "@/shared/constants/game";
-import { MINING_MAX_LEVEL, type MiningState } from "../entities/mining";
+import { type MiningState } from "../entities/mining";
+import { MINING_MAX_LEVEL } from "../data/ores";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 

@@ -7,7 +7,6 @@ import { usePageActivity } from "@/controllers/use-page-activity";
 import { playSound } from "@/controllers/sound";
 import { petLevelOf, petMaxEnergy } from "@/models/rules/pet";
 import { emphasizeDamage, narrationOf, type NarrationLine } from "../presenters/hunt.presenter";
-import { SPECIES_LABEL } from "@/models/entities/creature";
 import { DANGER_LABEL } from "@/models/entities/territory";
 import { canPetFight, isPetActive } from "@/models/rules/pet";
 import { HUNT_TICK_MS, HUNT_TICKS } from "@/shared/constants/game";
@@ -16,7 +15,7 @@ import { formatNumber, formatBronze } from "@/shared/utils/format";
 import { ArtImage } from "../components/art-image";
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
-import { Card, CardFooter, CardHeader } from "../components/card";
+import { Card } from "../components/card";
 import { useShake } from "../components/use-shake";
 import { Tag } from "../components/tag";
 import { DataRow } from "../components/data-row";
@@ -343,7 +342,7 @@ export function HuntScreen() {
         }
       />
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="space-y-6">
         {territories.map(
           ({ territory, creatures, prey, unlocked, hasHealth, transformed, reason }) => {
             const ready = unlocked && hasHealth;
@@ -360,7 +359,7 @@ export function HuntScreen() {
             return (
               <Card
                 key={territory.id}
-                height="fill"
+                height="content"
                 interactive={available}
                 tone={active ? "highlighted" : "default"}
                 className={cn(
@@ -368,138 +367,141 @@ export function HuntScreen() {
                   active && shaking && "card-shake",
                 )}
               >
-                {art.territories[territory.id] ? (
-                  <div className="aspect-video w-full overflow-hidden border-b border-edge">
-                    <ArtImage source={art.territories[territory.id]} />
-                  </div>
-                ) : null}
-                <CardHeader>
-                  <div className="min-w-0 flex-1">
-                    <h2 className="truncate text-sm text-ink">{territory.name}</h2>
-                    <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                      {SPECIES_LABEL[territory.species]} - {DANGER_LABEL[territory.danger]}
-                    </p>
-                  </div>
-                </CardHeader>
-
-                <div className="flex flex-1 flex-col divide-y divide-edge">
-                  <div className="space-y-2 px-4 py-3">
-                    <p className="text-xs leading-relaxed text-ink-faint">
-                      {territory.description}
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      <Tag tone="neutral">
-                        NV. {formatNumber(territory.minLevel)} a {formatNumber(territory.maxLevel)}
-                      </Tag>
+                <div className="grid md:grid-cols-2 md:divide-x md:divide-edge">
+                  {/* Left: art, name, story, level range and the hunt itself. */}
+                  <div className="flex flex-col divide-y divide-edge">
+                    {art.territories[territory.id] ? (
+                      <div className="aspect-video w-full overflow-hidden">
+                        <ArtImage source={art.territories[territory.id]} />
+                      </div>
+                    ) : null}
+                    <div className="p-4">
+                      <h2 className="text-sm text-ink">{territory.name}</h2>
+                      <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                        {DANGER_LABEL[territory.danger]}
+                      </p>
                     </div>
-                  </div>
-
-                  <div className="flex-1 space-y-2 px-4 py-3">
-                    <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                      Criaturas avistadas
-                    </p>
-                    <ul className="space-y-1">
-                      {creatures.map((creature) => (
-                        <li
-                          key={creature.id}
-                          className="flex items-center justify-between gap-2 text-xs"
-                        >
-                          <span
-                            className={cn(
-                              creature.id === fightingId || creature.id === prey?.id
-                                ? "text-ember"
-                                : character.level >= creature.level
-                                  ? "text-ink-soft"
-                                  : "text-ink-faint",
-                            )}
-                          >
-                            {creature.name}
-                          </span>
-                          <span
-                            className={cn(
-                              "font-mono text-[11px]",
-                              creature.id === fightingId || creature.id === prey?.id
-                                ? "text-ember"
-                                : "text-ink-faint",
-                            )}
-                          >
-                            NV. {formatNumber(creature.level)}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="px-4 py-3">
-                    <Bar
-                      label={active ? "Caçando..." : unlocked ? "Caçar" : "Nível insuficiente"}
-                      current={onThis ? progress.beat : 0}
-                      maximum={Math.max(1, script.length || HUNT_TICKS)}
-                      glows={active}
-                      wraps
-                    />
-                  </div>
-
-                  {active && petAlong ? (
+                    <div className="space-y-2 px-4 py-3">
+                      <p className="text-xs leading-relaxed text-ink-faint">
+                        {territory.description}
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        <Tag tone="neutral">
+                          NV. {formatNumber(territory.minLevel)} a{" "}
+                          {formatNumber(territory.maxLevel)}
+                        </Tag>
+                      </div>
+                    </div>
                     <div className="px-4 py-3">
                       <Bar
-                        label="Mascote - Energia"
-                        current={petAlong.energy}
-                        maximum={petMaxEnergy(petLevelOf(petAlong))}
-                        tone="vigor"
+                        label={active ? "Caçando..." : unlocked ? "Caçar" : "Nível insuficiente"}
+                        current={onThis ? progress.beat : 0}
+                        maximum={Math.max(1, script.length || HUNT_TICKS)}
+                        glows={active}
+                        wraps
                       />
                     </div>
-                  ) : null}
-
-                  {line ? (
-                    <p
-                      className={cn(
-                        "truncate px-4 py-3 font-mono text-[11px]",
-                        line.critical ? "text-ember" : "text-ink-faint",
+                    {active && petAlong ? (
+                      <div className="px-4 py-3">
+                        <Bar
+                          label="Mascote - Energia"
+                          current={petAlong.energy}
+                          maximum={petMaxEnergy(petLevelOf(petAlong))}
+                          tone="vigor"
+                        />
+                      </div>
+                    ) : null}
+                    {line ? (
+                      <p
+                        className={cn(
+                          "truncate px-4 py-3 font-mono text-[11px]",
+                          line.critical ? "text-ember" : "text-ink-faint",
+                        )}
+                      >
+                        {emphasizeDamage(line.text).map((part, index) =>
+                          typeof part === "string" ? (
+                            part
+                          ) : (
+                            <strong
+                              key={index}
+                              className={cn("font-bold", !line.critical && "text-ink")}
+                            >
+                              {part.damage}
+                            </strong>
+                          ),
+                        )}
+                      </p>
+                    ) : null}
+                    <div className="mt-auto flex min-h-16 flex-wrap items-center justify-between gap-3 p-4">
+                      <span className="text-[11px] text-ink-faint">
+                        {active
+                          ? petAlong
+                            ? "Caçando com o mascote..."
+                            : state.automation.hunt
+                              ? "Caçando sem parar..."
+                              : "Caçando..."
+                          : waitingId === territory.id
+                            ? "Esperando o corpo para voltar a caçar"
+                            : (reason ?? "Trilha liberada")}
+                      </span>
+                      {ready && !transformed && !active ? (
+                        <Button variant="primary" onClick={toggleForm}>
+                          Transformar
+                        </Button>
+                      ) : (
+                        <Button
+                          variant={active ? "secondary" : available ? "primary" : "outline"}
+                          onClick={() => toggleHunt(territory.id, available)}
+                          disabled={!available && !active}
+                        >
+                          {active ? "Parar" : "Caçar"}
+                        </Button>
                       )}
-                    >
-                      {emphasizeDamage(line.text).map((part, index) =>
-                        typeof part === "string" ? (
-                          part
-                        ) : (
-                          <strong
-                            key={index}
-                            className={cn("font-bold", !line.critical && "text-ink")}
+                    </div>
+                  </div>
+
+                  {/* Right: the ten creatures of the area, one per line. */}
+                  <div className="flex flex-col border-t border-edge md:border-t-0">
+                    <div className="px-4 py-3">
+                      <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                        Criaturas da área
+                      </p>
+                    </div>
+                    <ul className="divide-y divide-edge border-t border-edge">
+                      {creatures.map((creature) => {
+                        const isPrey = creature.id === fightingId || creature.id === prey?.id;
+                        const reached = character.level >= creature.level;
+                        return (
+                          <li
+                            key={creature.id}
+                            className="flex items-center justify-between gap-2 px-4 py-2.5 text-xs"
                           >
-                            {part.damage}
-                          </strong>
-                        ),
-                      )}
-                    </p>
-                  ) : null}
+                            <span
+                              className={cn(
+                                isPrey
+                                  ? "text-ember"
+                                  : reached
+                                    ? "text-ink-soft"
+                                    : "text-ink-faint",
+                              )}
+                            >
+                              {creature.name}
+                            </span>
+                            <span
+                              className={cn(
+                                "font-mono text-[11px]",
+                                isPrey ? "text-ember" : "text-ink-faint",
+                              )}
+                            >
+                              NV. {formatNumber(creature.level)} a{" "}
+                              {formatNumber(creature.level + 9)}
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
                 </div>
-
-                <CardFooter>
-                  <span className="text-[11px] text-ink-faint">
-                    {active
-                      ? petAlong
-                        ? "Caçando com o mascote..."
-                        : state.automation.hunt
-                          ? "Caçando sem parar..."
-                          : "Caçando..."
-                      : waitingId === territory.id
-                        ? "Esperando o corpo para voltar a caçar"
-                        : (reason ?? "Trilha liberada")}
-                  </span>
-                  {ready && !transformed && !active ? (
-                    <Button variant="primary" onClick={toggleForm}>
-                      Transformar
-                    </Button>
-                  ) : (
-                    <Button
-                      variant={active ? "secondary" : available ? "primary" : "outline"}
-                      onClick={() => toggleHunt(territory.id, available)}
-                      disabled={!available && !active}
-                    >
-                      {active ? "Parar" : "Caçar"}
-                    </Button>
-                  )}
-                </CardFooter>
               </Card>
             );
           },

@@ -42,7 +42,7 @@ const territoriesData = load("models/data/territories.js");
 const packsData = load("models/data/store-packs.js");
 const exercisesData = load("models/data/exercises.js");
 const entItem = load("models/entities/item.js");
-const entMining = load("models/entities/mining.js");
+const oresData = load("models/data/ores/index.js");
 const entTavern = load("models/entities/tavern.js");
 const entRanking = load("models/entities/ranking.js");
 const entBazaar = load("models/entities/bazaar.js");
@@ -344,29 +344,40 @@ sec("combate");
 }
 sec("bandas e presas");
 {
-  const bands = ["rabbit", "deer", "bear", "human", "vampire", "unicorn"].map((key) => ({
-    key,
-    ...species.bandOf(key),
-  }));
-  ok("primeira banda começa em 1", bands[0].start === 1);
-  ok("última banda termina em 1000", bands[5].end === 1000);
-  for (let index = 0; index < bands.length; index += 1) {
-    const band = bands[index];
-    ok("banda " + band.key + " cresce", band.end > band.start);
+  // Ten areas of a hundred levels each, tiling 1..1000 with no gap or overlap.
+  const areas = territoriesData.TERRITORIES;
+  ok("10 áreas", areas.length === 10);
+  ok("primeira área começa em 1", areas[0].minLevel === 1);
+  ok("última área termina em 1000", areas[areas.length - 1].maxLevel === 1000);
+  for (let index = 0; index < areas.length; index += 1) {
+    const area = areas[index];
+    ok("área " + area.id + " tem 100 níveis", area.maxLevel - area.minLevel + 1 === 100);
+    ok("área " + area.id + " tem 10 criaturas", area.creatures.length === 10);
     if (index > 0)
-      ok("banda " + band.key + " vem depois da anterior", band.start === bands[index - 1].end + 5);
-    if (index > 0) ok("borda inicial múltipla de 5 (" + band.key + ")", band.start % 5 === 0);
-    if (index < 5) ok("borda final múltipla de 5 (" + band.key + ")", band.end % 5 === 0);
+      ok(
+        "área " + area.id + " vem logo após a anterior",
+        area.minLevel === areas[index - 1].maxLevel + 1,
+      );
   }
+
   const creatures = creaturesData.CREATURES;
-  ok("30 criaturas", creatures.length === 30);
-  ok("ids únicos", new Set(creatures.map((c) => c.id)).size === 30);
+  ok("100 criaturas", creatures.length === 100);
+  ok("ids únicos", new Set(creatures.map((c) => c.id)).size === 100);
+
+  // Each creature owns its own 10-level block inside its area (1-10, 11-20 ...).
+  for (const area of areas) {
+    area.creatures.forEach((creatureId, slot) => {
+      const creature = creaturesData.findCreature(creatureId);
+      ok("criatura existe " + creatureId, Boolean(creature));
+      if (creature)
+        ok(
+          "criatura no seu bloco de 10 " + creatureId,
+          creature.level === area.minLevel + slot * 10,
+        );
+    });
+  }
+
   for (const creature of creatures) {
-    const band = species.bandOf(creature.species);
-    ok(
-      "variante dentro da banda " + creature.id,
-      creature.level >= band.start && creature.level <= band.end,
-    );
     ok(
       "números inteiros " + creature.id,
       [
@@ -379,17 +390,19 @@ sec("bandas e presas");
         creature.maxBronze,
       ].every(isInt),
     );
-    ok("bolsa mínima <= máxima " + creature.id, creature.minBronze <= creature.maxBronze);
     ok(
-      "experiência linear " + creature.id,
-      creature.experience === Math.round(12 + creature.level * 7),
+      "stats positivos " + creature.id,
+      [
+        creature.health,
+        creature.strength,
+        creature.endurance,
+        creature.agility,
+        creature.experience,
+      ].every((value) => value > 0),
     );
+    ok("bolsa mínima <= máxima " + creature.id, creature.minBronze <= creature.maxBronze);
     for (const drop of creature.drops) {
       ok("chance válida " + creature.id + "/" + drop.itemId, drop.chance > 0 && drop.chance <= 1);
-      ok(
-        "material sai aparado em um quarto " + creature.id + "/" + drop.itemId,
-        drop.chance <= 0.225,
-      );
       const male = items.itemIdFor(drop.itemId, "male");
       const female = items.itemIdFor(drop.itemId, "female");
       ok("drop resolve para macho " + drop.itemId, Boolean(items.findItem(male)));
@@ -401,6 +414,17 @@ sec("bandas e presas");
       );
     }
   }
+
+  // Experience is monotone by level: a deeper block always pays at least as much.
+  // Health is deliberately NOT monotone, since a frail high-level beast can carry
+  // less body than a tanky lower-level one.
+  const ranked = [...creatures].sort((a, b) => a.level - b.level);
+  let expMonotone = true;
+  for (let i = 1; i < ranked.length; i += 1) {
+    if (ranked[i].experience < ranked[i - 1].experience) expMonotone = false;
+  }
+  ok("experiência cresce com o nível", expMonotone);
+
   for (const definition of species.SPECIES) {
     ok("nenhuma espécie larga peça de conjunto " + definition.key, definition.gearDrops.length === 0);
   }
@@ -823,8 +847,9 @@ sec("caçada");
   const gapView = huntCtrl
     .listTerritories(inGap)
     .find((entry) => entry.territory.id === "village-field");
-  ok("no vão a presa trava no teto da banda", gapView.prey.level === 165);
-  ok("a presa é a variante mais forte destravada", gapView.prey.name === "Lebre da Lua Nova");
+  const topOfArea1 = creaturesData.findCreature("forest-lynx");
+  ok("a presa é a variante mais forte destravada", gapView.prey.name === "Lince do Mato");
+  ok("a presa fixa não escala com o nível do caçador", gapView.prey.health === topOfArea1.health);
   const withPet = baseState({ level: 10, form: "werewolf" });
   withPet.pet = {
     id: "pet",
@@ -1157,7 +1182,7 @@ sec("forja e mina");
     const on = inventoryCtrl.equipItem(enhanced.state, "bronze-claw");
     ok("equipar carrega a forja", on.ok && on.state.enhancements["bronze-claw"] === 5);
   }
-  const ores = entMining.ORES;
+  const ores = oresData.ORES;
   for (let index = 1; index < ores.length; index += 1) {
     ok(
       "escada da mina sobe " + ores[index].id,
@@ -1166,7 +1191,7 @@ sec("forja e mina");
   }
   ok(
     "teto da mineração vem da última veia",
-    entMining.MINING_MAX_LEVEL === ores[ores.length - 1].requiredLevel,
+    oresData.MINING_MAX_LEVEL === ores[ores.length - 1].requiredLevel,
   );
   for (const ore of ores) {
     ok("veia " + ore.id + " tem fragmento real", Boolean(items.findItem(ore.fragmentId)));

@@ -1,12 +1,5 @@
-import type { Creature } from "../entities/creature";
-import { buildCreatures } from "./species";
-
-export const CREATURES: readonly Creature[] = buildCreatures();
-
-const CREATURE_INDEX = new Map<string, Creature>(
-  CREATURES.map((creature) => [creature.id, creature]),
-);
-
-export function findCreature(creatureId: string): Creature | undefined {
-  return CREATURE_INDEX.get(creatureId);
-}
+// The creature catalog is fixed data now: one file per creature under creatures/,
+// ten per area, aggregated in creatures/index. This barrel keeps the legacy names
+// (CREATURES, findCreature) the rest of the app already imports.
+export { ALL_CREATURES as CREATURES, findCreature } from "./creatures/index";
+export type { Creature, CreatureDrop } from "./creatures/index";

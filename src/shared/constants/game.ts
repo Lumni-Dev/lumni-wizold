@@ -1,4 +1,8 @@
 import { numberFromEnv } from "@/shared/utils/env";
+import { VITALS } from "./tuning/vitals";
+import { RECOVERY } from "./tuning/recovery";
+import { TRANSFORM } from "./tuning/transform";
+import { PET } from "./tuning/pet";
 
 export const GAME_NAME = "Wizold";
 export const GAME_TAGLINE = "Crônica de Lumni e Luna";
@@ -13,16 +17,18 @@ export const MAX_CHARACTER_LEVEL = numberFromEnv(
 );
 export const MAX_ATTRIBUTE_VALUE = 1000;
 export const BASE_ATTRIBUTE_VALUE = 4;
-export const BASE_VITAL = 100;
-export const HEALTH_PER_ENDURANCE = 14;
-export const RAGE_PER_WILLPOWER = 2;
-export const WEREWOLF_STRENGTH_BONUS = 0.35;
+export const BASE_VITAL = VITALS.baseVital;
+export const HEALTH_PER_ENDURANCE = VITALS.healthPerResistance;
+export const HEALTH_PER_LEVEL = VITALS.healthPerLevel;
+export const RAGE_PER_WILLPOWER = VITALS.ragePerWillpower;
+export const RAGE_PER_LEVEL = VITALS.ragePerLevel;
+export const WEREWOLF_STRENGTH_BONUS = TRANSFORM.werewolfStrengthBonus;
 export const STARTING_BRONZE = 100;
-export const TRANSFORM_RAGE_COST = 40;
-export const TRANSFORM_DURATION_MS = 5 * 60_000;
-export const REST_TICK_MS = 15_000;
-export const REST_HEALTH_RATIO = 0.05;
-export const REST_RAGE_RATIO = 0.1;
+export const TRANSFORM_RAGE_COST = TRANSFORM.rageCost;
+export const TRANSFORM_DURATION_MS = TRANSFORM.durationMinutes * 60_000;
+export const REST_TICK_MS = RECOVERY.tickSeconds * 1_000;
+export const REST_HEALTH_RATIO = RECOVERY.healthPerTick;
+export const REST_RAGE_RATIO = RECOVERY.ragePerTick;
 export const RENAME_COOLDOWN_DAYS = 15;
 export const RENAME_PRICE = 50_000;
 export const MIN_HEALTH_RATIO_TO_ACT = 0.2;
@@ -39,20 +45,23 @@ export const MIN_AGE = 18;
 export const NAME_MAX_LENGTH = 25;
 export const NAME_MIN_LENGTH = 3;
 
-export const PET_MIN_LEVEL = 10;
-export const PET_PRICE = 50_000;
-export const PET_RENAME_PRICE = 10_000;
+// The wolf is a mid-run commitment: adopted at a third of the ceiling. The adoption
+// level and the pet ceiling stay here (they depend on the level cap and the env);
+// every other pet number lives in tuning/pet.ts.
+export const PET_MIN_LEVEL = Math.floor(MAX_CHARACTER_LEVEL / 3);
 export const PET_MAX_LEVEL = numberFromEnv(process.env.NEXT_PUBLIC_PET_MAX_LEVEL, 1000);
 export const PET_EXERCISE_ID = "pet-training";
-export const PET_BASE_BONUS = 5;
-export const PET_BASE_ENERGY = 100;
-export const PET_ENERGY_PER_LEVEL = 4;
-export const PET_ENERGY_PER_HUNT = 4;
-export const PET_ENERGY_PER_BLOW = 2;
-export const PET_BITE_ENERGY = 6;
-export const PET_REST_RATIO = 0.1;
-export const PET_ATTACK_RATIO = 0.25;
-export const PET_TARGET_CHANCE = 0.2;
+export const PET_PRICE = PET.price;
+export const PET_RENAME_PRICE = PET.renamePrice;
+export const PET_BASE_BONUS = PET.baseBonus;
+export const PET_BASE_ENERGY = PET.baseEnergy;
+export const PET_ENERGY_PER_LEVEL = PET.energyPerLevel;
+export const PET_ENERGY_PER_HUNT = PET.energyPerHunt;
+export const PET_ENERGY_PER_BLOW = PET.energyPerBlow;
+export const PET_BITE_ENERGY = PET.biteEnergy;
+export const PET_REST_RATIO = PET.restRatio;
+export const PET_ATTACK_RATIO = PET.attackRatio;
+export const PET_TARGET_CHANCE = PET.targetChance;
 
 export const MAX_ENHANCEMENT = numberFromEnv(process.env.NEXT_PUBLIC_MAX_ENHANCEMENT, 1000);
 export const ENHANCEMENT_STEP = 0.002;

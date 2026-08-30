@@ -408,18 +408,17 @@ function referenceGear(level: number) {
 
   const start = current.minLevel;
   const end = (next?.minLevel ?? MAX_CHARACTER_LEVEL + 1) - 1;
-  const ramp = Math.max(1, (end - start) * SET_REACHED_AT);
-  const at = Math.min(1, Math.max(0, (level - start) / ramp));
+  const at = Math.min(1, Math.max(0, (level - start) / Math.max(1, end - start)));
 
-  const now = setAttributes(current);
-  const before = previous
-    ? setAttributes(previous)
-    : { strength: 0, agility: 0, endurance: 0, instinct: 0, willpower: 0 };
+  // The reference hunter buys the whole set once, a slice (SET_REACHED_AT) into the
+  // band, not as a smooth ramp: until then they wear the previous set. This matches
+  // how the player actually gears and how the balance bench measures, so a fixed
+  // creature seeded against this hunter is a fair fight at the set boundary instead
+  // of a cliff (the old ramp tuned boundary creatures for gear the player lacked).
+  const worn = at < SET_REACHED_AT && previous ? previous : current;
+  const lent = setAttributes(worn);
 
-  return {
-    strength: before.strength + (now.strength - before.strength) * at,
-    endurance: before.endurance + (now.endurance - before.endurance) * at,
-  };
+  return { strength: lent.strength, endurance: lent.endurance };
 }
 
 function referenceHunter(level: number) {

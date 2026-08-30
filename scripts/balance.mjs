@@ -23,7 +23,6 @@ Module._resolveFilename = function (request, ...rest) {
 const require = createRequire(import.meta.url);
 const { simulateCombat } = require(join(BUILD, "models/rules/combat.js"));
 const { deriveStatsOf } = require(join(BUILD, "models/rules/stats.js"));
-const { SPECIES, bandOf, speciesNumbers } = require(join(BUILD, "models/data/species.js"));
 const { EQUIPMENT_SETS, pieceId, piecePrice, setForLevel } = require(
   join(BUILD, "models/data/equipment-sets.js"),
 );
@@ -31,7 +30,8 @@ const { findItem } = require(join(BUILD, "models/data/items.js"));
 const { trainingSessionCost, trainingSessionsPerPoint } = require(
   join(BUILD, "models/rules/training.js"),
 );
-const { buildCreatures } = require(join(BUILD, "models/data/species.js"));
+const { findCreature } = require(join(BUILD, "models/data/creatures.js"));
+const { TERRITORIES } = require(join(BUILD, "models/data/territories.js"));
 const { EQUIPMENT_SLOTS } = require(join(BUILD, "models/entities/item.js"));
 const { BASE_ATTRIBUTE_VALUE, MAX_ATTRIBUTE_VALUE, MIN_HEALTH_RATIO_TO_ACT } = require(
   join(BUILD, "shared/constants/game.js"),
@@ -80,14 +80,18 @@ function gearAt(level) {
 }
 
 function preyAt(level) {
-  const species =
-    SPECIES.find((entry) => {
-      const band = bandOf(entry.key);
-      return level >= band.start && level <= band.end;
-    }) ?? SPECIES[SPECIES.length - 1];
-
-  const numbers = speciesNumbers(species.key, level);
-  return { name: species.key, ...numbers };
+  // The territory whose band holds this level, then its strongest unlocked
+  // creature (level <= hunterLevel), exactly like the hunt's pickCreature.
+  const area =
+    TERRITORIES.find((t) => level >= t.minLevel && level <= t.maxLevel) ??
+    TERRITORIES[TERRITORIES.length - 1];
+  const creatures = area.creatures
+    .map((id) => findCreature(id))
+    .filter(Boolean)
+    .sort((a, b) => a.level - b.level);
+  const eligible = creatures.filter((c) => c.level <= level);
+  const creature = eligible[eligible.length - 1] ?? creatures[0];
+  return { ...creature, name: creature.species };
 }
 
 function measure(level, fights = 400) {
@@ -172,8 +176,7 @@ function economy(level) {
   const prey = preyAt(level);
   const bronze = (prey.minBronze + prey.maxBronze) / 2;
 
-  const creature = buildCreatures().find((entry) => entry.species === prey.name);
-  const loot = (creature?.drops ?? []).reduce((total, drop) => {
+  const loot = (prey.drops ?? []).reduce((total, drop) => {
     const item = findItem(drop.itemId);
     if (!item) return total;
     const amount = ((drop.minimum ?? 1) + (drop.maximum ?? 1)) / 2;
@@ -228,9 +231,8 @@ if (Number.isFinite(single) && single > 0) {
   );
 } else {
   const levels = [];
-  for (const species of SPECIES) {
-    const band = bandOf(species.key);
-    levels.push(band.start, Math.round((band.start + band.end) / 2), band.end);
+  for (const area of TERRITORIES) {
+    levels.push(area.minLevel, Math.round((area.minLevel + area.maxLevel) / 2), area.maxLevel);
   }
   for (const level of levels) {
     const row = measure(Math.max(1, level));
