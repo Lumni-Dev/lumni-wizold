@@ -8,7 +8,7 @@ export const talon: Item = {
     "Despojo da caça. Vale o bronze que o mercado paga por ele; não serve de arma nem de enfeite.",
   category: "material",
   rarity: "common",
-  price: 15,
+  price: 10,
   image: "/assets/inventory/materials/talon.png",
   minLevel: 1,
   stackable: true,

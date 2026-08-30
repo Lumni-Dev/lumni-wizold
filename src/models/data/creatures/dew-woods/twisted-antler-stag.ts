@@ -13,8 +13,8 @@ export const twistedAntlerStag: Creature = {
   endurance: 169,
   agility: 110,
   experience: 1244,
-  minBronze: 199,
-  maxBronze: 369,
+  minBronze: 106,
+  maxBronze: 196,
   drops: [
     { itemId: "twisted-antler", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "deer-hide", chance: 0.35, minimum: 1, maximum: 2 },

@@ -13,8 +13,8 @@ export const crawlingZombie: Creature = {
   endurance: 4584,
   agility: 218,
   experience: 4324,
-  minBronze: 661,
-  maxBronze: 1227,
+  minBronze: 352,
+  maxBronze: 654,
   drops: [
     { itemId: "rotten-flesh", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "grave-dirt", chance: 0.35, minimum: 1, maximum: 2 },

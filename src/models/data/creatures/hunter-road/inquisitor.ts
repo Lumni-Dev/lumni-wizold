@@ -13,8 +13,8 @@ export const inquisitor: Creature = {
   endurance: 1674,
   agility: 242,
   experience: 3344,
-  minBronze: 514,
-  maxBronze: 954,
+  minBronze: 274,
+  maxBronze: 508,
   drops: [
     { itemId: "holy-water", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "silver-charm", chance: 0.12, minimum: 1, maximum: 1 },

@@ -13,8 +13,8 @@ export const fullMoonUnicorn: Creature = {
   endurance: 65737,
   agility: 547,
   experience: 6914,
-  minBronze: 1049,
-  maxBronze: 1949,
+  minBronze: 559,
+  maxBronze: 1039,
   drops: [
     { itemId: "moon-mane", chance: 0.04, minimum: 1, maximum: 1 },
     { itemId: "horn-dust", chance: 0.04, minimum: 1, maximum: 1 },

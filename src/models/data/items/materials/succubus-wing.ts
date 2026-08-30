@@ -8,7 +8,7 @@ export const succubusWing: Item = {
     "Despojo da caça. Vale o bronze que o mercado paga por ele; não serve de arma nem de enfeite.",
   category: "material",
   rarity: "epic",
-  price: 1100,
+  price: 750,
   image: "/assets/inventory/materials/succubus-wing.png",
   minLevel: 1,
   stackable: true,

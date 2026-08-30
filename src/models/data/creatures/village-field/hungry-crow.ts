@@ -13,8 +13,8 @@ export const hungryCrow: Creature = {
   endurance: 60,
   agility: 32,
   experience: 334,
-  minBronze: 62,
-  maxBronze: 116,
+  minBronze: 33,
+  maxBronze: 61,
   drops: [
     { itemId: "black-feather", chance: 0.35, minimum: 1, maximum: 2 },
     { itemId: "crow-beak", chance: 0.35, minimum: 1, maximum: 2 },

@@ -13,8 +13,8 @@ export const peregrineFalcon: Creature = {
   endurance: 222,
   agility: 185,
   experience: 1804,
-  minBronze: 283,
-  maxBronze: 525,
+  minBronze: 151,
+  maxBronze: 280,
   drops: [
     { itemId: "falcon-feather", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "talon", chance: 0.35, minimum: 1, maximum: 2 },

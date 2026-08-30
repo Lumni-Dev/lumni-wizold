@@ -13,8 +13,8 @@ export const mistBear: Creature = {
   endurance: 326,
   agility: 82,
   experience: 1594,
-  minBronze: 251,
-  maxBronze: 467,
+  minBronze: 134,
+  maxBronze: 248,
   drops: [
     { itemId: "bear-pelt", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "bear-claw", chance: 0.12, minimum: 1, maximum: 1 },

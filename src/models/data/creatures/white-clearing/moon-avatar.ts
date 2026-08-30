@@ -13,8 +13,8 @@ export const moonAvatar: Creature = {
   endurance: 68322,
   agility: 552,
   experience: 6984,
-  minBronze: 1060,
-  maxBronze: 1968,
+  minBronze: 565,
+  maxBronze: 1049,
   drops: [
     { itemId: "moon-essence", chance: 0.04, minimum: 1, maximum: 1 },
     { itemId: "silver-mane", chance: 0.04, minimum: 1, maximum: 1 },

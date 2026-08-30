@@ -13,8 +13,8 @@ export const swampWitch: Creature = {
   endurance: 746,
   agility: 202,
   experience: 2784,
-  minBronze: 430,
-  maxBronze: 798,
+  minBronze: 229,
+  maxBronze: 425,
   drops: [
     { itemId: "witch-hair", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "cursed-charm", chance: 0.12, minimum: 1, maximum: 1 },

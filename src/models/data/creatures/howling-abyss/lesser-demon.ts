@@ -13,8 +13,8 @@ export const lesserDemon: Creature = {
   endurance: 9882,
   agility: 367,
   experience: 5094,
-  minBronze: 776,
-  maxBronze: 1442,
+  minBronze: 414,
+  maxBronze: 768,
   drops: [
     { itemId: "demon-horn", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "brimstone", chance: 0.12, minimum: 1, maximum: 1 },

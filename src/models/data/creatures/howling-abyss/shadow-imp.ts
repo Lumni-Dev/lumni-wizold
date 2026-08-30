@@ -13,8 +13,8 @@ export const shadowImp: Creature = {
   endurance: 5078,
   agility: 500,
   experience: 4954,
-  minBronze: 755,
-  maxBronze: 1403,
+  minBronze: 403,
+  maxBronze: 748,
   drops: [
     { itemId: "imp-horn", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "shadow-essence", chance: 0.12, minimum: 1, maximum: 1 },

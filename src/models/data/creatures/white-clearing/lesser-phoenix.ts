@@ -13,8 +13,8 @@ export const lesserPhoenix: Creature = {
   endurance: 45572,
   agility: 607,
   experience: 6494,
-  minBronze: 986,
-  maxBronze: 1832,
+  minBronze: 526,
+  maxBronze: 976,
   drops: [
     { itemId: "phoenix-ash", chance: 0.04, minimum: 1, maximum: 1 },
     { itemId: "phoenix-feather", chance: 0.04, minimum: 1, maximum: 1 },

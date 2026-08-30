@@ -13,8 +13,8 @@ export const wheatSnake: Creature = {
   endurance: 95,
   agility: 55,
   experience: 544,
-  minBronze: 94,
-  maxBronze: 174,
+  minBronze: 50,
+  maxBronze: 92,
   drops: [
     { itemId: "snake-skin", chance: 0.35, minimum: 1, maximum: 2 },
     { itemId: "venom-gland", chance: 0.2, minimum: 1, maximum: 2 },

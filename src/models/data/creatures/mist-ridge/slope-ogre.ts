@@ -13,8 +13,8 @@ export const slopeOgre: Creature = {
   endurance: 486,
   agility: 103,
   experience: 2014,
-  minBronze: 314,
-  maxBronze: 584,
+  minBronze: 167,
+  maxBronze: 311,
   drops: [
     { itemId: "ogre-tooth", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "thick-hide", chance: 0.35, minimum: 1, maximum: 2 },

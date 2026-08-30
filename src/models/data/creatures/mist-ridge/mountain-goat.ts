@@ -13,8 +13,8 @@ export const mountainGoat: Creature = {
   endurance: 223,
   agility: 128,
   experience: 1454,
-  minBronze: 230,
-  maxBronze: 428,
+  minBronze: 122,
+  maxBronze: 228,
   drops: [
     { itemId: "goat-horn", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "thick-hide", chance: 0.35, minimum: 1, maximum: 2 },

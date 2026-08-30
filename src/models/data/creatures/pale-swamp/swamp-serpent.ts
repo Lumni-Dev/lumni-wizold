@@ -13,8 +13,8 @@ export const swampSerpent: Creature = {
   endurance: 564,
   agility: 224,
   experience: 2364,
-  minBronze: 367,
-  maxBronze: 681,
+  minBronze: 195,
+  maxBronze: 363,
   drops: [
     { itemId: "serpent-scale", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "venom-gland", chance: 0.2, minimum: 1, maximum: 2 },

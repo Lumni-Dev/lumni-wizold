@@ -13,8 +13,8 @@ export const ridgePuma: Creature = {
   endurance: 321,
   agility: 159,
   experience: 1664,
-  minBronze: 262,
-  maxBronze: 486,
+  minBronze: 139,
+  maxBronze: 259,
   drops: [
     { itemId: "puma-pelt", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "puma-fang", chance: 0.12, minimum: 1, maximum: 1 },

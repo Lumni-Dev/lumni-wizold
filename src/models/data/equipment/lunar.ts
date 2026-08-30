@@ -15,5 +15,5 @@ export const lunarSet: SetDefinition = {
     "Forjado sob lua cheia, com a fera acordada segurando o martelo. Responde ao céu: " +
     "brilha fraco no escuro e respira junto com quem veste, na noite da virada.",
   power: 12500,
-  priceBase: 6300,
+  priceBase: 7900,
 };

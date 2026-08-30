@@ -13,8 +13,8 @@ export const lesserGorgon: Creature = {
   endurance: 2490,
   agility: 373,
   experience: 3974,
-  minBronze: 608,
-  maxBronze: 1130,
+  minBronze: 324,
+  maxBronze: 602,
   drops: [
     { itemId: "gorgon-scale", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "gorgon-eye", chance: 0.07, minimum: 1, maximum: 1 },

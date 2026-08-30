@@ -12,9 +12,10 @@ export const BALANCE = {
   // O bronze que uma carcaça paga, por NÍVEL, não pelo poder do equipamento (que é
   // enorme para o combate e estouraria o baú): huntPurse = bronzeBase + nível x
   // bronzePerLevel. Assim a economia inteira (venda, treino, poção, forja, drops,
-  // arena, loja) fica limitada e cabe no baú de 1M. No teto (NV 1000) rende ~1520.
-  bronzeBase: 20,
-  bronzePerLevel: 1.5,
+  // arena, loja) fica limitada e cabe no baú de 1M. No teto (NV 1000) rende ~810: renda
+  // enxuta de propósito, o monstro paga pouco e os preços sobem quase até o teto do baú.
+  bronzeBase: 10,
+  bronzePerLevel: 0.8,
 
   // Dano que uma criatura crava por golpe no caçador de 100 de vida. A Força da
   // criatura sai de sqrt(creatureHit x Resistência do caçador), então o dano por

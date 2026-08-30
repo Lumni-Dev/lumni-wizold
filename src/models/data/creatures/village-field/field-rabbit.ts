@@ -13,8 +13,8 @@ export const fieldRabbit: Creature = {
   endurance: 19,
   agility: 10,
   experience: 54,
-  minBronze: 20,
-  maxBronze: 38,
+  minBronze: 11,
+  maxBronze: 20,
   drops: [
     { itemId: "rabbit-fur", chance: 0.35, minimum: 1, maximum: 2 },
     { itemId: "lucky-foot", chance: 0.2, minimum: 1, maximum: 2 },

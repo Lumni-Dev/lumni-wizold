@@ -13,8 +13,8 @@ export const wildcat: Creature = {
   endurance: 178,
   agility: 113,
   experience: 1174,
-  minBronze: 188,
-  maxBronze: 350,
+  minBronze: 100,
+  maxBronze: 186,
   drops: [
     { itemId: "wildcat-pelt", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "sharp-fang", chance: 0.35, minimum: 1, maximum: 2 },

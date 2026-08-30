@@ -13,8 +13,8 @@ export const wildDog: Creature = {
   endurance: 69,
   agility: 38,
   experience: 404,
-  minBronze: 73,
-  maxBronze: 135,
+  minBronze: 39,
+  maxBronze: 72,
   drops: [
     { itemId: "canine-pelt", chance: 0.35, minimum: 1, maximum: 2 },
     { itemId: "sharp-fang", chance: 0.35, minimum: 1, maximum: 2 },

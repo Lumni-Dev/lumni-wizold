@@ -13,8 +13,8 @@ export const gargoyle: Creature = {
   endurance: 7735,
   agility: 239,
   experience: 4744,
-  minBronze: 724,
-  maxBronze: 1344,
+  minBronze: 386,
+  maxBronze: 716,
   drops: [
     { itemId: "gargoyle-stone", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "stone-shard", chance: 0.2, minimum: 1, maximum: 2 },

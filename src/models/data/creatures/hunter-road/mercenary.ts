@@ -13,8 +13,8 @@ export const mercenary: Creature = {
   endurance: 1150,
   agility: 217,
   experience: 2994,
-  minBronze: 461,
-  maxBronze: 857,
+  minBronze: 246,
+  maxBronze: 456,
   drops: [
     { itemId: "steel-scrap", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "silver-charm", chance: 0.12, minimum: 1, maximum: 1 },

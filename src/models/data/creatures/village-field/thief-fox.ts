@@ -13,8 +13,8 @@ export const thiefFox: Creature = {
   endurance: 52,
   agility: 26,
   experience: 264,
-  minBronze: 52,
-  maxBronze: 96,
+  minBronze: 27,
+  maxBronze: 51,
   drops: [
     { itemId: "fox-pelt", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "sharp-fang", chance: 0.35, minimum: 1, maximum: 2 },

@@ -278,7 +278,7 @@ function camel(slug) {
 // share them (wolves drop "wolf-pelt", bears "bear-claw"...). A material is
 // [name, rarity]; price and drop chance come from the rarity below, and the
 // image is derived from the id, so adding art is dropping a .png in the folder.
-const RARITY_PRICE = { common: 15, uncommon: 70, rare: 300, epic: 1100, legendary: 4000 };
+const RARITY_PRICE = { common: 10, uncommon: 50, rare: 200, epic: 750, legendary: 2800 };
 const RARITY_CHANCE = { common: 0.35, uncommon: 0.2, rare: 0.12, epic: 0.07, legendary: 0.04 };
 
 const MATERIALS = {

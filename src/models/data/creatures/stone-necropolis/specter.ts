@@ -13,8 +13,8 @@ export const specter: Creature = {
   endurance: 4650,
   agility: 412,
   experience: 4394,
-  minBronze: 671,
-  maxBronze: 1247,
+  minBronze: 358,
+  maxBronze: 664,
   drops: [
     { itemId: "ectoplasm", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "grave-dirt", chance: 0.35, minimum: 1, maximum: 2 },

@@ -13,8 +13,8 @@ export const lesserLich: Creature = {
   endurance: 8256,
   agility: 382,
   experience: 4814,
-  minBronze: 734,
-  maxBronze: 1364,
+  minBronze: 391,
+  maxBronze: 727,
   drops: [
     { itemId: "lich-phylactery", chance: 0.04, minimum: 1, maximum: 1 },
     { itemId: "necro-tome", chance: 0.07, minimum: 1, maximum: 1 },

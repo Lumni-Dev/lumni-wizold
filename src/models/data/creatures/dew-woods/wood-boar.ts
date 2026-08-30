@@ -13,8 +13,8 @@ export const woodBoar: Creature = {
   endurance: 166,
   agility: 50,
   experience: 964,
-  minBronze: 157,
-  maxBronze: 291,
+  minBronze: 83,
+  maxBronze: 155,
   drops: [
     { itemId: "boar-tusk", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "thick-hide", chance: 0.35, minimum: 1, maximum: 2 },

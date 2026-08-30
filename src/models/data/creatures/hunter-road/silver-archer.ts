@@ -13,8 +13,8 @@ export const silverArcher: Creature = {
   endurance: 1195,
   agility: 289,
   experience: 3064,
-  minBronze: 472,
-  maxBronze: 876,
+  minBronze: 251,
+  maxBronze: 467,
   drops: [
     { itemId: "silver-arrow", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "silver-charm", chance: 0.12, minimum: 1, maximum: 1 },

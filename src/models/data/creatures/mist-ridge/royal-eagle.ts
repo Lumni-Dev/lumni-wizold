@@ -13,8 +13,8 @@ export const royalEagle: Creature = {
   endurance: 272,
   agility: 146,
   experience: 1524,
-  minBronze: 241,
-  maxBronze: 447,
+  minBronze: 128,
+  maxBronze: 238,
   drops: [
     { itemId: "eagle-feather", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "eagle-talon", chance: 0.12, minimum: 1, maximum: 1 },

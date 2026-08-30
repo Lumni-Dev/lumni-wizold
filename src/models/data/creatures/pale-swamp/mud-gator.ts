@@ -13,8 +13,8 @@ export const mudGator: Creature = {
   endurance: 567,
   agility: 113,
   experience: 2224,
-  minBronze: 346,
-  maxBronze: 642,
+  minBronze: 184,
+  maxBronze: 342,
   drops: [
     { itemId: "gator-scale", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "gator-tooth", chance: 0.12, minimum: 1, maximum: 1 },

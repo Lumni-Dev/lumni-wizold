@@ -13,8 +13,8 @@ export const roadScout: Creature = {
   endurance: 895,
   agility: 254,
   experience: 2924,
-  minBronze: 451,
-  maxBronze: 837,
+  minBronze: 240,
+  maxBronze: 446,
   drops: [
     { itemId: "leather-strap", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "scout-map", chance: 0.12, minimum: 1, maximum: 1 },

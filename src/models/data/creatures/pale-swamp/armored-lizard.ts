@@ -13,8 +13,8 @@ export const armoredLizard: Creature = {
   endurance: 647,
   agility: 124,
   experience: 2434,
-  minBronze: 377,
-  maxBronze: 701,
+  minBronze: 201,
+  maxBronze: 373,
   drops: [
     { itemId: "lizard-scale", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "thick-hide", chance: 0.35, minimum: 1, maximum: 2 },

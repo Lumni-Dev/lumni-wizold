@@ -8,7 +8,7 @@ export const sphinxRiddle: Item = {
     "Despojo da caça. Vale o bronze que o mercado paga por ele; não serve de arma nem de enfeite.",
   category: "material",
   rarity: "legendary",
-  price: 4000,
+  price: 2800,
   image: "/assets/inventory/materials/sphinx-riddle.png",
   minLevel: 1,
   stackable: true,

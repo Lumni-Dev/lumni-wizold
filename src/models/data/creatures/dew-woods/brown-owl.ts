@@ -13,8 +13,8 @@ export const brownOwl: Creature = {
   endurance: 79,
   agility: 87,
   experience: 824,
-  minBronze: 136,
-  maxBronze: 252,
+  minBronze: 72,
+  maxBronze: 134,
   drops: [
     { itemId: "owl-feather", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "talon", chance: 0.35, minimum: 1, maximum: 2 },

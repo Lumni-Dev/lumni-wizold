@@ -13,8 +13,8 @@ export const barnRat: Creature = {
   endurance: 24,
   agility: 17,
   experience: 124,
-  minBronze: 31,
-  maxBronze: 57,
+  minBronze: 16,
+  maxBronze: 30,
   drops: [
     { itemId: "rat-tail", chance: 0.35, minimum: 1, maximum: 2 },
     { itemId: "gnawed-bone", chance: 0.35, minimum: 1, maximum: 2 },

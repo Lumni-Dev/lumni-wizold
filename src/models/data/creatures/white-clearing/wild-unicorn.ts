@@ -13,8 +13,8 @@ export const wildUnicorn: Creature = {
   endurance: 44960,
   agility: 503,
   experience: 6354,
-  minBronze: 965,
-  maxBronze: 1793,
+  minBronze: 515,
+  maxBronze: 956,
   drops: [
     { itemId: "silver-mane", chance: 0.04, minimum: 1, maximum: 1 },
     { itemId: "horn-dust", chance: 0.04, minimum: 1, maximum: 1 },

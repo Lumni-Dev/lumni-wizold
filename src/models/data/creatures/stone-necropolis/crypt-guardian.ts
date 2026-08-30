@@ -13,8 +13,8 @@ export const cryptGuardian: Creature = {
   endurance: 8778,
   agility: 246,
   experience: 4884,
-  minBronze: 745,
-  maxBronze: 1383,
+  minBronze: 397,
+  maxBronze: 737,
   drops: [
     { itemId: "guardian-relic", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "bone-shard", chance: 0.2, minimum: 1, maximum: 2 },

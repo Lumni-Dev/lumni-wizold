@@ -13,8 +13,8 @@ export const wastesLord: Creature = {
   endurance: 2930,
   agility: 302,
   experience: 4184,
-  minBronze: 640,
-  maxBronze: 1188,
+  minBronze: 341,
+  maxBronze: 633,
   drops: [
     { itemId: "wastes-crown", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "coin-purse", chance: 0.12, minimum: 1, maximum: 1 },

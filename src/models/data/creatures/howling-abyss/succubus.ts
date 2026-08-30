@@ -13,8 +13,8 @@ export const succubus: Creature = {
   endurance: 10844,
   agility: 497,
   experience: 5304,
-  minBronze: 808,
-  maxBronze: 1500,
+  minBronze: 431,
+  maxBronze: 800,
   drops: [
     { itemId: "succubus-wing", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "shadow-silk", chance: 0.12, minimum: 1, maximum: 1 },

@@ -13,8 +13,8 @@ export const pegasus: Creature = {
   endurance: 55349,
   agility: 525,
   experience: 6634,
-  minBronze: 1007,
-  maxBronze: 1871,
+  minBronze: 537,
+  maxBronze: 997,
   drops: [
     { itemId: "pegasus-feather", chance: 0.04, minimum: 1, maximum: 1 },
     { itemId: "silver-mane", chance: 0.04, minimum: 1, maximum: 1 },

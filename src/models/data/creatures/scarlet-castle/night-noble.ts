@@ -13,8 +13,8 @@ export const nightNoble: Creature = {
   endurance: 21985,
   agility: 542,
   experience: 5794,
-  minBronze: 881,
-  maxBronze: 1637,
+  minBronze: 470,
+  maxBronze: 872,
   drops: [
     { itemId: "noble-signet", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "empty-fang", chance: 0.12, minimum: 1, maximum: 1 },

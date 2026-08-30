@@ -8,7 +8,7 @@ export const leatherStrap: Item = {
     "Despojo da caça. Vale o bronze que o mercado paga por ele; não serve de arma nem de enfeite.",
   category: "material",
   rarity: "uncommon",
-  price: 70,
+  price: 50,
   image: "/assets/inventory/materials/leather-strap.png",
   minLevel: 1,
   stackable: true,

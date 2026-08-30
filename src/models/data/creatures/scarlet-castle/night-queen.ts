@@ -13,8 +13,8 @@ export const nightQueen: Creature = {
   endurance: 42325,
   agility: 497,
   experience: 6284,
-  minBronze: 955,
-  maxBronze: 1773,
+  minBronze: 509,
+  maxBronze: 945,
   drops: [
     { itemId: "queen-tiara", chance: 0.04, minimum: 1, maximum: 1 },
     { itemId: "black-blood", chance: 0.04, minimum: 1, maximum: 1 },

@@ -13,8 +13,8 @@ export const maskedBandit: Creature = {
   endurance: 1463,
   agility: 232,
   experience: 3204,
-  minBronze: 493,
-  maxBronze: 915,
+  minBronze: 263,
+  maxBronze: 488,
   drops: [
     { itemId: "bandit-mask", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "coin-purse", chance: 0.12, minimum: 1, maximum: 1 },

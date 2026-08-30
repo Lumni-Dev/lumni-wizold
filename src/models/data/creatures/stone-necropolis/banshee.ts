@@ -13,8 +13,8 @@ export const banshee: Creature = {
   endurance: 6074,
   agility: 432,
   experience: 4604,
-  minBronze: 703,
-  maxBronze: 1305,
+  minBronze: 375,
+  maxBronze: 696,
   drops: [
     { itemId: "banshee-wail", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "ectoplasm", chance: 0.12, minimum: 1, maximum: 1 },

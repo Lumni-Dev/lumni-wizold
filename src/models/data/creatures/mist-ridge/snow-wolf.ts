@@ -13,8 +13,8 @@ export const snowWolf: Creature = {
   endurance: 377,
   agility: 170,
   experience: 1944,
-  minBronze: 304,
-  maxBronze: 564,
+  minBronze: 162,
+  maxBronze: 300,
   drops: [
     { itemId: "snow-pelt", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "wolf-fang", chance: 0.2, minimum: 1, maximum: 2 },

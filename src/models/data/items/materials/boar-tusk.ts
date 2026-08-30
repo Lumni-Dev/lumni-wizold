@@ -8,7 +8,7 @@ export const boarTusk: Item = {
     "Despojo da caça. Vale o bronze que o mercado paga por ele; não serve de arma nem de enfeite.",
   category: "material",
   rarity: "uncommon",
-  price: 70,
+  price: 50,
   image: "/assets/inventory/materials/boar-tusk.png",
   minLevel: 1,
   stackable: true,

@@ -13,8 +13,8 @@ export const giantSpider: Creature = {
   endurance: 197,
   agility: 126,
   experience: 1314,
-  minBronze: 209,
-  maxBronze: 389,
+  minBronze: 111,
+  maxBronze: 207,
   drops: [
     { itemId: "spider-silk", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "venom-gland", chance: 0.2, minimum: 1, maximum: 2 },

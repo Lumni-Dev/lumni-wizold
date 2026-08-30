@@ -13,8 +13,8 @@ export const huntingHound: Creature = {
   endurance: 1164,
   agility: 272,
   experience: 3134,
-  minBronze: 482,
-  maxBronze: 896,
+  minBronze: 257,
+  maxBronze: 477,
   drops: [
     { itemId: "canine-pelt", chance: 0.35, minimum: 1, maximum: 2 },
     { itemId: "sharp-fang", chance: 0.35, minimum: 1, maximum: 2 },

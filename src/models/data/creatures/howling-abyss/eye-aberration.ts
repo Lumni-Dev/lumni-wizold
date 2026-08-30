@@ -13,8 +13,8 @@ export const eyeAberration: Creature = {
   endurance: 9886,
   agility: 484,
   experience: 5164,
-  minBronze: 787,
-  maxBronze: 1461,
+  minBronze: 419,
+  maxBronze: 779,
   drops: [
     { itemId: "aberrant-eye", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "shadow-essence", chance: 0.12, minimum: 1, maximum: 1 },
