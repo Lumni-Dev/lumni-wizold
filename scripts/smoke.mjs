@@ -139,7 +139,7 @@ check(
     Object.keys(state3.arenaDuels).length === 0,
 );
 const openTry = await call("POST", "/api/tavern/rooms", { name: "Praca", password: "" });
-check("sala sem senha exige o NV mínimo", openTry.payload?.ok === false, openTry.payload?.message);
+check("mesa sem senha exige o NV mínimo", openTry.payload?.ok === false, openTry.payload?.message);
 const room = await call("POST", "/api/tavern/rooms", { name: "Fogueira", password: "segredo" });
 check("mesa com senha abre em qualquer nível", room.payload?.ok === true, room.payload?.message);
 const roomId = room.payload?.data?.roomId;

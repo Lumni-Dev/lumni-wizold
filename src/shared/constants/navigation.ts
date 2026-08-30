@@ -35,7 +35,7 @@ export const NAVIGATION: readonly NavigationItem[] = [
     href: "/tavern",
     label: "Taverna",
     code: "TV",
-    description: "Salas de conversa entre jogadores",
+    description: "Mesas de conversa entre jogadores",
   },
   { href: "/ranking", label: "Ranking", code: "RK", description: "Os melhores de cada número" },
   { href: "/wiki", label: "Wiki", code: "WK", description: "Regras, bestiário e catálogo" },

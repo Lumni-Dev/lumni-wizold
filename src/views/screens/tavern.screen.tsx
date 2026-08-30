@@ -317,13 +317,13 @@ export function TavernScreen() {
       <PageHeader
         title="Taverna"
         description={
-          "Salas de conversa para até " +
+          "Mesas de conversa para até " +
           MAX_ROOM_MEMBERS +
-          " pessoas, com ou sem senha. A sala fecha sozinha quando a última pessoa sai."
+          " pessoas, com ou sem senha. A mesa fecha sozinha quando a última pessoa sai."
         }
         action={
           <Tag tone="neutral">
-            {openTables === 1 ? "1 sala aberta" : openTables + " salas abertas"}
+            {openTables === 1 ? "1 mesa aberta" : openTables + " mesas abertas"}
           </Tag>
         }
       />
@@ -333,8 +333,8 @@ export function TavernScreen() {
         description="Leia antes de combinar encontro com alguém."
       >
         <p className="text-xs leading-relaxed text-ink-soft">
-          As salas vivem no servidor: quem estiver jogando, de qualquer máquina, senta nas mesmas
-          mesas e lê as mesmas falas. A senha de sala é uma combinação entre jogadores, guardada
+          As mesas vivem no servidor: quem estiver jogando, de qualquer máquina, senta nas mesmas
+          mesas e lê as mesmas falas. A senha de mesa é uma combinação entre jogadores, guardada
           cifrada; ainda assim, invente uma só para a mesa, nunca uma senha que você usa em outro
           lugar.
         </p>
@@ -343,7 +343,7 @@ export function TavernScreen() {
       <div className="grid items-start gap-6 lg:grid-cols-3">
         <div className="space-y-6">
           <Panel
-            title="Abrir sala"
+            title="Abrir mesa"
             description={
               ownRoom
                 ? "Você já tem uma mesa aberta: feche a sua para abrir outra."
@@ -354,7 +354,7 @@ export function TavernScreen() {
           >
             <form onSubmit={submitRoom} className="space-y-3">
               <Field
-                label="Nome da sala"
+                label="Nome da mesa"
                 value={roomName}
                 maxLength={ROOM_NAME_MAX_LENGTH}
                 placeholder="Mesa do canto"
@@ -369,7 +369,7 @@ export function TavernScreen() {
                 type="password"
                 maxLength={60}
                 value={roomPassword}
-                placeholder="deixe vazio para sala aberta"
+                placeholder="deixe vazio para mesa aberta"
                 autoComplete="new-password"
                 disabled={Boolean(ownRoom)}
                 onChange={(event) => setRoomPassword(event.target.value)}
@@ -381,7 +381,7 @@ export function TavernScreen() {
                     ? "Feche a sua mesa antes de abrir outra"
                     : roomPassword.trim().length === 0 &&
                         (character?.level ?? 1) < OPEN_ROOM_MIN_LEVEL
-                      ? "Sala sem senha é só a partir do NV " +
+                      ? "Mesa sem senha é só a partir do NV " +
                         OPEN_ROOM_MIN_LEVEL +
                         ". Ponha uma senha para abrir em qualquer nível."
                       : ""
@@ -399,7 +399,7 @@ export function TavernScreen() {
                       (character?.level ?? 1) < OPEN_ROOM_MIN_LEVEL)
                   }
                 >
-                  {ownRoom ? "Sua mesa: " + ownRoom.room.name : "Abrir sala"}
+                  {ownRoom ? "Sua mesa: " + ownRoom.room.name : "Abrir mesa"}
                 </Button>
               </Tooltip>
             </form>
@@ -481,7 +481,7 @@ export function TavernScreen() {
               <div className="p-4">
                 <EmptyState
                   title="Matilha vazia"
-                  description="Convide alguém de dentro de uma sala ou pelo nick: a matilha começa quando aceitarem."
+                  description="Convide alguém de dentro de uma mesa ou pelo nick: a matilha começa quando aceitarem."
                 />
               </div>
             ) : (
@@ -522,7 +522,7 @@ export function TavernScreen() {
         <div className="space-y-6 lg:col-span-2">
           {rooms.length === 0 ? (
             <EmptyState
-              title="Nenhuma sala aberta"
+              title="Nenhuma mesa aberta"
               description="Abra a primeira e espere alguém puxar a cadeira."
             />
           ) : (
@@ -590,8 +590,8 @@ export function TavernScreen() {
                         compact
                         type="password"
                         maxLength={60}
-                        aria-label={"Senha da sala " + room.name}
-                        placeholder="senha da sala"
+                        aria-label={"Senha da mesa " + room.name}
+                        placeholder="senha da mesa"
                         value={joinPasswords[room.id] ?? ""}
                         onChange={(event) =>
                           setJoinPasswords((current) => ({
@@ -613,7 +613,7 @@ export function TavernScreen() {
                       {isPrivate
                         ? "Só vocês dois"
                         : full && !isMember
-                          ? "Sala cheia"
+                          ? "Mesa cheia"
                           : isMember
                             ? "Seu lugar está guardado"
                             : "Livre"}
@@ -621,7 +621,7 @@ export function TavernScreen() {
                     <div className="flex items-center gap-2">
                       {isPrivate || room.ownerId === identity.id ? (
                         <Button variant="ghost" onClick={() => setClosingRoomId(room.id)}>
-                          Fechar sala
+                          Fechar mesa
                         </Button>
                       ) : isMember ? (
                         <Button variant="ghost" onClick={() => leave(room.id)}>
@@ -631,7 +631,7 @@ export function TavernScreen() {
                       <Tooltip
                         label={
                           full && !isMember
-                            ? "A sala está cheia: " + MAX_ROOM_MEMBERS + " pessoas"
+                            ? "A mesa está cheia: " + MAX_ROOM_MEMBERS + " pessoas"
                             : ""
                         }
                       >
@@ -771,7 +771,7 @@ export function TavernScreen() {
 
       <ConfirmDialog
         open={closingRoomId !== null}
-        title={closingRoom?.isPrivate ? "Fechar mesa reservada" : "Fechar sala"}
+        title={closingRoom?.isPrivate ? "Fechar mesa reservada" : "Fechar mesa"}
         description={
           closingRoom?.isPrivate
             ? "A mesa some para vocês dois e as mensagens se perdem. Chamar de novo abre outra, vazia."

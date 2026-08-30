@@ -1757,7 +1757,7 @@ sec("taverna");
   ok("nome com espaço recusa", bad.ok === false);
   const lowbie = { id: "novato", name: "Novato", level: 10 };
   ok(
-    "sala sem senha exige o NV mínimo para abrir",
+    "mesa sem senha exige o NV mínimo para abrir",
     tavernCtrl.createRoom(entTavern.emptyTavern(), lowbie, "Ninho", "").ok === false,
   );
   ok(
@@ -1769,7 +1769,7 @@ sec("taverna");
   tavern = opened.state;
   ok("dona já está sentada", tavernCtrl.findRoom(tavern, opened.roomId).members.length === 1);
   ok(
-    "sala sem senha exige o NV mínimo para entrar",
+    "mesa sem senha exige o NV mínimo para entrar",
     tavernCtrl.joinRoom(tavern, opened.roomId, lowbie, "").ok === false,
   );
   ok(

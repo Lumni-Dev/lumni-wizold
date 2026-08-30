@@ -111,7 +111,7 @@ export function createRoom(
   if (open && (identity.level ?? 1) < OPEN_ROOM_MIN_LEVEL) {
     return fail(
       state,
-      "Abrir sala sem senha é só a partir do NV " +
+      "Abrir mesa sem senha é só a partir do NV " +
         OPEN_ROOM_MIN_LEVEL +
         ". Ponha uma senha para abrir em qualquer nível.",
     );
@@ -125,7 +125,7 @@ export function createRoom(
   const taken = state.rooms.some(
     (room) => !isPrivateTable(room) && room.name.toLowerCase() === cleanName.toLowerCase(),
   );
-  if (taken) return fail(state, "Já existe uma sala com esse nome.");
+  if (taken) return fail(state, "Já existe uma mesa com esse nome.");
 
   const now = new Date().toISOString();
   const room: TavernRoom = {
@@ -140,13 +140,13 @@ export function createRoom(
         id: generateId("msg"),
         authorId: "system",
         authorName: "Taverna",
-        text: identity.name + " abriu a sala.",
+        text: identity.name + " abriu a mesa.",
         at: now,
       },
     ],
   };
 
-  return done({ ...state, rooms: [...state.rooms, room] }, "Sala aberta.", room.id);
+  return done({ ...state, rooms: [...state.rooms, room] }, "Mesa aberta.", room.id);
 }
 
 export function joinRoom(
@@ -156,7 +156,7 @@ export function joinRoom(
   password: string,
 ): TavernResult {
   const room = findRoom(state, roomId);
-  if (!room) return fail(state, "Essa sala não existe mais.");
+  if (!room) return fail(state, "Essa mesa não existe mais.");
 
   if (isPrivateTable(room) && !(room.privateFor ?? []).includes(identity.id)) {
     return fail(state, "Essa mesa está reservada.");
@@ -169,10 +169,10 @@ export function joinRoom(
       room.password === null &&
       (identity.level ?? 1) < OPEN_ROOM_MIN_LEVEL
     ) {
-      return fail(state, "Entrar em sala aberta é só a partir do NV " + OPEN_ROOM_MIN_LEVEL + ".");
+      return fail(state, "Entrar em mesa aberta é só a partir do NV " + OPEN_ROOM_MIN_LEVEL + ".");
     }
     if (isRoomFull(room))
-      return fail(state, "A sala está cheia (" + MAX_ROOM_MEMBERS + " pessoas).");
+      return fail(state, "A mesa está cheia (" + MAX_ROOM_MEMBERS + " pessoas).");
     if (room.password !== null && room.password !== password.trim()) {
       return fail(state, "Senha incorreta.");
     }
@@ -209,7 +209,7 @@ export function leaveRoom(
   identity: TavernIdentity,
 ): TavernResult {
   const room = findRoom(state, roomId);
-  if (!room) return fail(state, "Essa sala não existe mais.");
+  if (!room) return fail(state, "Essa mesa não existe mais.");
   if (!room.members.some((member) => member.id === identity.id)) {
     return fail(state, "Você não está nessa mesa.");
   }
@@ -218,7 +218,7 @@ export function leaveRoom(
   if (members.length === 0) {
     return done(
       { ...state, rooms: state.rooms.filter((current) => current.id !== roomId) },
-      "Você saiu e a sala fechou.",
+      "Você saiu e a mesa fechou.",
     );
   }
 
@@ -246,7 +246,7 @@ export function closeRoom(
   identity: TavernIdentity,
 ): TavernResult {
   const room = findRoom(state, roomId);
-  if (!room) return fail(state, "Essa sala não existe mais.");
+  if (!room) return fail(state, "Essa mesa não existe mais.");
 
   const owns = isPrivateTable(room)
     ? (room.privateFor ?? []).includes(identity.id)
@@ -329,7 +329,7 @@ export function announceAway(
   identity: TavernIdentity,
 ): TavernResult {
   const room = findRoom(state, roomId);
-  if (!room) return fail(state, "Essa sala não existe mais.");
+  if (!room) return fail(state, "Essa mesa não existe mais.");
   if (!room.members.some((member) => member.id === identity.id)) {
     return fail(state, "Você não está nessa mesa.");
   }
@@ -356,9 +356,9 @@ export function sendMessage(
   text: string,
 ): TavernResult {
   const room = findRoom(state, roomId);
-  if (!room) return fail(state, "Essa sala não existe mais.");
+  if (!room) return fail(state, "Essa mesa não existe mais.");
   if (!room.members.some((member) => member.id === identity.id)) {
-    return fail(state, "Entre na sala antes de falar.");
+    return fail(state, "Entre na mesa antes de falar.");
   }
 
   const clean = text.trim().slice(0, MESSAGE_MAX_LENGTH);

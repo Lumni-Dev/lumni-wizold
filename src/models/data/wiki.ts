@@ -404,7 +404,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "Chamar alguém da matilha abre uma mesa reservada para vocês dois, que só vocês veem.",
       "A mesa reservada nunca é varrida: a mensagem espera até que o outro nome apareça.",
       "Excluir um nome não custa nada e guardar de novo também não; a mesa reservada continua até alguém fechá-la.",
-      "As salas vivem no servidor: quem estiver jogando, de qualquer máquina, senta nas mesmas mesas e lê as mesmas falas.",
+      "As mesas vivem no servidor: quem estiver jogando, de qualquer máquina, senta nas mesmas mesas e lê as mesmas falas.",
       "A senha da mesa fica guardada cifrada; ainda assim, invente uma só para a mesa, nunca uma senha que você usa em outro lugar.",
     ],
   },
