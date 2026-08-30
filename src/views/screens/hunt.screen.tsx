@@ -193,7 +193,9 @@ export function HuntScreen() {
     if (!activeId) return;
     const timer = window.setInterval(() => {
       const told = scriptRef.current.length;
-      const lap = told > 0 ? told + 1 : HUNT_TICKS;
+      // The loot lands on the last told beat, the one the bar fills on, instead
+      // of holding an extra empty beat afterwards.
+      const lap = told > 0 ? told : HUNT_TICKS;
       beatRef.current = beatRef.current >= lap ? 0 : beatRef.current + 1;
       setProgress({ id: activeId, beat: beatRef.current });
       if (beatRef.current === 1 && !pendingRef.current && !requestingRef.current) {
@@ -240,7 +242,7 @@ export function HuntScreen() {
           };
         }
       }
-      if (beatRef.current === scriptRef.current.length + 1 && pendingRef.current) {
+      if (beatRef.current === scriptRef.current.length && pendingRef.current) {
         const held = pendingRef.current;
         pendingRef.current = null;
         setPending(null);

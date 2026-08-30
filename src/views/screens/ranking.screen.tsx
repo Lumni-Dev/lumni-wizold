@@ -151,6 +151,7 @@ export function RankingScreen() {
                 <span className="w-10 shrink-0 font-mono text-[11px] text-ink-faint">
                   {formatNumber(entry.position)}º
                 </span>
+                <CopyNick name={entry.hunter.name} />
                 <Link
                   href={entry.isPlayer ? "/character" : "/ranking/" + entry.hunter.id}
                   className={cn(
@@ -160,7 +161,6 @@ export function RankingScreen() {
                 >
                   {entry.hunter.name}
                 </Link>
-                <CopyNick name={entry.hunter.name} />
                 <span className="hidden shrink-0 text-[10px] uppercase tracking-[0.16em] text-ink-faint sm:block">
                   {entry.hunter.gender === "male" ? "Lumni" : "Luna"}
                 </span>
