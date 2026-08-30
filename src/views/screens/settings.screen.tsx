@@ -8,7 +8,7 @@ import { renameCost, renameDaysLeft } from "@/controllers/character.controller";
 import { AUTOMATIONS } from "@/models/entities/automation";
 import { useGame } from "@/controllers/game.context";
 import { playSound } from "@/controllers/sound";
-import { disableTavernPush, enableTavernPush } from "@/controllers/tavern-notify";
+import { disableTavernPush, enableTavernPush, testTavernPush } from "@/controllers/tavern-notify";
 import { soundRepository } from "@/models/repositories/sound.repository";
 import { tavernPushRepository } from "@/models/repositories/tavern-push.repository";
 import { NAME_MAX_LENGTH, RENAME_COOLDOWN_DAYS } from "@/shared/constants/game";
@@ -271,15 +271,28 @@ export function SettingsScreen() {
       <div className="grid items-start gap-6 lg:grid-cols-2">
         <Panel
           title="Taverna"
-          description="Avisos no desktop das mensagens das suas mesas: nome da mesa, quem falou, quando e o quê, com um botão para responder direto na taverna."
+          description="Avisos no desktop das mensagens das suas mesas: nome da mesa, quem falou, quando e o quê, com um botão para responder direto na taverna. Chegam enquanto o jogo está aberto numa página fora da taverna."
         >
-          <div className="flex gap-2">
-            <Chip active={pushOn} onClick={() => choosePush(true)}>
-              Ativado
-            </Chip>
-            <Chip active={!pushOn} onClick={() => choosePush(false)}>
-              Desativado
-            </Chip>
+          <div className="space-y-3">
+            <div className="flex gap-2">
+              <Chip active={pushOn} onClick={() => choosePush(true)}>
+                Ativado
+              </Chip>
+              <Chip active={!pushOn} onClick={() => choosePush(false)}>
+                Desativado
+              </Chip>
+            </div>
+            {pushOn ? (
+              <div className="space-y-2">
+                <Button variant="secondary" onClick={testTavernPush}>
+                  Testar notificação
+                </Button>
+                <p className="text-[11px] leading-relaxed text-ink-faint">
+                  Não apareceu? O navegador ou o Windows pode estar silenciando: confira o Foco
+                  assistido e as notificações do Chrome nas configurações do sistema.
+                </p>
+              </div>
+            ) : null}
           </div>
         </Panel>
 

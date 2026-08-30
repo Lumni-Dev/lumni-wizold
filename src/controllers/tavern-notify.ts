@@ -23,6 +23,18 @@ export function tavernPushActive(): boolean {
   );
 }
 
+function registerWorker(): void {
+  if ("serviceWorker" in navigator) {
+    void navigator.serviceWorker.register(SW_URL).catch(() => {});
+  }
+}
+
+// Register the worker on load when the switch is on, so the Responder action is
+// ready without waiting for the player to toggle again.
+export function ensureTavernWorker(): void {
+  if (tavernPushActive()) registerWorker();
+}
+
 // Turn it on: ask the browser, keep the setting only if the user accepts, and
 // register the worker that owns the Responder action. Returns the permission so
 // the screen can flip to Desativado on a deny.
@@ -35,11 +47,7 @@ export async function enableTavernPush(): Promise<NotificationPermission> {
   if (permission === "default") permission = await Notification.requestPermission();
   const granted = permission === "granted";
   tavernPushRepository.setEnabled(granted);
-  if (granted && "serviceWorker" in navigator) {
-    try {
-      await navigator.serviceWorker.register(SW_URL);
-    } catch {}
-  }
+  if (granted) registerWorker();
   return permission;
 }
 
@@ -47,10 +55,12 @@ export function disableTavernPush(): void {
   tavernPushRepository.setEnabled(false);
 }
 
-// One desktop notice for a tavern message: the sender and table on the title,
-// the message and its date on the body, plus a Responder action that opens the
-// tavern (the service worker handles the click). Falls back to a plain, still
-// clickable notice where a worker is not available.
+// One desktop notice for a tavern message: the sender and table on the title, the
+// message and its date on the body, and it stays up until dismissed so a fleeting
+// toast is never missed. The service worker adds a Responder action when one is
+// active, but a plain notice is the reliable path: never wait on
+// `navigator.serviceWorker.ready`, which hangs forever when no worker is
+// registered instead of rejecting.
 export function notifyTavernMessage(
   roomName: string,
   authorName: string,
@@ -64,20 +74,40 @@ export function notifyTavernMessage(
     body: text + "\n" + formatDay(at),
     icon: ICON,
     tag: "tavern:" + roomName,
+    requireInteraction: true,
   };
 
   if ("serviceWorker" in navigator) {
-    const rich: NotificationOptionsWithActions = {
-      ...base,
-      data: { url: "/tavern" },
-      actions: [{ action: "reply", title: "Responder" }],
-    };
-    void navigator.serviceWorker.ready
-      .then((registration) => registration.showNotification(title, rich))
+    void navigator.serviceWorker
+      .getRegistration()
+      .then((registration) => {
+        if (registration && registration.active) {
+          const rich: NotificationOptionsWithActions = {
+            ...base,
+            data: { url: "/tavern" },
+            actions: [{ action: "reply", title: "Responder" }],
+          };
+          return registration.showNotification(title, rich);
+        }
+        // No active worker yet: show a plain notice now and register for next time.
+        plainNotice(title, base);
+        registerWorker();
+      })
       .catch(() => plainNotice(title, base));
     return;
   }
   plainNotice(title, base);
+}
+
+// Fired by the settings "Testar" button so the player can prove the notification
+// shows on their own machine (and unmask an OS switch that is silencing it).
+export function testTavernPush(): void {
+  notifyTavernMessage(
+    "Taverna",
+    "Wizold",
+    "Notificação de teste: se você está vendo isto, está funcionando.",
+    new Date().toISOString(),
+  );
 }
 
 function plainNotice(title: string, options: NotificationOptions): void {

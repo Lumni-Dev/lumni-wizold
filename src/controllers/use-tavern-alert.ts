@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { tavernReadRepository } from "@/models/repositories/tavern-read.repository";
 import { api } from "./api.client";
 import { useGame } from "./game.context";
-import { notifyTavernMessage, tavernPushActive } from "./tavern-notify";
+import { ensureTavernWorker, notifyTavernMessage, tavernPushActive } from "./tavern-notify";
 import type { RoomSummary } from "./tavern.controller";
 
 const ALERT_POLL_MS = 15000;
@@ -21,6 +21,7 @@ export function useTavernAlert(watching: boolean) {
 
   useEffect(() => {
     if (!enabled) return;
+    ensureTavernWorker();
     let alive = true;
     const look = async () => {
       const answer = await api<{ rooms: RoomSummary[] }>("POST", "/api/tavern");
