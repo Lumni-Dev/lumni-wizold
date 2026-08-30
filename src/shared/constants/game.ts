@@ -59,11 +59,11 @@ export const TRAINING_TICKS = 5;
 export const MINING_TICK_MS = 1000;
 export const MINING_TICKS = 5;
 export const MINING_CYCLE_MS = MINING_TICK_MS * (MINING_TICKS + 1);
-// The pick swings only so long each day: two hours of active mining per window,
-// and the window refills a full day after it opened. The clock counts a cycle at
-// a time, so idle time never eats the budget, and anchoring the window at the
-// first swing keeps a miner from doubling it across midnight.
-export const MINING_DAILY_BUDGET_MS = 2 * 60 * 60 * 1000;
+// The mine gives out only so many pulls each day: a fixed count of completed
+// minings (a landed fragment yield, not each swing of the pick), and the count
+// refills a full day after the first one. Anchoring the window at the first
+// mining keeps a miner from doubling it across midnight.
+export const MINING_DAILY_MININGS = 500;
 export const MINING_DAILY_WINDOW_MS = 24 * 60 * 60 * 1000;
 export const FORGE_TICKS = 5;
 export const FORGE_BASE_MS = 5000;

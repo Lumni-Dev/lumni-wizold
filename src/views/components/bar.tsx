@@ -9,7 +9,7 @@ const LAP_MS = 250;
 const REST_MS = 150;
 const RESUME_MS = 350;
 
-type BarTone = "light" | "blood" | "ember" | "fury" | "vigor";
+type BarTone = "light" | "blood" | "ember" | "fury" | "vigor" | "tide";
 
 const FILLS: Record<BarTone, string> = {
   light: "bg-ember",
@@ -17,6 +17,7 @@ const FILLS: Record<BarTone, string> = {
   ember: "bg-ember",
   fury: "bg-fury",
   vigor: "bg-vigor",
+  tide: "bg-tide",
 };
 
 interface BarProps {

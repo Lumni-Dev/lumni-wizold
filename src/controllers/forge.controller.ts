@@ -1,8 +1,7 @@
 import {
   FORGE_SUCCESS_RATIO,
   MAX_ENHANCEMENT,
-  MINING_CYCLE_MS,
-  MINING_DAILY_BUDGET_MS,
+  MINING_DAILY_MININGS,
 } from "@/shared/constants/game";
 import { chance, defaultRandom, intBetween, type Random } from "@/shared/utils/random";
 import { ATTRIBUTES, type AttributeKey } from "@/models/entities/attribute";
@@ -22,7 +21,7 @@ import {
   applyMiningProgress,
   miningExhausted,
   miningNeeded,
-  miningRemainingMs,
+  miningRemaining,
   miningResetsAtMs,
   miningYieldBonus,
   rolloverMining,
@@ -44,14 +43,15 @@ export interface MiningView {
   needed: number;
   maxed: boolean;
   ores: AvailableOre[];
-  dailyRemainingMs: number;
+  dailyRemaining: number;
+  dailyLimit: number;
   dailyExhausted: boolean;
   dailyResetsInMs: number;
 }
 
 export function listMining(state: GameState, now: number = Date.now()): MiningView {
   const mining = state.mining;
-  const dailyRemainingMs = miningRemainingMs(mining, now);
+  const dailyRemaining = miningRemaining(mining, now);
   const dailyExhausted = miningExhausted(mining, now);
 
   const ores = ORES.map((ore) => {
@@ -75,7 +75,8 @@ export function listMining(state: GameState, now: number = Date.now()): MiningVi
     needed,
     maxed,
     ores,
-    dailyRemainingMs,
+    dailyRemaining,
+    dailyLimit: MINING_DAILY_MININGS,
     dailyExhausted,
     dailyResetsInMs: Math.max(0, miningResetsAtMs(mining, now) - now),
   };
@@ -97,7 +98,7 @@ export function mine(
   }
 
   const rolled = rolloverMining(state.mining, now);
-  if (rolled.spentMs >= MINING_DAILY_BUDGET_MS) {
+  if (rolled.count >= MINING_DAILY_MININGS) {
     const wait = miningResetsAtMs(rolled, now) - now;
     return failure(state, "Você já minerou o limite de hoje. A veia reabre em " + formatCooldown(wait) + ".");
   }
@@ -107,7 +108,7 @@ export function mine(
   const mining: MiningState = {
     ...advanced,
     windowStart: rolled.windowStart ?? new Date(now).toISOString(),
-    spentMs: rolled.spentMs + MINING_CYCLE_MS,
+    count: rolled.count + 1,
   };
 
   const next: GameState = {

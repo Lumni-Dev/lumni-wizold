@@ -1155,16 +1155,16 @@ sec("forja e mina");
     bonusSwing.ok &&
       inventoryCtrl.countInInventory(bonusSwing.state.inventory, "bronze-fragment") % bonus === 0,
   );
-  // Limite diário: a picareta tem horas e o relógio só conta minerando.
+  // Cota diária: um número de minerações por dia, contando a colheita.
   const noon = 1_700_000_000_000; // instante fixo, para a matemática da janela ser determinística
-  const fresh = { ...baseState({ level: 1 }), mining: { level: 1, progress: 0, spentMs: 0 } };
+  const fresh = { ...baseState({ level: 1 }), mining: { level: 1, progress: 0, count: 0 } };
   const firstSwing = forgeCtrl.mine(fresh, "bronze-vein", seededRandom(1), noon);
   ok(
-    "o relógio só conta minerando: um golpe gasta um ciclo",
-    firstSwing.ok && firstSwing.state.mining.spentMs === CONST.MINING_CYCLE_MS,
+    "uma mineração conta uma da cota",
+    firstSwing.ok && firstSwing.state.mining.count === 1,
   );
   ok(
-    "o primeiro golpe abre a janela do dia",
+    "a primeira mineração abre a janela do dia",
     firstSwing.ok && typeof firstSwing.state.mining.windowStart === "string",
   );
   const spent = {
@@ -1173,11 +1173,11 @@ sec("forja e mina");
       level: 1,
       progress: 0,
       windowStart: new Date(noon - 60_000).toISOString(),
-      spentMs: CONST.MINING_DAILY_BUDGET_MS,
+      count: CONST.MINING_DAILY_MININGS,
     },
   };
   ok(
-    "gasto o limite do dia, a veia recusa",
+    "gasta a cota do dia, a veia recusa",
     forgeCtrl.mine(spent, "bronze-vein", seededRandom(2), noon).ok === false,
   );
   const nextDay = {
@@ -1189,21 +1189,21 @@ sec("forja e mina");
   };
   const reopened = forgeCtrl.mine(nextDay, "bronze-vein", seededRandom(3), noon);
   ok(
-    "passado um dia, a janela reabre com o gasto zerado",
-    reopened.ok && reopened.state.mining.spentMs === CONST.MINING_CYCLE_MS,
+    "passado um dia, a janela reabre com a cota zerada",
+    reopened.ok && reopened.state.mining.count === 1,
   );
   const preserved = miningRules.applyMiningProgress(
-    { level: 1, progress: 0, windowStart: "2020-01-01T00:00:00.000Z", spentMs: 42 },
+    { level: 1, progress: 0, windowStart: "2020-01-01T00:00:00.000Z", count: 42 },
     10,
   );
   ok(
-    "o progresso preserva a janela e o gasto do dia",
-    preserved.mining.spentMs === 42 &&
+    "o progresso preserva a janela e a cota do dia",
+    preserved.mining.count === 42 &&
       preserved.mining.windowStart === "2020-01-01T00:00:00.000Z",
   );
   ok(
-    "a listagem expõe o tempo restante do dia",
-    forgeCtrl.listMining(fresh, noon).dailyRemainingMs === CONST.MINING_DAILY_BUDGET_MS &&
+    "a listagem expõe a cota restante do dia",
+    forgeCtrl.listMining(fresh, noon).dailyRemaining === CONST.MINING_DAILY_MININGS &&
       forgeCtrl.listMining(spent, noon).dailyExhausted === true,
   );
 }
@@ -2234,7 +2234,7 @@ sec("persistência");
   ok("experiência podre vira 0", loaded.character.experience === 0);
   ok("vida podre vira o vital base", loaded.character.health === CONST.BASE_VITAL);
   ok("mineração sem progresso ganha 0", loaded.mining.progress === 0);
-  ok("mineração antiga chega com o dia cheio", loaded.mining.spentMs === 0);
+  ok("mineração antiga chega com a cota cheia", loaded.mining.count === 0);
   ok("carteira NaN volta aos R$ 10", loaded.wallet.cents === 1000);
   ok("fôlego negativo vira 0", loaded.pet.energy === 0);
   put(shell({ character: oldCharacter({}), wallet: undefined }));

@@ -24,15 +24,6 @@ import { Panel } from "../components/panel";
 import { Tag } from "../components/tag";
 import { PageHeader } from "../layout/page-header";
 
-// The daily mining budget, read in hours and minutes: "1h 47min", "45min".
-function formatMiningLeft(ms: number): string {
-  const totalMinutes = Math.max(0, Math.ceil(ms / 60000));
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-  if (hours > 0) return minutes > 0 ? hours + "h " + minutes + "min" : hours + "h";
-  return minutes + "min";
-}
-
 export function ForgeScreen() {
   const { state, character, mine, enhance, activity, setActivity, notify } = useGame();
   usePageActivity(["mine", "forge"]);
@@ -174,11 +165,6 @@ export function ForgeScreen() {
         action={
           <div className="flex items-center gap-2">
             <Tag tone="neutral">Mineração NV. {formatNumber(mining.level)}</Tag>
-            <Tag tone="neutral">
-              {mining.dailyExhausted
-                ? "Mina reabre em " + formatCooldown(miningResetLeft)
-                : "Mina " + formatMiningLeft(mining.dailyRemainingMs)}
-            </Tag>
             <Tag tone="neutral">{formatBronze(character.bronze)}</Tag>
           </div>
         }
@@ -199,6 +185,14 @@ export function ForgeScreen() {
                 current={mining.progress}
                 maximum={mining.needed}
                 wraps
+              />
+            </ListRow>
+            <ListRow layout="column">
+              <Bar
+                label={mining.dailyExhausted ? "Fôlego da mina esgotado" : "Fôlego da mina"}
+                tone="tide"
+                current={mining.dailyRemaining}
+                maximum={mining.dailyLimit}
               />
             </ListRow>
             {mining.ores.map(({ ore, fragment, owned, unlocked, reason }) => {
