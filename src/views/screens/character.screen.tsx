@@ -191,7 +191,7 @@ export function CharacterScreen() {
 
           {profile ? (
             <Panel
-              title="Posições"
+              title="Ranking"
               description={
                 "Onde você aparece em cada quadro, entre " + formatNumber(profile.boardSize) + "."
               }

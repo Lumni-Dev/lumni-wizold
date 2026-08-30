@@ -161,7 +161,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
           <EquipmentPanel gear={gear} forge={hunter.forge} />
 
           <Panel
-            title="Posições"
+            title="Ranking"
             description={"Onde ele aparece em cada quadro, entre " + formatNumber(boardSize) + "."}
             padding="none"
             footer={
