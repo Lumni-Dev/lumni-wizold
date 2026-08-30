@@ -506,7 +506,7 @@ export function HuntScreen() {
                               >
                                 <span className="slot-well relative flex h-full w-full items-center justify-center overflow-hidden rounded-md border border-edge bg-base font-mono text-lg text-ink-faint">
                                   {creature.image ? (
-                                    <IconArt source={creature.image + CREATURE_ART_VERSION} />
+                                    <IconArt source={creature.image + CREATURE_ART_VERSION} fit="contain" />
                                   ) : (
                                     "?"
                                   )}

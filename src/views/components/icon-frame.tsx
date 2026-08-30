@@ -71,12 +71,16 @@ export function IconArt({
   glow = false,
   badge,
   inset,
+  fit = "cover",
 }: {
   source: string;
   padded?: boolean;
   glow?: boolean;
   badge?: string;
   inset?: string;
+  // Square item art fills the frame (cover); a non-square drawing (a creature) fits
+  // whole (contain) so it is never cropped, in the icon and in the zoom preview.
+  fit?: "cover" | "contain";
 }) {
   const [preview, setPreview] = useState<{
     left: number;
@@ -108,7 +112,8 @@ export function IconArt({
         }}
         onLoad={() => setLoaded(true)}
         className={cn(
-          "h-full w-full cursor-zoom-in object-cover drop-shadow-[0_2px_4px_rgba(0,0,0,0.55)] transition-opacity duration-300",
+          "h-full w-full cursor-zoom-in drop-shadow-[0_2px_4px_rgba(0,0,0,0.55)] transition-opacity duration-300",
+          fit === "contain" ? "object-contain" : "object-cover",
           loaded ? "opacity-100" : "opacity-0",
           inset ?? (padded && ICON_PAD),
         )}
@@ -137,7 +142,8 @@ export function IconArt({
               src={source}
               alt=""
               className={cn(
-                "h-full w-full object-cover drop-shadow-[0_2px_4px_rgba(0,0,0,0.55)]",
+                "h-full w-full drop-shadow-[0_2px_4px_rgba(0,0,0,0.55)]",
+                fit === "contain" ? "object-contain" : "object-cover",
                 inset ? "p-[16px]" : padded && "p-[14px]",
               )}
             />
