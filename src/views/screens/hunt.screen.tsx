@@ -43,6 +43,11 @@ interface HuntSession {
     }
   >;
 }
+// Creature art rides a version query, like the manifest's ?v: /assets is cached a
+// year and immutable, so a URL 404-ed before its .png existed stays 404 in cache.
+// Bump this whenever new creature art lands so every drawing is re-fetched clean.
+const CREATURE_ART_VERSION = "?v=1";
+
 const EMPTY_SESSION: HuntSession = {
   hunts: 0,
   wins: 0,
@@ -443,7 +448,7 @@ export function HuntScreen() {
                         )}
                       </p>
                     ) : null}
-                    <div className="mt-auto flex min-h-16 flex-wrap items-center justify-between gap-3 p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3 p-4">
                       <span className="text-[11px] text-ink-faint">
                         {active
                           ? petAlong
@@ -492,7 +497,7 @@ export function HuntScreen() {
                             >
                               <span className="slot-well relative flex h-18 w-18 shrink-0 items-center justify-center overflow-hidden rounded-md border border-edge bg-base">
                                 {creature.image ? (
-                                  <IconArt source={creature.image} />
+                                  <IconArt source={creature.image + CREATURE_ART_VERSION} />
                                 ) : (
                                   <span className="font-mono text-xs text-ink-faint">?</span>
                                 )}
