@@ -111,7 +111,7 @@ export function ForgeScreen() {
             autoRef.current.forge ? { kind: "forge", id: activeSlot, paused: true } : null,
           );
         });
-      } else if (strikeRef.current > 1 && paidRef.current) {
+      } else if (strikeRef.current > 1 && strikeRef.current < FORGE_TICKS && paidRef.current) {
         playSound("forge");
       }
 
