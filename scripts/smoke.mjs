@@ -81,6 +81,27 @@ const badName = await call("POST", "/api/characters", { name: "dois nomes", gend
 check("nome com espaço recusa", badName.payload?.ok === false);
 const created = await call("POST", "/api/characters", { name: "Fumaca", gender: "female" });
 check("personagem criado", created.payload?.ok === true, created.payload?.message);
+// Nome único: uma segunda conta não nasce com o nome que outra já carrega, e a
+// checagem ignora maiúsculas porque "Fumaca" e "FUMACA" seriam linhas distintas.
+const rivalId = "usr_" + Date.now().toString(36) + "_riv" + randomBytes(2).toString("hex");
+await client.query("insert into users (id, email, birth_date) values ($1, $2, $3)", [
+  rivalId,
+  "rival@wizold.test",
+  "1990-01-01",
+]);
+const mine = cookie;
+const rivalPayload = rivalId + "." + (Date.now() + 3600000);
+cookie =
+  "wizold_session=" +
+  rivalPayload +
+  "." +
+  createHmac("sha256", secret).update(rivalPayload).digest("base64url");
+const clash = await call("POST", "/api/characters", { name: "Fumaca", gender: "male" });
+check("nome repetido recusa", clash.payload?.ok === false, clash.payload?.message);
+const clashUpper = await call("POST", "/api/characters", { name: "FUMACA", gender: "male" });
+check("nome repetido ignora maiúsculas", clashUpper.payload?.ok === false, clashUpper.payload?.message);
+await client.query("delete from users where id = $1", [rivalId]);
+cookie = mine;
 const state1 = (await call("POST", "/api/state")).payload?.data;
 check("nasce com 100 de bronze", state1?.character?.bronze === 100);
 check("carteira nasce com R$ 10", state1?.wallet?.cents === 1000);

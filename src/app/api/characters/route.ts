@@ -2,8 +2,15 @@ import { randomUUID, timingSafeEqual } from "node:crypto";
 import { after } from "next/server";
 import * as characterController from "@/controllers/character.controller";
 import type { Gender } from "@/models/entities/character";
+import { initialState } from "@/models/entities/game-state";
+import { failure } from "@/models/entities/result";
 import { withTransaction } from "@/models/repositories/server/database";
-import { insertNewGame, loadGame } from "@/models/repositories/server/game.store";
+import {
+  insertNewGame,
+  isNameCollision,
+  loadGame,
+  nameTaken,
+} from "@/models/repositories/server/game.store";
 import { asText, bad, readBody, refuseAbuse, reply, sessionIsLive } from "../_lib/api";
 import { sendDepartureNoticeEmail, sendFarewellEmail } from "../_lib/mail";
 import { rateLimit } from "../_lib/rate-limit";
@@ -130,10 +137,19 @@ export async function POST(request: Request) {
       }
       const result = characterController.startRun(name, gender);
       if (!result.ok) return reply(result);
+      const chosen = result.state.character?.name ?? name;
+      if (await nameTaken(client, chosen)) {
+        return reply(
+          failure(initialState(), "Esse nome já é de outro caçador. Escolha outro."),
+        );
+      }
       await insertNewGame(client, userId, result.state);
       return reply(result, { data: { characterId: result.state.character?.id } });
     });
   } catch (error) {
+    if (isNameCollision(error)) {
+      return reply(failure(initialState(), "Esse nome já é de outro caçador. Escolha outro."));
+    }
     console.error("[api] POST /api/characters", error);
     return bad("O servidor tropeçou. Tente de novo.", 500);
   }

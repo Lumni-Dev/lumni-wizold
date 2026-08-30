@@ -285,7 +285,7 @@ export function landArena(
       form: lost ? "human" : character.form,
       transformedAt: lost ? undefined : character.transformedAt,
       health: Math.max(1, character.health - remainingLoss),
-      rage: character.rage + combat.rageGained,
+      rage: character.rage,
       bronze: Math.max(0, character.bronze + spoils),
       arenaWins: character.arenaWins + (combat.victory ? 1 : 0),
       arenaLosses: character.arenaLosses + (lost ? 1 : 0),

@@ -304,7 +304,6 @@ sec("combate");
           outcome.finalHealth,
           outcome.damageDealt,
           outcome.damageTaken,
-          outcome.rageGained,
           outcome.petSpent,
         ].every(Number.isFinite),
       );
@@ -315,10 +314,6 @@ sec("combate");
           (outcome.retreated ? 1 : 0) +
           (outcome.finalHealth === 0 ? 1 : 0) ===
           1,
-      );
-      ok(
-        "fúria por rodada",
-        outcome.rageGained % 7 === 0 && outcome.rageGained <= CONST.MAX_COMBAT_ROUNDS * 7,
       );
       const dealt = told
         .filter((r) => r.author !== "creature")
@@ -791,8 +786,8 @@ sec("caçada");
         clamp(Math.max(1, before.health - resolved.data.healthLost), 0, derived.maxHealth),
     );
     ok(
-      "fúria sobe pelas rodadas",
-      after.rage === clamp(before.rage + resolved.data.combat.rageGained, 0, derived.maxRage),
+      "a caçada não mexe na fúria",
+      after.rage === clamp(before.rage, 0, derived.maxRage),
     );
     ok(
       "sangue já derramado não desconta duas vezes",
@@ -1596,7 +1591,7 @@ sec("personagem");
     ...turned.state,
     character: {
       ...turned.state.character,
-      transformedAt: new Date(Date.now() - 16 * 60000).toISOString(),
+      transformedAt: new Date(Date.now() - (CONST.TRANSFORM_DURATION_MS + 60000)).toISOString(),
     },
   };
   const expired = characterCtrl.expireTransformation(stale);
@@ -1611,9 +1606,10 @@ sec("personagem");
   const tick = characterCtrl.restTick(resting.state);
   const max = stats.deriveStats(resting.state.character, state.equipment, null, {}).maxHealth;
   ok(
-    "tique devolve 10%",
+    "o tique devolve vida pelo passo do descanso",
     tick.ok &&
-      tick.state.character.health === Math.min(max, 50 + Math.max(1, Math.ceil(max * 0.1))),
+      tick.state.character.health ===
+        Math.min(max, 50 + Math.max(1, Math.ceil(max * CONST.REST_HEALTH_RATIO))),
   );
   const whole = baseState({ level: 10 });
   ok("inteiro não repousa", characterCtrl.startRest(whole).ok === false);

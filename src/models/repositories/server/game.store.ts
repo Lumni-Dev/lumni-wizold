@@ -542,6 +542,35 @@ export async function recordWalletMovement(
     [characterId, centsDelta, reason, referenceId],
   );
 }
+// Every hunter answers to one name. The check is case-insensitive because
+// capitalize only touches the first letter, so "Lumni" and "LUMNI" would read
+// as different rows; the unique index on lower(name) is the concurrency-proof
+// backstop, and this is the friendly gate that runs before the write.
+export async function nameTaken(
+  client: PoolClient,
+  name: string,
+  exceptId?: string,
+): Promise<boolean> {
+  const found = exceptId
+    ? await client.query(
+        "select 1 from characters where lower(name) = lower($1) and id <> $2 limit 1",
+        [name, exceptId],
+      )
+    : await client.query("select 1 from characters where lower(name) = lower($1) limit 1", [name]);
+  return found.rows.length > 0;
+}
+
+// Postgres flags the unique index on lower(name) as 23505; the create and
+// rename doors turn that into the same refusal the pre-check gives.
+export function isNameCollision(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    (error as { code?: string }).code === "23505" &&
+    (error as { constraint?: string }).constraint === "characters_name_unique"
+  );
+}
+
 export async function insertNewGame(
   client: PoolClient,
   userId: string,

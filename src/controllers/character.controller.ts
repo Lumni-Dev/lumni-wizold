@@ -5,7 +5,8 @@ import {
   NAME_MIN_LENGTH,
   RENAME_BASE_PRICE,
   RENAME_COOLDOWN_DAYS,
-  REST_RECOVERY_RATIO,
+  REST_HEALTH_RATIO,
+  REST_RAGE_RATIO,
   TRANSFORM_DURATION_MS,
   TRANSFORM_RAGE_COST,
 } from "@/shared/constants/game";
@@ -199,8 +200,8 @@ export function startRest(state: GameState): Result {
   return success(addLog(next, "character", message), message);
 }
 
-function restRecovery(maximum: number): number {
-  return Math.max(1, Math.ceil(maximum * REST_RECOVERY_RATIO));
+function restRecovery(maximum: number, ratio: number): number {
+  return Math.max(1, Math.ceil(maximum * ratio));
 }
 
 export function restTick(state: GameState): Result<{ done: boolean }> {
@@ -209,9 +210,11 @@ export function restTick(state: GameState): Result<{ done: boolean }> {
 
   const stats = deriveStats(character, state.equipment, state.pet, state.enhancements);
   const healthGained =
-    Math.min(stats.maxHealth, character.health + restRecovery(stats.maxHealth)) - character.health;
+    Math.min(stats.maxHealth, character.health + restRecovery(stats.maxHealth, REST_HEALTH_RATIO)) -
+    character.health;
   const rageGained =
-    Math.min(stats.maxRage, character.rage + restRecovery(stats.maxRage)) - character.rage;
+    Math.min(stats.maxRage, character.rage + restRecovery(stats.maxRage, REST_RAGE_RATIO)) -
+    character.rage;
 
   const next = updateCharacter(state, (current) => ({
     ...current,

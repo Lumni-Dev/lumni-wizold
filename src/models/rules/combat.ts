@@ -41,7 +41,6 @@ export interface CombatOutcome {
   finalHealth: number;
   damageDealt: number;
   damageTaken: number;
-  rageGained: number;
 
   petBlows: number;
 
@@ -65,7 +64,6 @@ interface CombatInput {
   random?: Random;
 }
 
-const RAGE_PER_ROUND = 7;
 const CREATURE_CRITICAL_CHANCE = 0.1;
 const PET_CRITICAL_CHANCE = 5;
 
@@ -413,7 +411,6 @@ export function simulateCombat({
     finalHealth: characterHealth,
     damageDealt,
     damageTaken,
-    rageGained: cycles * RAGE_PER_ROUND,
     petBlows,
     petSpent,
   };

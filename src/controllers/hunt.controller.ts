@@ -211,7 +211,7 @@ export function landHunt(
       form: lost ? "human" : character.form,
       transformedAt: lost ? undefined : character.transformedAt,
       health: Math.max(1, character.health - remainingLoss),
-      rage: character.rage + combat.rageGained,
+      rage: character.rage,
       bronze: character.bronze + bronze,
       hunts: character.hunts + 1,
       wins: character.wins + (combat.victory ? 1 : 0),
