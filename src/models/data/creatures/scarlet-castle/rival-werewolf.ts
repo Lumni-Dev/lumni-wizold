@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const rivalWerewolf: Creature = {
   id: "rival-werewolf",
   name: "Lobisomem Rival",
-  image: "",
+  image: "/assets/creatures/scarlet-castle/rival-werewolf.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 851,
@@ -16,7 +16,7 @@ export const rivalWerewolf: Creature = {
   minBronze: 2187,
   maxBronze: 4061,
   drops: [
-    { itemId: "empty-fang", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "black-blood", chance: 0.083, minimum: 1, maximum: 2 },
+    { itemId: "rival-pelt", chance: 0.07, minimum: 1, maximum: 1 },
+    { itemId: "wolf-fang", chance: 0.2, minimum: 1, maximum: 2 },
   ],
 };

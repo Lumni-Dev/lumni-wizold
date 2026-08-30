@@ -1,7 +1,7 @@
 import { findGender, type Gender } from "../entities/character";
 import type { Item } from "../entities/item";
 import { buildSetItems } from "./equipment-sets";
-import { buildMaterials } from "./species";
+import { ALL_MATERIALS } from "./items/materials";
 import { POTIONS, PET_SUPPLIES } from "./consumables";
 
 // One fragment per set, mined from the veins. Never sold, only feeds the forge.
@@ -31,13 +31,13 @@ const FRAGMENTS: readonly Item[] = FRAGMENT_LINES.map((line) => ({
 }));
 
 // The full item catalog, assembled from the isolated tables: equipment (by set),
-// consumables (potions + rations), fragments (mined) and materials (from species).
+// consumables (potions + rations), fragments (mined) and materials (creature loot).
 export const ITEMS: readonly Item[] = [
   ...buildSetItems(),
   ...POTIONS,
   ...PET_SUPPLIES,
   ...FRAGMENTS,
-  ...buildMaterials(),
+  ...ALL_MATERIALS,
 ];
 
 const ITEM_INDEX = new Map<string, Item>(ITEMS.map((item) => [item.id, item]));

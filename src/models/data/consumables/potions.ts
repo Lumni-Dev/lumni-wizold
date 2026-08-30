@@ -1,10 +1,10 @@
 import { SIZE_LABEL, type Item, type PotionSize } from "@/models/entities/item";
 import { FURY } from "@/shared/constants/tuning/fury";
 
-// Health potions restore a slice of the body (a quarter, a half, a whole vital).
-// Fury potions are a timed buff instead: +10 to every attribute, for a stretch
-// that grows with the size (2,5 / 5 / 7,5 min). `hunts` prices each size in
-// carcasses of the buyer's level; `minLevel` splits the run in thirds
+// Health potions restore a slice of the body (a quarter, a half, three quarters
+// of the vital). Fury potions are a timed buff instead: +10 to every attribute,
+// for a stretch that grows with the size (2,5 / 5 / 7,5 min). `hunts` prices each
+// size in carcasses of the buyer's level; `minLevel` splits the run in thirds
 // (NV 1 / 334 / 667). `price` stays as a flat fallback.
 const POTION_TIERS = [
   {
@@ -25,7 +25,7 @@ const POTION_TIERS = [
   },
   {
     size: "large" as PotionSize,
-    ratio: 1,
+    ratio: 0.75,
     hunts: 12,
     rarity: "rare" as const,
     minLevel: 667,

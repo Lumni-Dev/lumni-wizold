@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const deadKnight: Creature = {
   id: "dead-knight",
   name: "Cavaleiro Morto",
-  image: "",
+  image: "/assets/creatures/stone-necropolis/dead-knight.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 641,
@@ -16,7 +16,7 @@ export const deadKnight: Creature = {
   minBronze: 1130,
   maxBronze: 2098,
   drops: [
-    { itemId: "bear-claw", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "bear-fat", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "cursed-plate", chance: 0.12, minimum: 1, maximum: 1 },
+    { itemId: "bone-shard", chance: 0.2, minimum: 1, maximum: 2 },
   ],
 };

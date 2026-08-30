@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const giantSpider: Creature = {
   id: "giant-spider",
   name: "Aranha Gigante",
-  image: "",
+  image: "/assets/creatures/dew-woods/giant-spider.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 181,
@@ -16,7 +16,7 @@ export const giantSpider: Creature = {
   minBronze: 69,
   maxBronze: 129,
   drops: [
-    { itemId: "empty-fang", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "black-blood", chance: 0.083, minimum: 1, maximum: 2 },
+    { itemId: "spider-silk", chance: 0.2, minimum: 1, maximum: 2 },
+    { itemId: "venom-gland", chance: 0.2, minimum: 1, maximum: 2 },
   ],
 };

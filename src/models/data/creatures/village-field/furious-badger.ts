@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const furiousBadger: Creature = {
   id: "furious-badger",
   name: "Texugo Furioso",
-  image: "",
+  image: "/assets/creatures/village-field/furious-badger.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 81,
@@ -16,7 +16,7 @@ export const furiousBadger: Creature = {
   minBronze: 35,
   maxBronze: 64,
   drops: [
-    { itemId: "bear-claw", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "bear-fat", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "badger-claw", chance: 0.35, minimum: 1, maximum: 2 },
+    { itemId: "thick-hide", chance: 0.35, minimum: 1, maximum: 2 },
   ],
 };

@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const brownOwl: Creature = {
   id: "brown-owl",
   name: "Coruja Parda",
-  image: "",
+  image: "/assets/creatures/dew-woods/brown-owl.png",
   description: "Pequenos, rápidos e em número maior do que parece. O primeiro sangue de qualquer lobisomem.",
   species: "rabbit",
   level: 111,
@@ -16,7 +16,7 @@ export const brownOwl: Creature = {
   minBronze: 45,
   maxBronze: 84,
   drops: [
-    { itemId: "soft-fur", chance: 0.225, minimum: 1, maximum: 2 },
-    { itemId: "lucky-foot", chance: 0.112, minimum: 1, maximum: 2 },
+    { itemId: "owl-feather", chance: 0.2, minimum: 1, maximum: 2 },
+    { itemId: "talon", chance: 0.35, minimum: 1, maximum: 2 },
   ],
 };

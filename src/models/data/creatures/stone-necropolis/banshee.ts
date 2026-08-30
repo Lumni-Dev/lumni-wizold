@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const banshee: Creature = {
   id: "banshee",
   name: "Banshee",
-  image: "",
+  image: "/assets/creatures/stone-necropolis/banshee.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 651,
@@ -16,7 +16,7 @@ export const banshee: Creature = {
   minBronze: 1133,
   maxBronze: 2105,
   drops: [
-    { itemId: "empty-fang", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "black-blood", chance: 0.083, minimum: 1, maximum: 2 },
+    { itemId: "banshee-wail", chance: 0.07, minimum: 1, maximum: 1 },
+    { itemId: "ectoplasm", chance: 0.12, minimum: 1, maximum: 1 },
   ],
 };

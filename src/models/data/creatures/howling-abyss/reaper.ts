@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const reaper: Creature = {
   id: "reaper",
   name: "Ceifador",
-  image: "",
+  image: "/assets/creatures/howling-abyss/reaper.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 771,
@@ -16,7 +16,7 @@ export const reaper: Creature = {
   minBronze: 1175,
   maxBronze: 2182,
   drops: [
-    { itemId: "empty-fang", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "black-blood", chance: 0.083, minimum: 1, maximum: 2 },
+    { itemId: "reaper-scythe", chance: 0.04, minimum: 1, maximum: 1 },
+    { itemId: "soul-shard", chance: 0.07, minimum: 1, maximum: 1 },
   ],
 };

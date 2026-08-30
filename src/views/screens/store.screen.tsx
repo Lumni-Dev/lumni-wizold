@@ -78,7 +78,6 @@ export function StoreScreen() {
       <PageHeader
         title="Wizold Store"
         description="Bronze por dinheiro, para quem quer pular a espera. Nada aqui compra nível: experiência só a caça dá."
-        action={<Tag tone="neutral">{formatBronze(character.bronze)}</Tag>}
       />
 
       <Panel

@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const fallenSeraph: Creature = {
   id: "fallen-seraph",
   name: "Serafim Caído",
-  image: "",
+  image: "/assets/creatures/white-clearing/fallen-seraph.png",
   description: "Nada aqui é gentil. O chifre atravessa antes de você ouvir o galope.",
   species: "unicorn",
   level: 971,
@@ -16,7 +16,7 @@ export const fallenSeraph: Creature = {
   minBronze: 2228,
   maxBronze: 4138,
   drops: [
-    { itemId: "silver-mane", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "horn-dust", chance: 0.075, minimum: 1, maximum: 2 },
+    { itemId: "seraph-feather", chance: 0.04, minimum: 1, maximum: 1 },
+    { itemId: "halo-shard", chance: 0.04, minimum: 1, maximum: 1 },
   ],
 };

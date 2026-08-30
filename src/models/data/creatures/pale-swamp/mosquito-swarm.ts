@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const mosquitoSwarm: Creature = {
   id: "mosquito-swarm",
   name: "Enxame de Mosquitos",
-  image: "",
+  image: "/assets/creatures/pale-swamp/mosquito-swarm.png",
   description: "Pequenos, rápidos e em número maior do que parece. O primeiro sangue de qualquer lobisomem.",
   species: "rabbit",
   level: 351,
@@ -16,7 +16,7 @@ export const mosquitoSwarm: Creature = {
   minBronze: 249,
   maxBronze: 463,
   drops: [
-    { itemId: "soft-fur", chance: 0.225, minimum: 1, maximum: 2 },
-    { itemId: "lucky-foot", chance: 0.112, minimum: 1, maximum: 2 },
+    { itemId: "mosquito-wing", chance: 0.35, minimum: 1, maximum: 2 },
+    { itemId: "venom-gland", chance: 0.2, minimum: 1, maximum: 2 },
   ],
 };

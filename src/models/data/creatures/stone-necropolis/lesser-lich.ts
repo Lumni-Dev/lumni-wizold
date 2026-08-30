@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const lesserLich: Creature = {
   id: "lesser-lich",
   name: "Lich Menor",
-  image: "",
+  image: "/assets/creatures/stone-necropolis/lesser-lich.png",
   description: "Nada aqui é gentil. O chifre atravessa antes de você ouvir o galope.",
   species: "unicorn",
   level: 681,
@@ -16,7 +16,7 @@ export const lesserLich: Creature = {
   minBronze: 1143,
   maxBronze: 2124,
   drops: [
-    { itemId: "silver-mane", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "horn-dust", chance: 0.075, minimum: 1, maximum: 2 },
+    { itemId: "lich-phylactery", chance: 0.04, minimum: 1, maximum: 1 },
+    { itemId: "necro-tome", chance: 0.07, minimum: 1, maximum: 1 },
   ],
 };

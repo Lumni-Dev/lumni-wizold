@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const wheatSnake: Creature = {
   id: "wheat-snake",
   name: "Cobra do Trigo",
-  image: "",
+  image: "/assets/creatures/village-field/wheat-snake.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 71,
@@ -16,7 +16,7 @@ export const wheatSnake: Creature = {
   minBronze: 31,
   maxBronze: 59,
   drops: [
-    { itemId: "empty-fang", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "black-blood", chance: 0.083, minimum: 1, maximum: 2 },
+    { itemId: "snake-skin", chance: 0.35, minimum: 1, maximum: 2 },
+    { itemId: "venom-gland", chance: 0.2, minimum: 1, maximum: 2 },
   ],
 };

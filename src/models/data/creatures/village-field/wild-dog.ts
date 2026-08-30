@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const wildDog: Creature = {
   id: "wild-dog",
   name: "Cão Selvagem",
-  image: "",
+  image: "/assets/creatures/village-field/wild-dog.png",
   description: "Fogem bem e chutam melhor. Alimentam uma matilha inteira por semanas.",
   species: "deer",
   level: 51,
@@ -16,7 +16,7 @@ export const wildDog: Creature = {
   minBronze: 25,
   maxBronze: 46,
   drops: [
-    { itemId: "chipped-antler", chance: 0.21, minimum: 1, maximum: 2 },
-    { itemId: "deer-hide", chance: 0.112, minimum: 1, maximum: 2 },
+    { itemId: "canine-pelt", chance: 0.35, minimum: 1, maximum: 2 },
+    { itemId: "sharp-fang", chance: 0.35, minimum: 1, maximum: 2 },
   ],
 };

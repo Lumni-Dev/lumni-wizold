@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const necromancer: Creature = {
   id: "necromancer",
   name: "Necromante",
-  image: "",
+  image: "/assets/creatures/stone-necropolis/necromancer.png",
   description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
   species: "human",
   level: 661,
@@ -16,7 +16,7 @@ export const necromancer: Creature = {
   minBronze: 1137,
   maxBronze: 2111,
   drops: [
-    { itemId: "twisted-steel", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "stolen-charm", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "necro-tome", chance: 0.07, minimum: 1, maximum: 1 },
+    { itemId: "cursed-charm", chance: 0.12, minimum: 1, maximum: 1 },
   ],
 };

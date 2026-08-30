@@ -1143,6 +1143,10 @@ sec("forja e mina");
     "teto da mineração vem da última veia",
     oresData.MINING_MAX_LEVEL === ores[ores.length - 1].requiredLevel,
   );
+  ok(
+    "veia pede o nível do equipamento do material",
+    ores.map((ore) => ore.requiredLevel).join(",") === "1,201,401,601,801",
+  );
   for (const ore of ores) {
     ok("veia " + ore.id + " tem fragmento real", Boolean(items.findItem(ore.fragmentId)));
   }
@@ -1230,7 +1234,7 @@ sec("bazar");
   ok("carteira nova tem R$ 10", factory.createRun("Novo", "male").wallet.cents === 1000);
   const fragment = items.findItem("bronze-fragment");
   const plain = items.findItem("bronze-claw");
-  const material = items.findItem("soft-fur");
+  const material = items.findItem("wolf-pelt");
   ok("fragmento entra no bazar", bazaarRules.checkTrade(fragment, 0).tradable === true);
   ok("peça forjada entra", bazaarRules.checkTrade(plain, 1).tradable === true);
   ok("peça lisa de mercado não entra", bazaarRules.checkTrade(plain, 0).tradable === false);
@@ -1384,7 +1388,7 @@ sec("inventário e mercado");
   const random = seededRandom(31337);
   let inventory = [];
   const expected = new Map();
-  const ids = ["health-potion-small", "bronze-fragment", "soft-fur", "bronze-claw"];
+  const ids = ["health-potion-small", "bronze-fragment", "rabbit-fur", "bronze-claw"];
   for (let step = 0; step < 400; step += 1) {
     const id = ids[Math.floor(random() * ids.length)];
     const amount = 1 + Math.floor(random() * 3);
@@ -1463,11 +1467,11 @@ sec("inventário e mercado");
   );
   ok("fragmento não se vende por bronze", fragmentSale.ok === false);
   const sale = marketCtrl.sellItem(
-    { ...state, inventory: [{ itemId: "soft-fur", quantity: 5 }] },
-    "soft-fur",
+    { ...state, inventory: [{ itemId: "rabbit-fur", quantity: 5 }] },
+    "rabbit-fur",
     2,
   );
-  const fur = items.findItem("soft-fur");
+  const fur = items.findItem("rabbit-fur");
   ok(
     "venda paga metade",
     sale.ok &&
@@ -2049,7 +2053,7 @@ sec("imutabilidade");
     { itemId: "silver-fragment", quantity: 20 },
     { itemId: "bronze-claw", quantity: 1 },
     { itemId: "pet-ration", quantity: 2 },
-    { itemId: "soft-fur", quantity: 3 },
+    { itemId: "rabbit-fur", quantity: 3 },
   ];
   state.enhancements["bronze-claw"] = 1;
   state.bazaarListings = [];
@@ -2093,7 +2097,7 @@ sec("imutabilidade");
     ["renamePet", () => petCtrl.renamePet(state, "Cinza")],
     ["releasePet", () => petCtrl.releasePet(state)],
     ["buyItem", () => marketCtrl.buyItem(state, "health-potion-small", 2)],
-    ["sellItem", () => marketCtrl.sellItem(state, "soft-fur", 1)],
+    ["sellItem", () => marketCtrl.sellItem(state, "rabbit-fur", 1)],
     ["listOffers", () => marketCtrl.listOffers(state)],
     ["equipItem", () => inventoryCtrl.equipItem(state, "bronze-claw")],
     ["unequipItem", () => inventoryCtrl.unequipItem(state, "claw")],
@@ -2241,7 +2245,7 @@ sec("persistência");
       character: oldCharacter({}),
       inventory: [
         { itemId: "espada-fantasma", quantity: 2 },
-        { itemId: "soft-fur", quantity: 1 },
+        { itemId: "rabbit-fur", quantity: 1 },
       ],
       equipment: { claw: "garra-fantasma" },
       enhancements: { "espada-fantasma": 4 },
@@ -2250,7 +2254,7 @@ sec("persistência");
   loaded = repo.load();
   ok(
     "id morto sai da mochila",
-    loaded.inventory.length === 1 && loaded.inventory[0].itemId === "soft-fur",
+    loaded.inventory.length === 1 && loaded.inventory[0].itemId === "rabbit-fur",
   );
   ok("id morto sai do corpo", loaded.equipment.claw === null);
   ok("id morto sai da forja", !("espada-fantasma" in loaded.enhancements));

@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const lesserPhoenix: Creature = {
   id: "lesser-phoenix",
   name: "Fênix Menor",
-  image: "",
+  image: "/assets/creatures/white-clearing/lesser-phoenix.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 921,
@@ -16,7 +16,7 @@ export const lesserPhoenix: Creature = {
   minBronze: 2211,
   maxBronze: 4106,
   drops: [
-    { itemId: "empty-fang", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "black-blood", chance: 0.083, minimum: 1, maximum: 2 },
+    { itemId: "phoenix-ash", chance: 0.04, minimum: 1, maximum: 1 },
+    { itemId: "phoenix-feather", chance: 0.04, minimum: 1, maximum: 1 },
   ],
 };

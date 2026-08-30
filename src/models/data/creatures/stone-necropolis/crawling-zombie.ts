@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const crawlingZombie: Creature = {
   id: "crawling-zombie",
   name: "Zumbi Rastejante",
-  image: "",
+  image: "/assets/creatures/stone-necropolis/crawling-zombie.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 611,
@@ -16,7 +16,7 @@ export const crawlingZombie: Creature = {
   minBronze: 805,
   maxBronze: 1494,
   drops: [
-    { itemId: "bear-claw", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "bear-fat", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "rotten-flesh", chance: 0.2, minimum: 1, maximum: 2 },
+    { itemId: "grave-dirt", chance: 0.35, minimum: 1, maximum: 2 },
   ],
 };

@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const eyeAberration: Creature = {
   id: "eye-aberration",
   name: "Aberração Ocular",
-  image: "",
+  image: "/assets/creatures/howling-abyss/eye-aberration.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 731,
@@ -16,7 +16,7 @@ export const eyeAberration: Creature = {
   minBronze: 1161,
   maxBronze: 2156,
   drops: [
-    { itemId: "empty-fang", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "black-blood", chance: 0.083, minimum: 1, maximum: 2 },
+    { itemId: "aberrant-eye", chance: 0.07, minimum: 1, maximum: 1 },
+    { itemId: "shadow-essence", chance: 0.12, minimum: 1, maximum: 1 },
   ],
 };

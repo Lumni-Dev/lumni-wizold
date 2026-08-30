@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const lesserGriffin: Creature = {
   id: "lesser-griffin",
   name: "Grifo Menor",
-  image: "",
+  image: "/assets/creatures/mist-ridge/lesser-griffin.png",
   description: "Nada aqui é gentil. O chifre atravessa antes de você ouvir o galope.",
   species: "unicorn",
   level: 291,
@@ -16,7 +16,7 @@ export const lesserGriffin: Creature = {
   minBronze: 229,
   maxBronze: 425,
   drops: [
-    { itemId: "silver-mane", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "horn-dust", chance: 0.075, minimum: 1, maximum: 2 },
+    { itemId: "griffin-feather", chance: 0.12, minimum: 1, maximum: 1 },
+    { itemId: "eagle-talon", chance: 0.12, minimum: 1, maximum: 1 },
   ],
 };

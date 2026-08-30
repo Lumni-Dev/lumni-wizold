@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const youngBehemoth: Creature = {
   id: "young-behemoth",
   name: "Behemoth Jovem",
-  image: "",
+  image: "/assets/creatures/howling-abyss/young-behemoth.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 761,
@@ -16,7 +16,7 @@ export const youngBehemoth: Creature = {
   minBronze: 1171,
   maxBronze: 2175,
   drops: [
-    { itemId: "bear-claw", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "bear-fat", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "behemoth-hide", chance: 0.07, minimum: 1, maximum: 1 },
+    { itemId: "behemoth-horn", chance: 0.07, minimum: 1, maximum: 1 },
   ],
 };

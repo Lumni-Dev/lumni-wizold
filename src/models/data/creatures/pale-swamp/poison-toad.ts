@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const poisonToad: Creature = {
   id: "poison-toad",
   name: "Sapo Venenoso",
-  image: "",
+  image: "/assets/creatures/pale-swamp/poison-toad.png",
   description: "Pequenos, rápidos e em número maior do que parece. O primeiro sangue de qualquer lobisomem.",
   species: "rabbit",
   level: 301,
@@ -16,7 +16,7 @@ export const poisonToad: Creature = {
   minBronze: 232,
   maxBronze: 431,
   drops: [
-    { itemId: "soft-fur", chance: 0.225, minimum: 1, maximum: 2 },
-    { itemId: "lucky-foot", chance: 0.112, minimum: 1, maximum: 2 },
+    { itemId: "toad-skin", chance: 0.2, minimum: 1, maximum: 2 },
+    { itemId: "venom-gland", chance: 0.2, minimum: 1, maximum: 2 },
   ],
 };

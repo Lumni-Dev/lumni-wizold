@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const wildHen: Creature = {
   id: "wild-hen",
   name: "Galinha do Mato",
-  image: "",
+  image: "/assets/creatures/village-field/wild-hen.png",
   description: "Pequenos, rápidos e em número maior do que parece. O primeiro sangue de qualquer lobisomem.",
   species: "rabbit",
   level: 21,
@@ -16,7 +16,7 @@ export const wildHen: Creature = {
   minBronze: 14,
   maxBronze: 26,
   drops: [
-    { itemId: "soft-fur", chance: 0.225, minimum: 1, maximum: 2 },
-    { itemId: "lucky-foot", chance: 0.112, minimum: 1, maximum: 2 },
+    { itemId: "feather", chance: 0.35, minimum: 1, maximum: 2 },
+    { itemId: "poultry-meat", chance: 0.35, minimum: 1, maximum: 2 },
   ],
 };

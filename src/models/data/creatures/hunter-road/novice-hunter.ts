@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const noviceHunter: Creature = {
   id: "novice-hunter",
   name: "Caçador Novato",
-  image: "",
+  image: "/assets/creatures/hunter-road/novice-hunter.png",
   description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
   species: "human",
   level: 401,
@@ -16,7 +16,7 @@ export const noviceHunter: Creature = {
   minBronze: 266,
   maxBronze: 495,
   drops: [
-    { itemId: "twisted-steel", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "stolen-charm", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "steel-scrap", chance: 0.2, minimum: 1, maximum: 2 },
+    { itemId: "coin-purse", chance: 0.12, minimum: 1, maximum: 1 },
   ],
 };

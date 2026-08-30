@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const marshNaga: Creature = {
   id: "marsh-naga",
   name: "Naga do Charco",
-  image: "",
+  image: "/assets/creatures/pale-swamp/marsh-naga.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 371,
@@ -16,7 +16,7 @@ export const marshNaga: Creature = {
   minBronze: 256,
   maxBronze: 476,
   drops: [
-    { itemId: "empty-fang", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "black-blood", chance: 0.083, minimum: 1, maximum: 2 },
+    { itemId: "naga-scale", chance: 0.07, minimum: 1, maximum: 1 },
+    { itemId: "venom-gland", chance: 0.2, minimum: 1, maximum: 2 },
   ],
 };

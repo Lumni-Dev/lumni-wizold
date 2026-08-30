@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const inquisitor: Creature = {
   id: "inquisitor",
   name: "Inquisidor",
-  image: "",
+  image: "/assets/creatures/hunter-road/inquisitor.png",
   description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
   species: "human",
   level: 471,
@@ -16,7 +16,7 @@ export const inquisitor: Creature = {
   minBronze: 756,
   maxBronze: 1404,
   drops: [
-    { itemId: "twisted-steel", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "stolen-charm", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "holy-water", chance: 0.12, minimum: 1, maximum: 1 },
+    { itemId: "silver-charm", chance: 0.12, minimum: 1, maximum: 1 },
   ],
 };

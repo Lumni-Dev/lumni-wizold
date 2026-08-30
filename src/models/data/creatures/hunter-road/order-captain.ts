@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const orderCaptain: Creature = {
   id: "order-captain",
   name: "Capitão da Ordem",
-  image: "",
+  image: "/assets/creatures/hunter-road/order-captain.png",
   description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
   species: "human",
   level: 481,
@@ -16,7 +16,7 @@ export const orderCaptain: Creature = {
   minBronze: 759,
   maxBronze: 1410,
   drops: [
-    { itemId: "twisted-steel", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "stolen-charm", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "captain-medal", chance: 0.07, minimum: 1, maximum: 1 },
+    { itemId: "knight-plate", chance: 0.12, minimum: 1, maximum: 1 },
   ],
 };

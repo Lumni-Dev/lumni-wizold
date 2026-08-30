@@ -1,0 +1,17 @@
+import type { Item } from "../../../entities/item";
+
+// Garra de Urso: despojo de caça, trocado por bronze no mercado.
+export const bearClaw: Item = {
+  id: "bear-claw",
+  name: "Garra de Urso",
+  description:
+    "Despojo da caça. Vale o bronze que o mercado paga por ele; não serve de arma nem de enfeite.",
+  category: "material",
+  rarity: "rare",
+  price: 300,
+  image: "/assets/inventory/materials/bear-claw.png",
+  minLevel: 1,
+  stackable: true,
+  inMarket: false,
+  effect: {},
+};

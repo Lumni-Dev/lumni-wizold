@@ -1,0 +1,17 @@
+import type { Item } from "../../../entities/item";
+
+// Água Benta: despojo de caça, trocado por bronze no mercado.
+export const holyWater: Item = {
+  id: "holy-water",
+  name: "Água Benta",
+  description:
+    "Despojo da caça. Vale o bronze que o mercado paga por ele; não serve de arma nem de enfeite.",
+  category: "material",
+  rarity: "rare",
+  price: 300,
+  image: "/assets/inventory/materials/holy-water.png",
+  minLevel: 1,
+  stackable: true,
+  inMarket: false,
+  effect: {},
+};

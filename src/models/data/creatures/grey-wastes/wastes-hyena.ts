@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const wastesHyena: Creature = {
   id: "wastes-hyena",
   name: "Hiena do Ermo",
-  image: "",
+  image: "/assets/creatures/grey-wastes/wastes-hyena.png",
   description: "Fogem bem e chutam melhor. Alimentam uma matilha inteira por semanas.",
   species: "deer",
   level: 511,
@@ -16,7 +16,7 @@ export const wastesHyena: Creature = {
   minBronze: 770,
   maxBronze: 1430,
   drops: [
-    { itemId: "chipped-antler", chance: 0.21, minimum: 1, maximum: 2 },
-    { itemId: "deer-hide", chance: 0.112, minimum: 1, maximum: 2 },
+    { itemId: "hyena-pelt", chance: 0.2, minimum: 1, maximum: 2 },
+    { itemId: "sharp-fang", chance: 0.35, minimum: 1, maximum: 2 },
   ],
 };

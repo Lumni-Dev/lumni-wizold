@@ -249,7 +249,6 @@ export function ForgeScreen() {
         action={
           <div className="flex items-center gap-2">
             <Tag tone="neutral">Mineração NV. {formatNumber(mining.level)}</Tag>
-            <Tag tone="neutral">{formatBronze(character.bronze)}</Tag>
           </div>
         }
       />

@@ -11,8 +11,9 @@ import { DANGER_LABEL } from "@/models/entities/territory";
 import { canPetFight, isPetActive } from "@/models/rules/pet";
 import { HUNT_TICK_MS, HUNT_TICKS } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
-import { formatNumber, formatBronze } from "@/shared/utils/format";
+import { formatNumber } from "@/shared/utils/format";
 import { ArtImage } from "../components/art-image";
+import { IconArt } from "../components/icon-frame";
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
 import { Card } from "../components/card";
@@ -336,7 +337,6 @@ export function HuntScreen() {
                     : "Mascote em repouso"}
               </Tag>
             ) : null}
-            <Tag tone="neutral">{formatBronze(character.bronze)}</Tag>
           </div>
         }
       />
@@ -469,14 +469,11 @@ export function HuntScreen() {
                             key={creature.id}
                             className="flex items-center gap-3 px-4 py-2.5 text-xs"
                           >
-                            <div
-                              className="h-8 w-8 shrink-0 rounded-md border border-edge bg-surface-high bg-cover bg-center"
-                              style={
-                                creature.image
-                                  ? { backgroundImage: `url(${creature.image})` }
-                                  : undefined
-                              }
-                            />
+                            <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-md border border-edge bg-surface-high">
+                              {creature.image ? (
+                                <IconArt source={creature.image} padded={false} />
+                              ) : null}
+                            </div>
                             <span
                               className={cn(
                                 "min-w-0 flex-1 truncate",

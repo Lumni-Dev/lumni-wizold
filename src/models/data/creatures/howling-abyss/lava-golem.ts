@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const lavaGolem: Creature = {
   id: "lava-golem",
   name: "Golem de Lava",
-  image: "",
+  image: "/assets/creatures/howling-abyss/lava-golem.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 741,
@@ -16,7 +16,7 @@ export const lavaGolem: Creature = {
   minBronze: 1164,
   maxBronze: 2162,
   drops: [
-    { itemId: "bear-claw", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "bear-fat", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "lava-core", chance: 0.07, minimum: 1, maximum: 1 },
+    { itemId: "molten-rock", chance: 0.12, minimum: 1, maximum: 1 },
   ],
 };

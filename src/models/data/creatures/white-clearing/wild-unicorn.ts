@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const wildUnicorn: Creature = {
   id: "wild-unicorn",
   name: "Unicórnio Selvagem",
-  image: "",
+  image: "/assets/creatures/white-clearing/wild-unicorn.png",
   description: "Nada aqui é gentil. O chifre atravessa antes de você ouvir o galope.",
   species: "unicorn",
   level: 901,
@@ -16,7 +16,7 @@ export const wildUnicorn: Creature = {
   minBronze: 2204,
   maxBronze: 4093,
   drops: [
-    { itemId: "silver-mane", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "horn-dust", chance: 0.075, minimum: 1, maximum: 2 },
+    { itemId: "silver-mane", chance: 0.04, minimum: 1, maximum: 1 },
+    { itemId: "horn-dust", chance: 0.04, minimum: 1, maximum: 1 },
   ],
 };

@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const carrionVulture: Creature = {
   id: "carrion-vulture",
   name: "Abutre Carniceiro",
-  image: "",
+  image: "/assets/creatures/grey-wastes/carrion-vulture.png",
   description: "Pequenos, rápidos e em número maior do que parece. O primeiro sangue de qualquer lobisomem.",
   species: "rabbit",
   level: 501,
@@ -16,7 +16,7 @@ export const carrionVulture: Creature = {
   minBronze: 766,
   maxBronze: 1423,
   drops: [
-    { itemId: "soft-fur", chance: 0.225, minimum: 1, maximum: 2 },
-    { itemId: "lucky-foot", chance: 0.112, minimum: 1, maximum: 2 },
+    { itemId: "vulture-feather", chance: 0.2, minimum: 1, maximum: 2 },
+    { itemId: "carrion-meat", chance: 0.35, minimum: 1, maximum: 2 },
   ],
 };

@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const youngBear: Creature = {
   id: "young-bear",
   name: "Urso Pardo Jovem",
-  image: "",
+  image: "/assets/creatures/dew-woods/young-bear.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 151,
@@ -16,7 +16,7 @@ export const youngBear: Creature = {
   minBronze: 59,
   maxBronze: 110,
   drops: [
-    { itemId: "bear-claw", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "bear-fat", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "bear-pelt", chance: 0.2, minimum: 1, maximum: 2 },
+    { itemId: "bear-claw", chance: 0.12, minimum: 1, maximum: 1 },
   ],
 };

@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const silverArcher: Creature = {
   id: "silver-archer",
   name: "Arqueiro de Prata",
-  image: "",
+  image: "/assets/creatures/hunter-road/silver-archer.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 431,
@@ -16,7 +16,7 @@ export const silverArcher: Creature = {
   minBronze: 742,
   maxBronze: 1378,
   drops: [
-    { itemId: "empty-fang", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "black-blood", chance: 0.083, minimum: 1, maximum: 2 },
+    { itemId: "silver-arrow", chance: 0.12, minimum: 1, maximum: 1 },
+    { itemId: "silver-charm", chance: 0.12, minimum: 1, maximum: 1 },
   ],
 };

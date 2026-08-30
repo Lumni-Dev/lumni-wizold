@@ -14,7 +14,7 @@ import {
   type ItemCategory,
 } from "@/models/entities/item";
 import { isForgeMaterial } from "@/models/rules/bazaar";
-import { formatNumber, formatBronze } from "@/shared/utils/format";
+import { formatNumber } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
 import { summarizeEffect } from "../presenters/item.presenter";
 import { Button } from "../components/button";
@@ -66,7 +66,6 @@ export function InventoryScreen() {
         action={
           <div className="flex items-center gap-2">
             <Tag tone="neutral">{formatNumber(totalItems)} itens</Tag>
-            <Tag tone="neutral">{formatBronze(character.bronze)}</Tag>
           </div>
         }
       />

@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const abyssLord: Creature = {
   id: "abyss-lord",
   name: "Senhor do Abismo",
-  image: "",
+  image: "/assets/creatures/howling-abyss/abyss-lord.png",
   description: "Nada aqui é gentil. O chifre atravessa antes de você ouvir o galope.",
   species: "unicorn",
   level: 781,
@@ -16,7 +16,7 @@ export const abyssLord: Creature = {
   minBronze: 1178,
   maxBronze: 2188,
   drops: [
-    { itemId: "silver-mane", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "horn-dust", chance: 0.075, minimum: 1, maximum: 2 },
+    { itemId: "abyss-crown", chance: 0.04, minimum: 1, maximum: 1 },
+    { itemId: "demon-horn", chance: 0.07, minimum: 1, maximum: 1 },
   ],
 };

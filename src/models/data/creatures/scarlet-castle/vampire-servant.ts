@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const vampireServant: Creature = {
   id: "vampire-servant",
   name: "Servo Vampiro",
-  image: "",
+  image: "/assets/creatures/scarlet-castle/vampire-servant.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 801,
@@ -16,7 +16,7 @@ export const vampireServant: Creature = {
   minBronze: 1185,
   maxBronze: 2201,
   drops: [
-    { itemId: "empty-fang", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "black-blood", chance: 0.083, minimum: 1, maximum: 2 },
+    { itemId: "empty-fang", chance: 0.12, minimum: 1, maximum: 1 },
+    { itemId: "pale-blood", chance: 0.12, minimum: 1, maximum: 1 },
   ],
 };

@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const shadowImp: Creature = {
   id: "shadow-imp",
   name: "Imp das Sombras",
-  image: "",
+  image: "/assets/creatures/howling-abyss/shadow-imp.png",
   description: "Pequenos, rápidos e em número maior do que parece. O primeiro sangue de qualquer lobisomem.",
   species: "rabbit",
   level: 701,
@@ -16,7 +16,7 @@ export const shadowImp: Creature = {
   minBronze: 1150,
   maxBronze: 2136,
   drops: [
-    { itemId: "soft-fur", chance: 0.225, minimum: 1, maximum: 2 },
-    { itemId: "lucky-foot", chance: 0.112, minimum: 1, maximum: 2 },
+    { itemId: "imp-horn", chance: 0.12, minimum: 1, maximum: 1 },
+    { itemId: "shadow-essence", chance: 0.12, minimum: 1, maximum: 1 },
   ],
 };

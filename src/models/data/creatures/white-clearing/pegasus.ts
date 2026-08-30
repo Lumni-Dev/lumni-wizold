@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const pegasus: Creature = {
   id: "pegasus",
   name: "Pégaso",
-  image: "",
+  image: "/assets/creatures/white-clearing/pegasus.png",
   description: "Nada aqui é gentil. O chifre atravessa antes de você ouvir o galope.",
   species: "unicorn",
   level: 941,
@@ -16,7 +16,7 @@ export const pegasus: Creature = {
   minBronze: 2218,
   maxBronze: 4118,
   drops: [
-    { itemId: "silver-mane", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "horn-dust", chance: 0.075, minimum: 1, maximum: 2 },
+    { itemId: "pegasus-feather", chance: 0.04, minimum: 1, maximum: 1 },
+    { itemId: "silver-mane", chance: 0.04, minimum: 1, maximum: 1 },
   ],
 };

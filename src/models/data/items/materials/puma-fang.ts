@@ -1,0 +1,17 @@
+import type { Item } from "../../../entities/item";
+
+// Presa de Puma: despojo de caça, trocado por bronze no mercado.
+export const pumaFang: Item = {
+  id: "puma-fang",
+  name: "Presa de Puma",
+  description:
+    "Despojo da caça. Vale o bronze que o mercado paga por ele; não serve de arma nem de enfeite.",
+  category: "material",
+  rarity: "rare",
+  price: 300,
+  image: "/assets/inventory/materials/puma-fang.png",
+  minLevel: 1,
+  stackable: true,
+  inMarket: false,
+  effect: {},
+};

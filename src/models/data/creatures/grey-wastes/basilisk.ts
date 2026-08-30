@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const basilisk: Creature = {
   id: "basilisk",
   name: "Basilisco",
-  image: "",
+  image: "/assets/creatures/grey-wastes/basilisk.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 581,
@@ -16,7 +16,7 @@ export const basilisk: Creature = {
   minBronze: 794,
   maxBronze: 1474,
   drops: [
-    { itemId: "empty-fang", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "black-blood", chance: 0.083, minimum: 1, maximum: 2 },
+    { itemId: "basilisk-fang", chance: 0.07, minimum: 1, maximum: 1 },
+    { itemId: "basilisk-scale", chance: 0.07, minimum: 1, maximum: 1 },
   ],
 };

@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const bloodyBride: Creature = {
   id: "bloody-bride",
   name: "Noiva Sangrenta",
-  image: "",
+  image: "/assets/creatures/scarlet-castle/bloody-bride.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 871,
@@ -16,7 +16,7 @@ export const bloodyBride: Creature = {
   minBronze: 2194,
   maxBronze: 4074,
   drops: [
-    { itemId: "empty-fang", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "black-blood", chance: 0.083, minimum: 1, maximum: 2 },
+    { itemId: "bride-veil", chance: 0.07, minimum: 1, maximum: 1 },
+    { itemId: "pale-blood", chance: 0.12, minimum: 1, maximum: 1 },
   ],
 };

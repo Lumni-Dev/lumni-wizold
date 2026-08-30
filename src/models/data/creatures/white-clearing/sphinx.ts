@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const sphinx: Creature = {
   id: "sphinx",
   name: "Esfinge",
-  image: "",
+  image: "/assets/creatures/white-clearing/sphinx.png",
   description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
   species: "human",
   level: 951,
@@ -16,7 +16,7 @@ export const sphinx: Creature = {
   minBronze: 2221,
   maxBronze: 4125,
   drops: [
-    { itemId: "twisted-steel", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "stolen-charm", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "sphinx-riddle", chance: 0.04, minimum: 1, maximum: 1 },
+    { itemId: "golden-fur", chance: 0.07, minimum: 1, maximum: 1 },
   ],
 };

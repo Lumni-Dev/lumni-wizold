@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const woodBoar: Creature = {
   id: "wood-boar",
   name: "Javali da Mata",
-  image: "",
+  image: "/assets/creatures/dew-woods/wood-boar.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 131,
@@ -16,7 +16,7 @@ export const woodBoar: Creature = {
   minBronze: 52,
   maxBronze: 97,
   drops: [
-    { itemId: "bear-claw", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "bear-fat", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "boar-tusk", chance: 0.2, minimum: 1, maximum: 2 },
+    { itemId: "thick-hide", chance: 0.35, minimum: 1, maximum: 2 },
   ],
 };

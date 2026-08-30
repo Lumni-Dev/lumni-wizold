@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const ridgePuma: Creature = {
   id: "ridge-puma",
   name: "Puma da Serra",
-  image: "",
+  image: "/assets/creatures/mist-ridge/ridge-puma.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 231,
@@ -16,7 +16,7 @@ export const ridgePuma: Creature = {
   minBronze: 208,
   maxBronze: 386,
   drops: [
-    { itemId: "empty-fang", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "black-blood", chance: 0.083, minimum: 1, maximum: 2 },
+    { itemId: "puma-pelt", chance: 0.12, minimum: 1, maximum: 1 },
+    { itemId: "puma-fang", chance: 0.12, minimum: 1, maximum: 1 },
   ],
 };

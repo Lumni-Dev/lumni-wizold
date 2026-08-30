@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const royalEagle: Creature = {
   id: "royal-eagle",
   name: "Águia Real",
-  image: "",
+  image: "/assets/creatures/mist-ridge/royal-eagle.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 211,
@@ -16,7 +16,7 @@ export const royalEagle: Creature = {
   minBronze: 80,
   maxBronze: 149,
   drops: [
-    { itemId: "empty-fang", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "black-blood", chance: 0.083, minimum: 1, maximum: 2 },
+    { itemId: "eagle-feather", chance: 0.12, minimum: 1, maximum: 1 },
+    { itemId: "eagle-talon", chance: 0.12, minimum: 1, maximum: 1 },
   ],
 };

@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const chimera: Creature = {
   id: "chimera",
   name: "Quimera",
-  image: "",
+  image: "/assets/creatures/white-clearing/chimera.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 931,
@@ -16,7 +16,7 @@ export const chimera: Creature = {
   minBronze: 2214,
   maxBronze: 4113,
   drops: [
-    { itemId: "bear-claw", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "bear-fat", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "chimera-mane", chance: 0.04, minimum: 1, maximum: 1 },
+    { itemId: "chimera-fang", chance: 0.04, minimum: 1, maximum: 1 },
   ],
 };

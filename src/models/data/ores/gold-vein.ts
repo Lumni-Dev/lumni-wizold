@@ -6,7 +6,7 @@ export const goldVein: Ore = {
   label: "Fragmento de Ouro",
   fragmentId: "gold-fragment",
   set: "gold",
-  requiredLevel: 25,
+  requiredLevel: 401,
   minYield: 1,
   maxYield: 2,
   progress: 120,

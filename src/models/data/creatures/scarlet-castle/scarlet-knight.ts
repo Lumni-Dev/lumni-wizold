@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const scarletKnight: Creature = {
   id: "scarlet-knight",
   name: "Cavaleiro Escarlate",
-  image: "",
+  image: "/assets/creatures/scarlet-castle/scarlet-knight.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 831,
@@ -16,7 +16,7 @@ export const scarletKnight: Creature = {
   minBronze: 2180,
   maxBronze: 4048,
   drops: [
-    { itemId: "bear-claw", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "bear-fat", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "scarlet-plate", chance: 0.07, minimum: 1, maximum: 1 },
+    { itemId: "cursed-plate", chance: 0.12, minimum: 1, maximum: 1 },
   ],
 };

@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const cryptGuardian: Creature = {
   id: "crypt-guardian",
   name: "Guardião da Cripta",
-  image: "",
+  image: "/assets/creatures/stone-necropolis/crypt-guardian.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 691,
@@ -16,7 +16,7 @@ export const cryptGuardian: Creature = {
   minBronze: 1147,
   maxBronze: 2131,
   drops: [
-    { itemId: "bear-claw", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "bear-fat", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "guardian-relic", chance: 0.07, minimum: 1, maximum: 1 },
+    { itemId: "bone-shard", chance: 0.2, minimum: 1, maximum: 2 },
   ],
 };

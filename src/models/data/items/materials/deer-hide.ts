@@ -1,0 +1,17 @@
+import type { Item } from "../../../entities/item";
+
+// Couro de Veado: despojo de caça, trocado por bronze no mercado.
+export const deerHide: Item = {
+  id: "deer-hide",
+  name: "Couro de Veado",
+  description:
+    "Despojo da caça. Vale o bronze que o mercado paga por ele; não serve de arma nem de enfeite.",
+  category: "material",
+  rarity: "common",
+  price: 15,
+  image: "/assets/inventory/materials/deer-hide.png",
+  minLevel: 1,
+  stackable: true,
+  inMarket: false,
+  effect: {},
+};

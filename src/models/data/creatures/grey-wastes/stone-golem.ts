@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const stoneGolem: Creature = {
   id: "stone-golem",
   name: "Golem de Pedra",
-  image: "",
+  image: "/assets/creatures/grey-wastes/stone-golem.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 571,
@@ -16,7 +16,7 @@ export const stoneGolem: Creature = {
   minBronze: 791,
   maxBronze: 1468,
   drops: [
-    { itemId: "bear-claw", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "bear-fat", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "golem-core", chance: 0.07, minimum: 1, maximum: 1 },
+    { itemId: "stone-shard", chance: 0.2, minimum: 1, maximum: 2 },
   ],
 };

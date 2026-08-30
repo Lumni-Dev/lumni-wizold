@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const ghoul: Creature = {
   id: "ghoul",
   name: "Carniçal",
-  image: "",
+  image: "/assets/creatures/stone-necropolis/ghoul.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 631,
@@ -16,7 +16,7 @@ export const ghoul: Creature = {
   minBronze: 1126,
   maxBronze: 2092,
   drops: [
-    { itemId: "empty-fang", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "black-blood", chance: 0.083, minimum: 1, maximum: 2 },
+    { itemId: "ghoul-claw", chance: 0.12, minimum: 1, maximum: 1 },
+    { itemId: "rotten-flesh", chance: 0.2, minimum: 1, maximum: 2 },
   ],
 };

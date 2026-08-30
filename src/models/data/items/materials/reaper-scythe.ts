@@ -1,0 +1,17 @@
+import type { Item } from "../../../entities/item";
+
+// Foice do Ceifador: despojo de caça, trocado por bronze no mercado.
+export const reaperScythe: Item = {
+  id: "reaper-scythe",
+  name: "Foice do Ceifador",
+  description:
+    "Despojo da caça. Vale o bronze que o mercado paga por ele; não serve de arma nem de enfeite.",
+  category: "material",
+  rarity: "legendary",
+  price: 4000,
+  image: "/assets/inventory/materials/reaper-scythe.png",
+  minLevel: 1,
+  stackable: true,
+  inMarket: false,
+  effect: {},
+};

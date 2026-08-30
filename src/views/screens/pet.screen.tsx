@@ -37,7 +37,6 @@ import { PetBanner, PetIcon } from "../components/pet-icon";
 import { List, ListRow, RowText } from "../components/list";
 import { Panel } from "../components/panel";
 import { RecoveryButton } from "../components/recovery-button";
-import { Tag } from "../components/tag";
 import { DataRow } from "../components/data-row";
 import { EmptyState } from "../components/empty-state";
 import { PageHeader } from "../layout/page-header";
@@ -180,7 +179,6 @@ export function PetScreen() {
         <PageHeader
           title="Mascote"
           description="Um lobo caça melhor acompanhado. Escolha o seu e dê um nome que fica para sempre."
-          action={<Tag tone="neutral">{formatBronze(character.bronze)}</Tag>}
         />
         <Kennel bronze={character.bronze} level={character.level} />
       </>
@@ -205,7 +203,6 @@ export function PetScreen() {
       <PageHeader
         title="Mascote"
         description="Acompanhando, ele entra na luta como um turno de ataque, os atributos dele contam como seus, e cada caçada ao seu lado rende experiência para ele."
-        action={<Tag tone="neutral">{formatBronze(character.bronze)}</Tag>}
       />
 
       <div className="grid items-start gap-6 lg:grid-cols-3">

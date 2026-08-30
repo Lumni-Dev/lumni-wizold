@@ -324,7 +324,6 @@ export function ArenaScreen() {
             <Tag tone="neutral">
               {formatNumber(character.arenaWins)}V - {formatNumber(character.arenaLosses)}D
             </Tag>
-            <Tag tone="neutral">{formatBronze(character.bronze)}</Tag>
           </div>
         }
       />

@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const swampSerpent: Creature = {
   id: "swamp-serpent",
   name: "Serpente do Pântano",
-  image: "",
+  image: "/assets/creatures/pale-swamp/swamp-serpent.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 331,
@@ -16,7 +16,7 @@ export const swampSerpent: Creature = {
   minBronze: 243,
   maxBronze: 450,
   drops: [
-    { itemId: "empty-fang", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "black-blood", chance: 0.083, minimum: 1, maximum: 2 },
+    { itemId: "serpent-scale", chance: 0.2, minimum: 1, maximum: 2 },
+    { itemId: "venom-gland", chance: 0.2, minimum: 1, maximum: 2 },
   ],
 };

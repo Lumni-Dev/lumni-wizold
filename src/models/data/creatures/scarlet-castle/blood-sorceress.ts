@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const bloodSorceress: Creature = {
   id: "blood-sorceress",
   name: "Feiticeira de Sangue",
-  image: "",
+  image: "/assets/creatures/scarlet-castle/blood-sorceress.png",
   description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
   species: "human",
   level: 841,
@@ -16,7 +16,7 @@ export const bloodSorceress: Creature = {
   minBronze: 2183,
   maxBronze: 4054,
   drops: [
-    { itemId: "twisted-steel", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "stolen-charm", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "blood-grimoire", chance: 0.07, minimum: 1, maximum: 1 },
+    { itemId: "black-blood", chance: 0.04, minimum: 1, maximum: 1 },
   ],
 };

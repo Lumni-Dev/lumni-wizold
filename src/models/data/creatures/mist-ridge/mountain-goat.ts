@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const mountainGoat: Creature = {
   id: "mountain-goat",
   name: "Cabra Montesa",
-  image: "",
+  image: "/assets/creatures/mist-ridge/mountain-goat.png",
   description: "Fogem bem e chutam melhor. Alimentam uma matilha inteira por semanas.",
   species: "deer",
   level: 201,
@@ -16,7 +16,7 @@ export const mountainGoat: Creature = {
   minBronze: 76,
   maxBronze: 142,
   drops: [
-    { itemId: "chipped-antler", chance: 0.21, minimum: 1, maximum: 2 },
-    { itemId: "deer-hide", chance: 0.112, minimum: 1, maximum: 2 },
+    { itemId: "goat-horn", chance: 0.2, minimum: 1, maximum: 2 },
+    { itemId: "thick-hide", chance: 0.35, minimum: 1, maximum: 2 },
   ],
 };

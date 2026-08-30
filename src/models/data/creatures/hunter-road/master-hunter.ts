@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const masterHunter: Creature = {
   id: "master-hunter",
   name: "Mestre Caçador",
-  image: "",
+  image: "/assets/creatures/hunter-road/master-hunter.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 491,
@@ -16,7 +16,7 @@ export const masterHunter: Creature = {
   minBronze: 763,
   maxBronze: 1417,
   drops: [
-    { itemId: "empty-fang", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "black-blood", chance: 0.083, minimum: 1, maximum: 2 },
+    { itemId: "master-trophy", chance: 0.07, minimum: 1, maximum: 1 },
+    { itemId: "silver-charm", chance: 0.12, minimum: 1, maximum: 1 },
   ],
 };

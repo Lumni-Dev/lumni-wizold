@@ -6,7 +6,7 @@ export const silverVein: Ore = {
   label: "Fragmento de Metal",
   fragmentId: "silver-fragment",
   set: "silver",
-  requiredLevel: 10,
+  requiredLevel: 201,
   minYield: 1,
   maxYield: 3,
   progress: 45,

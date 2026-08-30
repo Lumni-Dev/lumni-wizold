@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const forestLynx: Creature = {
   id: "forest-lynx",
   name: "Lince do Mato",
-  image: "",
+  image: "/assets/creatures/village-field/forest-lynx.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 91,
@@ -16,7 +16,7 @@ export const forestLynx: Creature = {
   minBronze: 38,
   maxBronze: 71,
   drops: [
-    { itemId: "empty-fang", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "black-blood", chance: 0.083, minimum: 1, maximum: 2 },
+    { itemId: "lynx-pelt", chance: 0.2, minimum: 1, maximum: 2 },
+    { itemId: "sharp-fang", chance: 0.35, minimum: 1, maximum: 2 },
   ],
 };

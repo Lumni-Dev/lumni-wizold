@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const youngYeti: Creature = {
   id: "young-yeti",
   name: "Iéti Jovem",
-  image: "",
+  image: "/assets/creatures/mist-ridge/young-yeti.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 261,
@@ -16,7 +16,7 @@ export const youngYeti: Creature = {
   minBronze: 218,
   maxBronze: 405,
   drops: [
-    { itemId: "bear-claw", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "bear-fat", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "yeti-fur", chance: 0.12, minimum: 1, maximum: 1 },
+    { itemId: "frost-heart", chance: 0.07, minimum: 1, maximum: 1 },
   ],
 };

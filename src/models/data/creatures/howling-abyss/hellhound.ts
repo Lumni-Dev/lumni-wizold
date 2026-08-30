@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const hellhound: Creature = {
   id: "hellhound",
   name: "Cão do Inferno",
-  image: "",
+  image: "/assets/creatures/howling-abyss/hellhound.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 711,
@@ -16,7 +16,7 @@ export const hellhound: Creature = {
   minBronze: 1154,
   maxBronze: 2143,
   drops: [
-    { itemId: "empty-fang", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "black-blood", chance: 0.083, minimum: 1, maximum: 2 },
+    { itemId: "hellhound-fang", chance: 0.07, minimum: 1, maximum: 1 },
+    { itemId: "ember-pelt", chance: 0.12, minimum: 1, maximum: 1 },
   ],
 };

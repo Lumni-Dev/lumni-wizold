@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const peregrineFalcon: Creature = {
   id: "peregrine-falcon",
   name: "Falcão Peregrino",
-  image: "",
+  image: "/assets/creatures/mist-ridge/peregrine-falcon.png",
   description: "Pequenos, rápidos e em número maior do que parece. O primeiro sangue de qualquer lobisomem.",
   species: "rabbit",
   level: 251,
@@ -16,7 +16,7 @@ export const peregrineFalcon: Creature = {
   minBronze: 215,
   maxBronze: 399,
   drops: [
-    { itemId: "soft-fur", chance: 0.225, minimum: 1, maximum: 2 },
-    { itemId: "lucky-foot", chance: 0.112, minimum: 1, maximum: 2 },
+    { itemId: "falcon-feather", chance: 0.2, minimum: 1, maximum: 2 },
+    { itemId: "talon", chance: 0.35, minimum: 1, maximum: 2 },
   ],
 };

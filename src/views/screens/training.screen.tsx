@@ -132,8 +132,7 @@ export function TrainingScreen() {
     <>
       <PageHeader
         title="Treinamento"
-        description="Só a fera treina: um exercício por atributo, cada barra cheia vira um ponto permanente, e o custo do próximo cresce a cada avanço."
-        action={<Tag tone="neutral">{formatBronze(character.bronze)}</Tag>}
+        description="Um exercício por atributo, cada barra cheia vira um ponto permanente, e o custo do próximo cresce a cada avanço."
       />
 
       <Panel

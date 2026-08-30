@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const wanderingKnight: Creature = {
   id: "wandering-knight",
   name: "Cavaleiro Errante",
-  image: "",
+  image: "/assets/creatures/hunter-road/wandering-knight.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 461,
@@ -16,7 +16,7 @@ export const wanderingKnight: Creature = {
   minBronze: 752,
   maxBronze: 1397,
   drops: [
-    { itemId: "bear-claw", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "bear-fat", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "knight-plate", chance: 0.12, minimum: 1, maximum: 1 },
+    { itemId: "steel-scrap", chance: 0.2, minimum: 1, maximum: 2 },
   ],
 };

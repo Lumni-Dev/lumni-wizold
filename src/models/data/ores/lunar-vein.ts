@@ -6,7 +6,7 @@ export const lunarVein: Ore = {
   label: "Fragmento Lunar",
   fragmentId: "lunar-fragment",
   set: "lunar",
-  requiredLevel: 70,
+  requiredLevel: 801,
   minYield: 1,
   maxYield: 2,
   progress: 520,

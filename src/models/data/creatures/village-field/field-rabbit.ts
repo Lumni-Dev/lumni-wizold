@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const fieldRabbit: Creature = {
   id: "field-rabbit",
   name: "Coelho do Campo",
-  image: "",
+  image: "/assets/creatures/village-field/field-rabbit.png",
   description: "Pequenos, rápidos e em número maior do que parece. O primeiro sangue de qualquer lobisomem.",
   species: "rabbit",
   level: 1,
@@ -16,7 +16,7 @@ export const fieldRabbit: Creature = {
   minBronze: 8,
   maxBronze: 14,
   drops: [
-    { itemId: "soft-fur", chance: 0.225, minimum: 1, maximum: 2 },
-    { itemId: "lucky-foot", chance: 0.112, minimum: 1, maximum: 2 },
+    { itemId: "rabbit-fur", chance: 0.35, minimum: 1, maximum: 2 },
+    { itemId: "lucky-foot", chance: 0.2, minimum: 1, maximum: 2 },
   ],
 };

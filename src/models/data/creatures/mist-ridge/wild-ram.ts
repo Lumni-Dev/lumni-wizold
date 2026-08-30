@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const wildRam: Creature = {
   id: "wild-ram",
   name: "Bode Selvagem",
-  image: "",
+  image: "/assets/creatures/mist-ridge/wild-ram.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 241,
@@ -16,7 +16,7 @@ export const wildRam: Creature = {
   minBronze: 211,
   maxBronze: 392,
   drops: [
-    { itemId: "bear-claw", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "bear-fat", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "ram-horn", chance: 0.2, minimum: 1, maximum: 2 },
+    { itemId: "thick-hide", chance: 0.35, minimum: 1, maximum: 2 },
   ],
 };

@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const mudGator: Creature = {
   id: "mud-gator",
   name: "Jacaré do Lodo",
-  image: "",
+  image: "/assets/creatures/pale-swamp/mud-gator.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 311,
@@ -16,7 +16,7 @@ export const mudGator: Creature = {
   minBronze: 236,
   maxBronze: 438,
   drops: [
-    { itemId: "bear-claw", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "bear-fat", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "gator-scale", chance: 0.12, minimum: 1, maximum: 1 },
+    { itemId: "gator-tooth", chance: 0.12, minimum: 1, maximum: 1 },
   ],
 };

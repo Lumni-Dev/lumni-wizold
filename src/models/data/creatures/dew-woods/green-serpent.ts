@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const greenSerpent: Creature = {
   id: "green-serpent",
   name: "Serpente Verde",
-  image: "",
+  image: "/assets/creatures/dew-woods/green-serpent.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 141,
@@ -16,7 +16,7 @@ export const greenSerpent: Creature = {
   minBronze: 55,
   maxBronze: 103,
   drops: [
-    { itemId: "empty-fang", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "black-blood", chance: 0.083, minimum: 1, maximum: 2 },
+    { itemId: "serpent-scale", chance: 0.2, minimum: 1, maximum: 2 },
+    { itemId: "venom-gland", chance: 0.2, minimum: 1, maximum: 2 },
   ],
 };

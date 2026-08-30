@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const moonAvatar: Creature = {
   id: "moon-avatar",
   name: "Avatar da Lua",
-  image: "",
+  image: "/assets/creatures/white-clearing/moon-avatar.png",
   description: "Nada aqui é gentil. O chifre atravessa antes de você ouvir o galope.",
   species: "unicorn",
   level: 991,
@@ -16,7 +16,7 @@ export const moonAvatar: Creature = {
   minBronze: 2235,
   maxBronze: 4151,
   drops: [
-    { itemId: "silver-mane", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "horn-dust", chance: 0.075, minimum: 1, maximum: 2 },
+    { itemId: "moon-essence", chance: 0.04, minimum: 1, maximum: 1 },
+    { itemId: "silver-mane", chance: 0.04, minimum: 1, maximum: 1 },
   ],
 };

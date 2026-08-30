@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const youngHydra: Creature = {
   id: "young-hydra",
   name: "Hidra Jovem",
-  image: "",
+  image: "/assets/creatures/pale-swamp/young-hydra.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 381,
@@ -16,7 +16,7 @@ export const youngHydra: Creature = {
   minBronze: 260,
   maxBronze: 482,
   drops: [
-    { itemId: "bear-claw", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "bear-fat", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "hydra-scale", chance: 0.07, minimum: 1, maximum: 1 },
+    { itemId: "hydra-blood", chance: 0.07, minimum: 1, maximum: 1 },
   ],
 };

@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const snowWolf: Creature = {
   id: "snow-wolf",
   name: "Lobo da Neve",
-  image: "",
+  image: "/assets/creatures/mist-ridge/snow-wolf.png",
   description: "Fogem bem e chutam melhor. Alimentam uma matilha inteira por semanas.",
   species: "deer",
   level: 271,
@@ -16,7 +16,7 @@ export const snowWolf: Creature = {
   minBronze: 222,
   maxBronze: 412,
   drops: [
-    { itemId: "chipped-antler", chance: 0.21, minimum: 1, maximum: 2 },
-    { itemId: "deer-hide", chance: 0.112, minimum: 1, maximum: 2 },
+    { itemId: "snow-pelt", chance: 0.12, minimum: 1, maximum: 1 },
+    { itemId: "wolf-fang", chance: 0.2, minimum: 1, maximum: 2 },
   ],
 };

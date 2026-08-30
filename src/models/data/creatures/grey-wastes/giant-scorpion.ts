@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const giantScorpion: Creature = {
   id: "giant-scorpion",
   name: "Escorpião Gigante",
-  image: "",
+  image: "/assets/creatures/grey-wastes/giant-scorpion.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 521,
@@ -16,7 +16,7 @@ export const giantScorpion: Creature = {
   minBronze: 773,
   maxBronze: 1436,
   drops: [
-    { itemId: "empty-fang", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "black-blood", chance: 0.083, minimum: 1, maximum: 2 },
+    { itemId: "scorpion-stinger", chance: 0.12, minimum: 1, maximum: 1 },
+    { itemId: "chitin-plate", chance: 0.12, minimum: 1, maximum: 1 },
   ],
 };

@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const starvingPack: Creature = {
   id: "starving-pack",
   name: "Alcateia Faminta",
-  image: "",
+  image: "/assets/creatures/dew-woods/starving-pack.png",
   description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
   species: "human",
   level: 191,
@@ -16,7 +16,7 @@ export const starvingPack: Creature = {
   minBronze: 73,
   maxBronze: 136,
   drops: [
-    { itemId: "twisted-steel", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "stolen-charm", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "wolf-pelt", chance: 0.2, minimum: 1, maximum: 2 },
+    { itemId: "wolf-fang", chance: 0.2, minimum: 1, maximum: 2 },
   ],
 };

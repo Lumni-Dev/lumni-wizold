@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const skeletonWarrior: Creature = {
   id: "skeleton-warrior",
   name: "Esqueleto Guerreiro",
-  image: "",
+  image: "/assets/creatures/stone-necropolis/skeleton-warrior.png",
   description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
   species: "human",
   level: 601,
@@ -16,7 +16,7 @@ export const skeletonWarrior: Creature = {
   minBronze: 801,
   maxBronze: 1487,
   drops: [
-    { itemId: "twisted-steel", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "stolen-charm", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "bone-shard", chance: 0.2, minimum: 1, maximum: 2 },
+    { itemId: "rusted-blade", chance: 0.2, minimum: 1, maximum: 2 },
   ],
 };

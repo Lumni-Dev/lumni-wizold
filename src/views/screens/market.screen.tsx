@@ -31,7 +31,6 @@ import { enhancedName } from "@/models/rules/forge";
 import { ItemCard } from "../components/item-card";
 import { List, ListRow } from "../components/list";
 import { ItemIcon } from "../components/item-icon";
-import { Tag } from "../components/tag";
 import { Panel } from "../components/panel";
 import { EmptyState } from "../components/empty-state";
 import { PageHeader } from "../layout/page-header";
@@ -172,7 +171,6 @@ export function MarketScreen() {
       <PageHeader
         title="Mercado"
         description="O ferreiro do vilarejo não pergunta de onde vem o material. Só conta o bronze."
-        action={<Tag tone="neutral">{formatBronze(character.bronze)}</Tag>}
       />
 
       <div className="flex gap-2">

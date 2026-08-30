@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const giantBat: Creature = {
   id: "giant-bat",
   name: "Morcego Gigante",
-  image: "",
+  image: "/assets/creatures/scarlet-castle/giant-bat.png",
   description: "Pequenos, rápidos e em número maior do que parece. O primeiro sangue de qualquer lobisomem.",
   species: "rabbit",
   level: 811,
@@ -16,7 +16,7 @@ export const giantBat: Creature = {
   minBronze: 1189,
   maxBronze: 2208,
   drops: [
-    { itemId: "soft-fur", chance: 0.225, minimum: 1, maximum: 2 },
-    { itemId: "lucky-foot", chance: 0.112, minimum: 1, maximum: 2 },
+    { itemId: "bat-wing", chance: 0.2, minimum: 1, maximum: 2 },
+    { itemId: "bat-fang", chance: 0.2, minimum: 1, maximum: 2 },
   ],
 };

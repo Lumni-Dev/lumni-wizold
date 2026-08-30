@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const youngDeer: Creature = {
   id: "young-deer",
   name: "Veado Jovem",
-  image: "",
+  image: "/assets/creatures/dew-woods/young-deer.png",
   description: "Fogem bem e chutam melhor. Alimentam uma matilha inteira por semanas.",
   species: "deer",
   level: 101,
@@ -16,7 +16,7 @@ export const youngDeer: Creature = {
   minBronze: 42,
   maxBronze: 77,
   drops: [
-    { itemId: "chipped-antler", chance: 0.21, minimum: 1, maximum: 2 },
-    { itemId: "deer-hide", chance: 0.112, minimum: 1, maximum: 2 },
+    { itemId: "deer-hide", chance: 0.35, minimum: 1, maximum: 2 },
+    { itemId: "soft-antler", chance: 0.35, minimum: 1, maximum: 2 },
   ],
 };

@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const elderDragon: Creature = {
   id: "elder-dragon",
   name: "Dragão Ancião",
-  image: "",
+  image: "/assets/creatures/white-clearing/elder-dragon.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 961,
@@ -16,7 +16,7 @@ export const elderDragon: Creature = {
   minBronze: 2225,
   maxBronze: 4131,
   drops: [
-    { itemId: "bear-claw", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "bear-fat", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "dragon-scale", chance: 0.04, minimum: 1, maximum: 1 },
+    { itemId: "dragon-heart", chance: 0.04, minimum: 1, maximum: 1 },
   ],
 };

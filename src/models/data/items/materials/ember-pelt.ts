@@ -1,0 +1,17 @@
+import type { Item } from "../../../entities/item";
+
+// Pele em Brasa: despojo de caça, trocado por bronze no mercado.
+export const emberPelt: Item = {
+  id: "ember-pelt",
+  name: "Pele em Brasa",
+  description:
+    "Despojo da caça. Vale o bronze que o mercado paga por ele; não serve de arma nem de enfeite.",
+  category: "material",
+  rarity: "rare",
+  price: 300,
+  image: "/assets/inventory/materials/ember-pelt.png",
+  minLevel: 1,
+  stackable: true,
+  inMarket: false,
+  effect: {},
+};

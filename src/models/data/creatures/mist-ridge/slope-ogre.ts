@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const slopeOgre: Creature = {
   id: "slope-ogre",
   name: "Ogro da Encosta",
-  image: "",
+  image: "/assets/creatures/mist-ridge/slope-ogre.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 281,
@@ -16,7 +16,7 @@ export const slopeOgre: Creature = {
   minBronze: 225,
   maxBronze: 418,
   drops: [
-    { itemId: "bear-claw", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "bear-fat", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "ogre-tooth", chance: 0.12, minimum: 1, maximum: 1 },
+    { itemId: "thick-hide", chance: 0.35, minimum: 1, maximum: 2 },
   ],
 };

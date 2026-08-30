@@ -34,7 +34,6 @@ Module._resolveFilename = function (request, ...rest) {
 const require = createRequire(import.meta.url);
 const { speciesNumbers, SPECIES } = require(join(BUILD, "models/data/species.js"));
 
-const MATERIAL_DROP_RATIO = 0.75;
 
 // Each area: slug, name, danger, one representative species key (internal), and
 // its 10 creatures as [slug, name, archetype]. The archetype is an existing
@@ -275,14 +274,280 @@ function camel(slug) {
   return slug.replace(/-([a-z0-9])/g, (_, c) => c.toUpperCase());
 }
 
-function dropsFor(archetype) {
-  const def = SPECIES.find((entry) => entry.key === archetype) ?? SPECIES[0];
-  return def.materials.map((material) => ({
-    itemId: material.id,
-    chance: Math.round(material.chance * MATERIAL_DROP_RATIO * 1000) / 1000,
-    minimum: 1,
-    maximum: 2,
-  }));
+// The loot catalog. Each creature drops its own materials, and similar creatures
+// share them (wolves drop "wolf-pelt", bears "bear-claw"...). A material is
+// [name, rarity]; price and drop chance come from the rarity below, and the
+// image is derived from the id, so adding art is dropping a .png in the folder.
+const RARITY_PRICE = { common: 15, uncommon: 70, rare: 300, epic: 1100, legendary: 4000 };
+const RARITY_CHANCE = { common: 0.35, uncommon: 0.2, rare: 0.12, epic: 0.07, legendary: 0.04 };
+
+const MATERIALS = {
+  // village-field
+  "rabbit-fur": ["Pelo de Coelho", "common"],
+  "lucky-foot": ["Pata de Coelho", "uncommon"],
+  "rat-tail": ["Rabo de Rato", "common"],
+  "gnawed-bone": ["Osso Roído", "common"],
+  "feather": ["Pena", "common"],
+  "poultry-meat": ["Carne de Ave", "common"],
+  "fox-pelt": ["Pele de Raposa", "uncommon"],
+  "sharp-fang": ["Presa Afiada", "common"],
+  "black-feather": ["Pena Negra", "common"],
+  "crow-beak": ["Bico de Corvo", "common"],
+  "canine-pelt": ["Pele Canina", "common"],
+  "boar-tusk": ["Presa de Javali", "uncommon"],
+  "thick-hide": ["Couro Grosso", "common"],
+  "snake-skin": ["Pele de Cobra", "common"],
+  "venom-gland": ["Glândula de Veneno", "uncommon"],
+  "badger-claw": ["Garra de Texugo", "common"],
+  "lynx-pelt": ["Pele de Lince", "uncommon"],
+  // dew-woods
+  "deer-hide": ["Couro de Veado", "common"],
+  "soft-antler": ["Chifre Macio", "common"],
+  "owl-feather": ["Pena de Coruja", "uncommon"],
+  "talon": ["Garra", "common"],
+  "wolf-pelt": ["Pele de Lobo", "uncommon"],
+  "wolf-fang": ["Presa de Lobo", "uncommon"],
+  "serpent-scale": ["Escama de Serpente", "uncommon"],
+  "bear-pelt": ["Pele de Urso", "uncommon"],
+  "bear-claw": ["Garra de Urso", "rare"],
+  "wildcat-pelt": ["Pele de Gato Selvagem", "uncommon"],
+  "twisted-antler": ["Chifre Torto", "uncommon"],
+  "spider-silk": ["Seda de Aranha", "uncommon"],
+  // mist-ridge
+  "goat-horn": ["Chifre de Cabra", "uncommon"],
+  "eagle-feather": ["Pena de Águia", "rare"],
+  "eagle-talon": ["Garra de Águia", "rare"],
+  "puma-pelt": ["Pele de Puma", "rare"],
+  "puma-fang": ["Presa de Puma", "rare"],
+  "ram-horn": ["Chifre de Bode", "uncommon"],
+  "falcon-feather": ["Pena de Falcão", "uncommon"],
+  "yeti-fur": ["Pelo de Iéti", "rare"],
+  "frost-heart": ["Coração Gelado", "epic"],
+  "snow-pelt": ["Pele Nevada", "rare"],
+  "ogre-tooth": ["Dente de Ogro", "rare"],
+  "griffin-feather": ["Pena de Grifo", "rare"],
+  // pale-swamp
+  "toad-skin": ["Pele de Sapo", "uncommon"],
+  "gator-scale": ["Escama de Jacaré", "rare"],
+  "gator-tooth": ["Dente de Jacaré", "rare"],
+  "leech-blood": ["Sangue de Sanguessuga", "uncommon"],
+  "lizard-scale": ["Escama de Lagarto", "rare"],
+  "mosquito-wing": ["Asa de Mosquito", "common"],
+  "swamp-mud": ["Lama do Pântano", "uncommon"],
+  "naga-scale": ["Escama de Naga", "epic"],
+  "hydra-scale": ["Escama de Hidra", "epic"],
+  "hydra-blood": ["Sangue de Hidra", "epic"],
+  "witch-hair": ["Cabelo de Bruxa", "rare"],
+  "cursed-charm": ["Amuleto Amaldiçoado", "rare"],
+  // hunter-road
+  "steel-scrap": ["Sucata de Aço", "uncommon"],
+  "coin-purse": ["Bolsa de Moedas", "rare"],
+  "leather-strap": ["Correia de Couro", "uncommon"],
+  "scout-map": ["Mapa do Batedor", "rare"],
+  "silver-charm": ["Amuleto de Prata", "rare"],
+  "silver-arrow": ["Flecha de Prata", "rare"],
+  "bandit-mask": ["Máscara de Bandido", "rare"],
+  "knight-plate": ["Placa de Cavaleiro", "rare"],
+  "holy-water": ["Água Benta", "rare"],
+  "captain-medal": ["Medalha do Capitão", "epic"],
+  "master-trophy": ["Troféu do Mestre", "epic"],
+  // grey-wastes
+  "vulture-feather": ["Pena de Abutre", "uncommon"],
+  "carrion-meat": ["Carniça", "common"],
+  "hyena-pelt": ["Pele de Hiena", "uncommon"],
+  "scorpion-stinger": ["Ferrão de Escorpião", "rare"],
+  "chitin-plate": ["Placa de Quitina", "rare"],
+  "jackal-pelt": ["Pele de Chacal", "uncommon"],
+  "worm-hide": ["Couro de Verme", "rare"],
+  "sand-tooth": ["Dente de Areia", "rare"],
+  "raider-loot": ["Espólio de Saqueador", "rare"],
+  "gorgon-scale": ["Escama de Górgona", "epic"],
+  "gorgon-eye": ["Olho de Górgona", "epic"],
+  "golem-core": ["Núcleo de Golem", "epic"],
+  "stone-shard": ["Lasca de Pedra", "uncommon"],
+  "basilisk-fang": ["Presa de Basilisco", "epic"],
+  "basilisk-scale": ["Escama de Basilisco", "epic"],
+  "wastes-crown": ["Coroa do Ermo", "epic"],
+  // stone-necropolis
+  "bone-shard": ["Lasca de Osso", "uncommon"],
+  "rusted-blade": ["Lâmina Enferrujada", "uncommon"],
+  "rotten-flesh": ["Carne Podre", "uncommon"],
+  "grave-dirt": ["Terra de Cova", "common"],
+  "ectoplasm": ["Ectoplasma", "rare"],
+  "ghoul-claw": ["Garra de Carniçal", "rare"],
+  "cursed-plate": ["Placa Amaldiçoada", "rare"],
+  "banshee-wail": ["Lamento de Banshee", "epic"],
+  "necro-tome": ["Tomo Necromante", "epic"],
+  "gargoyle-stone": ["Pedra de Gárgula", "rare"],
+  "lich-phylactery": ["Filactério de Lich", "legendary"],
+  "guardian-relic": ["Relíquia do Guardião", "epic"],
+  // howling-abyss
+  "imp-horn": ["Chifre de Imp", "rare"],
+  "shadow-essence": ["Essência das Sombras", "rare"],
+  "hellhound-fang": ["Presa Infernal", "epic"],
+  "ember-pelt": ["Pele em Brasa", "rare"],
+  "demon-horn": ["Chifre de Demônio", "epic"],
+  "brimstone": ["Enxofre", "rare"],
+  "aberrant-eye": ["Olho Aberrante", "epic"],
+  "lava-core": ["Núcleo de Lava", "epic"],
+  "molten-rock": ["Rocha Fundida", "rare"],
+  "succubus-wing": ["Asa de Súcubo", "epic"],
+  "shadow-silk": ["Seda Sombria", "rare"],
+  "behemoth-hide": ["Couro de Behemoth", "epic"],
+  "behemoth-horn": ["Chifre de Behemoth", "epic"],
+  "reaper-scythe": ["Foice do Ceifador", "legendary"],
+  "soul-shard": ["Fragmento de Alma", "epic"],
+  "abyss-crown": ["Coroa do Abismo", "legendary"],
+  "dragon-scale": ["Escama de Dragão", "legendary"],
+  "dragon-fang": ["Presa de Dragão", "legendary"],
+  // scarlet-castle
+  "empty-fang": ["Presa Vazia", "rare"],
+  "pale-blood": ["Sangue Pálido", "rare"],
+  "bat-wing": ["Asa de Morcego", "uncommon"],
+  "bat-fang": ["Presa de Morcego", "uncommon"],
+  "noble-signet": ["Anel de Nobre", "epic"],
+  "scarlet-plate": ["Placa Escarlate", "epic"],
+  "blood-grimoire": ["Grimório de Sangue", "epic"],
+  "black-blood": ["Sangue Negro", "legendary"],
+  "rival-pelt": ["Pele de Rival", "epic"],
+  "bride-veil": ["Véu da Noiva", "epic"],
+  "count-crown": ["Coroa do Conde", "legendary"],
+  "queen-tiara": ["Tiara da Rainha", "legendary"],
+  // white-clearing
+  "silver-mane": ["Crina Prateada", "legendary"],
+  "horn-dust": ["Pó de Chifre", "legendary"],
+  "spectral-antler": ["Chifre Espectral", "epic"],
+  "phoenix-ash": ["Cinza de Fênix", "legendary"],
+  "phoenix-feather": ["Pena de Fênix", "legendary"],
+  "chimera-mane": ["Juba de Quimera", "legendary"],
+  "chimera-fang": ["Presa de Quimera", "legendary"],
+  "pegasus-feather": ["Pena de Pégaso", "legendary"],
+  "sphinx-riddle": ["Enigma da Esfinge", "legendary"],
+  "golden-fur": ["Pelo Dourado", "epic"],
+  "dragon-heart": ["Coração de Dragão", "legendary"],
+  "seraph-feather": ["Pena de Serafim", "legendary"],
+  "halo-shard": ["Fragmento de Auréola", "legendary"],
+  "moon-mane": ["Crina Lunar", "legendary"],
+  "moon-essence": ["Essência da Lua", "legendary"],
+};
+
+const LOOT = {
+  "field-rabbit": ["rabbit-fur", "lucky-foot"],
+  "barn-rat": ["rat-tail", "gnawed-bone"],
+  "wild-hen": ["feather", "poultry-meat"],
+  "thief-fox": ["fox-pelt", "sharp-fang"],
+  "hungry-crow": ["black-feather", "crow-beak"],
+  "wild-dog": ["canine-pelt", "sharp-fang"],
+  "fierce-boar": ["boar-tusk", "thick-hide"],
+  "wheat-snake": ["snake-skin", "venom-gland"],
+  "furious-badger": ["badger-claw", "thick-hide"],
+  "forest-lynx": ["lynx-pelt", "sharp-fang"],
+  "young-deer": ["deer-hide", "soft-antler"],
+  "brown-owl": ["owl-feather", "talon"],
+  "grey-wolf": ["wolf-pelt", "wolf-fang"],
+  "wood-boar": ["boar-tusk", "thick-hide"],
+  "green-serpent": ["serpent-scale", "venom-gland"],
+  "young-bear": ["bear-pelt", "bear-claw"],
+  "wildcat": ["wildcat-pelt", "sharp-fang"],
+  "twisted-antler-stag": ["twisted-antler", "deer-hide"],
+  "giant-spider": ["spider-silk", "venom-gland"],
+  "starving-pack": ["wolf-pelt", "wolf-fang"],
+  "mountain-goat": ["goat-horn", "thick-hide"],
+  "royal-eagle": ["eagle-feather", "eagle-talon"],
+  "mist-bear": ["bear-pelt", "bear-claw"],
+  "ridge-puma": ["puma-pelt", "puma-fang"],
+  "wild-ram": ["ram-horn", "thick-hide"],
+  "peregrine-falcon": ["falcon-feather", "talon"],
+  "young-yeti": ["yeti-fur", "frost-heart"],
+  "snow-wolf": ["snow-pelt", "wolf-fang"],
+  "slope-ogre": ["ogre-tooth", "thick-hide"],
+  "lesser-griffin": ["griffin-feather", "eagle-talon"],
+  "poison-toad": ["toad-skin", "venom-gland"],
+  "mud-gator": ["gator-scale", "gator-tooth"],
+  "giant-leech": ["leech-blood", "venom-gland"],
+  "swamp-serpent": ["serpent-scale", "venom-gland"],
+  "armored-lizard": ["lizard-scale", "thick-hide"],
+  "mosquito-swarm": ["mosquito-wing", "venom-gland"],
+  "mud-man": ["swamp-mud", "thick-hide"],
+  "marsh-naga": ["naga-scale", "venom-gland"],
+  "young-hydra": ["hydra-scale", "hydra-blood"],
+  "swamp-witch": ["witch-hair", "cursed-charm"],
+  "novice-hunter": ["steel-scrap", "coin-purse"],
+  "road-scout": ["leather-strap", "scout-map"],
+  "mercenary": ["steel-scrap", "silver-charm"],
+  "silver-archer": ["silver-arrow", "silver-charm"],
+  "hunting-hound": ["canine-pelt", "sharp-fang"],
+  "masked-bandit": ["bandit-mask", "coin-purse"],
+  "wandering-knight": ["knight-plate", "steel-scrap"],
+  "inquisitor": ["holy-water", "silver-charm"],
+  "order-captain": ["captain-medal", "knight-plate"],
+  "master-hunter": ["master-trophy", "silver-charm"],
+  "carrion-vulture": ["vulture-feather", "carrion-meat"],
+  "wastes-hyena": ["hyena-pelt", "sharp-fang"],
+  "giant-scorpion": ["scorpion-stinger", "chitin-plate"],
+  "starving-jackal": ["jackal-pelt", "sharp-fang"],
+  "sand-worm": ["worm-hide", "sand-tooth"],
+  "wild-raider": ["raider-loot", "coin-purse"],
+  "lesser-gorgon": ["gorgon-scale", "gorgon-eye"],
+  "stone-golem": ["golem-core", "stone-shard"],
+  "basilisk": ["basilisk-fang", "basilisk-scale"],
+  "wastes-lord": ["wastes-crown", "coin-purse"],
+  "skeleton-warrior": ["bone-shard", "rusted-blade"],
+  "crawling-zombie": ["rotten-flesh", "grave-dirt"],
+  "specter": ["ectoplasm", "grave-dirt"],
+  "ghoul": ["ghoul-claw", "rotten-flesh"],
+  "dead-knight": ["cursed-plate", "bone-shard"],
+  "banshee": ["banshee-wail", "ectoplasm"],
+  "necromancer": ["necro-tome", "cursed-charm"],
+  "gargoyle": ["gargoyle-stone", "stone-shard"],
+  "lesser-lich": ["lich-phylactery", "necro-tome"],
+  "crypt-guardian": ["guardian-relic", "bone-shard"],
+  "shadow-imp": ["imp-horn", "shadow-essence"],
+  "hellhound": ["hellhound-fang", "ember-pelt"],
+  "lesser-demon": ["demon-horn", "brimstone"],
+  "eye-aberration": ["aberrant-eye", "shadow-essence"],
+  "lava-golem": ["lava-core", "molten-rock"],
+  "succubus": ["succubus-wing", "shadow-silk"],
+  "young-behemoth": ["behemoth-hide", "behemoth-horn"],
+  "reaper": ["reaper-scythe", "soul-shard"],
+  "abyss-lord": ["abyss-crown", "demon-horn"],
+  "cave-dragon": ["dragon-scale", "dragon-fang"],
+  "vampire-servant": ["empty-fang", "pale-blood"],
+  "giant-bat": ["bat-wing", "bat-fang"],
+  "night-noble": ["noble-signet", "empty-fang"],
+  "scarlet-knight": ["scarlet-plate", "cursed-plate"],
+  "blood-sorceress": ["blood-grimoire", "black-blood"],
+  "rival-werewolf": ["rival-pelt", "wolf-fang"],
+  "elder-vampire": ["black-blood", "empty-fang"],
+  "bloody-bride": ["bride-veil", "pale-blood"],
+  "scarlet-count": ["count-crown", "black-blood"],
+  "night-queen": ["queen-tiara", "black-blood"],
+  "wild-unicorn": ["silver-mane", "horn-dust"],
+  "spectral-stag": ["spectral-antler", "ectoplasm"],
+  "lesser-phoenix": ["phoenix-ash", "phoenix-feather"],
+  "chimera": ["chimera-mane", "chimera-fang"],
+  "pegasus": ["pegasus-feather", "silver-mane"],
+  "sphinx": ["sphinx-riddle", "golden-fur"],
+  "elder-dragon": ["dragon-scale", "dragon-heart"],
+  "fallen-seraph": ["seraph-feather", "halo-shard"],
+  "full-moon-unicorn": ["moon-mane", "horn-dust"],
+  "moon-avatar": ["moon-essence", "silver-mane"],
+};
+
+function dropsFor(slug) {
+  const ids = LOOT[slug];
+  if (!ids) throw new Error("Sem loot definido para a criatura: " + slug);
+  return ids.map((id) => {
+    const entry = MATERIALS[id];
+    if (!entry) throw new Error("Material desconhecido: " + id + " (criatura " + slug + ")");
+    const rarity = entry[1];
+    return {
+      itemId: id,
+      chance: RARITY_CHANCE[rarity],
+      minimum: 1,
+      maximum: rarity === "common" || rarity === "uncommon" ? 2 : 1,
+    };
+  });
 }
 
 function descriptionFor(archetype) {
@@ -307,7 +572,7 @@ function creatureFile(creature) {
 export const ${camel(creature.id)}: Creature = {
   id: ${lit(creature.id)},
   name: ${lit(creature.name)},
-  image: "",
+  image: ${lit(creature.image)},
   description: ${lit(creature.description)},
   species: ${lit(creature.species)},
   level: ${creature.level},
@@ -363,6 +628,7 @@ for (let a = 0; a < AREAS.length; a++) {
     return {
       id: slug,
       name,
+      image: `/assets/creatures/${area.slug}/${slug}.png`,
       species: archetype,
       areaName: area.name,
       description: descriptionFor(archetype),
@@ -374,7 +640,7 @@ for (let a = 0; a < AREAS.length; a++) {
       experience: numbers.experience,
       minBronze: numbers.minBronze,
       maxBronze: numbers.maxBronze,
-      drops: dropsFor(archetype),
+      drops: dropsFor(slug),
     };
   });
 
@@ -466,6 +732,49 @@ const AREA_INDEX = new Map<string, Territory>(ALL_AREAS.map((area) => [area.id, 
 export function findArea(areaId: string): Territory | undefined {
   return AREA_INDEX.get(areaId);
 }
+`,
+);
+
+// items/materials: one file per material the creatures drop, plus the index.
+const usedMaterials = [...new Set(Object.values(LOOT).flat())].sort();
+const materialImports = [];
+const materialNames = [];
+for (const id of usedMaterials) {
+  const [name, rarity] = MATERIALS[id];
+  const varName = camel(id);
+  write(
+    `${DATA}/items/materials/${id}.ts`,
+    `import type { Item } from "../../../entities/item";
+
+// ${name}: despojo de caça, trocado por bronze no mercado.
+export const ${varName}: Item = {
+  id: ${lit(id)},
+  name: ${lit(name)},
+  description:
+    "Despojo da caça. Vale o bronze que o mercado paga por ele; não serve de arma nem de enfeite.",
+  category: "material",
+  rarity: ${lit(rarity)},
+  price: ${RARITY_PRICE[rarity]},
+  image: ${lit(`/assets/inventory/materials/${id}.png`)},
+  minLevel: 1,
+  stackable: true,
+  inMarket: false,
+  effect: {},
+};
+`,
+  );
+  materialImports.push(`import { ${varName} } from "./${id}";`);
+  materialNames.push(varName);
+}
+write(
+  `${DATA}/items/materials/index.ts`,
+  `${materialImports.join("\n")}
+import type { Item } from "../../../entities/item";
+
+// Every material a creature drops. Assembled into the item catalog by items.ts.
+export const ALL_MATERIALS: readonly Item[] = [
+${materialNames.map((n) => `  ${n},`).join("\n")}
+];
 `,
 );
 

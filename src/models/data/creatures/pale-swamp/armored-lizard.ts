@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const armoredLizard: Creature = {
   id: "armored-lizard",
   name: "Lagarto Blindado",
-  image: "",
+  image: "/assets/creatures/pale-swamp/armored-lizard.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 341,
@@ -16,7 +16,7 @@ export const armoredLizard: Creature = {
   minBronze: 246,
   maxBronze: 456,
   drops: [
-    { itemId: "bear-claw", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "bear-fat", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "lizard-scale", chance: 0.12, minimum: 1, maximum: 1 },
+    { itemId: "thick-hide", chance: 0.35, minimum: 1, maximum: 2 },
   ],
 };

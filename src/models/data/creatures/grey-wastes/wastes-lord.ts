@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const wastesLord: Creature = {
   id: "wastes-lord",
   name: "Senhor do Ermo",
-  image: "",
+  image: "/assets/creatures/grey-wastes/wastes-lord.png",
   description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
   species: "human",
   level: 591,
@@ -16,7 +16,7 @@ export const wastesLord: Creature = {
   minBronze: 798,
   maxBronze: 1481,
   drops: [
-    { itemId: "twisted-steel", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "stolen-charm", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "wastes-crown", chance: 0.07, minimum: 1, maximum: 1 },
+    { itemId: "coin-purse", chance: 0.12, minimum: 1, maximum: 1 },
   ],
 };

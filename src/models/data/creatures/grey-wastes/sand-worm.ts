@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const sandWorm: Creature = {
   id: "sand-worm",
   name: "Verme das Areias",
-  image: "",
+  image: "/assets/creatures/grey-wastes/sand-worm.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 541,
@@ -16,7 +16,7 @@ export const sandWorm: Creature = {
   minBronze: 780,
   maxBronze: 1448,
   drops: [
-    { itemId: "bear-claw", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "bear-fat", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "worm-hide", chance: 0.12, minimum: 1, maximum: 1 },
+    { itemId: "sand-tooth", chance: 0.12, minimum: 1, maximum: 1 },
   ],
 };

@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const mercenary: Creature = {
   id: "mercenary",
   name: "Mercenário",
-  image: "",
+  image: "/assets/creatures/hunter-road/mercenary.png",
   description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
   species: "human",
   level: 421,
@@ -16,7 +16,7 @@ export const mercenary: Creature = {
   minBronze: 738,
   maxBronze: 1371,
   drops: [
-    { itemId: "twisted-steel", chance: 0.188, minimum: 1, maximum: 2 },
-    { itemId: "stolen-charm", chance: 0.09, minimum: 1, maximum: 2 },
+    { itemId: "steel-scrap", chance: 0.2, minimum: 1, maximum: 2 },
+    { itemId: "silver-charm", chance: 0.12, minimum: 1, maximum: 1 },
   ],
 };

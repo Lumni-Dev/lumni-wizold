@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const giantLeech: Creature = {
   id: "giant-leech",
   name: "Sanguessuga Gigante",
-  image: "",
+  image: "/assets/creatures/pale-swamp/giant-leech.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 321,
@@ -16,7 +16,7 @@ export const giantLeech: Creature = {
   minBronze: 239,
   maxBronze: 443,
   drops: [
-    { itemId: "empty-fang", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "black-blood", chance: 0.083, minimum: 1, maximum: 2 },
+    { itemId: "leech-blood", chance: 0.2, minimum: 1, maximum: 2 },
+    { itemId: "venom-gland", chance: 0.2, minimum: 1, maximum: 2 },
   ],
 };

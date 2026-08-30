@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const lesserGorgon: Creature = {
   id: "lesser-gorgon",
   name: "Górgona Menor",
-  image: "",
+  image: "/assets/creatures/grey-wastes/lesser-gorgon.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 561,
@@ -16,7 +16,7 @@ export const lesserGorgon: Creature = {
   minBronze: 787,
   maxBronze: 1461,
   drops: [
-    { itemId: "empty-fang", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "black-blood", chance: 0.083, minimum: 1, maximum: 2 },
+    { itemId: "gorgon-scale", chance: 0.07, minimum: 1, maximum: 1 },
+    { itemId: "gorgon-eye", chance: 0.07, minimum: 1, maximum: 1 },
   ],
 };

@@ -4,7 +4,7 @@ import type { Creature } from "../types";
 export const fullMoonUnicorn: Creature = {
   id: "full-moon-unicorn",
   name: "Unicórnio da Lua Cheia",
-  image: "",
+  image: "/assets/creatures/white-clearing/full-moon-unicorn.png",
   description: "Nada aqui é gentil. O chifre atravessa antes de você ouvir o galope.",
   species: "unicorn",
   level: 981,
@@ -16,7 +16,7 @@ export const fullMoonUnicorn: Creature = {
   minBronze: 2231,
   maxBronze: 4144,
   drops: [
-    { itemId: "silver-mane", chance: 0.165, minimum: 1, maximum: 2 },
-    { itemId: "horn-dust", chance: 0.075, minimum: 1, maximum: 2 },
+    { itemId: "moon-mane", chance: 0.04, minimum: 1, maximum: 1 },
+    { itemId: "horn-dust", chance: 0.04, minimum: 1, maximum: 1 },
   ],
 };
