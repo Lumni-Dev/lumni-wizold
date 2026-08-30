@@ -69,23 +69,30 @@ export function Modal({
         )}
         onClick={(event) => event.stopPropagation()}
       >
-        <header className="flex items-center justify-between gap-3 border-b border-edge bg-surface-high/40 px-4 py-3">
+        <header className="flex items-center gap-3 border-b border-edge bg-surface-high/40 px-4 py-3">
           <h2 className="heading truncate text-[11px] text-ink">{title}</h2>
-          {action ? (
-            <span className="ml-auto inline-flex h-6 shrink-0 items-center justify-center rounded-md border border-edge px-2 font-mono text-[11px] text-ink-faint">
-              {action}
-            </span>
-          ) : null}
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label={"Fechar " + title}
-            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-edge text-ink-faint transition-colors hover:border-edge-strong hover:text-ink"
-          >
-            <span aria-hidden="true" className="text-sm leading-none">
-              ×
-            </span>
-          </button>
+          <div className="ml-auto flex shrink-0 items-center gap-2">
+            {action ? (
+              <span className="inline-flex h-6 items-center justify-center rounded-md border border-edge px-2 font-mono text-[11px] text-ink-faint">
+                {action}
+              </span>
+            ) : null}
+            {dismissible ? (
+              <kbd className="hidden h-6 select-none items-center rounded-md border border-edge px-1.5 font-mono text-[10px] tracking-[0.1em] text-ink-faint sm:inline-flex">
+                ESC
+              </kbd>
+            ) : null}
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label={"Fechar " + title}
+              className="flex h-6 w-6 items-center justify-center rounded-md border border-edge text-ink-faint transition-colors hover:border-edge-strong hover:text-ink"
+            >
+              <span aria-hidden="true" className="text-sm leading-none">
+                ×
+              </span>
+            </button>
+          </div>
         </header>
 
         <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>

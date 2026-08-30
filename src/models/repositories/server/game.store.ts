@@ -144,7 +144,12 @@ export async function loadGame(
           adoptedAt: iso(petRow.adopted_at),
         } satisfies Pet)
       : null,
-    mining: { level: int(row.mining_level) || 1, progress: int(row.mining_progress) },
+    mining: {
+      level: int(row.mining_level) || 1,
+      progress: int(row.mining_progress),
+      windowStart: stamp(row.mining_window_start),
+      spentMs: int(row.mining_spent_ms),
+    },
     enhancements: Object.fromEntries(
       enhancements.rows.map((entry) => [entry.item_id, int(entry.level)]),
     ),
@@ -259,7 +264,8 @@ export async function saveGame(
        instinct_progress = $18, willpower_progress = $19,
        mining_level = $20, mining_progress = $21,
        hunts = $22, wins = $23, losses = $24, arena_wins = $25, arena_losses = $26,
-       renamed_at = $27, transformed_at = $28
+       renamed_at = $27, transformed_at = $28,
+       mining_window_start = $29, mining_spent_ms = $30
      where id = $1`,
     [
       characterId,
@@ -290,6 +296,8 @@ export async function saveGame(
       character.arenaLosses,
       character.renamedAt ?? null,
       character.transformedAt ?? null,
+      after.mining.windowStart ?? null,
+      after.mining.spentMs,
     ],
   );
   await savePieces(client, characterId, before, after);

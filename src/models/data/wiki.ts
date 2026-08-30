@@ -6,6 +6,7 @@ import {
   FORGE_SUCCESS_RATIO,
   MAX_ENHANCEMENT,
   MINING_CYCLE_MS,
+  MINING_DAILY_BUDGET_MS,
   PET_BASE_ENERGY,
   PET_BITE_ENERGY,
   PET_ENERGY_PER_BLOW,
@@ -250,6 +251,9 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "A mina rende a cada " +
         (MINING_CYCLE_MS / 1000).toFixed(1).replace(".", ",") +
         " segundos: um clique vale um rendimento, e com a mineração automática ligada ela repete até você mandar parar.",
+      "A picareta tem hora: " +
+        MINING_DAILY_BUDGET_MS / 3600000 +
+        " horas de mineração por dia, e o relógio só corre enquanto você minera. Gasto o tempo, o veio reabre um dia depois da primeira batida.",
       ...oreLines(),
       "Mineração começa em 1 e para em " +
         MINING_MAX_LEVEL +

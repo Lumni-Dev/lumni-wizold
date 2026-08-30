@@ -1,19 +1,32 @@
-import { FORGE_SUCCESS_RATIO, MAX_ENHANCEMENT } from "@/shared/constants/game";
+import {
+  FORGE_SUCCESS_RATIO,
+  MAX_ENHANCEMENT,
+  MINING_CYCLE_MS,
+  MINING_DAILY_BUDGET_MS,
+} from "@/shared/constants/game";
 import { chance, defaultRandom, intBetween, type Random } from "@/shared/utils/random";
 import { ATTRIBUTES, type AttributeKey } from "@/models/entities/attribute";
 import { findItem } from "@/models/data/items";
 import type { GameState } from "@/models/entities/game-state";
 import { EQUIPMENT_SLOTS, type EquipmentSlot, type Item } from "@/models/entities/item";
-import { findOre, MINING_MAX_LEVEL, ORES, type Ore } from "@/models/entities/mining";
+import { findOre, MINING_MAX_LEVEL, ORES, type MiningState, type Ore } from "@/models/entities/mining";
 import { failure, success, type Result } from "@/models/entities/result";
-import { formatBronze } from "@/shared/utils/format";
+import { formatBronze, formatCooldown } from "@/shared/utils/format";
 import {
   enhancementCost,
   enhancementOf,
   enhancedEffect,
   forgeBronzeCost,
 } from "@/models/rules/forge";
-import { applyMiningProgress, miningNeeded, miningYieldBonus } from "@/models/rules/mining";
+import {
+  applyMiningProgress,
+  miningExhausted,
+  miningNeeded,
+  miningRemainingMs,
+  miningResetsAtMs,
+  miningYieldBonus,
+  rolloverMining,
+} from "@/models/rules/mining";
 import { addToInventory, countInInventory, removeFromInventory } from "./inventory.controller";
 import { addLog } from "./log.controller";
 
@@ -31,10 +44,15 @@ export interface MiningView {
   needed: number;
   maxed: boolean;
   ores: AvailableOre[];
+  dailyRemainingMs: number;
+  dailyExhausted: boolean;
+  dailyResetsInMs: number;
 }
 
-export function listMining(state: GameState): MiningView {
+export function listMining(state: GameState, now: number = Date.now()): MiningView {
   const mining = state.mining;
+  const dailyRemainingMs = miningRemainingMs(mining, now);
+  const dailyExhausted = miningExhausted(mining, now);
 
   const ores = ORES.map((ore) => {
     const unlocked = mining.level >= ore.requiredLevel;
@@ -57,6 +75,9 @@ export function listMining(state: GameState): MiningView {
     needed,
     maxed,
     ores,
+    dailyRemainingMs,
+    dailyExhausted,
+    dailyResetsInMs: Math.max(0, miningResetsAtMs(mining, now) - now),
   };
 }
 
@@ -64,6 +85,7 @@ export function mine(
   state: GameState,
   oreId: string,
   random: Random = defaultRandom,
+  now: number = Date.now(),
 ): Result<{ levelsGained: number }> {
   const character = state.character;
   if (!character) return failure(state, "Nenhum personagem ativo.");
@@ -74,9 +96,19 @@ export function mine(
     return failure(state, ore.label + " exige mineração NV. " + ore.requiredLevel + ".");
   }
 
-  const yielded =
-    intBetween(ore.minYield, ore.maxYield, random) * miningYieldBonus(state.mining.level);
-  const { mining, levelsGained } = applyMiningProgress(state.mining, ore.progress);
+  const rolled = rolloverMining(state.mining, now);
+  if (rolled.spentMs >= MINING_DAILY_BUDGET_MS) {
+    const wait = miningResetsAtMs(rolled, now) - now;
+    return failure(state, "Você já minerou o limite de hoje. A veia reabre em " + formatCooldown(wait) + ".");
+  }
+
+  const yielded = intBetween(ore.minYield, ore.maxYield, random) * miningYieldBonus(rolled.level);
+  const { mining: advanced, levelsGained } = applyMiningProgress(rolled, ore.progress);
+  const mining: MiningState = {
+    ...advanced,
+    windowStart: rolled.windowStart ?? new Date(now).toISOString(),
+    spentMs: rolled.spentMs + MINING_CYCLE_MS,
+  };
 
   const next: GameState = {
     ...state,

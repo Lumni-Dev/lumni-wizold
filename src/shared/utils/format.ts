@@ -59,6 +59,10 @@ export function formatDay(iso: string): string {
     formatTime(iso)
   );
 }
+export function formatCooldown(milliseconds: number): string {
+  const minutes = Math.ceil(milliseconds / 60000);
+  return minutes >= 60 ? Math.ceil(minutes / 60) + "h" : minutes + "min";
+}
 export function formatReais(cents: number): string {
   return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(
     Math.round(cents) / 100,

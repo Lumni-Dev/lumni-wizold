@@ -14,10 +14,14 @@ export interface Ore {
 export interface MiningState {
   level: number;
   progress: number;
+  // The daily budget: when the current window opened (ISO, unset before the
+  // first swing) and how much active mining time it has already spent.
+  windowStart?: string;
+  spentMs: number;
 }
 
 export function initialMining(): MiningState {
-  return { level: 1, progress: 0 };
+  return { level: 1, progress: 0, spentMs: 0 };
 }
 
 export const ORES: readonly Ore[] = [

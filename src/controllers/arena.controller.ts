@@ -1,5 +1,5 @@
 import { MIN_HEALTH_RATIO_TO_ACT } from "@/shared/constants/game";
-import { formatNumber, formatBronze } from "@/shared/utils/format";
+import { formatCooldown, formatNumber, formatBronze } from "@/shared/utils/format";
 import { defaultRandom, pickOne, type Random } from "@/shared/utils/random";
 import { normalizeText } from "@/shared/utils/text";
 import type { ArenaHistoryEntry, ArenaOutcome } from "@/models/entities/arena";
@@ -31,10 +31,9 @@ export interface ArenaRival {
   cooldownLeft: number;
   spoils: SpoilsRange;
 }
-export function formatCooldown(milliseconds: number): string {
-  const minutes = Math.ceil(milliseconds / 60000);
-  return minutes >= 60 ? Math.ceil(minutes / 60) + "h" : minutes + "min";
-}
+// Kept as a re-export so the arena screen's import path stays put; the body now
+// lives in shared/utils/format, shared with the mine's daily countdown.
+export { formatCooldown };
 export interface ArenaView {
   band: LevelBand;
   rivals: ArenaRival[];

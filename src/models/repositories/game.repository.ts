@@ -218,6 +218,8 @@ function normalize(data: Partial<GameState>): GameState {
         ? {
             level: clamp(finiteInt(mining.level, 1), 1, MINING_MAX_LEVEL),
             progress: Math.max(0, finiteInt(mining.progress, 0)),
+            windowStart: typeof mining.windowStart === "string" ? mining.windowStart : undefined,
+            spentMs: Math.max(0, finiteInt(mining.spentMs, 0)),
           }
         : initialMining(),
     enhancements: normalizeRecord(data.enhancements, (value) => {

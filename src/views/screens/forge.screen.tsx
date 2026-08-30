@@ -13,7 +13,7 @@ import {
   MINING_TICK_MS,
   MINING_TICKS,
 } from "@/shared/constants/game";
-import { formatBronze, formatNumber } from "@/shared/utils/format";
+import { formatBronze, formatCooldown, formatNumber } from "@/shared/utils/format";
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
 import { ConfirmDialog } from "../components/confirm-dialog";
@@ -23,6 +23,15 @@ import { List, ListRow, RowText } from "../components/list";
 import { Panel } from "../components/panel";
 import { Tag } from "../components/tag";
 import { PageHeader } from "../layout/page-header";
+
+// The daily mining budget, read in hours and minutes: "1h 47min", "45min".
+function formatMiningLeft(ms: number): string {
+  const totalMinutes = Math.max(0, Math.ceil(ms / 60000));
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  if (hours > 0) return minutes > 0 ? hours + "h " + minutes + "min" : hours + "h";
+  return minutes + "min";
+}
 
 export function ForgeScreen() {
   const { state, character, mine, enhance, activity, setActivity, notify } = useGame();
@@ -35,6 +44,7 @@ export function ForgeScreen() {
 
   const mining = useMemo(() => listMining(state), [state]);
   const slots = useMemo(() => listForge(state), [state]);
+  const miningResetLeft = mining.dailyResetsInMs;
 
   const autoRef = useRef(state.automation);
   const mineRef = useRef(mine);
@@ -164,6 +174,11 @@ export function ForgeScreen() {
         action={
           <div className="flex items-center gap-2">
             <Tag tone="neutral">Mineração NV. {formatNumber(mining.level)}</Tag>
+            <Tag tone="neutral">
+              {mining.dailyExhausted
+                ? "Mina reabre em " + formatCooldown(miningResetLeft)
+                : "Mina " + formatMiningLeft(mining.dailyRemainingMs)}
+            </Tag>
             <Tag tone="neutral">{formatBronze(character.bronze)}</Tag>
           </div>
         }
@@ -188,7 +203,11 @@ export function ForgeScreen() {
             </ListRow>
             {mining.ores.map(({ ore, fragment, owned, unlocked, reason }) => {
               const active = activeOre === ore.id;
-              const available = unlocked;
+              const available = unlocked && !mining.dailyExhausted;
+              const limitReason =
+                unlocked && mining.dailyExhausted
+                  ? "Limite de hoje atingido. Reabre em " + formatCooldown(miningResetLeft)
+                  : reason;
 
               return (
                 <ListRow key={ore.id} layout="column" padding="art">
@@ -203,7 +222,7 @@ export function ForgeScreen() {
                             : "Minerando..."
                           : waitingOre === ore.id
                             ? "Esperando para bater de novo"
-                            : (reason ??
+                            : (limitReason ??
                               "+" + formatNumber(ore.progress) + " de progresso por batida")
                       }
                     />
