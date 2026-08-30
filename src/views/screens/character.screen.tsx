@@ -11,16 +11,12 @@ import { enhancementOf } from "@/models/rules/forge";
 import { EQUIPMENT_SLOTS } from "@/models/entities/item";
 import { findGender, FORM_LABEL } from "@/models/entities/character";
 import type { Hunter } from "@/models/entities/ranking";
-import { findPet } from "@/models/entities/pet";
-import { petMaxEnergy } from "@/models/rules/pet";
-import { PET_MAX_LEVEL } from "@/shared/constants/game";
 import { formatNumber } from "@/shared/utils/format";
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
 import { Tag } from "../components/tag";
 import { DataRow } from "../components/data-row";
 import { GenderBanner } from "../components/gender-icon";
-import { PetBanner } from "../components/pet-icon";
 import { VitalActionButton } from "../components/vital-action-button";
 import { List, ListRow } from "../components/list";
 import { Panel } from "../components/panel";
@@ -69,9 +65,6 @@ export function CharacterScreen() {
     };
   });
 
-  const wolf = state.pet ? findPet(state.pet.gender) : null;
-  const petLevel = state.pet?.level ?? 1;
-
   const best = profile
     ? profile.positions.reduce((first, next) => (next.position < first.position ? next : first))
     : null;
@@ -119,7 +112,7 @@ export function CharacterScreen() {
           <Panel title="Ficha" padding="none">
             <GenderBanner gender={character.gender} />
             <div className="space-y-2 border-b border-edge p-4">
-              <div className="min-w-0">
+              <div className="min-w-0 space-y-1">
                 <p className="truncate text-sm text-ink">{character.name}</p>
                 <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                   {genderDefinition.label}
@@ -150,40 +143,6 @@ export function CharacterScreen() {
               <DataRow label="Vitórias" value={formatNumber(character.arenaWins)} />
               <DataRow label="Derrotas" value={formatNumber(character.arenaLosses)} />
             </List>
-          </Panel>
-
-          <Panel title="Mascote" padding="none">
-            {wolf && state.pet ? (
-              <>
-                <PetBanner gender={state.pet.gender} />
-                <div className="border-b border-edge p-4">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm text-ink">{state.pet.name}</p>
-                    <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                      {wolf.label} - {wolf.title}
-                    </p>
-                  </div>
-                </div>
-                <List>
-                  <DataRow
-                    label="Nível"
-                    value={formatNumber(petLevel) + " / " + formatNumber(PET_MAX_LEVEL)}
-                  />
-                  <DataRow
-                    label="Energia"
-                    value={
-                      formatNumber(state.pet.energy) + " / " + formatNumber(petMaxEnergy(petLevel))
-                    }
-                  />
-                  <DataRow
-                    label="Estado"
-                    value={state.pet.active !== false ? "Acompanhando" : "Em casa"}
-                  />
-                </List>
-              </>
-            ) : (
-              <p className="px-4 py-3 text-xs text-ink-faint">Caça sozinho, sem lobo no rastro.</p>
-            )}
           </Panel>
         </div>
 

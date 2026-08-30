@@ -78,7 +78,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
           <Panel title="Ficha" padding="none">
             <GenderBanner gender={hunter.gender} />
             <div className="space-y-2 border-b border-edge p-4">
-              <div className="min-w-0">
+              <div className="min-w-0 space-y-1">
                 <p className="truncate text-sm text-ink">{hunter.name}</p>
                 <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                   {hunter.gender === "male" ? "Lumni" : "Luna"}
@@ -113,14 +113,10 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
               <>
                 <PetBanner gender={hunter.pet.gender} />
                 <div className="border-b border-edge p-4">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm text-ink">{hunter.pet.name}</p>
-                    <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                      {wolf.label} - {wolf.title}
-                    </p>
-                  </div>
+                  <p className="truncate text-sm text-ink">{hunter.pet.name}</p>
                 </div>
                 <List>
+                  <DataRow label="Sexo" value={wolf.label} />
                   <DataRow
                     label="Nível"
                     value={formatNumber(hunter.pet.level) + " / " + formatNumber(PET_MAX_LEVEL)}
