@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { api } from "@/controllers/api.client";
 import { useGame } from "@/controllers/game.context";
 import { isInPack, listPack } from "@/controllers/pack.controller";
 import { playSound } from "@/controllers/sound";
 import { useTavern } from "@/controllers/use-tavern";
-import { MAX_PACK, type PackMate } from "@/models/entities/pack";
+import { MAX_PACK, type PackInvite, type PackMate } from "@/models/entities/pack";
 import {
   tavernReadRepository,
   type TavernReadMap,
@@ -19,6 +20,7 @@ import {
   MAX_ROOM_MEMBERS,
   MESSAGE_COOLDOWN_MS,
   MESSAGE_MAX_LENGTH,
+  OPEN_ROOM_MIN_LEVEL,
   ROOM_NAME_MAX_LENGTH,
 } from "@/models/entities/tavern";
 import { NAME_MAX_LENGTH } from "@/shared/constants/game";
@@ -60,7 +62,8 @@ function MemberName({
 }
 
 export function TavernScreen() {
-  const { state, character, notify, addToPack, addToPackByNick, removeFromPack } = useGame();
+  const { state, character, notify, invite, inviteByNick, acceptInvite, declineInvite, removeFromPack } =
+    useGame();
 
   const [activeRoomId, setActiveRoomId] = useState<string | null>(null);
   const [roomName, setRoomName] = useState("");
@@ -70,6 +73,7 @@ export function TavernScreen() {
   const [page, setPage] = useState(1);
   const [nick, setNick] = useState("");
   const [removing, setRemoving] = useState<PackMate | null>(null);
+  const [invites, setInvites] = useState<PackInvite[]>([]);
 
   const {
     identity,
@@ -85,6 +89,17 @@ export function TavernScreen() {
     announceAway,
   } = useTavern(activeRoomId);
   const [closingRoomId, setClosingRoomId] = useState<string | null>(null);
+
+  const refreshInvites = useCallback(() => {
+    void api<{ invites: PackInvite[] }>("GET", "/api/pack/invites").then((answer) => {
+      if (answer.ok && answer.data) setInvites(answer.data.invites);
+    });
+  }, []);
+  useEffect(() => {
+    refreshInvites();
+    const timer = window.setInterval(refreshInvites, 12000);
+    return () => window.clearInterval(timer);
+  }, [refreshInvites]);
 
   const messagesRef = useRef<HTMLUListElement>(null);
 
@@ -273,9 +288,17 @@ export function TavernScreen() {
 
   function submitNick(event: FormEvent) {
     event.preventDefault();
-    return addToPackByNick(nick).then((ok) => {
+    return inviteByNick(nick).then((ok) => {
       if (ok) setNick("");
     });
+  }
+
+  async function accept(id: string) {
+    if (await acceptInvite(id)) refreshInvites();
+  }
+
+  async function decline(id: string) {
+    if (await declineInvite(id)) refreshInvites();
   }
 
   async function speakTo(mate: PackMate) {
@@ -324,7 +347,9 @@ export function TavernScreen() {
             description={
               ownRoom
                 ? "Você já tem uma mesa aberta: feche a sua para abrir outra."
-                : "Sem senha, qualquer um entra."
+                : "Sem senha, NV " +
+                  OPEN_ROOM_MIN_LEVEL +
+                  "+ abre e entra. Com senha, qualquer nível."
             }
           >
             <form onSubmit={submitRoom} className="space-y-3">
@@ -349,13 +374,30 @@ export function TavernScreen() {
                 disabled={Boolean(ownRoom)}
                 onChange={(event) => setRoomPassword(event.target.value)}
               />
-              <Tooltip block label={ownRoom ? "Feche a sua mesa antes de abrir outra" : ""}>
+              <Tooltip
+                block
+                label={
+                  ownRoom
+                    ? "Feche a sua mesa antes de abrir outra"
+                    : roomPassword.trim().length === 0 &&
+                        (character?.level ?? 1) < OPEN_ROOM_MIN_LEVEL
+                      ? "Sala sem senha é só a partir do NV " +
+                        OPEN_ROOM_MIN_LEVEL +
+                        ". Ponha uma senha para abrir em qualquer nível."
+                      : ""
+                }
+              >
                 <Button
                   type="submit"
                   variant="primary"
                   size="medium"
                   fullWidth
-                  disabled={Boolean(ownRoom) || roomName.trim().length === 0}
+                  disabled={
+                    Boolean(ownRoom) ||
+                    roomName.trim().length === 0 ||
+                    (roomPassword.trim().length === 0 &&
+                      (character?.level ?? 1) < OPEN_ROOM_MIN_LEVEL)
+                  }
                 >
                   {ownRoom ? "Sua mesa: " + ownRoom.room.name : "Abrir sala"}
                 </Button>
@@ -363,9 +405,48 @@ export function TavernScreen() {
             </form>
           </Panel>
 
+          {invites.length > 0 ? (
+            <Panel
+              title="Convites"
+              description="Quem chamou você para a matilha. Aceitar torna vocês companheiros e libera a mesa reservada."
+              action={<Tag tone="light">{invites.length}</Tag>}
+              padding="none"
+            >
+              <List>
+                {invites.map((entry) => (
+                  <ListRow key={entry.id}>
+                    <p className="min-w-0 flex-1 truncate text-sm text-ink">
+                      <MemberName href={profileHref(entry.fromId)} name={entry.fromName} />
+                    </p>
+                    <Tooltip label={"Aceitar " + entry.fromName}>
+                      <Button
+                        icon
+                        variant="secondary"
+                        aria-label={"Aceitar " + entry.fromName}
+                        onClick={() => accept(entry.id)}
+                      >
+                        <ActionIcon action="keep" />
+                      </Button>
+                    </Tooltip>
+                    <Tooltip label={"Recusar " + entry.fromName}>
+                      <Button
+                        icon
+                        variant="ghost"
+                        aria-label={"Recusar " + entry.fromName}
+                        onClick={() => decline(entry.id)}
+                      >
+                        <ActionIcon action="remove" />
+                      </Button>
+                    </Tooltip>
+                  </ListRow>
+                ))}
+              </List>
+            </Panel>
+          ) : null}
+
           <Panel
             title="Matilha"
-            description="Os nomes que você guarda. Chamar um abre uma mesa só de vocês dois."
+            description="Companheiros de matilha. Chamar um abre uma mesa reservada só de vocês dois."
             action={
               <Tag tone="neutral">
                 {pack.length} de {MAX_PACK}
@@ -375,7 +456,7 @@ export function TavernScreen() {
           >
             <form onSubmit={submitNick} className="space-y-3 border-b border-edge p-4">
               <Field
-                label="Adicionar pelo nick"
+                label="Convidar pelo nick"
                 value={nick}
                 maxLength={NAME_MAX_LENGTH}
                 placeholder="O nick de quem você procura"
@@ -391,7 +472,7 @@ export function TavernScreen() {
                   fullWidth
                   disabled={nick.trim().length === 0 || pack.length >= MAX_PACK}
                 >
-                  Adicionar à matilha
+                  Convidar para a matilha
                 </Button>
               </Tooltip>
             </form>
@@ -400,7 +481,7 @@ export function TavernScreen() {
               <div className="p-4">
                 <EmptyState
                   title="Matilha vazia"
-                  description="Guarde alguém de dentro de uma sala ou pelo nick para ter a quem chamar."
+                  description="Convide alguém de dentro de uma sala ou pelo nick: a matilha começa quando aceitarem."
                 />
               </div>
             ) : (
@@ -421,11 +502,11 @@ export function TavernScreen() {
                         <ActionIcon action="message" />
                       </Button>
                     </Tooltip>
-                    <Tooltip label={"Excluir " + mate.name + " da matilha"}>
+                    <Tooltip label={"Sair da matilha com " + mate.name}>
                       <Button
                         icon
                         variant="ghost"
-                        aria-label={"Excluir " + mate.name + " da matilha"}
+                        aria-label={"Sair da matilha com " + mate.name}
                         onClick={() => setRemoving(mate)}
                       >
                         <ActionIcon action="remove" />
@@ -633,12 +714,12 @@ export function TavernScreen() {
                       ) : null}
                     </Tag>
                     {!yourself && !kept ? (
-                      <Tooltip label={"Guardar " + member.name + " na sua matilha"}>
+                      <Tooltip label={"Convidar " + member.name + " para a matilha"}>
                         <button
                           type="button"
-                          aria-label={"Guardar " + member.name + " na sua matilha"}
+                          aria-label={"Convidar " + member.name + " para a matilha"}
                           className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-edge text-ink-faint transition-colors hover:border-edge-strong hover:text-highlight"
-                          onClick={() => addToPack({ id: member.id, name: member.name })}
+                          onClick={() => invite({ id: member.id, name: member.name })}
                         >
                           <ActionIcon action="keep" className="h-3 w-3" />
                         </button>
@@ -715,10 +796,10 @@ export function TavernScreen() {
 
       <ConfirmDialog
         open={removing !== null}
-        title="Excluir da matilha"
-        description="O nome sai da sua lista. Guardar de novo é de graça, e a mesa reservada entre vocês continua aberta até alguém fechá-la."
+        title="Sair da matilha"
+        description="Vocês dois saem da matilha um do outro. Sem o laço não dá para abrir novas mesas reservadas entre vocês; convidar de novo recomeça."
         detail={removing?.name}
-        confirmLabel="Excluir"
+        confirmLabel="Sair"
         onCancel={() => setRemoving(null)}
         onConfirm={() => {
           if (removing) removeFromPack(removing.id);

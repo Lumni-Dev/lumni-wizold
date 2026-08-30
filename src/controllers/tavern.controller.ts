@@ -8,6 +8,7 @@ import {
   MESSAGE_COOLDOWN_MS,
   MESSAGE_MAX_LENGTH,
   MEMBER_TIMEOUT_MS,
+  OPEN_ROOM_MIN_LEVEL,
   validateRoomName,
   type TavernIdentity,
   type TavernResult,
@@ -106,6 +107,16 @@ export function createRoom(
   const problem = validateRoomName(name);
   if (problem) return fail(state, problem);
 
+  const open = password.trim().length === 0;
+  if (open && (identity.level ?? 1) < OPEN_ROOM_MIN_LEVEL) {
+    return fail(
+      state,
+      "Abrir sala sem senha é só a partir do NV " +
+        OPEN_ROOM_MIN_LEVEL +
+        ". Ponha uma senha para abrir em qualquer nível.",
+    );
+  }
+
   if (state.rooms.some((room) => !isPrivateTable(room) && room.ownerId === identity.id)) {
     return fail(state, "Você já tem uma mesa aberta. Feche a sua antes de abrir outra.");
   }
@@ -153,6 +164,13 @@ export function joinRoom(
 
   const already = room.members.some((member) => member.id === identity.id);
   if (!already) {
+    if (
+      !isPrivateTable(room) &&
+      room.password === null &&
+      (identity.level ?? 1) < OPEN_ROOM_MIN_LEVEL
+    ) {
+      return fail(state, "Entrar em sala aberta é só a partir do NV " + OPEN_ROOM_MIN_LEVEL + ".");
+    }
     if (isRoomFull(room))
       return fail(state, "A sala está cheia (" + MAX_ROOM_MEMBERS + " pessoas).");
     if (room.password !== null && room.password !== password.trim()) {

@@ -1749,16 +1749,29 @@ sec("automação");
 }
 sec("taverna");
 {
-  const me = { id: "eu", name: "Teste" };
-  const other = { id: "ela", name: "Luna" };
-  const third = { id: "ele", name: "Lumni" };
+  const me = { id: "eu", name: "Teste", level: 60 };
+  const other = { id: "ela", name: "Luna", level: 60 };
+  const third = { id: "ele", name: "Lumni", level: 60 };
   let tavern = entTavern.emptyTavern();
   const bad = tavernCtrl.createRoom(tavern, me, "mesa da lua", "");
   ok("nome com espaço recusa", bad.ok === false);
+  const lowbie = { id: "novato", name: "Novato", level: 10 };
+  ok(
+    "sala sem senha exige o NV mínimo para abrir",
+    tavernCtrl.createRoom(entTavern.emptyTavern(), lowbie, "Ninho", "").ok === false,
+  );
+  ok(
+    "com senha o novato abre em qualquer nível",
+    tavernCtrl.createRoom(entTavern.emptyTavern(), lowbie, "Ninho", "chave").ok === true,
+  );
   const opened = tavernCtrl.createRoom(tavern, me, "Fogueira", "");
   ok("mesa abre", opened.ok === true);
   tavern = opened.state;
   ok("dona já está sentada", tavernCtrl.findRoom(tavern, opened.roomId).members.length === 1);
+  ok(
+    "sala sem senha exige o NV mínimo para entrar",
+    tavernCtrl.joinRoom(tavern, opened.roomId, lowbie, "").ok === false,
+  );
   ok(
     "segunda mesa do mesmo dono recusa",
     tavernCtrl.createRoom(tavern, me, "Outra", "").ok === false,
@@ -1771,13 +1784,14 @@ sec("taverna");
     tavern = tavernCtrl.joinRoom(
       tavern,
       opened.roomId,
-      { id: "x" + extra, name: "Lobo" + extra },
+      { id: "x" + extra, name: "Lobo" + extra, level: 60 },
       "",
     ).state;
   }
   ok(
     "a vigésima primeira cadeira não existe",
-    tavernCtrl.joinRoom(tavern, opened.roomId, { id: "sobra", name: "Sobra" }, "").ok === false,
+    tavernCtrl.joinRoom(tavern, opened.roomId, { id: "sobra", name: "Sobra", level: 60 }, "").ok ===
+      false,
   );
   const backdate = () => {
     const seatRoom = tavernCtrl.findRoom(tavern, opened.roomId);
@@ -1856,6 +1870,10 @@ sec("taverna");
     const nosy = { id: "xereta", name: "Xereta" };
     const locked = tavernCtrl.createRoom(vault, boss, "Trancada", "segredo");
     ok("mesa com senha abre", locked.ok === true);
+    ok(
+      "com senha o novato entra em qualquer nível",
+      tavernCtrl.joinRoom(locked.state, locked.roomId, lowbie, "segredo").ok === true,
+    );
     vault = tavernCtrl.sendMessage(locked.state, locked.roomId, boss, "conversa secreta").state;
     const stranger = tavernCtrl
       .listRooms(vault, nosy)
@@ -1943,12 +1961,12 @@ sec("matilha");
     full = packCtrl.addMate(full, { id: "amigo-" + index, name: "Amigo" + index }).state;
   }
   ok("a matilha para em 20", full.pack.length === 20);
-  const byNick = packCtrl.addByNick(state, normalizeText("Loba"), board);
-  ok("nick exato acha", byNick.ok === true);
-  const vague = packCtrl.addByNick(state, "alua", board);
-  ok("pedaço ambíguo recusa", vague.ok === false);
-  const nobody = packCtrl.addByNick(state, "Fantasma", board);
-  ok("nick sem dono recusa", nobody.ok === false);
+  const byNick = packCtrl.matchNick(normalizeText("Loba"), board);
+  ok("nick exato acha", typeof byNick === "object" && byNick.id === "mate-3");
+  const vague = packCtrl.matchNick("alua", board);
+  ok("pedaço ambíguo recusa", typeof vague === "string");
+  const nobody = packCtrl.matchNick("Fantasma", board);
+  ok("nick sem dono recusa", typeof nobody === "string");
   const removed = packCtrl.removeMate(added.state, "mate-3");
   ok("excluir devolve a vaga", removed.ok && removed.state.pack.length === 0);
 }

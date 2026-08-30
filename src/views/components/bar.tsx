@@ -27,6 +27,9 @@ interface BarProps {
   tone?: BarTone;
   glows?: boolean;
   jolt?: number;
+  // Reads the label in the section-title ink instead of the faint chrome ink,
+  // for the top nav, where the readout has to stay legible.
+  prominent?: boolean;
   className?: string;
 }
 
@@ -44,6 +47,7 @@ export function Bar({
   tone = "light",
   glows = false,
   jolt = 0,
+  prominent = false,
   className,
 }: BarProps) {
   const target = percentage(current, maximum);
@@ -83,7 +87,14 @@ export function Bar({
   return (
     <div className={cn("space-y-2", className)}>
       <div className="flex items-baseline justify-between gap-2">
-        <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">{label}</span>
+        <span
+          className={cn(
+            "text-[10px] uppercase tracking-[0.16em]",
+            prominent ? "text-ink" : "text-ink-faint",
+          )}
+        >
+          {label}
+        </span>
         <span className="font-mono text-[11px] text-ink-soft">
           {formatNumber(current)}
           <span className="text-ink-faint">/{formatNumber(maximum)}</span>

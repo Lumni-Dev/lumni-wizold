@@ -93,8 +93,10 @@ interface GameContextValue {
   adoptPet: (gender: PetGender, name: string) => Promise<void>;
   releasePet: () => Promise<void>;
   setAutomation: (key: AutomationKey, on: boolean) => void;
-  addToPack: (person: TavernIdentity) => Promise<boolean>;
-  addToPackByNick: (nick: string) => Promise<boolean>;
+  invite: (person: TavernIdentity) => Promise<boolean>;
+  inviteByNick: (nick: string) => Promise<boolean>;
+  acceptInvite: (id: string) => Promise<boolean>;
+  declineInvite: (id: string) => Promise<boolean>;
   removeFromPack: (id: string) => Promise<void>;
   renamePet: (name: string) => Promise<boolean>;
   feedPet: (itemId: string) => Promise<void>;
@@ -665,18 +667,40 @@ export function GameProvider({ children }: { children: ReactNode }) {
           }
         });
       },
-      addToPack: async (person) => {
+      invite: async (person) => {
         const answer = await act(
           "POST",
-          "/api/pack",
+          "/api/pack/invites",
           { id: person.id, name: person.name },
           "Matilha",
           () => playSound("chat"),
         );
         return answer.ok;
       },
-      addToPackByNick: async (nick) => {
-        const answer = await act("POST", "/api/pack", { nick }, "Matilha", () => playSound("chat"));
+      inviteByNick: async (nick) => {
+        const answer = await act("POST", "/api/pack/invites", { nick }, "Matilha", () =>
+          playSound("chat"),
+        );
+        return answer.ok;
+      },
+      acceptInvite: async (id) => {
+        const answer = await act(
+          "POST",
+          "/api/pack/invites/" + encodeURIComponent(id) + "/accept",
+          undefined,
+          "Matilha",
+          () => playSound("chat"),
+        );
+        return answer.ok;
+      },
+      declineInvite: async (id) => {
+        const answer = await act(
+          "POST",
+          "/api/pack/invites/" + encodeURIComponent(id) + "/decline",
+          undefined,
+          "Matilha",
+          () => playSound("discard"),
+        );
         return answer.ok;
       },
       removeFromPack: async (id) => {

@@ -42,27 +42,27 @@ export function addMate(state: GameState, person: TavernIdentity): Result<PackMa
   return success(addLog(next, "character", message), message, mate);
 }
 
-export function addByNick(
-  state: GameState,
+// Resolve a typed nick against the tavern and the roster: an exact name wins,
+// then a single partial match, and a piece that fits many is refused. Returns
+// the person or the line that says why. Shared by the invite door so a nick and
+// a click both reach the same identity.
+export function matchNick(
   nick: string,
-  atTables: readonly TavernIdentity[],
-): Result<PackMate> {
+  candidates: readonly TavernIdentity[],
+): TavernIdentity | string {
   const term = normalizeText(nick);
-  if (term.length === 0) return failure(state, "Escreva o nick de alguém.");
+  if (term.length === 0) return "Escreva o nick de alguém.";
 
-  const people: TavernIdentity[] = [...atTables];
+  const exact = candidates.find((person) => normalizeText(person.name) === term);
+  if (exact) return exact;
 
-  const exact = people.find((person) => normalizeText(person.name) === term);
-  if (exact) return addMate(state, exact);
-
-  const partial = people.filter((person) => normalizeText(person.name).includes(term));
-  if (partial.length === 0)
-    return failure(state, "Ninguém com esse nick na taverna nem no quadro.");
+  const partial = candidates.filter((person) => normalizeText(person.name).includes(term));
+  if (partial.length === 0) return "Ninguém com esse nick na taverna nem no quadro.";
   if (partial.length > 1) {
-    return failure(state, partial.length + " nomes com esse pedaço. Escreva o nick inteiro.");
+    return partial.length + " nomes com esse pedaço. Escreva o nick inteiro.";
   }
 
-  return addMate(state, partial[0]);
+  return partial[0];
 }
 
 export function removeMate(state: GameState, id: string): Result {

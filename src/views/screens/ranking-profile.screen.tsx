@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { api } from "@/controllers/api.client";
 import { useGame } from "@/controllers/game.context";
+import { isInPack } from "@/controllers/pack.controller";
 import { profileOf } from "@/controllers/ranking.controller";
 import type { Hunter } from "@/models/entities/ranking";
 import { findPet } from "@/models/entities/pet";
@@ -21,7 +22,7 @@ import { Panel } from "../components/panel";
 import { Tag } from "../components/tag";
 import { PageHeader } from "../layout/page-header";
 export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
-  const { state, character, moon } = useGame();
+  const { state, character, moon, invite } = useGame();
   const [roster, setRoster] = useState<Hunter[] | null>(null);
   useEffect(() => {
     let alive = true;
@@ -67,9 +68,25 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
             : "Ficha de leitura: o que se sabe deste caçador pelo quadro do ranking."
         }
         action={
-          <Tag tone={isPlayer ? "light" : "neutral"}>
-            Melhor em {best.label} - {formatNumber(best.position)}º
-          </Tag>
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            {!isPlayer ? (
+              isInPack(state, hunter.id) ? (
+                <Tag tone="neutral">Na matilha</Tag>
+              ) : (
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    void invite({ id: hunter.id, name: hunter.name });
+                  }}
+                >
+                  Convidar para matilha
+                </Button>
+              )
+            ) : null}
+            <Tag tone={isPlayer ? "light" : "neutral"}>
+              Melhor em {best.label} - {formatNumber(best.position)}º
+            </Tag>
+          </div>
         }
       />
 

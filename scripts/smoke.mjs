@@ -138,8 +138,10 @@ check(
     typeof state3?.arenaDuels === "object" &&
     Object.keys(state3.arenaDuels).length === 0,
 );
-const room = await call("POST", "/api/tavern/rooms", { name: "Fogueira", password: "" });
-check("mesa aberta", room.payload?.ok === true, room.payload?.message);
+const openTry = await call("POST", "/api/tavern/rooms", { name: "Praca", password: "" });
+check("sala sem senha exige o NV mínimo", openTry.payload?.ok === false, openTry.payload?.message);
+const room = await call("POST", "/api/tavern/rooms", { name: "Fogueira", password: "segredo" });
+check("mesa com senha abre em qualquer nível", room.payload?.ok === true, room.payload?.message);
 const roomId = room.payload?.data?.roomId;
 const spoke = await call("POST", "/api/tavern/rooms/" + roomId + "/messages", {
   text: "Uivo de teste",
@@ -155,6 +157,59 @@ check(
   "mesa listada com a fala",
   seat?.room?.messages?.some((m) => m.text === "Uivo de teste") === true,
 );
+
+// Convite de matilha, matilha mútua e permissão de DM: A convida, B aceita, viram
+// companheiros e só então a mesa reservada abre. Sair tira os dois um do outro.
+const aId = state1?.character?.id;
+const mateUserId = "usr_" + Date.now().toString(36) + "_pk" + randomBytes(2).toString("hex");
+await client.query("insert into users (id, email, birth_date) values ($1, $2, $3)", [
+  mateUserId,
+  "packmate@wizold.test",
+  "1990-01-01",
+]);
+const aCookie = cookie;
+const matePayload = mateUserId + "." + (Date.now() + 3600000);
+const mateToken =
+  "wizold_session=" +
+  matePayload +
+  "." +
+  createHmac("sha256", secret).update(matePayload).digest("base64url");
+cookie = mateToken;
+const mateCreated = await call("POST", "/api/characters", { name: "Companheira", gender: "female" });
+check("companheira criada", mateCreated.payload?.ok === true, mateCreated.payload?.message);
+const mateId = mateCreated.payload?.data?.characterId;
+cookie = aCookie;
+const dmBefore = await call("POST", "/api/tavern/direct", { otherId: mateId });
+check("DM fora da matilha é recusado", dmBefore.payload?.ok === false, dmBefore.payload?.message);
+const invited = await call("POST", "/api/pack/invites", { id: mateId });
+check("convite de matilha enviado", invited.payload?.ok === true, invited.payload?.message);
+check(
+  "convite repetido é recusado",
+  (await call("POST", "/api/pack/invites", { id: mateId })).payload?.ok === false,
+);
+cookie = mateToken;
+const inbox = await call("GET", "/api/pack/invites");
+const inviteId = inbox.payload?.data?.invites?.[0]?.id;
+check("o convidado vê o convite", Boolean(inviteId));
+const accepted = await call("POST", "/api/pack/invites/" + inviteId + "/accept");
+check(
+  "aceitar coloca o inviter na matilha de quem aceitou",
+  accepted.payload?.ok === true && accepted.payload?.state?.pack?.some((m) => m.id === aId) === true,
+  accepted.payload?.message,
+);
+cookie = aCookie;
+const aPack = (await call("POST", "/api/state")).payload?.data;
+check("a matilha é mútua", aPack?.pack?.some((m) => m.id === mateId) === true);
+const dmAfter = await call("POST", "/api/tavern/direct", { otherId: mateId });
+check("DM entre a matilha abre", dmAfter.payload?.ok === true, dmAfter.payload?.message);
+const left = await call("DELETE", "/api/pack/" + mateId);
+check(
+  "sair da matilha tira o companheiro",
+  left.payload?.ok === true && left.payload?.state?.pack?.some((m) => m.id === mateId) !== true,
+  left.payload?.message,
+);
+await client.query("delete from users where id = $1", [mateUserId]);
+
 const bazaar = (await call("GET", "/api/bazaar")).payload?.data;
 check("quadro do bazar é real", Array.isArray(bazaar?.board));
 const roster = (await call("GET", "/api/roster")).payload?.data;

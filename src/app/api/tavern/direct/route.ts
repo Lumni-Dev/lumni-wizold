@@ -18,6 +18,20 @@ export async function POST(request: Request) {
           data: null,
         });
       }
+      // Mesa reservada só entre a matilha: sem ser companheiros, não há DM. Como a
+      // matilha é mútua, uma direção basta para provar o laço.
+      const mates = await context.client.query(
+        "select 1 from pack_mates where character_id = $1 and mate_id = $2",
+        [context.identity.id, otherId],
+      );
+      if (mates.rows.length === 0) {
+        return NextResponse.json({
+          ok: false,
+          message:
+            "Mesa reservada é só entre a matilha. Convide " + other.name + " e espere aceitar.",
+          data: null,
+        });
+      }
       const result = tavernController.openDirect(state, context.identity, {
         id: other.id,
         name: other.name,

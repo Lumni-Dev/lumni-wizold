@@ -31,6 +31,7 @@ export function ResourceBar() {
             maximum={stats.maxHealth}
             glows={resting && character.health < stats.maxHealth}
             tone="blood"
+            prominent
           />
           <Bar
             label={
@@ -42,12 +43,14 @@ export function ResourceBar() {
             maximum={stats.maxRage}
             glows={resting && character.rage < stats.maxRage}
             tone="fury"
+            prominent
           />
           <Bar
             label={"Experiência (NV. " + formatNumber(character.level) + ")"}
             current={character.experience}
             maximum={stats.experienceNeeded}
             wraps
+            prominent
           />
         </div>
       </div>

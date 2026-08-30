@@ -139,9 +139,11 @@ type TavernAction = (
   context: TavernContext,
 ) => Promise<NextResponse>;
 async function tavernIdentity(client: PoolClient, userId: string): Promise<TavernIdentity | null> {
-  const found = await client.query("select id, name from characters where user_id = $1", [userId]);
+  const found = await client.query("select id, name, level from characters where user_id = $1", [
+    userId,
+  ]);
   const row = found.rows[0];
-  return row ? { id: row.id, name: row.name } : null;
+  return row ? { id: row.id, name: row.name, level: Number(row.level) } : null;
 }
 async function guardTavern(request: Request): Promise<SessionClaims | NextResponse> {
   const refused = refuseAbuse(request);

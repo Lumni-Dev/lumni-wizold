@@ -10,9 +10,17 @@ export const MESSAGE_COOLDOWN_MS = numberFromEnv(
   10000,
 );
 export const MEMBER_TIMEOUT_MS = 150000;
+// A room with no password is a public square: creating one and stepping into one
+// both ask for OPEN_ROOM_MIN_LEVEL. A room with a password takes any level, as
+// long as the person carries the password.
+export const OPEN_ROOM_MIN_LEVEL = 50;
 export interface TavernIdentity {
   id: string;
   name: string;
+  // Only the acting identity (built by tavernIdentity from the character row)
+  // carries a level; identities derived from room members leave it undefined,
+  // and the open-room gate reads `level ?? 1`.
+  level?: number;
 }
 export interface TavernMember extends TavernIdentity {
   joinedAt: string;
