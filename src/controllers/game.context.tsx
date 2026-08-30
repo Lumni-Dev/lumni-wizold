@@ -212,6 +212,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const appliedRef = useRef(0);
   const heldHuntRef = useRef<HeldLanding | null>(null);
   const heldArenaRef = useRef<HeldLanding | null>(null);
+  // A hunt/arena request is committed on the server the instant it is sent, but
+  // its landing is only held once the answer arrives. This counts such requests
+  // while they are in flight so the automation stays blocked across that gap too,
+  // and can never interrupt a lap mid-commit (which dropped the fight and made a
+  // lap "not hunt").
+  const inFlightRef = useRef(0);
   const applyState = useCallback((next: GameState, seq: number) => {
     if (seq <= appliedRef.current) return;
     appliedRef.current = seq;
@@ -231,31 +237,36 @@ export function GameProvider({ children }: { children: ReactNode }) {
           applyState(held.state, held.seq);
         }
       }
-      const answer = await api<T>(method, path, body);
-      if (answer.status === 401) {
-        setAuthenticated(false);
-        return answer;
-      }
-      if (answer.state) {
-        const seq = ++mintRef.current;
-        if (defer === "hunt" && answer.ok) {
-          heldHuntRef.current = {
-            state: answer.state,
-            seq,
-            report: answer.data as HuntReport,
-            at: Date.now(),
-          };
-        } else if (defer === "arena" && answer.ok) {
-          heldArenaRef.current = { state: answer.state, seq, report: null, at: Date.now() };
-        } else if (heldHuntRef.current) {
-          heldHuntRef.current = { ...heldHuntRef.current, state: answer.state, seq };
-        } else if (heldArenaRef.current) {
-          heldArenaRef.current = { ...heldArenaRef.current, state: answer.state, seq };
-        } else {
-          applyState(answer.state, seq);
+      if (defer) inFlightRef.current += 1;
+      try {
+        const answer = await api<T>(method, path, body);
+        if (answer.status === 401) {
+          setAuthenticated(false);
+          return answer;
         }
+        if (answer.state) {
+          const seq = ++mintRef.current;
+          if (defer === "hunt" && answer.ok) {
+            heldHuntRef.current = {
+              state: answer.state,
+              seq,
+              report: answer.data as HuntReport,
+              at: Date.now(),
+            };
+          } else if (defer === "arena" && answer.ok) {
+            heldArenaRef.current = { state: answer.state, seq, report: null, at: Date.now() };
+          } else if (heldHuntRef.current) {
+            heldHuntRef.current = { ...heldHuntRef.current, state: answer.state, seq };
+          } else if (heldArenaRef.current) {
+            heldArenaRef.current = { ...heldArenaRef.current, state: answer.state, seq };
+          } else {
+            applyState(answer.state, seq);
+          }
+        }
+        return answer;
+      } finally {
+        if (defer) inFlightRef.current -= 1;
       }
-      return answer;
     },
     [applyState],
   );
@@ -334,7 +345,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     let busy = false;
     const beat = async () => {
       if (busy) return;
-      if (heldHuntRef.current || heldArenaRef.current) return;
+      if (inFlightRef.current > 0 || heldHuntRef.current || heldArenaRef.current) return;
       busy = true;
       try {
         const step = automationController.nextAutomationStep(stateRef.current, activityRef.current);
