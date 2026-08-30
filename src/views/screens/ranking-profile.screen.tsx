@@ -8,7 +8,7 @@ import { ATTRIBUTES } from "@/models/entities/attribute";
 import type { Hunter } from "@/models/entities/ranking";
 import { SLOT_LABEL } from "@/models/entities/item";
 import { findPet } from "@/models/entities/pet";
-import { formatNumber, formatBronze } from "@/shared/utils/format";
+import { formatNumber } from "@/shared/utils/format";
 import { Button } from "../components/button";
 import { DataRow } from "../components/data-row";
 import { EmptyState } from "../components/empty-state";
@@ -172,17 +172,15 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
             <List>
               {gear.map(({ slot, item, level }) => (
                 <ListRow key={slot} padding="art">
-                  {item ? <ItemIcon item={item} /> : <IconFrame>--</IconFrame>}
+                  {item ? (
+                    <ItemIcon item={item} enhancement={level} />
+                  ) : (
+                    <IconFrame>--</IconFrame>
+                  )}
                   <RowText
                     title={item ? item.name : "Nada equipado"}
                     description={SLOT_LABEL[slot]}
                   />
-                  {level > 0 ? <Tag tone="neutral">+{formatNumber(level)}</Tag> : null}
-                  {item ? (
-                    <span className="font-mono text-[11px] text-ink-faint">
-                      {formatBronze(item.price)}
-                    </span>
-                  ) : null}
                 </ListRow>
               ))}
             </List>
