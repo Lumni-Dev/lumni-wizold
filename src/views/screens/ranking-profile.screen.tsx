@@ -89,12 +89,25 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
             </div>
 
             <List>
-              <DataRow label="Caçadas" value={formatNumber(hunter.hunts)} />
-              <DataRow label="Vitórias" value={formatNumber(hunter.wins)} />
-              <DataRow label="Derrotas" value={formatNumber(hunter.losses)} />
               <DataRow label="Bronze" value={formatNumber(hunter.bronze)} />
               <DataRow label="Forja" value={"+" + formatNumber(hunter.forge)} />
               <DataRow label="Mineração" value={"NV. " + formatNumber(hunter.mining)} />
+            </List>
+          </Panel>
+
+          <Panel title="Caçada" description="O que a trilha rendeu: presas ganhas e perdidas." padding="none">
+            <List>
+              <DataRow label="Caçadas" value={formatNumber(hunter.hunts)} />
+              <DataRow label="Vitórias" value={formatNumber(hunter.wins)} />
+              <DataRow label="Derrotas" value={formatNumber(hunter.losses)} />
+            </List>
+          </Panel>
+
+          <Panel title="Arena" description="Os duelos no fosso, contra outros caçadores." padding="none">
+            <List>
+              <DataRow label="Duelos" value={formatNumber(hunter.arena + hunter.arenaLosses)} />
+              <DataRow label="Vitórias" value={formatNumber(hunter.arena)} />
+              <DataRow label="Derrotas" value={formatNumber(hunter.arenaLosses)} />
             </List>
           </Panel>
 

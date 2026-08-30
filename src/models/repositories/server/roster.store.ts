@@ -56,6 +56,7 @@ export async function loadHunters(client: PoolClient): Promise<Hunter[]> {
       wins: Number(row.wins),
       losses: Number(row.losses),
       arena: Number(row.arena_wins),
+      arenaLosses: Number(row.arena_losses),
       bronze: Number(row.bronze),
       forge,
       enhancements: forged,

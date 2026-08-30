@@ -89,9 +89,25 @@ export function CharacterScreen() {
                 }
               />
               <DataRow label="Bronze" value={formatNumber(character.bronze)} />
+            </List>
+          </Panel>
+
+          <Panel title="Caçada" description="O que a trilha rende: presas ganhas e perdidas." padding="none">
+            <List>
               <DataRow label="Caçadas" value={formatNumber(character.hunts)} />
               <DataRow label="Vitórias" value={formatNumber(character.wins)} />
               <DataRow label="Derrotas" value={formatNumber(character.losses)} />
+            </List>
+          </Panel>
+
+          <Panel title="Arena" description="Os duelos no fosso, contra outros caçadores." padding="none">
+            <List>
+              <DataRow
+                label="Duelos"
+                value={formatNumber(character.arenaWins + character.arenaLosses)}
+              />
+              <DataRow label="Vitórias" value={formatNumber(character.arenaWins)} />
+              <DataRow label="Derrotas" value={formatNumber(character.arenaLosses)} />
             </List>
           </Panel>
 

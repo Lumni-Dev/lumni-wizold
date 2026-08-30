@@ -47,6 +47,7 @@ function playerAsHunter(state: GameState): Hunter | null {
     wins: character.wins,
     losses: character.losses,
     arena: character.arenaWins,
+    arenaLosses: character.arenaLosses,
     bronze: character.bronze,
     pet: state.pet
       ? {

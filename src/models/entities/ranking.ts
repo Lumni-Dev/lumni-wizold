@@ -21,6 +21,7 @@ export interface Hunter {
   wins: number;
   losses: number;
   arena: number;
+  arenaLosses: number;
   bronze: number;
   forge: number;
   enhancements: Record<string, number>;
