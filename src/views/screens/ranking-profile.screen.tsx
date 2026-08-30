@@ -4,9 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { api } from "@/controllers/api.client";
 import { useGame } from "@/controllers/game.context";
 import { profileOf } from "@/controllers/ranking.controller";
-import { ATTRIBUTES } from "@/models/entities/attribute";
 import type { Hunter } from "@/models/entities/ranking";
-import { SLOT_LABEL } from "@/models/entities/item";
 import { findPet } from "@/models/entities/pet";
 import { petMaxEnergy } from "@/models/rules/pet";
 import { PET_MAX_LEVEL } from "@/shared/constants/game";
@@ -14,12 +12,11 @@ import { formatNumber } from "@/shared/utils/format";
 import { Button } from "../components/button";
 import { DataRow } from "../components/data-row";
 import { EmptyState } from "../components/empty-state";
-import { AttributeIcon } from "../components/attribute-icon";
 import { GenderBanner } from "../components/gender-icon";
-import { IconFrame } from "../components/icon-frame";
 import { PetBanner } from "../components/pet-icon";
-import { ItemIcon } from "../components/item-icon";
-import { List, ListRow, RowText } from "../components/list";
+import { List, ListRow } from "../components/list";
+import { AttributesPanel } from "../components/attributes-panel";
+import { EquipmentPanel } from "../components/equipment-panel";
 import { Panel } from "../components/panel";
 import { Tag } from "../components/tag";
 import { PageHeader } from "../layout/page-header";
@@ -163,56 +160,9 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
             </List>
           </Panel>
 
-          <Panel
-            title="Atributos"
-            description="O que foi treinado, mais o que o resto empresta."
-            padding="none"
-          >
-            <List>
-              {ATTRIBUTES.map((definition) => {
-                const base = hunter.attributes[definition.key];
-                const bonus = stats.totalAttributes[definition.key] - base;
-                return (
-                  <ListRow key={definition.key} padding="art">
-                    <AttributeIcon attribute={definition.key} />
-                    <RowText title={definition.name} description={definition.description} />
-                    <span className="font-mono text-sm text-ink">
-                      {formatNumber(base)}
-                      {bonus > 0 ? (
-                        <span className="text-ink-faint"> +{formatNumber(bonus)}</span>
-                      ) : null}
-                    </span>
-                  </ListRow>
-                );
-              })}
-            </List>
-          </Panel>
+          <AttributesPanel stats={stats} gender={hunter.gender} />
 
-          <Panel
-            title="Equipamento"
-            description={
-              "Os sete espaços, do elmo ao anel, somando +" +
-              formatNumber(hunter.forge) +
-              " de forja."
-            }
-            padding="none"
-          >
-            <List>
-              {gear.map(({ slot, item, level }) => (
-                <ListRow key={slot} padding="art">
-                  {item ? (
-                    <ItemIcon item={item} enhancement={level} />
-                  ) : (
-                    <IconFrame>--</IconFrame>
-                  )}
-                  <RowText
-                    title={item ? item.name : "Nada equipado"}
-                    description={SLOT_LABEL[slot]}
-                  />
-                </ListRow>
-              ))}
-            </List>
-          </Panel>
+          <EquipmentPanel gear={gear} forge={hunter.forge} />
 
           <Panel
             title="Posições"

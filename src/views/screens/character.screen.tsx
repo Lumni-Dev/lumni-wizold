@@ -1,32 +1,53 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { api } from "@/controllers/api.client";
 import { useGame } from "@/controllers/game.context";
+import { profileOf } from "@/controllers/ranking.controller";
 import { criticalMultiplierOf } from "@/models/rules/combat";
-import { ATTRIBUTES, type Attributes } from "@/models/entities/attribute";
 import { findItem } from "@/models/data/items";
-import { enhancedName, enhancementOf } from "@/models/rules/forge";
-import { EQUIPMENT_SLOTS, SLOT_LABEL } from "@/models/entities/item";
+import { enhancementOf } from "@/models/rules/forge";
+import { EQUIPMENT_SLOTS } from "@/models/entities/item";
 import { findGender, FORM_LABEL } from "@/models/entities/character";
-import { BASE_ATTRIBUTE_VALUE } from "@/shared/constants/game";
-import { cn } from "@/shared/utils/class-names";
+import type { Hunter } from "@/models/entities/ranking";
+import { findPet } from "@/models/entities/pet";
+import { petMaxEnergy } from "@/models/rules/pet";
+import { PET_MAX_LEVEL } from "@/shared/constants/game";
 import { formatNumber } from "@/shared/utils/format";
 import { Bar } from "../components/bar";
+import { Button } from "../components/button";
 import { Tag } from "../components/tag";
 import { DataRow } from "../components/data-row";
-import { AttributeIcon } from "../components/attribute-icon";
 import { GenderBanner } from "../components/gender-icon";
+import { PetBanner } from "../components/pet-icon";
 import { VitalActionButton } from "../components/vital-action-button";
-import { List, ListRow, RowText } from "../components/list";
+import { List, ListRow } from "../components/list";
 import { Panel } from "../components/panel";
+import { AttributesPanel } from "../components/attributes-panel";
+import { EquipmentPanel } from "../components/equipment-panel";
 import { ActivityLog } from "../components/activity-log";
 import { PageHeader } from "../layout/page-header";
 
-function plus(value: number): string {
-  return value > 0 ? "+" + formatNumber(value) : "0";
-}
-
 export function CharacterScreen() {
   const { state, character, stats, activity } = useGame();
+  const [roster, setRoster] = useState<Hunter[] | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    void api<{ hunters: Hunter[] }>("GET", "/api/roster").then((answer) => {
+      if (alive && answer.ok && answer.data) setRoster(answer.data.hunters);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const profile = useMemo(
+    () => (roster && character ? profileOf(state, roster, character.id) : null),
+    [state, roster, character],
+  );
+
   if (!character || !stats) return null;
 
   const strength = stats.totalAttributes.strength;
@@ -34,6 +55,26 @@ export function CharacterScreen() {
 
   const genderDefinition = findGender(character.gender);
   const resting = activity?.kind === "rest";
+
+  const forge = EQUIPMENT_SLOTS.reduce((total, slot) => {
+    const itemId = state.equipment[slot];
+    return total + (itemId ? enhancementOf(state.enhancements, itemId) : 0);
+  }, 0);
+  const gear = EQUIPMENT_SLOTS.map((slot) => {
+    const itemId = state.equipment[slot];
+    return {
+      slot,
+      item: itemId ? (findItem(itemId) ?? null) : null,
+      level: itemId ? enhancementOf(state.enhancements, itemId) : 0,
+    };
+  });
+
+  const wolf = state.pet ? findPet(state.pet.gender) : null;
+  const petLevel = state.pet?.level ?? 1;
+
+  const best = profile
+    ? profile.positions.reduce((first, next) => (next.position < first.position ? next : first))
+    : null;
 
   const vitals = [
     {
@@ -64,6 +105,13 @@ export function CharacterScreen() {
       <PageHeader
         title="Personagem"
         description="A ficha completa: quem você é, o que o corpo aguenta e como a fera responde."
+        action={
+          best ? (
+            <Tag tone="light">
+              Melhor em {best.label} - {formatNumber(best.position)}º
+            </Tag>
+          ) : undefined
+        }
       />
 
       <div className="grid items-start gap-6 lg:grid-cols-3">
@@ -77,18 +125,16 @@ export function CharacterScreen() {
                   {genderDefinition.label}
                 </p>
               </div>
-              <Tag tone="neutral">{FORM_LABEL[character.form]}</Tag>
+              <div className="flex flex-wrap items-center gap-2">
+                <Tag tone="neutral">NV. {formatNumber(character.level)}</Tag>
+                <Tag tone="neutral">{FORM_LABEL[character.form]}</Tag>
+              </div>
             </div>
 
             <List>
-              <DataRow label="NV." value={formatNumber(character.level)} />
-              <DataRow
-                label="Experiência"
-                value={
-                  formatNumber(character.experience) + " / " + formatNumber(stats.experienceNeeded)
-                }
-              />
               <DataRow label="Bronze" value={formatNumber(character.bronze)} />
+              <DataRow label="Forja" value={"+" + formatNumber(forge)} />
+              <DataRow label="Mineração" value={"NV. " + formatNumber(state.mining.level)} />
             </List>
           </Panel>
 
@@ -106,21 +152,38 @@ export function CharacterScreen() {
             </List>
           </Panel>
 
-          <Panel
-            title="Combate"
-            description="Não há número escondido aqui: cada linha diz de qual atributo ela sai."
-            padding="none"
-          >
-            <List>
-              <DataRow label="Golpe (Força)" value={formatNumber(strength)} />
-              <DataRow label="Defesa (Resistência)" value={formatNumber(endurance)} />
-              <DataRow label="Esquiva (Agilidade)" value={stats.dodge + "%"} />
-              <DataRow label="Crítico (Instinto)" value={stats.critical + "%"} />
-              <DataRow
-                label="Dano do crítico (Fúria)"
-                value={"×" + criticalMultiplierOf(character.rage).toFixed(2).replace(".", ",")}
-              />
-            </List>
+          <Panel title="Mascote" padding="none">
+            {wolf && state.pet ? (
+              <>
+                <PetBanner gender={state.pet.gender} />
+                <div className="border-b border-edge p-4">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm text-ink">{state.pet.name}</p>
+                    <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                      {wolf.label} - {wolf.title}
+                    </p>
+                  </div>
+                </div>
+                <List>
+                  <DataRow
+                    label="Nível"
+                    value={formatNumber(petLevel) + " / " + formatNumber(PET_MAX_LEVEL)}
+                  />
+                  <DataRow
+                    label="Energia"
+                    value={
+                      formatNumber(state.pet.energy) + " / " + formatNumber(petMaxEnergy(petLevel))
+                    }
+                  />
+                  <DataRow
+                    label="Estado"
+                    value={state.pet.active !== false ? "Acompanhando" : "Em casa"}
+                  />
+                </List>
+              </>
+            ) : (
+              <p className="px-4 py-3 text-xs text-ink-faint">Caça sozinho, sem lobo no rastro.</p>
+            )}
           </Panel>
         </div>
 
@@ -149,91 +212,56 @@ export function CharacterScreen() {
             </List>
           </Panel>
 
-          <Panel
-            title="Atributos"
-            description="Tudo o que o jogo usa está nesta tabela. Some as colunas e você chega no total."
-            padding="none"
-          >
+          <Panel title="Combate" description="Cada linha diz de qual atributo ela sai." padding="none">
             <List>
-              {ATTRIBUTES.map((definition) => {
-                const lent = (from: Attributes) => from[definition.key];
-                const total = stats.totalAttributes[definition.key];
+              <DataRow label="Golpe (Força)" value={formatNumber(strength)} />
+              <DataRow label="Defesa (Resistência)" value={formatNumber(endurance)} />
+              <DataRow label="Esquiva (Agilidade)" value={stats.dodge + "%"} />
+              <DataRow label="Crítico (Instinto)" value={stats.critical + "%"} />
+              <DataRow label="Vida máxima" value={formatNumber(stats.maxHealth)} />
+              <DataRow
+                label="Dano do crítico (Fúria)"
+                value={"×" + criticalMultiplierOf(character.rage).toFixed(2).replace(".", ",")}
+              />
+            </List>
+          </Panel>
 
-                const natural =
-                  BASE_ATTRIBUTE_VALUE + (genderDefinition.bonus[definition.key] ?? 0);
-                const cells = [
-                  { label: "Natural", value: formatNumber(natural), sum: false },
-                  {
-                    label: "Treino",
-                    value: plus(lent(stats.sources.trained) - natural),
-                    sum: false,
-                  },
-                  { label: "Equipamento", value: plus(lent(stats.sources.equipment)), sum: false },
-                  { label: "Mascote", value: plus(lent(stats.sources.pet)), sum: false },
-                  { label: "Lua", value: plus(lent(stats.sources.moon)), sum: false },
-                  { label: "Lobisomem", value: plus(lent(stats.sources.form)), sum: false },
-                  { label: "Total", value: formatNumber(total), sum: true },
-                ];
+          <AttributesPanel stats={stats} gender={character.gender} />
 
-                return (
-                  <ListRow key={definition.key} layout="column" padding="art">
-                    <div className="flex min-w-0 items-center gap-3">
-                      <AttributeIcon attribute={definition.key} />
-                      <RowText title={definition.name} description={definition.description} />
-                    </div>
-                    <div className="grid w-full grid-cols-4 divide-x divide-y divide-edge sm:grid-cols-7 sm:divide-y-0 overflow-hidden rounded-md border border-edge">
-                      {cells.map((cell) => (
-                        <div
-                          key={cell.label}
-                          className={cn(
-                            "space-y-0.5 px-2 py-1.5 text-center",
-                            cell.sum && "bg-surface-high/40",
-                          )}
-                        >
-                          <p className="truncate text-[10px] uppercase tracking-normal text-ink-faint">
-                            {cell.label}
-                          </p>
-                          <p
-                            className={cn(
-                              "font-mono text-[11px]",
-                              cell.value === "0" ? "text-ink-faint" : "text-ink",
-                            )}
-                          >
-                            {cell.value}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
+          <EquipmentPanel gear={gear} forge={forge} />
+
+          {profile ? (
+            <Panel
+              title="Posições"
+              description={
+                "Onde você aparece em cada quadro, entre " + formatNumber(profile.boardSize) + "."
+              }
+              padding="none"
+              footer={
+                <Link href="/ranking">
+                  <Button variant="outline">Ver ranking completo</Button>
+                </Link>
+              }
+            >
+              <List>
+                {profile.positions.map((position) => (
+                  <ListRow key={position.key} className="justify-between">
+                    <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                      {position.label}
+                    </span>
+                    <span className="flex items-center gap-3">
+                      <span className="font-mono text-[11px] text-ink-faint">
+                        {formatNumber(position.value)}
+                      </span>
+                      <span className="w-14 text-right font-mono text-sm text-ink">
+                        {formatNumber(position.position)}º
+                      </span>
+                    </span>
                   </ListRow>
-                );
-              })}
-            </List>
-          </Panel>
-
-          <Panel title="Equipamento" description="Trocas são feitas no inventário." padding="none">
-            <List>
-              {EQUIPMENT_SLOTS.map((slot) => {
-                const itemId = state.equipment[slot];
-                const item = itemId ? findItem(itemId) : undefined;
-
-                return (
-                  <DataRow
-                    key={slot}
-                    label={SLOT_LABEL[slot]}
-                    value={
-                      item ? (
-                        <span className="text-ink">
-                          {enhancedName(item.name, enhancementOf(state.enhancements, item.id))}
-                        </span>
-                      ) : (
-                        <span className="text-ink-faint">vazio</span>
-                      )
-                    }
-                  />
-                );
-              })}
-            </List>
-          </Panel>
+                ))}
+              </List>
+            </Panel>
+          ) : null}
         </div>
       </div>
 
