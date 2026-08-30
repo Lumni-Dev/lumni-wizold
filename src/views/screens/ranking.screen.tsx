@@ -12,6 +12,7 @@ import { cn } from "@/shared/utils/class-names";
 import { formatNumber } from "@/shared/utils/format";
 import { sanitizeName } from "@/shared/utils/text";
 import { Chip } from "../components/chip";
+import { CopyNick } from "../components/copy-nick";
 import { Field } from "../components/field";
 import { List, ListRow } from "../components/list";
 import { EmptyState } from "../components/empty-state";
@@ -159,6 +160,7 @@ export function RankingScreen() {
                 >
                   {entry.hunter.name}
                 </Link>
+                <CopyNick name={entry.hunter.name} />
                 <span className="hidden shrink-0 text-[10px] uppercase tracking-[0.16em] text-ink-faint sm:block">
                   {entry.hunter.gender === "male" ? "Lumni" : "Luna"}
                 </span>

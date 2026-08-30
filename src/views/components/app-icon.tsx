@@ -4,9 +4,11 @@ import {
   Beer,
   Bell,
   BookOpen,
+  Check,
   ChevronLeft,
   ChevronRight,
   Coins,
+  Copy,
   Dumbbell,
   Hammer,
   Mail,
@@ -79,6 +81,8 @@ const ACTION_ICONS = {
   previous: ChevronLeft,
   next: ChevronRight,
   mail: Mail,
+  copy: Copy,
+  check: Check,
 } as const;
 
 export type AppAction = keyof typeof ACTION_ICONS;

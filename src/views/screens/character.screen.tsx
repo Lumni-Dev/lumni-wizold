@@ -14,6 +14,7 @@ import type { Hunter } from "@/models/entities/ranking";
 import { formatNumber } from "@/shared/utils/format";
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
+import { CopyNick } from "../components/copy-nick";
 import { Tag } from "../components/tag";
 import { DataRow } from "../components/data-row";
 import { GenderBanner } from "../components/gender-icon";
@@ -113,7 +114,10 @@ export function CharacterScreen() {
             <GenderBanner gender={character.gender} />
             <div className="space-y-2 border-b border-edge p-4">
               <div className="min-w-0 space-y-1">
-                <p className="truncate text-sm text-ink">{character.name}</p>
+                <div className="flex items-center gap-2">
+                  <p className="min-w-0 truncate text-sm text-ink">{character.name}</p>
+                  <CopyNick name={character.name} />
+                </div>
                 <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                   {genderDefinition.label}
                 </p>

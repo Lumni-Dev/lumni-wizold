@@ -11,6 +11,7 @@ import { petMaxEnergy } from "@/models/rules/pet";
 import { PET_MAX_LEVEL } from "@/shared/constants/game";
 import { formatNumber } from "@/shared/utils/format";
 import { Button } from "../components/button";
+import { CopyNick } from "../components/copy-nick";
 import { DataRow } from "../components/data-row";
 import { EmptyState } from "../components/empty-state";
 import { GenderBanner } from "../components/gender-icon";
@@ -96,7 +97,10 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
             <GenderBanner gender={hunter.gender} />
             <div className="space-y-2 border-b border-edge p-4">
               <div className="min-w-0 space-y-1">
-                <p className="truncate text-sm text-ink">{hunter.name}</p>
+                <div className="flex items-center gap-2">
+                  <p className="min-w-0 truncate text-sm text-ink">{hunter.name}</p>
+                  <CopyNick name={hunter.name} />
+                </div>
                 <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                   {hunter.gender === "male" ? "Lumni" : "Luna"}
                 </p>
