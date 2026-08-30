@@ -349,6 +349,16 @@ export function HuntScreen() {
               : null;
           const foe = pending ?? report;
           const fightingId = line && foe ? foe.creature.id : selectedId;
+          const selectedCreature =
+            creatures.find((creature) => creature.id === selectedId) ?? prey ?? creatures[0];
+          const replaying = onThis && pending !== null && line !== null;
+          const shownFoe = replaying && foe ? foe.creature : selectedCreature;
+          const monsterMax = Math.max(1, shownFoe?.health ?? 1);
+          const monsterCurrent =
+            replaying && line
+              ? Math.max(0, Math.min(monsterMax, line.creatureHealth))
+              : monsterMax;
+          const monsterStatus = replaying ? "Atacando" : "Aguardando";
           return (
             <Card
               key={territory.id}
@@ -378,6 +388,16 @@ export function HuntScreen() {
                       {territory.description}
                     </p>
                   </div>
+                  {shownFoe ? (
+                    <div className="px-4 py-3">
+                      <Bar
+                        label={monsterStatus + " · " + shownFoe.name}
+                        current={monsterCurrent}
+                        maximum={monsterMax}
+                        tone="blood"
+                      />
+                    </div>
+                  ) : null}
                   <div className="px-4 py-3">
                     <Bar
                       label={active ? "Caçando..." : "Caçar"}
