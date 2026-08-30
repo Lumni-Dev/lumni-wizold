@@ -467,7 +467,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     summary: "Bronze entra pela caça e sai pelo mercado.",
     lines: [
       "A partida começa com 100 de bronze.",
-      "A caçada é a unidade de preço do jogo: uma presa paga conforme a faixa em que ela vive, e treino, poção, nome novo e bolsa da arena são todos contados em caçadas dessa mesma faixa.",
+      "A caçada é a unidade de preço do jogo: uma presa paga conforme a faixa em que ela vive, e treino, poção e bolsa da arena são todos contados em caçadas dessa mesma faixa. Trocar de nome foge à regra: custa 50 mil de bronze fixos.",
       "Subir de nível dentro de uma faixa não enche o bolso: o que muda o tamanho da bolsa é abrir a faixa seguinte, com presas mais caras e conjunto mais caro.",
       "Um conjunto novo custa entre 150 e 330 caçadas da faixa que o abriu: é a poupança da faixa inteira.",
       "O mercado vende pelo preço de tabela e recompra pela metade.",

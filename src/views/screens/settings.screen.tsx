@@ -8,7 +8,9 @@ import { renameCost, renameDaysLeft } from "@/controllers/character.controller";
 import { AUTOMATIONS } from "@/models/entities/automation";
 import { useGame } from "@/controllers/game.context";
 import { playSound } from "@/controllers/sound";
+import { disableTavernPush, enableTavernPush } from "@/controllers/tavern-notify";
 import { soundRepository } from "@/models/repositories/sound.repository";
+import { tavernPushRepository } from "@/models/repositories/tavern-push.repository";
 import { NAME_MAX_LENGTH, RENAME_COOLDOWN_DAYS } from "@/shared/constants/game";
 import { formatNumber, formatBronze } from "@/shared/utils/format";
 import { sanitizeName } from "@/shared/utils/text";
@@ -99,13 +101,26 @@ export function SettingsScreen() {
     if (on) playSound("ui");
   }
 
+  const pushOn = useSyncExternalStore(
+    tavernPushRepository.subscribe,
+    tavernPushRepository.enabled,
+    tavernPushRepository.serverSnapshot,
+  );
+
+  // Turning it on asks the browser for permission; the setting only sticks on a
+  // yes, so a deny flips the switch back to Desativado on its own.
+  function choosePush(on: boolean) {
+    if (on) void enableTavernPush();
+    else disableTavernPush();
+  }
+
   if (!character) return null;
 
   const active = AUTOMATIONS.filter((entry) => state.automation[entry.key]).length;
 
   const daysLeft = renameDaysLeft(character);
   const canRename = daysLeft === 0;
-  const cost = renameCost(character);
+  const cost = renameCost();
   const affordable = character.bronze >= cost;
 
   function submitRename(event: FormEvent) {
@@ -225,7 +240,7 @@ export function SettingsScreen() {
         description="O que a partida faz sozinha. Cada chave faz uma coisa só, e elas se ajudam: a caçada bebe, a poção acaba, o corpo descansa, a caçada volta."
         action={
           <Tag tone="neutral">
-            {formatNumber(active)} de {AUTOMATIONS.length} ligadas
+            {formatNumber(active)} de {AUTOMATIONS.length} ativadas
           </Tag>
         }
         padding="none"
@@ -239,13 +254,13 @@ export function SettingsScreen() {
                   active={state.automation[entry.key]}
                   onClick={() => setAutomation(entry.key, true)}
                 >
-                  Ligada
+                  Ativado
                 </Chip>
                 <Chip
                   active={!state.automation[entry.key]}
                   onClick={() => setAutomation(entry.key, false)}
                 >
-                  Desligada
+                  Desativado
                 </Chip>
               </div>
             </ListRow>
@@ -254,6 +269,20 @@ export function SettingsScreen() {
       </Panel>
 
       <div className="grid items-start gap-6 lg:grid-cols-2">
+        <Panel
+          title="Taverna"
+          description="Avisos no desktop das mensagens das suas mesas: nome da mesa, quem falou, quando e o quê, com um botão para responder direto na taverna."
+        >
+          <div className="flex gap-2">
+            <Chip active={pushOn} onClick={() => choosePush(true)}>
+              Ativado
+            </Chip>
+            <Chip active={!pushOn} onClick={() => choosePush(false)}>
+              Desativado
+            </Chip>
+          </div>
+        </Panel>
+
         <Panel title="Som" description="Os efeitos do jogo: couro, moedas e o rugido da virada.">
           <div className="flex gap-2">
             <Chip active={sound} onClick={() => chooseSound(true)}>

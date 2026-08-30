@@ -1,9 +1,8 @@
-import { huntPurse } from "@/models/data/species";
 import {
   MIN_HEALTH_RATIO_TO_ACT,
   NAME_MAX_LENGTH,
   NAME_MIN_LENGTH,
-  RENAME_BASE_PRICE,
+  RENAME_PRICE,
   RENAME_COOLDOWN_DAYS,
   REST_HEALTH_RATIO,
   REST_RAGE_RATIO,
@@ -61,8 +60,8 @@ export function startRun(name: string, gender: Gender): Result {
   return success(createRun(capitalizeName(name), gender), "Personagem criado. A caçada aguarda.");
 }
 
-export function renameCost(character: Character): number {
-  return Math.max(RENAME_BASE_PRICE, Math.round(huntPurse(character.level) * 30));
+export function renameCost(): number {
+  return RENAME_PRICE;
 }
 
 export function renameDaysLeft(character: Character): number {
@@ -91,7 +90,7 @@ export function renameCharacter(state: GameState, name: string): Result {
     );
   }
 
-  const cost = renameCost(character);
+  const cost = renameCost();
   if (character.bronze < cost) {
     return failure(
       state,

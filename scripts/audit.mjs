@@ -486,11 +486,7 @@ sec("economia");
       perPoint.toFixed(2),
     );
   }
-  ok(
-    "renomear custa 30 caçadas com piso",
-    characterCtrl.renameCost({ level: 500 }) ===
-      Math.max(500, Math.round(species.huntPurse(500) * 30)),
-  );
+  ok("renomear custa 50 mil de bronze fixos", characterCtrl.renameCost() === CONST.RENAME_PRICE);
 }
 sec("progressão");
 {

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { tavernReadRepository } from "@/models/repositories/tavern-read.repository";
 import { api } from "./api.client";
 import { useGame } from "./game.context";
+import { notifyTavernMessage, tavernPushActive } from "./tavern-notify";
 import type { RoomSummary } from "./tavern.controller";
 
 const ALERT_POLL_MS = 15000;
@@ -13,6 +14,10 @@ export function useTavernAlert(watching: boolean) {
   const [unread, setUnread] = useState(0);
   const selfId = character?.id ?? "";
   const enabled = watching && authenticated && character !== null;
+  // The newest message already accounted for, so a notification fires once per
+  // arrival. Null until the first poll, which only sets the baseline so the
+  // backlog on open never rings.
+  const notifiedRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!enabled) return;
@@ -21,17 +26,42 @@ export function useTavernAlert(watching: boolean) {
       const answer = await api<{ rooms: RoomSummary[] }>("POST", "/api/tavern");
       if (!alive || !answer.ok || !answer.data) return;
       const readMap = tavernReadRepository.load();
+      const pushOn = tavernPushActive();
       let total = 0;
-      for (const { room } of answer.data.rooms) {
+      let latest = notifiedRef.current ?? "";
+      const fresh = new Map<
+        string,
+        { roomName: string; authorName: string; text: string; at: string }
+      >();
+      for (const { room, isMember } of answer.data.rooms) {
         const lastRead = readMap[room.id] ?? "";
-        total += room.messages.filter(
-          (message) =>
-            message.at > lastRead &&
-            message.authorId !== "system" &&
-            message.authorId !== selfId,
-        ).length;
+        for (const message of room.messages) {
+          if (message.authorId === "system" || message.authorId === selfId) continue;
+          if (message.at > lastRead) total += 1;
+          if (message.at > latest) latest = message.at;
+          if (
+            pushOn &&
+            isMember &&
+            notifiedRef.current !== null &&
+            message.at > notifiedRef.current
+          ) {
+            const prev = fresh.get(room.id);
+            if (!prev || message.at > prev.at) {
+              fresh.set(room.id, {
+                roomName: room.name,
+                authorName: message.authorName,
+                text: message.text,
+                at: message.at,
+              });
+            }
+          }
+        }
       }
       setUnread(total);
+      for (const item of fresh.values()) {
+        notifyTavernMessage(item.roomName, item.authorName, item.text, item.at);
+      }
+      notifiedRef.current = latest;
     };
     void look();
     const timer = window.setInterval(() => void look(), ALERT_POLL_MS);
