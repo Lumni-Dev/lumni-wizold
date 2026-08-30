@@ -8,6 +8,8 @@ import { ATTRIBUTES } from "@/models/entities/attribute";
 import type { Hunter } from "@/models/entities/ranking";
 import { SLOT_LABEL } from "@/models/entities/item";
 import { findPet } from "@/models/entities/pet";
+import { petMaxEnergy } from "@/models/rules/pet";
+import { PET_MAX_LEVEL } from "@/shared/constants/game";
 import { formatNumber } from "@/shared/utils/format";
 import { Button } from "../components/button";
 import { DataRow } from "../components/data-row";
@@ -95,35 +97,48 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
             </List>
           </Panel>
 
-          <Panel title="Caçada" description="O que a trilha rendeu: presas ganhas e perdidas." padding="none">
+          <Panel title="Caçada" description="Vitórias e derrotas na trilha." padding="none">
             <List>
-              <DataRow label="Caçadas" value={formatNumber(hunter.hunts)} />
               <DataRow label="Vitórias" value={formatNumber(hunter.wins)} />
               <DataRow label="Derrotas" value={formatNumber(hunter.losses)} />
             </List>
           </Panel>
 
-          <Panel title="Arena" description="Os duelos no fosso, contra outros caçadores." padding="none">
+          <Panel title="Arena" description="Vitórias e derrotas no fosso." padding="none">
             <List>
-              <DataRow label="Duelos" value={formatNumber(hunter.arena + hunter.arenaLosses)} />
               <DataRow label="Vitórias" value={formatNumber(hunter.arena)} />
               <DataRow label="Derrotas" value={formatNumber(hunter.arenaLosses)} />
             </List>
           </Panel>
 
           <Panel title="Mascote" padding="none">
-            {wolf && hunter.pet ? <PetBanner gender={hunter.pet.gender} /> : null}
             {wolf && hunter.pet ? (
-              <div className="flex items-center gap-3 p-4">
-                <div className="min-w-0 space-y-2">
-                  <div>
+              <>
+                <PetBanner gender={hunter.pet.gender} />
+                <div className="border-b border-edge p-4">
+                  <div className="min-w-0">
                     <p className="truncate text-sm text-ink">{hunter.pet.name}</p>
                     <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                       {wolf.label} - {wolf.title}
                     </p>
                   </div>
                 </div>
-              </div>
+                <List>
+                  <DataRow
+                    label="Nível"
+                    value={formatNumber(hunter.pet.level) + " / " + formatNumber(PET_MAX_LEVEL)}
+                  />
+                  <DataRow
+                    label="Energia"
+                    value={
+                      formatNumber(hunter.pet.energy) +
+                      " / " +
+                      formatNumber(petMaxEnergy(hunter.pet.level))
+                    }
+                  />
+                  <DataRow label="Estado" value={hunter.pet.active ? "Acompanhando" : "Em casa"} />
+                </List>
+              </>
             ) : (
               <p className="px-4 py-3 text-xs text-ink-faint">Caça sozinho, sem lobo no rastro.</p>
             )}
