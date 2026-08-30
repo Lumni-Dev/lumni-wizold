@@ -53,10 +53,10 @@ export function TrainingScreen() {
     trainRef.current = train;
     notifyRef.current = notify;
     if (activeExercise === PET_EXERCISE_ID) {
-      if (petTraining) resumableRef.current = !petTraining.maxed && petTraining.transformed;
+      if (petTraining) resumableRef.current = !petTraining.maxed;
     } else if (activeExercise) {
       const entry = exercises.find((candidate) => candidate.exercise.id === activeExercise);
-      if (entry) resumableRef.current = !entry.maxed && entry.transformed;
+      if (entry) resumableRef.current = !entry.maxed;
     }
   });
 
@@ -115,8 +115,6 @@ export function TrainingScreen() {
   }, [activeExercise, petGone, setActivity]);
 
   if (!character || !stats) return null;
-
-  const transformed = character.form === "werewolf";
 
   function toggleTraining(exerciseId: string, ready: boolean) {
     // Stop: freeze at the exact beat; the effect cleanup banks it and the
@@ -220,10 +218,10 @@ export function TrainingScreen() {
                           ? "Esperando bronze para continuar"
                           : reason}
                   </span>
-                  <BodyGate open={ready && !active} reason="Só a fera treina.">
+                  <BodyGate open={ready && !active} reason="Vida baixa demais para treinar.">
                     <Button
                       variant={active ? "secondary" : ready ? "primary" : "outline"}
-                      onClick={() => toggleTraining(exercise.id, ready && transformed)}
+                      onClick={() => toggleTraining(exercise.id, ready)}
                       disabled={!ready && !active}
                     >
                       {active ? "Parar" : "Treinar"}
@@ -294,10 +292,10 @@ export function TrainingScreen() {
                       ? "Pausado, retoma de onde parou"
                       : petTraining.reason}
                 </span>
-                <BodyGate open={petReady && !petActive} reason="Só a fera treina.">
+                <BodyGate open={petReady && !petActive} reason="Vida baixa demais para treinar.">
                   <Button
                     variant={petActive ? "secondary" : petReady ? "primary" : "outline"}
-                    onClick={() => toggleTraining(PET_EXERCISE_ID, petReady && transformed)}
+                    onClick={() => toggleTraining(PET_EXERCISE_ID, petReady)}
                     disabled={!petReady && !petActive}
                   >
                     {petActive ? "Parar" : "Treinar"}

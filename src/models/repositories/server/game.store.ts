@@ -2,7 +2,7 @@ import type { PoolClient } from "pg";
 import { STATE_VERSION } from "@/shared/constants/game";
 import { emptyEquipment, EQUIPMENT_SLOTS, type EquipmentSlot } from "../../entities/item";
 import type { BazaarListing, Wallet } from "../../entities/bazaar";
-import type { Character, Form, Gender } from "../../entities/character";
+import type { Character, Gender } from "../../entities/character";
 import { initialState, type GameState } from "../../entities/game-state";
 import type { LogEntry, LogKind } from "../../entities/log-entry";
 import type { PackMate } from "../../entities/pack";
@@ -18,7 +18,6 @@ interface CharacterRow {
   user_id: string;
   name: string;
   gender: Gender;
-  form: Form;
   [key: string]: unknown;
 }
 function rowToCharacter(row: CharacterRow): Character {
@@ -26,11 +25,9 @@ function rowToCharacter(row: CharacterRow): Character {
     id: row.id,
     name: row.name,
     gender: row.gender,
-    form: row.form,
     level: int(row.level),
     experience: int(row.experience),
     health: int(row.health),
-    rage: int(row.rage),
     bronze: int(row.bronze),
     attributes: {
       strength: int(row.strength),
@@ -53,7 +50,7 @@ function rowToCharacter(row: CharacterRow): Character {
     arenaLosses: int(row.arena_losses),
     createdAt: iso(row.created_at),
     renamedAt: stamp(row.renamed_at),
-    transformedAt: stamp(row.transformed_at),
+    furyUntil: stamp(row.fury_until),
   };
 }
 export interface LoadedGame {
@@ -265,17 +262,18 @@ export async function saveGame(
        mining_level = $20, mining_progress = $21,
        hunts = $22, wins = $23, losses = $24, arena_wins = $25, arena_losses = $26,
        renamed_at = $27, transformed_at = $28,
-       mining_window_start = $29, mining_count = $30
+       mining_window_start = $29, mining_count = $30,
+       fury_until = $31
      where id = $1`,
     [
       characterId,
       character.name,
       character.gender,
-      character.form,
+      "human",
       character.level,
       character.experience,
       character.health,
-      character.rage,
+      0,
       character.bronze,
       character.attributes.strength,
       character.attributes.agility,
@@ -295,9 +293,10 @@ export async function saveGame(
       character.arenaWins,
       character.arenaLosses,
       character.renamedAt ?? null,
-      character.transformedAt ?? null,
+      null,
       after.mining.windowStart ?? null,
       after.mining.count,
+      character.furyUntil ?? null,
     ],
   );
   await savePieces(client, characterId, before, after);
@@ -597,11 +596,11 @@ export async function insertNewGame(
       userId,
       character.name,
       character.gender,
-      character.form,
+      "human",
       character.level,
       character.experience,
       character.health,
-      character.rage,
+      0,
       character.bronze,
       character.attributes.strength,
       character.attributes.agility,

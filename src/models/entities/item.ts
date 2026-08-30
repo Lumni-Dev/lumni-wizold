@@ -16,10 +16,10 @@ export type PotionSize = "small" | "medium" | "large";
 export interface ItemEffect {
   attributes?: Partial<Attributes>;
   health?: number;
-  rage?: number;
   petEnergyRatio?: number;
   healthRatio?: number;
-  rageRatio?: number;
+  // The fury potion: how many minutes the +10-to-every-attribute buff lasts.
+  furyMinutes?: number;
 }
 
 export interface Item {

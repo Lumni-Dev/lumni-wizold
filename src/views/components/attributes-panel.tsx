@@ -14,7 +14,7 @@ function plus(value: number): string {
 
 // The detailed attributes table shared by the character sheet and the read-only
 // profile, so the two never drift: one row per attribute, split into the source
-// of every point (natural, trained, gear, pet, moon, werewolf) plus the total.
+// of every point (natural, trained, gear, pet, moon, fury) plus the total.
 export function AttributesPanel({ stats, gender }: { stats: DerivedStats; gender: Gender }) {
   const genderBonus = findGender(gender).bonus;
 
@@ -35,7 +35,7 @@ export function AttributesPanel({ stats, gender }: { stats: DerivedStats; gender
             { label: "Equipamento", value: plus(lent(stats.sources.equipment)), sum: false },
             { label: "Mascote", value: plus(lent(stats.sources.pet)), sum: false },
             { label: "Lua", value: plus(lent(stats.sources.moon)), sum: false },
-            { label: "Lobisomem", value: plus(lent(stats.sources.form)), sum: false },
+            { label: "Fúria", value: plus(lent(stats.sources.fury)), sum: false },
             { label: "Total", value: formatNumber(total), sum: true },
           ];
 

@@ -32,7 +32,6 @@ import type { HuntReport } from "./hunt.controller";
 import type { ArenaResolution } from "./arena.controller";
 import type { TrainingReport } from "./training.controller";
 import * as automationController from "./automation.controller";
-import * as characterController from "./character.controller";
 import { api, type ApiAnswer } from "./api.client";
 import { playSound, preloadSounds, setVoiceProfile } from "./sound";
 export interface Notice {
@@ -65,7 +64,6 @@ interface GameContextValue {
   deleteRun: (code: string) => Promise<boolean>;
   logout: () => Promise<void>;
   logoutEverywhere: () => Promise<void>;
-  toggleForm: () => Promise<void>;
   rest: () => Promise<void>;
   activity: Activity | null;
   setActivity: (activity: Activity | null) => void;
@@ -198,10 +196,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
     preloadSounds();
   }, []);
   const lineage = state.character?.gender ?? "male";
-  const shape = state.character?.form ?? "human";
   useEffect(() => {
-    setVoiceProfile(lineage, shape);
-  }, [lineage, shape]);
+    setVoiceProfile(lineage);
+  }, [lineage]);
   const stateRef = useRef(state);
   const activityRef = useRef(activity);
   useEffect(() => {
@@ -356,11 +353,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
               playSound("potion"),
             );
             return;
-          case "transform":
-            await act("POST", "/api/character/transform", undefined, "Personagem", () =>
-              playSound("transform"),
-            );
-            return;
           case "rest": {
             const answer = await act("POST", "/api/character/rest", undefined, "Recuperação", () =>
               playSound("rest"),
@@ -402,22 +394,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
       window.clearInterval(timer);
     };
   }, [ready, act, setActivity]);
-  const character = state.character;
-  useEffect(() => {
-    if (!ready || !character || character.form !== "werewolf") return;
-    const timer = window.setTimeout(
-      () => {
-        announce(
-          "Sua fúria se esgotou, você voltou à forma humana.",
-          true,
-          "Personagem",
-        );
-        void request("POST", "/api/state");
-      },
-      Math.max(5000, characterController.transformationRemainingMs(character)),
-    );
-    return () => window.clearTimeout(timer);
-  }, [ready, character, request, announce]);
   useEffect(() => {
     if (!ready || !authenticated) return;
     const settle = async () => {
@@ -445,7 +421,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
         ? {
             ...state.character,
             health: Math.min(state.character.health, stats.maxHealth),
-            rage: Math.min(state.character.rage, stats.maxRage),
           }
         : state.character;
     return {
@@ -515,12 +490,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
           setAuthenticated(false);
         }
         return answer.ok;
-      },
-      toggleForm: async () => {
-        const wasHuman = state.character?.form === "human";
-        await act("POST", "/api/character/transform", undefined, "Personagem", () =>
-          playSound(wasHuman ? "transform" : "revert"),
-        );
       },
       rest: async () => {
         const answer = await act("POST", "/api/character/rest", undefined, "Recuperação", () =>

@@ -146,7 +146,6 @@ export function HuntScreen() {
     sufferBlow,
     landHunt,
     notify,
-    toggleForm,
     activity,
     setActivity,
   } = useGame();
@@ -344,9 +343,9 @@ export function HuntScreen() {
 
       <div className="space-y-6">
         {territories.map(
-          ({ territory, creatures, prey, unlocked, hasHealth, transformed, reason }) => {
+          ({ territory, creatures, prey, unlocked, hasHealth, reason }) => {
             const ready = unlocked && hasHealth;
-            const available = ready && transformed;
+            const available = ready;
             const active = activeId === territory.id;
             // The live fight only plays on the active card, once a beat has landed.
             const onThis = active && progress.id === territory.id;
@@ -444,19 +443,13 @@ export function HuntScreen() {
                             ? "Esperando o corpo para voltar a caçar"
                             : (reason ?? "Trilha liberada")}
                       </span>
-                      {ready && !transformed && !active ? (
-                        <Button variant="primary" onClick={toggleForm}>
-                          Transformar
-                        </Button>
-                      ) : (
-                        <Button
-                          variant={active ? "secondary" : available ? "primary" : "outline"}
-                          onClick={() => toggleHunt(territory.id, available)}
-                          disabled={!available && !active}
-                        >
-                          {active ? "Parar" : "Caçar"}
-                        </Button>
-                      )}
+                      <Button
+                        variant={active ? "secondary" : available ? "primary" : "outline"}
+                        onClick={() => toggleHunt(territory.id, available)}
+                        disabled={!available && !active}
+                      >
+                        {active ? "Parar" : "Caçar"}
+                      </Button>
                     </div>
                   </div>
 
@@ -474,10 +467,19 @@ export function HuntScreen() {
                         return (
                           <li
                             key={creature.id}
-                            className="flex items-center justify-between gap-2 px-4 py-2.5 text-xs"
+                            className="flex items-center gap-3 px-4 py-2.5 text-xs"
                           >
+                            <div
+                              className="h-8 w-8 shrink-0 rounded-md border border-edge bg-surface-high bg-cover bg-center"
+                              style={
+                                creature.image
+                                  ? { backgroundImage: `url(${creature.image})` }
+                                  : undefined
+                              }
+                            />
                             <span
                               className={cn(
+                                "min-w-0 flex-1 truncate",
                                 isPrey
                                   ? "text-ember"
                                   : reached
@@ -489,7 +491,7 @@ export function HuntScreen() {
                             </span>
                             <span
                               className={cn(
-                                "font-mono text-[11px]",
+                                "shrink-0 font-mono text-[11px]",
                                 isPrey ? "text-ember" : "text-ink-faint",
                               )}
                             >

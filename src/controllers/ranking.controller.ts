@@ -158,7 +158,6 @@ export function profileOf(
     {
       level: hunter.level,
       attributes: hunter.attributes,
-      form: "human",
       petAttributes: hunter.id === playerId ? petBonus(state.pet) : undefined,
       enhancements: hunter.enhancements,
     },

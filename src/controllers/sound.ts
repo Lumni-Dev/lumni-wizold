@@ -1,4 +1,4 @@
-import type { Form, Gender } from "@/models/entities/character";
+import type { Gender } from "@/models/entities/character";
 import { soundRepository } from "@/models/repositories/sound.repository";
 const SOURCES = {
   ui: "/assets/sounds/ui/ui.mp3",
@@ -42,18 +42,17 @@ export type GameSound = keyof typeof SOURCES;
 const VERSION = "?v=19";
 const VOICED: readonly GameSound[] = ["hit", "crit", "hurt"];
 const LINEAGE_VOICED: readonly GameSound[] = ["rest"];
-let voice = { lineage: "male" as Gender, form: "human" as Form };
-export function setVoiceProfile(lineage: Gender, form: Form): void {
-  if (voice.lineage === lineage && voice.form === form) return;
-  voice = { lineage, form };
+let voice = { lineage: "male" as Gender };
+export function setVoiceProfile(lineage: Gender): void {
+  if (voice.lineage === lineage) return;
+  voice = { lineage };
 }
 function sourceOf(sound: GameSound): string {
   const base = SOURCES[sound];
   const voiced = VOICED.includes(sound);
   if (!voiced && !LINEAGE_VOICED.includes(sound)) return base;
   const lineage = voice.lineage === "male" ? "lumni" : "luna";
-  const form = voice.form === "werewolf" ? "beast" : "human";
-  const suffix = voiced ? "-" + lineage + "-" + form : "-" + lineage;
+  const suffix = voiced ? "-" + lineage + "-beast" : "-" + lineage;
   return base.replace(/\.(mp3|ogg|wav)$/, suffix + ".$1");
 }
 const cache = new Map<string, HTMLAudioElement>();

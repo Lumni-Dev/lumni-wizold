@@ -12,6 +12,7 @@ export function RecoveryButton({
   label,
   tooltip,
   onClick,
+  size,
 }: {
   recovering: boolean;
   beat: string | number;
@@ -19,9 +20,10 @@ export function RecoveryButton({
   label: ReactNode;
   tooltip?: string | null;
   onClick: () => void;
+  size?: "small" | "medium";
 }) {
   const button = (
-    <Button variant={recovering ? "secondary" : "primary"} onClick={onClick}>
+    <Button size={size} variant={recovering ? "secondary" : "primary"} onClick={onClick}>
       {recovering ? (
         <>
           {recoveringLabel} <RestSeconds key={beat} />

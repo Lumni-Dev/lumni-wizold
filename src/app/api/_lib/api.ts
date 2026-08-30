@@ -3,7 +3,7 @@ import type { PoolClient } from "pg";
 import type { GameState } from "@/models/entities/game-state";
 import type { Result } from "@/models/entities/result";
 import type { TavernIdentity, TavernState } from "@/models/entities/tavern";
-import { expireTransformation, syncCharacter } from "@/controllers/character.controller";
+import { syncCharacter } from "@/controllers/character.controller";
 import { withTransaction } from "@/models/repositories/server/database";
 import { loadGame, saveGame, type LoadedGame } from "@/models/repositories/server/game.store";
 import {
@@ -129,7 +129,7 @@ export async function withGame<T>(request: Request, action: GameAction<T>): Prom
       const loaded = await loadGame(client, userId, request.method !== "GET");
       if (!loaded) return bad("Nenhum personagem ativo.", 404);
       const baseline = syncCharacter(
-        request.method === "GET" ? loaded.state : expireTransformation(loaded.state).state,
+        loaded.state,
       );
       const context: ApiContext = { client, userId, characterId: loaded.characterId, loaded };
       const result = await action(baseline, body, context);

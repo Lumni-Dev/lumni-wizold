@@ -307,6 +307,7 @@ function creatureFile(creature) {
 export const ${camel(creature.id)}: Creature = {
   id: ${lit(creature.id)},
   name: ${lit(creature.name)},
+  image: "",
   description: ${lit(creature.description)},
   species: ${lit(creature.species)},
   level: ${creature.level},

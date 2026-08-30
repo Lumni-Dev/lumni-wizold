@@ -1,13 +1,9 @@
 import {
-  MIN_HEALTH_RATIO_TO_ACT,
   NAME_MAX_LENGTH,
   NAME_MIN_LENGTH,
   RENAME_PRICE,
   RENAME_COOLDOWN_DAYS,
   REST_HEALTH_RATIO,
-  REST_RAGE_RATIO,
-  TRANSFORM_DURATION_MS,
-  TRANSFORM_RAGE_COST,
 } from "@/shared/constants/game";
 import { formatBronze } from "@/shared/utils/format";
 import { capitalize } from "@/shared/utils/text";
@@ -112,62 +108,12 @@ export function renameCharacter(state: GameState, name: string): Result {
   return success(addLog(next, "character", message), message);
 }
 
-export function toggleForm(state: GameState): Result {
-  const character = state.character;
-  if (!character) return failure(state, "Nenhum personagem ativo.");
-
-  if (character.form === "werewolf") {
-    const next = updateCharacter(state, (current) => ({
-      ...current,
-      form: "human",
-      transformedAt: undefined,
-    }));
-    const message = "Você recolhe a fera e volta à forma humana.";
-    return success(addLog(next, "character", message), message);
-  }
-
-  if (character.rage < TRANSFORM_RAGE_COST) {
-    return failure(
-      state,
-      "Fúria insuficiente. São necessários " + TRANSFORM_RAGE_COST + " pontos.",
-    );
-  }
-
-  const floor =
-    deriveStats(character, state.equipment, state.pet, state.enhancements).maxHealth *
-    MIN_HEALTH_RATIO_TO_ACT;
-  if (character.health <= floor) {
-    return failure(state, "Vida baixa demais para transformar. Recupere-se ou beba uma poção.");
-  }
-
-  const next = updateCharacter(state, (current) => ({
-    ...current,
-    form: "werewolf",
-    rage: current.rage - TRANSFORM_RAGE_COST,
-    transformedAt: new Date().toISOString(),
-  }));
-  const message = "Você se transforma. Ossos estalam, o pelo sobe.";
-  return success(addLog(next, "character", message), message);
-}
-
-export function transformationRemainingMs(character: Character): number {
-  if (character.form !== "werewolf" || !character.transformedAt) return 0;
-  const elapsed = Date.now() - new Date(character.transformedAt).getTime();
-  return Math.max(0, TRANSFORM_DURATION_MS - elapsed);
-}
-
-export function expireTransformation(state: GameState): Result {
-  const character = state.character;
-  if (!character || character.form !== "werewolf") return success(state, "");
-  if (transformationRemainingMs(character) > 0) return success(state, "");
-
-  const next = updateCharacter(state, (current) => ({
-    ...current,
-    form: "human",
-    transformedAt: undefined,
-  }));
-  const message = "Sua fúria se esgotou, você voltou à forma humana.";
-  return success(addLog(next, "character", message), message);
+// How long the fury-potion buff (+10 to every attribute) still lasts, for the
+// countdown in the UI. Zero when no buff is active. The buff needs no server-side
+// expiry: it simply stops counting once furyUntil is in the past.
+export function furyRemainingMs(character: Character): number {
+  if (!character.furyUntil) return 0;
+  return Math.max(0, Date.parse(character.furyUntil) - Date.now());
 }
 
 export function sufferBlow(state: GameState, damage: number): Result {
@@ -186,17 +132,12 @@ export function startRest(state: GameState): Result {
   if (!character) return failure(state, "Nenhum personagem ativo.");
 
   const stats = deriveStats(character, state.equipment, state.pet, state.enhancements);
-  if (character.health >= stats.maxHealth && character.rage >= stats.maxRage) {
+  if (character.health >= stats.maxHealth) {
     return failure(state, "Você já está inteiro.");
   }
 
-  const next = updateCharacter(state, (current) => ({
-    ...current,
-    form: "human",
-    transformedAt: undefined,
-  }));
   const message = "Você se recolhe. O corpo se regenera aos poucos.";
-  return success(addLog(next, "character", message), message);
+  return success(addLog(state, "character", message), message);
 }
 
 function restRecovery(maximum: number, ratio: number): number {
@@ -211,31 +152,22 @@ export function restTick(state: GameState): Result<{ done: boolean }> {
   const healthGained =
     Math.min(stats.maxHealth, character.health + restRecovery(stats.maxHealth, REST_HEALTH_RATIO)) -
     character.health;
-  const rageGained =
-    Math.min(stats.maxRage, character.rage + restRecovery(stats.maxRage, REST_RAGE_RATIO)) -
-    character.rage;
 
   const next = updateCharacter(state, (current) => ({
     ...current,
     health: current.health + healthGained,
-    rage: current.rage + rageGained,
   }));
 
   const rested = next.character;
-  const done = Boolean(rested && rested.health >= stats.maxHealth && rested.rage >= stats.maxRage);
+  const done = Boolean(rested && rested.health >= stats.maxHealth);
 
   if (done) {
-    const message = "Recuperação completa: vida e fúria inteiras.";
+    const message = "Recuperação completa: vida inteira.";
     return success(addLog(next, "character", message), message, { done });
   }
 
-  const gains = [
-    healthGained > 0 ? healthGained + " de vida" : "",
-    rageGained > 0 ? rageGained + " de fúria" : "",
-  ].filter((part) => part.length > 0);
-
-  if (gains.length === 0) return success(next, "", { done: false });
-  return success(next, "Você regenerou " + gains.join(" e ") + ".", { done: false });
+  if (healthGained <= 0) return success(next, "", { done: false });
+  return success(next, "Você regenerou " + healthGained + " de vida.", { done: false });
 }
 
 export interface ExperienceGrant {

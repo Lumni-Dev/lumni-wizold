@@ -163,16 +163,29 @@ export function consumeItem(state: GameState, itemId: string): Result {
     return failure(state, item.name + " não está no inventário.");
   }
 
+  // Fury potion: a timed buff (+10 to every attribute). Drinking it (re)starts the
+  // clock at its full duration; there is no vital to top up.
+  const furyMinutes = item.effect.furyMinutes ?? 0;
+  if (furyMinutes > 0) {
+    const until = new Date(Date.now() + furyMinutes * 60_000).toISOString();
+    const consumed: GameState = {
+      ...state,
+      inventory: removeFromInventory(state.inventory, itemId, 1),
+    };
+    const next = updateCharacter(consumed, (current) => ({ ...current, furyUntil: until }));
+    const message =
+      item.name +
+      " consumida: +10 em todos os atributos por " +
+      String(furyMinutes).replace(".", ",") +
+      " min.";
+    return success(addLog(next, "inventory", message), message);
+  }
+
   const stats = deriveStats(character, state.equipment, state.pet, state.enhancements);
   const healthGain =
     (item.effect.health ?? 0) + Math.round((item.effect.healthRatio ?? 0) * stats.maxHealth);
-  const rageGain =
-    (item.effect.rage ?? 0) + Math.round((item.effect.rageRatio ?? 0) * stats.maxRage);
 
-  const healsHealth = healthGain > 0 && character.health < stats.maxHealth;
-  const healsRage = rageGain > 0 && character.rage < stats.maxRage;
-
-  if (!healsHealth && !healsRage) {
+  if (healthGain <= 0 || character.health >= stats.maxHealth) {
     return failure(state, "Nada a recuperar com " + item.name + " agora.");
   }
 
@@ -184,7 +197,6 @@ export function consumeItem(state: GameState, itemId: string): Result {
   const next = updateCharacter(consumed, (current) => ({
     ...current,
     health: current.health + healthGain,
-    rage: current.rage + rageGain,
   }));
 
   const message = item.name + " consumida.";

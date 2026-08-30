@@ -1,4 +1,5 @@
 import { MIN_HEALTH_RATIO_TO_ACT } from "@/shared/constants/game";
+import { capBronze } from "@/shared/utils/format";
 import { formatNumber, formatBronze } from "@/shared/utils/format";
 import { chance, defaultRandom, intBetween, type Random } from "@/shared/utils/random";
 import { findCreature } from "@/models/data/creatures";
@@ -28,7 +29,6 @@ export interface AvailableTerritory {
   prey: Creature | null;
   unlocked: boolean;
   hasHealth: boolean;
-  transformed: boolean;
   reason: string | null;
 }
 
@@ -84,7 +84,6 @@ export function listTerritories(state: GameState): AvailableTerritory[] {
       character !== null &&
       stats !== null &&
       character.health > stats.maxHealth * MIN_HEALTH_RATIO_TO_ACT;
-    const transformed = character !== null && character.form === "werewolf";
 
     return {
       territory,
@@ -92,14 +91,11 @@ export function listTerritories(state: GameState): AvailableTerritory[] {
       prey: character ? (pickCreature(territory, character.level) ?? null) : null,
       unlocked,
       hasHealth,
-      transformed,
       reason: !unlocked
         ? "Requer NV. " + territory.minLevel
         : !hasHealth
           ? "Vida baixa demais"
-          : !transformed
-            ? "Só a fera caça"
-            : null,
+          : null,
     };
   });
 }
@@ -133,10 +129,6 @@ export function resolveHunt(
   if (!territory) return failure(state, "Território desconhecido.");
   if (character.level < territory.minLevel) {
     return failure(state, territory.name + " exige NV. " + territory.minLevel + ".");
-  }
-
-  if (character.form !== "werewolf") {
-    return failure(state, "Só a fera caça. Transforme-se antes de subir a trilha.");
   }
 
   const stats = deriveStats(character, state.equipment, state.pet, state.enhancements);
@@ -198,11 +190,8 @@ export function landHunt(
     ...state,
     character: {
       ...character,
-      form: lost ? "human" : character.form,
-      transformedAt: lost ? undefined : character.transformedAt,
       health: Math.max(1, character.health - remainingLoss),
-      rage: character.rage,
-      bronze: character.bronze + bronze,
+      bronze: capBronze(character.bronze + bronze),
       hunts: character.hunts + 1,
       wins: character.wins + (combat.victory ? 1 : 0),
       losses: character.losses + (lost ? 1 : 0),

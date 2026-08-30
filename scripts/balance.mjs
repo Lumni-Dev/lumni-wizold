@@ -97,7 +97,7 @@ function preyAt(level) {
 function measure(level, fights = 400) {
   const attributes = trainedAt(level);
   const { equipment, set } = gearAt(level);
-  const stats = deriveStatsOf({ level, attributes, form: "werewolf", enhancements: {} }, equipment);
+  const stats = deriveStatsOf({ level, attributes, enhancements: {} }, equipment);
   const prey = preyAt(level);
   const random = seeded(level * 7919 + 13);
 
@@ -140,7 +140,7 @@ function measure(level, fights = 400) {
 function session(level, nights = 300) {
   const attributes = trainedAt(level);
   const { equipment } = gearAt(level);
-  const stats = deriveStatsOf({ level, attributes, form: "werewolf", enhancements: {} }, equipment);
+  const stats = deriveStatsOf({ level, attributes, enhancements: {} }, equipment);
   const prey = preyAt(level);
   const random = seeded(level * 104729 + 7);
 

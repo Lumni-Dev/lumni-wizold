@@ -16,7 +16,6 @@ export interface AvailableExercise {
   cost: number;
   affordable: boolean;
   maxed: boolean;
-  transformed: boolean;
   reason: string | null;
 }
 
@@ -33,7 +32,6 @@ export function listExercises(state: GameState): AvailableExercise[] {
   const character = state.character;
 
   const effort = trainingEffort(character?.level ?? 1);
-  const transformed = character?.form === "werewolf";
 
   return EXERCISES.map((exercise) => {
     const maxed =
@@ -50,14 +48,7 @@ export function listExercises(state: GameState): AvailableExercise[] {
       cost,
       affordable,
       maxed,
-      transformed,
-      reason: maxed
-        ? "Atributo no teto"
-        : !transformed
-          ? "Só a fera treina"
-          : !affordable
-            ? "Bronze insuficiente"
-            : null,
+      reason: maxed ? "Atributo no teto" : !affordable ? "Bronze insuficiente" : null,
     };
   });
 }
@@ -103,10 +94,6 @@ export function train(state: GameState, exerciseId: string): Result<TrainingRepo
       state,
       (definition?.name ?? "O atributo") + " já está no teto de " + MAX_ATTRIBUTE_VALUE + ".",
     );
-  }
-
-  if (character.form !== "werewolf") {
-    return failure(state, "Só a fera treina. Transforme-se antes de subir no pátio.");
   }
 
   const cost = trainingSessionCost(character.level, character.attributes[exercise.attribute]);

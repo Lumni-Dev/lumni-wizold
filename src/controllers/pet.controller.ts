@@ -118,7 +118,6 @@ export interface PetTrainingView {
   effort: TrainingEffort;
   affordable: boolean;
   maxed: boolean;
-  transformed: boolean;
   reason: string | null;
 }
 
@@ -132,7 +131,6 @@ export function petTrainingView(state: GameState): PetTrainingView | null {
   const cost = petTrainingSessionCost(level, character.level);
   const affordable = character.bronze >= cost;
   const needed = petTrainingNeeded(level);
-  const transformed = character.form === "werewolf";
 
   return {
     pet,
@@ -143,14 +141,7 @@ export function petTrainingView(state: GameState): PetTrainingView | null {
     effort: { progress: petTrainingEffort(level) },
     affordable,
     maxed,
-    transformed,
-    reason: maxed
-      ? "Mascote no teto"
-      : !transformed
-        ? "Só a fera treina"
-        : !affordable
-          ? "Bronze insuficiente"
-          : null,
+    reason: maxed ? "Mascote no teto" : !affordable ? "Bronze insuficiente" : null,
   };
 }
 
@@ -164,10 +155,6 @@ export function trainPet(state: GameState): Result<{ leveled: boolean }> {
   const level = petLevelOf(pet);
   if (level >= PET_MAX_LEVEL) {
     return failure(state, "O mascote já está no teto de NV. " + PET_MAX_LEVEL + ".");
-  }
-
-  if (character.form !== "werewolf") {
-    return failure(state, "Só a fera treina. Transforme-se antes de subir no pátio.");
   }
 
   const cost = petTrainingSessionCost(level, character.level);

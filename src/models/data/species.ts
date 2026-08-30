@@ -390,9 +390,12 @@ function creatureDrops(definition: SpeciesDefinition): CreatureDrop[] {
   return [...materials, ...gear];
 }
 
-const PREY_STRENGTH_SHARE = 0.85;
+// Tuned for a hunter with no werewolf bonus (transformation was removed): the prey
+// carries less of the reference hunter's strength and body than it did when the
+// player fought at +35% Força, so a base hunter still sees the target difficulty.
+const PREY_STRENGTH_SHARE = 0.68;
 const PREY_ENDURANCE_SHARE = 0.5;
-const PREY_HEALTH_SHARE = 0.3;
+const PREY_HEALTH_SHARE = 0.23;
 
 const BRONZE_PER_STRENGTH = 0.9;
 

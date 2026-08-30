@@ -1,4 +1,4 @@
-import { MIN_HEALTH_RATIO_TO_ACT, TRANSFORM_RAGE_COST } from "@/shared/constants/game";
+import { MIN_HEALTH_RATIO_TO_ACT } from "@/shared/constants/game";
 import { ITEMS } from "@/models/data/items";
 import type { Activity } from "@/models/entities/activity";
 import type { GameState } from "@/models/entities/game-state";
@@ -11,7 +11,6 @@ import { listExercises } from "./training.controller";
 
 export type AutomationStep =
   | { kind: "potion"; itemId: string }
-  | { kind: "transform" }
   | { kind: "rest" }
   | { kind: "feed"; itemId: string }
   | { kind: "kennel"; active: boolean }
@@ -39,13 +38,12 @@ function canWork(state: GameState, activity: Activity): boolean {
 
   switch (activity.kind) {
     case "hunt": {
-      if (character.form !== "werewolf") return false;
       const stats = deriveStats(character, state.equipment, state.pet, state.enhancements);
       return character.health > stats.maxHealth * MIN_HEALTH_RATIO_TO_ACT;
     }
     case "train": {
       const entry = listExercises(state).find(({ exercise }) => exercise.id === activity.id);
-      return Boolean(entry && entry.affordable && !entry.maxed && entry.transformed);
+      return Boolean(entry && entry.affordable && !entry.maxed);
     }
     case "mine": {
       const entry = listMining(state).ores.find(({ ore }) => ore.id === activity.id);
@@ -79,14 +77,6 @@ export function nextAutomationStep(
     const flask = smallestPotion(state, "health");
     if (flask) return { kind: "potion", itemId: flask };
     if (!resting) return { kind: "rest" };
-  }
-
-  if (on.transform && character.form === "human" && character.health > floor && !resting) {
-    if (character.rage >= TRANSFORM_RAGE_COST) return { kind: "transform" };
-    if (on.potion) {
-      const flask = smallestPotion(state, "rage");
-      if (flask && character.rage < stats.maxRage) return { kind: "potion", itemId: flask };
-    }
   }
 
   const pet = state.pet;

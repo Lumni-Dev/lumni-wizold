@@ -1,5 +1,5 @@
 import { MIN_HEALTH_RATIO_TO_ACT } from "@/shared/constants/game";
-import { formatCooldown, formatNumber, formatBronze } from "@/shared/utils/format";
+import { capBronze, formatCooldown, formatNumber, formatBronze } from "@/shared/utils/format";
 import { defaultRandom, pickOne, type Random } from "@/shared/utils/random";
 import { normalizeText } from "@/shared/utils/text";
 import type { ArenaHistoryEntry, ArenaOutcome } from "@/models/entities/arena";
@@ -42,7 +42,6 @@ export interface ArenaView {
   charges: ArenaCharges;
   hasHealth: boolean;
   ready: boolean;
-  transformed: boolean;
   canFight: boolean;
   reason: string | null;
 }
@@ -71,7 +70,6 @@ export function listArena(
       charges: { left: 0, used: 0, returnsIn: 0 },
       hasHealth: false,
       ready: false,
-      transformed: false,
       canFight: false,
       reason: "Nenhum personagem ativo.",
     };
@@ -79,7 +77,6 @@ export function listArena(
   const band = arenaBand(character.level);
   const stats = deriveStats(character, state.equipment, state.pet, state.enhancements);
   const healthy = character.health > stats.maxHealth * MIN_HEALTH_RATIO_TO_ACT;
-  const transformed = character.form === "werewolf";
   const charges = arenaCharges(state.arenaDuels, now);
   const ready = healthy && charges.left > 0;
   const pit = roster.filter((hunter) => hunter.id !== character.id);
@@ -107,17 +104,14 @@ export function listArena(
     charges,
     hasHealth: healthy,
     ready,
-    transformed,
-    canFight: ready && transformed,
+    canFight: ready,
     reason: !healthy
       ? "Vida baixa demais para subir na arena. Recupere-se ou use uma poção."
       : charges.left === 0
         ? "Os três ataques do dia acabaram: o próximo volta em " +
           formatCooldown(charges.returnsIn) +
           "."
-        : !transformed
-          ? "Só a fera desce ao fosso. Transforme-se antes de descer."
-          : null,
+        : null,
   };
 }
 function nearestByLevel(pit: readonly Hunter[], level: number, amount: number): Hunter[] {
@@ -203,9 +197,6 @@ export function resolveArena(
         ".",
     );
   }
-  if (character.form !== "werewolf") {
-    return failure(state, "Só a fera desce ao fosso. Transforme-se antes de descer.");
-  }
   const band = arenaBand(character.level);
   const pit = roster.filter((candidate) => candidate.id !== character.id);
   const bandHasRivals = pit.some((candidate) => isInBand(band, candidate.level));
@@ -280,11 +271,8 @@ export function landArena(
     pet: state.pet && combat.petSpent > 0 ? spendPetEnergy(state.pet, combat.petSpent) : state.pet,
     character: {
       ...character,
-      form: lost ? "human" : character.form,
-      transformedAt: lost ? undefined : character.transformedAt,
       health: Math.max(1, character.health - remainingLoss),
-      rage: character.rage,
-      bronze: Math.max(0, character.bronze + spoils),
+      bronze: capBronze(character.bronze + spoils),
       arenaWins: character.arenaWins + (combat.victory ? 1 : 0),
       arenaLosses: character.arenaLosses + (lost ? 1 : 0),
     },

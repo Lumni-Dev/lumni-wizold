@@ -93,13 +93,12 @@ function deepFreeze(value) {
 }
 const json = (value) => JSON.stringify(value);
 const isInt = (value) => Number.isInteger(value);
-function baseState({ level = 1, gender = "male", bronze = 1000000, form = "human" } = {}) {
+function baseState({ level = 1, gender = "male", bronze = 1000000 } = {}) {
   const state = factory.createRun("Teste", gender);
   const trained = clamp(Math.round(level * 0.55), CONST.BASE_ATTRIBUTE_VALUE, 1000);
   state.character = {
     ...state.character,
     level,
-    form,
     bronze,
     attributes: {
       strength: trained,
@@ -116,7 +115,6 @@ function baseState({ level = 1, gender = "male", bronze = 1000000, form = "human
     state.enhancements,
   );
   state.character.health = derived.maxHealth;
-  state.character.rage = derived.maxRage;
   return state;
 }
 function benchHunter(id, level, over = {}) {
@@ -149,80 +147,52 @@ function benchHunter(id, level, over = {}) {
 sec("stats");
 {
   for (const level of [1, 7, 83, 165, 170, 340, 505, 670, 999, 1000]) {
-    for (const form of ["human", "werewolf"]) {
-      const trained = clamp(Math.round(level * 0.55), 4, 1000);
-      const attrs = {
-        strength: trained,
-        agility: trained,
-        endurance: trained,
-        instinct: trained,
-        willpower: trained,
-      };
-      const derived = stats.deriveStatsOf(
-        { level, attributes: attrs, form },
-        entItem.emptyEquipment(),
-      );
-      const t = derived.totalAttributes;
-      ok(
-        "saúde pela fórmula NV " + level,
-        derived.maxHealth ===
-          Math.round(
-            CONST.BASE_VITAL +
-              (t.endurance - CONST.BASE_ATTRIBUTE_VALUE) * CONST.HEALTH_PER_ENDURANCE,
-          ),
-      );
-      ok(
-        "fúria pela fórmula NV " + level,
-        derived.maxRage ===
-          Math.round(
-            CONST.BASE_VITAL +
-              (t.willpower - CONST.BASE_ATTRIBUTE_VALUE) * CONST.RAGE_PER_WILLPOWER,
-          ),
-      );
-      ok(
-        "esquiva na curva NV " + level,
-        derived.dodge === clamp(Math.round((35 * t.agility) / (t.agility + 120)), 0, 35),
-      );
-      ok(
-        "crítico na curva NV " + level,
-        derived.critical === clamp(Math.round(5 + (40 * t.instinct) / (t.instinct + 250)), 0, 45),
-      );
-      const sourceSum = (key) =>
-        derived.sources.trained[key] +
-        derived.sources.equipment[key] +
-        derived.sources.pet[key] +
-        derived.sources.moon[key] +
-        derived.sources.form[key];
-      for (const key of ["strength", "agility", "endurance", "instinct", "willpower"]) {
-        ok("fontes somam o total (" + key + ")", sourceSum(key) === t[key]);
-      }
-      if (form === "werewolf") {
-        ok(
-          "fera dá só Força NV " + level,
-          derived.sources.form.strength > 0 &&
-            derived.sources.form.agility === 0 &&
-            derived.sources.form.endurance === 0 &&
-            derived.sources.form.instinct === 0 &&
-            derived.sources.form.willpower === 0,
-        );
-      }
-    }
-    const attrs = { strength: 50, agility: 50, endurance: 50, instinct: 50, willpower: 50 };
-    const human = stats.deriveStatsOf(
-      { level, attributes: attrs, form: "human" },
-      entItem.emptyEquipment(),
-    );
-    const beast = stats.deriveStatsOf(
-      { level, attributes: attrs, form: "werewolf" },
-      entItem.emptyEquipment(),
-    );
-    ok("virada não muda vida máxima NV " + level, human.maxHealth === beast.maxHealth);
-    ok("virada não muda fúria máxima NV " + level, human.maxRage === beast.maxRage);
+    const trained = clamp(Math.round(level * 0.55), 4, 1000);
+    const attrs = {
+      strength: trained,
+      agility: trained,
+      endurance: trained,
+      instinct: trained,
+      willpower: trained,
+    };
+    const derived = stats.deriveStatsOf({ level, attributes: attrs }, entItem.emptyEquipment());
+    const t = derived.totalAttributes;
     ok(
-      "fera soma 35% de Força NV " + level,
-      beast.totalAttributes.strength ===
-        human.totalAttributes.strength +
-          Math.round(human.totalAttributes.strength * CONST.WEREWOLF_STRENGTH_BONUS),
+      "saúde pela fórmula NV " + level,
+      derived.maxHealth ===
+        Math.round(
+          CONST.BASE_VITAL +
+            (t.endurance - CONST.BASE_ATTRIBUTE_VALUE) * CONST.HEALTH_PER_ENDURANCE +
+            level * CONST.HEALTH_PER_LEVEL,
+        ),
+    );
+    ok(
+      "esquiva na curva NV " + level,
+      derived.dodge === clamp(Math.round((35 * t.agility) / (t.agility + 120)), 0, 35),
+    );
+    ok(
+      "crítico na curva NV " + level,
+      derived.critical === clamp(Math.round(5 + (40 * t.instinct) / (t.instinct + 250)), 0, 45),
+    );
+    const sourceSum = (key) =>
+      derived.sources.trained[key] +
+      derived.sources.equipment[key] +
+      derived.sources.pet[key] +
+      derived.sources.moon[key] +
+      derived.sources.fury[key];
+    for (const key of ["strength", "agility", "endurance", "instinct", "willpower"]) {
+      ok("fontes somam o total (" + key + ")", sourceSum(key) === t[key]);
+    }
+    ok("sem buff, a fonte fúria é zero NV " + level, derived.sources.fury.strength === 0);
+    const buffed = stats.deriveStatsOf(
+      { level, attributes: attrs, furyActive: true },
+      entItem.emptyEquipment(),
+    );
+    ok(
+      "buff de fúria soma +" + CONST.FURY_ATTRIBUTE_BONUS + " em todos NV " + level,
+      ["strength", "agility", "endurance", "instinct", "willpower"].every(
+        (key) => buffed.sources.fury[key] === CONST.FURY_ATTRIBUTE_BONUS,
+      ),
     );
   }
   const attrs = { strength: 10, agility: 10, endurance: 10, instinct: 10, willpower: 10 };
@@ -625,14 +595,9 @@ sec("arena");
     }
     ok("bolsa vazia não paga nada NV " + level, arena.arenaSpoils(level, 0, random) === 0);
   }
-  const inBand = baseState({ level: 5, form: "werewolf" });
+  const inBand = baseState({ level: 5 });
   const rival = benchHunter("pit-near", 5);
   const pit = [rival, benchHunter("pit-far", 500)];
-  const human = { ...inBand, character: { ...inBand.character, form: "human" } };
-  ok(
-    "humano não desce ao fosso",
-    arenaCtrl.resolveArena(human, pit, rival.id, random).ok === false,
-  );
   ok(
     "fora da banda é recusado",
     arenaCtrl.resolveArena(inBand, pit, "pit-far", random).ok === false,
@@ -694,14 +659,10 @@ sec("arena");
       spoils: 0,
     };
     const humbled = arenaCtrl.landArena(inBand, beaten, 0);
-    ok("derrota no fosso volta ao humano", humbled.state.character.form === "human");
-    ok("derrota no fosso limpa o selo", humbled.state.character.transformedAt === undefined);
-    const winner = arenaCtrl.landArena(
-      inBand,
-      { ...duel.data, combat: { ...duel.data.combat, victory: true, retreated: false } },
-      0,
+    ok(
+      "derrota conta uma perda no fosso",
+      humbled.state.character.arenaLosses === inBand.character.arenaLosses + 1,
     );
-    ok("vitória mantém a fera de pé", winner.state.character.form === "werewolf");
   }
   const allyPet = {
     id: "pet",
@@ -792,10 +753,8 @@ sec("arena");
 sec("caçada");
 {
   const random = seededRandom(2024);
-  const state = baseState({ level: 170, form: "werewolf" });
+  const state = baseState({ level: 170 });
   state.equipment.claw = "silver-claw";
-  const humanState = { ...state, character: { ...state.character, form: "human" } };
-  ok("humano não caça", huntCtrl.resolveHunt(humanState, "dew-woods", random).ok === false);
   const weak = { ...state, character: { ...state.character, health: 1 } };
   ok("vida no chão não caça", huntCtrl.resolveHunt(weak, "dew-woods", random).ok === false);
   ok(
@@ -813,8 +772,10 @@ sec("caçada");
       drops: [],
     };
     const humbledHunt = huntCtrl.landHunt(state, beaten, 0);
-    ok("derrota na caçada volta ao humano", humbledHunt.state.character.form === "human");
-    ok("derrota na caçada limpa o selo", humbledHunt.state.character.transformedAt === undefined);
+    ok(
+      "derrota na caçada conta uma perda",
+      humbledHunt.state.character.losses === state.character.losses + 1,
+    );
 
     const landed = huntCtrl.landHunt(state, resolved.data, 0);
     const before = state.character;
@@ -826,10 +787,6 @@ sec("caçada");
       "vida desce o que a luta tirou",
       after.health ===
         clamp(Math.max(1, before.health - resolved.data.healthLost), 0, derived.maxHealth),
-    );
-    ok(
-      "a caçada não mexe na fúria",
-      after.rage === clamp(before.rage, 0, derived.maxRage),
     );
     ok(
       "sangue já derramado não desconta duas vezes",
@@ -925,9 +882,7 @@ sec("caçada");
 }
 sec("treinamento");
 {
-  const state = baseState({ level: 100, form: "werewolf" });
-  const human = { ...state, character: { ...state.character, form: "human" } };
-  ok("humano não treina", trainingCtrl.train(human, "trunk-punches").ok === false);
+  const state = baseState({ level: 100 });
   const broke = { ...state, character: { ...state.character, bronze: 0 } };
   ok("sem bronze não treina", trainingCtrl.train(broke, "trunk-punches").ok === false);
   ok("exercício desconhecido recusa", trainingCtrl.train(state, "nada").ok === false);
@@ -976,11 +931,6 @@ sec("treinamento");
       adoptedAt: new Date().toISOString(),
     },
   };
-  ok(
-    "humano não treina o lobo",
-    petCtrl.trainPet({ ...withPet, character: { ...withPet.character, form: "human" } }).ok ===
-      false,
-  );
   const petSession = petCtrl.trainPet(withPet);
   ok("sessão do lobo funciona", petSession.ok === true);
   if (petSession.ok) {
@@ -1660,7 +1610,7 @@ sec("ranking");
   );
   ok("sem lobo o quadro do mascote lê zero", wolfBoard.value(roster[0]) === 0);
   const profile = rankingCtrl.profileOf(state, roster, "bench-0");
-  ok("perfil de outro caçador abre", profile !== null && profile.positions.length === 13);
+  ok("perfil de outro caçador abre", profile !== null && profile.positions.length === 12);
   ok("perfil sem NaN", profile !== null && Number.isFinite(profile.stats.maxHealth));
   const own = rankingCtrl.profileOf(state, roster, state.character.id);
   ok("a própria ficha se reconhece", own !== null && own.isPlayer === true);
@@ -1689,44 +1639,31 @@ sec("personagem");
     run.character.attributes.agility === 9 && run.character.attributes.strength === 4,
   );
   const state = baseState({ level: 10 });
-  state.character.rage = 100;
-  const turned = characterCtrl.toggleForm(state);
+
+  // The fury potion is a timed buff (+10 to every attribute); drinking it stamps
+  // furyUntil ahead, and deriveStats reads the bonus while it is in the future.
+  const withPotion = { ...state, inventory: [{ itemId: "rage-potion-small", quantity: 1 }] };
+  const drank = inventoryCtrl.consumeItem(withPotion, "rage-potion-small");
+  ok("poção de fúria vira buff", drank.ok && typeof drank.state.character.furyUntil === "string");
+  ok("o buff está ativo agora", Date.parse(drank.state.character.furyUntil) > Date.now());
+  const buffedStats = stats.deriveStats(drank.state.character, drank.state.equipment, null, {});
+  const plainStats = stats.deriveStats(state.character, state.equipment, null, {});
   ok(
-    "virar cobra 40 de fúria",
-    turned.ok && turned.state.character.rage === 60 && turned.state.character.form === "werewolf",
+    "o buff levanta a Força em " + CONST.FURY_ATTRIBUTE_BONUS,
+    buffedStats.totalAttributes.strength ===
+      plainStats.totalAttributes.strength + CONST.FURY_ATTRIBUTE_BONUS,
   );
-  ok("virada guarda o selo", turned.ok && typeof turned.state.character.transformedAt === "string");
-  const back = characterCtrl.toggleForm(turned.state);
-  ok("voltar limpa o selo", back.ok && back.state.character.transformedAt === undefined);
-  const angry = { ...state, character: { ...state.character, rage: 39 } };
-  ok("sem fúria não vira", characterCtrl.toggleForm(angry).ok === false);
-  const dying = { ...state, character: { ...state.character, health: 1, rage: 100 } };
-  ok("no chão não vira", characterCtrl.toggleForm(dying).ok === false);
-  const bloated = { ...state, character: { ...state.character, health: 99999, rage: 99999 } };
+  ok("a poção de fúria não devolve vida", drank.state.character.health === state.character.health);
+
+  const bloated = { ...state, character: { ...state.character, health: 99999 } };
   const squeezed = characterCtrl.syncCharacter(bloated);
   const ceiling = stats.deriveStats(state.character, state.equipment, null, {});
-  ok(
-    "teto encolhido aperta os vitais",
-    squeezed.character.health === ceiling.maxHealth &&
-      squeezed.character.rage === ceiling.maxRage,
-  );
+  ok("teto encolhido aperta a vida", squeezed.character.health === ceiling.maxHealth);
   ok("corpo em dia não troca referência", characterCtrl.syncCharacter(state) === state);
-  const stale = {
-    ...turned.state,
-    character: {
-      ...turned.state.character,
-      transformedAt: new Date(Date.now() - (CONST.TRANSFORM_DURATION_MS + 60000)).toISOString(),
-    },
-  };
-  const expired = characterCtrl.expireTransformation(stale);
-  ok("fúria vencida volta sozinha", expired.state.character.form === "human");
-  ok(
-    "fúria no prazo continua",
-    characterCtrl.expireTransformation(turned.state).state.character.form === "werewolf",
-  );
-  const tired = { ...state, character: { ...state.character, health: 50, rage: 10 } };
+
+  const tired = { ...state, character: { ...state.character, health: 50 } };
   const resting = characterCtrl.startRest(tired);
-  ok("repousar volta ao humano", resting.ok && resting.state.character.form === "human");
+  ok("repousar quando ferido é permitido", resting.ok);
   const tick = characterCtrl.restTick(resting.state);
   const max = stats.deriveStats(resting.state.character, state.equipment, null, {}).maxHealth;
   ok(
@@ -1772,24 +1709,6 @@ sec("automação");
     automation: { ...low.automation, potion: true, rest: true },
   };
   ok("sem poção, deita", automationCtrl.nextAutomationStep(noFlask, null)?.kind === "rest");
-  const angry = baseState({ level: 10 });
-  angry.character.rage = 100;
-  const turnable = { ...angry, automation: { ...angry.automation, transform: true } };
-  ok(
-    "fúria automática vira",
-    automationCtrl.nextAutomationStep(turnable, null)?.kind === "transform",
-  );
-  const calm = {
-    ...angry,
-    character: { ...angry.character, rage: 0 },
-    automation: { ...angry.automation, transform: true, potion: true },
-    inventory: [{ itemId: "rage-potion-small", quantity: 1 }],
-  };
-  const drink = automationCtrl.nextAutomationStep(calm, null);
-  ok(
-    "sem fúria bebe a poção de fúria",
-    drink?.kind === "potion" && drink.itemId === "rage-potion-small",
-  );
   const petState = baseState({ level: 10 });
   petState.pet = {
     id: "p",
@@ -2189,12 +2108,10 @@ sec("imutabilidade");
     ["purchaseListing", () => bazaarCtrl.purchaseListing(state, offer, 1)],
     ["requestWithdraw", () => bazaarCtrl.requestWithdraw(state, "chave-pix")],
     ["purchasePack", () => storeCtrl.purchasePack(state, "one-pouch")],
-    ["toggleForm", () => characterCtrl.toggleForm(state)],
     ["startRest", () => characterCtrl.startRest(state)],
     ["restTick", () => characterCtrl.restTick(state)],
     ["sufferBlow", () => characterCtrl.sufferBlow(state, 12)],
     ["grantExperience", () => characterCtrl.grantExperience(state, 50)],
-    ["expireTransformation", () => characterCtrl.expireTransformation(state)],
     ["renameCharacter", () => characterCtrl.renameCharacter(state, "Novonome")],
     [
       "nextAutomationStep",

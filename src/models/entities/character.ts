@@ -1,7 +1,6 @@
 import type { Attributes, AttributeKey } from "./attribute";
 
 export type Gender = "male" | "female";
-export type Form = "human" | "werewolf";
 
 export interface GenderDefinition {
   key: Gender;
@@ -31,20 +30,13 @@ export const GENDERS: readonly GenderDefinition[] = [
   },
 ] as const;
 
-export const FORM_LABEL: Record<Form, string> = {
-  human: "Humano",
-  werewolf: "Lobisomem",
-};
-
 export interface Character {
   id: string;
   name: string;
   gender: Gender;
-  form: Form;
   level: number;
   experience: number;
   health: number;
-  rage: number;
   bronze: number;
   attributes: Attributes;
   trainingProgress: Record<AttributeKey, number>;
@@ -55,7 +47,8 @@ export interface Character {
   arenaLosses: number;
   createdAt: string;
   renamedAt?: string;
-  transformedAt?: string;
+  // When the fury-potion buff (+10 to every attribute) ends. Absent means no buff.
+  furyUntil?: string;
 }
 
 export function findGender(key: Gender): GenderDefinition {

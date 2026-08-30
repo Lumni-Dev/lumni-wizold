@@ -16,11 +16,9 @@ import {
   PET_REST_RATIO,
   REST_TICK_MS,
   REST_HEALTH_RATIO,
-  REST_RAGE_RATIO,
   PET_MIN_LEVEL,
   PET_PRICE,
   PET_RENAME_PRICE,
-  TRANSFORM_DURATION_MS,
 } from "@/shared/constants/game";
 import { SPECIES_LABEL } from "../entities/creature";
 import { MAX_PACK } from "../entities/pack";
@@ -109,13 +107,12 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     summary: "O ciclo de uma noite qualquer em Wizold.",
     lines: [
       "Você começa sem nada equipado, com 100 de bronze e dez poções de vida.",
-      "Só a fera caça: transforme-se antes de subir a trilha, porque em forma humana o território recusa.",
       "Escolha um território e a caça roda sozinha: a barra conta a luta e dura o que ela durar.",
       "Cada clique vale uma luta. Para encadear caçadas sem tocar em nada, ligue a caçada automática nas configurações; o mesmo vale para treino, mina e forja.",
-      "A presa acompanha o seu nível dentro da banda do território: a caçada nunca fica banal.",
-      "A fúria não muda a chance de crítico. O golpe crítico da fera bate +" +
+      "Cada área tem dez criaturas de números fixos: você fica mais forte, elas não, então subir de área é o que renova o desafio.",
+      "O golpe crítico bate +" +
         Math.round(CRITICAL_DAMAGE_BONUS * 100) +
-        "% mais forte, fixo enquanto você está transformado, e a fúria só paga a transformação.",
+        "% mais forte, fixo. Instinto sobe a chance de crítico; Agilidade, a de esquiva.",
       "Treine para acumular progresso de atributo.",
       "Equipe o que serve, venda o que sobra e volte a caçar.",
       "Na forja, minere fragmentos e bata na peça equipada para levantá-la de +1 em diante.",
@@ -126,41 +123,29 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
   {
     id: "vitals",
     title: "Vitais",
-    summary: "Todo personagem nasce com 100 de vida e 100 de fúria.",
+    summary: "Todo personagem nasce com 100 de vida.",
     lines: [
       "Vida: 100, mais 14 por ponto de Resistência acima de 4. O nível não entra aqui: quem engorda a barra é a Resistência, venha ela do treino, do equipamento, do mascote ou da lua.",
-      "Fúria: 100, mais 2 por ponto de Vontade acima de 4. Sobe só no descanso, nunca na luta, e paga a transformação.",
-      "Uma fúria funda rende mais transformações antes de precisar descansar para enchê-la de novo: é para isso que serve a Vontade.",
-      "Poções de vida e fúria recuperam uma porcentagem do próprio máximo.",
-      "Zerou a vida na caçada, você escapa com 1 de vida, registra uma derrota e a fera não se sustenta: derrotado, você volta à forma humana na hora.",
+      "Poções de vida recuperam uma porcentagem do máximo. Recuperar-se devolve só vida: a cada " +
+        REST_TICK_MS / 1000 +
+        " segundos, " +
+        Math.round(REST_HEALTH_RATIO * 100) +
+        "% do máximo, então o corpo inteiro volta em " +
+        Math.round(REST_TICK_MS / 1000 / REST_HEALTH_RATIO) +
+        " segundos, em qualquer nível. A poção é o atalho pago.",
+      "Zerou a vida na caçada, você escapa com 1 de vida e registra uma derrota.",
       "Luta que se arrasta até o teto de rodadas termina em recuo: a caçada conta, mas ninguém vence nem perde.",
     ],
   },
   {
-    id: "forms",
-    title: "Formas",
-    summary: "Humano por padrão, lobisomem por escolha.",
+    id: "fury",
+    title: "Fúria",
+    summary: "A poção de fúria: um empurrão temporário em todos os atributos.",
     lines: [
-      "Transformar custa 40 de fúria e só é possível na forma humana.",
-      "Caçar exige estar transformado. O jogo inteiro gira em torno disso: junte fúria, vire, cace enquanto a fera dura, e volte a juntar.",
-      "Como lobisomem, a Força sobe 35%. Só a Força: o resto do corpo é o mesmo, e a barra de vida não muda no meio da virada.",
-      "Quando o tempo acaba no meio de uma caçada, o corpo volta ao humano e a trilha para: a próxima lapada da barra é recusada.",
-      "A fúria dura " +
-        TRANSFORM_DURATION_MS / 60_000 +
-        " minutos: passado o tempo, o corpo volta sozinho à forma humana.",
-      "Voltar ao humano é gratuito e não devolve a fúria gasta.",
-      "Perder uma caçada ou um duelo recolhe a fera sozinho: a derrota devolve a forma humana e apaga o selo da fúria.",
-      "Um botão só comanda o corpo: Recuperar-se para todas as atividades. A cada " +
-        REST_TICK_MS / 1000 +
-        " segundos devolve " +
-        Math.round(REST_HEALTH_RATIO * 100) +
-        "% da vida e " +
-        Math.round(REST_RAGE_RATIO * 100) +
-        "% da fúria, então o corpo inteiro volta em " +
-        Math.round(REST_TICK_MS / 1000 / REST_HEALTH_RATIO) +
-        " segundos e a fúria em " +
-        Math.round(REST_TICK_MS / 1000 / REST_RAGE_RATIO) +
-        " segundos, em qualquer nível: a vida é a metade lenta de propósito, e a poção é o atalho pago. Inteiro, o botão vira Transformar; transformado, recolhe a fera.",
+      "Não existe transformação: você caça, treina e duela direto, do jeito que está.",
+      "A poção de fúria não devolve vida. Enquanto dura, dá +10 em cada atributo, o que levanta vida, dano, esquiva e crítico de uma vez.",
+      "A duração vem pelo tamanho do frasco: pequena 2,5 minutos, média 5, grande 7,5. Beber de novo reinicia o relógio cheio.",
+      "É um atalho pago para uma janela de força: guarde para uma banda dura ou um duelo que você não quer perder.",
     ],
   },
   {
@@ -197,7 +182,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "Atributo não se distribui: só o treino levanta um ponto.",
       "Treinar acumula progresso: o próximo ponto custa 10 + valor atual x 4.",
       "Um exercício por atributo, e o rendimento da sessão cresce junto com o nível: um ponto fica perto de cinco sessões a corrida inteira.",
-      "Só a fera treina: em forma humana o pátio recusa a sessão, a sua e a do lobo. Transforme-se antes de subir.",
+      "O pátio treina você e o lobo direto: uma sessão paga progresso de atributo, e o excedente carrega para o próximo ponto, como a experiência.",
       "Cada treino é pago na hora: um quinto do ponto da sua faixa mais um bronze por nível do atributo treinado, cobrado no primeiro turno de cada volta. Dois atributos no mesmo nível custam o mesmo, e cada ponto conquistado encarece o próximo treino; o progresso que passar do ponto se perde, e é a caça que paga o corpo.",
       "Equipamento soma por cima do teto: o limite vale para o valor treinado.",
     ],
@@ -212,7 +197,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "A fórmula vale em qualquer escala: Resistência alta reduz muito, mas nunca zera o golpe.",
       "Quem tem mais Agilidade começa a rodada.",
       "Esquiva e crítico sobem a vida toda sem nunca encostar no teto: 35% de esquiva e 45% de crítico ficam no horizonte, e cada ponto de Agilidade ou Instinto ainda compra alguma coisa no nível 1000.",
-      "Crítico multiplica o dano por 1,5; com a fúria cheia, o multiplicador sobe até 2,0.",
+      "Crítico multiplica o dano por um bônus fixo, sem depender de nada que você acumule.",
       "A luta trava em 24 rodadas: ninguém morre e a caçada termina em recuo.",
     ],
   },
@@ -366,7 +351,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "O fosso tem memória: as " +
         ARENA_HISTORY_SIZE +
         " últimas lutas do seu nome ficam registradas, as que você marcou e as que marcaram contra você, com o resultado e o bronze que mudou de mãos.",
-      "Só a fera desce ao fosso: sem se transformar a arena recusa o duelo, e os dois lutam com a Força da fera.",
+      "Os dois lutam com seus números atuais: atributos, equipamento e mascote incluídos.",
       "O mascote desce junto: ativo e com fôlego, ele morde no duelo como na caçada, o seu e o do rival. Só o seu gasta energia aqui; o do rival se cansa nos duelos do próprio dono.",
       "O fosso não paga experiência: quem sobe de nível é quem caça. O que se ganha aqui é a bolsa do outro.",
       "Quem vence tira da bolsa do vencido o que " +
@@ -379,7 +364,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         "% a " +
         Math.round(ARENA_SPOILS_MAX_SHARE * 100) +
         "% do que o perdedor carrega, então quem está duro paga pouco.",
-      "Perder custa a mesma coisa: sai da sua bolsa e vai para a dele, e você deixa o fosso com 1 de vida e de volta à forma humana.",
+      "Perder custa a mesma coisa: sai da sua bolsa e vai para a dele, e você deixa o fosso com 1 de vida.",
       "Duelo que chega ao teto de rodadas termina empatado: ninguém leva bronze e ninguém marca ponto.",
       "Os duelos ganhos têm quadro próprio no ranking.",
     ],

@@ -1,7 +1,8 @@
 import { numberFromEnv } from "@/shared/utils/env";
 import { VITALS } from "./tuning/vitals";
 import { RECOVERY } from "./tuning/recovery";
-import { TRANSFORM } from "./tuning/transform";
+import { FURY } from "./tuning/fury";
+import { VAULT } from "./tuning/vault";
 import { PET } from "./tuning/pet";
 
 export const GAME_NAME = "Wizold";
@@ -20,15 +21,12 @@ export const BASE_ATTRIBUTE_VALUE = 4;
 export const BASE_VITAL = VITALS.baseVital;
 export const HEALTH_PER_ENDURANCE = VITALS.healthPerResistance;
 export const HEALTH_PER_LEVEL = VITALS.healthPerLevel;
-export const RAGE_PER_WILLPOWER = VITALS.ragePerWillpower;
-export const RAGE_PER_LEVEL = VITALS.ragePerLevel;
-export const WEREWOLF_STRENGTH_BONUS = TRANSFORM.werewolfStrengthBonus;
+export const FURY_ATTRIBUTE_BONUS = FURY.attributeBonus;
+export const FURY_DURATION_MINUTES = FURY.durationMinutesBySize;
+export const BAU_LIMIT = VAULT.bronzeLimit;
 export const STARTING_BRONZE = 100;
-export const TRANSFORM_RAGE_COST = TRANSFORM.rageCost;
-export const TRANSFORM_DURATION_MS = TRANSFORM.durationMinutes * 60_000;
 export const REST_TICK_MS = RECOVERY.tickSeconds * 1_000;
 export const REST_HEALTH_RATIO = RECOVERY.healthPerTick;
-export const REST_RAGE_RATIO = RECOVERY.ragePerTick;
 export const RENAME_COOLDOWN_DAYS = 15;
 export const RENAME_PRICE = 50_000;
 export const MIN_HEALTH_RATIO_TO_ACT = 0.2;

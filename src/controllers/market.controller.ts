@@ -1,4 +1,4 @@
-import { formatBronze } from "@/shared/utils/format";
+import { capBronze, formatBronze } from "@/shared/utils/format";
 import { isValidQuantity } from "@/shared/utils/quantity";
 import { findItem, lineageName, marketItems, servesLineage } from "@/models/data/items";
 import { huntPurse } from "@/models/data/species";
@@ -140,7 +140,7 @@ export function sellItem(state: GameState, itemId: string, quantity = 1): Result
   const gain = sellPrice(item, character.level) * quantity;
   const next: GameState = {
     ...state,
-    character: { ...character, bronze: character.bronze + gain },
+    character: { ...character, bronze: capBronze(character.bronze + gain) },
     inventory: removeFromInventory(state.inventory, itemId, quantity),
   };
 

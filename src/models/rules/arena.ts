@@ -64,7 +64,6 @@ export function arenaStats(hunter: Hunter): DerivedStats {
     {
       level: hunter.level,
       attributes: hunter.attributes,
-      form: "werewolf",
       enhancements: hunter.enhancements,
     },
     hunter.equipment,

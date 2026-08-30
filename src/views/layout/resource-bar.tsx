@@ -1,17 +1,16 @@
 "use client";
 
 import { useGame } from "@/controllers/game.context";
+import { BAU_LIMIT } from "@/shared/constants/game";
 import { formatNumber } from "@/shared/utils/format";
 import { Bar } from "../components/bar";
 import { RestSeconds } from "../components/rest-seconds";
-import { TransformSeconds } from "../components/transform-seconds";
 
 export function ResourceBar() {
   const { character, stats, activity } = useGame();
   if (!character || !stats) return null;
 
   const resting = activity?.kind === "rest";
-  const transformed = character.form === "werewolf" && Boolean(character.transformedAt);
 
   return (
     <header className="sticky top-0 z-20 border-b border-edge bg-surface/40 backdrop-blur">
@@ -21,8 +20,7 @@ export function ResourceBar() {
             label={
               resting ? (
                 <>
-                  Vida (Recuperando-se...{" "}
-                  <RestSeconds key={character.health + "-" + character.rage} />)
+                  Vida (Recuperando-se... <RestSeconds key={character.health} />)
                 </>
               ) : (
                 "Vida"
@@ -34,26 +32,12 @@ export function ResourceBar() {
             tone="blood"
             prominent
           />
-          <Bar
-            label={
-              transformed ? (
-                <>
-                  Fúria (Fera <TransformSeconds transformedAt={character.transformedAt as string} />)
-                </>
-              ) : (
-                "Fúria"
-              )
-            }
-            current={character.rage}
-            maximum={stats.maxRage}
-            glows={resting && character.rage < stats.maxRage}
-            tone="fury"
-            prominent
-          />
+          <Bar label="Baú" current={character.bronze} maximum={BAU_LIMIT} tone="ember" prominent />
           <Bar
             label={"Experiência (NV. " + formatNumber(character.level) + ")"}
             current={character.experience}
             maximum={stats.experienceNeeded}
+            tone="fury"
             wraps
             prominent
           />

@@ -28,11 +28,9 @@ function createCharacter(name: string, gender: Gender): Character {
     id: generateId("chr"),
     name: name.trim(),
     gender,
-    form: "human",
     level: 1,
     experience: 0,
     health: 0,
-    rage: 0,
     bronze: STARTING_BRONZE,
     attributes,
     trainingProgress: { strength: 0, agility: 0, endurance: 0, instinct: 0, willpower: 0 },
@@ -45,7 +43,7 @@ function createCharacter(name: string, gender: Gender): Character {
   };
 
   const stats = deriveStats(base, emptyEquipment());
-  return { ...base, health: stats.maxHealth, rage: stats.maxRage };
+  return { ...base, health: stats.maxHealth };
 }
 
 export function createRun(name: string, gender: Gender): GameState {

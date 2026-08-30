@@ -26,10 +26,12 @@ export function summarizeEffect(item: Item, enhancement = 0): string[] {
   const lines: string[] = [];
 
   if (effect.health) lines.push("+" + effect.health + " vida");
-  if (effect.rage) lines.push("+" + effect.rage + " fúria");
   if (effect.petEnergyRatio) lines.push(percent(effect.petEnergyRatio) + " da energia do mascote");
   if (effect.healthRatio) lines.push(percent(effect.healthRatio) + " da vida");
-  if (effect.rageRatio) lines.push(percent(effect.rageRatio) + " da fúria");
+  if (effect.furyMinutes)
+    lines.push(
+      "+10 em todos os atributos por " + String(effect.furyMinutes).replace(".", ",") + " min",
+    );
 
   for (const definition of ATTRIBUTES) {
     const value = effect.attributes?.[definition.key];

@@ -1,9 +1,11 @@
 import { SIZE_LABEL, type Item, type PotionSize } from "@/models/entities/item";
+import { FURY } from "@/shared/constants/tuning/fury";
 
-// Two lines (vida, fúria) in three sizes. `hunts` prices each size in carcasses of
-// the buyer's level, proportional to how much it heals (a quarter, a half, a whole
-// vital). `minLevel` splits the run in thirds: NV 1 / 334 / 667. `price` is a flat
-// fallback.
+// Health potions restore a slice of the body (a quarter, a half, a whole vital).
+// Fury potions are a timed buff instead: +10 to every attribute, for a stretch
+// that grows with the size (2,5 / 5 / 7,5 min). `hunts` prices each size in
+// carcasses of the buyer's level; `minLevel` splits the run in thirds
+// (NV 1 / 334 / 667). `price` stays as a flat fallback.
 const POTION_TIERS = [
   {
     size: "small" as PotionSize,
@@ -31,6 +33,8 @@ const POTION_TIERS = [
   },
 ];
 
+type PotionTier = (typeof POTION_TIERS)[number];
+
 const POTION_LINES = [
   {
     kind: "health" as const,
@@ -39,16 +43,16 @@ const POTION_LINES = [
     description:
       "Espessa e morna, com cheiro de ferro velho. Fecha em segundos o corte que a sua " +
       "própria cura levaria a noite inteira para costurar.",
-    effect: (ratio: number) => ({ healthRatio: ratio }),
+    effect: (tier: PotionTier) => ({ healthRatio: tier.ratio }),
   },
   {
     kind: "rage" as const,
     label: "Fúria",
     id: "rage",
     description:
-      "Não pergunte do que é feita: ninguém que responde ainda está por aí. Acende a fera " +
-      "sem esperar a lua, e por alguns minutos a coleira fica com quem bebeu.",
-    effect: (ratio: number) => ({ rageRatio: ratio }),
+      "Não devolve nada ao corpo: acende a fera por dentro. Enquanto dura, +10 em cada " +
+      "atributo, e o quanto dura depende do tamanho do frasco.",
+    effect: (tier: PotionTier) => ({ furyMinutes: FURY.durationMinutesBySize[tier.size] }),
   },
 ];
 
@@ -64,7 +68,7 @@ export const POTIONS: readonly Item[] = POTION_LINES.flatMap((line) =>
     minLevel: tier.minLevel,
     stackable: true,
     inMarket: true,
-    effect: line.effect(tier.ratio),
+    effect: line.effect(tier),
     potion: line.kind,
     size: tier.size,
   })),

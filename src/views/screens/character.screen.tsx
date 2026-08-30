@@ -9,7 +9,7 @@ import { criticalMultiplierOf } from "@/models/rules/combat";
 import { findItem } from "@/models/data/items";
 import { enhancementOf } from "@/models/rules/forge";
 import { EQUIPMENT_SLOTS } from "@/models/entities/item";
-import { findGender, FORM_LABEL } from "@/models/entities/character";
+import { findGender } from "@/models/entities/character";
 import type { Hunter } from "@/models/entities/ranking";
 import { formatNumber } from "@/shared/utils/format";
 import { Bar } from "../components/bar";
@@ -79,13 +79,6 @@ export function CharacterScreen() {
       glows: resting && character.health < stats.maxHealth,
     },
     {
-      key: "rage",
-      label: "Fúria",
-      current: character.rage,
-      maximum: stats.maxRage,
-      glows: resting && character.rage < stats.maxRage,
-    },
-    {
       key: "experience",
       label: "Experiência",
       current: character.experience,
@@ -124,7 +117,6 @@ export function CharacterScreen() {
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <Tag tone="neutral">NV. {formatNumber(character.level)}</Tag>
-                <Tag tone="neutral">{FORM_LABEL[character.form]}</Tag>
               </div>
             </div>
 
@@ -166,9 +158,7 @@ export function CharacterScreen() {
                     maximum={vital.maximum}
                     wraps={vital.key === "experience"}
                     glows={vital.glows}
-                    tone={
-                      vital.key === "health" ? "blood" : vital.key === "rage" ? "fury" : "light"
-                    }
+                    tone={vital.key === "health" ? "blood" : "fury"}
                   />
                 </ListRow>
               ))}

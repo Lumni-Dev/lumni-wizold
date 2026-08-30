@@ -67,11 +67,9 @@ function normalizeCharacter(character: Character): Character {
     id: text(character.id, generateId("chr")),
     name: text(character.name, "Errante"),
     gender: character.gender === "female" ? "female" : "male",
-    form: character.form === "werewolf" ? "werewolf" : "human",
     level: clamp(finiteInt(character.level, 1), 1, MAX_CHARACTER_LEVEL),
     experience: Math.max(0, finiteInt(character.experience, 0)),
     health: Math.max(0, finiteInt(character.health, BASE_VITAL)),
-    rage: Math.max(0, finiteInt(character.rage, 0)),
     bronze: Math.max(0, finiteInt(character.bronze ?? silver, 0)),
     attributes: fillAttributes(character.attributes, BASE_ATTRIBUTE_VALUE),
     trainingProgress: fillAttributes(character.trainingProgress, 0),
@@ -82,7 +80,7 @@ function normalizeCharacter(character: Character): Character {
     arenaLosses: Math.max(0, finiteInt(character.arenaLosses, 0)),
     createdAt: text(character.createdAt, new Date().toISOString()),
     renamedAt: stamp(character.renamedAt),
-    transformedAt: stamp(character.transformedAt),
+    furyUntil: stamp(character.furyUntil),
   };
 }
 function normalizePet(pet: Pet): Pet {

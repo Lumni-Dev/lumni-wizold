@@ -1,4 +1,4 @@
-import { formatReais, formatBronze } from "@/shared/utils/format";
+import { capBronze, formatReais, formatBronze } from "@/shared/utils/format";
 import { findPack, STORE_PACKS, type StorePack } from "@/models/data/store-packs";
 import type { GameState } from "@/models/entities/game-state";
 import { failure, success, type Result } from "@/models/entities/result";
@@ -32,7 +32,7 @@ export function purchasePack(state: GameState, packId: string): Result<StoreOffe
   const bronze = packBronze(pack, character.level);
   const next = updateCharacter(state, (current) => ({
     ...current,
-    bronze: current.bronze + bronze,
+    bronze: capBronze(current.bronze + bronze),
   }));
 
   const message =

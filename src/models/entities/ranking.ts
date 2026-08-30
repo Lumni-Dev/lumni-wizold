@@ -36,7 +36,6 @@ export type RankingKey =
   | "wins"
   | "hunts"
   | "arena"
-  | "bronze"
   | "forge"
   | "mining"
   | "pet";
@@ -72,12 +71,6 @@ export const RANKING_BOARDS: readonly RankingBoard[] = [
     label: "Arena",
     description: "Duelos vencidos no fosso, contra outros lobisomens.",
     value: (hunter) => hunter.arena,
-  },
-  {
-    key: "bronze",
-    label: "Bronze",
-    description: "O que sobrou depois do ferreiro.",
-    value: (hunter) => hunter.bronze,
   },
   {
     key: "forge",
