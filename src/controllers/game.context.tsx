@@ -22,6 +22,7 @@ import { activityRepository } from "@/models/repositories/activity.repository";
 import { moonRepository } from "@/models/repositories/moon.repository";
 import type { MoonState } from "@/models/rules/moon";
 import { AUTOMATION_TICK_MS, PET_EXERCISE_ID, REST_TICK_MS } from "@/shared/constants/game";
+import { GAME_VERSION, VERSION_POLL_MS } from "@/shared/constants/version";
 import { formatReais } from "@/shared/utils/format";
 import { petLevelOf, petMaxEnergy } from "@/models/rules/pet";
 import { deriveStats, type DerivedStats } from "@/models/rules/stats";
@@ -104,6 +105,8 @@ interface GameContextValue {
   feedPet: (itemId: string) => Promise<void>;
   setPetActive: (active: boolean) => Promise<void>;
   refresh: () => Promise<void>;
+  updateAvailable: boolean;
+  applyUpdate: () => void;
 }
 const GameContext = createContext<GameContextValue | null>(null);
 function subscribeToClient() {
@@ -127,6 +130,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [authenticated, setAuthenticated] = useState(false);
   const [notices, setNotices] = useState<Notice[]>([]);
   const [activity, setActivityState] = useState<Activity | null>(null);
+  const [updateAvailable, setUpdateAvailable] = useState(false);
   const noticeCounter = useRef(0);
   const ready = hydrated && booted;
   const setActivity = useCallback((next: Activity | null) => {
@@ -147,6 +151,48 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, []);
   const dismissNotice = useCallback((id: number) => {
     setNotices((current) => current.filter((line) => line.id !== id));
+  }, []);
+  // Closing the update prompt reloads the page and clears the Cache Storage first,
+  // so the browser fetches the fresh build instead of a stale one. The
+  // notification service worker caches nothing, so it is left registered.
+  const applyUpdate = useCallback(() => {
+    const reload = () => window.location.reload();
+    try {
+      if (typeof caches !== "undefined") {
+        void caches
+          .keys()
+          .then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+          .then(reload, reload);
+        return;
+      }
+    } catch {}
+    reload();
+  }, []);
+  // An open tab keeps running its old bundle after a deploy. It asks the server
+  // for the current version on mount, on a clock and whenever the tab regains
+  // focus, and once the answer no longer matches this build it raises the prompt,
+  // which never lowers again.
+  useEffect(() => {
+    let alive = true;
+    const check = async () => {
+      const answer = await api("GET", "/api/version");
+      if (alive && answer.version && answer.version !== GAME_VERSION) {
+        setUpdateAvailable(true);
+      }
+    };
+    void check();
+    const timer = window.setInterval(() => void check(), VERSION_POLL_MS);
+    const recheck = () => {
+      if (document.visibilityState === "visible") void check();
+    };
+    document.addEventListener("visibilitychange", recheck);
+    window.addEventListener("focus", recheck);
+    return () => {
+      alive = false;
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", recheck);
+      window.removeEventListener("focus", recheck);
+    };
   }, []);
   useEffect(() => {
     preloadSounds();
@@ -736,6 +782,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
       refresh: async () => {
         await request("POST", "/api/state");
       },
+      updateAvailable,
+      applyUpdate,
     };
   }, [
     state,
@@ -744,6 +792,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
     notices,
     activity,
     moon,
+    updateAvailable,
+    applyUpdate,
     dismissNotice,
     announce,
     act,

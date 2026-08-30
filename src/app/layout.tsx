@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Orbitron } from "next/font/google";
 import { GameProvider } from "@/controllers/game.context";
 import { GAME_NAME } from "@/shared/constants/game";
 import { Shield } from "@/views/layout/shield";
+import { UpdateGate } from "@/views/components/update-gate";
 import "./globals.css";
 
 const sans = Geist({ variable: "--font-sans-stack", subsets: ["latin"] });
@@ -28,7 +29,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         }
       >
         <Shield />
-        <GameProvider>{children}</GameProvider>
+        <GameProvider>
+          <UpdateGate />
+          {children}
+        </GameProvider>
       </body>
     </html>
   );

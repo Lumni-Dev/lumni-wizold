@@ -97,6 +97,21 @@ export const asText = (value: unknown, maximum = 200): string =>
 export const asInt = (value: unknown, fallback = 0): number =>
   typeof value === "number" && Number.isFinite(value) ? Math.round(value) : fallback;
 export const asQuantity = (value: unknown): number => Math.min(999, Math.max(1, asInt(value, 1)));
+// The client stamps its running version on every request; keep the users row in
+// step so the roster can be watched for stragglers still on an old build. Only a
+// plain x.y.z string is stored, and only when it actually changed, so a read
+// never writes a dead tuple and a crafted header can never poison the column.
+async function recordClientVersion(
+  client: PoolClient,
+  userId: string,
+  reported: string | null,
+): Promise<void> {
+  if (!reported || !/^[0-9]+\.[0-9]+\.[0-9]+$/.test(reported)) return;
+  await client.query(
+    "update users set game_version = $1 where id = $2 and game_version is distinct from $1",
+    [reported, userId],
+  );
+}
 export async function withGame<T>(request: Request, action: GameAction<T>): Promise<NextResponse> {
   const refused = refuseAbuse(request);
   if (refused) return refused;
@@ -120,6 +135,7 @@ export async function withGame<T>(request: Request, action: GameAction<T>): Prom
       const result = await action(baseline, body, context);
       if (request.method !== "GET") {
         await saveGame(client, loaded.characterId, loaded.state, result.state);
+        await recordClientVersion(client, userId, request.headers.get("x-game-version"));
       }
       return reply(result);
     });
