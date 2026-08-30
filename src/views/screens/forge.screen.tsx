@@ -271,7 +271,7 @@ export function ForgeScreen() {
                         ) : null}
                         {entry.fragment && !maxed ? (
                           <p className="font-mono text-[11px] text-ink-soft">
-                            {formatBronze(entry.bronzeCost)} por martelada
+                            Forjar custa {formatBronze(entry.bronzeCost)}
                           </p>
                         ) : null}
                         {entry.attributes.map((attribute) => (

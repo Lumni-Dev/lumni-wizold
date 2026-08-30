@@ -13,8 +13,8 @@ export function ResourceBar() {
   const resting = activity?.kind === "rest";
 
   return (
-    <header className="sticky top-0 z-20 border-b border-edge bg-base/85 backdrop-blur">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 p-4 md:px-8 lg:h-20 lg:flex-row lg:items-center">
+    <header className="sticky top-0 z-20 border-b border-edge bg-surface/40 backdrop-blur">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 p-4 md:px-8 lg:h-[74px] lg:flex-row lg:items-center">
         <div className="grid flex-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <Bar
             label={
