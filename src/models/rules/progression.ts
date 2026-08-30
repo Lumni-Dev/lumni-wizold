@@ -51,10 +51,14 @@ export function applyTrainingProgress(
   let value = character.attributes[attribute];
   let pointsGained = 0;
 
-  if (value < MAX_ATTRIBUTE_VALUE && progress >= progressNeeded(value)) {
-    progress = 0;
+  // The excess carries into the next point instead of being thrown away, the
+  // same way experience carries into the next level: what a point did not need
+  // becomes the head start of the next, so a session never wastes progress and
+  // a fat gain can climb more than one point, carrying the remainder each time.
+  while (value < MAX_ATTRIBUTE_VALUE && progress >= progressNeeded(value)) {
+    progress -= progressNeeded(value);
     value += 1;
-    pointsGained = 1;
+    pointsGained += 1;
   }
 
   if (value >= MAX_ATTRIBUTE_VALUE) progress = 0;

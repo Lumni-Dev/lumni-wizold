@@ -535,6 +535,20 @@ sec("progressão");
     raised.pointsGained === 1 && raised.character.attributes.strength === 11,
   );
   ok("progresso zera no ponto", raised.character.trainingProgress.strength === 0);
+  const carry = progression.applyTrainingProgress(trainee, "strength", 11);
+  ok(
+    "o excedente do treino vira o começo do próximo ponto",
+    carry.pointsGained === 1 &&
+      carry.character.attributes.strength === 11 &&
+      carry.character.trainingProgress.strength === 10,
+  );
+  const leapt = progression.applyTrainingProgress(trainee, "strength", 60);
+  ok(
+    "um treino gordo sobe vários pontos carregando a sobra",
+    leapt.pointsGained === 2 &&
+      leapt.character.attributes.strength === 12 &&
+      leapt.character.trainingProgress.strength === 5,
+  );
   const maxed = progression.applyTrainingProgress(
     { ...trainee, attributes: { ...trainee.attributes, strength: 1000 } },
     "strength",
@@ -962,6 +976,21 @@ sec("mascote");
 {
   ok("fôlego base", petRules.petMaxEnergy(1) === 100);
   ok("fôlego cresce 4 por nível", petRules.petMaxEnergy(100) === 100 + 99 * 4);
+  const growing = {
+    id: "p",
+    name: "L",
+    gender: "male",
+    energy: 0,
+    active: false,
+    level: 5,
+    adoptedAt: "",
+    trainingProgress: 100,
+  };
+  const grown = petRules.growPet(growing, 30);
+  ok(
+    "o excedente do treino do lobo vira o começo do próximo nível",
+    grown.leveled && grown.pet.level === 6 && grown.pet.trainingProgress === 10,
+  );
   ok(
     "bônus começa em 5",
     json(petRules.petLevelBonus(1)) ===

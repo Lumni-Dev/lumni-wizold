@@ -76,8 +76,11 @@ export function growPet(pet: Pet, effort: number): { pet: Pet; leveled: boolean 
   let nextLevel = level;
   let leveled = false;
 
-  if (progress >= petTrainingNeeded(level)) {
-    progress = 0;
+  // The excess carries into the next level instead of being thrown away, the
+  // same way the hunter's training and experience carry, so a session never
+  // wastes progress and a fat gain can climb more than one level at once.
+  while (nextLevel < PET_MAX_LEVEL && progress >= petTrainingNeeded(nextLevel)) {
+    progress -= petTrainingNeeded(nextLevel);
     nextLevel += 1;
     leveled = true;
   }
