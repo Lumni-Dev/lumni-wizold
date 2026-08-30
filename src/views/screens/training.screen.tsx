@@ -188,7 +188,7 @@ export function TrainingScreen() {
           "."
         }
       >
-        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {exercises.map(({ exercise, effort, cost, affordable, maxed, reason }) => {
             const row = progress.find((entry) => entry.key === exercise.attribute);
             const ready = !maxed && affordable;
