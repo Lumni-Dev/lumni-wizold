@@ -3,16 +3,34 @@ import { SIZE_LABEL, type Item, type PotionSize } from "../entities/item";
 import { buildSetItems } from "./equipment-sets";
 import { buildMaterials } from "./species";
 
+// `hunts` prices each size in carcasses of the buyer's level, proportional to
+// how much it heals (a quarter, a half, a whole vital), so a potion costs the
+// same slice of time cedo or tarde. `price` stays as a flat fallback.
 const POTION_TIERS = [
-  { size: "small" as PotionSize, ratio: 0.25, rarity: "common" as const, minLevel: 1, price: 60 },
+  {
+    size: "small" as PotionSize,
+    ratio: 0.25,
+    hunts: 1,
+    rarity: "common" as const,
+    minLevel: 1,
+    price: 60,
+  },
   {
     size: "medium" as PotionSize,
     ratio: 0.5,
+    hunts: 2,
     rarity: "uncommon" as const,
     minLevel: 340,
     price: 2500,
   },
-  { size: "large" as PotionSize, ratio: 1, rarity: "rare" as const, minLevel: 670, price: 12000 },
+  {
+    size: "large" as PotionSize,
+    ratio: 1,
+    hunts: 4,
+    rarity: "rare" as const,
+    minLevel: 670,
+    price: 12000,
+  },
 ];
 
 const POTION_LINES = [
@@ -44,6 +62,7 @@ const POTIONS: readonly Item[] = POTION_LINES.flatMap((line) =>
     category: "potion" as const,
     rarity: tier.rarity,
     price: tier.price,
+    huntCost: tier.hunts,
     minLevel: tier.minLevel,
     stackable: true,
     inMarket: true,
@@ -63,6 +82,7 @@ const PET_SUPPLIES: readonly Item[] = [
     category: "pet",
     rarity: "common",
     price: 40,
+    huntCost: 0.5,
     minLevel: 1,
     stackable: true,
     inMarket: true,

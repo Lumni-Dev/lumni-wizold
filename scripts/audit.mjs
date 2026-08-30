@@ -1368,6 +1368,25 @@ sec("inventário e mercado");
   const highSet = marketCtrl.buyItem(state, "lunar-claw", 1);
   ok("mercado respeita o nível", highSet.ok === false);
   ok("ração sem lobo recusa", marketCtrl.buyItem(state, "pet-ration", 1).ok === false);
+  ok(
+    "poção pequena custa uma caçada do nível",
+    marketCtrl.marketPriceOf(items.findItem("health-potion-small"), 100) === species.huntPurse(100),
+  );
+  ok(
+    "poção grande custa quatro caçadas",
+    marketCtrl.marketPriceOf(items.findItem("health-potion-large"), 100) ===
+      Math.round(species.huntPurse(100) * 4),
+  );
+  ok(
+    "ração custa meia caçada",
+    marketCtrl.marketPriceOf(items.findItem("pet-ration"), 100) ===
+      Math.max(1, Math.round(species.huntPurse(100) * 0.5)),
+  );
+  ok(
+    "equipamento mantém o preço fixo do catálogo",
+    marketCtrl.marketPriceOf(items.findItem("bronze-claw"), 100) ===
+      items.findItem("bronze-claw").price,
+  );
   const fragmentSale = marketCtrl.sellItem(
     { ...state, inventory: [{ itemId: "bronze-fragment", quantity: 5 }] },
     "bronze-fragment",

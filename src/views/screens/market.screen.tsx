@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useGame } from "@/controllers/game.context";
-import { listOffers, listSellables, sellPrice } from "@/controllers/market.controller";
+import { listOffers, listSellables, marketPriceOf, sellPrice } from "@/controllers/market.controller";
 import {
   type Item,
   CATEGORY_PLURAL,
@@ -123,8 +123,11 @@ export function MarketScreen() {
 
   if (!character) return null;
 
+  const priceOf = (item: Item) => marketPriceOf(item, character.level);
+  const sellOf = (item: Item) => sellPrice(item, character.level);
+
   const affordableAmount =
-    deal && deal.kind === "buy" ? Math.floor(character.bronze / deal.item.price) : 0;
+    deal && deal.kind === "buy" ? Math.floor(character.bronze / priceOf(deal.item)) : 0;
   const dealWearable =
     deal !== null &&
     deal.kind === "buy" &&
@@ -136,7 +139,7 @@ export function MarketScreen() {
         : clampAmount(Number(buying), Math.max(1, affordableAmount))
       : (deal?.quantity ?? 1);
   const dealTotal =
-    deal && deal.kind === "buy" ? deal.item.price * dealQuantity : (deal?.total ?? 0);
+    deal && deal.kind === "buy" ? priceOf(deal.item) * dealQuantity : (deal?.total ?? 0);
 
   return (
     <>
@@ -243,7 +246,7 @@ export function MarketScreen() {
                           }
                           onClick={() => {
                             setBuying("1");
-                            setDeal({ kind: "buy", item, quantity: 1, total: item.price });
+                            setDeal({ kind: "buy", item, quantity: 1, total: priceOf(item) });
                           }}
                           disabled={
                             !ofLineage || !levelAllowed || !affordable || petless || alreadyOwned
@@ -254,7 +257,7 @@ export function MarketScreen() {
                             : alreadyOwned
                               ? "Já possuo"
                               : ofLineage
-                                ? "Comprar por " + formatBronze(item.price)
+                                ? "Comprar por " + formatBronze(priceOf(item))
                                 : "Apenas " + lineageName(item)}
                         </Button>
                       </div>
@@ -285,7 +288,7 @@ export function MarketScreen() {
                 typed === undefined || typed === "" ? quantity : Number(typed),
                 quantity,
               );
-              const total = sellPrice(item) * amount;
+              const total = sellOf(item) * amount;
 
               return (
                 <ListRow key={item.id} layout="split">
@@ -296,7 +299,7 @@ export function MarketScreen() {
                         {enhancedName(item.name, enhancement)}
                       </p>
                       <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                        {formatNumber(quantity)} em estoque - {formatBronze(sellPrice(item))} cada
+                        {formatNumber(quantity)} em estoque - {formatBronze(sellOf(item))} cada
                       </p>
                     </div>
                   </div>
@@ -327,7 +330,7 @@ export function MarketScreen() {
                             kind: "sell",
                             item,
                             quantity: amount,
-                            total: sellPrice(item) * amount,
+                            total: sellOf(item) * amount,
                           })
                         }
                       >

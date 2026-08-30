@@ -108,7 +108,7 @@ const bought = await call("POST", "/api/market/buy", {
 });
 check("compra no mercado", bought.payload?.ok === true, bought.payload?.message);
 const state3 = (await call("POST", "/api/state")).payload?.data;
-check("bronze desceu o preço", state3?.character?.bronze === state2?.character?.bronze - 60);
+check("bronze desceu o preço", state3?.character?.bronze === state2?.character?.bronze - 4);
 const trained = await call("POST", "/api/training/session", { exerciseId: "ice-bath" });
 check("sessão de treino", trained.payload?.ok === true, trained.payload?.message);
 check(

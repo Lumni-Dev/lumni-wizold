@@ -1,6 +1,7 @@
 import { formatBronze } from "@/shared/utils/format";
 import { isValidQuantity } from "@/shared/utils/quantity";
 import { findItem, lineageName, marketItems, servesLineage } from "@/models/data/items";
+import { huntPurse } from "@/models/data/species";
 import type { GameState } from "@/models/entities/game-state";
 import { EQUIPMENT_SLOTS, type EquipmentSlot, type Item } from "@/models/entities/item";
 import { failure, success, type Result } from "@/models/entities/result";
@@ -16,12 +17,22 @@ import { addLog } from "./log.controller";
 
 const SELL_RATIO = 0.5;
 
-export function sellPrice(item: Item): number {
-  return Math.max(1, Math.round(item.price * SELL_RATIO));
+// The price the market actually charges. A consumable carrying a `huntCost` is
+// priced in carcasses of the buyer's level, like the pet and the store packs, so
+// it costs the same slice of time the whole run; everything else keeps its flat
+// catalog price.
+export function marketPriceOf(item: Item, level: number): number {
+  if (item.huntCost === undefined) return item.price;
+  return Math.max(1, Math.round(huntPurse(level) * item.huntCost));
+}
+
+export function sellPrice(item: Item, level: number): number {
+  return Math.max(1, Math.round(marketPriceOf(item, level) * SELL_RATIO));
 }
 
 export interface MarketOffer {
   item: Item;
+  price: number;
   levelAllowed: boolean;
   affordable: boolean;
   ofLineage: boolean;
@@ -39,15 +50,19 @@ function ownsWearable(state: GameState, item: Item): boolean {
 export function listOffers(state: GameState): MarketOffer[] {
   const character = state.character;
 
+  const level = character?.level ?? 1;
+
   return marketItems()
     .map((item) => {
+      const price = marketPriceOf(item, level);
       const levelAllowed = character !== null && character.level >= item.minLevel;
-      const affordable = character !== null && character.bronze >= item.price;
+      const affordable = character !== null && character.bronze >= price;
       const ofLineage = character !== null && servesLineage(item, character.gender);
       const alreadyOwned = ownsWearable(state, item);
 
       return {
         item,
+        price,
         levelAllowed,
         affordable,
         ofLineage,
@@ -64,7 +79,7 @@ export function listOffers(state: GameState): MarketOffer[] {
                 : null,
       };
     })
-    .sort((a, b) => a.item.price - b.item.price);
+    .sort((a, b) => a.price - b.price);
 }
 
 export function listSellables(state: GameState): DetailedSlot[] {
@@ -95,7 +110,7 @@ export function buyItem(state: GameState, itemId: string, quantity = 1): Result 
     return failure(state, item.name + " já é do seu corpo: uma peça basta.");
   }
 
-  const cost = item.price * quantity;
+  const cost = marketPriceOf(item, character.level) * quantity;
   if (character.bronze < cost) return failure(state, "Bronze insuficiente para " + item.name + ".");
 
   const next: GameState = {
@@ -122,7 +137,7 @@ export function sellItem(state: GameState, itemId: string, quantity = 1): Result
     return failure(state, "Você não tem essa quantidade de " + item.name + ".");
   }
 
-  const gain = sellPrice(item) * quantity;
+  const gain = sellPrice(item, character.level) * quantity;
   const next: GameState = {
     ...state,
     character: { ...character, bronze: character.bronze + gain },

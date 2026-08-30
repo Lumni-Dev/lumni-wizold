@@ -29,6 +29,10 @@ export interface Item {
   category: ItemCategory;
   rarity: Rarity;
   price: number;
+  // When set, the market prices this item in hunts of the buyer's level instead
+  // of the flat `price`: a consumable then costs the same slice of time the whole
+  // run, the way the pet and the store packs are priced.
+  huntCost?: number;
   minLevel: number;
   stackable: boolean;
   inMarket: boolean;
