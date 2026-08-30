@@ -106,7 +106,6 @@ function measure(level, fights = 400) {
     const outcome = simulateCombat({
       characterName: "Bot",
       currentHealth: stats.maxHealth,
-      currentRage: stats.maxRage,
       stats,
       creature: { ...prey, health: prey.health },
       pet: null,
@@ -151,7 +150,6 @@ function session(level, nights = 300) {
       const outcome = simulateCombat({
         characterName: "Bot",
         currentHealth: health,
-        currentRage: stats.maxRage,
         stats,
         creature: { ...prey, health: prey.health },
         pet: null,

@@ -17,6 +17,7 @@ import { ArtImage } from "../components/art-image";
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
 import { Card, CardFooter, CardHeader } from "../components/card";
+import { useShake } from "../components/use-shake";
 import { Tag } from "../components/tag";
 import { DataRow } from "../components/data-row";
 import { List, ListRow } from "../components/list";
@@ -165,6 +166,8 @@ export function HuntScreen() {
   }>({ id: "", beat: 0 });
   const [preyJolt, setPreyJolt] = useState(0);
   const [lapJolt, setLapJolt] = useState(0);
+  // A critical, given or received, shakes the whole fight card, not the bar.
+  const shaking = useShake(preyJolt + lapJolt);
   const beatRef = useRef(0);
   const [pending, setPending] = useState<HuntReport | null>(null);
   const pendingRef = useRef<HuntReport | null>(null);
@@ -367,7 +370,10 @@ export function HuntScreen() {
                 height="fill"
                 interactive={available}
                 tone={active ? "highlighted" : "default"}
-                className={cn(!available && !active && "opacity-70")}
+                className={cn(
+                  !available && !active && "opacity-70",
+                  active && shaking && "card-shake",
+                )}
               >
                 {art.territories[territory.id] ? (
                   <div className="aspect-video w-full overflow-hidden border-b border-edge">
@@ -438,7 +444,6 @@ export function HuntScreen() {
                         current={shownHealth}
                         maximum={shownPrey.health}
                         tone={shownHealth > shownPrey.health / 2 ? "blood" : "ember"}
-                        jolt={preyJolt}
                       />
                     </div>
                   ) : null}
@@ -459,7 +464,6 @@ export function HuntScreen() {
                           ? (script.length || HUNT_TICKS) - 1
                           : HUNT_TICKS - 1
                       }
-                      jolt={progress.id === territory.id ? lapJolt : 0}
                       wraps
                     />
                   </div>

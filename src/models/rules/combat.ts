@@ -1,12 +1,11 @@
 import {
-  BASE_VITAL,
+  CRITICAL_DAMAGE_BONUS,
   MAX_COMBAT_ROUNDS,
   PET_ATTACK_RATIO,
   PET_ENERGY_PER_BLOW,
   PET_BITE_ENERGY,
   PET_ENERGY_PER_HUNT,
   PET_TARGET_CHANCE,
-  RAGE_CRITICAL_DAMAGE_BONUS,
 } from "@/shared/constants/game";
 import { chance, defaultRandom, pickOne, spread, type Random } from "@/shared/utils/random";
 import { clamp } from "@/shared/utils/format";
@@ -55,8 +54,6 @@ export interface CombatPet {
 interface CombatInput {
   characterName: string;
   currentHealth: number;
-
-  currentRage: number;
   stats: DerivedStats;
   creature: CombatOpponent;
   pet?: CombatPet | null;
@@ -101,12 +98,11 @@ function creatureDodge(creature: CombatOpponent): number {
   return clamp(Math.round((30 * creature.agility) / (creature.agility + 120)), 0, 30);
 }
 
-export function rageCriticalDamageBonus(currentRage: number): number {
-  return Math.min(1, Math.max(0, currentRage) / BASE_VITAL) * RAGE_CRITICAL_DAMAGE_BONUS;
-}
-
-export function criticalMultiplierOf(currentRage: number): number {
-  return CRITICAL_MULTIPLIER + rageCriticalDamageBonus(currentRage);
+// The critical cut is fixed for the beast: a flat CRITICAL_DAMAGE_BONUS on top
+// of the base multiplier, no longer tied to rage. Only the werewolf fights, and
+// turning already spends rage, so a rage-scaled bonus could never reach its top.
+export function criticalMultiplierOf(): number {
+  return CRITICAL_MULTIPLIER + CRITICAL_DAMAGE_BONUS;
 }
 
 function calculateDamage(
@@ -125,7 +121,6 @@ function calculateDamage(
 export function simulateCombat({
   characterName,
   currentHealth,
-  currentRage,
   stats,
   creature,
   pet = null,
@@ -133,7 +128,7 @@ export function simulateCombat({
   random = defaultRandom,
 }: CombatInput): CombatOutcome {
   const criticalChance = stats.critical;
-  const criticalMultiplier = criticalMultiplierOf(currentRage);
+  const criticalMultiplier = criticalMultiplierOf();
 
   const rounds: CombatRound[] = [];
   let characterHealth = currentHealth;

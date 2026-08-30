@@ -291,7 +291,6 @@ sec("combate");
       const outcome = combat.simulateCombat({
         characterName: "Teste",
         currentHealth: derived.maxHealth,
-        currentRage: 100,
         stats: derived,
         creature: { ...creature },
         pet: petEnergy > 0 ? { name: "Lobo", energy: petEnergy } : null,
@@ -338,9 +337,10 @@ sec("combate");
     }
   }
   ok("bateria rodou", fights === 2400, fights);
-  ok("multiplicador sem fúria", combat.criticalMultiplierOf(0) === 1.5);
-  ok("multiplicador com fúria cheia", combat.criticalMultiplierOf(100) === 2);
-  ok("fúria acima do vital base não passa de 2", combat.criticalMultiplierOf(5000) === 2);
+  ok(
+    "dano do crítico é fixo, sem depender da fúria",
+    combat.criticalMultiplierOf() === 1.5 + CONST.CRITICAL_DAMAGE_BONUS,
+  );
 }
 sec("bandas e presas");
 {

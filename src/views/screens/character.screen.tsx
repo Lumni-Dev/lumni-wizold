@@ -183,8 +183,8 @@ export function CharacterScreen() {
               <DataRow label="Crítico (Instinto)" value={stats.critical + "%"} />
               <DataRow label="Vida máxima" value={formatNumber(stats.maxHealth)} />
               <DataRow
-                label="Dano do crítico (Fúria)"
-                value={"×" + criticalMultiplierOf(character.rage).toFixed(2).replace(".", ",")}
+                label="Dano do crítico"
+                value={"×" + criticalMultiplierOf().toFixed(2).replace(".", ",")}
               />
             </List>
           </Panel>

@@ -35,6 +35,7 @@ import { Pagination } from "../components/pagination";
 import { Panel } from "../components/panel";
 import { Tag } from "../components/tag";
 import { Tooltip } from "../components/tooltip";
+import { useShake } from "../components/use-shake";
 import { PageHeader } from "../layout/page-header";
 const PAGE_SIZE = 6;
 function Fighter({
@@ -44,7 +45,6 @@ function Fighter({
   side,
   health,
   maximum,
-  jolt = 0,
 }: {
   gender: Gender;
   name: string;
@@ -52,7 +52,6 @@ function Fighter({
   side: string;
   health: number;
   maximum: number;
-  jolt?: number;
 }) {
   const left = Math.max(0, Math.round(health));
   return (
@@ -70,7 +69,6 @@ function Fighter({
           current={left}
           maximum={maximum}
           tone={left > maximum / 2 ? "blood" : "ember"}
-          jolt={jolt}
         />
       </div>
     </div>
@@ -146,6 +144,8 @@ export function ArenaScreen() {
   const [report, setReport] = useState<ArenaResolution | null>(null);
   const [myJolt, setMyJolt] = useState(0);
   const [foeJolt, setFoeJolt] = useState(0);
+  // A critical, given or received, shakes the whole duel panel, not the bar.
+  const shaking = useShake(myJolt + foeJolt);
   const beatRef = useRef(0);
   const scriptRef = useRef<NarrationLine[]>([]);
   const pendingRef = useRef<ArenaResolution | null>(null);
@@ -352,6 +352,7 @@ export function ArenaScreen() {
           }
           action={<Tag tone="neutral">{busy ? "No fosso" : "Encerrado"}</Tag>}
           padding="none"
+          className={cn(shaking && "card-shake")}
         >
           <div className="grid divide-y divide-edge border-b border-edge sm:grid-cols-2 sm:divide-x sm:divide-y-0">
             <Fighter
@@ -361,7 +362,6 @@ export function ArenaScreen() {
               side="Você"
               health={character.health}
               maximum={stats.maxHealth}
-              jolt={myJolt}
             />
             <Fighter
               gender={foe.hunter.gender}
@@ -370,7 +370,6 @@ export function ArenaScreen() {
               side="Desafiado"
               health={line ? line.creatureHealth : foe.foe.health}
               maximum={foe.foe.health}
-              jolt={foeJolt}
             />
           </div>
 

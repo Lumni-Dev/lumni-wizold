@@ -160,7 +160,6 @@ export function resolveHunt(
   const combat = simulateCombat({
     characterName: character.name,
     currentHealth: character.health,
-    currentRage: character.rage,
     stats,
     creature,
     pet: petJoining ? { name: petJoining.name, energy: petJoining.energy } : null,

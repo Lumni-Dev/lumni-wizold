@@ -1,10 +1,10 @@
 import { formatReais } from "@/shared/utils/format";
 import {
   ENHANCEMENT_STEP,
+  CRITICAL_DAMAGE_BONUS,
   FORGE_BRONZE_RATIO,
   FORGE_SUCCESS_RATIO,
   MAX_ENHANCEMENT,
-  RAGE_CRITICAL_DAMAGE_BONUS,
   MINING_CYCLE_MS,
   PET_BASE_ENERGY,
   PET_BITE_ENERGY,
@@ -112,9 +112,9 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "Escolha um território e a caça roda sozinha: a barra conta a luta e dura o que ela durar.",
       "Cada clique vale uma luta. Para encadear caçadas sem tocar em nada, ligue a caçada automática nas configurações; o mesmo vale para treino, mina e forja.",
       "A presa acompanha o seu nível dentro da banda do território: a caçada nunca fica banal.",
-      "A fúria não muda a chance de crítico: cheia, ela aumenta o dano do golpe crítico em +" +
-        Math.round(RAGE_CRITICAL_DAMAGE_BONUS * 100) +
-        "%, e transformar gasta parte dela.",
+      "A fúria não muda a chance de crítico. O golpe crítico da fera bate +" +
+        Math.round(CRITICAL_DAMAGE_BONUS * 100) +
+        "% mais forte, fixo enquanto você está transformado, e a fúria só paga a transformação.",
       "Treine para acumular progresso de atributo.",
       "Equipe o que serve, venda o que sobra e volte a caçar.",
       "Na forja, minere fragmentos e bata na peça equipada para levantá-la de +1 em diante.",
@@ -129,7 +129,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     lines: [
       "Vida: 100, mais 14 por ponto de Resistência acima de 4. O nível não entra aqui: quem engorda a barra é a Resistência, venha ela do treino, do equipamento, do mascote ou da lua.",
       "Fúria: 100, mais 2 por ponto de Vontade acima de 4. Sobe só no descanso, nunca na luta, e paga a transformação.",
-      "Um poço fundo de fúria segura o bônus de dano do crítico mesmo depois de transformar: é para isso que serve a Vontade.",
+      "Uma fúria funda rende mais transformações antes de precisar descansar para enchê-la de novo: é para isso que serve a Vontade.",
       "Poções de vida e fúria recuperam uma porcentagem do próprio máximo.",
       "Zerou a vida na caçada, você escapa com 1 de vida, registra uma derrota e a fera não se sustenta: derrotado, você volta à forma humana na hora.",
       "Luta que se arrasta até o teto de rodadas termina em recuo: a caçada conta, mas ninguém vence nem perde.",

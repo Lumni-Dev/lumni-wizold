@@ -241,7 +241,6 @@ export function resolveArena(
   const combat = simulateCombat({
     characterName: character.name,
     currentHealth: character.health,
-    currentRage: character.rage,
     stats,
     creature: foe,
     pet: ally ? { name: ally.name, energy: ally.energy } : null,

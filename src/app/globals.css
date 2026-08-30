@@ -219,27 +219,33 @@ button:not(:disabled) {
   cursor: pointer;
 }
 
-@keyframes bar-shake {
+@keyframes card-shake {
   0%,
   100% {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0) rotate(0deg);
   }
-  20% {
-    transform: translateX(-3px);
+  10% {
+    transform: translate3d(-9px, 2px, 0) rotate(-0.9deg);
+  }
+  25% {
+    transform: translate3d(8px, -2px, 0) rotate(0.9deg);
   }
   40% {
-    transform: translateX(3px);
+    transform: translate3d(-7px, 2px, 0) rotate(-0.7deg);
   }
-  60% {
-    transform: translateX(-2px);
+  55% {
+    transform: translate3d(6px, -1px, 0) rotate(0.6deg);
   }
-  80% {
-    transform: translateX(2px);
+  70% {
+    transform: translate3d(-4px, 1px, 0) rotate(-0.4deg);
+  }
+  85% {
+    transform: translate3d(2px, 0, 0) rotate(0.2deg);
   }
 }
 
-@utility bar-shake {
-  animation: bar-shake 350ms ease-in-out;
+@utility card-shake {
+  animation: card-shake 450ms cubic-bezier(0.36, 0.07, 0.19, 0.97);
 }
 
 @keyframes toast-in {

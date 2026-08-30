@@ -26,7 +26,6 @@ interface BarProps {
   wraps?: boolean;
   tone?: BarTone;
   glows?: boolean;
-  jolt?: number;
   // Reads the label in the section-title ink instead of the faint chrome ink,
   // for the top nav, where the readout has to stay legible.
   prominent?: boolean;
@@ -46,23 +45,12 @@ export function Bar({
   wraps = false,
   tone = "light",
   glows = false,
-  jolt = 0,
   prominent = false,
   className,
 }: BarProps) {
   const target = percentage(current, maximum);
   const [paint, setPaint] = useState<BarPaint>({ value: target, instant: false });
   const previous = useRef(target);
-  const [shaking, setShaking] = useState(false);
-
-  useEffect(() => {
-    if (!jolt) return;
-    const timers = [
-      window.setTimeout(() => setShaking(true), 0),
-      window.setTimeout(() => setShaking(false), 380),
-    ];
-    return () => timers.forEach((timer) => window.clearTimeout(timer));
-  }, [jolt]);
 
   useEffect(() => {
     const from = previous.current;
@@ -101,10 +89,7 @@ export function Bar({
         </span>
       </div>
       <div
-        className={cn(
-          "relative h-2 w-full overflow-hidden rounded-full border border-ember/45 bg-charcoal",
-          shaking && "bar-shake",
-        )}
+        className="relative h-2 w-full overflow-hidden rounded-full border border-ember/45 bg-charcoal"
       >
         <div
           className={cn(

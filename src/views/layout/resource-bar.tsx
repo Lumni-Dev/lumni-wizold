@@ -1,7 +1,6 @@
 "use client";
 
 import { useGame } from "@/controllers/game.context";
-import { rageCriticalDamageBonus } from "@/models/rules/combat";
 import { formatNumber } from "@/shared/utils/format";
 import { Bar } from "../components/bar";
 import { RestSeconds } from "../components/rest-seconds";
@@ -34,11 +33,7 @@ export function ResourceBar() {
             prominent
           />
           <Bar
-            label={
-              "Fúria (+" +
-              Math.round(rageCriticalDamageBonus(character.rage) * 100) +
-              "% de dano no crítico)"
-            }
+            label="Fúria (paga a transformação)"
             current={character.rage}
             maximum={stats.maxRage}
             glows={resting && character.rage < stats.maxRage}
