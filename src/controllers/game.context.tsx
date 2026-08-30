@@ -80,7 +80,6 @@ interface GameContextValue {
   equipItem: (itemId: string) => Promise<void>;
   unequipItem: (slot: EquipmentSlot) => Promise<void>;
   consumeItem: (itemId: string) => Promise<void>;
-  discardItem: (itemId: string, quantity?: number) => Promise<void>;
   buyItem: (itemId: string, quantity?: number) => Promise<void>;
   sellItem: (itemId: string, quantity?: number) => Promise<void>;
   announceListing: (itemId: string, quantity: number, priceCents: number) => Promise<boolean>;
@@ -557,11 +556,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
       consumeItem: async (itemId) => {
         await act("POST", "/api/inventory/consume", { itemId }, "Inventário", () =>
           playSound(findItem(itemId)?.category === "pet" ? "pet-eat" : "potion"),
-        );
-      },
-      discardItem: async (itemId, quantity = 1) => {
-        await act("POST", "/api/inventory/discard", { itemId, quantity }, "Inventário", () =>
-          playSound("discard"),
         );
       },
       buyItem: async (itemId, quantity = 1) => {

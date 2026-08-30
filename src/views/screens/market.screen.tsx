@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useGame } from "@/controllers/game.context";
 import { listOffers, listSellables, marketPriceOf, sellPrice } from "@/controllers/market.controller";
 import {
@@ -93,13 +93,29 @@ export function MarketScreen() {
   const [set, setSet] = useState<SetFilter>("all");
   const [size, setSize] = useState<SizeFilter>("all");
   const [lineage, setLineage] = useState<LineageFilter>("all");
-  const [amounts, setAmounts] = useState<Record<string, string>>({});
   const [deal, setDeal] = useState<PendingDeal | null>(null);
   const [page, setPage] = useState(1);
   const [buying, setBuying] = useState("1");
+  const [selling, setSelling] = useState("1");
 
   const offers = useMemo(() => listOffers(state), [state]);
   const sellables = useMemo(() => listSellables(state), [state]);
+
+  useEffect(() => {
+    const sellId = new URLSearchParams(window.location.search).get("sell");
+    if (!sellId) return;
+    // Clear the param first so this only fires for the fresh deep link, never on
+    // the re-runs that a changing inventory (sellables) triggers.
+    window.history.replaceState(null, "", "/market");
+    const slot = sellables.find((entry) => entry.item.id === sellId);
+    if (!slot) return;
+    // A ?sell= deep link from the inventory opens the item's sell dialog here.
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setTab("sell");
+    setSelling(String(slot.quantity));
+    setDeal({ kind: "sell", item: slot.item, quantity: slot.quantity, total: 0 });
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [sellables]);
 
   const isPotion = category === "potion";
   const isPet = category === "pet";
@@ -132,14 +148,24 @@ export function MarketScreen() {
     deal !== null &&
     deal.kind === "buy" &&
     (EQUIPMENT_SLOTS as readonly string[]).includes(deal.item.category);
+  const sellOwned =
+    deal && deal.kind === "sell"
+      ? (sellables.find((entry) => entry.item.id === deal.item.id)?.quantity ?? 0)
+      : 0;
   const dealQuantity =
     deal && deal.kind === "buy"
       ? dealWearable
         ? 1
         : clampAmount(Number(buying), Math.max(1, affordableAmount))
-      : (deal?.quantity ?? 1);
+      : deal && deal.kind === "sell"
+        ? clampAmount(Number(selling), Math.max(1, sellOwned))
+        : 1;
   const dealTotal =
-    deal && deal.kind === "buy" ? priceOf(deal.item) * dealQuantity : (deal?.total ?? 0);
+    deal && deal.kind === "buy"
+      ? priceOf(deal.item) * dealQuantity
+      : deal && deal.kind === "sell"
+        ? sellOf(deal.item) * dealQuantity
+        : 0;
 
   return (
     <>
@@ -232,7 +258,7 @@ export function MarketScreen() {
                     note={
                       ofLineage
                         ? (reason ??
-                          (ownedQuantity > 0 ? formatNumber(ownedQuantity) + " na mochila" : null))
+                          (ownedQuantity > 0 ? formatNumber(ownedQuantity) + " no inventário" : null))
                         : null
                     }
                     footer={
@@ -282,65 +308,31 @@ export function MarketScreen() {
           padding="none"
         >
           <List>
-            {sellablesOnPage.map(({ item, quantity, enhancement }) => {
-              const typed = amounts[item.id];
-              const amount = clampAmount(
-                typed === undefined || typed === "" ? quantity : Number(typed),
-                quantity,
-              );
-              const total = sellOf(item) * amount;
-
-              return (
-                <ListRow key={item.id} layout="split">
-                  <div className="flex min-w-0 flex-1 items-center gap-3">
-                    <ItemIcon item={item} />
-                    <div className="min-w-0">
-                      <p className="truncate text-sm text-ink">
-                        {enhancedName(item.name, enhancement)}
-                      </p>
-                      <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                        {formatNumber(quantity)} em estoque - {formatBronze(sellOf(item))} cada
-                      </p>
-                    </div>
+            {sellablesOnPage.map(({ item, quantity, enhancement }) => (
+              <ListRow key={item.id} layout="split">
+                <div className="flex min-w-0 flex-1 items-center gap-3">
+                  <ItemIcon item={item} />
+                  <div className="min-w-0">
+                    <p className="truncate text-sm text-ink">
+                      {enhancedName(item.name, enhancement)}
+                    </p>
+                    <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                      {formatNumber(quantity)} em estoque - {formatBronze(sellOf(item))} cada
+                    </p>
                   </div>
+                </div>
 
-                  <div className="flex shrink-0 flex-col gap-2">
-                    <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                      Quantidade
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <Field
-                        numeric
-                        compact
-                        aria-label={"Quantidade de " + item.name + " para vender"}
-                        maxLength={10}
-                        className="w-24 text-right font-mono"
-                        value={typed ?? String(quantity)}
-                        onChange={(event) =>
-                          setAmounts((current) => ({
-                            ...current,
-                            [item.id]: event.target.value,
-                          }))
-                        }
-                      />
-                      <Button
-                        variant="secondary"
-                        onClick={() =>
-                          setDeal({
-                            kind: "sell",
-                            item,
-                            quantity: amount,
-                            total: sellOf(item) * amount,
-                          })
-                        }
-                      >
-                        Vender por {formatBronze(total)}
-                      </Button>
-                    </div>
-                  </div>
-                </ListRow>
-              );
-            })}
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    setSelling(String(quantity));
+                    setDeal({ kind: "sell", item, quantity, total: 0 });
+                  }}
+                >
+                  Vender
+                </Button>
+              </ListRow>
+            ))}
           </List>
         </Panel>
       )}
@@ -382,7 +374,23 @@ export function MarketScreen() {
                 />
               ),
             }
-          : {})}
+          : deal?.kind === "sell" && sellOwned > 1
+            ? {
+                children: (
+                  <Field
+                    compact
+                    numeric
+                    label="Quantidade"
+                    hint={"Você tem " + formatNumber(sellOwned) + "."}
+                    aria-label={"Quantidade de " + deal.item.name + " para vender"}
+                    maxLength={10}
+                    className="w-full font-mono"
+                    value={selling}
+                    onChange={(event) => setSelling(event.target.value)}
+                  />
+                ),
+              }
+            : {})}
         onCancel={() => setDeal(null)}
         onConfirm={() => {
           if (!deal) return;
@@ -390,12 +398,7 @@ export function MarketScreen() {
           if (deal.kind === "buy") {
             buyItem(deal.item.id, dealQuantity);
           } else {
-            sellItem(deal.item.id, deal.quantity);
-            setAmounts((current) => {
-              const next = { ...current };
-              delete next[deal.item.id];
-              return next;
-            });
+            sellItem(deal.item.id, dealQuantity);
           }
 
           setDeal(null);

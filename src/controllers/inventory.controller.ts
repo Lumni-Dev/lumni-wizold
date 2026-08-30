@@ -1,4 +1,3 @@
-import { isValidQuantity } from "@/shared/utils/quantity";
 import { findItem, lineageName, servesLineage } from "@/models/data/items";
 import type { GameState } from "@/models/entities/game-state";
 import {
@@ -189,22 +188,5 @@ export function consumeItem(state: GameState, itemId: string): Result {
   }));
 
   const message = item.name + " consumida.";
-  return success(addLog(next, "inventory", message), message);
-}
-
-export function discardItem(state: GameState, itemId: string, quantity = 1): Result {
-  const item = findItem(itemId);
-  if (!item) return failure(state, "Item desconhecido.");
-  if (!isValidQuantity(quantity)) return failure(state, "Quantidade inválida.");
-  if (countInInventory(state.inventory, itemId) < quantity) {
-    return failure(state, "Quantidade indisponível de " + item.name + ".");
-  }
-
-  const next: GameState = {
-    ...state,
-    inventory: removeFromInventory(state.inventory, itemId, quantity),
-  };
-
-  const message = item.name + " descartado.";
   return success(addLog(next, "inventory", message), message);
 }

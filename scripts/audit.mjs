@@ -2028,7 +2028,6 @@ sec("imutabilidade");
     ["equipItem", () => inventoryCtrl.equipItem(state, "bronze-claw")],
     ["unequipItem", () => inventoryCtrl.unequipItem(state, "claw")],
     ["consumeItem", () => inventoryCtrl.consumeItem(state, "health-potion-small")],
-    ["discardItem", () => inventoryCtrl.discardItem(state, "soft-fur", 1)],
     ["enhance", () => forgeCtrl.enhance(state, "claw")],
     ["mine", () => forgeCtrl.mine(state, "bronze-vein", random)],
     ["listForge", () => forgeCtrl.listForge(state)],

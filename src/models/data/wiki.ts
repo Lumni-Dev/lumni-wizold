@@ -415,7 +415,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         BAZAAR_LISTING_DAYS +
         " dias: o quadro mostra quantos faltam e a hora em que vence, e o vencido sai da vitrine esperando o dono remover para recolher as peças.",
       "A compra é paga no checkout do Stripe, com dinheiro de verdade; assim que o pagamento confirma, o item entra na mochila e o vendedor recebe no Alforje, já sem a taxa da casa.",
-      "O que veio do bazar carrega a insígnia Bazar na mochila: uma marca de origem, sem regra presa a ela, e a peça vende no mercado ou se descarta como qualquer outra.",
+      "O que veio do bazar carrega a insígnia Bazar na mochila: uma marca de origem, sem regra presa a ela, e a peça vende no mercado como qualquer outra.",
       "Ninguém compra o próprio anúncio.",
       "A casa fica com " +
         Math.round(BAZAAR_FEE_RATIO * 100) +
