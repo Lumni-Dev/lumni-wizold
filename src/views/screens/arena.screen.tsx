@@ -13,10 +13,21 @@ import { ARENA_HISTORY_SIZE, type ArenaHistoryEntry } from "@/models/entities/ar
 import { ATTRIBUTES } from "@/models/entities/attribute";
 import type { Gender } from "@/models/entities/character";
 import type { Hunter } from "@/models/entities/ranking";
-import { ARENA_COOLDOWN_HOURS, ARENA_DAILY_ATTACKS, arenaSpoilsRange } from "@/models/rules/arena";
+import {
+  ARENA_COOLDOWN_HOURS,
+  ARENA_DAILY_ATTACKS,
+  arenaSpoilsRange,
+  arenaStats,
+} from "@/models/rules/arena";
+import type { DerivedStats } from "@/models/rules/stats";
 import { canPetFight, isPetActive } from "@/models/rules/pet";
 import { playSound } from "@/controllers/sound";
-import { HUNT_TICK_MS, HUNT_TICKS, NAME_MAX_LENGTH } from "@/shared/constants/game";
+import {
+  HUNT_APPROACH_TICKS,
+  HUNT_TICK_MS,
+  HUNT_TICKS,
+  NAME_MAX_LENGTH,
+} from "@/shared/constants/game";
 import { sanitizeName } from "@/shared/utils/text";
 import { cn } from "@/shared/utils/class-names";
 import { formatDay, formatNumber, formatBronze } from "@/shared/utils/format";
@@ -124,36 +135,36 @@ function DuelReport({ report }: { report: ArenaResolution }) {
   );
 }
 export function ArenaScreen() {
-  const {
-    state,
-    character,
-    stats,
-    pet,
-    moon,
-    drawOpponent,
-    challengeArena,
-    sufferBlow,
-    landArena,
-  } = useGame();
+  const { state, character, stats, pet, moon, drawOpponent, challengeArena, sufferBlow, landArena } =
+    useGame();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [roster, setRoster] = useState<Hunter[]>([]);
-  const [fighting, setFighting] = useState<ArenaResolution | null>(null);
-  const [script, setScript] = useState<NarrationLine[]>([]);
+  // The duel fills a "No fosso..." approach first (cancelable, nothing committed)
+  // and only calls the server when it tops out; then it plays out live. `fighting`
+  // holds the opponent shown throughout, `report` the settled duel.
+  const [fighting, setFighting] = useState<{ hunter: Hunter; maxHealth: number } | null>(null);
+  const [phase, setPhase] = useState<"approach" | "fight">("approach");
   const [beat, setBeat] = useState(0);
   const [report, setReport] = useState<ArenaResolution | null>(null);
+  const [script, setScript] = useState<NarrationLine[]>([]);
   const [myJolt, setMyJolt] = useState(0);
   const [foeJolt, setFoeJolt] = useState(0);
   // A critical, given or received, shakes the whole duel panel, not the bar.
   const shaking = useShake(myJolt + foeJolt);
   const beatRef = useRef(0);
+  const phaseRef = useRef<"approach" | "fight">("approach");
   const scriptRef = useRef<NarrationLine[]>([]);
   const pendingRef = useRef<ArenaResolution | null>(null);
   const requestingRef = useRef(false);
   const bledRef = useRef({ last: 0, total: 0 });
+  const characterRef = useRef(character);
+  const challengeRef = useRef(challengeArena);
   const sufferRef = useRef(sufferBlow);
   const landRef = useRef(landArena);
   useEffect(() => {
+    characterRef.current = character;
+    challengeRef.current = challengeArena;
     sufferRef.current = sufferBlow;
     landRef.current = landArena;
   });
@@ -185,7 +196,38 @@ export function ArenaScreen() {
   const view = useMemo(() => listArena(state, roster, search), [state, roster, search, moon]);
   useEffect(() => {
     if (!fighting) return;
+    const target = fighting.hunter.id;
     const timer = window.setInterval(() => {
+      // Approach: circle the pit; nothing committed, so leaving cancels.
+      if (phaseRef.current === "approach") {
+        beatRef.current = Math.min(beatRef.current + 1, HUNT_APPROACH_TICKS);
+        setBeat(beatRef.current);
+        if (beatRef.current < HUNT_APPROACH_TICKS || requestingRef.current) return;
+        requestingRef.current = true;
+        void challengeRef.current(target).then((resolution) => {
+          requestingRef.current = false;
+          if (!resolution) {
+            setFighting(null);
+            return;
+          }
+          // The server settled and committed the duel; play it out live.
+          pendingRef.current = resolution;
+          bledRef.current = { last: characterRef.current?.health ?? 0, total: 0 };
+          scriptRef.current = narrationOf(
+            { foe: resolution.foe, combat: resolution.combat },
+            HUNT_TICKS,
+            characterRef.current?.name ?? "",
+          );
+          setScript(scriptRef.current);
+          phaseRef.current = "fight";
+          setPhase("fight");
+          beatRef.current = 0;
+          setBeat(0);
+        });
+        return;
+      }
+      // Fight: play the settled duel line by line, bleeding the body as it goes.
+      if (!pendingRef.current) return;
       beatRef.current += 1;
       setBeat(beatRef.current);
       const line = scriptRef.current[Math.min(beatRef.current, scriptRef.current.length) - 1];
@@ -196,19 +238,17 @@ export function ArenaScreen() {
         if (line.blow === "theirs") setMyJolt((count) => count + 1);
         else setFoeJolt((count) => count + 1);
       }
-      if (pendingRef.current && line?.characterHealth !== undefined) {
+      if (line?.characterHealth !== undefined) {
         const delta = bledRef.current.last - line.characterHealth;
         if (delta > 0) {
           sufferRef.current(delta);
-          bledRef.current = {
-            last: line.characterHealth,
-            total: bledRef.current.total + delta,
-          };
+          bledRef.current = { last: line.characterHealth, total: bledRef.current.total + delta };
         }
       }
-      if (beatRef.current > scriptRef.current.length && pendingRef.current) {
+      if (beatRef.current >= scriptRef.current.length) {
         const held = pendingRef.current;
         pendingRef.current = null;
+        window.clearInterval(timer);
         landRef.current();
         setReport(held);
         if (held.combat.victory) playSound("victory");
@@ -218,6 +258,7 @@ export function ArenaScreen() {
     }, HUNT_TICK_MS);
     return () => {
       window.clearInterval(timer);
+      // Committed duel left mid-replay: land it, the server already settled it.
       if (pendingRef.current) {
         pendingRef.current = null;
         landRef.current();
@@ -226,37 +267,38 @@ export function ArenaScreen() {
   }, [fighting]);
   if (!character || !stats) return null;
   const busy = fighting !== null;
-  async function challenge(hunterId: string) {
-    if (requestingRef.current || pendingRef.current || !character) return;
-    requestingRef.current = true;
-    const resolution = await challengeArena(hunterId).finally(() => {
-      requestingRef.current = false;
-    });
-    if (!resolution) return;
-    pendingRef.current = resolution;
-    scriptRef.current = narrationOf(
-      { foe: resolution.foe, combat: resolution.combat },
-      HUNT_TICKS,
-      character.name,
-    );
-    bledRef.current = { last: character.health, total: 0 };
+  // Start filling the bar toward a known opponent; the server call waits for the
+  // last beat, so the fight is not committed until the bar tops out.
+  function beginDuel(hunter: Hunter, maxHealth: number) {
+    if (fighting) return;
     beatRef.current = 0;
-    setScript(scriptRef.current);
+    phaseRef.current = "approach";
+    pendingRef.current = null;
+    scriptRef.current = [];
     setBeat(0);
+    setPhase("approach");
+    setScript([]);
     setReport(null);
-    setFighting(resolution);
+    setFighting({ hunter, maxHealth });
+  }
+  function challenge(hunter: Hunter, rival: DerivedStats) {
+    beginDuel(hunter, rival.maxHealth);
   }
   async function challengeDrawn() {
+    if (fighting) return;
     const opponent = await drawOpponent();
     if (!opponent) return;
-    await challenge(opponent.hunterId);
+    const hunter = roster.find((entry) => entry.id === opponent.hunterId);
+    if (!hunter) return;
+    beginDuel(hunter, arenaStats(hunter).maxHealth);
   }
   const currentPage = clampPage(page, view.rivals.length, PAGE_SIZE);
   const pages = pageCount(view.rivals.length, PAGE_SIZE);
   const onPage = pageOf(view.rivals, currentPage, PAGE_SIZE);
-  const told = Math.min(beat, script.length);
-  const line = script.length > 0 ? script[Math.max(1, told) - 1] : null;
-  const foe = fighting ?? report ?? null;
+  const duelLine =
+    fighting && phase === "fight" && script.length > 0
+      ? script[Math.min(Math.max(1, beat), script.length) - 1]
+      : null;
   return (
     <>
       <PageHeader
@@ -338,19 +380,19 @@ export function ArenaScreen() {
         />
       </Panel>
 
-      {foe ? (
+      {fighting ? (
         <Panel
           title="Duelo"
           description={
             "Você contra " +
-            foe.hunter.name +
+            fighting.hunter.name +
             ", os dois transformados. Em jogo, um pedaço da bolsa de quem cair: de " +
-            formatNumber(arenaSpoilsRange(foe.hunter.level).min) +
+            formatNumber(arenaSpoilsRange(fighting.hunter.level).min) +
             " a " +
-            formatBronze(arenaSpoilsRange(foe.hunter.level).max) +
+            formatBronze(arenaSpoilsRange(fighting.hunter.level).max) +
             "."
           }
-          action={<Tag tone="neutral">{busy ? "No fosso" : "Encerrado"}</Tag>}
+          action={<Tag tone="neutral">No fosso</Tag>}
           padding="none"
           className={cn(shaking && "card-shake")}
         >
@@ -364,33 +406,36 @@ export function ArenaScreen() {
               maximum={stats.maxHealth}
             />
             <Fighter
-              gender={foe.hunter.gender}
-              name={foe.hunter.name}
-              level={foe.hunter.level}
+              gender={fighting.hunter.gender}
+              name={fighting.hunter.name}
+              level={fighting.hunter.level}
               side="Desafiado"
-              health={line ? line.creatureHealth : foe.foe.health}
-              maximum={foe.foe.health}
+              health={duelLine ? duelLine.creatureHealth : fighting.maxHealth}
+              maximum={fighting.maxHealth}
             />
           </div>
 
           <div className="space-y-3 p-4">
             <Bar
-              label="Duelo"
-              current={Math.min(Math.max(0, told - 1), Math.max(1, script.length - 1))}
-              maximum={Math.max(1, (script.length || HUNT_TICKS) - 1)}
+              label={phase === "fight" ? "Duelo" : "No fosso..."}
+              current={beat}
+              maximum={phase === "fight" ? Math.max(1, script.length) : HUNT_APPROACH_TICKS}
             />
-            {line ? (
+            {duelLine ? (
               <p
                 className={cn(
                   "truncate font-mono text-[11px]",
-                  line.critical ? "text-ember" : "text-ink-faint",
+                  duelLine.critical ? "text-ember" : "text-ink-faint",
                 )}
               >
-                {emphasizeDamage(line.text).map((part, index) =>
+                {emphasizeDamage(duelLine.text).map((part, index) =>
                   typeof part === "string" ? (
                     part
                   ) : (
-                    <strong key={index} className={cn("font-bold", !line.critical && "text-ink")}>
+                    <strong
+                      key={index}
+                      className={cn("font-bold", !duelLine.critical && "text-ink")}
+                    >
                       {part.damage}
                     </strong>
                   ),
@@ -470,7 +515,7 @@ export function ArenaScreen() {
                         <Button
                           variant={inBand && !resting ? "primary" : "outline"}
                           disabled={!inBand || resting || !view.canFight || busy}
-                          onClick={() => challenge(hunter.id)}
+                          onClick={() => challenge(hunter, rival)}
                         >
                           {!inBand ? "Fora da faixa" : resting ? "Descansando" : "Desafiar"}
                         </Button>

@@ -6,6 +6,7 @@ import { isGameSound, playSound } from "@/controllers/sound";
 import { petTrainingView } from "@/controllers/pet.controller";
 import { listAttributeProgress, listExercises } from "@/controllers/training.controller";
 import { usePageActivity } from "@/controllers/use-page-activity";
+import { progressRepository } from "@/models/repositories/progress.repository";
 import {
   MAX_ATTRIBUTE_VALUE,
   PET_EXERCISE_ID,
@@ -39,56 +40,23 @@ export function TrainingScreen() {
 
   const [session, setSession] = useState<{ id: string; beat: number }>({ id: "", beat: 0 });
   const beatRef = useRef(0);
+  const petFrozen = !petActive && session.id === PET_EXERCISE_ID && session.beat > 0;
 
-  interface RowSnapshot {
-    progress: number;
-    needed: number;
-    value: number;
-    cost: number;
-    effort: number;
-  }
   const autoRef = useRef(state.automation.train);
   const trainRef = useRef(train);
   const notifyRef = useRef(notify);
-  const paidRef = useRef(false);
+  // Whether the running exercise is worth pausing for later (not maxed, still a
+  // beast), which decides an out-of-bronze lap between a pause and a full stop.
   const resumableRef = useRef(false);
-  const landedRef = useRef<{ message: string; raised: boolean } | null>(null);
-  const rowSnapshotRef = useRef<RowSnapshot>({
-    progress: 0,
-    needed: 0,
-    value: 0,
-    cost: 0,
-    effort: 0,
-  });
-  const [heldRow, setHeldRow] = useState<(RowSnapshot & { id: string }) | null>(null);
   useEffect(() => {
     autoRef.current = state.automation.train;
     trainRef.current = train;
     notifyRef.current = notify;
     if (activeExercise === PET_EXERCISE_ID) {
-      if (petTraining) {
-        rowSnapshotRef.current = {
-          progress: petTraining.progress,
-          needed: petTraining.needed,
-          value: petTraining.level,
-          cost: petTraining.cost,
-          effort: petTraining.effort.progress,
-        };
-        resumableRef.current = !petTraining.maxed && petTraining.transformed;
-      }
+      if (petTraining) resumableRef.current = !petTraining.maxed && petTraining.transformed;
     } else if (activeExercise) {
       const entry = exercises.find((candidate) => candidate.exercise.id === activeExercise);
-      const row = progress.find((line) => line.key === entry?.exercise.attribute);
-      if (entry && row) {
-        rowSnapshotRef.current = {
-          progress: row.progress,
-          needed: row.needed,
-          value: row.value,
-          cost: entry.cost,
-          effort: entry.effort.progress,
-        };
-        resumableRef.current = !entry.maxed && entry.transformed;
-      }
+      if (entry) resumableRef.current = !entry.maxed && entry.transformed;
     }
   });
 
@@ -101,53 +69,49 @@ export function TrainingScreen() {
     if (!activeExercise) return;
     if (activeExercise === PET_EXERCISE_ID && petGone) return;
 
+    const key = "train:" + activeExercise;
+    // Resume the session from the banked beat; a fresh one starts at zero.
+    beatRef.current = progressRepository.get(key, TRAINING_TICKS);
+    setSession({ id: activeExercise, beat: beatRef.current });
     const timer = window.setInterval(() => {
       beatRef.current = beatRef.current >= TRAINING_TICKS ? 0 : beatRef.current + 1;
       setSession({ id: activeExercise, beat: beatRef.current });
 
-      if (beatRef.current === 1) {
-        paidRef.current = false;
-        landedRef.current = null;
-        setHeldRow({ id: activeExercise, ...rowSnapshotRef.current });
-        void trainRef.current(activeExercise).then((landed) => {
-          if (landed) {
-            paidRef.current = true;
-            landedRef.current = landed;
-            playSound("buy");
-            return;
-          }
-          beatRef.current = 0;
-          setSession({ id: activeExercise, beat: 0 });
-          setHeldRow(null);
-          setActivity(
-            autoRef.current && resumableRef.current
-              ? { kind: "train", id: activeExercise, paused: true }
-              : null,
-          );
-        });
-      } else if (beatRef.current > 1 && paidRef.current) {
+      // Beats before the last are the exercise in motion; nothing is charged yet,
+      // so stopping here costs no bronze and lands no point.
+      if (beatRef.current > 0 && beatRef.current < TRAINING_TICKS) {
         const effort = activeExercise === PET_EXERCISE_ID ? "growl" : activeExercise;
         if (isGameSound(effort)) playSound(effort);
+        return;
       }
-
       if (beatRef.current < TRAINING_TICKS) return;
-      setHeldRow(null);
-      const landed = landedRef.current;
-      landedRef.current = null;
-      if (landed) {
-        if (landed.message) notifyRef.current(landed.message, true, "Treino");
-        if (landed.raised) {
-          playSound(activeExercise === PET_EXERCISE_ID ? "pet-up" : "point");
+
+      // Last beat: the server charges the bronze and lands the progress in one call.
+      progressRepository.clear(key);
+      void trainRef.current(activeExercise).then((landed) => {
+        if (landed) {
+          if (landed.message) notifyRef.current(landed.message, true, "Treino");
+          if (landed.raised) {
+            playSound(activeExercise === PET_EXERCISE_ID ? "pet-up" : "point");
+          }
         }
-      }
-      if (!autoRef.current) {
+        if (landed && autoRef.current) return; // chain: let the interval wrap to a new lap
         beatRef.current = 0;
         setSession({ id: activeExercise, beat: 0 });
-        setActivity(null);
-      }
+        setActivity(
+          !landed && autoRef.current && resumableRef.current
+            ? { kind: "train", id: activeExercise, paused: true }
+            : null,
+        );
+      });
     }, TRAINING_TICK_MS);
 
-    return () => window.clearInterval(timer);
+    // Leaving mid-session banks the exact beat; a landed session reset the ref to
+    // zero, so this clears instead.
+    return () => {
+      window.clearInterval(timer);
+      progressRepository.set("train:" + activeExercise, beatRef.current);
+    };
   }, [activeExercise, petGone, setActivity]);
 
   if (!character || !stats) return null;
@@ -155,12 +119,8 @@ export function TrainingScreen() {
   const transformed = character.form === "werewolf";
 
   function toggleTraining(exerciseId: string, ready: boolean) {
-    beatRef.current = 0;
-    paidRef.current = false;
-    landedRef.current = null;
-    setSession({ id: exerciseId, beat: 0 });
-    setHeldRow(null);
-
+    // Stop: freeze at the exact beat; the effect cleanup banks it and the
+    // interrupted session lands nothing. Starting seeds the beat from the bank.
     if (activeExercise === exerciseId) {
       setActivity(null);
       return;
@@ -193,7 +153,7 @@ export function TrainingScreen() {
             const row = progress.find((entry) => entry.key === exercise.attribute);
             const ready = !maxed && affordable;
             const active = activeExercise === exercise.id;
-            const held = active && heldRow?.id === exercise.id ? heldRow : null;
+            const frozen = !active && session.id === exercise.id && session.beat > 0;
 
             return (
               <Card
@@ -211,11 +171,11 @@ export function TrainingScreen() {
                     </p>
                   </div>
                   <span className="shrink-0 font-mono text-sm text-ink">
-                    NV. {formatNumber(held?.value ?? row?.value ?? 0)}
+                    NV. {formatNumber(row?.value ?? 0)}
                     <span className="text-ink-faint">
                       {" / " + formatNumber(MAX_ATTRIBUTE_VALUE)}
                     </span>
-                    {(held?.value ?? row?.value ?? 0) >= MAX_ATTRIBUTE_VALUE ? (
+                    {(row?.value ?? 0) >= MAX_ATTRIBUTE_VALUE ? (
                       <span className="ml-1 text-[10px] text-ink-faint">teto</span>
                     ) : null}
                   </span>
@@ -227,21 +187,21 @@ export function TrainingScreen() {
 
                   <div className="flex flex-wrap gap-2">
                     <Tag>+{effort.progress} de progresso por treinamento</Tag>
-                    <Tag>Treino por {formatBronze(held?.cost ?? cost)}</Tag>
+                    <Tag>Treino por {formatBronze(cost)}</Tag>
                   </div>
 
                   {row ? (
                     <Bar
                       label="Progresso"
-                      current={held?.progress ?? row.progress}
-                      maximum={held?.needed ?? row.needed}
+                      current={row.progress}
+                      maximum={row.needed}
                       wraps
                       className="mt-auto"
                     />
                   ) : null}
 
                   <Bar
-                    label="Treinamento"
+                    label={frozen ? "Pausado" : "Treinamento"}
                     current={session.id === exercise.id ? session.beat : 0}
                     maximum={TRAINING_TICKS}
                     wraps
@@ -251,14 +211,14 @@ export function TrainingScreen() {
                 <CardFooter>
                   <span className="text-[11px] text-ink-faint">
                     {active
-                      ? session.id === exercise.id && session.beat <= 1
-                        ? "Cobrando..."
-                        : state.automation.train
-                          ? "Treinando sem parar..."
-                          : "Treinando..."
-                      : waitingExercise === exercise.id
-                        ? "Esperando bronze para continuar"
-                        : reason}
+                      ? state.automation.train
+                        ? "Treinando sem parar..."
+                        : "Treinando..."
+                      : frozen
+                        ? "Pausado, retoma de onde parou"
+                        : waitingExercise === exercise.id
+                          ? "Esperando bronze para continuar"
+                          : reason}
                   </span>
                   <BodyGate open={ready && !active} reason="Só a fera treina.">
                     <Button
@@ -289,14 +249,9 @@ export function TrainingScreen() {
                   </p>
                 </div>
                 <span className="shrink-0 font-mono text-sm text-ink">
-                  NV.{" "}
-                  {formatNumber(
-                    (petActive && heldRow?.id === PET_EXERCISE_ID ? heldRow.value : null) ??
-                      petTraining.level,
-                  )}
+                  NV. {formatNumber(petTraining.level)}
                   <span className="text-ink-faint">{" / " + formatNumber(PET_MAX_LEVEL)}</span>
-                  {((petActive && heldRow?.id === PET_EXERCISE_ID ? heldRow.value : null) ??
-                    petTraining.level) >= PET_MAX_LEVEL ? (
+                  {petTraining.level >= PET_MAX_LEVEL ? (
                     <span className="ml-1 text-[10px] text-ink-faint">teto</span>
                   ) : null}
                 </span>
@@ -309,37 +264,20 @@ export function TrainingScreen() {
                 </p>
 
                 <div className="flex flex-wrap gap-2">
-                  <Tag>
-                    +
-                    {(petActive && heldRow?.id === PET_EXERCISE_ID ? heldRow.effort : null) ??
-                      petTraining.effort.progress}{" "}
-                    de progresso por treinamento
-                  </Tag>
-                  <Tag>
-                    Treino por{" "}
-                    {formatBronze(
-                      (petActive && heldRow?.id === PET_EXERCISE_ID ? heldRow.cost : null) ??
-                        petTraining.cost,
-                    )}
-                  </Tag>
+                  <Tag>+{petTraining.effort.progress} de progresso por treinamento</Tag>
+                  <Tag>Treino por {formatBronze(petTraining.cost)}</Tag>
                 </div>
 
                 <Bar
                   label="Progresso"
-                  current={
-                    (petActive && heldRow?.id === PET_EXERCISE_ID ? heldRow.progress : null) ??
-                    petTraining.progress
-                  }
-                  maximum={
-                    (petActive && heldRow?.id === PET_EXERCISE_ID ? heldRow.needed : null) ??
-                    petTraining.needed
-                  }
+                  current={petTraining.progress}
+                  maximum={petTraining.needed}
                   wraps
                   className="mt-auto"
                 />
 
                 <Bar
-                  label="Treinamento"
+                  label={petFrozen ? "Pausado" : "Treinamento"}
                   current={session.id === PET_EXERCISE_ID ? session.beat : 0}
                   maximum={TRAINING_TICKS}
                   wraps
@@ -349,12 +287,12 @@ export function TrainingScreen() {
               <CardFooter>
                 <span className="text-[11px] text-ink-faint">
                   {petActive
-                    ? session.id === PET_EXERCISE_ID && session.beat <= 1
-                      ? "Cobrando..."
-                      : state.automation.train
-                        ? "Treinando sem parar..."
-                        : "Treinando..."
-                    : petTraining.reason}
+                    ? state.automation.train
+                      ? "Treinando sem parar..."
+                      : "Treinando..."
+                    : petFrozen
+                      ? "Pausado, retoma de onde parou"
+                      : petTraining.reason}
                 </span>
                 <BodyGate open={petReady && !petActive} reason="Só a fera treina.">
                   <Button

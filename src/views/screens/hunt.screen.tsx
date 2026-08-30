@@ -5,12 +5,13 @@ import { useGame } from "@/controllers/game.context";
 import { listTerritories, type HuntReport } from "@/controllers/hunt.controller";
 import { usePageActivity } from "@/controllers/use-page-activity";
 import { playSound } from "@/controllers/sound";
+import { progressRepository } from "@/models/repositories/progress.repository";
 import { petLevelOf, petMaxEnergy } from "@/models/rules/pet";
 import { emphasizeDamage, narrationOf, type NarrationLine } from "../presenters/hunt.presenter";
 import { SPECIES_LABEL } from "@/models/entities/creature";
 import { DANGER_LABEL } from "@/models/entities/territory";
 import { canPetFight, isPetActive } from "@/models/rules/pet";
-import { HUNT_TICK_MS, HUNT_TICKS } from "@/shared/constants/game";
+import { HUNT_APPROACH_TICKS, HUNT_TICK_MS, HUNT_TICKS } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
 import { formatNumber, formatBronze } from "@/shared/utils/format";
 import { ArtImage } from "../components/art-image";
@@ -160,22 +161,26 @@ export function HuntScreen() {
   const [report, setReport] = useState<HuntReport | null>(null);
   const [reportLines, setReportLines] = useState<NarrationLine[]>([]);
   const [session, setSession] = useState<HuntSession>(EMPTY_SESSION);
+  // `phase` is "approach" while the bar closes in (cancelable, banked, nothing
+  // committed) and "fight" once the server settled the hunt and it plays out live.
   const [progress, setProgress] = useState<{
     id: string;
     beat: number;
-  }>({ id: "", beat: 0 });
+    phase: "approach" | "fight";
+  }>({ id: "", beat: 0, phase: "approach" });
+  const [script, setScript] = useState<NarrationLine[]>([]);
+  const [pending, setPending] = useState<HuntReport | null>(null);
   const [preyJolt, setPreyJolt] = useState(0);
   const [lapJolt, setLapJolt] = useState(0);
   // A critical, given or received, shakes the whole fight card, not the bar.
   const shaking = useShake(preyJolt + lapJolt);
   const beatRef = useRef(0);
-  const [pending, setPending] = useState<HuntReport | null>(null);
+  const phaseRef = useRef<"approach" | "fight">("approach");
+  const scriptRef = useRef<NarrationLine[]>([]);
   const pendingRef = useRef<HuntReport | null>(null);
   const requestingRef = useRef(false);
   const bledRef = useRef({ last: 0, total: 0 });
   const territories = useMemo(() => listTerritories(state), [state]);
-  const [script, setScript] = useState<NarrationLine[]>([]);
-  const scriptRef = useRef<NarrationLine[]>([]);
   const autoRef = useRef(state.automation.hunt);
   const huntRef = useRef(hunt);
   const sufferRef = useRef(sufferBlow);
@@ -194,25 +199,30 @@ export function HuntScreen() {
   });
   useEffect(() => {
     if (!activeId) return;
+    const key = "hunt:" + activeId;
+    // The approach resumes from the bank; the fight phase never persists.
+    phaseRef.current = "approach";
+    scriptRef.current = [];
+    pendingRef.current = null;
+    beatRef.current = progressRepository.get(key, HUNT_APPROACH_TICKS);
+    setProgress({ id: activeId, beat: beatRef.current, phase: "approach" });
     const timer = window.setInterval(() => {
-      const told = scriptRef.current.length;
-      // The loot lands on the last told beat, the one the bar fills on, instead
-      // of holding an extra empty beat afterwards.
-      const lap = told > 0 ? told : HUNT_TICKS;
-      beatRef.current = beatRef.current >= lap ? 0 : beatRef.current + 1;
-      setProgress({ id: activeId, beat: beatRef.current });
-      if (beatRef.current === 1 && !pendingRef.current && !requestingRef.current) {
+      // Approach: the bar closes in, nothing is committed, and stopping cancels.
+      if (phaseRef.current === "approach") {
+        beatRef.current = Math.min(beatRef.current + 1, HUNT_APPROACH_TICKS);
+        setProgress({ id: activeId, beat: beatRef.current, phase: "approach" });
+        if (beatRef.current < HUNT_APPROACH_TICKS || requestingRef.current) return;
         requestingRef.current = true;
+        progressRepository.clear(key);
         void huntRef.current(activeId).then((fight) => {
           requestingRef.current = false;
           if (!fight) {
             beatRef.current = 0;
-            scriptRef.current = [];
-            setScript([]);
-            setProgress({ id: activeId, beat: 0 });
+            setProgress({ id: activeId, beat: 0, phase: "approach" });
             setActivity(autoRef.current ? { kind: "hunt", id: activeId, paused: true } : null);
             return;
           }
+          // The server settled and committed the fight; now play it out live.
           pendingRef.current = fight;
           bledRef.current = { last: stateRef.current.character?.health ?? 0, total: 0 };
           scriptRef.current = narrationOf(
@@ -220,14 +230,19 @@ export function HuntScreen() {
             HUNT_TICKS,
             nameRef.current,
           );
-          beatRef.current = Math.min(beatRef.current, 1);
           setScript(scriptRef.current);
           setPending(fight);
+          phaseRef.current = "fight";
+          beatRef.current = 0;
+          setProgress({ id: activeId, beat: 0, phase: "fight" });
         });
+        return;
       }
-      const line = pendingRef.current
-        ? scriptRef.current[Math.min(beatRef.current, scriptRef.current.length) - 1]
-        : null;
+      // Fight: play the settled hunt line by line, bleeding the body as it goes.
+      if (!pendingRef.current) return;
+      beatRef.current += 1;
+      setProgress({ id: activeId, beat: beatRef.current, phase: "fight" });
+      const line = scriptRef.current[Math.min(beatRef.current, scriptRef.current.length) - 1];
       if (line?.blow === "ours") playSound(line.critical ? "crit" : "hit");
       if (line?.blow === "pet") playSound("snap");
       if (line?.blow === "theirs") playSound("hurt");
@@ -235,17 +250,14 @@ export function HuntScreen() {
         if (line.blow === "theirs") setLapJolt((count) => count + 1);
         else setPreyJolt((count) => count + 1);
       }
-      if (pendingRef.current && line?.characterHealth !== undefined) {
+      if (line?.characterHealth !== undefined) {
         const delta = bledRef.current.last - line.characterHealth;
         if (delta > 0) {
           sufferRef.current(delta);
-          bledRef.current = {
-            last: line.characterHealth,
-            total: bledRef.current.total + delta,
-          };
+          bledRef.current = { last: line.characterHealth, total: bledRef.current.total + delta };
         }
       }
-      if (beatRef.current === scriptRef.current.length && pendingRef.current) {
+      if (beatRef.current >= scriptRef.current.length) {
         const held = pendingRef.current;
         pendingRef.current = null;
         setPending(null);
@@ -281,37 +293,35 @@ export function HuntScreen() {
             false,
             "Caça",
           );
+          playSound("defeat");
         }
-        if (!held.combat.victory && !held.combat.retreated) playSound("defeat");
-        if (!autoRef.current) {
-          beatRef.current = 0;
-          scriptRef.current = [];
-          setScript([]);
-          setProgress({ id: activeId, beat: 0 });
-          setActivity(null);
-        }
+        // Back to the approach for the next lap, or stop.
+        phaseRef.current = "approach";
+        scriptRef.current = [];
+        setScript([]);
+        beatRef.current = 0;
+        setProgress({ id: activeId, beat: 0, phase: "approach" });
+        if (!autoRef.current) setActivity(null);
       }
     }, HUNT_TICK_MS);
+    // Only the approach banks; a committed fight left mid-replay is landed, since
+    // the server already settled it.
     return () => {
       window.clearInterval(timer);
-      if (pendingRef.current) {
+      if (phaseRef.current === "approach") {
+        progressRepository.set("hunt:" + activeId, beatRef.current);
+      } else if (pendingRef.current) {
         pendingRef.current = null;
         setPending(null);
         landRef.current();
-        beatRef.current = 0;
-        scriptRef.current = [];
-        setScript([]);
-        setProgress((current) => ({ ...current, beat: 0 }));
       }
     };
   }, [activeId, setActivity]);
   if (!character) return null;
   const drops = Object.entries(session.drops);
   function toggleHunt(territoryId: string, available: boolean) {
-    beatRef.current = 0;
-    scriptRef.current = [];
-    setScript([]);
-    setProgress({ id: territoryId, beat: 0 });
+    // Stop: freeze at the exact beat; the effect cleanup banks it and the
+    // interrupted trail lands nothing. Starting seeds the beat from the bank.
     if (activeId === territoryId) {
       setActivity(null);
       return;
@@ -352,18 +362,18 @@ export function HuntScreen() {
             const ready = unlocked && hasHealth;
             const available = ready && transformed;
             const active = activeId === territory.id;
+            const onThis = progress.id === territory.id;
+            // Frozen only in the approach; the fight, once settled, is committed.
+            const frozen = !active && onThis && progress.beat > 0 && progress.phase === "approach";
+            const inFight = active && onThis && progress.phase === "fight";
             const line =
-              active && script.length > 0
-                ? script[
-                    (progress.beat === 0 ? script.length : Math.min(progress.beat, script.length)) -
-                      1
-                  ]
+              inFight && script.length > 0
+                ? script[Math.min(Math.max(1, progress.beat), script.length) - 1]
                 : null;
             const foe = pending ?? report;
-            const shownPrey = line && foe ? foe.creature : prey;
-            const shownHealth =
-              line && foe ? line.creatureHealth : unlocked ? (prey?.health ?? 0) : 0;
-            const fightingId = line && foe ? foe.creature.id : null;
+            const shownPrey = line && foe ? foe.creature : unlocked ? (prey ?? null) : null;
+            const shownHealth = line && foe ? line.creatureHealth : (shownPrey?.health ?? 0);
+            const fightingId = line && foe ? foe.creature.id : (prey?.id ?? null);
             return (
               <Card
                 key={territory.id}
@@ -450,20 +460,9 @@ export function HuntScreen() {
 
                   <div className="px-4 py-3">
                     <Bar
-                      label="Caçada"
-                      current={
-                        progress.id === territory.id
-                          ? Math.min(
-                              Math.max(0, progress.beat - 1),
-                              (script.length || HUNT_TICKS) - 1,
-                            )
-                          : 0
-                      }
-                      maximum={
-                        progress.id === territory.id
-                          ? (script.length || HUNT_TICKS) - 1
-                          : HUNT_TICKS - 1
-                      }
+                      label={frozen ? "Pausado" : inFight ? "Caçada" : "Caçando..."}
+                      current={onThis ? progress.beat : 0}
+                      maximum={inFight ? Math.max(1, script.length) : HUNT_APPROACH_TICKS}
                       wraps
                     />
                   </div>
@@ -510,9 +509,11 @@ export function HuntScreen() {
                         : state.automation.hunt
                           ? "Caçando sem parar..."
                           : "Caçando..."
-                      : waitingId === territory.id
-                        ? "Esperando o corpo para voltar a caçar"
-                        : (reason ?? "Trilha liberada")}
+                      : frozen
+                        ? "Pausado, retoma de onde parou"
+                        : waitingId === territory.id
+                          ? "Esperando o corpo para voltar a caçar"
+                          : (reason ?? "Trilha liberada")}
                   </span>
                   {ready && !transformed && !active ? (
                     <Button variant="primary" onClick={toggleForm}>

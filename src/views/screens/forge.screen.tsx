@@ -2,9 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useGame } from "@/controllers/game.context";
-import { listForge, listMining, type ForgePiece } from "@/controllers/forge.controller";
+import { listForge, listMining } from "@/controllers/forge.controller";
 import { usePageActivity } from "@/controllers/use-page-activity";
 import { playSound } from "@/controllers/sound";
+import { progressRepository } from "@/models/repositories/progress.repository";
 import type { Activity } from "@/models/entities/activity";
 import { enhancedName, forgeDurationMs } from "@/models/rules/forge";
 import {
@@ -78,9 +79,6 @@ export function ForgeScreen() {
 
   const [strike, setStrike] = useState<{ id: string; beat: number }>({ id: "", beat: 0 });
   const strikeRef = useRef(0);
-  const paidRef = useRef(false);
-  const landedRef = useRef<{ message: string; raised: boolean } | null>(null);
-  const [heldPiece, setHeldPiece] = useState<ForgePiece | null>(null);
   // A switch between the pick and the anvil waits for the running cycle to land
   // before it takes over, so a charged lap is never thrown away. The click is
   // held here and applied at the next landing.
@@ -92,67 +90,57 @@ export function ForgeScreen() {
   useEffect(() => {
     if (!activeItem) return;
 
-    strikeRef.current = 0;
+    const key = "forge:" + activeItem;
+    // Resume from the banked beat: a paused anvil picks up where it froze, and a
+    // fresh one starts at zero.
+    strikeRef.current = progressRepository.get(key, FORGE_TICKS);
+    setStrike({ id: activeItem, beat: strikeRef.current });
     const level = slotsRef.current.find((entry) => entry.item.id === activeItem)?.level ?? 0;
     const tickMs = forgeDurationMs(level) / FORGE_TICKS;
     const timer = window.setInterval(() => {
       strikeRef.current = strikeRef.current >= FORGE_TICKS ? 0 : strikeRef.current + 1;
       setStrike({ id: activeItem, beat: strikeRef.current });
 
-      if (strikeRef.current === 1) {
-        paidRef.current = false;
-        landedRef.current = null;
-        setHeldPiece(slotsRef.current.find((entry) => entry.item.id === activeItem) ?? null);
-        void enhanceRef.current(activeItem).then((landed) => {
-          if (landed) {
-            paidRef.current = true;
-            landedRef.current = landed;
-            playSound("buy");
-            return;
-          }
-          strikeRef.current = 0;
-          setStrike({ id: activeItem, beat: 0 });
-          setHeldPiece(null);
-          if (pendingRef.current) {
-            const next = pendingRef.current;
-            pendingRef.current = null;
-            setPending(null);
-            setActivity(next);
-            return;
-          }
-          setActivity(
-            autoRef.current.forge ? { kind: "forge", id: activeItem, paused: true } : null,
-          );
-        });
-      } else if (strikeRef.current > 1 && strikeRef.current < FORGE_TICKS && paidRef.current) {
+      // Every beat before the last is the hammer swinging and nothing is charged
+      // yet, so stopping here spends nothing and lands nothing.
+      if (strikeRef.current > 0 && strikeRef.current < FORGE_TICKS) {
         playSound("forge");
-      }
-
-      if (strikeRef.current < FORGE_TICKS) return;
-      setHeldPiece(null);
-      const landed = landedRef.current;
-      landedRef.current = null;
-      if (landed) {
-        if (landed.message) notifyRef.current(landed.message, true, "Bigorna");
-        playSound(landed.raised ? "point" : "denied");
-      }
-      if (pendingRef.current) {
-        const next = pendingRef.current;
-        pendingRef.current = null;
-        setPending(null);
-        strikeRef.current = 0;
-        setStrike({ id: activeItem, beat: 0 });
-        setActivity(next);
         return;
       }
-      if (!autoRef.current.forge) {
+      if (strikeRef.current < FORGE_TICKS) return;
+
+      // Last beat: the server charges the fragments and bronze, rolls the dice and
+      // lands the level in one call. The lap is done, so its banked position clears.
+      progressRepository.clear(key);
+      void enhanceRef.current(activeItem).then((landed) => {
+        if (landed) {
+          if (landed.message) notifyRef.current(landed.message, true, "Bigorna");
+          playSound(landed.raised ? "point" : "denied");
+        }
+        if (pendingRef.current) {
+          const next = pendingRef.current;
+          pendingRef.current = null;
+          setPending(null);
+          strikeRef.current = 0;
+          setStrike({ id: activeItem, beat: 0 });
+          setActivity(next);
+          return;
+        }
+        if (landed && autoRef.current.forge) return; // chain: let the interval wrap to a new lap
         strikeRef.current = 0;
         setStrike({ id: activeItem, beat: 0 });
-        setActivity(null);
-      }
+        setActivity(
+          !landed && autoRef.current.forge ? { kind: "forge", id: activeItem, paused: true } : null,
+        );
+      });
     }, tickMs);
 
-    return () => window.clearInterval(timer);
+    // Leaving mid-lap banks the exact beat so the anvil resumes there; a lap that
+    // already landed reset the ref to zero, so this clears instead.
+    return () => {
+      window.clearInterval(timer);
+      progressRepository.set("forge:" + activeItem, strikeRef.current);
+    };
   }, [activeItem, setActivity]);
 
   const [swing, setSwing] = useState<{ id: string; beat: number }>({ id: "", beat: 0 });
@@ -161,7 +149,10 @@ export function ForgeScreen() {
   useEffect(() => {
     if (!activeOre) return;
 
-    swingRef.current = 0;
+    const key = "mine:" + activeOre;
+    // Resume the pick from where it froze; a fresh vein starts at zero.
+    swingRef.current = progressRepository.get(key, MINING_TICKS);
+    setSwing({ id: activeOre, beat: swingRef.current });
     const timer = window.setInterval(() => {
       swingRef.current = swingRef.current >= MINING_TICKS ? 0 : swingRef.current + 1;
       setSwing({ id: activeOre, beat: swingRef.current });
@@ -169,6 +160,9 @@ export function ForgeScreen() {
       if (swingRef.current > 0) playSound("mine");
 
       if (swingRef.current < MINING_TICKS) return;
+      // Last beat: the swing lands on the server, which charges the daily quota and
+      // hands out the fragments. Stopping earlier spends nothing and yields nothing.
+      progressRepository.clear(key);
       void mineRef.current(activeOre).then((mined) => {
         if (!mined) {
           swingRef.current = 0;
@@ -200,7 +194,12 @@ export function ForgeScreen() {
       });
     }, MINING_TICK_MS);
 
-    return () => window.clearInterval(timer);
+    // Leaving mid-swing banks the exact beat; a landed swing reset the ref to zero,
+    // so this clears instead.
+    return () => {
+      window.clearInterval(timer);
+      progressRepository.set("mine:" + activeOre, swingRef.current);
+    };
   }, [activeOre, setActivity]);
 
   if (!character) return null;
@@ -215,11 +214,11 @@ export function ForgeScreen() {
   }
 
   function toggleMining(oreId: string, available: boolean) {
-    // Already mining this vein: stop, dropping any queued switch.
+    // Already mining this vein: stop, dropping any queued switch. The bar freezes
+    // at the exact beat and the effect cleanup banks it, so resuming picks up here
+    // instead of restarting, and the interrupted swing lands nothing.
     if (activeOre === oreId) {
       queueSwitch(null);
-      swingRef.current = 0;
-      setSwing({ id: oreId, beat: 0 });
       setActivity(null);
       return;
     }
@@ -335,7 +334,7 @@ export function ForgeScreen() {
                   {active || (swing.id === ore.id && swing.beat > 0) ? (
                     <div className="pt-2">
                       <Bar
-                        label="Minerando..."
+                        label={active ? "Minerando..." : "Pausado"}
                         current={swing.beat}
                         maximum={MINING_TICKS}
                         wraps
@@ -367,8 +366,7 @@ export function ForgeScreen() {
               </ListRow>
             ) : (
               slots.map((row) => {
-                const entry =
-                  activeItem === row.item.id && heldPiece?.item.id === row.item.id ? heldPiece : row;
+                const entry = row;
                 const maxed = entry.level >= MAX_ENHANCEMENT;
                 const queuedForge = pending?.kind === "forge" && pending.id === row.item.id;
 
@@ -420,7 +418,7 @@ export function ForgeScreen() {
                       <div className="space-y-1 pt-2">
                         {activeItem === row.item.id && strike.id === row.item.id ? (
                           <Bar
-                            label={strike.beat === 1 ? "Cobrando..." : "Forjando..."}
+                            label="Forjando..."
                             current={strike.beat}
                             maximum={FORGE_TICKS}
                             wraps
@@ -469,11 +467,7 @@ export function ForgeScreen() {
             if (activeOre !== null || activeItem !== null) {
               queueSwitch(next);
             } else {
-              strikeRef.current = 0;
-              paidRef.current = false;
-              landedRef.current = null;
-              setStrike({ id: confirming.item.id, beat: 0 });
-              setHeldPiece(null);
+              // The effect seeds the beat from the bank on mount, so just start it.
               setActivity(next);
             }
           }
