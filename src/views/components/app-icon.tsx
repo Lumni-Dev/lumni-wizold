@@ -21,6 +21,7 @@ import {
   Settings,
   Shield,
   ShoppingBag,
+  Smile,
   Store,
   Swords,
   Trash2,
@@ -83,6 +84,7 @@ const ACTION_ICONS = {
   mail: Mail,
   copy: Copy,
   check: Check,
+  smile: Smile,
 } as const;
 
 export type AppAction = keyof typeof ACTION_ICONS;

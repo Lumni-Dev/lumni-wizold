@@ -719,7 +719,7 @@ export function TavernScreen() {
             </div>
             <div className="relative shrink-0" ref={emojiRef}>
               {emojiOpen ? (
-                <div className="absolute bottom-full right-0 z-20 mb-2 grid grid-cols-4 gap-1 rounded-md border border-edge bg-surface p-2 shadow-[0_18px_40px_-12px_rgba(0,0,0,0.9)]">
+                <div className="absolute bottom-full right-0 z-30 mb-2 grid grid-cols-4 gap-1 rounded-md border border-edge-strong bg-surface p-2 shadow-[0_18px_40px_-12px_rgba(0,0,0,0.9)]">
                   {["😂", "❤️", "👍", "😮", "😢", "🔥", "🎉", "🍺"].map((emoji) => (
                     <button
                       key={emoji}
@@ -744,9 +744,9 @@ export function TavernScreen() {
                 aria-label="Emojis"
                 aria-expanded={emojiOpen}
                 onClick={() => setEmojiOpen((open) => !open)}
-                className="grid h-8 w-8 place-items-center rounded-md border border-edge text-lg hover:bg-surface-high"
+                className="grid h-8 w-8 place-items-center rounded-md border border-edge text-ink-faint transition-colors hover:border-edge-strong hover:bg-surface-high hover:text-ink"
               >
-                🙂
+                <ActionIcon action="smile" className="h-4 w-4" />
               </button>
             </div>
             <Button

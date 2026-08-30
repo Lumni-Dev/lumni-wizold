@@ -5,7 +5,7 @@
 // one build they always agree; across a deploy the old bundle differs from the
 // new server, which is exactly the staleness signal. Bump on a real release, not
 // on every commit.
-export const GAME_VERSION = "1.4.3";
+export const GAME_VERSION = "1.4.4";
 
 // How often an open tab asks the server for its current version. One minute is
 // frequent enough to reach players soon after a deploy without polling noise.

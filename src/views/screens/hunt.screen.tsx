@@ -14,6 +14,7 @@ import { cn } from "@/shared/utils/class-names";
 import { formatNumber } from "@/shared/utils/format";
 import { ArtImage } from "../components/art-image";
 import { IconArt } from "../components/icon-frame";
+import { CornerAccents } from "../components/corner-accents";
 import {
   loadHuntSelection,
   saveHuntSelection,
@@ -46,7 +47,7 @@ interface HuntSession {
 // Creature art rides a version query, like the manifest's ?v: /assets is cached a
 // year and immutable, so a URL 404-ed before its .png existed stays 404 in cache.
 // Bump this whenever new creature art lands so every drawing is re-fetched clean.
-const CREATURE_ART_VERSION = "?v=1";
+const CREATURE_ART_VERSION = "?v=2";
 
 const EMPTY_SESSION: HuntSession = {
   hunts: 0,
@@ -495,12 +496,22 @@ export function HuntScreen() {
                                 isSelected ? "bg-surface-high" : "hover:bg-surface-high/60",
                               )}
                             >
-                              <span className="slot-well relative flex h-18 w-18 shrink-0 items-center justify-center overflow-hidden rounded-md border border-edge bg-base">
-                                {creature.image ? (
-                                  <IconArt source={creature.image + CREATURE_ART_VERSION} />
-                                ) : (
-                                  <span className="font-mono text-xs text-ink-faint">?</span>
-                                )}
+                              {/* Exactly the equipment icon (IconFrame medium): slot-well
+                                  gradient, edge border, ember corner accents and the art
+                                  cover-fit with the same 5px inset, only without the m-3
+                                  margin so the list row stays aligned. */}
+                              <span
+                                aria-hidden="true"
+                                className="relative flex h-18 w-18 shrink-0"
+                              >
+                                <span className="slot-well relative flex h-full w-full items-center justify-center overflow-hidden rounded-md border border-edge bg-base font-mono text-lg text-ink-faint">
+                                  {creature.image ? (
+                                    <IconArt source={creature.image + CREATURE_ART_VERSION} />
+                                  ) : (
+                                    "?"
+                                  )}
+                                </span>
+                                <CornerAccents scale="icon" />
                               </span>
                               <span className="min-w-0 flex-1">
                                 <span
