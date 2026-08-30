@@ -22,7 +22,7 @@ import {
   miningExhausted,
   miningNeeded,
   miningRemaining,
-  miningResetsAtMs,
+  miningResetsInMs,
   miningYieldBonus,
   rolloverMining,
 } from "@/models/rules/mining";
@@ -78,7 +78,7 @@ export function listMining(state: GameState, now: number = Date.now()): MiningVi
     dailyRemaining,
     dailyLimit: MINING_DAILY_MININGS,
     dailyExhausted,
-    dailyResetsInMs: Math.max(0, miningResetsAtMs(mining, now) - now),
+    dailyResetsInMs: miningResetsInMs(now),
   };
 }
 
@@ -99,8 +99,10 @@ export function mine(
 
   const rolled = rolloverMining(state.mining, now);
   if (rolled.count >= MINING_DAILY_MININGS) {
-    const wait = miningResetsAtMs(rolled, now) - now;
-    return failure(state, "Você já minerou o limite de hoje. A veia reabre em " + formatCooldown(wait) + ".");
+    return failure(
+      state,
+      "Você já minerou o limite de hoje. A veia reabre em " + formatCooldown(miningResetsInMs(now)) + ".",
+    );
   }
 
   const yielded = intBetween(ore.minYield, ore.maxYield, random) * miningYieldBonus(rolled.level);

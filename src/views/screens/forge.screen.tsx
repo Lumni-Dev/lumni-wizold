@@ -10,10 +10,11 @@ import { enhancedName, forgeDurationMs } from "@/models/rules/forge";
 import {
   FORGE_TICKS,
   MAX_ENHANCEMENT,
+  MINING_RESET_HOUR,
   MINING_TICK_MS,
   MINING_TICKS,
 } from "@/shared/constants/game";
-import { formatBronze, formatCooldown, formatNumber } from "@/shared/utils/format";
+import { formatBronze, formatNumber } from "@/shared/utils/format";
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
 import { ConfirmDialog } from "../components/confirm-dialog";
@@ -24,6 +25,17 @@ import { Panel } from "../components/panel";
 import { Tag } from "../components/tag";
 import { PageHeader } from "../layout/page-header";
 
+// A live countdown to the daily reset, in hours and minutes: "3h 24min", "24min".
+function formatCountdown(ms: number): string {
+  const totalMinutes = Math.max(0, Math.ceil(ms / 60000));
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  if (hours > 0) return minutes > 0 ? hours + "h " + minutes + "min" : hours + "h";
+  return minutes + "min";
+}
+
+const RESET_LABEL = String(MINING_RESET_HOUR).padStart(2, "0") + ":00";
+
 export function ForgeScreen() {
   const { state, character, mine, enhance, activity, setActivity, notify } = useGame();
   usePageActivity(["mine", "forge"]);
@@ -33,7 +45,21 @@ export function ForgeScreen() {
   const waitingOre = activity?.kind === "mine" && paused ? (activity.id ?? null) : null;
   const waitingSlot = activity?.kind === "forge" && paused ? (activity.id ?? null) : null;
 
-  const mining = useMemo(() => listMining(state), [state]);
+  // A clock that ticks so the reset countdown stays live and the 06:00 refill
+  // lands on screen on its own. Starts at 0 and lets listMining fall back to its
+  // own Date.now() until the first tick, keeping Date.now() out of render.
+  const [now, setNow] = useState(0);
+  useEffect(() => {
+    const tick = () => setNow(Date.now());
+    const first = window.setTimeout(tick, 0);
+    const timer = window.setInterval(tick, 30_000);
+    return () => {
+      window.clearTimeout(first);
+      window.clearInterval(timer);
+    };
+  }, []);
+
+  const mining = useMemo(() => listMining(state, now || undefined), [state, now]);
   const slots = useMemo(() => listForge(state), [state]);
   const miningResetLeft = mining.dailyResetsInMs;
 
@@ -194,13 +220,16 @@ export function ForgeScreen() {
                 current={mining.dailyRemaining}
                 maximum={mining.dailyLimit}
               />
+              <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                {"Reseta às " + RESET_LABEL + ", faltam " + formatCountdown(miningResetLeft)}
+              </p>
             </ListRow>
             {mining.ores.map(({ ore, fragment, owned, unlocked, reason }) => {
               const active = activeOre === ore.id;
               const available = unlocked && !mining.dailyExhausted;
               const limitReason =
                 unlocked && mining.dailyExhausted
-                  ? "Limite de hoje atingido. Reabre em " + formatCooldown(miningResetLeft)
+                  ? "Limite de hoje atingido. Reabre em " + formatCountdown(miningResetLeft)
                   : reason;
 
               return (

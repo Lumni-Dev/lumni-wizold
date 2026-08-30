@@ -1155,8 +1155,9 @@ sec("forja e mina");
     bonusSwing.ok &&
       inventoryCtrl.countInInventory(bonusSwing.state.inventory, "bronze-fragment") % bonus === 0,
   );
-  // Cota diária: um número de minerações por dia, contando a colheita.
-  const noon = 1_700_000_000_000; // instante fixo, para a matemática da janela ser determinística
+  // Cota diária: um número de minerações por dia, zerando às 06:00 de São Paulo.
+  const noon = 1_700_000_000_000; // instante fixo, para a matemática do dia ser determinística
+  const period = miningRules.miningPeriodStart(noon);
   const fresh = { ...baseState({ level: 1 }), mining: { level: 1, progress: 0, count: 0 } };
   const firstSwing = forgeCtrl.mine(fresh, "bronze-vein", seededRandom(1), noon);
   ok(
@@ -1164,15 +1165,20 @@ sec("forja e mina");
     firstSwing.ok && firstSwing.state.mining.count === 1,
   );
   ok(
-    "a primeira mineração abre a janela do dia",
-    firstSwing.ok && typeof firstSwing.state.mining.windowStart === "string",
+    "o reset é o mesmo instante para todos: 09:00 UTC (06:00 São Paulo)",
+    new Date(period).getUTCHours() === CONST.MINING_RESET_HOUR_UTC && noon - period < 24 * 60 * 60 * 1000,
+  );
+  ok(
+    "o próximo reset cai dentro de um dia",
+    miningRules.miningResetsInMs(noon) > 0 &&
+      miningRules.miningResetsInMs(noon) <= 24 * 60 * 60 * 1000,
   );
   const spent = {
     ...fresh,
     mining: {
       level: 1,
       progress: 0,
-      windowStart: new Date(noon - 60_000).toISOString(),
+      windowStart: new Date(period).toISOString(),
       count: CONST.MINING_DAILY_MININGS,
     },
   };
@@ -1180,16 +1186,13 @@ sec("forja e mina");
     "gasta a cota do dia, a veia recusa",
     forgeCtrl.mine(spent, "bronze-vein", seededRandom(2), noon).ok === false,
   );
-  const nextDay = {
+  const yesterday = {
     ...spent,
-    mining: {
-      ...spent.mining,
-      windowStart: new Date(noon - CONST.MINING_DAILY_WINDOW_MS - 1000).toISOString(),
-    },
+    mining: { ...spent.mining, windowStart: new Date(period - 1000).toISOString() },
   };
-  const reopened = forgeCtrl.mine(nextDay, "bronze-vein", seededRandom(3), noon);
+  const reopened = forgeCtrl.mine(yesterday, "bronze-vein", seededRandom(3), noon);
   ok(
-    "passado um dia, a janela reabre com a cota zerada",
+    "passadas as 06:00, o período novo zera a cota",
     reopened.ok && reopened.state.mining.count === 1,
   );
   const preserved = miningRules.applyMiningProgress(
@@ -1197,7 +1200,7 @@ sec("forja e mina");
     10,
   );
   ok(
-    "o progresso preserva a janela e a cota do dia",
+    "o progresso preserva o período e a cota do dia",
     preserved.mining.count === 42 &&
       preserved.mining.windowStart === "2020-01-01T00:00:00.000Z",
   );

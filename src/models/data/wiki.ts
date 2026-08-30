@@ -253,7 +253,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         " segundos: um clique vale um rendimento, e com a mineração automática ligada ela repete até você mandar parar.",
       "A picareta tem cota: " +
         MINING_DAILY_MININGS +
-        " minerações por dia, contando a colheita e não cada batida. Esgotada, a veia reabre um dia depois da primeira mineração.",
+        " minerações por dia, contando a colheita e não cada batida. A cota zera às 06:00 de São Paulo, o mesmo horário para todo mundo.",
       ...oreLines(),
       "Mineração começa em 1 e para em " +
         MINING_MAX_LEVEL +

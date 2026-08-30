@@ -60,11 +60,13 @@ export const MINING_TICK_MS = 1000;
 export const MINING_TICKS = 5;
 export const MINING_CYCLE_MS = MINING_TICK_MS * (MINING_TICKS + 1);
 // The mine gives out only so many pulls each day: a fixed count of completed
-// minings (a landed fragment yield, not each swing of the pick), and the count
-// refills a full day after the first one. Anchoring the window at the first
-// mining keeps a miner from doubling it across midnight.
-export const MINING_DAILY_MININGS = 500;
-export const MINING_DAILY_WINDOW_MS = 24 * 60 * 60 * 1000;
+// minings (a landed fragment yield, not each swing of the pick). The count is
+// the same for everyone and refills at 06:00 America/Sao_Paulo, the game's one
+// timezone, which holds UTC-3 year-round (no DST since 2019), so the daily
+// boundary is 09:00 UTC.
+export const MINING_DAILY_MININGS = 100;
+export const MINING_RESET_HOUR = 6;
+export const MINING_RESET_HOUR_UTC = 9;
 export const FORGE_TICKS = 5;
 export const FORGE_BASE_MS = 5000;
 export const FORGE_MS_PER_LEVEL = 10;
