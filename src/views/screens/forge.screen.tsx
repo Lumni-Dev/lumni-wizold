@@ -5,6 +5,7 @@ import { useGame } from "@/controllers/game.context";
 import { listForge, listMining, type ForgeSlot } from "@/controllers/forge.controller";
 import { usePageActivity } from "@/controllers/use-page-activity";
 import { playSound } from "@/controllers/sound";
+import type { Activity } from "@/models/entities/activity";
 import { SLOT_LABEL, type EquipmentSlot } from "@/models/entities/item";
 import { enhancedName, forgeDurationMs } from "@/models/rules/forge";
 import {
@@ -81,12 +82,18 @@ export function ForgeScreen() {
   const paidRef = useRef(false);
   const landedRef = useRef<{ message: string; raised: boolean } | null>(null);
   const [heldSlot, setHeldSlot] = useState<ForgeSlot | null>(null);
+  // A switch between the pick and the anvil waits for the running cycle to land
+  // before it takes over, so a charged lap is never thrown away. The click is
+  // held here and applied at the next landing.
+  const [pending, setPending] = useState<Activity | null>(null);
+  const pendingRef = useRef<Activity | null>(null);
 
   const [confirmingSlot, setConfirmingSlot] = useState<EquipmentSlot | null>(null);
 
   useEffect(() => {
     if (!activeSlot) return;
 
+    strikeRef.current = 0;
     const level = slotsRef.current.find((entry) => entry.slot === activeSlot)?.level ?? 0;
     const tickMs = forgeDurationMs(level) / FORGE_TICKS;
     const timer = window.setInterval(() => {
@@ -107,6 +114,13 @@ export function ForgeScreen() {
           strikeRef.current = 0;
           setStrike({ id: activeSlot, beat: 0 });
           setHeldSlot(null);
+          if (pendingRef.current) {
+            const next = pendingRef.current;
+            pendingRef.current = null;
+            setPending(null);
+            setActivity(next);
+            return;
+          }
           setActivity(
             autoRef.current.forge ? { kind: "forge", id: activeSlot, paused: true } : null,
           );
@@ -122,6 +136,15 @@ export function ForgeScreen() {
       if (landed) {
         if (landed.message) notifyRef.current(landed.message, true, "Bigorna");
         playSound(landed.raised ? "point" : "denied");
+      }
+      if (pendingRef.current) {
+        const next = pendingRef.current;
+        pendingRef.current = null;
+        setPending(null);
+        strikeRef.current = 0;
+        setStrike({ id: activeSlot, beat: 0 });
+        setActivity(next);
+        return;
       }
       if (!autoRef.current.forge) {
         strikeRef.current = 0;
@@ -139,6 +162,7 @@ export function ForgeScreen() {
   useEffect(() => {
     if (!activeOre) return;
 
+    swingRef.current = 0;
     const timer = window.setInterval(() => {
       swingRef.current = swingRef.current >= MINING_TICKS ? 0 : swingRef.current + 1;
       setSwing({ id: activeOre, beat: swingRef.current });
@@ -150,7 +174,23 @@ export function ForgeScreen() {
         if (!mined) {
           swingRef.current = 0;
           setSwing({ id: activeOre, beat: 0 });
+          if (pendingRef.current) {
+            const next = pendingRef.current;
+            pendingRef.current = null;
+            setPending(null);
+            setActivity(next);
+            return;
+          }
           setActivity(autoRef.current.mine ? { kind: "mine", id: activeOre, paused: true } : null);
+          return;
+        }
+        if (pendingRef.current) {
+          const next = pendingRef.current;
+          pendingRef.current = null;
+          setPending(null);
+          swingRef.current = 0;
+          setSwing({ id: activeOre, beat: 0 });
+          setActivity(next);
           return;
         }
         if (!autoRef.current.mine) {
@@ -170,17 +210,37 @@ export function ForgeScreen() {
     ? (slots.find((entry) => entry.slot === confirmingSlot) ?? null)
     : null;
 
-  function toggleMining(oreId: string, available: boolean) {
-    swingRef.current = 0;
-    setSwing({ id: oreId, beat: 0 });
+  function queueSwitch(next: Activity | null) {
+    pendingRef.current = next;
+    setPending(next);
+  }
 
+  function toggleMining(oreId: string, available: boolean) {
+    // Already mining this vein: stop, dropping any queued switch.
     if (activeOre === oreId) {
+      queueSwitch(null);
+      swingRef.current = 0;
+      setSwing({ id: oreId, beat: 0 });
       setActivity(null);
+      return;
+    }
+    // This vein is already queued: cancel it, the running cycle keeps going.
+    if (pending?.kind === "mine" && pending.id === oreId) {
+      queueSwitch(null);
       return;
     }
     if (!available) return;
 
-    setActivity({ kind: "mine", id: oreId });
+    const next: Activity = { kind: "mine", id: oreId };
+    // Busy at the anvil or another vein: wait for the running cycle to land.
+    if (activeOre !== null || activeSlot !== null) {
+      queueSwitch(next);
+      return;
+    }
+    // Idle: start now.
+    swingRef.current = 0;
+    setSwing({ id: oreId, beat: 0 });
+    setActivity(next);
   }
 
   return (
@@ -226,6 +286,7 @@ export function ForgeScreen() {
             </ListRow>
             {mining.ores.map(({ ore, fragment, owned, unlocked, reason }) => {
               const active = activeOre === ore.id;
+              const queuedMine = pending?.kind === "mine" && pending.id === ore.id;
               const available = unlocked && !mining.dailyExhausted;
               const limitReason =
                 unlocked && mining.dailyExhausted
@@ -243,10 +304,12 @@ export function ForgeScreen() {
                           ? state.automation.mine
                             ? "Minerando sem parar..."
                             : "Minerando..."
-                          : waitingOre === ore.id
-                            ? "Esperando para bater de novo"
-                            : (limitReason ??
-                              "+" + formatNumber(ore.progress) + " de progresso por batida")
+                          : queuedMine
+                            ? "Na fila, começa quando o ciclo atual acabar"
+                            : waitingOre === ore.id
+                              ? "Esperando para bater de novo"
+                              : (limitReason ??
+                                "+" + formatNumber(ore.progress) + " de progresso por batida")
                       }
                     />
                     <div className="flex shrink-0 items-center gap-3">
@@ -254,12 +317,18 @@ export function ForgeScreen() {
                         x{formatNumber(owned)}
                       </span>
                       <Button
-                        variant={active ? "secondary" : available ? "primary" : "outline"}
-                        disabled={!available && !active}
+                        variant={active || queuedMine ? "secondary" : available ? "primary" : "outline"}
+                        disabled={!available && !active && !queuedMine}
                         onClick={() => toggleMining(ore.id, available)}
-                        aria-label={(active ? "Parar de minerar " : "Minerar ") + ore.label}
+                        aria-label={
+                          (queuedMine
+                            ? "Cancelar fila de "
+                            : active
+                              ? "Parar de minerar "
+                              : "Minerar ") + ore.label
+                        }
                       >
-                        {active ? "Parar" : "Minerar"}
+                        {queuedMine ? "Na fila" : active ? "Parar" : "Minerar"}
                       </Button>
                     </div>
                   </div>
@@ -293,6 +362,7 @@ export function ForgeScreen() {
             {slots.map((row) => {
               const entry = activeSlot === row.slot && heldSlot?.slot === row.slot ? heldSlot : row;
               const maxed = entry.level >= MAX_ENHANCEMENT;
+              const queuedForge = pending?.kind === "forge" && pending.id === row.slot;
 
               return (
                 <ListRow key={entry.slot} layout="column" padding="art">
@@ -327,12 +397,17 @@ export function ForgeScreen() {
                       <RowText title="Nada equipado" description={SLOT_LABEL[entry.slot]} />
                     )}
                     <Button
-                      variant={entry.canForge ? "primary" : "outline"}
-                      disabled={!entry.canForge || activeSlot !== null}
-                      onClick={() => setConfirmingSlot(entry.slot)}
-                      aria-label={"Forjar " + SLOT_LABEL[entry.slot]}
+                      variant={queuedForge ? "secondary" : entry.canForge ? "primary" : "outline"}
+                      disabled={queuedForge ? false : !entry.canForge || activeSlot !== null}
+                      onClick={() =>
+                        queuedForge ? queueSwitch(null) : setConfirmingSlot(entry.slot)
+                      }
+                      aria-label={
+                        (queuedForge ? "Cancelar fila de forja de " : "Forjar ") +
+                        SLOT_LABEL[entry.slot]
+                      }
                     >
-                      {activeSlot === entry.slot ? "Forjando..." : "Forjar"}
+                      {queuedForge ? "Na fila" : activeSlot === entry.slot ? "Forjando..." : "Forjar"}
                     </Button>
                   </div>
 
@@ -385,12 +460,18 @@ export function ForgeScreen() {
         onCancel={() => setConfirmingSlot(null)}
         onConfirm={() => {
           if (confirming) {
-            strikeRef.current = 0;
-            paidRef.current = false;
-            landedRef.current = null;
-            setStrike({ id: confirming.slot, beat: 0 });
-            setHeldSlot(null);
-            setActivity({ kind: "forge", id: confirming.slot });
+            const next: Activity = { kind: "forge", id: confirming.slot };
+            // Busy at the pick: wait for the running swing to land, then forge.
+            if (activeOre !== null || activeSlot !== null) {
+              queueSwitch(next);
+            } else {
+              strikeRef.current = 0;
+              paidRef.current = false;
+              landedRef.current = null;
+              setStrike({ id: confirming.slot, beat: 0 });
+              setHeldSlot(null);
+              setActivity(next);
+            }
           }
           setConfirmingSlot(null);
         }}
