@@ -90,7 +90,7 @@ interface GameContextValue {
   buyPack: (packId: string) => Promise<boolean>;
   confirmPayment: (sessionId: string) => Promise<boolean>;
   mine: (oreId: string) => Promise<boolean>;
-  enhance: (slot: EquipmentSlot) => Promise<{ message: string; raised: boolean } | null>;
+  enhance: (itemId: string) => Promise<{ message: string; raised: boolean } | null>;
   adoptPet: (gender: PetGender, name: string) => Promise<void>;
   releasePet: () => Promise<void>;
   setAutomation: (key: AutomationKey, on: boolean) => void;
@@ -633,8 +633,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
         });
         return answer.ok;
       },
-      enhance: async (slot) => {
-        const answer = await request<{ raised: boolean }>("POST", "/api/forge", { slot });
+      enhance: async (itemId) => {
+        const answer = await request<{ raised: boolean }>("POST", "/api/forge", { itemId });
         if (!answer.ok) {
           if (answer.message) announce(answer.message, false, "Bigorna");
           return null;

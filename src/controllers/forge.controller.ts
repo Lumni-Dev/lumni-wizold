@@ -7,7 +7,7 @@ import { chance, defaultRandom, intBetween, type Random } from "@/shared/utils/r
 import { ATTRIBUTES, type AttributeKey } from "@/models/entities/attribute";
 import { findItem } from "@/models/data/items";
 import type { GameState } from "@/models/entities/game-state";
-import { EQUIPMENT_SLOTS, type EquipmentSlot, type Item } from "@/models/entities/item";
+import { EQUIPMENT_SLOTS, isEquippable, type EquipmentSlot, type Item } from "@/models/entities/item";
 import { findOre, MINING_MAX_LEVEL, ORES, type MiningState, type Ore } from "@/models/entities/mining";
 import { failure, success, type Result } from "@/models/entities/result";
 import { formatBronze, formatCooldown } from "@/shared/utils/format";
@@ -133,9 +133,8 @@ export function mine(
   return success(addLog(next, "system", message), message, { levelsGained });
 }
 
-export interface ForgeSlot {
-  slot: EquipmentSlot;
-  item: Item | null;
+export interface ForgePiece {
+  item: Item;
   level: number;
   fragment: Item | null;
   cost: number;
@@ -150,30 +149,20 @@ function fragmentOf(item: Item): Item | null {
   return item.set ? (findItem(item.set + "-fragment") ?? null) : null;
 }
 
-export function listForge(state: GameState): ForgeSlot[] {
+// The anvil beats a piece off the body, so it lists the wearables sitting in the
+// bag and never the seven equipped slots. A piece has to be unequipped to forge.
+export function listForge(state: GameState): ForgePiece[] {
   const characterLevel = state.character?.level ?? 1;
   const bronze = state.character?.bronze ?? 0;
 
-  return EQUIPMENT_SLOTS.map((slot) => {
-    const itemId = state.equipment[slot];
-    const item = itemId ? (findItem(itemId) ?? null) : null;
-    const level = itemId ? enhancementOf(state.enhancements, itemId) : 0;
+  const pieces: ForgePiece[] = [];
+  for (const entry of state.inventory) {
+    const item = findItem(entry.itemId);
+    if (!item || !isEquippable(item)) continue;
+    // A worn piece can never be forged, so it never appears on the anvil.
+    if (EQUIPMENT_SLOTS.some((slot) => state.equipment[slot] === item.id)) continue;
 
-    if (!item) {
-      return {
-        slot,
-        item: null,
-        level: 0,
-        fragment: null,
-        cost: 0,
-        owned: 0,
-        bronzeCost: 0,
-        canForge: false,
-        reason: null,
-        attributes: [],
-      };
-    }
-
+    const level = enhancementOf(state.enhancements, item.id);
     const fragment = fragmentOf(item);
     const cost = enhancementCost(level + 1);
     const owned = fragment ? countInInventory(state.inventory, fragment.id) : 0;
@@ -183,8 +172,7 @@ export function listForge(state: GameState): ForgeSlot[] {
     const current = enhancedEffect(item, level);
     const next = enhancedEffect(item, level + 1);
 
-    return {
-      slot,
+    pieces.push({
       item,
       level,
       fragment,
@@ -205,23 +193,34 @@ export function listForge(state: GameState): ForgeSlot[] {
         value: current.attributes?.[definition.key] ?? 0,
         nextValue: next.attributes?.[definition.key] ?? 0,
       })),
-    };
-  });
+    });
+  }
+
+  return pieces.sort(
+    (a, b) =>
+      EQUIPMENT_SLOTS.indexOf(a.item.category as EquipmentSlot) -
+      EQUIPMENT_SLOTS.indexOf(b.item.category as EquipmentSlot),
+  );
 }
 
 export function enhance(
   state: GameState,
-  slot: EquipmentSlot,
+  itemId: string,
   random: Random = defaultRandom,
 ): Result<{ raised: boolean }> {
   const character = state.character;
   if (!character) return failure(state, "Nenhum personagem ativo.");
 
-  const itemId = state.equipment[slot];
-  if (!itemId) return failure(state, "Nada equipado nesse espaço.");
-
   const item = findItem(itemId);
-  if (!item) return failure(state, "Item desconhecido.");
+  if (!item || !isEquippable(item)) return failure(state, "Item desconhecido.");
+
+  // Only a piece off the body, sitting in the bag, can be forged.
+  if (EQUIPMENT_SLOTS.some((slot) => state.equipment[slot] === itemId)) {
+    return failure(state, "Desequipe " + item.name + " para forjar.");
+  }
+  if (countInInventory(state.inventory, itemId) < 1) {
+    return failure(state, item.name + " não está na mochila.");
+  }
 
   const level = enhancementOf(state.enhancements, itemId);
   if (level >= MAX_ENHANCEMENT) {

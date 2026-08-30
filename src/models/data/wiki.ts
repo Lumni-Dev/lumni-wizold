@@ -246,7 +246,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
   {
     id: "forge",
     title: "Forja e mina",
-    summary: "A bigorna não faz peça nova: melhora a que já está no corpo.",
+    summary: "A bigorna não faz peça nova: melhora a que está na mochila, fora do corpo.",
     lines: [
       "A mina rende a cada " +
         (MINING_CYCLE_MS / 1000).toFixed(1).replace(".", ",") +
@@ -266,7 +266,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         miningNeeded(69) +
         " no último: a escada da mina sobe como a de nível.",
       "A cada 40 níveis de mineração cada golpe rende um múltiplo a mais de fragmentos, então a forja continua alimentada sem virar chuva de fragmento.",
-      "A forja só aceita a peça equipada, e só o fragmento do conjunto dela.",
+      "A forja só aceita peça desequipada, na mochila: tire do corpo para forjar. Cada peça come só o fragmento do conjunto dela.",
       "Preço do próximo nível: um fragmento a cada três níveis, então +" +
         5 +
         " custa " +
@@ -283,7 +283,9 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "Cada martelada também cobra bronze: " +
         Math.round(FORGE_BRONZE_RATIO * 100) +
         "% da bolsa de caçada do seu nível, mais um por nível já forjado da peça. O ferreiro não trabalha de graça.",
-      "O teto é +" + MAX_ENHANCEMENT + ", e o nível fica com a peça, não com o espaço.",
+      "O teto é +" +
+        MAX_ENHANCEMENT +
+        ", e o nível fica com a peça: forjada na mochila, ela leva o ganho quando volta ao corpo.",
     ],
   },
   {

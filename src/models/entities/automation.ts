@@ -62,7 +62,7 @@ export const AUTOMATIONS: readonly { key: AutomationKey; label: string; effect: 
     key: "petRest",
     label: "Repouso automático",
     effect:
-      "Manda o lobo repousar quando ele fica sem fôlego e não há comida, e o chama de volta quando a energia enche.",
+      "Sem fôlego, dá comida ao lobo se houver na mochila, senão o manda repousar, e o chama de volta quando a energia enche.",
   },
 ];
 

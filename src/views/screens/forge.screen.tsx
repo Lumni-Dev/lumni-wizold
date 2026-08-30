@@ -2,11 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useGame } from "@/controllers/game.context";
-import { listForge, listMining, type ForgeSlot } from "@/controllers/forge.controller";
+import { listForge, listMining, type ForgePiece } from "@/controllers/forge.controller";
 import { usePageActivity } from "@/controllers/use-page-activity";
 import { playSound } from "@/controllers/sound";
 import type { Activity } from "@/models/entities/activity";
-import { SLOT_LABEL, type EquipmentSlot } from "@/models/entities/item";
 import { enhancedName, forgeDurationMs } from "@/models/rules/forge";
 import {
   FORGE_TICKS,
@@ -42,9 +41,9 @@ export function ForgeScreen() {
   usePageActivity(["mine", "forge"]);
   const paused = activity?.paused === true;
   const activeOre = activity?.kind === "mine" && !paused ? (activity.id ?? null) : null;
-  const activeSlot = activity?.kind === "forge" && !paused ? (activity.id ?? null) : null;
+  const activeItem = activity?.kind === "forge" && !paused ? (activity.id ?? null) : null;
   const waitingOre = activity?.kind === "mine" && paused ? (activity.id ?? null) : null;
-  const waitingSlot = activity?.kind === "forge" && paused ? (activity.id ?? null) : null;
+  const waitingItem = activity?.kind === "forge" && paused ? (activity.id ?? null) : null;
 
   // A clock that ticks so the reset countdown stays live and the 06:00 refill
   // lands on screen on its own. Starts at 0 and lets listMining fall back to its
@@ -81,30 +80,30 @@ export function ForgeScreen() {
   const strikeRef = useRef(0);
   const paidRef = useRef(false);
   const landedRef = useRef<{ message: string; raised: boolean } | null>(null);
-  const [heldSlot, setHeldSlot] = useState<ForgeSlot | null>(null);
+  const [heldPiece, setHeldPiece] = useState<ForgePiece | null>(null);
   // A switch between the pick and the anvil waits for the running cycle to land
   // before it takes over, so a charged lap is never thrown away. The click is
   // held here and applied at the next landing.
   const [pending, setPending] = useState<Activity | null>(null);
   const pendingRef = useRef<Activity | null>(null);
 
-  const [confirmingSlot, setConfirmingSlot] = useState<EquipmentSlot | null>(null);
+  const [confirmingItem, setConfirmingItem] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!activeSlot) return;
+    if (!activeItem) return;
 
     strikeRef.current = 0;
-    const level = slotsRef.current.find((entry) => entry.slot === activeSlot)?.level ?? 0;
+    const level = slotsRef.current.find((entry) => entry.item.id === activeItem)?.level ?? 0;
     const tickMs = forgeDurationMs(level) / FORGE_TICKS;
     const timer = window.setInterval(() => {
       strikeRef.current = strikeRef.current >= FORGE_TICKS ? 0 : strikeRef.current + 1;
-      setStrike({ id: activeSlot, beat: strikeRef.current });
+      setStrike({ id: activeItem, beat: strikeRef.current });
 
       if (strikeRef.current === 1) {
         paidRef.current = false;
         landedRef.current = null;
-        setHeldSlot(slotsRef.current.find((entry) => entry.slot === activeSlot) ?? null);
-        void enhanceRef.current(activeSlot as EquipmentSlot).then((landed) => {
+        setHeldPiece(slotsRef.current.find((entry) => entry.item.id === activeItem) ?? null);
+        void enhanceRef.current(activeItem).then((landed) => {
           if (landed) {
             paidRef.current = true;
             landedRef.current = landed;
@@ -112,8 +111,8 @@ export function ForgeScreen() {
             return;
           }
           strikeRef.current = 0;
-          setStrike({ id: activeSlot, beat: 0 });
-          setHeldSlot(null);
+          setStrike({ id: activeItem, beat: 0 });
+          setHeldPiece(null);
           if (pendingRef.current) {
             const next = pendingRef.current;
             pendingRef.current = null;
@@ -122,7 +121,7 @@ export function ForgeScreen() {
             return;
           }
           setActivity(
-            autoRef.current.forge ? { kind: "forge", id: activeSlot, paused: true } : null,
+            autoRef.current.forge ? { kind: "forge", id: activeItem, paused: true } : null,
           );
         });
       } else if (strikeRef.current > 1 && strikeRef.current < FORGE_TICKS && paidRef.current) {
@@ -130,7 +129,7 @@ export function ForgeScreen() {
       }
 
       if (strikeRef.current < FORGE_TICKS) return;
-      setHeldSlot(null);
+      setHeldPiece(null);
       const landed = landedRef.current;
       landedRef.current = null;
       if (landed) {
@@ -142,19 +141,19 @@ export function ForgeScreen() {
         pendingRef.current = null;
         setPending(null);
         strikeRef.current = 0;
-        setStrike({ id: activeSlot, beat: 0 });
+        setStrike({ id: activeItem, beat: 0 });
         setActivity(next);
         return;
       }
       if (!autoRef.current.forge) {
         strikeRef.current = 0;
-        setStrike({ id: activeSlot, beat: 0 });
+        setStrike({ id: activeItem, beat: 0 });
         setActivity(null);
       }
     }, tickMs);
 
     return () => window.clearInterval(timer);
-  }, [activeSlot, setActivity]);
+  }, [activeItem, setActivity]);
 
   const [swing, setSwing] = useState<{ id: string; beat: number }>({ id: "", beat: 0 });
   const swingRef = useRef(0);
@@ -206,8 +205,8 @@ export function ForgeScreen() {
 
   if (!character) return null;
 
-  const confirming = confirmingSlot
-    ? (slots.find((entry) => entry.slot === confirmingSlot) ?? null)
+  const confirming = confirmingItem
+    ? (slots.find((entry) => entry.item.id === confirmingItem) ?? null)
     : null;
 
   function queueSwitch(next: Activity | null) {
@@ -233,7 +232,7 @@ export function ForgeScreen() {
 
     const next: Activity = { kind: "mine", id: oreId };
     // Busy at the anvil or another vein: wait for the running cycle to land.
-    if (activeOre !== null || activeSlot !== null) {
+    if (activeOre !== null || activeItem !== null) {
       queueSwitch(next);
       return;
     }
@@ -352,27 +351,31 @@ export function ForgeScreen() {
         <Panel
           title="Bigorna"
           description={
-            "Cada nível soma um ponto de força ou resistência mais 0,2% da peça original, até +" +
+            "A bigorna só bate em peça desequipada, na mochila: tire do corpo para forjar. Cada nível soma um ponto de força ou resistência mais 0,2% da peça original, até +" +
             formatNumber(MAX_ENHANCEMENT) +
             "."
           }
           padding="none"
         >
           <List>
-            {slots.map((row) => {
-              const entry = activeSlot === row.slot && heldSlot?.slot === row.slot ? heldSlot : row;
-              const maxed = entry.level >= MAX_ENHANCEMENT;
-              const queuedForge = pending?.kind === "forge" && pending.id === row.slot;
+            {slots.length === 0 ? (
+              <ListRow layout="column" padding="art">
+                <RowText
+                  title="Nada na mochila para forjar"
+                  description="Desequipe uma peça para bater nela na bigorna."
+                />
+              </ListRow>
+            ) : (
+              slots.map((row) => {
+                const entry =
+                  activeItem === row.item.id && heldPiece?.item.id === row.item.id ? heldPiece : row;
+                const maxed = entry.level >= MAX_ENHANCEMENT;
+                const queuedForge = pending?.kind === "forge" && pending.id === row.item.id;
 
-              return (
-                <ListRow key={entry.slot} layout="column" padding="art">
-                  <div className="flex items-center gap-3">
-                    {entry.item ? (
+                return (
+                  <ListRow key={row.item.id} layout="column" padding="art">
+                    <div className="flex items-center gap-3">
                       <ItemIcon item={entry.item} enhancement={entry.level} />
-                    ) : (
-                      <IconFrame>--</IconFrame>
-                    )}
-                    {entry.item ? (
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm text-ink">{entry.item.name}</p>
                         {entry.fragment && !maxed ? (
@@ -393,58 +396,59 @@ export function ForgeScreen() {
                           </p>
                         ))}
                       </div>
-                    ) : (
-                      <RowText title="Nada equipado" description={SLOT_LABEL[entry.slot]} />
-                    )}
-                    <Button
-                      variant={queuedForge ? "secondary" : entry.canForge ? "primary" : "outline"}
-                      disabled={queuedForge ? false : !entry.canForge || activeSlot !== null}
-                      onClick={() =>
-                        queuedForge ? queueSwitch(null) : setConfirmingSlot(entry.slot)
-                      }
-                      aria-label={
-                        (queuedForge ? "Cancelar fila de forja de " : "Forjar ") +
-                        SLOT_LABEL[entry.slot]
-                      }
-                    >
-                      {queuedForge ? "Na fila" : activeSlot === entry.slot ? "Forjando..." : "Forjar"}
-                    </Button>
-                  </div>
-
-                  {(activeSlot === entry.slot && strike.id === entry.slot) ||
-                  waitingSlot === entry.slot ||
-                  entry.reason ? (
-                    <div className="space-y-1 pt-2">
-                      {activeSlot === entry.slot && strike.id === entry.slot ? (
-                        <Bar
-                          label={strike.beat === 1 ? "Cobrando..." : "Forjando..."}
-                          current={strike.beat}
-                          maximum={FORGE_TICKS}
-                          wraps
-                        />
-                      ) : null}
-                      {waitingSlot === entry.slot ? (
-                        <p className="text-[11px] text-ink-faint">
-                          Esperando fragmentos e bronze para a próxima martelada
-                        </p>
-                      ) : entry.reason ? (
-                        <p className="text-[11px] text-ink-faint">{entry.reason}</p>
-                      ) : null}
+                      <Button
+                        variant={queuedForge ? "secondary" : entry.canForge ? "primary" : "outline"}
+                        disabled={queuedForge ? false : !entry.canForge || activeItem !== null}
+                        onClick={() =>
+                          queuedForge ? queueSwitch(null) : setConfirmingItem(row.item.id)
+                        }
+                        aria-label={
+                          (queuedForge ? "Cancelar fila de forja de " : "Forjar ") + entry.item.name
+                        }
+                      >
+                        {queuedForge
+                          ? "Na fila"
+                          : activeItem === row.item.id
+                            ? "Forjando..."
+                            : "Forjar"}
+                      </Button>
                     </div>
-                  ) : null}
-                </ListRow>
-              );
-            })}
+
+                    {(activeItem === row.item.id && strike.id === row.item.id) ||
+                    waitingItem === row.item.id ||
+                    entry.reason ? (
+                      <div className="space-y-1 pt-2">
+                        {activeItem === row.item.id && strike.id === row.item.id ? (
+                          <Bar
+                            label={strike.beat === 1 ? "Cobrando..." : "Forjando..."}
+                            current={strike.beat}
+                            maximum={FORGE_TICKS}
+                            wraps
+                          />
+                        ) : null}
+                        {waitingItem === row.item.id ? (
+                          <p className="text-[11px] text-ink-faint">
+                            Esperando fragmentos e bronze para a próxima martelada
+                          </p>
+                        ) : entry.reason ? (
+                          <p className="text-[11px] text-ink-faint">{entry.reason}</p>
+                        ) : null}
+                      </div>
+                    ) : null}
+                  </ListRow>
+                );
+              })
+            )}
           </List>
         </Panel>
       </div>
 
       <ConfirmDialog
-        open={confirming !== null && confirming.item !== null}
+        open={confirming !== null}
         title="Forjar"
         description="A bigorna consome os fragmentos e o bronze na hora, e marteladas não se desfazem."
         detail={
-          confirming && confirming.item && confirming.fragment
+          confirming && confirming.fragment
             ? enhancedName(confirming.item.name, confirming.level) +
               " → +" +
               formatNumber(confirming.level + 1) +
@@ -457,23 +461,23 @@ export function ForgeScreen() {
             : undefined
         }
         confirmLabel="Forjar"
-        onCancel={() => setConfirmingSlot(null)}
+        onCancel={() => setConfirmingItem(null)}
         onConfirm={() => {
           if (confirming) {
-            const next: Activity = { kind: "forge", id: confirming.slot };
+            const next: Activity = { kind: "forge", id: confirming.item.id };
             // Busy at the pick: wait for the running swing to land, then forge.
-            if (activeOre !== null || activeSlot !== null) {
+            if (activeOre !== null || activeItem !== null) {
               queueSwitch(next);
             } else {
               strikeRef.current = 0;
               paidRef.current = false;
               landedRef.current = null;
-              setStrike({ id: confirming.slot, beat: 0 });
-              setHeldSlot(null);
+              setStrike({ id: confirming.item.id, beat: 0 });
+              setHeldPiece(null);
               setActivity(next);
             }
           }
-          setConfirmingSlot(null);
+          setConfirmingItem(null);
         }}
       />
     </>

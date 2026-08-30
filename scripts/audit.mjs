@@ -1068,11 +1068,14 @@ sec("forja e mina");
   );
   ok("forja zero devolve o efeito puro", forgeRules.enhancedEffect(claw, 0) === claw.effect);
   const state = baseState({ level: 1 });
-  state.equipment.claw = "bronze-claw";
+  state.inventory = [
+    ...state.inventory,
+    { itemId: "bronze-claw", quantity: 1 },
+    { itemId: "bronze-fragment", quantity: 10 },
+  ];
   state.enhancements["bronze-claw"] = 4;
-  state.inventory = [...state.inventory, { itemId: "bronze-fragment", quantity: 10 }];
   const strikeFee = forgeRules.forgeBronzeCost(state.character.level, 4);
-  const enhanced = forgeCtrl.enhance(state, "claw", () => 0);
+  const enhanced = forgeCtrl.enhance(state, "bronze-claw", () => 0);
   ok("martelada certeira sobe um nível", enhanced.ok && enhanced.state.enhancements["bronze-claw"] === 5);
   ok("martelada certeira responde raised", enhanced.ok && enhanced.data.raised === true);
   ok(
@@ -1085,7 +1088,7 @@ sec("forja e mina");
     "martelada cobra bronze",
     enhanced.ok && enhanced.state.character.bronze === state.character.bronze - strikeFee,
   );
-  const missed = forgeCtrl.enhance(state, "claw", () => 0.99);
+  const missed = forgeCtrl.enhance(state, "bronze-claw", () => 0.99);
   ok(
     "martelada falha mantém o nível",
     missed.ok && missed.state.enhancements["bronze-claw"] === 4 && missed.data.raised === false,
@@ -1101,23 +1104,33 @@ sec("forja e mina");
     missed.ok && missed.state.character.bronze === state.character.bronze - strikeFee,
   );
   const broke = { ...state, character: { ...state.character, bronze: strikeFee - 1 } };
-  ok("sem bronze a bigorna recusa", forgeCtrl.enhance(broke, "claw", () => 0).ok === false);
+  ok("sem bronze a bigorna recusa", forgeCtrl.enhance(broke, "bronze-claw", () => 0).ok === false);
   ok(
     "a martelada encarece com a peça e com a banda",
     forgeRules.forgeBronzeCost(1, 5) > forgeRules.forgeBronzeCost(1, 4) &&
       forgeRules.forgeBronzeCost(500, 4) > forgeRules.forgeBronzeCost(1, 4),
   );
-  const wrongFragments = { ...state, inventory: [{ itemId: "silver-fragment", quantity: 99 }] };
+  const wrongFragments = {
+    ...state,
+    inventory: [
+      { itemId: "bronze-claw", quantity: 1 },
+      { itemId: "silver-fragment", quantity: 99 },
+    ],
+  };
   ok(
     "fragmento de outro conjunto não serve",
-    forgeCtrl.enhance(wrongFragments, "claw").ok === false,
+    forgeCtrl.enhance(wrongFragments, "bronze-claw").ok === false,
   );
-  ok("espaço vazio recusa", forgeCtrl.enhance(state, "helmet").ok === false);
+  const equippedClaw = { ...state, equipment: { ...state.equipment, claw: "bronze-claw" } };
+  ok("peça equipada não forja", forgeCtrl.enhance(equippedClaw, "bronze-claw").ok === false);
+  ok(
+    "a bigorna lista só o que está na mochila",
+    forgeCtrl.listForge(state).some((piece) => piece.item.id === "bronze-claw") &&
+      !forgeCtrl.listForge(equippedClaw).some((piece) => piece.item.id === "bronze-claw"),
+  );
   if (enhanced.ok) {
-    const off = inventoryCtrl.unequipItem(enhanced.state, "claw");
-    ok("desequipar preserva a forja", off.ok && off.state.enhancements["bronze-claw"] === 5);
-    const on = inventoryCtrl.equipItem(off.state, "bronze-claw");
-    ok("reequipar lê a mesma forja", on.ok && on.state.enhancements["bronze-claw"] === 5);
+    const on = inventoryCtrl.equipItem(enhanced.state, "bronze-claw");
+    ok("equipar carrega a forja", on.ok && on.state.enhancements["bronze-claw"] === 5);
   }
   const ores = entMining.ORES;
   for (let index = 1; index < ores.length; index += 1) {
@@ -1690,10 +1703,18 @@ sec("automação");
   const low = baseState({ level: 10 });
   const floor = stats.deriveStats(low.character, low.equipment, null, {}).maxHealth;
   low.character.health = Math.max(1, Math.floor(floor * 0.1));
-  ok("ferido sem chave não age", automationCtrl.nextAutomationStep(low, null) === null);
+  ok(
+    "ferido bebe sozinho ao zerar, sem chave",
+    automationCtrl.nextAutomationStep(low, null)?.kind === "potion",
+  );
+  const bareFloor = { ...low, inventory: [] };
+  ok(
+    "ferido sem poção deita sozinho, sem chave",
+    automationCtrl.nextAutomationStep(bareFloor, null)?.kind === "rest",
+  );
   const withPotion = { ...low, automation: { ...low.automation, potion: true } };
   const step = automationCtrl.nextAutomationStep(withPotion, null);
-  ok("ferido com chave bebe", step?.kind === "potion" && step.itemId === "health-potion-small");
+  ok("ferido bebe a menor poção", step?.kind === "potion" && step.itemId === "health-potion-small");
   const noFlask = {
     ...withPotion,
     inventory: [],
@@ -1758,6 +1779,11 @@ sec("automação");
     "lobo sem fôlego come antes de zerar",
     automationCtrl.nextAutomationStep(shortPetState, null)?.kind === "feed",
   );
+  const restKeyOnly = { ...petState, automation: { ...petState.automation, petRest: true } };
+  ok(
+    "com repouso automático, ração vence a casinha",
+    automationCtrl.nextAutomationStep(restKeyOnly, null)?.kind === "feed",
+  );
   const paused = baseState({ level: 10, form: "werewolf" });
   const idle = { kind: "hunt", id: "village-field", paused: true };
   ok("pausado sem chave espera", automationCtrl.nextAutomationStep(paused, idle) === null);
@@ -1779,8 +1805,8 @@ sec("automação");
     automation: { ...low.automation, transform: true },
   };
   ok(
-    "no chão a fúria não vira sozinha",
-    automationCtrl.nextAutomationStep(floorTurn, null) === null,
+    "no chão a fúria não vira sozinha, recupera antes",
+    automationCtrl.nextAutomationStep(floorTurn, null)?.kind !== "transform",
   );
   ok(
     "descansando não deita de novo",
@@ -2102,7 +2128,7 @@ sec("imutabilidade");
     ["equipItem", () => inventoryCtrl.equipItem(state, "bronze-claw")],
     ["unequipItem", () => inventoryCtrl.unequipItem(state, "claw")],
     ["consumeItem", () => inventoryCtrl.consumeItem(state, "health-potion-small")],
-    ["enhance", () => forgeCtrl.enhance(state, "claw")],
+    ["enhance", () => forgeCtrl.enhance(state, "bronze-claw")],
     ["mine", () => forgeCtrl.mine(state, "bronze-vein", random)],
     ["listForge", () => forgeCtrl.listForge(state)],
     ["listMining", () => forgeCtrl.listMining(state)],
