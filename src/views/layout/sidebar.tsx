@@ -103,7 +103,7 @@ export function MobileNavigation({ tavernUnread = 0 }: { tavernUnread?: number }
   return (
     <nav
       aria-label="Páginas do jogo"
-      className="flex gap-2 overflow-x-auto border-b border-edge bg-charcoal/80 p-3 backdrop-blur lg:hidden"
+      className="flex h-[74px] items-center gap-2 overflow-x-auto border-b border-edge bg-surface/40 px-3 backdrop-blur lg:hidden"
     >
       {links.map((item) => {
         const active = pathname === item.href;
