@@ -10,7 +10,7 @@ const POTION_TIERS = [
   {
     size: "small" as PotionSize,
     ratio: 0.25,
-    hunts: 1,
+    hunts: 3,
     rarity: "common" as const,
     minLevel: 1,
     price: 60,
@@ -18,7 +18,7 @@ const POTION_TIERS = [
   {
     size: "medium" as PotionSize,
     ratio: 0.5,
-    hunts: 2,
+    hunts: 6,
     rarity: "uncommon" as const,
     minLevel: 340,
     price: 2500,
@@ -26,7 +26,7 @@ const POTION_TIERS = [
   {
     size: "large" as PotionSize,
     ratio: 1,
-    hunts: 4,
+    hunts: 12,
     rarity: "rare" as const,
     minLevel: 670,
     price: 12000,
@@ -82,7 +82,7 @@ const PET_SUPPLIES: readonly Item[] = [
     category: "pet",
     rarity: "common",
     price: 40,
-    huntCost: 0.5,
+    huntCost: 1.5,
     minLevel: 1,
     stackable: true,
     inMarket: true,
