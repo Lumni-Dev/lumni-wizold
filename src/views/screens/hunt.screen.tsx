@@ -332,7 +332,7 @@ export function HuntScreen() {
                 {petAlong
                   ? "Mascote acompanhando"
                   : isPetActive(pet)
-                    ? "Mascote sem fôlego"
+                    ? "Mascote sem energia"
                     : "Mascote em repouso"}
               </Tag>
             ) : null}
