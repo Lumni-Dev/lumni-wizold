@@ -2,7 +2,6 @@ import { SLOT_LABEL, type EquipmentSlot, type Item } from "@/models/entities/ite
 import { formatNumber } from "@/shared/utils/format";
 import { IconFrame } from "./icon-frame";
 import { ItemIcon } from "./item-icon";
-import { List, ListRow, RowText } from "./list";
 import { Panel } from "./panel";
 
 export interface GearSlot {
@@ -11,9 +10,10 @@ export interface GearSlot {
   level: number;
 }
 
-// The equipment list with item art, shared by the character sheet and the
-// read-only profile: each of the seven slots shows the drawing (with its forge
-// badge), the piece name and the slot label.
+// The equipment grid with item art, shared by the character sheet and the
+// read-only profile so the two never drift. Two pieces per row to keep the
+// section compact: each cell shows the drawing (with its forge badge), the piece
+// name and the slot label.
 export function EquipmentPanel({ gear, forge }: { gear: GearSlot[]; forge: number }) {
   return (
     <Panel
@@ -21,19 +21,20 @@ export function EquipmentPanel({ gear, forge }: { gear: GearSlot[]; forge: numbe
       description={
         "Os sete espaços, do elmo ao anel, somando +" + formatNumber(forge) + " de forja."
       }
-      padding="none"
     >
-      <List>
+      <div className="grid gap-3 sm:grid-cols-2">
         {gear.map(({ slot, item, level }) => (
-          <ListRow key={slot} padding="art">
+          <div key={slot} className="flex items-center gap-3 rounded-md border border-edge p-3">
             {item ? <ItemIcon item={item} enhancement={level} /> : <IconFrame>--</IconFrame>}
-            <RowText
-              title={item ? item.name : "Nada equipado"}
-              description={SLOT_LABEL[slot]}
-            />
-          </ListRow>
+            <div className="min-w-0">
+              <p className="truncate text-sm text-ink">{item ? item.name : "Nada equipado"}</p>
+              <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                {SLOT_LABEL[slot]}
+              </p>
+            </div>
+          </div>
         ))}
-      </List>
+      </div>
     </Panel>
   );
 }
