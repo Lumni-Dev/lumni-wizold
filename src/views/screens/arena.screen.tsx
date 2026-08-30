@@ -197,6 +197,10 @@ export function ArenaScreen() {
   useEffect(() => {
     if (!fighting) return;
     const target = fighting.hunter.id;
+    // Reset the in-flight guard so a stale request never freezes this approach,
+    // and mark this run live so a stale completion skips instead of corrupting it.
+    let alive = true;
+    requestingRef.current = false;
     const timer = window.setInterval(() => {
       // Approach: circle the pit; nothing committed, so leaving cancels.
       if (phaseRef.current === "approach") {
@@ -205,6 +209,7 @@ export function ArenaScreen() {
         if (beatRef.current < HUNT_APPROACH_TICKS || requestingRef.current) return;
         requestingRef.current = true;
         void challengeRef.current(target).then((resolution) => {
+          if (!alive) return;
           requestingRef.current = false;
           if (!resolution) {
             setFighting(null);
@@ -257,6 +262,7 @@ export function ArenaScreen() {
       }
     }, HUNT_TICK_MS);
     return () => {
+      alive = false;
       window.clearInterval(timer);
       // Committed duel left mid-replay: land it, the server already settled it.
       if (pendingRef.current) {

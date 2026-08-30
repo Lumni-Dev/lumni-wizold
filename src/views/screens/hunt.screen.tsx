@@ -200,6 +200,11 @@ export function HuntScreen() {
   useEffect(() => {
     if (!activeId) return;
     const key = "hunt:" + activeId;
+    // A fresh run starts clean: reset the in-flight guard so a request left over
+    // from a torn-down run can never freeze this approach, and mark this run live
+    // so a stale completion below skips instead of corrupting it.
+    let alive = true;
+    requestingRef.current = false;
     // The approach resumes from the bank; the fight phase never persists.
     phaseRef.current = "approach";
     scriptRef.current = [];
@@ -215,6 +220,7 @@ export function HuntScreen() {
         requestingRef.current = true;
         progressRepository.clear(key);
         void huntRef.current(activeId).then((fight) => {
+          if (!alive) return;
           requestingRef.current = false;
           if (!fight) {
             beatRef.current = 0;
@@ -307,6 +313,7 @@ export function HuntScreen() {
     // Only the approach banks; a committed fight left mid-replay is landed, since
     // the server already settled it.
     return () => {
+      alive = false;
       window.clearInterval(timer);
       if (phaseRef.current === "approach") {
         progressRepository.set("hunt:" + activeId, beatRef.current);
