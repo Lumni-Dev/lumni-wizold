@@ -687,29 +687,50 @@ export function TavernScreen() {
         }}
         className="max-w-lg"
         footer={
-          <form onSubmit={submitMessage} className="flex items-center gap-2">
-            <div className="min-w-0 flex-1">
-              <Field
-                compact
-                aria-label="Mensagem"
-                placeholder="Diga alguma coisa"
-                maxLength={MESSAGE_MAX_LENGTH}
-                autoComplete="off"
-                value={draft}
-                onChange={(event) => setDraft(event.target.value)}
-              />
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-1">
+              {["😂", "❤️", "👍", "😮", "😢", "🔥", "🎉", "🍺"].map((emoji) => (
+                <button
+                  key={emoji}
+                  type="button"
+                  aria-label={"Enviar " + emoji}
+                  onClick={() =>
+                    setDraft((current) =>
+                      current.length + emoji.length <= MESSAGE_MAX_LENGTH
+                        ? current + emoji
+                        : current,
+                    )
+                  }
+                  className="grid h-8 w-8 place-items-center rounded-md text-lg hover:bg-surface-high"
+                >
+                  {emoji}
+                </button>
+              ))}
             </div>
-            <span className="shrink-0 font-mono text-[10px] text-ink-faint">
-              {draft.length}/{MESSAGE_MAX_LENGTH}
-            </span>
-            <Button
-              type="submit"
-              variant="primary"
-              disabled={draft.trim().length === 0 || cooldownLeft > 0}
-            >
-              {cooldownLeft > 0 ? Math.ceil(cooldownLeft / 1000) : "Enviar"}
-            </Button>
-          </form>
+            <form onSubmit={submitMessage} className="flex items-center gap-2">
+              <div className="min-w-0 flex-1">
+                <Field
+                  compact
+                  aria-label="Mensagem"
+                  placeholder="Diga alguma coisa"
+                  maxLength={MESSAGE_MAX_LENGTH}
+                  autoComplete="off"
+                  value={draft}
+                  onChange={(event) => setDraft(event.target.value)}
+                />
+              </div>
+              <span className="shrink-0 font-mono text-[10px] text-ink-faint">
+                {draft.length}/{MESSAGE_MAX_LENGTH}
+              </span>
+              <Button
+                type="submit"
+                variant="primary"
+                disabled={draft.trim().length === 0 || cooldownLeft > 0}
+              >
+                {cooldownLeft > 0 ? Math.ceil(cooldownLeft / 1000) : "Enviar"}
+              </Button>
+            </form>
+          </div>
         }
       >
         {activeRoom ? (

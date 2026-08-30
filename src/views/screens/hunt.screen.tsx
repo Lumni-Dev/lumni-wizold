@@ -390,7 +390,7 @@ export function HuntScreen() {
                     {art.territories[territory.id] ? (
                       <div className="relative aspect-video w-full overflow-hidden">
                         <ArtImage source={art.territories[territory.id]} />
-                        <span className="absolute left-2 top-2 z-10 inline-flex h-6 items-center rounded-md border border-edge-strong bg-base/80 px-2 font-mono text-[10px] uppercase tracking-[0.12em] text-ink-soft backdrop-blur-sm">
+                        <span className="absolute left-4 top-4 z-10 inline-flex h-6 items-center rounded-md border border-edge-strong bg-base/80 px-2 font-mono text-[10px] uppercase tracking-[0.12em] text-ink-soft backdrop-blur-sm">
                           Sugestão NV. {formatNumber(territory.minLevel)} a{" "}
                           {formatNumber(territory.maxLevel)}
                         </span>
