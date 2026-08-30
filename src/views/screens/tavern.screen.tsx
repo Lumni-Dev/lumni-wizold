@@ -78,10 +78,24 @@ export function TavernScreen() {
   const [roomPassword, setRoomPassword] = useState("");
   const [joinPasswords, setJoinPasswords] = useState<Record<string, string>>({});
   const [draft, setDraft] = useState("");
+  const [emojiOpen, setEmojiOpen] = useState(false);
+  const emojiRef = useRef<HTMLDivElement>(null);
   const [page, setPage] = useState(1);
   const [nick, setNick] = useState("");
   const [removing, setRemoving] = useState<PackMate | null>(null);
   const [invites, setInvites] = useState<PackInvite[]>([]);
+
+  // The emoji dropup closes when you click anywhere outside it.
+  useEffect(() => {
+    if (!emojiOpen) return;
+    const onDown = (event: MouseEvent) => {
+      if (emojiRef.current && !emojiRef.current.contains(event.target as Node)) {
+        setEmojiOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, [emojiOpen]);
 
   const {
     identity,
@@ -687,50 +701,62 @@ export function TavernScreen() {
         }}
         className="max-w-lg"
         footer={
-          <div className="space-y-2">
-            <div className="flex flex-wrap items-center gap-1">
-              {["😂", "❤️", "👍", "😮", "😢", "🔥", "🎉", "🍺"].map((emoji) => (
-                <button
-                  key={emoji}
-                  type="button"
-                  aria-label={"Enviar " + emoji}
-                  onClick={() =>
-                    setDraft((current) =>
-                      current.length + emoji.length <= MESSAGE_MAX_LENGTH
-                        ? current + emoji
-                        : current,
-                    )
-                  }
-                  className="grid h-8 w-8 place-items-center rounded-md text-lg hover:bg-surface-high"
-                >
-                  {emoji}
-                </button>
-              ))}
-            </div>
-            <form onSubmit={submitMessage} className="flex items-center gap-2">
-              <div className="min-w-0 flex-1">
-                <Field
-                  compact
-                  aria-label="Mensagem"
-                  placeholder="Diga alguma coisa"
-                  maxLength={MESSAGE_MAX_LENGTH}
-                  autoComplete="off"
-                  value={draft}
-                  onChange={(event) => setDraft(event.target.value)}
-                />
-              </div>
-              <span className="shrink-0 font-mono text-[10px] text-ink-faint">
+          <form onSubmit={submitMessage} className="flex items-center gap-2">
+            <div className="relative min-w-0 flex-1">
+              <Field
+                compact
+                aria-label="Mensagem"
+                placeholder="Diga alguma coisa"
+                maxLength={MESSAGE_MAX_LENGTH}
+                autoComplete="off"
+                value={draft}
+                onChange={(event) => setDraft(event.target.value)}
+                className="pr-14"
+              />
+              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 font-mono text-[10px] text-ink-faint">
                 {draft.length}/{MESSAGE_MAX_LENGTH}
               </span>
-              <Button
-                type="submit"
-                variant="primary"
-                disabled={draft.trim().length === 0 || cooldownLeft > 0}
+            </div>
+            <div className="relative shrink-0" ref={emojiRef}>
+              {emojiOpen ? (
+                <div className="absolute bottom-full right-0 z-20 mb-2 grid grid-cols-4 gap-1 rounded-md border border-edge bg-surface p-2 shadow-[0_18px_40px_-12px_rgba(0,0,0,0.9)]">
+                  {["😂", "❤️", "👍", "😮", "😢", "🔥", "🎉", "🍺"].map((emoji) => (
+                    <button
+                      key={emoji}
+                      type="button"
+                      aria-label={"Inserir " + emoji}
+                      onClick={() =>
+                        setDraft((current) =>
+                          current.length + emoji.length <= MESSAGE_MAX_LENGTH
+                            ? current + emoji
+                            : current,
+                        )
+                      }
+                      className="grid h-8 w-8 place-items-center rounded-md text-lg hover:bg-surface-high"
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+              <button
+                type="button"
+                aria-label="Emojis"
+                aria-expanded={emojiOpen}
+                onClick={() => setEmojiOpen((open) => !open)}
+                className="grid h-8 w-8 place-items-center rounded-md border border-edge text-lg hover:bg-surface-high"
               >
-                {cooldownLeft > 0 ? Math.ceil(cooldownLeft / 1000) : "Enviar"}
-              </Button>
-            </form>
-          </div>
+                🙂
+              </button>
+            </div>
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={draft.trim().length === 0 || cooldownLeft > 0}
+            >
+              {cooldownLeft > 0 ? Math.ceil(cooldownLeft / 1000) : "Enviar"}
+            </Button>
+          </form>
         }
       >
         {activeRoom ? (

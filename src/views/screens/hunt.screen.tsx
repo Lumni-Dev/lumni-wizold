@@ -13,7 +13,7 @@ import { HUNT_TICK_MS, HUNT_TICKS } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
 import { formatNumber } from "@/shared/utils/format";
 import { ArtImage } from "../components/art-image";
-import { IconArt, IconFrame } from "../components/icon-frame";
+import { IconArt } from "../components/icon-frame";
 import {
   loadHuntSelection,
   saveHuntSelection,
@@ -388,21 +388,10 @@ export function HuntScreen() {
                   {/* Left: art, name, story, level range and the hunt itself. */}
                   <div className="flex flex-col divide-y divide-edge">
                     {art.territories[territory.id] ? (
-                      <div className="relative aspect-video w-full overflow-hidden">
+                      <div className="aspect-video w-full overflow-hidden">
                         <ArtImage source={art.territories[territory.id]} />
-                        <span className="absolute left-4 top-4 z-10 inline-flex h-6 items-center rounded-md border border-edge-strong bg-base/80 px-2 font-mono text-[10px] uppercase tracking-[0.12em] text-ink-soft backdrop-blur-sm">
-                          Sugestão NV. {formatNumber(territory.minLevel)} a{" "}
-                          {formatNumber(territory.maxLevel)}
-                        </span>
                       </div>
-                    ) : (
-                      <div className="px-4 pt-4">
-                        <span className="inline-flex h-6 items-center rounded-md border border-edge-strong bg-surface-high px-2 font-mono text-[10px] uppercase tracking-[0.12em] text-ink-soft">
-                          Sugestão NV. {formatNumber(territory.minLevel)} a{" "}
-                          {formatNumber(territory.maxLevel)}
-                        </span>
-                      </div>
-                    )}
+                    ) : null}
                     <div className="p-4">
                       <h2 className="text-sm text-ink">{territory.name}</h2>
                       <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
@@ -501,13 +490,13 @@ export function HuntScreen() {
                                 isSelected ? "bg-surface-high" : "hover:bg-surface-high/60",
                               )}
                             >
-                              <IconFrame size="medium">
+                              <span className="slot-well relative flex h-18 w-18 shrink-0 items-center justify-center overflow-hidden rounded-md border border-edge bg-base">
                                 {creature.image ? (
-                                  <IconArt source={creature.image} padded={false} />
+                                  <IconArt source={creature.image} />
                                 ) : (
-                                  <span>?</span>
+                                  <span className="font-mono text-xs text-ink-faint">?</span>
                                 )}
-                              </IconFrame>
+                              </span>
                               <span className="min-w-0 flex-1">
                                 <span
                                   className={cn(
