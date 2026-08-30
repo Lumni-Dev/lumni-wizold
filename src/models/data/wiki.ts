@@ -14,7 +14,8 @@ import {
   PET_ENERGY_PER_HUNT,
   PET_REST_RATIO,
   REST_TICK_MS,
-  PET_PRICE,
+  PET_MIN_LEVEL,
+  PET_PRICE_IN_HUNTS,
   PET_RENAME_PRICE,
   TRANSFORM_DURATION_MS,
 } from "@/shared/constants/game";
@@ -39,7 +40,7 @@ import {
 } from "../rules/arena";
 import { MINING_MAX_LEVEL, ORES } from "../entities/mining";
 import { RANKING_BOARDS } from "../entities/ranking";
-import { BAZAAR_FEE_RATIO, MIN_WITHDRAW_CENTS } from "../rules/bazaar";
+import { BAZAAR_FEE_RATIO, BAZAAR_LISTING_FEE, MIN_WITHDRAW_CENTS } from "../rules/bazaar";
 import { BAZAAR_LISTING_DAYS, initialWallet } from "../entities/bazaar";
 import { enhancementCost } from "../rules/forge";
 import { experienceForLevel } from "../rules/progression";
@@ -202,7 +203,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "A fórmula vale em qualquer escala: Resistência alta reduz muito, mas nunca zera o golpe.",
       "Quem tem mais Agilidade começa a rodada.",
       "Esquiva e crítico sobem a vida toda sem nunca encostar no teto: 35% de esquiva e 45% de crítico ficam no horizonte, e cada ponto de Agilidade ou Instinto ainda compra alguma coisa no nível 1000.",
-      "Crítico multiplica o dano por 1,7; com a fúria cheia, o multiplicador sobe até 2,2.",
+      "Crítico multiplica o dano por 1,5; com a fúria cheia, o multiplicador sobe até 2,0.",
       "A luta trava em 24 rodadas: ninguém morre e a caçada termina em recuo.",
     ],
   },
@@ -278,7 +279,11 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     title: "Mascote",
     summary: "Um lobo caça melhor acompanhado, enquanto estiver de pé.",
     lines: [
-      "A adoção custa " + PET_PRICE + " de bronze. Soltar o lobo não paga nada: ele só parte.",
+      "A adoção exige NV " +
+        PET_MIN_LEVEL +
+        " e custa " +
+        PET_PRICE_IN_HUNTS +
+        " caçadas do seu nível em bronze. Soltar o lobo não paga nada: ele só parte.",
       "O lobo chega zerado: a linhagem é só identidade, e todo bônus nasce do treino.",
       "Trocar o apelido custa " +
         PET_RENAME_PRICE +
@@ -402,7 +407,9 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     lines: [
       "Só entra o que a forja tocou: peça +1 ou mais fora do corpo, e fragmentos da mina.",
       "O que o mercado vende igual não entra: peça sem forja fica de fora.",
-      "Anunciar tira as peças da mochila; remover o anúncio devolve tudo.",
+      "Anunciar tira as peças da mochila e cobra " +
+        BAZAAR_LISTING_FEE +
+        " de bronze; remover o anúncio devolve as peças, nunca a taxa.",
       "Quem compra é gente de verdade: o anúncio fica no quadro até outro caçador pagar por ele, e o preço é você quem decide.",
       "Todo anúncio dura " +
         BAZAAR_LISTING_DAYS +

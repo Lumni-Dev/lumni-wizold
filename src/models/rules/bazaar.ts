@@ -2,6 +2,11 @@ import type { EquipmentSet, Item } from "../entities/item";
 
 export const BAZAAR_FEE_RATIO = 0.1;
 
+// A flat bronze fee charged to put a piece on the board, spent for good: it is
+// not returned when the listing is cancelled, so announcing is a small sink and
+// the board does not fill with idle offers.
+export const BAZAAR_LISTING_FEE = 500;
+
 export const MIN_LISTING_CENTS = 100;
 
 export const MIN_WITHDRAW_CENTS = 10_000;

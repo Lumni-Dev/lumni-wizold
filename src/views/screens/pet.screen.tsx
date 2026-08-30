@@ -10,6 +10,7 @@ import {
   petHuntEffort,
   isPetWhole,
   petMaxEnergy,
+  petPrice,
   petRationOf,
   petRestStep,
   petLevelBonus,
@@ -20,7 +21,7 @@ import {
 import {
   NAME_MAX_LENGTH,
   PET_MAX_LEVEL,
-  PET_PRICE,
+  PET_MIN_LEVEL,
   PET_RENAME_PRICE,
   REST_TICK_MS,
 } from "@/shared/constants/game";
@@ -41,13 +42,15 @@ import { DataRow } from "../components/data-row";
 import { EmptyState } from "../components/empty-state";
 import { PageHeader } from "../layout/page-header";
 
-function Kennel({ bronze }: { bronze: number }) {
+function Kennel({ bronze, level }: { bronze: number; level: number }) {
   const { adoptPet } = useGame();
   const [gender, setGender] = useState<PetGender>("male");
   const [name, setName] = useState("");
   const [confirming, setConfirming] = useState(false);
 
-  const affordable = bronze >= PET_PRICE;
+  const price = petPrice(level);
+  const oldEnough = level >= PET_MIN_LEVEL;
+  const affordable = bronze >= price;
 
   return (
     <>
@@ -97,8 +100,10 @@ function Kennel({ bronze }: { bronze: number }) {
         description={
           "O apelido é dado na porta; trocar depois custa " +
           formatBronze(PET_RENAME_PRICE) +
-          " no canil. A adoção custa " +
-          formatBronze(PET_PRICE) +
+          " no canil. A adoção exige NV " +
+          PET_MIN_LEVEL +
+          " e custa " +
+          formatBronze(price) +
           "."
         }
       >
@@ -106,7 +111,7 @@ function Kennel({ bronze }: { bronze: number }) {
           className="space-y-3"
           onSubmit={(event) => {
             event.preventDefault();
-            if (name.trim().length > 0) setConfirming(true);
+            if (oldEnough && name.trim().length > 0) setConfirming(true);
           }}
         >
           <Field
@@ -117,14 +122,19 @@ function Kennel({ bronze }: { bronze: number }) {
             autoComplete="off"
             onChange={(event) => setName(sanitizeName(event.target.value, NAME_MAX_LENGTH))}
           />
+          {!oldEnough ? (
+            <p className="text-[11px] text-ink-faint">
+              O lobo só caça ao lado de um NV {PET_MIN_LEVEL} ou mais.
+            </p>
+          ) : null}
           <Button
             type="submit"
             variant="primary"
             size="medium"
             fullWidth
-            disabled={!affordable || name.trim().length === 0}
+            disabled={!oldEnough || !affordable || name.trim().length === 0}
           >
-            Adotar por {formatBronze(PET_PRICE)}
+            Adotar por {formatBronze(price)}
           </Button>
         </form>
       </Panel>
@@ -138,7 +148,7 @@ function Kennel({ bronze }: { bronze: number }) {
           formatBronze(PET_RENAME_PRICE) +
           " no canil."
         }
-        detail={findPet(gender).label + " - " + name.trim() + " - " + formatBronze(PET_PRICE)}
+        detail={findPet(gender).label + " - " + name.trim() + " - " + formatBronze(price)}
         confirmLabel="Adotar"
         onCancel={() => setConfirming(false)}
         onConfirm={() => {
@@ -172,7 +182,7 @@ export function PetScreen() {
           description="Um lobo caça melhor acompanhado. Escolha o seu e dê um nome que fica para sempre."
           action={<Tag tone="neutral">{formatBronze(character.bronze)}</Tag>}
         />
-        <Kennel bronze={character.bronze} />
+        <Kennel bronze={character.bronze} level={character.level} />
       </>
     );
   }

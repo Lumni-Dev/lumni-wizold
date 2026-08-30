@@ -34,7 +34,8 @@ export const MIN_AGE = 18;
 export const NAME_MAX_LENGTH = 25;
 export const NAME_MIN_LENGTH = 3;
 
-export const PET_PRICE = 1200;
+export const PET_MIN_LEVEL = 10;
+export const PET_PRICE_IN_HUNTS = 40;
 export const PET_RENAME_PRICE = 10_000;
 export const PET_MAX_LEVEL = numberFromEnv(process.env.NEXT_PUBLIC_PET_MAX_LEVEL, 1000);
 export const PET_EXERCISE_ID = "pet-training";

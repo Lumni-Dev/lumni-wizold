@@ -1,4 +1,4 @@
-import { PET_MAX_LEVEL, PET_PRICE, PET_RENAME_PRICE } from "@/shared/constants/game";
+import { PET_MAX_LEVEL, PET_MIN_LEVEL, PET_RENAME_PRICE } from "@/shared/constants/game";
 import { formatBronze } from "@/shared/utils/format";
 import { generateId } from "@/shared/utils/id";
 import { findItem } from "@/models/data/items";
@@ -11,6 +11,7 @@ import {
   isPetAwake,
   isPetWhole,
   petMaxEnergy,
+  petPrice,
   petRationOf,
   petRestStep,
   petLevelOf,
@@ -32,11 +33,12 @@ export function adoptPet(state: GameState, gender: PetGender, name: string): Res
 
   const problem = validateName(name);
   if (problem) return failure(state, problem);
-  if (character.bronze < PET_PRICE) {
-    return failure(
-      state,
-      "Faltam " + formatBronze(PET_PRICE - character.bronze) + " para a adoção.",
-    );
+  if (character.level < PET_MIN_LEVEL) {
+    return failure(state, "O lobo só caça ao lado de um NV " + PET_MIN_LEVEL + " ou mais.");
+  }
+  const price = petPrice(character.level);
+  if (character.bronze < price) {
+    return failure(state, "Faltam " + formatBronze(price - character.bronze) + " para a adoção.");
   }
 
   const pet: Pet = {
@@ -50,7 +52,7 @@ export function adoptPet(state: GameState, gender: PetGender, name: string): Res
 
   const next: GameState = syncCharacter({
     ...state,
-    character: { ...character, bronze: character.bronze - PET_PRICE },
+    character: { ...character, bronze: character.bronze - price },
     pet,
   });
 

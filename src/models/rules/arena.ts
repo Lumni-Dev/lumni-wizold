@@ -88,8 +88,8 @@ export function arenaCombatant(hunter: Hunter): CombatOpponent {
 export const ARENA_SPOILS_MIN_SHARE = 0.1;
 export const ARENA_SPOILS_MAX_SHARE = 0.25;
 
-export const ARENA_SPOILS_MIN_HUNTS = 2;
-export const ARENA_SPOILS_MAX_HUNTS = 5;
+export const ARENA_SPOILS_MIN_HUNTS = 1.5;
+export const ARENA_SPOILS_MAX_HUNTS = 3;
 
 export interface SpoilsRange {
   min: number;

@@ -69,7 +69,7 @@ const RAGE_PER_ROUND = 7;
 const CREATURE_CRITICAL_CHANCE = 0.1;
 const PET_CRITICAL_CHANCE = 5;
 
-const CRITICAL_MULTIPLIER = 1.7;
+const CRITICAL_MULTIPLIER = 1.5;
 
 const CHARACTER_HIT_VERBS = [" acerta ", " morde ", " crava as garras em ", " golpeia "];
 const CHARACTER_CRIT_VERBS = [" rasga ", " despedaça ", " abre "];
@@ -118,7 +118,7 @@ function calculateDamage(
   random: Random,
   criticalMultiplier: number = CRITICAL_MULTIPLIER,
 ): number {
-  const raw = strength * spread(0.15, random);
+  const raw = strength * spread(0.1, random);
   const mitigated = (raw * raw) / (raw + Math.max(0, endurance));
   const total = critical ? mitigated * criticalMultiplier : mitigated;
   return Math.max(1, Math.round(total));

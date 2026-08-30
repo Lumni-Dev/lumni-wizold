@@ -7,6 +7,7 @@ import { listBoard, listSellable, type BoardEntry } from "@/controllers/bazaar.c
 import { api } from "@/controllers/api.client";
 import {
   BAZAAR_FEE_RATIO,
+  BAZAAR_LISTING_FEE,
   feeOf,
   MIN_LISTING_CENTS,
   MIN_WITHDRAW_CENTS,
@@ -14,7 +15,13 @@ import {
 } from "@/models/rules/bazaar";
 import { listingExpiresAt, type BazaarListing } from "@/models/entities/bazaar";
 import { enhancedName } from "@/models/rules/forge";
-import { formatNumber, formatReais, formatTime, parseReais } from "@/shared/utils/format";
+import {
+  formatBronze,
+  formatNumber,
+  formatReais,
+  formatTime,
+  parseReais,
+} from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
 import { Button } from "../components/button";
 import { ConfirmDialog } from "../components/confirm-dialog";
@@ -247,7 +254,11 @@ export function BazaarScreen() {
               </Button>
               <Button
                 variant="primary"
-                disabled={askedCents === null || askedCents < MIN_LISTING_CENTS}
+                disabled={
+                  askedCents === null ||
+                  askedCents < MIN_LISTING_CENTS ||
+                  character.bronze < BAZAAR_LISTING_FEE
+                }
                 onClick={() => {
                   if (askedCents === null) return;
                   return announceListing(announcing.item.id, askedQuantity, askedCents).then(
@@ -301,9 +312,16 @@ export function BazaarScreen() {
               />
 
               <p className="text-xs leading-relaxed text-ink-faint">
-                A plataforma fica com {FEE_LABEL} da transação. O anúncio fica no quadro até outro
-                caçador pagar por ele: o preço é seu, e a espera também.
+                Anunciar custa {formatBronze(BAZAAR_LISTING_FEE)} de bronze, que não voltam no
+                cancelamento. A plataforma fica com {FEE_LABEL} da venda. O anúncio fica no quadro
+                até outro caçador pagar por ele: o preço é seu, e a espera também.
               </p>
+              {character.bronze < BAZAAR_LISTING_FEE ? (
+                <p className="text-[11px] text-ink-faint">
+                  Faltam {formatBronze(BAZAAR_LISTING_FEE - character.bronze)} para a taxa do
+                  anúncio.
+                </p>
+              ) : null}
 
               {askedCents !== null && askedCents >= MIN_LISTING_CENTS ? (
                 <p className="font-mono text-[11px] text-ink-soft">

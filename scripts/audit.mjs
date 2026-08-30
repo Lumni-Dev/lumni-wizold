@@ -343,9 +343,9 @@ sec("combate");
     }
   }
   ok("bateria rodou", fights === 2400, fights);
-  ok("multiplicador sem fúria", combat.criticalMultiplierOf(0) === 1.7);
-  ok("multiplicador com fúria cheia", combat.criticalMultiplierOf(100) === 2.2);
-  ok("fúria acima do vital base não passa de 2,2", combat.criticalMultiplierOf(5000) === 2.2);
+  ok("multiplicador sem fúria", combat.criticalMultiplierOf(0) === 1.5);
+  ok("multiplicador com fúria cheia", combat.criticalMultiplierOf(100) === 2);
+  ok("fúria acima do vital base não passa de 2", combat.criticalMultiplierOf(5000) === 2);
 }
 sec("bandas e presas");
 {
@@ -573,8 +573,8 @@ sec("arena");
     const range = arena.arenaSpoilsRange(level);
     const purse = species.huntPurse(level);
     ok(
-      "faixa de espólio 2..5 bolsas NV " + level,
-      range.min === Math.round(purse * 2) && range.max === Math.round(purse * 5),
+      "faixa de espólio 1,5..3 bolsas NV " + level,
+      range.min === Math.round(purse * 1.5) && range.max === Math.round(purse * 3),
     );
     for (const bag of [0, 10, range.max, 10000000]) {
       for (let trial = 0; trial < 500; trial += 1) {
@@ -1025,10 +1025,23 @@ sec("mascote");
     const tick = petCtrl.restPetTick(kennel.state);
     ok("tique de repouso rende", tick.ok && tick.state.pet.energy > 10);
   }
-  const adopt = petCtrl.adoptPet({ ...baseState({ level: 1 }), pet: null }, "female", "Neve");
+  const young = petCtrl.adoptPet(
+    { ...baseState({ level: CONST.PET_MIN_LEVEL - 1 }), pet: null },
+    "female",
+    "Neve",
+  );
+  ok("adoção recusa antes do NV mínimo", young.ok === false);
+  const adoptLevel = CONST.PET_MIN_LEVEL;
+  const adopt = petCtrl.adoptPet(
+    { ...baseState({ level: adoptLevel }), pet: null },
+    "female",
+    "Neve",
+  );
   ok(
-    "adoção cobra o preço",
-    adopt.ok && adopt.state.character.bronze === 1000000 - CONST.PET_PRICE,
+    "adoção cobra o preço em caçadas",
+    adopt.ok &&
+      adopt.state.character.bronze ===
+        1000000 - Math.round(species.huntPurse(adoptLevel) * CONST.PET_PRICE_IN_HUNTS),
   );
   ok("segunda adoção recusa", petCtrl.adoptPet(adopt.state, "male", "Outro").ok === false);
   const released = petCtrl.releasePet(adopt.state);
@@ -1170,6 +1183,12 @@ sec("bazar");
     "anúncio tira da mochila",
     announced.ok &&
       inventoryCtrl.countInInventory(announced.state.inventory, "bronze-fragment") === 20,
+  );
+  ok(
+    "anúncio cobra a taxa em bronze",
+    announced.ok &&
+      announced.state.character.bronze ===
+        state.character.bronze - bazaarRules.BAZAAR_LISTING_FEE,
   );
   const freshListing = {
     id: "bz-1",
