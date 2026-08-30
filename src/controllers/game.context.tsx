@@ -17,6 +17,7 @@ import type { EquipmentSlot } from "@/models/entities/item";
 import { initialState, type GameState } from "@/models/entities/game-state";
 import type { Character, Gender } from "@/models/entities/character";
 import type { Pet, PetGender } from "@/models/entities/pet";
+import type { PackInvite } from "@/models/entities/pack";
 import { activityRepository } from "@/models/repositories/activity.repository";
 import { moonRepository } from "@/models/repositories/moon.repository";
 import type { MoonState } from "@/models/rules/moon";
@@ -97,6 +98,7 @@ interface GameContextValue {
   inviteByNick: (nick: string) => Promise<boolean>;
   acceptInvite: (id: string) => Promise<boolean>;
   declineInvite: (id: string) => Promise<boolean>;
+  fetchInvites: () => Promise<PackInvite[] | null>;
   removeFromPack: (id: string) => Promise<void>;
   renamePet: (name: string) => Promise<boolean>;
   feedPet: (itemId: string) => Promise<void>;
@@ -702,6 +704,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
           () => playSound("discard"),
         );
         return answer.ok;
+      },
+      // Reads the received invites and adopts the run in the same trip, so a
+      // pack change made elsewhere (someone accepting) lands without a refresh.
+      fetchInvites: async () => {
+        const answer = await request<{ invites: PackInvite[] }>("GET", "/api/pack/invites");
+        return answer.ok ? (answer.data?.invites ?? []) : null;
       },
       removeFromPack: async (id) => {
         await act("DELETE", "/api/pack/" + encodeURIComponent(id), undefined, "Matilha", () =>

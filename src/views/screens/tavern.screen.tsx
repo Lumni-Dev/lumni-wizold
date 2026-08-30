@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
-import { api } from "@/controllers/api.client";
 import { useGame } from "@/controllers/game.context";
 import { isInPack, listPack } from "@/controllers/pack.controller";
 import { playSound } from "@/controllers/sound";
@@ -62,8 +61,17 @@ function MemberName({
 }
 
 export function TavernScreen() {
-  const { state, character, notify, invite, inviteByNick, acceptInvite, declineInvite, removeFromPack } =
-    useGame();
+  const {
+    state,
+    character,
+    notify,
+    invite,
+    inviteByNick,
+    acceptInvite,
+    declineInvite,
+    fetchInvites,
+    removeFromPack,
+  } = useGame();
 
   const [activeRoomId, setActiveRoomId] = useState<string | null>(null);
   const [roomName, setRoomName] = useState("");
@@ -90,14 +98,20 @@ export function TavernScreen() {
   } = useTavern(activeRoomId);
   const [closingRoomId, setClosingRoomId] = useState<string | null>(null);
 
+  const fetchInvitesRef = useRef(fetchInvites);
+  useEffect(() => {
+    fetchInvitesRef.current = fetchInvites;
+  });
+  // Reads the invites and, in the same trip, adopts the run, so a mate that
+  // accepted your invite shows up in the matilha without a manual refresh.
   const refreshInvites = useCallback(() => {
-    void api<{ invites: PackInvite[] }>("GET", "/api/pack/invites").then((answer) => {
-      if (answer.ok && answer.data) setInvites(answer.data.invites);
+    void fetchInvitesRef.current().then((list) => {
+      if (list) setInvites(list);
     });
   }, []);
   useEffect(() => {
     refreshInvites();
-    const timer = window.setInterval(refreshInvites, 12000);
+    const timer = window.setInterval(refreshInvites, 10000);
     return () => window.clearInterval(timer);
   }, [refreshInvites]);
 

@@ -200,6 +200,8 @@ check(
 cookie = aCookie;
 const aPack = (await call("POST", "/api/state")).payload?.data;
 check("a matilha é mútua", aPack?.pack?.some((m) => m.id === mateId) === true);
+const reinvite = await call("POST", "/api/pack/invites", { id: mateId });
+check("não convida quem já é da matilha", reinvite.payload?.ok === false, reinvite.payload?.message);
 const dmAfter = await call("POST", "/api/tavern/direct", { otherId: mateId });
 check("DM entre a matilha abre", dmAfter.payload?.ok === true, dmAfter.payload?.message);
 const left = await call("DELETE", "/api/pack/" + mateId);
