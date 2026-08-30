@@ -28,7 +28,11 @@ function transporter() {
   });
 }
 
-function layout(paragraphs: readonly string[], buttonLabel: string): string {
+function layout(
+  paragraphs: readonly string[],
+  buttonLabel: string,
+  buttonHref: string = GAME_URL,
+): string {
   const body = paragraphs
     .map(
       (text) =>
@@ -65,7 +69,7 @@ function layout(paragraphs: readonly string[], buttonLabel: string): string {
     body +
     '<div style="text-align:center;padding-top:10px;">' +
     '<a href="' +
-    GAME_URL +
+    buttonHref +
     '" style="display:inline-block;background-color:' +
     EMBER +
     ";color:" +
@@ -110,6 +114,25 @@ export async function sendWelcomeEmail(to: string): Promise<void> {
     "A noite te esperava",
     layout(paragraphs, "Entrar na caçada"),
     "Sua conta nasceu em Wizold. Entre na caçada: " + GAME_URL,
+  );
+}
+
+export async function sendPackInviteEmail(to: string, inviterName: string): Promise<void> {
+  const tavern = GAME_URL + "/tavern";
+  const paragraphs = [
+    '<strong style="color:' +
+      INK +
+      ';">' +
+      inviterName +
+      "</strong> chamou você para a matilha dele em Wizold.",
+    "A matilha corre junta: quem é da sua matilha pode abrir uma mesa reservada com você, e você com ele, o único jeito de conversar a dois na taverna.",
+    "O convite espera na Taverna, no quadro de Convites. É lá que você aceita ou recusa, com um clique.",
+  ];
+  await deliver(
+    to,
+    inviterName + " chamou você para a matilha",
+    layout(paragraphs, "Aceitar na Taverna", tavern),
+    inviterName + " chamou você para a matilha em Wizold. Aceite na Taverna: " + tavern,
   );
 }
 

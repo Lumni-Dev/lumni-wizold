@@ -1,9 +1,11 @@
+import { after } from "next/server";
 import { failure, success } from "@/models/entities/result";
 import type { TavernIdentity } from "@/models/entities/tavern";
 import { loadNames } from "@/models/repositories/server/roster.store";
 import * as packController from "@/controllers/pack.controller";
 import { generateId } from "@/shared/utils/id";
 import { asText, withGame } from "../../_lib/api";
+import { sendPackInviteEmail } from "../../_lib/mail";
 
 // Send a pack invite to another hunter, by id (a click) or by nick (typed).
 export async function POST(request: Request) {
@@ -34,6 +36,22 @@ export async function POST(request: Request) {
     );
     if (inserted.rowCount === 0) {
       return failure(state, "Você já chamou " + target.name + " para a matilha.");
+    }
+
+    // Avisa por carta quem foi chamado, com o link para a Taverna. Best-effort,
+    // fora do caminho da resposta; contas de teste não recebem correio.
+    const contact = await context.client.query(
+      "select u.email from users u join characters c on c.user_id = u.id where c.id = $1",
+      [target.id],
+    );
+    const email = contact.rows[0]?.email;
+    const inviterName = state.character?.name ?? "Um caçador";
+    if (email && !String(email).endsWith("@wizold.test")) {
+      after(() =>
+        sendPackInviteEmail(String(email), inviterName).catch((error) =>
+          console.error("[mail] convite de matilha", error),
+        ),
+      );
     }
 
     return success(state, "Convite enviado a " + target.name + ".");
