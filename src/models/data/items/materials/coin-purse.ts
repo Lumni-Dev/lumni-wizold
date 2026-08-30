@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Bolsa de Moedas: despojo de caça, trocado por bronze no mercado.
 export const coinPurse: Item = {
   id: "coin-purse",
   name: "Bolsa de Moedas",

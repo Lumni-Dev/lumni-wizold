@@ -103,12 +103,9 @@ export function MarketScreen() {
   useEffect(() => {
     const sellId = new URLSearchParams(window.location.search).get("sell");
     if (!sellId) return;
-    // Clear the param first so this only fires for the fresh deep link, never on
-    // the re-runs that a changing inventory (sellables) triggers.
     window.history.replaceState(null, "", "/market");
     const slot = sellables.find((entry) => entry.item.id === sellId);
     if (!slot) return;
-    // A ?sell= deep link from the inventory opens the item's sell dialog here.
     /* eslint-disable react-hooks/set-state-in-effect */
     setTab("sell");
     setSelling(String(slot.quantity));

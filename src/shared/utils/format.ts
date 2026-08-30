@@ -4,8 +4,6 @@ export function clamp(value: number, minimum: number, maximum: number): number {
   return Math.max(minimum, Math.min(maximum, value));
 }
 
-// Bronze cannot pass the vault ceiling (BAU_LIMIT). Applied wherever bronze is
-// credited, so the baú caps what the player can hoard.
 export function capBronze(value: number): number {
   return Math.max(0, Math.min(BAU_LIMIT, Math.round(value)));
 }

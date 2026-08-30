@@ -1,9 +1,6 @@
 import type { EquipmentSlot } from "@/models/entities/item";
 import type { SlotBlueprint } from "./types";
 
-// The seven slots and the attribute each lends, as a fraction of the set's power.
-// Claw and ring give Força; armor, pants and helmet give Resistência; boots give
-// Agilidade; necklace gives Instinto and Vontade.
 export const SLOTS: Record<EquipmentSlot, SlotBlueprint> = {
   helmet: {
     noun: "Gorro",

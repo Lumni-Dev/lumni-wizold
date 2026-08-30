@@ -1,10 +1,5 @@
 export type Random = () => number;
 
-// A float in [0, 1) drawn from the platform CSPRNG when it exists (Node's
-// global webcrypto on the server, window.crypto in the browser), so the rolls
-// that decide forge success, drops and spoils cannot be predicted from a run
-// of observed outputs the way Math.random's xorshift state can. Math.random is
-// only the fallback for an ancient runtime; the benches inject seededRandom.
 function secureFloat(): number {
   const source = globalThis.crypto;
   if (source && typeof source.getRandomValues === "function") {

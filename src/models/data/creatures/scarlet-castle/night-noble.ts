@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Nobre da Noite (NV. 821 a 830) da área Castelo Escarlate.
 export const nightNoble: Creature = {
   id: "night-noble",
   name: "Nobre da Noite",

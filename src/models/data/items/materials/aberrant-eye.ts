@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Olho Aberrante: despojo de caça, trocado por bronze no mercado.
 export const aberrantEye: Item = {
   id: "aberrant-eye",
   name: "Olho Aberrante",

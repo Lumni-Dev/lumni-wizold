@@ -1,6 +1,5 @@
 import type { Exercise } from "./types";
 
-// Treina Força.
 export const trunkPunches: Exercise = {
   id: "trunk-punches",
   name: "Socos no Tronco",

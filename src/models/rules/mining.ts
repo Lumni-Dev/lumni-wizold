@@ -8,10 +8,6 @@ export function miningNeeded(level: number): number {
   return Math.round(40 * level * (1 + level / 25));
 }
 
-// The day resets at 06:00 America/Sao_Paulo (09:00 UTC) for everyone at once.
-// This is the most recent boundary at or before `now`, so the count belongs to
-// the period it opened in. Computing it is pure, so the client shows the same
-// number the server enforces, and nobody needs a cron to run for it to hold.
 export function miningPeriodStart(now: number): number {
   const at = new Date(now);
   let boundary = Date.UTC(at.getUTCFullYear(), at.getUTCMonth(), at.getUTCDate(), MINING_RESET_HOUR_UTC);
@@ -19,7 +15,6 @@ export function miningPeriodStart(now: number): number {
   return boundary;
 }
 
-// When the count next refills: the next 06:00 São Paulo boundary.
 export function miningNextReset(now: number): number {
   return miningPeriodStart(now) + DAY_MS;
 }
@@ -28,8 +23,6 @@ export function miningResetsInMs(now: number): number {
   return Math.max(0, miningNextReset(now) - now);
 }
 
-// Wipes the count when it belongs to an earlier daily period, so the reset lands
-// at 06:00 for everyone without any scheduled job firing.
 export function rolloverMining(mining: MiningState, now: number): MiningState {
   const period = miningPeriodStart(now);
   const stored = mining.windowStart ? Date.parse(mining.windowStart) : Number.NaN;
@@ -48,9 +41,6 @@ export function miningExhausted(mining: MiningState, now: number): boolean {
 }
 
 export function miningYieldBonus(level: number): number {
-  // Every 40 mining levels adds one to the multiplier (was every 20), so the
-  // deep veins yield roughly half what they used to and feeding the pricier
-  // forge is a real grind instead of a fragment fountain.
   return 1 + Math.floor(level / 40);
 }
 

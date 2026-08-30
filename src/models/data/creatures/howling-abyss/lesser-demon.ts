@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Demônio Menor (NV. 721 a 730) da área Abismo Uivante.
 export const lesserDemon: Creature = {
   id: "lesser-demon",
   name: "Demônio Menor",

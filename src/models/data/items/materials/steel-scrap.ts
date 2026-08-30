@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Sucata de Aço: despojo de caça, trocado por bronze no mercado.
 export const steelScrap: Item = {
   id: "steel-scrap",
   name: "Sucata de Aço",

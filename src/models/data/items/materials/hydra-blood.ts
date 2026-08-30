@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Sangue de Hidra: despojo de caça, trocado por bronze no mercado.
 export const hydraBlood: Item = {
   id: "hydra-blood",
   name: "Sangue de Hidra",

@@ -14,7 +14,6 @@ import { emptyAttributes, type Attributes } from "../entities/attribute";
 import type { Item } from "../entities/item";
 import type { Pet } from "../entities/pet";
 
-// The wolf costs a flat price, the same bronze at every level.
 export function petPrice(): number {
   return PET_PRICE;
 }
@@ -76,9 +75,6 @@ export function growPet(pet: Pet, effort: number): { pet: Pet; leveled: boolean 
   let nextLevel = level;
   let leveled = false;
 
-  // The excess carries into the next level instead of being thrown away, the
-  // same way the hunter's training and experience carry, so a session never
-  // wastes progress and a fat gain can climb more than one level at once.
   while (nextLevel < PET_MAX_LEVEL && progress >= petTrainingNeeded(nextLevel)) {
     progress -= petTrainingNeeded(nextLevel);
     nextLevel += 1;

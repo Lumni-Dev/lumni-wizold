@@ -23,7 +23,6 @@ export interface StatSources {
 
   moon: Attributes;
 
-  // The fury-potion buff: a flat bonus to every attribute while it is active.
   fury: Attributes;
 }
 
@@ -78,8 +77,6 @@ export interface StatSubject {
   level: number;
   attributes: Attributes;
 
-  // Whether the fury-potion buff is active. The caller decides it from furyUntil
-  // and the current time, so this derivation stays pure and testable.
   furyActive?: boolean;
 
   petAttributes?: Attributes;

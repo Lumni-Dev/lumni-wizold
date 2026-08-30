@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Glândula de Veneno: despojo de caça, trocado por bronze no mercado.
 export const venomGland: Item = {
   id: "venom-gland",
   name: "Glândula de Veneno",

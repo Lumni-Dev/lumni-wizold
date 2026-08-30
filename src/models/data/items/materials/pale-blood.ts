@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Sangue Pálido: despojo de caça, trocado por bronze no mercado.
 export const paleBlood: Item = {
   id: "pale-blood",
   name: "Sangue Pálido",

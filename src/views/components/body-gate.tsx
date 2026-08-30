@@ -5,9 +5,6 @@ import { useGame } from "@/controllers/game.context";
 import { MIN_HEALTH_RATIO_TO_ACT } from "@/shared/constants/game";
 import { RecoveryButton } from "./recovery-button";
 
-// The body comes before the action: while the body is too low to act, a row's
-// action is swapped for Recuperar-se. Transformation is gone, so low health is the
-// only thing that gates an action now.
 export function BodyGate({
   open,
   reason,

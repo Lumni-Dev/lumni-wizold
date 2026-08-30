@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Ferrão de Escorpião: despojo de caça, trocado por bronze no mercado.
 export const scorpionStinger: Item = {
   id: "scorpion-stinger",
   name: "Ferrão de Escorpião",

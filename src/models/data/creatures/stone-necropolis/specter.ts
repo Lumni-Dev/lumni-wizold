@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Espectro (NV. 621 a 630) da área Necrópole de Pedra.
 export const specter: Creature = {
   id: "specter",
   name: "Espectro",

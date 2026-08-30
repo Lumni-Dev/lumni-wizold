@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Pedra de Gárgula: despojo de caça, trocado por bronze no mercado.
 export const gargoyleStone: Item = {
   id: "gargoyle-stone",
   name: "Pedra de Gárgula",

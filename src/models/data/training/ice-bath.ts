@@ -1,6 +1,5 @@
 import type { Exercise } from "./types";
 
-// Treina Resistência.
 export const iceBath: Exercise = {
   id: "ice-bath",
   name: "Banho de Gelo",

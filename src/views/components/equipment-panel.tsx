@@ -10,10 +10,6 @@ export interface GearSlot {
   level: number;
 }
 
-// The equipment grid with item art, shared by the character sheet and the
-// read-only profile so the two never drift. Two pieces per row to keep the
-// section compact: each cell shows the drawing (with its forge badge), the piece
-// name and the slot label.
 export function EquipmentPanel({ gear, forge }: { gear: GearSlot[]; forge: number }) {
   return (
     <Panel

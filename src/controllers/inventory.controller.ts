@@ -163,8 +163,6 @@ export function consumeItem(state: GameState, itemId: string): Result {
     return failure(state, item.name + " não está no inventário.");
   }
 
-  // Fury potion: a timed buff (+10 to every attribute). Drinking it (re)starts the
-  // clock at its full duration; there is no vital to top up.
   const furyMinutes = item.effect.furyMinutes ?? 0;
   if (furyMinutes > 0) {
     const until = new Date(Date.now() + furyMinutes * 60_000).toISOString();

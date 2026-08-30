@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Súcubo (NV. 751 a 760) da área Abismo Uivante.
 export const succubus: Creature = {
   id: "succubus",
   name: "Súcubo",

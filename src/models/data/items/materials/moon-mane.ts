@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Crina Lunar: despojo de caça, trocado por bronze no mercado.
 export const moonMane: Item = {
   id: "moon-mane",
   name: "Crina Lunar",

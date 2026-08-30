@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Carniça: despojo de caça, trocado por bronze no mercado.
 export const carrionMeat: Item = {
   id: "carrion-meat",
   name: "Carniça",

@@ -27,8 +27,6 @@ interface BarProps {
   wraps?: boolean;
   tone?: BarTone;
   glows?: boolean;
-  // Reads the label in the section-title ink instead of the faint chrome ink,
-  // for the top nav, where the readout has to stay legible.
   prominent?: boolean;
   className?: string;
 }

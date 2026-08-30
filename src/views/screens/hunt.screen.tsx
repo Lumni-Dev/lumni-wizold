@@ -44,9 +44,6 @@ interface HuntSession {
     }
   >;
 }
-// Creature art rides a version query, like the manifest's ?v: /assets is cached a
-// year and immutable, so a URL 404-ed before its .png existed stays 404 in cache.
-// Bump this whenever new creature art lands so every drawing is re-fetched clean.
 const CREATURE_ART_VERSION = "?v=2";
 
 const EMPTY_SESSION: HuntSession = {
@@ -167,8 +164,6 @@ export function HuntScreen() {
   const waitingId = activity?.kind === "hunt" && paused ? (activity.id ?? null) : null;
   const petAlong = canPetFight(pet) ? pet : null;
   const [report, setReport] = useState<HuntReport | null>(null);
-  // The monster picked per area (a radio on the list), a device fact: which creature
-  // the trail hunts, so you can drop to an easier one while you forge for the next.
   const [selection, setSelection] = useState<Record<string, string>>(() => loadHuntSelection());
   const [reportLines, setReportLines] = useState<NarrationLine[]>([]);
   const [session, setSession] = useState<HuntSession>(EMPTY_SESSION);
@@ -177,7 +172,6 @@ export function HuntScreen() {
   const [pending, setPending] = useState<HuntReport | null>(null);
   const [preyJolt, setPreyJolt] = useState(0);
   const [lapJolt, setLapJolt] = useState(0);
-  // A critical, given or received, shakes the whole fight card, not the bar.
   const shaking = useShake(preyJolt + lapJolt);
   const beatRef = useRef(0);
   const scriptRef = useRef<NarrationLine[]>([]);
@@ -205,9 +199,6 @@ export function HuntScreen() {
   });
   useEffect(() => {
     if (!activeId) return;
-    // A fresh run starts clean: reset the in-flight guard so a request left over
-    // from a torn-down run can never stall this one, and mark it live so a stale
-    // completion below skips instead of corrupting it.
     let alive = true;
     requestingRef.current = false;
     pendingRef.current = null;
@@ -215,9 +206,6 @@ export function HuntScreen() {
     beatRef.current = 0;
     setProgress({ id: activeId, beat: beatRef.current });
     const timer = window.setInterval(() => {
-      // No fight in flight or held: settle a new one on the server. It commits at
-      // once (deferred so the body only bleeds as the narration reaches each blow),
-      // which also blocks the automation from the instant the request is sent.
       if (!pendingRef.current && !requestingRef.current) {
         requestingRef.current = true;
         void huntRef.current(activeId, selectionRef.current[activeId]).then((fight) => {
@@ -241,9 +229,7 @@ export function HuntScreen() {
         });
         return;
       }
-      // Waiting for the settled fight to arrive.
       if (!pendingRef.current) return;
-      // Play it out line by line, bleeding the body as it goes.
       beatRef.current += 1;
       setProgress({ id: activeId, beat: beatRef.current });
       const line = scriptRef.current[Math.min(beatRef.current, scriptRef.current.length) - 1];
@@ -299,7 +285,6 @@ export function HuntScreen() {
           );
           playSound("defeat");
         }
-        // Ready for the next lap, or stop.
         scriptRef.current = [];
         setScript([]);
         beatRef.current = 0;
@@ -307,7 +292,6 @@ export function HuntScreen() {
         if (!autoRef.current) setActivity(null);
       }
     }, HUNT_TICK_MS);
-    // A committed fight left mid-replay is landed, since the server settled it.
     return () => {
       alive = false;
       window.clearInterval(timer);
@@ -328,8 +312,6 @@ export function HuntScreen() {
     });
   }
   function toggleHunt(territoryId: string, available: boolean) {
-    // Stop: freeze at the exact beat; the effect cleanup banks it and the
-    // interrupted trail lands nothing. Starting seeds the beat from the bank.
     if (activeId === territoryId) {
       setActivity(null);
       return;
@@ -369,9 +351,7 @@ export function HuntScreen() {
             const ready = unlocked && hasHealth;
             const available = ready;
             const active = activeId === territory.id;
-            // The creature the radio has picked here, falling back to the suggested one.
             const selectedId = selection[territory.id] ?? prey?.id ?? null;
-            // The live fight only plays on the active card, once a beat has landed.
             const onThis = active && progress.id === territory.id;
             const line =
               onThis && progress.beat > 0 && script.length > 0
@@ -391,7 +371,7 @@ export function HuntScreen() {
                 )}
               >
                 <div className="grid md:grid-cols-2 md:divide-x md:divide-edge">
-                  {/* Left: art, name, story, level range and the hunt itself. */}
+                  {}
                   <div className="flex flex-col divide-y divide-edge">
                     {art.territories[territory.id] ? (
                       <div className="aspect-video w-full overflow-hidden">
@@ -471,15 +451,14 @@ export function HuntScreen() {
                     </div>
                   </div>
 
-                  {/* Right: the ten creatures of the area, one per line. */}
+                  {}
                   <div className="flex flex-col border-t border-edge md:border-t-0">
                     <div className="px-4 py-3">
                       <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                         Criaturas da área
                       </p>
                     </div>
-                    {/* Click a row to hunt that monster; the radio marks the pick, one
-                        per area. While you cannot beat the next, drop to an easier one. */}
+                    {}
                     <ul className="max-h-[560px] divide-y divide-edge overflow-y-auto border-t border-edge">
                       {creatures.map((creature) => {
                         const isSelected = creature.id === selectedId;
@@ -496,10 +475,7 @@ export function HuntScreen() {
                                 isSelected ? "bg-surface-high" : "hover:bg-surface-high/60",
                               )}
                             >
-                              {/* Exactly the equipment icon (IconFrame medium): slot-well
-                                  gradient, edge border, ember corner accents and the art
-                                  cover-fit with the same 5px inset, only without the m-3
-                                  margin so the list row stays aligned. */}
+                              {}
                               <span
                                 aria-hidden="true"
                                 className="relative flex h-18 w-18 shrink-0"

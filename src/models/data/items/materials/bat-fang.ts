@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Presa de Morcego: despojo de caça, trocado por bronze no mercado.
 export const batFang: Item = {
   id: "bat-fang",
   name: "Presa de Morcego",

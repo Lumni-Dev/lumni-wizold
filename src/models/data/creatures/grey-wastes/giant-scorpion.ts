@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Escorpião Gigante (NV. 521 a 530) da área Ermo Cinza.
 export const giantScorpion: Creature = {
   id: "giant-scorpion",
   name: "Escorpião Gigante",

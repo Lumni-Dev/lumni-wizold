@@ -4,7 +4,6 @@ import { buildSetItems } from "./equipment-sets";
 import { ALL_MATERIALS } from "./items/materials";
 import { POTIONS, PET_SUPPLIES } from "./consumables";
 
-// One fragment per set, mined from the veins. Never sold, only feeds the forge.
 const FRAGMENT_LINES = [
   { set: "bronze", label: "Bronze", price: 15, rarity: "common" as const },
   { set: "silver", label: "Metal", price: 60, rarity: "uncommon" as const },
@@ -30,8 +29,6 @@ const FRAGMENTS: readonly Item[] = FRAGMENT_LINES.map((line) => ({
   effect: {},
 }));
 
-// The full item catalog, assembled from the isolated tables: equipment (by set),
-// consumables (potions + rations), fragments (mined) and materials (creature loot).
 export const ITEMS: readonly Item[] = [
   ...buildSetItems(),
   ...POTIONS,

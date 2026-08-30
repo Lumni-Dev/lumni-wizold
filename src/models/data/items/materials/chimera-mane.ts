@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Juba de Quimera: despojo de caça, trocado por bronze no mercado.
 export const chimeraMane: Item = {
   id: "chimera-mane",
   name: "Juba de Quimera",

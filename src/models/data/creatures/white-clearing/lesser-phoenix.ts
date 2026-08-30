@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Fênix Menor (NV. 921 a 930) da área Clareira Branca.
 export const lesserPhoenix: Creature = {
   id: "lesser-phoenix",
   name: "Fênix Menor",

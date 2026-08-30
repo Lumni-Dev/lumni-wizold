@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Pele de Puma: despojo de caça, trocado por bronze no mercado.
 export const pumaPelt: Item = {
   id: "puma-pelt",
   name: "Pele de Puma",

@@ -1,9 +1,5 @@
 import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from "node:crypto";
 
-// AES-256-GCM at rest for withdrawal PII (CPF, legal name, Pix key). The key is
-// derived from SESSION_SECRET so no new env is needed; the derived key never
-// leaves the server. Format is iv:tag:ciphertext, all base64url. A single DB
-// read now yields ciphertext, not a monetisable CPF-name-Pix dataset.
 let cachedKey: Buffer | null = null;
 
 function key(): Buffer {
@@ -26,7 +22,7 @@ export function sealPII(plain: string): string {
 
 export function openPII(packed: string): string {
   const [iv, tag, body] = packed.split(":");
-  if (!iv || !tag || !body) return packed; // legacy plaintext, read as-is
+  if (!iv || !tag || !body) return packed;
   const decipher = createDecipheriv("aes-256-gcm", key(), Buffer.from(iv, "base64url"));
   decipher.setAuthTag(Buffer.from(tag, "base64url"));
   return Buffer.concat([decipher.update(Buffer.from(body, "base64url")), decipher.final()]).toString(

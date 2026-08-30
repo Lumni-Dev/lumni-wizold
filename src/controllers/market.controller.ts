@@ -17,10 +17,6 @@ import { addLog } from "./log.controller";
 
 const SELL_RATIO = 0.5;
 
-// The price the market actually charges. A consumable carrying a `huntCost` is
-// priced in carcasses of the buyer's level, like the pet and the store packs, so
-// it costs the same slice of time the whole run; everything else keeps its flat
-// catalog price.
 export function marketPriceOf(item: Item, level: number): number {
   if (item.huntCost === undefined) return item.price;
   return Math.max(1, Math.round(huntPurse(level) * item.huntCost));

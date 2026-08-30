@@ -1,6 +1,5 @@
 import type { Exercise } from "./types";
 
-// Treina Vontade.
 export const lunarMeditation: Exercise = {
   id: "lunar-meditation",
   name: "Meditação Lunar",

@@ -108,9 +108,6 @@ export function renameCharacter(state: GameState, name: string): Result {
   return success(addLog(next, "character", message), message);
 }
 
-// How long the fury-potion buff (+10 to every attribute) still lasts, for the
-// countdown in the UI. Zero when no buff is active. The buff needs no server-side
-// expiry: it simply stops counting once furyUntil is in the past.
 export function furyRemainingMs(character: Character): number {
   if (!character.furyUntil) return 0;
   return Math.max(0, Date.parse(character.furyUntil) - Date.now());

@@ -1,6 +1,5 @@
 import type { Exercise } from "./types";
 
-// Treina Instinto.
 export const blindTracking: Exercise = {
   id: "blind-tracking",
   name: "Rastreio Cego",

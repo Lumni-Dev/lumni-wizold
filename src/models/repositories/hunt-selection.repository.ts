@@ -1,7 +1,3 @@
-// The creature the player is farming in each area: a device fact (localStorage),
-// one selected monster per territory, keyed by territory id. It is a preference,
-// not run state, so it lives on the device like the sound switch and the mining
-// bank, never in the save; the hunt route validates the id against the area anyway.
 const KEY = "lumni-wizold:hunt-selection";
 
 export function loadHuntSelection(): Record<string, string> {
@@ -25,6 +21,5 @@ export function saveHuntSelection(selection: Record<string, string>): void {
   try {
     window.localStorage.setItem(KEY, JSON.stringify(selection));
   } catch {
-    // Ignore write failures (private mode, quota): the selection is only a comfort.
   }
 }

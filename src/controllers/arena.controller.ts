@@ -31,8 +31,6 @@ export interface ArenaRival {
   cooldownLeft: number;
   spoils: SpoilsRange;
 }
-// Kept as a re-export so the arena screen's import path stays put; the body now
-// lives in shared/utils/format, shared with the mine's daily countdown.
 export { formatCooldown };
 export interface ArenaView {
   band: LevelBand;

@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Raposa Ladra (NV. 31 a 40) da área Campo do Vilarejo.
 export const thiefFox: Creature = {
   id: "thief-fox",
   name: "Raposa Ladra",

@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Caçador Novato (NV. 401 a 410) da área Estrada dos Caçadores.
 export const noviceHunter: Creature = {
   id: "novice-hunter",
   name: "Caçador Novato",

@@ -42,10 +42,6 @@ export function addMate(state: GameState, person: TavernIdentity): Result<PackMa
   return success(addLog(next, "character", message), message, mate);
 }
 
-// Resolve a typed nick against the tavern and the roster: an exact name wins,
-// then a single partial match, and a piece that fits many is refused. Returns
-// the person or the line that says why. Shared by the invite door so a nick and
-// a click both reach the same identity.
 export function matchNick(
   nick: string,
   candidates: readonly TavernIdentity[],

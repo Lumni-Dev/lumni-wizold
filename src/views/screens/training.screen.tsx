@@ -45,8 +45,6 @@ export function TrainingScreen() {
   const autoRef = useRef(state.automation.train);
   const trainRef = useRef(train);
   const notifyRef = useRef(notify);
-  // Whether the running exercise is worth pausing for later (not maxed, still a
-  // beast), which decides an out-of-bronze lap between a pause and a full stop.
   const resumableRef = useRef(false);
   useEffect(() => {
     autoRef.current = state.automation.train;
@@ -70,15 +68,12 @@ export function TrainingScreen() {
     if (activeExercise === PET_EXERCISE_ID && petGone) return;
 
     const key = "train:" + activeExercise;
-    // Resume the session from the banked beat; a fresh one starts at zero.
     beatRef.current = progressRepository.get(key, TRAINING_TICKS);
     setSession({ id: activeExercise, beat: beatRef.current });
     const timer = window.setInterval(() => {
       beatRef.current = beatRef.current >= TRAINING_TICKS ? 0 : beatRef.current + 1;
       setSession({ id: activeExercise, beat: beatRef.current });
 
-      // Beats before the last are the exercise in motion; nothing is charged yet,
-      // so stopping here costs no bronze and lands no point.
       if (beatRef.current > 0 && beatRef.current < TRAINING_TICKS) {
         const effort = activeExercise === PET_EXERCISE_ID ? "growl" : activeExercise;
         if (isGameSound(effort)) playSound(effort);
@@ -86,7 +81,6 @@ export function TrainingScreen() {
       }
       if (beatRef.current < TRAINING_TICKS) return;
 
-      // Last beat: the server charges the bronze and lands the progress in one call.
       progressRepository.clear(key);
       void trainRef.current(activeExercise).then((landed) => {
         if (landed) {
@@ -95,7 +89,7 @@ export function TrainingScreen() {
             playSound(activeExercise === PET_EXERCISE_ID ? "pet-up" : "point");
           }
         }
-        if (landed && autoRef.current) return; // chain: let the interval wrap to a new lap
+        if (landed && autoRef.current) return;
         beatRef.current = 0;
         setSession({ id: activeExercise, beat: 0 });
         setActivity(
@@ -106,8 +100,6 @@ export function TrainingScreen() {
       });
     }, TRAINING_TICK_MS);
 
-    // Leaving mid-session banks the exact beat; a landed session reset the ref to
-    // zero, so this clears instead.
     return () => {
       window.clearInterval(timer);
       progressRepository.set("train:" + activeExercise, beatRef.current);
@@ -117,8 +109,6 @@ export function TrainingScreen() {
   if (!character || !stats) return null;
 
   function toggleTraining(exerciseId: string, ready: boolean) {
-    // Stop: freeze at the exact beat; the effect cleanup banks it and the
-    // interrupted session lands nothing. Starting seeds the beat from the bank.
     if (activeExercise === exerciseId) {
       setActivity(null);
       return;

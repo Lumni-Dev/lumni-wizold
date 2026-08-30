@@ -140,9 +140,6 @@ export function ArenaScreen() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [roster, setRoster] = useState<Hunter[]>([]);
-  // The duel fills a "No fosso..." approach first (cancelable, nothing committed)
-  // and only calls the server when it tops out; then it plays out live. `fighting`
-  // holds the opponent shown throughout, `report` the settled duel.
   const [fighting, setFighting] = useState<{ hunter: Hunter; maxHealth: number } | null>(null);
   const [phase, setPhase] = useState<"approach" | "fight">("approach");
   const [beat, setBeat] = useState(0);
@@ -150,7 +147,6 @@ export function ArenaScreen() {
   const [script, setScript] = useState<NarrationLine[]>([]);
   const [myJolt, setMyJolt] = useState(0);
   const [foeJolt, setFoeJolt] = useState(0);
-  // A critical, given or received, shakes the whole duel panel, not the bar.
   const shaking = useShake(myJolt + foeJolt);
   const beatRef = useRef(0);
   const phaseRef = useRef<"approach" | "fight">("approach");
@@ -197,12 +193,9 @@ export function ArenaScreen() {
   useEffect(() => {
     if (!fighting) return;
     const target = fighting.hunter.id;
-    // Reset the in-flight guard so a stale request never freezes this approach,
-    // and mark this run live so a stale completion skips instead of corrupting it.
     let alive = true;
     requestingRef.current = false;
     const timer = window.setInterval(() => {
-      // Approach: circle the pit; nothing committed, so leaving cancels.
       if (phaseRef.current === "approach") {
         beatRef.current = Math.min(beatRef.current + 1, HUNT_APPROACH_TICKS);
         setBeat(beatRef.current);
@@ -215,7 +208,6 @@ export function ArenaScreen() {
             setFighting(null);
             return;
           }
-          // The server settled and committed the duel; play it out live.
           pendingRef.current = resolution;
           bledRef.current = { last: characterRef.current?.health ?? 0, total: 0 };
           scriptRef.current = narrationOf(
@@ -231,7 +223,6 @@ export function ArenaScreen() {
         });
         return;
       }
-      // Fight: play the settled duel line by line, bleeding the body as it goes.
       if (!pendingRef.current) return;
       beatRef.current += 1;
       setBeat(beatRef.current);
@@ -264,7 +255,6 @@ export function ArenaScreen() {
     return () => {
       alive = false;
       window.clearInterval(timer);
-      // Committed duel left mid-replay: land it, the server already settled it.
       if (pendingRef.current) {
         pendingRef.current = null;
         landRef.current();
@@ -273,8 +263,6 @@ export function ArenaScreen() {
   }, [fighting]);
   if (!character || !stats) return null;
   const busy = fighting !== null;
-  // Start filling the bar toward a known opponent; the server call waits for the
-  // last beat, so the fight is not committed until the bar tops out.
   function beginDuel(hunter: Hunter, maxHealth: number) {
     if (fighting) return;
     beatRef.current = 0;

@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Rato de Celeiro (NV. 11 a 20) da área Campo do Vilarejo.
 export const barnRat: Creature = {
   id: "barn-rat",
   name: "Rato de Celeiro",

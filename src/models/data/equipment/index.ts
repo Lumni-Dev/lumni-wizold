@@ -18,8 +18,6 @@ import type { SetDefinition } from "./types";
 export type { SetDefinition, SlotBlueprint } from "./types";
 export { SLOTS } from "./slots";
 
-// Five sets, one per file, ordered by the level they unlock (fifths of the ceiling:
-// NV 1 / 201 / 401 / 601 / 801, each set covering two areas).
 export const EQUIPMENT_SETS: readonly SetDefinition[] = [
   bronzeSet,
   silverSet,

@@ -7,7 +7,6 @@ import { generateId } from "@/shared/utils/id";
 import { asText, withGame } from "../../_lib/api";
 import { sendPackInviteEmail } from "../../_lib/mail";
 
-// Send a pack invite to another hunter, by id (a click) or by nick (typed).
 export async function POST(request: Request) {
   return withGame(request, async (state, body, context) => {
     const names = await loadNames(context.client);
@@ -38,8 +37,6 @@ export async function POST(request: Request) {
       return failure(state, "Você já chamou " + target.name + " para a matilha.");
     }
 
-    // Avisa por carta quem foi chamado, com o link para a Taverna. Best-effort,
-    // fora do caminho da resposta; contas de teste não recebem correio.
     const contact = await context.client.query(
       "select u.email from users u join characters c on c.user_id = u.id where c.id = $1",
       [target.id],
@@ -58,7 +55,6 @@ export async function POST(request: Request) {
   });
 }
 
-// The invites this hunter has received, newest first, with the inviter's live name.
 export async function GET(request: Request) {
   return withGame(request, async (state, _body, context) => {
     const rows = await context.client.query(

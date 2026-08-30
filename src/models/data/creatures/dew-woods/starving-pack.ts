@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Alcateia Faminta (NV. 191 a 200) da área Mata do Orvalho.
 export const starvingPack: Creature = {
   id: "starving-pack",
   name: "Alcateia Faminta",

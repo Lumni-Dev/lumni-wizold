@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Cervo de Chifre Torto (NV. 171 a 180) da área Mata do Orvalho.
 export const twistedAntlerStag: Creature = {
   id: "twisted-antler-stag",
   name: "Cervo de Chifre Torto",

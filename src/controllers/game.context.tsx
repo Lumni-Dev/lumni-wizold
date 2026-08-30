@@ -150,9 +150,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const dismissNotice = useCallback((id: number) => {
     setNotices((current) => current.filter((line) => line.id !== id));
   }, []);
-  // Closing the update prompt reloads the page and clears the Cache Storage first,
-  // so the browser fetches the fresh build instead of a stale one. The
-  // notification service worker caches nothing, so it is left registered.
   const applyUpdate = useCallback(() => {
     const reload = () => window.location.reload();
     try {
@@ -166,10 +163,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
     } catch {}
     reload();
   }, []);
-  // An open tab keeps running its old bundle after a deploy. It asks the server
-  // for the current version on mount, on a clock and whenever the tab regains
-  // focus, and once the answer no longer matches this build it raises the prompt,
-  // which never lowers again.
   useEffect(() => {
     let alive = true;
     const check = async () => {
@@ -209,11 +202,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const appliedRef = useRef(0);
   const heldHuntRef = useRef<HeldLanding | null>(null);
   const heldArenaRef = useRef<HeldLanding | null>(null);
-  // A hunt/arena request is committed on the server the instant it is sent, but
-  // its landing is only held once the answer arrives. This counts such requests
-  // while they are in flight so the automation stays blocked across that gap too,
-  // and can never interrupt a lap mid-commit (which dropped the fight and made a
-  // lap "not hunt").
   const inFlightRef = useRef(0);
   const applyState = useCallback((next: GameState, seq: number) => {
     if (seq <= appliedRef.current) return;
@@ -322,7 +310,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
         return;
       }
       const ticks = answer.data?.ticks ?? 0;
-      // The breathing repeats with every rest tick, in step with the bars rising.
       if (ticks > 0) playSound("rest");
       if (ticks > 0 && !answer.data?.done) {
         announce("O corpo se recompõe aos poucos.", true, "Recuperação");
@@ -739,8 +726,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
         );
         return answer.ok;
       },
-      // Reads the received invites and adopts the run in the same trip, so a
-      // pack change made elsewhere (someone accepting) lands without a refresh.
       fetchInvites: async () => {
         const answer = await request<{ invites: PackInvite[] }>("GET", "/api/pack/invites");
         return answer.ok ? (answer.data?.invites ?? []) : null;

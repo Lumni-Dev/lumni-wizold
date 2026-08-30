@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Cavaleiro Errante (NV. 461 a 470) da área Estrada dos Caçadores.
 export const wanderingKnight: Creature = {
   id: "wandering-knight",
   name: "Cavaleiro Errante",

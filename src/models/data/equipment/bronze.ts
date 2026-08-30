@@ -1,6 +1,5 @@
 import type { SetDefinition } from "./types";
 
-// O primeiro set, comprado no mercado a partir do NV 1. Cobre as áreas 1 e 2.
 export const bronzeSet: SetDefinition = {
   key: "bronze",
   label: "Bronze",

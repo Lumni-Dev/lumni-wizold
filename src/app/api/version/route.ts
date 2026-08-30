@@ -3,9 +3,6 @@ import { GAME_VERSION } from "@/shared/constants/version";
 import { clientIp, refuseAbuse } from "../_lib/api";
 import { rateLimit } from "../_lib/rate-limit";
 
-// The build's current version, read by every open tab to notice a fresh deploy.
-// Public and cheap: no session, no database, just the constant the running server
-// was built with. An IP budget keeps it from being hammered.
 export async function GET(request: Request) {
   const refused = refuseAbuse(request);
   if (refused) return refused;

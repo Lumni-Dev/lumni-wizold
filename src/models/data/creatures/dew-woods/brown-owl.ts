@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Coruja Parda (NV. 111 a 120) da área Mata do Orvalho.
 export const brownOwl: Creature = {
   id: "brown-owl",
   name: "Coruja Parda",

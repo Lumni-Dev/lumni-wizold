@@ -12,9 +12,6 @@ function plus(value: number): string {
   return value > 0 ? "+" + formatNumber(value) : "0";
 }
 
-// The detailed attributes table shared by the character sheet and the read-only
-// profile, so the two never drift: one row per attribute, split into the source
-// of every point (natural, trained, gear, pet, moon, fury) plus the total.
 export function AttributesPanel({ stats, gender }: { stats: DerivedStats; gender: Gender }) {
   const genderBonus = findGender(gender).bonus;
 

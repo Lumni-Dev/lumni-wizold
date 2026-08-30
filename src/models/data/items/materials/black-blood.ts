@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Sangue Negro: despojo de caça, trocado por bronze no mercado.
 export const blackBlood: Item = {
   id: "black-blood",
   name: "Sangue Negro",

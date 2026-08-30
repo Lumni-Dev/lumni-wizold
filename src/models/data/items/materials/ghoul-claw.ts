@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Garra de Carniçal: despojo de caça, trocado por bronze no mercado.
 export const ghoulClaw: Item = {
   id: "ghoul-claw",
   name: "Garra de Carniçal",

@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Hidra Jovem (NV. 381 a 390) da área Pântano Pálido.
 export const youngHydra: Creature = {
   id: "young-hydra",
   name: "Hidra Jovem",

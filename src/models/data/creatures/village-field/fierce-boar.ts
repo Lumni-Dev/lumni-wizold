@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Javali Bravo (NV. 61 a 70) da área Campo do Vilarejo.
 export const fierceBoar: Creature = {
   id: "fierce-boar",
   name: "Javali Bravo",

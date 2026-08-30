@@ -38,8 +38,6 @@ export function verifySession(token: string | undefined): SessionClaims | null {
   const b = Buffer.from(wanted);
   if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
   const parts = payload.split(".");
-  // Old tokens are userId.expiry (epoch defaults to 0, matching the column
-  // default); new tokens are userId.epoch.expiry.
   const userId = parts[0];
   const epoch = parts.length >= 3 ? Number(parts[1]) : 0;
   const expiry = parts.length >= 3 ? Number(parts[2]) : Number(parts[1]);

@@ -24,10 +24,6 @@ export function applyExperience(character: Character, gain: number): ExperienceO
   let level = character.level;
   let levelsGained = 0;
 
-  // The excess carries into the next level instead of being thrown away: what
-  // a level did not need becomes the head start of the next, so a hunt never
-  // wastes experience and the run never restarts a level from zero. A single
-  // fat gain can climb more than one level, carrying the remainder each time.
   while (level < MAX_CHARACTER_LEVEL && experience >= experienceForLevel(level)) {
     experience -= experienceForLevel(level);
     level += 1;
@@ -51,10 +47,6 @@ export function applyTrainingProgress(
   let value = character.attributes[attribute];
   let pointsGained = 0;
 
-  // The excess carries into the next point instead of being thrown away, the
-  // same way experience carries into the next level: what a point did not need
-  // becomes the head start of the next, so a session never wastes progress and
-  // a fat gain can climb more than one point, carrying the remainder each time.
   while (value < MAX_ATTRIBUTE_VALUE && progress >= progressNeeded(value)) {
     progress -= progressNeeded(value);
     value += 1;

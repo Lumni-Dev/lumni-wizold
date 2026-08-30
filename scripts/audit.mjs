@@ -314,7 +314,6 @@ sec("combate");
 }
 sec("bandas e presas");
 {
-  // Ten areas of a hundred levels each, tiling 1..1000 with no gap or overlap.
   const areas = territoriesData.TERRITORIES;
   ok("10 áreas", areas.length === 10);
   ok("primeira área começa em 1", areas[0].minLevel === 1);
@@ -334,7 +333,6 @@ sec("bandas e presas");
   ok("100 criaturas", creatures.length === 100);
   ok("ids únicos", new Set(creatures.map((c) => c.id)).size === 100);
 
-  // Each creature owns its own 10-level block inside its area (1-10, 11-20 ...).
   for (const area of areas) {
     area.creatures.forEach((creatureId, slot) => {
       const creature = creaturesData.findCreature(creatureId);
@@ -385,9 +383,6 @@ sec("bandas e presas");
     }
   }
 
-  // Experience is monotone by level: a deeper block always pays at least as much.
-  // Health is deliberately NOT monotone, since a frail high-level beast can carry
-  // less body than a tanky lower-level one.
   const ranked = [...creatures].sort((a, b) => a.level - b.level);
   let expMonotone = true;
   for (let i = 1; i < ranked.length; i += 1) {
@@ -852,8 +847,6 @@ sec("caçada");
       shortLanded.state.pet.trainingProgress === 0 && shortLanded.state.pet.level === 1,
     );
   }
-  // Full cycle: a wolf that enters with just enough breath fights one hunt,
-  // burns below the threshold, and is barred from the next hunt on its own.
   const oneMore = {
     ...withPet,
     pet: {
@@ -869,8 +862,6 @@ sec("caçada");
       "a caçada esgota o fôlego do lobo",
       afterOne.state.pet.energy < CONST.PET_ENERGY_PER_HUNT + CONST.PET_ENERGY_PER_BLOW,
     );
-    // Heal the body (fixed at 100 now) so the next hunt is barred only by the wolf's
-    // breath, not by the hunter's own health after a hard lap.
     const rested = { ...afterOne.state, character: { ...afterOne.state.character, health: 100 } };
     const nextHunt = huntCtrl.resolveHunt(rested, "village-field", seededRandom(10));
     ok(
@@ -1182,8 +1173,7 @@ sec("forja e mina");
     bonusSwing.ok &&
       inventoryCtrl.countInInventory(bonusSwing.state.inventory, "bronze-fragment") % bonus === 0,
   );
-  // Cota diária: um número de minerações por dia, zerando às 06:00 de São Paulo.
-  const noon = 1_700_000_000_000; // instante fixo, para a matemática do dia ser determinística
+  const noon = 1_700_000_000_000;
   const period = miningRules.miningPeriodStart(noon);
   const fresh = { ...baseState({ level: 1 }), mining: { level: 1, progress: 0, count: 0 } };
   const firstSwing = forgeCtrl.mine(fresh, "bronze-vein", seededRandom(1), noon);
@@ -1654,8 +1644,6 @@ sec("personagem");
   );
   const state = baseState({ level: 10 });
 
-  // The fury potion is a timed buff (+10 to every attribute); drinking it stamps
-  // furyUntil ahead, and deriveStats reads the bonus while it is in the future.
   const withPotion = { ...state, inventory: [{ itemId: "rage-potion-small", quantity: 1 }] };
   const drank = inventoryCtrl.consumeItem(withPotion, "rage-potion-small");
   ok("poção de fúria vira buff", drank.ok && typeof drank.state.character.furyUntil === "string");

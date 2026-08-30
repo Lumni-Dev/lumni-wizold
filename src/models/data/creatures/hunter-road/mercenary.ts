@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Mercenário (NV. 421 a 430) da área Estrada dos Caçadores.
 export const mercenary: Creature = {
   id: "mercenary",
   name: "Mercenário",

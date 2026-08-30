@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Falcão Peregrino (NV. 251 a 260) da área Serra das Brumas.
 export const peregrineFalcon: Creature = {
   id: "peregrine-falcon",
   name: "Falcão Peregrino",

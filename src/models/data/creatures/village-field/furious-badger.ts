@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Texugo Furioso (NV. 81 a 90) da área Campo do Vilarejo.
 export const furiousBadger: Creature = {
   id: "furious-badger",
   name: "Texugo Furioso",

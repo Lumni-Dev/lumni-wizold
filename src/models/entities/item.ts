@@ -18,7 +18,6 @@ export interface ItemEffect {
   health?: number;
   petEnergyRatio?: number;
   healthRatio?: number;
-  // The fury potion: how many minutes the +10-to-every-attribute buff lasts.
   furyMinutes?: number;
 }
 
@@ -29,13 +28,7 @@ export interface Item {
   category: ItemCategory;
   rarity: Rarity;
   price: number;
-  // Direct path to the item's art, matched by hand-added .png in public/assets.
-  // When set, the icon draws it; the material catalog fills this so a drawing is
-  // just a file dropped in the folder. Optional so equipment keeps the manifest.
   image?: string;
-  // When set, the market prices this item in hunts of the buyer's level instead
-  // of the flat `price`: a consumable then costs the same slice of time the whole
-  // run, the way the pet and the store packs are priced.
   huntCost?: number;
   minLevel: number;
   stackable: boolean;

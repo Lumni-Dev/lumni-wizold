@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Água Benta: despojo de caça, trocado por bronze no mercado.
 export const holyWater: Item = {
   id: "holy-water",
   name: "Água Benta",

@@ -1,6 +1,5 @@
 import type { SetDefinition } from "./types";
 
-// O set de Ouro, comprado a partir do NV 401. Cobre as áreas 5 e 6.
 export const goldSet: SetDefinition = {
   key: "gold",
   label: "Ouro",

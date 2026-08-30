@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Ceifador (NV. 771 a 780) da área Abismo Uivante.
 export const reaper: Creature = {
   id: "reaper",
   name: "Ceifador",

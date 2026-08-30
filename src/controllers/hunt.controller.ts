@@ -70,9 +70,6 @@ function pickCreature(territory: Territory, level: number): Creature | undefined
   return eligible[eligible.length - 1] ?? creatures[0];
 }
 
-// The creature the player picked on the list (a radio, one per area), validated to
-// belong to this area. With none picked, the trail falls back to the level-appropriate
-// suggestion, so a first visit still hunts something sensible.
 function chosenCreature(
   territory: Territory,
   creatureId: string | null,
@@ -94,9 +91,6 @@ export function listTerritories(state: GameState): AvailableTerritory[] {
   return TERRITORIES.map((territory) => {
     const creatures = creaturesOf(territory);
 
-    // Every area is open: only a character (and enough health) gates the hunt now,
-    // never the level. The band survives as `prey`, the suggested creature, and as
-    // the level range the card shows as a hint.
     const unlocked = character !== null;
     const hasHealth =
       character !== null &&
@@ -148,7 +142,6 @@ export function resolveHunt(
     return failure(state, "Vida baixa demais para caçar. Recupere-se ou use uma poção.");
   }
 
-  // Every area is open, the band is a suggestion: hunt the creature the player picked.
   const creature = chosenCreature(territory, creatureId, character.level);
   if (!creature) return failure(state, "A trilha não levou a nada.");
 

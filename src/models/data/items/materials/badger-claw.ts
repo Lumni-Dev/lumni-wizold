@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Garra de Texugo: despojo de caça, trocado por bronze no mercado.
 export const badgerClaw: Item = {
   id: "badger-claw",
   name: "Garra de Texugo",

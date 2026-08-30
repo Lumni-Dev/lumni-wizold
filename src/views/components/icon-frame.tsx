@@ -78,8 +78,6 @@ export function IconArt({
   glow?: boolean;
   badge?: string;
   inset?: string;
-  // Square item art fills the frame (cover); a non-square drawing (a creature) fits
-  // whole (contain) so it is never cropped, in the icon and in the zoom preview.
   fit?: "cover" | "contain";
 }) {
   const [preview, setPreview] = useState<{

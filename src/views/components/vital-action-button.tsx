@@ -4,8 +4,6 @@ import { useGame } from "@/controllers/game.context";
 import { REST_TICK_MS } from "@/shared/constants/game";
 import { RecoveryButton } from "./recovery-button";
 
-// Recuperar-se, and nothing else: transformation is gone, so the only vital action
-// is resting the body back up. Hidden when the body is already whole.
 export function VitalActionButton({ size = "medium" }: { size?: "small" | "medium" }) {
   const { character, stats, activity, setActivity, rest } = useGame();
   if (!character || !stats) return null;

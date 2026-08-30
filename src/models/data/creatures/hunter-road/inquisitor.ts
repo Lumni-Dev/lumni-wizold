@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Inquisidor (NV. 471 a 480) da área Estrada dos Caçadores.
 export const inquisitor: Creature = {
   id: "inquisitor",
   name: "Inquisidor",

@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Cabra Montesa (NV. 201 a 210) da área Serra das Brumas.
 export const mountainGoat: Creature = {
   id: "mountain-goat",
   name: "Cabra Montesa",

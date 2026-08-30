@@ -33,9 +33,6 @@ export const MIN_HEALTH_RATIO_TO_ACT = 0.2;
 export const AUTOMATION_TICK_MS = 2000;
 export const HUNT_TICK_MS = 1400;
 export const HUNT_TICKS = 8;
-// The short approach a hunt or duel fills before the fight resolves: stopping
-// here cancels and banks the position, and only when it tops out does the server
-// settle the fight, which then plays out live over the returned rounds.
 export const HUNT_APPROACH_TICKS = 3;
 export const MAX_COMBAT_ROUNDS = 24;
 export const CRITICAL_DAMAGE_BONUS = 0.35;
@@ -43,9 +40,6 @@ export const MIN_AGE = 18;
 export const NAME_MAX_LENGTH = 25;
 export const NAME_MIN_LENGTH = 3;
 
-// The wolf is a mid-run commitment: adopted at a third of the ceiling. The adoption
-// level and the pet ceiling stay here (they depend on the level cap and the env);
-// every other pet number lives in tuning/pet.ts.
 export const PET_MIN_LEVEL = Math.floor(MAX_CHARACTER_LEVEL / 3);
 export const PET_MAX_LEVEL = numberFromEnv(process.env.NEXT_PUBLIC_PET_MAX_LEVEL, 1000);
 export const PET_EXERCISE_ID = "pet-training";
@@ -70,11 +64,6 @@ export const TRAINING_TICKS = 5;
 export const MINING_TICK_MS = 1000;
 export const MINING_TICKS = 5;
 export const MINING_CYCLE_MS = MINING_TICK_MS * (MINING_TICKS + 1);
-// The mine gives out only so many pulls each day: a fixed count of completed
-// minings (a landed fragment yield, not each swing of the pick). The count is
-// the same for everyone and refills at 06:00 America/Sao_Paulo, the game's one
-// timezone, which holds UTC-3 year-round (no DST since 2019), so the daily
-// boundary is 09:00 UTC.
 export const MINING_DAILY_MININGS = 100;
 export const MINING_RESET_HOUR = 6;
 export const MINING_RESET_HOUR_UTC = 9;

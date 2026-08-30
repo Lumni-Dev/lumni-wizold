@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Coelho do Campo (NV. 1 a 10) da área Campo do Vilarejo.
 export const fieldRabbit: Creature = {
   id: "field-rabbit",
   name: "Coelho do Campo",

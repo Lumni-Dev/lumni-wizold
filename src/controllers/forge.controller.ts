@@ -57,8 +57,6 @@ export function listMining(state: GameState, now: number = Date.now()): MiningVi
 
   const characterLevel = state.character?.level ?? 0;
   const ores = ORES.map((ore) => {
-    // A fragment is gated by the character level of its set, not the mining ladder:
-    // you mine what feeds the gear you can already wear.
     const unlocked = characterLevel >= ore.requiredLevel;
 
     return {
@@ -153,8 +151,6 @@ function fragmentOf(item: Item): Item | null {
   return item.set ? (findItem(item.set + "-fragment") ?? null) : null;
 }
 
-// The anvil beats a piece off the body, so it lists the wearables sitting in the
-// bag and never the seven equipped slots. A piece has to be unequipped to forge.
 export function listForge(state: GameState): ForgePiece[] {
   const characterLevel = state.character?.level ?? 1;
   const bronze = state.character?.bronze ?? 0;
@@ -163,7 +159,6 @@ export function listForge(state: GameState): ForgePiece[] {
   for (const entry of state.inventory) {
     const item = findItem(entry.itemId);
     if (!item || !isEquippable(item)) continue;
-    // A worn piece can never be forged, so it never appears on the anvil.
     if (EQUIPMENT_SLOTS.some((slot) => state.equipment[slot] === item.id)) continue;
 
     const level = enhancementOf(state.enhancements, item.id);
@@ -218,7 +213,6 @@ export function enhance(
   const item = findItem(itemId);
   if (!item || !isEquippable(item)) return failure(state, "Item desconhecido.");
 
-  // Only a piece off the body, sitting in the bag, can be forged.
   if (EQUIPMENT_SLOTS.some((slot) => state.equipment[slot] === itemId)) {
     return failure(state, "Desequipe " + item.name + " para forjar.");
   }

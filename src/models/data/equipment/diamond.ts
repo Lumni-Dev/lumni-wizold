@@ -1,6 +1,5 @@
 import type { SetDefinition } from "./types";
 
-// O set de Diamante, comprado a partir do NV 601. Cobre as áreas 7 e 8.
 export const diamondSet: SetDefinition = {
   key: "diamond",
   label: "Diamante",

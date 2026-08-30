@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Lobo da Neve (NV. 271 a 280) da área Serra das Brumas.
 export const snowWolf: Creature = {
   id: "snow-wolf",
   name: "Lobo da Neve",

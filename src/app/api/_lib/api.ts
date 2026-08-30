@@ -17,9 +17,6 @@ import { syncServerMoon } from "./moon";
 import { rateLimit } from "./rate-limit";
 import { sessionClaims, type SessionClaims } from "./session";
 
-// A token is only live while its epoch still matches the user's stored epoch;
-// "sair de todos os aparelhos" bumps the column and instantly retires every
-// token minted before it. Old tokens carry epoch 0, matching the default.
 export async function sessionIsLive(client: PoolClient, claims: SessionClaims): Promise<boolean> {
   const found = await client.query("select session_epoch from users where id = $1", [
     claims.userId,
@@ -97,10 +94,6 @@ export const asText = (value: unknown, maximum = 200): string =>
 export const asInt = (value: unknown, fallback = 0): number =>
   typeof value === "number" && Number.isFinite(value) ? Math.round(value) : fallback;
 export const asQuantity = (value: unknown): number => Math.min(999, Math.max(1, asInt(value, 1)));
-// The client stamps its running version on every request; keep the users row in
-// step so the roster can be watched for stragglers still on an old build. Only a
-// plain x.y.z string is stored, and only when it actually changed, so a read
-// never writes a dead tuple and a crafted header can never poison the column.
 async function recordClientVersion(
   client: PoolClient,
   userId: string,

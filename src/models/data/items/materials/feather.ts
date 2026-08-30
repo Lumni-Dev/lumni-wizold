@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Pena: despojo de caça, trocado por bronze no mercado.
 export const feather: Item = {
   id: "feather",
   name: "Pena",

@@ -1,6 +1,5 @@
 import type { Ore } from "./types";
 
-// O primeiro veio, minerado a partir da mineração NV 1.
 export const bronzeVein: Ore = {
   id: "bronze-vein",
   label: "Fragmento de Bronze",

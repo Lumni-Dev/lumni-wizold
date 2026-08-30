@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Esqueleto Guerreiro (NV. 601 a 610) da área Necrópole de Pedra.
 export const skeletonWarrior: Creature = {
   id: "skeleton-warrior",
   name: "Esqueleto Guerreiro",

@@ -1,6 +1,3 @@
-// The tuning config: the game's gains, buffs and caps, one file per theme,
-// re-exported by shared/constants/game.ts (its real source). Edit a value here to
-// change the game; game.ts keeps the legacy constant names the code already imports.
 export { VITALS } from "./vitals";
 export { BALANCE } from "./balance";
 export { RECOVERY } from "./recovery";

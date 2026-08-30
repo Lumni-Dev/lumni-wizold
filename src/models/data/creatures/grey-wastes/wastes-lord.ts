@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Senhor do Ermo (NV. 591 a 600) da área Ermo Cinza.
 export const wastesLord: Creature = {
   id: "wastes-lord",
   name: "Senhor do Ermo",

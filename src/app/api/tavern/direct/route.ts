@@ -18,8 +18,6 @@ export async function POST(request: Request) {
           data: null,
         });
       }
-      // Mesa reservada só entre a matilha: sem ser companheiros, não há DM. Como a
-      // matilha é mútua, uma direção basta para provar o laço.
       const mates = await context.client.query(
         "select 1 from pack_mates where character_id = $1 and mate_id = $2",
         [context.identity.id, otherId],

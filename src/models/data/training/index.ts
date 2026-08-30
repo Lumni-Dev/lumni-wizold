@@ -7,8 +7,6 @@ import type { Exercise } from "./types";
 
 export type { Exercise } from "./types";
 
-// One exercise per attribute, one file each. The same exercise follows the
-// character from level 1 to the ceiling; what a session yields is a rule, not data.
 export const EXERCISES: readonly Exercise[] = [
   trunkPunches,
   shadowRun,

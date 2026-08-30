@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Asa de Morcego: despojo de caça, trocado por bronze no mercado.
 export const batWing: Item = {
   id: "bat-wing",
   name: "Asa de Morcego",

@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Imp das Sombras (NV. 701 a 710) da área Abismo Uivante.
 export const shadowImp: Creature = {
   id: "shadow-imp",
   name: "Imp das Sombras",

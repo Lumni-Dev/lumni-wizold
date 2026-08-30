@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Dente de Jacaré: despojo de caça, trocado por bronze no mercado.
 export const gatorTooth: Item = {
   id: "gator-tooth",
   name: "Dente de Jacaré",

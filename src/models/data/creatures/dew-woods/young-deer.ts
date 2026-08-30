@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Veado Jovem (NV. 101 a 110) da área Mata do Orvalho.
 export const youngDeer: Creature = {
   id: "young-deer",
   name: "Veado Jovem",

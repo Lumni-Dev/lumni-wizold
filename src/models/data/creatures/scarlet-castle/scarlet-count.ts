@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Conde Escarlate (NV. 881 a 890) da área Castelo Escarlate.
 export const scarletCount: Creature = {
   id: "scarlet-count",
   name: "Conde Escarlate",

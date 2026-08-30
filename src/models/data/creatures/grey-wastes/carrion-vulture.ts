@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Abutre Carniceiro (NV. 501 a 510) da área Ermo Cinza.
 export const carrionVulture: Creature = {
   id: "carrion-vulture",
   name: "Abutre Carniceiro",

@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Bode Selvagem (NV. 241 a 250) da área Serra das Brumas.
 export const wildRam: Creature = {
   id: "wild-ram",
   name: "Bode Selvagem",

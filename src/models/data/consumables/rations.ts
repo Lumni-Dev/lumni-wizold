@@ -1,7 +1,5 @@
 import type { Item } from "@/models/entities/item";
 
-// A ração do lobo: devolve fôlego, não vida. Preço em caçadas como as poções
-// (huntCost 1.5), roteada para feedPet pelo consumeItem por causa da categoria.
 export const PET_SUPPLIES: readonly Item[] = [
   {
     id: "pet-ration",

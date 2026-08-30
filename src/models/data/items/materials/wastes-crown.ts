@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Coroa do Ermo: despojo de caça, trocado por bronze no mercado.
 export const wastesCrown: Item = {
   id: "wastes-crown",
   name: "Coroa do Ermo",

@@ -2,8 +2,6 @@ const STORAGE_KEY = "lumni-wizold:tavern-push";
 
 const listeners = new Set<() => void>();
 
-// The desktop-notification switch for the tavern, a device fact like the sound
-// switch. Off by default: the player turns it on and grants permission.
 export const tavernPushRepository = {
   enabled(): boolean {
     if (typeof window === "undefined") return false;

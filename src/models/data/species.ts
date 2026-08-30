@@ -370,8 +370,6 @@ function variantLevels(band: LevelBand): number[] {
   });
 }
 
-// Materials are the hunt's steady income (sold for bronze), trimmed a quarter so
-// the carcass does not over-pay on top of the purse.
 const MATERIAL_DROP_RATIO = 0.75;
 
 function creatureDrops(definition: SpeciesDefinition): CreatureDrop[] {
@@ -392,17 +390,9 @@ function creatureDrops(definition: SpeciesDefinition): CreatureDrop[] {
   return [...materials, ...gear];
 }
 
-// The fixed-100-HP model, tuned through shared/constants/tuning/balance.ts. Health
-// no longer grows, so the only defense is the Resistência the gear (and its forge)
-// lends, mitigating each blow. A creature is built against the reference hunter of
-// its level: the trained value of that level plus the band's set, forged along a
-// ramp that opens at 0 when the set unlocks and reaches +1000 at the end of its two
-// areas, so the last creature of the pair's second area needs that set at +1000.
 
 const AREA_LEVELS = MAX_CHARACTER_LEVEL / 10;
 
-// The forge the reference hunter carries at this level: 0 when the band's set
-// unlocks, the ceiling at the end of the set's two areas.
 export function referenceForge(level: number): number {
   const set = setForLevel(level);
   const span = AREA_LEVELS * 2 - 1;
@@ -439,11 +429,6 @@ function areaOf(level: number): number {
   return Math.max(1, Math.min(10, Math.ceil(level / AREA_LEVELS)));
 }
 
-// The purse rides the unforged gear, not the forged reference: forging is the
-// player's own grind and must never multiply the bronze a carcass pays.
-// The purse rides the level, not the forged (or even unforged) gear power: that power
-// is enormous for the combat math and would push the whole bronze economy past the
-// vault. Level-based keeps every price that is quoted in hunts bounded under the cap.
 export function huntPurse(level: number): number {
   return Math.round(BALANCE.bronzeBase + level * BALANCE.bronzePerLevel);
 }
@@ -454,9 +439,6 @@ export function speciesNumbers(key: SpeciesKey, level: number) {
   const difficulty = definition.difficulty;
   const hunter = referenceHunter(level);
 
-  // Constant per-blow damage: the creature's Força is the root of the hunter's
-  // Resistência, so each blow stays near BALANCE.creatureHit at every band instead
-  // of one-shotting a 100-HP body once the numbers grow.
   const strength = Math.max(
     1,
     Math.round(Math.sqrt(BALANCE.creatureHit * hunter.endurance * profile.strength)),
@@ -466,8 +448,6 @@ export function speciesNumbers(key: SpeciesKey, level: number) {
     Math.round(hunter.strength * BALANCE.creatureResRatio * profile.endurance),
   );
 
-  // The body those kill-rounds imply against the hunter's own blow, padded from the
-  // halfway area so the wolf's blows are part of the math and a lone hunter falls short.
   const hunterBlow = (hunter.strength * hunter.strength) / (hunter.strength + endurance);
   const petPad = areaOf(level) >= BALANCE.petFromArea ? 1 + BALANCE.petKillBoost : 1;
   const health = Math.max(

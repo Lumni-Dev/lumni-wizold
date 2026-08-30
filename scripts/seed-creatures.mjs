@@ -1,12 +1,3 @@
-// One-time seeder: expands the compact area/creature catalog below into isolated
-// per-entity files under src/models/data/{creatures,areas}. Stats are seeded from
-// the current combat curve (speciesNumbers at each block's centre level, carrying
-// the chosen archetype's profile), so day-one balance is preserved; afterwards
-// every file is the hand-editable source of truth. Re-running SKIPS files that
-// already exist, so tuned creatures are never clobbered; delete a file to reseed it.
-//
-//   node scripts/seed-creatures.mjs            seed missing files
-//   node scripts/seed-creatures.mjs --force    overwrite every file
 import { execFileSync } from "node:child_process";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
@@ -34,10 +25,6 @@ Module._resolveFilename = function (request, ...rest) {
 const require = createRequire(import.meta.url);
 const { speciesNumbers, SPECIES } = require(join(BUILD, "models/data/species.js"));
 
-
-// Each area: slug, name, danger, one representative species key (internal), and
-// its 10 creatures as [slug, name, archetype]. The archetype is an existing
-// species key whose profile/difficulty shapes the seeded stats.
 const AREAS = [
   {
     slug: "village-field",
@@ -268,21 +255,16 @@ const AREAS = [
 
 const AREA_LEVELS = 100;
 const CREATURES_PER_AREA = 10;
-const BLOCK = AREA_LEVELS / CREATURES_PER_AREA; // 10 levels each
+const BLOCK = AREA_LEVELS / CREATURES_PER_AREA;
 
 function camel(slug) {
   return slug.replace(/-([a-z0-9])/g, (_, c) => c.toUpperCase());
 }
 
-// The loot catalog. Each creature drops its own materials, and similar creatures
-// share them (wolves drop "wolf-pelt", bears "bear-claw"...). A material is
-// [name, rarity]; price and drop chance come from the rarity below, and the
-// image is derived from the id, so adding art is dropping a .png in the folder.
 const RARITY_PRICE = { common: 10, uncommon: 50, rare: 200, epic: 750, legendary: 2800 };
 const RARITY_CHANCE = { common: 0.35, uncommon: 0.2, rare: 0.12, epic: 0.07, legendary: 0.04 };
 
 const MATERIALS = {
-  // village-field
   "rabbit-fur": ["Pelo de Coelho", "common"],
   "lucky-foot": ["Pata de Coelho", "uncommon"],
   "rat-tail": ["Rabo de Rato", "common"],
@@ -300,7 +282,6 @@ const MATERIALS = {
   "venom-gland": ["Glândula de Veneno", "uncommon"],
   "badger-claw": ["Garra de Texugo", "common"],
   "lynx-pelt": ["Pele de Lince", "uncommon"],
-  // dew-woods
   "deer-hide": ["Couro de Veado", "common"],
   "soft-antler": ["Chifre Macio", "common"],
   "owl-feather": ["Pena de Coruja", "uncommon"],
@@ -313,7 +294,6 @@ const MATERIALS = {
   "wildcat-pelt": ["Pele de Gato Selvagem", "uncommon"],
   "twisted-antler": ["Chifre Torto", "uncommon"],
   "spider-silk": ["Seda de Aranha", "uncommon"],
-  // mist-ridge
   "goat-horn": ["Chifre de Cabra", "uncommon"],
   "eagle-feather": ["Pena de Águia", "rare"],
   "eagle-talon": ["Garra de Águia", "rare"],
@@ -326,7 +306,6 @@ const MATERIALS = {
   "snow-pelt": ["Pele Nevada", "rare"],
   "ogre-tooth": ["Dente de Ogro", "rare"],
   "griffin-feather": ["Pena de Grifo", "rare"],
-  // pale-swamp
   "toad-skin": ["Pele de Sapo", "uncommon"],
   "gator-scale": ["Escama de Jacaré", "rare"],
   "gator-tooth": ["Dente de Jacaré", "rare"],
@@ -339,7 +318,6 @@ const MATERIALS = {
   "hydra-blood": ["Sangue de Hidra", "epic"],
   "witch-hair": ["Cabelo de Bruxa", "rare"],
   "cursed-charm": ["Amuleto Amaldiçoado", "rare"],
-  // hunter-road
   "steel-scrap": ["Sucata de Aço", "uncommon"],
   "coin-purse": ["Bolsa de Moedas", "rare"],
   "leather-strap": ["Correia de Couro", "uncommon"],
@@ -351,7 +329,6 @@ const MATERIALS = {
   "holy-water": ["Água Benta", "rare"],
   "captain-medal": ["Medalha do Capitão", "epic"],
   "master-trophy": ["Troféu do Mestre", "epic"],
-  // grey-wastes
   "vulture-feather": ["Pena de Abutre", "uncommon"],
   "carrion-meat": ["Carniça", "common"],
   "hyena-pelt": ["Pele de Hiena", "uncommon"],
@@ -368,7 +345,6 @@ const MATERIALS = {
   "basilisk-fang": ["Presa de Basilisco", "epic"],
   "basilisk-scale": ["Escama de Basilisco", "epic"],
   "wastes-crown": ["Coroa do Ermo", "epic"],
-  // stone-necropolis
   "bone-shard": ["Lasca de Osso", "uncommon"],
   "rusted-blade": ["Lâmina Enferrujada", "uncommon"],
   "rotten-flesh": ["Carne Podre", "uncommon"],
@@ -381,7 +357,6 @@ const MATERIALS = {
   "gargoyle-stone": ["Pedra de Gárgula", "rare"],
   "lich-phylactery": ["Filactério de Lich", "legendary"],
   "guardian-relic": ["Relíquia do Guardião", "epic"],
-  // howling-abyss
   "imp-horn": ["Chifre de Imp", "rare"],
   "shadow-essence": ["Essência das Sombras", "rare"],
   "hellhound-fang": ["Presa Infernal", "epic"],
@@ -400,7 +375,6 @@ const MATERIALS = {
   "abyss-crown": ["Coroa do Abismo", "legendary"],
   "dragon-scale": ["Escama de Dragão", "legendary"],
   "dragon-fang": ["Presa de Dragão", "legendary"],
-  // scarlet-castle
   "empty-fang": ["Presa Vazia", "rare"],
   "pale-blood": ["Sangue Pálido", "rare"],
   "bat-wing": ["Asa de Morcego", "uncommon"],
@@ -413,7 +387,6 @@ const MATERIALS = {
   "bride-veil": ["Véu da Noiva", "epic"],
   "count-crown": ["Coroa do Conde", "legendary"],
   "queen-tiara": ["Tiara da Rainha", "legendary"],
-  // white-clearing
   "silver-mane": ["Crina Prateada", "legendary"],
   "horn-dust": ["Pó de Chifre", "legendary"],
   "spectral-antler": ["Chifre Espectral", "epic"],
@@ -606,7 +579,6 @@ function write(path, contents) {
 
 const DATA = "src/models/data";
 
-// creatures/types.ts + areas/types.ts
 write(
   `${DATA}/creatures/types.ts`,
   `export type { Creature, CreatureDrop } from "@/models/entities/creature";\n`,
@@ -623,7 +595,7 @@ for (let a = 0; a < AREAS.length; a++) {
   const area = AREAS[a];
   const creatureRecords = area.creatures.map(([slug, name, archetype], c) => {
     const level = a * AREA_LEVELS + c * BLOCK + 1;
-    const seed = level + Math.floor(BLOCK / 2); // block centre
+    const seed = level + Math.floor(BLOCK / 2);
     const numbers = speciesNumbers(archetype, seed);
     return {
       id: slug,
@@ -644,7 +616,6 @@ for (let a = 0; a < AREAS.length; a++) {
     };
   });
 
-  // one file per creature
   const fileNames = [];
   for (const creature of creatureRecords) {
     const path = `${DATA}/creatures/${area.slug}/${creature.id}.ts`;
@@ -652,7 +623,6 @@ for (let a = 0; a < AREAS.length; a++) {
     fileNames.push(creature.id);
   }
 
-  // area's creature index
   const imports = creatureRecords
     .map((c) => `import { ${camel(c.id)} } from "./${c.id}";`)
     .join("\n");
@@ -667,7 +637,6 @@ for (let a = 0; a < AREAS.length; a++) {
   );
   areaIndexNames.push(`${camel(area.slug)}Creatures`);
 
-  // area (territory) file
   const minLevel = a * AREA_LEVELS + 1;
   const maxLevel = (a + 1) * AREA_LEVELS;
   const ids = fileNames.map((id) => `    ${lit(id)},`).join("\n");
@@ -691,7 +660,6 @@ ${ids}
   );
 }
 
-// creatures/index.ts
 write(
   `${DATA}/creatures/index.ts`,
   `${areaIndexImports.join("\n")}
@@ -713,7 +681,6 @@ export function findCreature(creatureId: string): Creature | undefined {
 `,
 );
 
-// areas/index.ts
 const areaImports = AREAS.map((area) => `import { ${camel(area.slug)} } from "./${area.slug}";`).join("\n");
 const areaList = AREAS.map((area) => `  ${camel(area.slug)},`).join("\n");
 write(
@@ -735,7 +702,6 @@ export function findArea(areaId: string): Territory | undefined {
 `,
 );
 
-// items/materials: one file per material the creatures drop, plus the index.
 const usedMaterials = [...new Set(Object.values(LOOT).flat())].sort();
 const materialImports = [];
 const materialNames = [];

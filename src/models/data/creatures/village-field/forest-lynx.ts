@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Lince do Mato (NV. 91 a 100) da área Campo do Vilarejo.
 export const forestLynx: Creature = {
   id: "forest-lynx",
   name: "Lince do Mato",

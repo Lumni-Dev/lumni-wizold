@@ -47,7 +47,6 @@ export interface Character {
   arenaLosses: number;
   createdAt: string;
   renamedAt?: string;
-  // When the fury-potion buff (+10 to every attribute) ends. Absent means no buff.
   furyUntil?: string;
 }
 

@@ -1,6 +1,5 @@
 import type { Ore } from "./types";
 
-// O último veio, Lunar, a partir da mineração NV 70 (o teto da mineração).
 export const lunarVein: Ore = {
   id: "lunar-vein",
   label: "Fragmento Lunar",

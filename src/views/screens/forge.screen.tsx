@@ -26,7 +26,6 @@ import { Panel } from "../components/panel";
 import { Tag } from "../components/tag";
 import { PageHeader } from "../layout/page-header";
 
-// A live countdown to the daily reset, in hours and minutes: "3h 24min", "24min".
 function formatCountdown(ms: number): string {
   const totalMinutes = Math.max(0, Math.ceil(ms / 60000));
   const hours = Math.floor(totalMinutes / 60);
@@ -46,9 +45,6 @@ export function ForgeScreen() {
   const waitingOre = activity?.kind === "mine" && paused ? (activity.id ?? null) : null;
   const waitingItem = activity?.kind === "forge" && paused ? (activity.id ?? null) : null;
 
-  // A clock that ticks so the reset countdown stays live and the 06:00 refill
-  // lands on screen on its own. Starts at 0 and lets listMining fall back to its
-  // own Date.now() until the first tick, keeping Date.now() out of render.
   const [now, setNow] = useState(0);
   useEffect(() => {
     const tick = () => setNow(Date.now());
@@ -79,9 +75,6 @@ export function ForgeScreen() {
 
   const [strike, setStrike] = useState<{ id: string; beat: number }>({ id: "", beat: 0 });
   const strikeRef = useRef(0);
-  // A switch between the pick and the anvil waits for the running cycle to land
-  // before it takes over, so a charged lap is never thrown away. The click is
-  // held here and applied at the next landing.
   const [pending, setPending] = useState<Activity | null>(null);
   const pendingRef = useRef<Activity | null>(null);
 
@@ -91,8 +84,6 @@ export function ForgeScreen() {
     if (!activeItem) return;
 
     const key = "forge:" + activeItem;
-    // Resume from the banked beat: a paused anvil picks up where it froze, and a
-    // fresh one starts at zero.
     strikeRef.current = progressRepository.get(key, FORGE_TICKS);
     setStrike({ id: activeItem, beat: strikeRef.current });
     const level = slotsRef.current.find((entry) => entry.item.id === activeItem)?.level ?? 0;
@@ -101,16 +92,12 @@ export function ForgeScreen() {
       strikeRef.current = strikeRef.current >= FORGE_TICKS ? 0 : strikeRef.current + 1;
       setStrike({ id: activeItem, beat: strikeRef.current });
 
-      // Every beat before the last is the hammer swinging and nothing is charged
-      // yet, so stopping here spends nothing and lands nothing.
       if (strikeRef.current > 0 && strikeRef.current < FORGE_TICKS) {
         playSound("forge");
         return;
       }
       if (strikeRef.current < FORGE_TICKS) return;
 
-      // Last beat: the server charges the fragments and bronze, rolls the dice and
-      // lands the level in one call. The lap is done, so its banked position clears.
       progressRepository.clear(key);
       void enhanceRef.current(activeItem).then((landed) => {
         if (landed) {
@@ -126,7 +113,7 @@ export function ForgeScreen() {
           setActivity(next);
           return;
         }
-        if (landed && autoRef.current.forge) return; // chain: let the interval wrap to a new lap
+        if (landed && autoRef.current.forge) return;
         strikeRef.current = 0;
         setStrike({ id: activeItem, beat: 0 });
         setActivity(
@@ -135,8 +122,6 @@ export function ForgeScreen() {
       });
     }, tickMs);
 
-    // Leaving mid-lap banks the exact beat so the anvil resumes there; a lap that
-    // already landed reset the ref to zero, so this clears instead.
     return () => {
       window.clearInterval(timer);
       progressRepository.set("forge:" + activeItem, strikeRef.current);
@@ -150,7 +135,6 @@ export function ForgeScreen() {
     if (!activeOre) return;
 
     const key = "mine:" + activeOre;
-    // Resume the pick from where it froze; a fresh vein starts at zero.
     swingRef.current = progressRepository.get(key, MINING_TICKS);
     setSwing({ id: activeOre, beat: swingRef.current });
     const timer = window.setInterval(() => {
@@ -160,8 +144,6 @@ export function ForgeScreen() {
       if (swingRef.current > 0) playSound("mine");
 
       if (swingRef.current < MINING_TICKS) return;
-      // Last beat: the swing lands on the server, which charges the daily quota and
-      // hands out the fragments. Stopping earlier spends nothing and yields nothing.
       progressRepository.clear(key);
       void mineRef.current(activeOre).then((mined) => {
         if (!mined) {
@@ -194,8 +176,6 @@ export function ForgeScreen() {
       });
     }, MINING_TICK_MS);
 
-    // Leaving mid-swing banks the exact beat; a landed swing reset the ref to zero,
-    // so this clears instead.
     return () => {
       window.clearInterval(timer);
       progressRepository.set("mine:" + activeOre, swingRef.current);
@@ -214,15 +194,11 @@ export function ForgeScreen() {
   }
 
   function toggleMining(oreId: string, available: boolean) {
-    // Already mining this vein: stop, dropping any queued switch. The bar freezes
-    // at the exact beat and the effect cleanup banks it, so resuming picks up here
-    // instead of restarting, and the interrupted swing lands nothing.
     if (activeOre === oreId) {
       queueSwitch(null);
       setActivity(null);
       return;
     }
-    // This vein is already queued: cancel it, the running cycle keeps going.
     if (pending?.kind === "mine" && pending.id === oreId) {
       queueSwitch(null);
       return;
@@ -230,12 +206,10 @@ export function ForgeScreen() {
     if (!available) return;
 
     const next: Activity = { kind: "mine", id: oreId };
-    // Busy at the anvil or another vein: wait for the running cycle to land.
     if (activeOre !== null || activeItem !== null) {
       queueSwitch(next);
       return;
     }
-    // Idle: start now.
     swingRef.current = 0;
     setSwing({ id: oreId, beat: 0 });
     setActivity(next);
@@ -462,11 +436,9 @@ export function ForgeScreen() {
         onConfirm={() => {
           if (confirming) {
             const next: Activity = { kind: "forge", id: confirming.item.id };
-            // Busy at the pick: wait for the running swing to land, then forge.
             if (activeOre !== null || activeItem !== null) {
               queueSwitch(next);
             } else {
-              // The effect seeds the beat from the bank on mount, so just start it.
               setActivity(next);
             }
           }

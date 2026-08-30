@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Batedor da Estrada (NV. 411 a 420) da área Estrada dos Caçadores.
 export const roadScout: Creature = {
   id: "road-scout",
   name: "Batedor da Estrada",

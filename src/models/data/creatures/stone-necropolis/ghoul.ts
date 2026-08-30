@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Carniçal (NV. 631 a 640) da área Necrópole de Pedra.
 export const ghoul: Creature = {
   id: "ghoul",
   name: "Carniçal",

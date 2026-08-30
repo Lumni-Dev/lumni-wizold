@@ -63,9 +63,6 @@ function trainedAt(level) {
   };
 }
 
-// The reference hunter wears the band's set forged along the ramp (0 when the set
-// unlocks, +1000 at the end of its two areas), exactly what a creature is seeded
-// against, so the bench measures the real target fight.
 function gearAt(level) {
   const set = setForLevel(level);
   const forge = referenceForge(level);
@@ -79,8 +76,6 @@ function gearAt(level) {
   return { equipment, enhancements, set, forge };
 }
 
-// The wolf joins from the halfway area (5), fed and rested, so the bench measures
-// what the creatures from there are seeded to assume.
 const PET_FROM_AREA = 5;
 
 function petAt(level) {
@@ -89,8 +84,6 @@ function petAt(level) {
 }
 
 function preyAt(level) {
-  // The territory whose band holds this level, then its strongest unlocked
-  // creature (level <= hunterLevel), exactly like the hunt's pickCreature.
   const area =
     TERRITORIES.find((t) => level >= t.minLevel && level <= t.maxLevel) ??
     TERRITORIES[TERRITORIES.length - 1];
@@ -184,8 +177,6 @@ function session(level, nights = 300) {
   return { hunts: hunts / nights, defeatRatio: defeats / hunts };
 }
 
-// Proof the forge and the wolf carry the model: the same pair-end creature faced
-// with a fresh (unforged) set, and faced without the wolf.
 function verify(level, mode) {
   const attributes = trainedAt(level);
   const { equipment, enhancements: ramp } = gearAt(level);

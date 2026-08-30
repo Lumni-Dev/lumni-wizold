@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Górgona Menor (NV. 561 a 570) da área Ermo Cinza.
 export const lesserGorgon: Creature = {
   id: "lesser-gorgon",
   name: "Górgona Menor",

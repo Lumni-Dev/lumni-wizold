@@ -6,8 +6,6 @@ import { formatDay } from "@/shared/utils/format";
 const SW_URL = "/sw.js";
 const ICON = "/assets/ui/caneca.png";
 
-// The DOM lib dropped `actions` from NotificationOptions, but a service-worker
-// notification still honours it, so widen the type where we use the worker.
 interface NotificationOptionsWithActions extends NotificationOptions {
   actions?: { action: string; title: string }[];
 }
@@ -16,7 +14,6 @@ export function tavernPushSupported(): boolean {
   return typeof window !== "undefined" && "Notification" in window;
 }
 
-// Both the switch and the granted permission have to line up for a notice to fire.
 export function tavernPushActive(): boolean {
   return (
     tavernPushSupported() && tavernPushRepository.enabled() && Notification.permission === "granted"
@@ -29,15 +26,10 @@ function registerWorker(): void {
   }
 }
 
-// Register the worker on load when the switch is on, so the Responder action is
-// ready without waiting for the player to toggle again.
 export function ensureTavernWorker(): void {
   if (tavernPushActive()) registerWorker();
 }
 
-// Turn it on: ask the browser, keep the setting only if the user accepts, and
-// register the worker that owns the Responder action. Returns the permission so
-// the screen can flip to Desativado on a deny.
 export async function enableTavernPush(): Promise<NotificationPermission> {
   if (!tavernPushSupported()) {
     tavernPushRepository.setEnabled(false);
@@ -55,12 +47,6 @@ export function disableTavernPush(): void {
   tavernPushRepository.setEnabled(false);
 }
 
-// One desktop notice for a tavern message: the sender and table on the title, the
-// message and its date on the body, and it stays up until dismissed so a fleeting
-// toast is never missed. The service worker adds a Responder action when one is
-// active, but a plain notice is the reliable path: never wait on
-// `navigator.serviceWorker.ready`, which hangs forever when no worker is
-// registered instead of rejecting.
 export function notifyTavernMessage(
   roomName: string,
   authorName: string,
@@ -89,7 +75,6 @@ export function notifyTavernMessage(
           };
           return registration.showNotification(title, rich);
         }
-        // No active worker yet: show a plain notice now and register for next time.
         plainNotice(title, base);
         registerWorker();
       })
@@ -99,8 +84,6 @@ export function notifyTavernMessage(
   plainNotice(title, base);
 }
 
-// Fired by the settings "Testar" button so the player can prove the notification
-// shows on their own machine (and unmask an OS switch that is silencing it).
 export function testTavernPush(): void {
   notifyTavernMessage(
     "Taverna",
@@ -115,8 +98,6 @@ function plainNotice(title: string, options: NotificationOptions): void {
     const notice = new Notification(title, options);
     notice.onclick = () => {
       window.focus();
-      // A plain notification click has no router in reach; a hard nav is fine on
-      // this rare no-service-worker fallback.
       // eslint-disable-next-line @next/next/no-location-assign-relative-destination
       window.location.assign("/tavern");
       notice.close();

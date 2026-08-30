@@ -15,9 +15,6 @@ export function ItemIcon({
   enhancement?: number;
 }) {
   const art = useArt();
-  // The hand-drawn manifest wins (equipment art); otherwise the item's own image
-  // path (the creatures' loot fills this), so a drawing is a .png dropped in the
-  // folder, broken square until then, and initials only when neither is set.
   const source = art.items[item.id] ?? item.image;
 
   return (

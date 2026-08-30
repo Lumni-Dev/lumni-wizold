@@ -1,6 +1,3 @@
-// Mascote: os números que moldam o lobo (poder, energia e economia). O nível de
-// adoção (um terço do teto) e o teto do mascote ficam em game.ts, porque dependem
-// do teto de nível e da env. PET_HUNT_SHARE vive na regra do pet.
 export const PET = {
   price: 50_000,
   renamePrice: 10_000,

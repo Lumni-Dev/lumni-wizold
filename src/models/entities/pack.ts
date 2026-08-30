@@ -6,8 +6,6 @@ export interface PackMate {
   addedAt: string;
 }
 
-// A pending invite this hunter received: who sent it and when. Accepting makes
-// the two companions; declining drops the row.
 export interface PackInvite {
   id: string;
   fromId: string;

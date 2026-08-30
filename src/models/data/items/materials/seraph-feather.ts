@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Pena de Serafim: despojo de caça, trocado por bronze no mercado.
 export const seraphFeather: Item = {
   id: "seraph-feather",
   name: "Pena de Serafim",

@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Tiara da Rainha: despojo de caça, trocado por bronze no mercado.
 export const queenTiara: Item = {
   id: "queen-tiara",
   name: "Tiara da Rainha",

@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Osso Roído: despojo de caça, trocado por bronze no mercado.
 export const gnawedBone: Item = {
   id: "gnawed-bone",
   name: "Osso Roído",

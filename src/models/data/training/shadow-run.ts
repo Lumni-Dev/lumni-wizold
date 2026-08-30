@@ -1,6 +1,5 @@
 import type { Exercise } from "./types";
 
-// Treina Agilidade.
 export const shadowRun: Exercise = {
   id: "shadow-run",
   name: "Corrida nas Sombras",

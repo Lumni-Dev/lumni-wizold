@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Vampiro Ancião (NV. 861 a 870) da área Castelo Escarlate.
 export const elderVampire: Creature = {
   id: "elder-vampire",
   name: "Vampiro Ancião",

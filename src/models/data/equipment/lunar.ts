@@ -1,6 +1,5 @@
 import type { SetDefinition } from "./types";
 
-// O último set, Lunar, comprado a partir do NV 801. Cobre as áreas 9 e 10.
 export const lunarSet: SetDefinition = {
   key: "lunar",
   label: "Lunar",

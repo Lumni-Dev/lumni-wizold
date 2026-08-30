@@ -70,9 +70,6 @@ export function nextAutomationStep(
   const floor = stats.maxHealth * MIN_HEALTH_RATIO_TO_ACT;
   const resting = activity?.kind === "rest";
 
-  // The floor recovery is always on, no switch needed: the moment vitals bottom
-  // out the body drinks a health potion if the bag has one, otherwise lies down
-  // to rest, every time, so it never sits helpless at the floor.
   if (character.health <= floor && character.health < stats.maxHealth) {
     const flask = smallestPotion(state, "health");
     if (flask) return { kind: "potion", itemId: flask };
@@ -84,10 +81,6 @@ export function nextAutomationStep(
     const spent = petShortOfBreath(pet);
     const ration = smallestRation(state);
 
-    // The wolf's floor mirrors the body's, but stays opt-in: out of breath it
-    // eats a ration if the bag has one, otherwise goes to the kennel. Feeding
-    // rides either pet switch; the kennel is the petRest fallback when there is
-    // no food.
     if (spent && (on.petFeed || on.petRest) && ration) return { kind: "feed", itemId: ration };
     if (spent && on.petRest && !ration && isPetActive(pet)) return { kind: "kennel", active: false };
     if (on.petRest && !isPetActive(pet) && isPetWhole(pet)) {

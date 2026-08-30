@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Aberração Ocular (NV. 731 a 740) da área Abismo Uivante.
 export const eyeAberration: Creature = {
   id: "eye-aberration",
   name: "Aberração Ocular",

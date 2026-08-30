@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Sapo Venenoso (NV. 301 a 310) da área Pântano Pálido.
 export const poisonToad: Creature = {
   id: "poison-toad",
   name: "Sapo Venenoso",

@@ -5,8 +5,6 @@ import { cn } from "@/shared/utils/class-names";
 import { ActionIcon } from "./app-icon";
 import { Tooltip } from "./tooltip";
 
-// A small button that copies a hunter's nick to the clipboard, with a brief
-// check to confirm. Used beside a name on the ranking, a profile and the sheet.
 export function CopyNick({ name, className }: { name: string; className?: string }) {
   const [copied, setCopied] = useState(false);
 
@@ -16,7 +14,6 @@ export function CopyNick({ name, className }: { name: string; className?: string
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1500);
     } catch {
-      // A browser that refuses the clipboard just does nothing.
     }
   }
 

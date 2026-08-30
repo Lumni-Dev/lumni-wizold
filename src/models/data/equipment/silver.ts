@@ -1,7 +1,5 @@
 import type { SetDefinition } from "./types";
 
-// O set de Metal (chave "silver" no código, para não renomear ids dentro de saves).
-// Forjado do que se tira dos caçadores. Cobre as áreas 3 e 4.
 export const silverSet: SetDefinition = {
   key: "silver",
   label: "Metal",

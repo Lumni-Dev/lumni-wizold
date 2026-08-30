@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Homem-Lodo (NV. 361 a 370) da área Pântano Pálido.
 export const mudMan: Creature = {
   id: "mud-man",
   name: "Homem-Lodo",

@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Rainha da Noite (NV. 891 a 900) da área Castelo Escarlate.
 export const nightQueen: Creature = {
   id: "night-queen",
   name: "Rainha da Noite",

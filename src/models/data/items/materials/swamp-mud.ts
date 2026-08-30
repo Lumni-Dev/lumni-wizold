@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Lama do Pântano: despojo de caça, trocado por bronze no mercado.
 export const swampMud: Item = {
   id: "swamp-mud",
   name: "Lama do Pântano",

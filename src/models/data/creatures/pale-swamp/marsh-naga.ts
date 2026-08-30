@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Naga do Charco (NV. 371 a 380) da área Pântano Pálido.
 export const marshNaga: Creature = {
   id: "marsh-naga",
   name: "Naga do Charco",

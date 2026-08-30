@@ -436,10 +436,6 @@ async function saveWallet(
   characterId: string,
   centsDelta: number,
 ): Promise<void> {
-  // Applied as a relative delta, never an absolute overwrite: a sale credited
-  // by fulfillment (cents = cents + credit) that lands between this run's load
-  // and save must survive. Both writes are atomic row updates, so a withdrawal
-  // draining the wallet and an incoming sale compose instead of clobbering.
   if (centsDelta === 0) return;
   await client.query(
     `insert into wallets (character_id, cents) values ($1, greatest(0, $2))
@@ -549,10 +545,6 @@ export async function recordWalletMovement(
     [characterId, centsDelta, reason, referenceId],
   );
 }
-// Every hunter answers to one name. The check is case-insensitive because
-// capitalize only touches the first letter, so "Lumni" and "LUMNI" would read
-// as different rows; the unique index on lower(name) is the concurrency-proof
-// backstop, and this is the friendly gate that runs before the write.
 export async function nameTaken(
   client: PoolClient,
   name: string,
@@ -567,8 +559,6 @@ export async function nameTaken(
   return found.rows.length > 0;
 }
 
-// Postgres flags the unique index on lower(name) as 23505; the create and
-// rename doors turn that into the same refusal the pre-check gives.
 export function isNameCollision(error: unknown): boolean {
   return (
     typeof error === "object" &&
@@ -612,9 +602,6 @@ export async function insertNewGame(
       character.createdAt,
     ],
   );
-  // Seed the wallet row directly: saveGame persists it as a delta and a fresh
-  // run's before/after both hold the starting balance, so the delta is zero and
-  // would never create the row.
   await client.query(
     `insert into wallets (character_id, cents) values ($1, $2)
      on conflict (character_id) do update set cents = $2`,

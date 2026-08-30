@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Urso das Brumas (NV. 221 a 230) da área Serra das Brumas.
 export const mistBear: Creature = {
   id: "mist-bear",
   name: "Urso das Brumas",

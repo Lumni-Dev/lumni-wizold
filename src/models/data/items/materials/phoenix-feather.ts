@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Pena de Fênix: despojo de caça, trocado por bronze no mercado.
 export const phoenixFeather: Item = {
   id: "phoenix-feather",
   name: "Pena de Fênix",

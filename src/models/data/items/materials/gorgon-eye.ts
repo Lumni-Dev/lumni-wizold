@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Olho de Górgona: despojo de caça, trocado por bronze no mercado.
 export const gorgonEye: Item = {
   id: "gorgon-eye",
   name: "Olho de Górgona",

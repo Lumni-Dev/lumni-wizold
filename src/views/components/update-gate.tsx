@@ -4,10 +4,6 @@ import { useGame } from "@/controllers/game.context";
 import { Button } from "./button";
 import { Modal } from "./modal";
 
-// The forced-update prompt. It cannot be dismissed to keep playing: Escape and the
-// backdrop are off, so the only way out, the close button or "Atualizar agora",
-// reloads the page clearing the cache. A player on a stale build always lands on
-// the fresh one.
 export function UpdateGate() {
   const { updateAvailable, applyUpdate } = useGame();
   return (

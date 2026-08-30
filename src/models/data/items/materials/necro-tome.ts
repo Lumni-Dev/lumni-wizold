@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Tomo Necromante: despojo de caça, trocado por bronze no mercado.
 export const necroTome: Item = {
   id: "necro-tome",
   name: "Tomo Necromante",

@@ -30,12 +30,6 @@ export function rateLimit(key: string, limit: number, windowMs: number): RateVer
   return { allowed: false, retryAfterMs: window.resetAt - now };
 }
 
-// A fixed-window limiter that lives in Postgres, so it holds across every
-// serverless instance where the in-memory Map would not. Reserved for the
-// low-volume security gates (login, deletion code, room password) that a
-// horizontal fan-out could otherwise multiply; the high-frequency game
-// budgets stay in memory. Fails open on a DB hiccup, falling back to the
-// in-memory guard the caller already applied.
 export async function rateLimitShared(
   key: string,
   limit: number,

@@ -14,9 +14,6 @@ export function useTavernAlert(watching: boolean) {
   const [unread, setUnread] = useState(0);
   const selfId = character?.id ?? "";
   const enabled = watching && authenticated && character !== null;
-  // The newest message already accounted for, so a notification fires once per
-  // arrival. Null until the first poll, which only sets the baseline so the
-  // backlog on open never rings.
   const notifiedRef = useRef<string | null>(null);
 
   useEffect(() => {

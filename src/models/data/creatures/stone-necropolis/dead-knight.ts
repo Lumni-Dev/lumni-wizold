@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Cavaleiro Morto (NV. 641 a 650) da área Necrópole de Pedra.
 export const deadKnight: Creature = {
   id: "dead-knight",
   name: "Cavaleiro Morto",

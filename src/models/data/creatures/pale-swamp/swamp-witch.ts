@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Bruxa do Pântano (NV. 391 a 400) da área Pântano Pálido.
 export const swampWitch: Creature = {
   id: "swamp-witch",
   name: "Bruxa do Pântano",

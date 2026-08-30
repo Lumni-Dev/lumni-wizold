@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Cervo Espectral (NV. 911 a 920) da área Clareira Branca.
 export const spectralStag: Creature = {
   id: "spectral-stag",
   name: "Cervo Espectral",

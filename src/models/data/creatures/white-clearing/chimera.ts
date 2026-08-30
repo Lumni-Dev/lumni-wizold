@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Quimera (NV. 931 a 940) da área Clareira Branca.
 export const chimera: Creature = {
   id: "chimera",
   name: "Quimera",

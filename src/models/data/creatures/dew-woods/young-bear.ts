@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Urso Pardo Jovem (NV. 151 a 160) da área Mata do Orvalho.
 export const youngBear: Creature = {
   id: "young-bear",
   name: "Urso Pardo Jovem",

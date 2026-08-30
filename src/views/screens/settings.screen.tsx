@@ -107,8 +107,6 @@ export function SettingsScreen() {
     tavernPushRepository.serverSnapshot,
   );
 
-  // Turning it on asks the browser for permission; the setting only sticks on a
-  // yes, so a deny flips the switch back to Desativado on its own.
   function choosePush(on: boolean) {
     if (on) void enableTavernPush();
     else disableTavernPush();

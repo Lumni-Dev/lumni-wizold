@@ -98,9 +98,6 @@ function creatureDodge(creature: CombatOpponent): number {
   return clamp(Math.round((30 * creature.agility) / (creature.agility + 120)), 0, 30);
 }
 
-// The critical cut is fixed for the beast: a flat CRITICAL_DAMAGE_BONUS on top
-// of the base multiplier, no longer tied to rage. Only the werewolf fights, and
-// turning already spends rage, so a rage-scaled bonus could never reach its top.
 export function criticalMultiplierOf(): number {
   return CRITICAL_MULTIPLIER + CRITICAL_DAMAGE_BONUS;
 }

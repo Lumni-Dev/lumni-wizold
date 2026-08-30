@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Garra de Águia: despojo de caça, trocado por bronze no mercado.
 export const eagleTalon: Item = {
   id: "eagle-talon",
   name: "Garra de Águia",

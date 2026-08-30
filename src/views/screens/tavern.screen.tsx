@@ -85,7 +85,6 @@ export function TavernScreen() {
   const [removing, setRemoving] = useState<PackMate | null>(null);
   const [invites, setInvites] = useState<PackInvite[]>([]);
 
-  // The emoji dropup closes when you click anywhere outside it.
   useEffect(() => {
     if (!emojiOpen) return;
     const onDown = (event: MouseEvent) => {
@@ -116,8 +115,6 @@ export function TavernScreen() {
   useEffect(() => {
     fetchInvitesRef.current = fetchInvites;
   });
-  // Reads the invites and, in the same trip, adopts the run, so a mate that
-  // accepted your invite shows up in the matilha without a manual refresh.
   const refreshInvites = useCallback(() => {
     void fetchInvitesRef.current().then((list) => {
       if (list) setInvites(list);

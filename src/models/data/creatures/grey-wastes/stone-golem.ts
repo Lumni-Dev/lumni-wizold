@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Golem de Pedra (NV. 571 a 580) da área Ermo Cinza.
 export const stoneGolem: Creature = {
   id: "stone-golem",
   name: "Golem de Pedra",

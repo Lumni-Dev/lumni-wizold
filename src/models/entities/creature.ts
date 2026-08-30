@@ -28,8 +28,6 @@ export interface CreatureDrop {
 export interface Creature {
   id: string;
   name: string;
-  // Hand-added art path for the creature, empty until it has one. The hunt card
-  // shows an empty square while this is blank, ready to receive the image.
   image?: string;
   description: string;
   species: SpeciesKey;

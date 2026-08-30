@@ -75,8 +75,6 @@ export function listRooms(state: TavernState, identity: TavernIdentity | null): 
     .map((room) => {
       const isMember =
         identity !== null && room.members.some((member) => member.id === identity.id);
-      // The board never carries the password hash, and only members receive the
-      // message history: a locked room shows its name and seats, never its chat.
       const safeRoom: TavernRoom = {
         ...room,
         password: null,
