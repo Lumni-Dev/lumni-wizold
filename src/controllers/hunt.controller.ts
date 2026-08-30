@@ -70,6 +70,21 @@ function pickCreature(territory: Territory, level: number): Creature | undefined
   return eligible[eligible.length - 1] ?? creatures[0];
 }
 
+// The creature the player picked on the list (a radio, one per area), validated to
+// belong to this area. With none picked, the trail falls back to the level-appropriate
+// suggestion, so a first visit still hunts something sensible.
+function chosenCreature(
+  territory: Territory,
+  creatureId: string | null,
+  level: number,
+): Creature | undefined {
+  if (creatureId) {
+    const chosen = creaturesOf(territory).find((creature) => creature.id === creatureId);
+    if (chosen) return chosen;
+  }
+  return pickCreature(territory, level);
+}
+
 export function listTerritories(state: GameState): AvailableTerritory[] {
   const character = state.character;
   const stats = character
@@ -79,7 +94,10 @@ export function listTerritories(state: GameState): AvailableTerritory[] {
   return TERRITORIES.map((territory) => {
     const creatures = creaturesOf(territory);
 
-    const unlocked = character !== null && character.level >= territory.minLevel;
+    // Every area is open: only a character (and enough health) gates the hunt now,
+    // never the level. The band survives as `prey`, the suggested creature, and as
+    // the level range the card shows as a hint.
+    const unlocked = character !== null;
     const hasHealth =
       character !== null &&
       stats !== null &&
@@ -91,11 +109,7 @@ export function listTerritories(state: GameState): AvailableTerritory[] {
       prey: character ? (pickCreature(territory, character.level) ?? null) : null,
       unlocked,
       hasHealth,
-      reason: !unlocked
-        ? "Requer NV. " + territory.minLevel
-        : !hasHealth
-          ? "Vida baixa demais"
-          : null,
+      reason: !hasHealth ? "Vida baixa demais" : null,
     };
   });
 }
@@ -121,22 +135,21 @@ export function resolveHunt(
   state: GameState,
   territoryId: string,
   random: Random = defaultRandom,
+  creatureId: string | null = null,
 ): Result<HuntResolution> {
   const character = state.character;
   if (!character) return failure(state, "Nenhum personagem ativo.");
 
   const territory = findTerritory(territoryId);
   if (!territory) return failure(state, "Território desconhecido.");
-  if (character.level < territory.minLevel) {
-    return failure(state, territory.name + " exige NV. " + territory.minLevel + ".");
-  }
 
   const stats = deriveStats(character, state.equipment, state.pet, state.enhancements);
   if (character.health <= stats.maxHealth * MIN_HEALTH_RATIO_TO_ACT) {
     return failure(state, "Vida baixa demais para caçar. Recupere-se ou use uma poção.");
   }
 
-  const creature = pickCreature(territory, character.level);
+  // Every area is open, the band is a suggestion: hunt the creature the player picked.
+  const creature = chosenCreature(territory, creatureId, character.level);
   if (!creature) return failure(state, "A trilha não levou a nada.");
 
   const petJoining = canPetFight(state.pet) ? state.pet : null;

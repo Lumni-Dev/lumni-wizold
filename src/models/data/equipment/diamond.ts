@@ -13,6 +13,6 @@ export const diamondSet: SetDefinition = {
   flavor:
     "Cravejado de diamante, devolve a lua inteira no meio da mata e corta a luz antes " +
     "de cortar carne. É o limite do que o vilarejo monta sem começar a perguntar.",
-  power: 1150,
-  priceMultiplier: 15,
+  power: 2500,
+  priceMultiplier: 5,
 };

@@ -11,6 +11,6 @@ export const PET = {
   energyPerBlow: 2,
   biteEnergy: 6,
   restRatio: 0.1,
-  attackRatio: 0.25,
+  attackRatio: 0.5,
   targetChance: 0.2,
 };

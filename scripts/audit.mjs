@@ -459,7 +459,7 @@ sec("economia");
   );
   const setTotal = (definition) =>
     entItem.EQUIPMENT_SLOTS.reduce((total, slot) => total + sets.piecePrice(definition, slot), 0);
-  ok("conjunto de bronze custa 1140", setTotal(sets.EQUIPMENT_SETS[0]) === 1140);
+  ok("conjunto de bronze custa 3800", setTotal(sets.EQUIPMENT_SETS[0]) === 3800);
   let setsClimb = true;
   for (let index = 1; index < sets.EQUIPMENT_SETS.length; index += 1) {
     if (setTotal(sets.EQUIPMENT_SETS[index]) <= setTotal(sets.EQUIPMENT_SETS[index - 1])) {
@@ -758,12 +758,17 @@ sec("caçada");
   const weak = { ...state, character: { ...state.character, health: 1 } };
   ok("vida no chão não caça", huntCtrl.resolveHunt(weak, "dew-woods", random).ok === false);
   ok(
-    "território trancado recusa",
-    huntCtrl.resolveHunt(state, "white-clearing", random).ok === false,
+    "toda área é aberta: a faixa virou só sugestão",
+    huntCtrl.resolveHunt(state, "white-clearing", random).ok === true,
   );
   ok("território desconhecido recusa", huntCtrl.resolveHunt(state, "nada", random).ok === false);
   const resolved = huntCtrl.resolveHunt(state, "dew-woods", random);
   ok("caçada válida resolve", resolved.ok === true);
+  const picked = huntCtrl.resolveHunt(state, "dew-woods", random, "young-bear");
+  ok(
+    "a caçada enfrenta o bicho escolhido pelo id",
+    picked.ok === true && picked.data.creature.id === "young-bear",
+  );
   if (resolved.ok) {
     const beaten = {
       ...resolved.data,
@@ -864,7 +869,10 @@ sec("caçada");
       "a caçada esgota o fôlego do lobo",
       afterOne.state.pet.energy < CONST.PET_ENERGY_PER_HUNT + CONST.PET_ENERGY_PER_BLOW,
     );
-    const nextHunt = huntCtrl.resolveHunt(afterOne.state, "village-field", seededRandom(10));
+    // Heal the body (fixed at 100 now) so the next hunt is barred only by the wolf's
+    // breath, not by the hunter's own health after a hard lap.
+    const rested = { ...afterOne.state, character: { ...afterOne.state.character, health: 100 } };
+    const nextHunt = huntCtrl.resolveHunt(rested, "village-field", seededRandom(10));
     ok(
       "no recomeço o lobo esgotado fica de fora",
       nextHunt.ok && nextHunt.data.combat.petSpent === 0 && nextHunt.data.combat.petBlows === 0,
@@ -1063,8 +1071,8 @@ sec("forja e mina");
   const forged = forgeRules.enhancedEffect(claw, 100);
   const base = claw.effect.attributes.strength;
   ok(
-    "forja soma 1 ponto por nível mais 0,2%",
-    forged.attributes.strength === base + 100 + Math.round(base * 0.002 * 100),
+    "forja multiplica a peça (0,3% por nível, sem termo fixo)",
+    forged.attributes.strength === Math.round(base * (1 + 0.003 * 100)),
   );
   ok("forja zero devolve o efeito puro", forgeRules.enhancedEffect(claw, 0) === claw.effect);
   const state = baseState({ level: 1 });

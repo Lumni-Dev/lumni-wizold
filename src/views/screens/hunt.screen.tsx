@@ -13,7 +13,11 @@ import { HUNT_TICK_MS, HUNT_TICKS } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
 import { formatNumber } from "@/shared/utils/format";
 import { ArtImage } from "../components/art-image";
-import { IconArt } from "../components/icon-frame";
+import { IconArt, IconFrame } from "../components/icon-frame";
+import {
+  loadHuntSelection,
+  saveHuntSelection,
+} from "@/models/repositories/hunt-selection.repository";
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
 import { Card } from "../components/card";
@@ -157,6 +161,9 @@ export function HuntScreen() {
   const waitingId = activity?.kind === "hunt" && paused ? (activity.id ?? null) : null;
   const petAlong = canPetFight(pet) ? pet : null;
   const [report, setReport] = useState<HuntReport | null>(null);
+  // The monster picked per area (a radio on the list), a device fact: which creature
+  // the trail hunts, so you can drop to an easier one while you forge for the next.
+  const [selection, setSelection] = useState<Record<string, string>>(() => loadHuntSelection());
   const [reportLines, setReportLines] = useState<NarrationLine[]>([]);
   const [session, setSession] = useState<HuntSession>(EMPTY_SESSION);
   const [progress, setProgress] = useState<{ id: string; beat: number }>({ id: "", beat: 0 });
@@ -178,6 +185,7 @@ export function HuntScreen() {
   const landRef = useRef(landHunt);
   const notifyRef = useRef(notify);
   const stateRef = useRef(state);
+  const selectionRef = useRef(selection);
   const nameRef = useRef("");
   useEffect(() => {
     autoRef.current = state.automation.hunt;
@@ -186,6 +194,7 @@ export function HuntScreen() {
     landRef.current = landHunt;
     notifyRef.current = notify;
     stateRef.current = state;
+    selectionRef.current = selection;
     nameRef.current = character?.name ?? "";
   });
   useEffect(() => {
@@ -205,7 +214,7 @@ export function HuntScreen() {
       // which also blocks the automation from the instant the request is sent.
       if (!pendingRef.current && !requestingRef.current) {
         requestingRef.current = true;
-        void huntRef.current(activeId).then((fight) => {
+        void huntRef.current(activeId, selectionRef.current[activeId]).then((fight) => {
           if (!alive) return;
           requestingRef.current = false;
           if (!fight) {
@@ -305,6 +314,13 @@ export function HuntScreen() {
   }, [activeId, setActivity]);
   if (!character) return null;
   const drops = Object.entries(session.drops);
+  function selectCreature(territoryId: string, creatureId: string) {
+    setSelection((current) => {
+      const next = { ...current, [territoryId]: creatureId };
+      saveHuntSelection(next);
+      return next;
+    });
+  }
   function toggleHunt(territoryId: string, available: boolean) {
     // Stop: freeze at the exact beat; the effect cleanup banks it and the
     // interrupted trail lands nothing. Starting seeds the beat from the bank.
@@ -347,6 +363,8 @@ export function HuntScreen() {
             const ready = unlocked && hasHealth;
             const available = ready;
             const active = activeId === territory.id;
+            // The creature the radio has picked here, falling back to the suggested one.
+            const selectedId = selection[territory.id] ?? prey?.id ?? null;
             // The live fight only plays on the active card, once a beat has landed.
             const onThis = active && progress.id === territory.id;
             const line =
@@ -354,7 +372,7 @@ export function HuntScreen() {
                 ? script[Math.min(progress.beat, script.length) - 1]
                 : null;
             const foe = pending ?? report;
-            const fightingId = line && foe ? foe.creature.id : (prey?.id ?? null);
+            const fightingId = line && foe ? foe.creature.id : selectedId;
             return (
               <Card
                 key={territory.id}
@@ -370,30 +388,35 @@ export function HuntScreen() {
                   {/* Left: art, name, story, level range and the hunt itself. */}
                   <div className="flex flex-col divide-y divide-edge">
                     {art.territories[territory.id] ? (
-                      <div className="aspect-video w-full overflow-hidden">
+                      <div className="relative aspect-video w-full overflow-hidden">
                         <ArtImage source={art.territories[territory.id]} />
+                        <span className="absolute left-2 top-2 z-10 inline-flex h-6 items-center rounded-md border border-edge-strong bg-base/80 px-2 font-mono text-[10px] uppercase tracking-[0.12em] text-ink-soft backdrop-blur-sm">
+                          Sugestão NV. {formatNumber(territory.minLevel)} a{" "}
+                          {formatNumber(territory.maxLevel)}
+                        </span>
                       </div>
-                    ) : null}
+                    ) : (
+                      <div className="px-4 pt-4">
+                        <span className="inline-flex h-6 items-center rounded-md border border-edge-strong bg-surface-high px-2 font-mono text-[10px] uppercase tracking-[0.12em] text-ink-soft">
+                          Sugestão NV. {formatNumber(territory.minLevel)} a{" "}
+                          {formatNumber(territory.maxLevel)}
+                        </span>
+                      </div>
+                    )}
                     <div className="p-4">
                       <h2 className="text-sm text-ink">{territory.name}</h2>
                       <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                         {DANGER_LABEL[territory.danger]}
                       </p>
                     </div>
-                    <div className="space-y-2 px-4 py-3">
+                    <div className="px-4 py-3">
                       <p className="text-xs leading-relaxed text-ink-faint">
                         {territory.description}
                       </p>
-                      <div className="flex flex-wrap gap-2">
-                        <Tag tone="neutral">
-                          NV. {formatNumber(territory.minLevel)} a{" "}
-                          {formatNumber(territory.maxLevel)}
-                        </Tag>
-                      </div>
                     </div>
                     <div className="px-4 py-3">
                       <Bar
-                        label={active ? "Caçando..." : unlocked ? "Caçar" : "Nível insuficiente"}
+                        label={active ? "Caçando..." : "Caçar"}
                         current={onThis ? progress.beat : 0}
                         maximum={Math.max(1, script.length || HUNT_TICKS)}
                         glows={active}
@@ -460,41 +483,60 @@ export function HuntScreen() {
                         Criaturas da área
                       </p>
                     </div>
-                    <ul className="divide-y divide-edge border-t border-edge">
+                    {/* Click a row to hunt that monster; the radio marks the pick, one
+                        per area. While you cannot beat the next, drop to an easier one. */}
+                    <ul className="max-h-[560px] divide-y divide-edge overflow-y-auto border-t border-edge">
                       {creatures.map((creature) => {
-                        const isPrey = creature.id === fightingId || creature.id === prey?.id;
+                        const isSelected = creature.id === selectedId;
+                        const isPrey = creature.id === fightingId;
                         const reached = character.level >= creature.level;
                         return (
-                          <li
-                            key={creature.id}
-                            className="flex items-center gap-3 px-4 py-2.5 text-xs"
-                          >
-                            <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-md border border-edge bg-surface-high">
-                              {creature.image ? (
-                                <IconArt source={creature.image} padded={false} />
-                              ) : null}
-                            </div>
-                            <span
+                          <li key={creature.id}>
+                            <button
+                              type="button"
+                              onClick={() => selectCreature(territory.id, creature.id)}
+                              aria-pressed={isSelected}
                               className={cn(
-                                "min-w-0 flex-1 truncate",
-                                isPrey
-                                  ? "text-ember"
-                                  : reached
-                                    ? "text-ink-soft"
-                                    : "text-ink-faint",
+                                "flex w-full items-center gap-3 px-4 py-3 text-left transition-colors",
+                                isSelected ? "bg-surface-high" : "hover:bg-surface-high/60",
                               )}
                             >
-                              {creature.name}
-                            </span>
-                            <span
-                              className={cn(
-                                "shrink-0 font-mono text-[11px]",
-                                isPrey ? "text-ember" : "text-ink-faint",
-                              )}
-                            >
-                              NV. {formatNumber(creature.level)} a{" "}
-                              {formatNumber(creature.level + 9)}
-                            </span>
+                              <IconFrame size="medium">
+                                {creature.image ? (
+                                  <IconArt source={creature.image} padded={false} />
+                                ) : (
+                                  <span>?</span>
+                                )}
+                              </IconFrame>
+                              <span className="min-w-0 flex-1">
+                                <span
+                                  className={cn(
+                                    "block truncate text-xs",
+                                    isPrey
+                                      ? "text-ember"
+                                      : reached
+                                        ? "text-ink-soft"
+                                        : "text-ink-faint",
+                                  )}
+                                >
+                                  {creature.name}
+                                </span>
+                                <span className="font-mono text-[11px] text-ink-faint">
+                                  NV. {formatNumber(creature.level)} a{" "}
+                                  {formatNumber(creature.level + 9)}
+                                </span>
+                              </span>
+                              <span
+                                className={cn(
+                                  "grid h-4 w-4 shrink-0 place-items-center rounded-full border",
+                                  isSelected ? "border-ember" : "border-edge-strong",
+                                )}
+                              >
+                                {isSelected ? (
+                                  <span className="h-2 w-2 rounded-full bg-ember" />
+                                ) : null}
+                              </span>
+                            </button>
                           </li>
                         );
                       })}

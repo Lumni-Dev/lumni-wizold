@@ -1,9 +1,11 @@
-// Vitais: só a vida agora (a fúria deixou de ser um vital).
+// Vitais: só a vida, e agora ela é fixa em 100 para todo mundo.
 //   vida = baseVital + (Resistência - atributo base) x healthPerResistance + nível x healthPerLevel
-// healthPerLevel começa em 0: o nível não dá vida direta, só o atributo. Suba-o
-// para a vida crescer por nível também.
+// healthPerResistance e healthPerLevel começam em 0: nem o nível nem a Resistência
+// dão vida. A Resistência agora só mitiga dano (Força²/(Força+RES)), então quem te
+// defende são os itens e suas forjas, nunca uma barra de vida que cresce. Suba
+// qualquer um dos dois para a vida voltar a crescer.
 export const VITALS = {
   baseVital: 100,
-  healthPerResistance: 14,
+  healthPerResistance: 0,
   healthPerLevel: 0,
 };

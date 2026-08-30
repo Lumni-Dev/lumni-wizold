@@ -14,6 +14,6 @@ export const lunarSet: SetDefinition = {
   flavor:
     "Forjado sob lua cheia, com a fera acordada segurando o martelo. Responde ao céu: " +
     "brilha fraco no escuro e respira junto com quem veste, na noite da virada.",
-  power: 2400,
-  priceMultiplier: 18,
+  power: 12500,
+  priceMultiplier: 6,
 };

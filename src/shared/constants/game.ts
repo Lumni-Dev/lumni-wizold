@@ -62,7 +62,7 @@ export const PET_ATTACK_RATIO = PET.attackRatio;
 export const PET_TARGET_CHANCE = PET.targetChance;
 
 export const MAX_ENHANCEMENT = numberFromEnv(process.env.NEXT_PUBLIC_MAX_ENHANCEMENT, 1000);
-export const ENHANCEMENT_STEP = 0.002;
+export const ENHANCEMENT_STEP = 0.003;
 export const FORGE_SUCCESS_RATIO = 0.75;
 export const FORGE_BRONZE_RATIO = 0.15;
 export const TRAINING_TICK_MS = 1000;

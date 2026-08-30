@@ -23,7 +23,7 @@ Module._resolveFilename = function (request, ...rest) {
 const require = createRequire(import.meta.url);
 const { simulateCombat } = require(join(BUILD, "models/rules/combat.js"));
 const { deriveStatsOf } = require(join(BUILD, "models/rules/stats.js"));
-const { EQUIPMENT_SETS, pieceId, piecePrice, setForLevel } = require(
+const { pieceId, piecePrice, setForLevel } = require(
   join(BUILD, "models/data/equipment-sets.js"),
 );
 const { findItem } = require(join(BUILD, "models/data/items.js"));
@@ -31,6 +31,8 @@ const { trainingSessionCost, trainingSessionsPerPoint } = require(
   join(BUILD, "models/rules/training.js"),
 );
 const { findCreature } = require(join(BUILD, "models/data/creatures.js"));
+const { referenceForge } = require(join(BUILD, "models/data/species.js"));
+const { petMaxEnergy } = require(join(BUILD, "models/rules/pet.js"));
 const { TERRITORIES } = require(join(BUILD, "models/data/territories.js"));
 const { EQUIPMENT_SLOTS } = require(join(BUILD, "models/entities/item.js"));
 const { BASE_ATTRIBUTE_VALUE, MAX_ATTRIBUTE_VALUE, MIN_HEALTH_RATIO_TO_ACT } = require(
@@ -61,22 +63,29 @@ function trainedAt(level) {
   };
 }
 
-const SET_BOUGHT_AT = 0.08;
-
+// The reference hunter wears the band's set forged along the ramp (0 when the set
+// unlocks, +1000 at the end of its two areas), exactly what a creature is seeded
+// against, so the bench measures the real target fight.
 function gearAt(level) {
-  const owned = EQUIPMENT_SETS.filter((set) => set.minLevel <= level);
-  const current = owned[owned.length - 1];
-  const previous = owned[owned.length - 2] ?? null;
-  const next = EQUIPMENT_SETS[owned.length];
-
-  const start = current ? current.minLevel : 1;
-  const end = (next ? next.minLevel : 1001) - 1;
-  const at = Math.min(1, Math.max(0, (level - start) / Math.max(1, end - start)));
-
-  const worn = at < SET_BOUGHT_AT ? (previous ?? current) : current;
+  const set = setForLevel(level);
+  const forge = referenceForge(level);
   const equipment = {};
-  for (const slot of EQUIPMENT_SLOTS) equipment[slot] = worn ? pieceId(worn.key, slot) : null;
-  return { equipment, set: worn };
+  const enhancements = {};
+  for (const slot of EQUIPMENT_SLOTS) {
+    const id = pieceId(set.key, slot);
+    equipment[slot] = id;
+    enhancements[id] = forge;
+  }
+  return { equipment, enhancements, set, forge };
+}
+
+// The wolf joins from the halfway area (5), fed and rested, so the bench measures
+// what the creatures from there are seeded to assume.
+const PET_FROM_AREA = 5;
+
+function petAt(level) {
+  if (Math.ceil(level / 100) < PET_FROM_AREA) return null;
+  return { name: "Lobo", energy: petMaxEnergy(Math.min(level, 1000)) };
 }
 
 function preyAt(level) {
@@ -96,9 +105,10 @@ function preyAt(level) {
 
 function measure(level, fights = 400) {
   const attributes = trainedAt(level);
-  const { equipment, set } = gearAt(level);
-  const stats = deriveStatsOf({ level, attributes, enhancements: {} }, equipment);
+  const { equipment, enhancements, set, forge } = gearAt(level);
+  const stats = deriveStatsOf({ level, attributes, enhancements }, equipment);
   const prey = preyAt(level);
+  const pet = petAt(level);
   const random = seeded(level * 7919 + 13);
 
   let lost = 0;
@@ -112,7 +122,7 @@ function measure(level, fights = 400) {
       currentHealth: stats.maxHealth,
       stats,
       creature: { ...prey, health: prey.health },
-      pet: null,
+      pet: pet ? { ...pet } : null,
       random,
     });
 
@@ -126,6 +136,7 @@ function measure(level, fights = 400) {
     level,
     set: set ? set.label : "nenhum",
     prey: prey.name,
+    forge,
     strength: stats.totalAttributes.strength,
     endurance: stats.totalAttributes.endurance,
     maxHealth: stats.maxHealth,
@@ -139,9 +150,10 @@ function measure(level, fights = 400) {
 
 function session(level, nights = 300) {
   const attributes = trainedAt(level);
-  const { equipment } = gearAt(level);
-  const stats = deriveStatsOf({ level, attributes, enhancements: {} }, equipment);
+  const { equipment, enhancements } = gearAt(level);
+  const stats = deriveStatsOf({ level, attributes, enhancements }, equipment);
   const prey = preyAt(level);
+  const pet = petAt(level);
   const random = seeded(level * 104729 + 7);
 
   let hunts = 0;
@@ -156,7 +168,7 @@ function session(level, nights = 300) {
         currentHealth: health,
         stats,
         creature: { ...prey, health: prey.health },
-        pet: null,
+        pet: pet ? { ...pet } : null,
         random,
       });
 
@@ -170,6 +182,34 @@ function session(level, nights = 300) {
   }
 
   return { hunts: hunts / nights, defeatRatio: defeats / hunts };
+}
+
+// Proof the forge and the wolf carry the model: the same pair-end creature faced
+// with a fresh (unforged) set, and faced without the wolf.
+function verify(level, mode) {
+  const attributes = trainedAt(level);
+  const { equipment, enhancements: ramp } = gearAt(level);
+  const enhancements = mode === "noforge" ? {} : ramp;
+  const stats = deriveStatsOf({ level, attributes, enhancements }, equipment);
+  const prey = preyAt(level);
+  const pet = mode === "nopet" ? null : petAt(level);
+  const random = seeded(level * 7919 + 13);
+  let lost = 0;
+  let deaths = 0;
+  const runs = 600;
+  for (let i = 0; i < runs; i += 1) {
+    const o = simulateCombat({
+      characterName: "Bot",
+      currentHealth: stats.maxHealth,
+      stats,
+      creature: { ...prey, health: prey.health },
+      pet: pet ? { ...pet } : null,
+      random,
+    });
+    lost += o.damageTaken;
+    if (!o.victory && !o.retreated) deaths += 1;
+  }
+  return { perda: lost / runs / stats.maxHealth, morte: deaths / runs };
 }
 
 function economy(level) {
@@ -207,6 +247,7 @@ function line(row) {
     "NV " + String(row.level).padStart(4),
     row.set.padEnd(9),
     row.prey.padEnd(8),
+    "forja " + String(row.forge).padStart(4),
     "treino " + String(row.trained).padStart(4),
     "FOR " + String(row.strength).padStart(6),
     "RES " + String(row.endurance).padStart(6),
@@ -244,6 +285,23 @@ if (Number.isFinite(single) && single > 0) {
         "  morte " +
         (night.defeatRatio * 100).toFixed(1).padStart(4) +
         "%",
+    );
+  }
+
+  console.log("");
+  console.log("VERIFICAÇÃO: forja e mascote sustentam o modelo (último bicho do par)");
+  const pct = (v) => (v * 100).toFixed(1).padStart(5) + "%";
+  for (const level of [200, 400, 600, 800, 1000]) {
+    const full = verify(level, "full");
+    const noForge = verify(level, "noforge");
+    const noPet = verify(level, "nopet");
+    console.log(
+      [
+        "NV " + String(level).padStart(4),
+        "tudo p " + pct(full.perda) + " m " + pct(full.morte),
+        "| sem forja p " + pct(noForge.perda) + " m " + pct(noForge.morte),
+        "| sem pet p " + pct(noPet.perda) + " m " + pct(noPet.morte),
+      ].join("  "),
     );
   }
 

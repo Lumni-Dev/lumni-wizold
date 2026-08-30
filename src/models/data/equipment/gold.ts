@@ -13,6 +13,6 @@ export const goldSet: SetDefinition = {
   flavor:
     "Ouro trabalhado, mais firme do que a fama sugere e o único que a fera não tenta " +
     "arrancar do corpo na virada. Só desce da serra o que a serra devolve.",
-  power: 750,
-  priceMultiplier: 11,
+  power: 500,
+  priceMultiplier: 4,
 };

@@ -68,7 +68,7 @@ interface GameContextValue {
   activity: Activity | null;
   setActivity: (activity: Activity | null) => void;
   train: (exerciseId: string) => Promise<{ message: string; raised: boolean } | null>;
-  hunt: (territoryId: string) => Promise<HuntReport | null>;
+  hunt: (territoryId: string, creatureId?: string) => Promise<HuntReport | null>;
   landHunt: () => void;
   sufferBlow: (damage: number) => void;
   drawOpponent: () => Promise<{
@@ -517,8 +517,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
         }
         return { message: answer.message, raised: answer.data?.attributeRaised === true };
       },
-      hunt: async (territoryId) => {
-        const answer = await request<HuntReport>("POST", "/api/hunt", { territoryId }, "hunt");
+      hunt: async (territoryId, creatureId) => {
+        const answer = await request<HuntReport>(
+          "POST",
+          "/api/hunt",
+          { territoryId, creatureId },
+          "hunt",
+        );
         if (!answer.ok) {
           if (answer.message) announce(answer.message, false, "Caça");
           return null;

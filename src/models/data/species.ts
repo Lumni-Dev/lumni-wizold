@@ -1,10 +1,12 @@
 import {
   BASE_ATTRIBUTE_VALUE,
   BASE_VITAL,
-  HEALTH_PER_ENDURANCE,
+  ENHANCEMENT_STEP,
   MAX_ATTRIBUTE_VALUE,
   MAX_CHARACTER_LEVEL,
+  MAX_ENHANCEMENT,
 } from "@/shared/constants/game";
+import { BALANCE } from "@/shared/constants/tuning/balance";
 import {
   SPECIES_ORDER,
   type Creature,
@@ -14,7 +16,7 @@ import {
 } from "../entities/creature";
 import type { Item, Rarity } from "../entities/item";
 import type { DangerLevel, Territory } from "../entities/territory";
-import { EQUIPMENT_SETS, setAttributes } from "./equipment-sets";
+import { setAttributes, setForLevel } from "./equipment-sets";
 
 const VARIANTS_PER_SPECIES = 5;
 
@@ -390,83 +392,94 @@ function creatureDrops(definition: SpeciesDefinition): CreatureDrop[] {
   return [...materials, ...gear];
 }
 
-// Tuned for a hunter with no werewolf bonus (transformation was removed): the prey
-// carries less of the reference hunter's strength and body than it did when the
-// player fought at +35% Força, so a base hunter still sees the target difficulty.
-const PREY_STRENGTH_SHARE = 0.68;
-const PREY_ENDURANCE_SHARE = 0.5;
-const PREY_HEALTH_SHARE = 0.23;
+// The fixed-100-HP model, tuned through shared/constants/tuning/balance.ts. Health
+// no longer grows, so the only defense is the Resistência the gear (and its forge)
+// lends, mitigating each blow. A creature is built against the reference hunter of
+// its level: the trained value of that level plus the band's set, forged along a
+// ramp that opens at 0 when the set unlocks and reaches +1000 at the end of its two
+// areas, so the last creature of the pair's second area needs that set at +1000.
 
-const BRONZE_PER_STRENGTH = 0.9;
+const AREA_LEVELS = MAX_CHARACTER_LEVEL / 10;
 
-const TRAINED_PER_LEVEL = 0.55;
-
-const SET_REACHED_AT = 0.08;
-
-function referenceGear(level: number) {
-  const owned = EQUIPMENT_SETS.filter((definition) => definition.minLevel <= level);
-  const current = owned[owned.length - 1] ?? EQUIPMENT_SETS[0];
-  const previous = owned[owned.length - 2] ?? null;
-  const next = EQUIPMENT_SETS[owned.length];
-
-  const start = current.minLevel;
-  const end = (next?.minLevel ?? MAX_CHARACTER_LEVEL + 1) - 1;
-  const at = Math.min(1, Math.max(0, (level - start) / Math.max(1, end - start)));
-
-  // The reference hunter buys the whole set once, a slice (SET_REACHED_AT) into the
-  // band, not as a smooth ramp: until then they wear the previous set. This matches
-  // how the player actually gears and how the balance bench measures, so a fixed
-  // creature seeded against this hunter is a fair fight at the set boundary instead
-  // of a cliff (the old ramp tuned boundary creatures for gear the player lacked).
-  const worn = at < SET_REACHED_AT && previous ? previous : current;
-  const lent = setAttributes(worn);
-
-  return { strength: lent.strength, endurance: lent.endurance };
+// The forge the reference hunter carries at this level: 0 when the band's set
+// unlocks, the ceiling at the end of the set's two areas.
+export function referenceForge(level: number): number {
+  const set = setForLevel(level);
+  const span = AREA_LEVELS * 2 - 1;
+  return Math.max(
+    0,
+    Math.min(MAX_ENHANCEMENT, Math.round((MAX_ENHANCEMENT * (level - set.minLevel)) / span)),
+  );
 }
 
-function referenceHunter(level: number) {
-  const trained = Math.min(
+function trainedAt(level: number): number {
+  return Math.min(
     MAX_ATTRIBUTE_VALUE,
-    Math.max(BASE_ATTRIBUTE_VALUE, Math.round(level * TRAINED_PER_LEVEL)),
+    Math.max(BASE_ATTRIBUTE_VALUE, Math.round(level * BALANCE.trainedPerLevel)),
   );
-  const gear = referenceGear(level);
-  const endurance = trained + gear.endurance;
+}
 
+function forgedGear(level: number) {
+  const multiplier = 1 + ENHANCEMENT_STEP * referenceForge(level);
+  const lent = setAttributes(setForLevel(level));
+  return { strength: lent.strength * multiplier, endurance: lent.endurance * multiplier };
+}
+
+export function referenceHunter(level: number) {
+  const trained = trainedAt(level);
+  const gear = forgedGear(level);
   return {
     strength: trained + gear.strength,
-    endurance,
-    health: BASE_VITAL + (endurance - BASE_ATTRIBUTE_VALUE) * HEALTH_PER_ENDURANCE,
+    endurance: trained + gear.endurance,
+    health: BASE_VITAL,
   };
 }
 
-const BAND_RAMP_LOW = 0.92;
-const BAND_RAMP_HIGH = 1.12;
-
-function bandPressure(key: SpeciesKey, level: number): number {
-  const band = bandOf(key);
-  const at = Math.min(1, Math.max(0, (level - band.start) / Math.max(1, band.end - band.start)));
-  return BAND_RAMP_LOW + (BAND_RAMP_HIGH - BAND_RAMP_LOW) * at;
+function areaOf(level: number): number {
+  return Math.max(1, Math.min(10, Math.ceil(level / AREA_LEVELS)));
 }
 
+// The purse rides the unforged gear, not the forged reference: forging is the
+// player's own grind and must never multiply the bronze a carcass pays.
 export function huntPurse(level: number): number {
-  return Math.round(referenceHunter(level).strength * BRONZE_PER_STRENGTH);
+  const gear = setAttributes(setForLevel(level));
+  return Math.round((trainedAt(level) + gear.strength) * BALANCE.bronzePerStrength);
 }
 
 export function speciesNumbers(key: SpeciesKey, level: number) {
   const definition = SPECIES.find((entry) => entry.key === key) ?? SPECIES[0];
-  const difficulty = definition.difficulty * bandPressure(key, level);
+  const profile = definition.profile;
+  const difficulty = definition.difficulty;
   const hunter = referenceHunter(level);
-  const purse = hunter.strength * BRONZE_PER_STRENGTH;
+
+  // Constant per-blow damage: the creature's Força is the root of the hunter's
+  // Resistência, so each blow stays near BALANCE.creatureHit at every band instead
+  // of one-shotting a 100-HP body once the numbers grow.
+  const strength = Math.max(
+    1,
+    Math.round(Math.sqrt(BALANCE.creatureHit * hunter.endurance * profile.strength)),
+  );
+  const endurance = Math.max(
+    1,
+    Math.round(hunter.strength * BALANCE.creatureResRatio * profile.endurance),
+  );
+
+  // The body those kill-rounds imply against the hunter's own blow, padded from the
+  // halfway area so the wolf's blows are part of the math and a lone hunter falls short.
+  const hunterBlow = (hunter.strength * hunter.strength) / (hunter.strength + endurance);
+  const petPad = areaOf(level) >= BALANCE.petFromArea ? 1 + BALANCE.petKillBoost : 1;
+  const health = Math.max(
+    1,
+    Math.round(BALANCE.creatureKillRounds * hunterBlow * petPad * profile.health * difficulty),
+  );
+
+  const purse = huntPurse(level);
 
   return {
-    health: Math.round(hunter.health * PREY_HEALTH_SHARE * definition.profile.health * difficulty),
-    strength: Math.round(
-      hunter.strength * PREY_STRENGTH_SHARE * definition.profile.strength * difficulty,
-    ),
-    endurance: Math.round(
-      hunter.endurance * PREY_ENDURANCE_SHARE * definition.profile.endurance * difficulty,
-    ),
-    agility: Math.round((4 + level * 0.5) * definition.profile.agility),
+    health,
+    strength,
+    endurance,
+    agility: Math.round((4 + level * 0.5) * profile.agility),
     experience: Math.round(12 + level * 7),
     minBronze: Math.round(purse * 0.7),
     maxBronze: Math.round(purse * 1.3),
