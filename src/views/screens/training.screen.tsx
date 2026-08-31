@@ -6,8 +6,8 @@ import { isGameSound, playSound } from "@/controllers/sound";
 import { petTrainingView } from "@/controllers/pet.controller";
 import { listAttributeProgress, listExercises } from "@/controllers/training.controller";
 import { usePageActivity } from "@/controllers/use-page-activity";
-import { progressRepository } from "@/models/repositories/progress.repository";
 import {
+  CYCLE_OPTOUT_SECS,
   MAX_ATTRIBUTE_VALUE,
   PET_EXERCISE_ID,
   PET_MAX_LEVEL,
@@ -39,8 +39,8 @@ export function TrainingScreen() {
   const petReady = petTraining !== null && !petTraining.maxed && petTraining.affordable;
 
   const [session, setSession] = useState<{ id: string; beat: number }>({ id: "", beat: 0 });
+  const [cooldown, setCooldown] = useState<number | null>(null);
   const beatRef = useRef(0);
-  const petFrozen = !petActive && session.id === PET_EXERCISE_ID && session.beat > 0;
 
   const autoRef = useRef(state.automation.train);
   const trainRef = useRef(train);
@@ -66,43 +66,77 @@ export function TrainingScreen() {
   useEffect(() => {
     if (!activeExercise) return;
     if (activeExercise === PET_EXERCISE_ID && petGone) return;
+    let alive = true;
+    let barTimer = 0;
+    let coolTimer = 0;
+    beatRef.current = 0;
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setSession({ id: activeExercise, beat: 0 });
+    setCooldown(null);
+    /* eslint-enable react-hooks/set-state-in-effect */
 
-    const key = "train:" + activeExercise;
-    beatRef.current = progressRepository.get(key, TRAINING_TICKS);
-    setSession({ id: activeExercise, beat: beatRef.current });
-    const timer = window.setInterval(() => {
-      beatRef.current = beatRef.current >= TRAINING_TICKS ? 0 : beatRef.current + 1;
-      setSession({ id: activeExercise, beat: beatRef.current });
-
-      if (beatRef.current > 0 && beatRef.current < TRAINING_TICKS) {
-        const effort = activeExercise === PET_EXERCISE_ID ? "growl" : activeExercise;
-        if (isGameSound(effort)) playSound(effort);
-        return;
-      }
-      if (beatRef.current < TRAINING_TICKS) return;
-
-      progressRepository.clear(key);
-      void trainRef.current(activeExercise).then((landed) => {
-        if (landed) {
-          if (landed.message) notifyRef.current(landed.message, true, "Treino");
-          if (landed.raised) {
-            playSound(activeExercise === PET_EXERCISE_ID ? "pet-up" : "point");
-          }
+    const startBar = () => {
+      beatRef.current = 0;
+      setSession({ id: activeExercise, beat: 0 });
+      barTimer = window.setInterval(() => {
+        beatRef.current += 1;
+        setSession({ id: activeExercise, beat: beatRef.current });
+        if (beatRef.current < TRAINING_TICKS) {
+          const effort = activeExercise === PET_EXERCISE_ID ? "growl" : activeExercise;
+          if (isGameSound(effort)) playSound(effort);
+          return;
         }
-        if (landed && autoRef.current) return;
-        beatRef.current = 0;
-        setSession({ id: activeExercise, beat: 0 });
-        setActivity(
-          !landed && autoRef.current && resumableRef.current
-            ? { kind: "train", id: activeExercise, paused: true }
-            : null,
-        );
-      });
-    }, TRAINING_TICK_MS);
+        window.clearInterval(barTimer);
+        barTimer = 0;
+        void trainRef.current(activeExercise).then((landed) => {
+          if (!alive) return;
+          if (landed) {
+            if (landed.message) notifyRef.current(landed.message, true, "Treino");
+            if (landed.raised) {
+              playSound(activeExercise === PET_EXERCISE_ID ? "pet-up" : "point");
+            }
+          }
+          beatRef.current = 0;
+          setSession({ id: activeExercise, beat: 0 });
+          if (!landed) {
+            setActivity(
+              autoRef.current && resumableRef.current
+                ? { kind: "train", id: activeExercise, paused: true }
+                : null,
+            );
+            return;
+          }
+          if (!autoRef.current) {
+            setActivity(null);
+            return;
+          }
+          startCooldown();
+        });
+      }, TRAINING_TICK_MS);
+    };
+
+    const startCooldown = () => {
+      let left = CYCLE_OPTOUT_SECS;
+      setCooldown(left);
+      coolTimer = window.setInterval(() => {
+        left -= 1;
+        if (left <= 0) {
+          window.clearInterval(coolTimer);
+          coolTimer = 0;
+          setCooldown(null);
+          startBar();
+        } else {
+          setCooldown(left);
+        }
+      }, 1000);
+    };
+
+    startBar();
 
     return () => {
-      window.clearInterval(timer);
-      progressRepository.set("train:" + activeExercise, beatRef.current);
+      alive = false;
+      if (barTimer) window.clearInterval(barTimer);
+      if (coolTimer) window.clearInterval(coolTimer);
     };
   }, [activeExercise, petGone, setActivity]);
 
@@ -110,11 +144,10 @@ export function TrainingScreen() {
 
   function toggleTraining(exerciseId: string, ready: boolean) {
     if (activeExercise === exerciseId) {
-      setActivity(null);
+      if (cooldown !== null) setActivity(null);
       return;
     }
     if (!ready) return;
-
     setActivity({ kind: "train", id: exerciseId });
   }
 
@@ -122,7 +155,7 @@ export function TrainingScreen() {
     <>
       <PageHeader
         title="Treinamento"
-        description="Um exercício por atributo, cada barra cheia vira um ponto permanente, e o custo do próximo cresce a cada avanço."
+        description="Um exercício por atributo, cada barra cheia vira um ponto permanente. Não dá para parar no meio de uma sessão, mas entre uma e outra sobram três segundos para você mandar parar."
       />
 
       <Panel
@@ -140,7 +173,7 @@ export function TrainingScreen() {
             const row = progress.find((entry) => entry.key === exercise.attribute);
             const ready = !maxed && affordable;
             const active = activeExercise === exercise.id;
-            const frozen = !active && session.id === exercise.id && session.beat > 0;
+            const opting = active && cooldown !== null;
 
             return (
               <Card
@@ -188,9 +221,10 @@ export function TrainingScreen() {
                   ) : null}
 
                   <Bar
-                    label={frozen ? "Pausado" : "Treinamento"}
+                    label="Treinamento"
                     current={session.id === exercise.id ? session.beat : 0}
                     maximum={TRAINING_TICKS}
+                    glows={active}
                     wraps
                   />
                 </CardBody>
@@ -198,22 +232,22 @@ export function TrainingScreen() {
                 <CardFooter>
                   <span className="text-[11px] text-ink-faint">
                     {active
-                      ? state.automation.train
-                        ? "Treinando sem parar..."
-                        : "Treinando..."
-                      : frozen
-                        ? "Pausado, retoma de onde parou"
-                        : waitingExercise === exercise.id
-                          ? "Esperando bronze para continuar"
-                          : reason}
+                      ? opting
+                        ? "Pode parar agora ou seguir para a próxima."
+                        : state.automation.train
+                          ? "Treinando sem parar..."
+                          : "Treinando..."
+                      : waitingExercise === exercise.id
+                        ? "Esperando bronze para continuar"
+                        : reason}
                   </span>
                   <BodyGate open={ready && !active} reason="Vida baixa demais para treinar.">
                     <Button
                       variant={active ? "secondary" : ready ? "primary" : "outline"}
                       onClick={() => toggleTraining(exercise.id, ready)}
-                      disabled={!ready && !active}
+                      disabled={active ? !opting : !ready}
                     >
-                      {active ? "Parar" : "Treinar"}
+                      {opting ? "Parar (" + cooldown + ")" : active ? "Treinando..." : "Treinar"}
                     </Button>
                   </BodyGate>
                 </CardFooter>
@@ -264,9 +298,10 @@ export function TrainingScreen() {
                 />
 
                 <Bar
-                  label={petFrozen ? "Pausado" : "Treinamento"}
+                  label="Treinamento"
                   current={session.id === PET_EXERCISE_ID ? session.beat : 0}
                   maximum={TRAINING_TICKS}
+                  glows={petActive}
                   wraps
                 />
               </CardBody>
@@ -274,20 +309,24 @@ export function TrainingScreen() {
               <CardFooter>
                 <span className="text-[11px] text-ink-faint">
                   {petActive
-                    ? state.automation.train
-                      ? "Treinando sem parar..."
-                      : "Treinando..."
-                    : petFrozen
-                      ? "Pausado, retoma de onde parou"
-                      : petTraining.reason}
+                    ? cooldown !== null
+                      ? "Pode parar agora ou seguir para a próxima."
+                      : state.automation.train
+                        ? "Treinando sem parar..."
+                        : "Treinando..."
+                    : petTraining.reason}
                 </span>
                 <BodyGate open={petReady && !petActive} reason="Vida baixa demais para treinar.">
                   <Button
                     variant={petActive ? "secondary" : petReady ? "primary" : "outline"}
                     onClick={() => toggleTraining(PET_EXERCISE_ID, petReady)}
-                    disabled={!petReady && !petActive}
+                    disabled={petActive ? cooldown === null : !petReady}
                   >
-                    {petActive ? "Parar" : "Treinar"}
+                    {petActive && cooldown !== null
+                      ? "Parar (" + cooldown + ")"
+                      : petActive
+                        ? "Treinando..."
+                        : "Treinar"}
                   </Button>
                 </BodyGate>
               </CardFooter>
