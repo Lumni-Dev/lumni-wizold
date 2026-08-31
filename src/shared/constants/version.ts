@@ -1,3 +1,3 @@
-export const GAME_VERSION = "1.12.1";
+export const GAME_VERSION = "1.13.0";
 
 export const VERSION_POLL_MS = 60000;

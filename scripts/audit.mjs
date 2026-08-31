@@ -481,7 +481,7 @@ sec("progressão");
   for (const level of [1, 25, 500, 1000]) {
     ok(
       "experiência exigida NV " + level,
-      progression.experienceForLevel(level) === Math.round(100 * level * (1 + level / 25)),
+      progression.experienceForLevel(level) === 50 * (level * level - 3 * level + 4),
     );
   }
   const character = baseState({ level: 5 }).character;
@@ -1063,7 +1063,7 @@ sec("forja e mina");
   for (let level = 1; level <= 1000; level += 1) {
     if (
       forgeRules.enhancementCost(level) !==
-      Math.max(1, Math.round((100 * level * (1 + level / 25)) / 2))
+      Math.max(1, Math.round((50 * (level * level - 3 * level + 4)) / 2))
     ) {
       forgeCostOk = false;
       break;
