@@ -10,7 +10,7 @@ export interface StorePack {
 export const STORE_PACKS: readonly StorePack[] = [
   {
     id: "one-pouch",
-    name: "Uma Bolsa de Bronze",
+    name: "Uma Bolsa de WCoins",
     description:
       "Uma noite de caça que você não precisa caçar. Serve para fechar o conjunto que está faltando uma peça.",
     hunts: 25,
@@ -19,7 +19,7 @@ export const STORE_PACKS: readonly StorePack[] = [
   },
   {
     id: "two-pouches",
-    name: "Duas Bolsas de Bronze",
+    name: "Duas Bolsas de WCoins",
     description:
       "Meia semana de noites, de uma vez. Dá para trocar de conjunto no meio da faixa sem parar de treinar.",
     hunts: 125,
@@ -28,7 +28,7 @@ export const STORE_PACKS: readonly StorePack[] = [
   },
   {
     id: "three-pouches",
-    name: "Três Bolsas de Bronze",
+    name: "Três Bolsas de WCoins",
     description:
       "O conjunto inteiro da sua faixa e ainda sobra para a bigorna. É o atalho mais longo que a loja vende.",
     hunts: 400,

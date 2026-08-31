@@ -22,7 +22,7 @@ export function CreatureIcon({
 
   return (
     <IconFrame size={size} className={source ? undefined : "tracking-widest"}>
-      {source ? <IconArt source={source} glow /> : creatureInitials(creature.name)}
+      {source ? <IconArt source={source} fit="contain" glow /> : creatureInitials(creature.name)}
     </IconFrame>
   );
 }
