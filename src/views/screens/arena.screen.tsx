@@ -15,7 +15,7 @@ import type { Gender } from "@/models/entities/character";
 import type { Hunter } from "@/models/entities/ranking";
 import { ARENA_DAILY_ATTACKS, arenaSpoilsRange, arenaStats } from "@/models/rules/arena";
 import type { DerivedStats } from "@/models/rules/stats";
-import { canPetFight, isPetActive } from "@/models/rules/pet";
+import { canPetFight, isPetActive, petLevelOf, petMaxEnergy } from "@/models/rules/pet";
 import { playSound } from "@/controllers/sound";
 import { HUNT_TICK_MS, NAME_MAX_LENGTH } from "@/shared/constants/game";
 import { sanitizeName } from "@/shared/utils/text";
@@ -23,8 +23,8 @@ import { cn } from "@/shared/utils/class-names";
 import { formatDay, formatNumber, formatBronze } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
 import { emphasizeDamage, narrationOf, type NarrationLine } from "../presenters/hunt.presenter";
-import { GenderSymbol } from "../components/app-icon";
 import { Bar } from "../components/bar";
+import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
 import { BodyGate } from "../components/body-gate";
 import { Button } from "../components/button";
 import { DataRow } from "../components/data-row";
@@ -38,7 +38,7 @@ import { Tag } from "../components/tag";
 import { Tooltip } from "../components/tooltip";
 import { useShake } from "../components/use-shake";
 import { PageHeader } from "../layout/page-header";
-const PAGE_SIZE = 6;
+const PAGE_SIZE = 9;
 function Fighter({
   gender,
   name,
@@ -182,6 +182,7 @@ export function ArenaScreen() {
     if (!fighting) return;
     const target = fighting.hunter.id;
     let alive = true;
+    let fillTimer = 0;
     requestingRef.current = true;
     beatRef.current = 0;
     pendingRef.current = null;
@@ -192,8 +193,8 @@ export function ArenaScreen() {
     /* eslint-enable react-hooks/set-state-in-effect */
     void challengeRef.current(target).then((resolution) => {
       if (!alive) return;
-      requestingRef.current = false;
       if (!resolution) {
+        requestingRef.current = false;
         setFighting(null);
         return;
       }
@@ -202,6 +203,9 @@ export function ArenaScreen() {
       scriptRef.current = narrationOf({ foe: resolution.foe, combat: resolution.combat });
       setScript(scriptRef.current);
       setBeat(0);
+      fillTimer = window.setTimeout(() => {
+        requestingRef.current = false;
+      }, HUNT_TICK_MS);
     });
     const timer = window.setInterval(() => {
       if (!pendingRef.current || requestingRef.current) return;
@@ -236,6 +240,7 @@ export function ArenaScreen() {
     return () => {
       alive = false;
       window.clearInterval(timer);
+      if (fillTimer) window.clearTimeout(fillTimer);
       if (pendingRef.current) {
         pendingRef.current = null;
         landRef.current();
@@ -244,6 +249,7 @@ export function ArenaScreen() {
   }, [fighting]);
   if (!character || !stats) return null;
   const busy = fighting !== null;
+  const petAlong = canPetFight(pet) ? pet : null;
   function beginDuel(hunter: Hunter, maxHealth: number) {
     if (fighting) return;
     beatRef.current = 0;
@@ -269,9 +275,7 @@ export function ArenaScreen() {
   const pages = pageCount(view.rivals.length, PAGE_SIZE);
   const onPage = pageOf(view.rivals, currentPage, PAGE_SIZE);
   const duelLine =
-    fighting && script.length > 0
-      ? script[Math.min(Math.max(1, beat), script.length) - 1]
-      : null;
+    fighting && script.length > 0 && beat > 0 ? script[Math.min(beat, script.length) - 1] : null;
   return (
     <>
       <PageHeader
@@ -380,13 +384,21 @@ export function ArenaScreen() {
               name={fighting.hunter.name}
               level={fighting.hunter.level}
               side="Desafiado"
-              health={duelLine ? duelLine.creatureHealth : fighting.maxHealth}
+              health={duelLine ? duelLine.creatureHealth : script.length > 0 ? fighting.maxHealth : 0}
               maximum={fighting.maxHealth}
             />
           </div>
 
           <div className="space-y-3 p-4">
             <Bar label="Duelo" current={beat} maximum={Math.max(1, script.length)} glows />
+            {petAlong ? (
+              <Bar
+                label="Mascote - Energia"
+                current={petAlong.energy}
+                maximum={petMaxEnergy(petLevelOf(petAlong))}
+                tone="vigor"
+              />
+            ) : null}
             {duelLine ? (
               <p
                 className={cn(
@@ -427,67 +439,40 @@ export function ArenaScreen() {
         <Panel
           title="Desafiantes"
           description="Da luta mais justa para a mais desigual."
-          padding="none"
           footer={
             pages > 1 ? (
               <Pagination page={currentPage} pages={pages} onChange={setPage} />
             ) : undefined
           }
         >
-          <List>
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {onPage.map(({ hunter, stats: rival, inBand, cooldownLeft, spoils }) => {
               const resting = cooldownLeft > 0;
               return (
-                <ListRow key={hunter.id} layout="column" padding="art">
-                  <div className="flex items-center gap-3">
-                    <GenderIcon gender={hunter.gender} size="small" />
+                <Card key={hunter.id} height="fill">
+                  <CardHeader>
+                    <GenderIcon gender={hunter.gender} size="medium" />
                     <div className="min-w-0 flex-1">
-                      <p className="flex items-center gap-2">
-                        <Link
-                          href={"/ranking/" + hunter.id}
-                          className="min-w-0 truncate text-sm text-ink transition-colors hover:text-highlight"
-                        >
-                          {hunter.name}
-                        </Link>
-                        <GenderSymbol gender={hunter.gender} className="shrink-0 text-ink-faint" />
-                      </p>
-                      <p className="text-[11px] text-ink-faint">
-                        NV. {formatNumber(hunter.level)} - {formatNumber(hunter.arena)} duelos
-                        ganhos - bolsa de {formatNumber(spoils.min)} a {formatNumber(spoils.max)}
-                        {resting ? " - descansa por " + formatCooldown(cooldownLeft) : ""}
+                      <Link
+                        href={"/ranking/" + hunter.id}
+                        className="block truncate text-sm text-ink transition-colors hover:text-highlight"
+                      >
+                        {hunter.name}
+                      </Link>
+                      <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                        {hunter.gender === "male" ? "Lumni" : "Luna"} - NV.{" "}
+                        {formatNumber(hunter.level)}
                       </p>
                     </div>
-                    <BodyGate
-                      open={inBand && !resting && !busy && view.charges.left > 0}
-                      reason="Só a fera desce ao fosso."
-                    >
-                      <Tooltip
-                        label={
-                          !inBand
-                            ? "Fora da sua faixa: a arena só marca luta entre NV. " +
-                              formatNumber(view.band.start) +
-                              " e NV. " +
-                              formatNumber(view.band.end) +
-                              "."
-                            : resting
-                              ? "Vocês já duelaram hoje: o próximo desafio a ele reabre às 06:00. Faltam " +
-                                formatCooldown(cooldownLeft) +
-                                "."
-                              : view.reason
-                        }
-                      >
-                        <Button
-                          variant={inBand && !resting ? "primary" : "outline"}
-                          disabled={!inBand || resting || !view.canFight || busy}
-                          onClick={() => challenge(hunter, rival)}
-                        >
-                          {!inBand ? "Fora da faixa" : resting ? "Descansando" : "Desafiar"}
-                        </Button>
-                      </Tooltip>
-                    </BodyGate>
-                  </div>
+                  </CardHeader>
 
-                  <div className="grid gap-3 pt-1 sm:grid-cols-2">
+                  <CardBody>
+                    <p className="text-[11px] text-ink-faint">
+                      {formatNumber(hunter.arena)} duelos ganhos - bolsa de{" "}
+                      {formatNumber(spoils.min)} a {formatNumber(spoils.max)}
+                      {resting ? " - descansa " + formatCooldown(cooldownLeft) : ""}
+                    </p>
+
                     <div className="space-y-1">
                       <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                         Atributos
@@ -525,11 +510,42 @@ export function ArenaScreen() {
                         ))}
                       </div>
                     </div>
-                  </div>
-                </ListRow>
+                  </CardBody>
+
+                  <CardFooter>
+                    <BodyGate
+                      open={inBand && !resting && !busy && view.charges.left > 0}
+                      reason="Só a fera desce ao fosso."
+                    >
+                      <Tooltip
+                        label={
+                          !inBand
+                            ? "Fora da sua faixa: a arena só marca luta entre NV. " +
+                              formatNumber(view.band.start) +
+                              " e NV. " +
+                              formatNumber(view.band.end) +
+                              "."
+                            : resting
+                              ? "Vocês já duelaram hoje: o próximo desafio a ele reabre às 06:00. Faltam " +
+                                formatCooldown(cooldownLeft) +
+                                "."
+                              : view.reason
+                        }
+                      >
+                        <Button
+                          variant={inBand && !resting ? "primary" : "outline"}
+                          disabled={!inBand || resting || !view.canFight || busy}
+                          onClick={() => challenge(hunter, rival)}
+                        >
+                          {!inBand ? "Fora da faixa" : resting ? "Descansando" : "Desafiar"}
+                        </Button>
+                      </Tooltip>
+                    </BodyGate>
+                  </CardFooter>
+                </Card>
               );
             })}
-          </List>
+          </div>
         </Panel>
       )}
 
