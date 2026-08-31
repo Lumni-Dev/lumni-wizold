@@ -22,12 +22,7 @@ import {
 import type { DerivedStats } from "@/models/rules/stats";
 import { canPetFight, isPetActive } from "@/models/rules/pet";
 import { playSound } from "@/controllers/sound";
-import {
-  HUNT_APPROACH_TICKS,
-  HUNT_TICK_MS,
-  HUNT_TICKS,
-  NAME_MAX_LENGTH,
-} from "@/shared/constants/game";
+import { ARENA_TICKS, HUNT_TICK_MS, NAME_MAX_LENGTH } from "@/shared/constants/game";
 import { sanitizeName } from "@/shared/utils/text";
 import { cn } from "@/shared/utils/class-names";
 import { formatDay, formatNumber, formatBronze } from "@/shared/utils/format";
@@ -141,7 +136,6 @@ export function ArenaScreen() {
   const [page, setPage] = useState(1);
   const [roster, setRoster] = useState<Hunter[]>([]);
   const [fighting, setFighting] = useState<{ hunter: Hunter; maxHealth: number } | null>(null);
-  const [phase, setPhase] = useState<"approach" | "fight">("approach");
   const [beat, setBeat] = useState(0);
   const [report, setReport] = useState<ArenaResolution | null>(null);
   const [script, setScript] = useState<NarrationLine[]>([]);
@@ -149,7 +143,6 @@ export function ArenaScreen() {
   const [foeJolt, setFoeJolt] = useState(0);
   const shaking = useShake(myJolt + foeJolt);
   const beatRef = useRef(0);
-  const phaseRef = useRef<"approach" | "fight">("approach");
   const scriptRef = useRef<NarrationLine[]>([]);
   const pendingRef = useRef<ArenaResolution | null>(null);
   const requestingRef = useRef(false);
@@ -194,35 +187,32 @@ export function ArenaScreen() {
     if (!fighting) return;
     const target = fighting.hunter.id;
     let alive = true;
-    requestingRef.current = false;
-    const timer = window.setInterval(() => {
-      if (phaseRef.current === "approach") {
-        beatRef.current = Math.min(beatRef.current + 1, HUNT_APPROACH_TICKS);
-        setBeat(beatRef.current);
-        if (beatRef.current < HUNT_APPROACH_TICKS || requestingRef.current) return;
-        requestingRef.current = true;
-        void challengeRef.current(target).then((resolution) => {
-          if (!alive) return;
-          requestingRef.current = false;
-          if (!resolution) {
-            setFighting(null);
-            return;
-          }
-          pendingRef.current = resolution;
-          bledRef.current = { last: characterRef.current?.health ?? 0, total: 0 };
-          scriptRef.current = narrationOf(
-            { foe: resolution.foe, combat: resolution.combat },
-            HUNT_TICKS,
-          );
-          setScript(scriptRef.current);
-          phaseRef.current = "fight";
-          setPhase("fight");
-          beatRef.current = 0;
-          setBeat(0);
-        });
+    requestingRef.current = true;
+    beatRef.current = 0;
+    pendingRef.current = null;
+    scriptRef.current = [];
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setBeat(0);
+    setScript([]);
+    /* eslint-enable react-hooks/set-state-in-effect */
+    void challengeRef.current(target).then((resolution) => {
+      if (!alive) return;
+      requestingRef.current = false;
+      if (!resolution) {
+        setFighting(null);
         return;
       }
-      if (!pendingRef.current) return;
+      pendingRef.current = resolution;
+      bledRef.current = { last: characterRef.current?.health ?? 0, total: 0 };
+      scriptRef.current = narrationOf(
+        { foe: resolution.foe, combat: resolution.combat },
+        ARENA_TICKS,
+      );
+      setScript(scriptRef.current);
+      setBeat(0);
+    });
+    const timer = window.setInterval(() => {
+      if (!pendingRef.current || requestingRef.current) return;
       beatRef.current += 1;
       setBeat(beatRef.current);
       const line = scriptRef.current[Math.min(beatRef.current, scriptRef.current.length) - 1];
@@ -240,7 +230,7 @@ export function ArenaScreen() {
           bledRef.current = { last: line.characterHealth, total: bledRef.current.total + delta };
         }
       }
-      if (beatRef.current >= scriptRef.current.length) {
+      if (beatRef.current >= ARENA_TICKS) {
         const held = pendingRef.current;
         pendingRef.current = null;
         window.clearInterval(timer);
@@ -265,11 +255,9 @@ export function ArenaScreen() {
   function beginDuel(hunter: Hunter, maxHealth: number) {
     if (fighting) return;
     beatRef.current = 0;
-    phaseRef.current = "approach";
     pendingRef.current = null;
     scriptRef.current = [];
     setBeat(0);
-    setPhase("approach");
     setScript([]);
     setReport(null);
     setFighting({ hunter, maxHealth });
@@ -289,7 +277,7 @@ export function ArenaScreen() {
   const pages = pageCount(view.rivals.length, PAGE_SIZE);
   const onPage = pageOf(view.rivals, currentPage, PAGE_SIZE);
   const duelLine =
-    fighting && phase === "fight" && script.length > 0
+    fighting && script.length > 0
       ? script[Math.min(Math.max(1, beat), script.length) - 1]
       : null;
   return (
@@ -408,11 +396,7 @@ export function ArenaScreen() {
           </div>
 
           <div className="space-y-3 p-4">
-            <Bar
-              label={phase === "fight" ? "Duelo" : "No fosso..."}
-              current={beat}
-              maximum={phase === "fight" ? Math.max(1, script.length) : HUNT_APPROACH_TICKS}
-            />
+            <Bar label="Duelo" current={beat} maximum={ARENA_TICKS} glows />
             {duelLine ? (
               <p
                 className={cn(
