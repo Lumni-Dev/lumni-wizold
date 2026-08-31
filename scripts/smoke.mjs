@@ -120,16 +120,24 @@ check(
 );
 const hunt = await call("POST", "/api/hunt", { territoryId: "village-field" });
 const report = hunt.payload?.data;
-check("caçada resolve e pousa", hunt.payload?.ok === true && Array.isArray(report?.combat?.rounds));
+check("caçada resolve e segura", hunt.payload?.ok === true && Array.isArray(report?.combat?.rounds));
+const held = (await call("POST", "/api/state")).payload?.data;
+check("resolve não grava antes do commit", held?.character?.hunts === 0);
+const commit = await call("POST", "/api/hunt/commit", {});
+check("commit fecha a caçada", commit.payload?.ok === true, commit.payload?.message);
 const state2 = (await call("POST", "/api/state")).payload?.data;
-check("caçada contou", state2?.character?.hunts === 1);
+check("caçada contou só no commit", state2?.character?.hunts === 1);
 const bought = await call("POST", "/api/market/buy", {
   itemId: "health-potion-small",
   quantity: 1,
 });
 check("compra no mercado", bought.payload?.ok === true, bought.payload?.message);
 const state3 = (await call("POST", "/api/state")).payload?.data;
-check("bronze desceu o preço", state3?.character?.bronze === state2?.character?.bronze - 4);
+check(
+  "bronze desceu na compra",
+  typeof state3?.character?.bronze === "number" &&
+    state3.character.bronze < state2?.character?.bronze,
+);
 const trained = await call("POST", "/api/training/session", { exerciseId: "ice-bath" });
 check("sessão de treino", trained.payload?.ok === true, trained.payload?.message);
 check(

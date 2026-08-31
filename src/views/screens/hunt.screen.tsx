@@ -6,7 +6,7 @@ import { listTerritories, type HuntReport } from "@/controllers/hunt.controller"
 import { usePageActivity } from "@/controllers/use-page-activity";
 import { playSound } from "@/controllers/sound";
 import { petLevelOf, petMaxEnergy } from "@/models/rules/pet";
-import { narrationOf, type NarrationLine } from "../presenters/hunt.presenter";
+import { emphasizeDamage, narrationOf, type NarrationLine } from "../presenters/hunt.presenter";
 import { DANGER_LABEL } from "@/models/entities/territory";
 import { canPetFight, isPetActive } from "@/models/rules/pet";
 import { HUNT_TICK_MS, HUNT_TICKS } from "@/shared/constants/game";
@@ -23,6 +23,7 @@ import {
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
 import { Card } from "../components/card";
+import { useShake } from "../components/use-shake";
 import { Tag } from "../components/tag";
 import { DataRow } from "../components/data-row";
 import { List, ListRow } from "../components/list";
@@ -88,7 +89,7 @@ function CombatReport({ report, lines }: { report: HuntReport; lines: NarrationL
       <div className="grid items-start border-b border-edge sm:grid-cols-2 sm:divide-x sm:divide-edge">
         <List>
           <DataRow label="Experiência" value={"+" + formatNumber(report.experience)} />
-          <DataRow label="Bronze" value={"+" + formatNumber(report.bronze)} />
+          <DataRow label="WCoin" value={"+" + formatNumber(report.bronze)} />
           <DataRow label="Dano causado" value={formatNumber(combat.damageDealt)} />
           <DataRow label="Dano recebido" value={formatNumber(combat.damageTaken)} />
           {report.petEffort > 0 ? (
@@ -146,7 +147,8 @@ function CombatReport({ report, lines }: { report: HuntReport; lines: NarrationL
   );
 }
 export function HuntScreen() {
-  const { state, character, pet, hunt, landHunt, notify, activity, setActivity } = useGame();
+  const { state, character, pet, hunt, sufferBlow, commitHunt, notify, activity, setActivity } =
+    useGame();
   usePageActivity(["hunt"]);
   const art = useArt();
   const paused = activity?.paused === true;
@@ -158,19 +160,31 @@ export function HuntScreen() {
   const [reportLines, setReportLines] = useState<NarrationLine[]>([]);
   const [session, setSession] = useState<HuntSession>(EMPTY_SESSION);
   const [progress, setProgress] = useState<{ id: string; beat: number }>({ id: "", beat: 0 });
+  const [script, setScript] = useState<NarrationLine[]>([]);
+  const [pending, setPending] = useState<HuntReport | null>(null);
+  const [preyJolt, setPreyJolt] = useState(0);
+  const [lapJolt, setLapJolt] = useState(0);
+  const shaking = useShake(preyJolt + lapJolt);
   const beatRef = useRef(0);
+  const scriptRef = useRef<NarrationLine[]>([]);
+  const pendingRef = useRef<HuntReport | null>(null);
   const requestingRef = useRef(false);
+  const bledRef = useRef({ last: 0, total: 0 });
   const territories = useMemo(() => listTerritories(state), [state]);
   const autoRef = useRef(state.automation.hunt);
   const huntRef = useRef(hunt);
-  const landRef = useRef(landHunt);
+  const sufferRef = useRef(sufferBlow);
+  const commitRef = useRef(commitHunt);
   const notifyRef = useRef(notify);
+  const stateRef = useRef(state);
   const selectionRef = useRef(selection);
   useEffect(() => {
     autoRef.current = state.automation.hunt;
     huntRef.current = hunt;
-    landRef.current = landHunt;
+    sufferRef.current = sufferBlow;
+    commitRef.current = commitHunt;
     notifyRef.current = notify;
+    stateRef.current = state;
     selectionRef.current = selection;
   });
   useEffect(() => {
@@ -179,17 +193,15 @@ export function HuntScreen() {
     const key = "hunt:" + activeId;
     beatRef.current = progressRepository.get(key, HUNT_TICKS);
     requestingRef.current = false;
+    pendingRef.current = null;
+    scriptRef.current = [];
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setPending(null);
+    setScript([]);
     setProgress({ id: activeId, beat: beatRef.current });
-    const timer = window.setInterval(() => {
-      if (requestingRef.current) return;
-      beatRef.current = beatRef.current >= HUNT_TICKS ? 0 : beatRef.current + 1;
-      setProgress({ id: activeId, beat: beatRef.current });
-      if (beatRef.current < HUNT_TICKS) {
-        playSound("hit");
-        return;
-      }
+    /* eslint-enable react-hooks/set-state-in-effect */
+    const resolve = () => {
       requestingRef.current = true;
-      progressRepository.clear(key);
       void huntRef.current(activeId, selectionRef.current[activeId]).then((fight) => {
         if (!alive) return;
         requestingRef.current = false;
@@ -197,51 +209,91 @@ export function HuntScreen() {
           setActivity(autoRef.current ? { kind: "hunt", id: activeId, paused: true } : null);
           return;
         }
-        landRef.current();
-        setReport(fight);
-        setReportLines(narrationOf({ foe: fight.creature, combat: fight.combat }, HUNT_TICKS));
-        setSession((current) => accumulate(current, fight));
-        if (fight.combat.victory) {
-          const spoils = fight.drops
-            .map((drop) => drop.name + (drop.quantity > 1 ? " x" + drop.quantity : ""))
-            .join(", ");
-          notifyRef.current(
-            fight.creature.name +
-              " abatido: +" +
-              formatNumber(fight.bronze) +
-              " de bronze e +" +
-              formatNumber(fight.experience) +
-              " de experiência." +
-              (spoils ? " Espólio: " + spoils + "." : "") +
-              (fight.levelsGained > 0 ? " Você subiu de nível!" : ""),
-            true,
-            "Caça",
-          );
-        } else if (fight.combat.retreated) {
-          notifyRef.current(
-            "A caçada com " + fight.creature.name + " se arrastou e os dois recuaram.",
-            true,
-            "Caça",
-          );
-        } else {
-          notifyRef.current(
-            fight.creature.name + " levou a melhor: a caçada não pagou nada.",
-            false,
-            "Caça",
-          );
-          playSound("defeat");
-        }
-        beatRef.current = 0;
-        setProgress({ id: activeId, beat: 0 });
-        if (!autoRef.current) setActivity(null);
+        pendingRef.current = fight;
+        bledRef.current = { last: stateRef.current.character?.health ?? 0, total: 0 };
+        scriptRef.current = narrationOf({ foe: fight.creature, combat: fight.combat }, HUNT_TICKS);
+        setScript(scriptRef.current);
+        setPending(fight);
       });
+    };
+    resolve();
+    const timer = window.setInterval(() => {
+      if (!pendingRef.current || requestingRef.current) return;
+      beatRef.current += 1;
+      setProgress({ id: activeId, beat: beatRef.current });
+      const line = scriptRef.current[Math.min(beatRef.current, scriptRef.current.length) - 1];
+      if (line?.blow === "ours") playSound(line.critical ? "crit" : "hit");
+      if (line?.blow === "pet") playSound("snap");
+      if (line?.blow === "theirs") playSound("hurt");
+      if (line?.critical) {
+        if (line.blow === "theirs") setLapJolt((count) => count + 1);
+        else setPreyJolt((count) => count + 1);
+      }
+      if (line?.characterHealth !== undefined) {
+        const delta = bledRef.current.last - line.characterHealth;
+        if (delta > 0) {
+          sufferRef.current(delta);
+          bledRef.current = { last: line.characterHealth, total: bledRef.current.total + delta };
+        }
+      }
+      if (beatRef.current >= HUNT_TICKS) {
+        const held = pendingRef.current;
+        pendingRef.current = null;
+        setPending(null);
+        progressRepository.clear(key);
+        requestingRef.current = true;
+        void commitRef.current().then(() => {
+          if (!alive) return;
+          requestingRef.current = false;
+          setReport(held);
+          setReportLines(scriptRef.current);
+          setSession((current) => accumulate(current, held));
+          if (held.combat.victory) {
+            const spoils = held.drops
+              .map((drop) => drop.name + (drop.quantity > 1 ? " x" + drop.quantity : ""))
+              .join(", ");
+            notifyRef.current(
+              held.creature.name +
+                " abatido: +" +
+                formatNumber(held.bronze) +
+                " WCoin e +" +
+                formatNumber(held.experience) +
+                " de experiência." +
+                (spoils ? " Espólio: " + spoils + "." : "") +
+                (held.levelsGained > 0 ? " Você subiu de nível!" : ""),
+              true,
+              "Caça",
+            );
+          } else if (held.combat.retreated) {
+            notifyRef.current(
+              "A caçada com " + held.creature.name + " se arrastou e os dois recuaram.",
+              true,
+              "Caça",
+            );
+          } else {
+            notifyRef.current(
+              held.creature.name + " levou a melhor: a caçada não pagou nada.",
+              false,
+              "Caça",
+            );
+            playSound("defeat");
+          }
+          scriptRef.current = [];
+          setScript([]);
+          beatRef.current = 0;
+          setProgress({ id: activeId, beat: 0 });
+          if (!autoRef.current) {
+            setActivity(null);
+            return;
+          }
+          resolve();
+        });
+      }
     }, HUNT_TICK_MS);
     return () => {
       alive = false;
       window.clearInterval(timer);
-      if (!requestingRef.current) {
-        progressRepository.set("hunt:" + activeId, beatRef.current);
-      }
+      progressRepository.set("hunt:" + activeId, beatRef.current);
     };
   }, [activeId, setActivity]);
   if (!character) return null;
@@ -269,8 +321,8 @@ export function HuntScreen() {
         title="Caça"
         description={
           state.automation.hunt
-            ? "A caçada roda sozinha: a barra enche, o combate resolve e o loot cai. Ela só para quando você mandar parar."
-            : "A caçada roda sozinha: a barra enche, o combate resolve e o loot cai. Cada clique vale uma luta; ligue a caçada automática nas configurações para encadear."
+            ? "A caçada roda sozinha: a barra enche com a luta, o combate grava no fim e o loot cai. Ela só para quando você mandar parar."
+            : "A caçada roda sozinha: a barra enche com a luta e grava no fim. Cada clique vale uma luta; ligue a caçada automática nas configurações para encadear."
         }
         action={
           <div className="flex items-center gap-2">
@@ -295,19 +347,29 @@ export function HuntScreen() {
           const selectedId = selection[territory.id] ?? prey?.id ?? null;
           const onThis = active && progress.id === territory.id;
           const frozen = !active && progress.id === territory.id && progress.beat > 0;
-          const filled = onThis || frozen ? progress.beat : 0;
+          const line =
+            onThis && progress.beat > 0 && script.length > 0
+              ? script[Math.min(progress.beat, script.length) - 1]
+              : null;
+          const replaying = onThis && pending !== null && line !== null;
+          const foe = pending ?? report;
           const shownFoe =
-            creatures.find((creature) => creature.id === selectedId) ?? prey ?? creatures[0];
+            replaying && foe
+              ? foe.creature
+              : (creatures.find((creature) => creature.id === selectedId) ?? prey ?? creatures[0]);
           const monsterMax = Math.max(1, shownFoe?.health ?? 1);
-          const monsterCurrent = Math.round((monsterMax * (HUNT_TICKS - filled)) / HUNT_TICKS);
-          const monsterStatus = active ? "Atacando" : "Aguardando";
+          const monsterCurrent =
+            replaying && line
+              ? Math.max(0, Math.min(monsterMax, line.creatureHealth))
+              : monsterMax;
+          const monsterStatus = replaying ? "Atacando" : "Aguardando";
           return (
             <Card
               key={territory.id}
               height="content"
               interactive={available}
               tone={active ? "highlighted" : "default"}
-              className={cn(!available && !active && "opacity-70")}
+              className={cn(!available && !active && "opacity-70", active && shaking && "card-shake")}
             >
               <div className="grid md:grid-cols-2 md:divide-x md:divide-edge">
                 <div className="flex flex-col divide-y divide-edge">
@@ -355,6 +417,27 @@ export function HuntScreen() {
                         tone="vigor"
                       />
                     </div>
+                  ) : null}
+                  {line ? (
+                    <p
+                      className={cn(
+                        "truncate px-4 py-3 font-mono text-[11px]",
+                        line.critical ? "text-ember" : "text-ink-faint",
+                      )}
+                    >
+                      {emphasizeDamage(line.text).map((part, index) =>
+                        typeof part === "string" ? (
+                          part
+                        ) : (
+                          <strong
+                            key={index}
+                            className={cn("font-bold", !line.critical && "text-ink")}
+                          >
+                            {part.damage}
+                          </strong>
+                        ),
+                      )}
+                    </p>
                   ) : null}
                   <div className="flex flex-wrap items-center justify-between gap-3 p-4">
                     <span className="text-[11px] text-ink-faint">
@@ -432,7 +515,7 @@ export function HuntScreen() {
                                   {formatNumber(creature.level + 9)}
                                 </span>
                                 <span className="block font-mono text-[11px] text-ink-faint">
-                                  {formatNumber(creature.experience)} XP
+                                  {formatNumber(creature.experience)} de experiência
                                 </span>
                               </span>
                               <span
@@ -475,7 +558,7 @@ export function HuntScreen() {
               {session.retreats > 0 ? (
                 <DataRow label="Recuos" value={formatNumber(session.retreats)} />
               ) : null}
-              <DataRow label="Bronze" value={"+" + formatNumber(session.bronze)} />
+              <DataRow label="WCoin" value={"+" + formatNumber(session.bronze)} />
               <DataRow label="Experiência" value={"+" + formatNumber(session.experience)} />
             </List>
             <div className="space-y-2 p-4">

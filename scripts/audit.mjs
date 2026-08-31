@@ -2137,7 +2137,7 @@ sec("imutabilidade");
 }
 sec("moeda e formato");
 {
-  ok("bronze fala bronze", formatBronze(120) === "120 de bronze");
+  ok("moeda fala WCoin", formatBronze(120) === "120 WCoin");
   ok("parse simples", parseReais("50") === 5000);
   ok("parse com vírgula", parseReais("49,90") === 4990);
   ok("parse com milhar", parseReais("1.500,00") === 150000);
