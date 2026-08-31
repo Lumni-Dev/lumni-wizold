@@ -17,12 +17,14 @@ import {
 } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
 import { formatBronze, formatNumber } from "@/shared/utils/format";
+import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { IconFrame } from "../components/icon-frame";
 import { ItemIcon } from "../components/item-icon";
 import { List, ListRow, RowText } from "../components/list";
+import { Pagination } from "../components/pagination";
 import { Panel } from "../components/panel";
 import { useShake } from "../components/use-shake";
 import { PageHeader } from "../layout/page-header";
@@ -40,6 +42,8 @@ const RESET_LABEL = String(MINING_RESET_HOUR).padStart(2, "0") + ":00";
 function pieceKey(itemId: string, level: number): string {
   return itemId + "@" + level;
 }
+
+const FORGE_PAGE_SIZE = 5;
 
 export function ForgeScreen() {
   const { state, character, mine, enhance, activity, setActivity, notify } = useGame();
@@ -88,6 +92,7 @@ export function ForgeScreen() {
   const [activeForgeLevel, setActiveForgeLevel] = useState<number | null>(null);
   const [selectedOre, setSelectedOre] = useState<string>("");
   const [selectedForge, setSelectedForge] = useState<string>("");
+  const [forgePage, setForgePage] = useState(1);
   const forgeShake = useShake(strike.beat);
 
   useEffect(() => {
@@ -272,6 +277,10 @@ export function ForgeScreen() {
   const forgeOpting = activeItem !== null && cooldown !== null;
   const forgeActive =
     activeItem !== null && forgeEntry !== null && activeItem === forgeEntry.item.id;
+
+  const forgeCurrentPage = clampPage(forgePage, slots.length, FORGE_PAGE_SIZE);
+  const forgePages = pageCount(slots.length, FORGE_PAGE_SIZE);
+  const forgeOnPage = pageOf(slots, forgeCurrentPage, FORGE_PAGE_SIZE);
 
   function toggleMining(oreId: string, available: boolean) {
     if (activeOre === oreId) {
@@ -517,6 +526,11 @@ export function ForgeScreen() {
             title="Disponíveis"
             description="As peças do inventário fora do corpo. Escolha uma para a bigorna."
             padding="none"
+            footer={
+              forgePages > 1 ? (
+                <Pagination page={forgeCurrentPage} pages={forgePages} onChange={setForgePage} />
+              ) : undefined
+            }
           >
             {slots.length === 0 ? (
               <div className="p-4">
@@ -524,7 +538,7 @@ export function ForgeScreen() {
               </div>
             ) : (
               <List>
-                {slots.map((row) => {
+                {forgeOnPage.map((row) => {
                   const key = pieceKey(row.item.id, row.level);
                   const isSelected = key === effectiveForge;
                   return (
