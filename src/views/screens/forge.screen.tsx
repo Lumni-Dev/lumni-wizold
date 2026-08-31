@@ -5,10 +5,10 @@ import { useGame } from "@/controllers/game.context";
 import { listForge, listMining } from "@/controllers/forge.controller";
 import { usePageActivity } from "@/controllers/use-page-activity";
 import { playSound } from "@/controllers/sound";
-import { progressRepository } from "@/models/repositories/progress.repository";
 import type { Activity } from "@/models/entities/activity";
 import { enhancedName, forgeDurationMs } from "@/models/rules/forge";
 import {
+  CYCLE_OPTOUT_SECS,
   FORGE_TICKS,
   MAX_ENHANCEMENT,
   MINING_RESET_HOUR,
@@ -75,110 +75,144 @@ export function ForgeScreen() {
 
   const [strike, setStrike] = useState<{ id: string; beat: number }>({ id: "", beat: 0 });
   const strikeRef = useRef(0);
-  const [pending, setPending] = useState<Activity | null>(null);
-  const pendingRef = useRef<Activity | null>(null);
-
+  const [swing, setSwing] = useState<{ id: string; beat: number }>({ id: "", beat: 0 });
+  const swingRef = useRef(0);
+  const [cooldown, setCooldown] = useState<number | null>(null);
   const [confirmingItem, setConfirmingItem] = useState<string | null>(null);
 
   useEffect(() => {
     if (!activeItem) return;
-
-    const key = "forge:" + activeItem;
-    strikeRef.current = progressRepository.get(key, FORGE_TICKS);
-    setStrike({ id: activeItem, beat: strikeRef.current });
+    let alive = true;
+    let barTimer = 0;
+    let coolTimer = 0;
     const level = slotsRef.current.find((entry) => entry.item.id === activeItem)?.level ?? 0;
     const tickMs = forgeDurationMs(level) / FORGE_TICKS;
-    const timer = window.setInterval(() => {
-      strikeRef.current = strikeRef.current >= FORGE_TICKS ? 0 : strikeRef.current + 1;
-      setStrike({ id: activeItem, beat: strikeRef.current });
+    strikeRef.current = 0;
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setStrike({ id: activeItem, beat: 0 });
+    setCooldown(null);
+    /* eslint-enable react-hooks/set-state-in-effect */
 
-      if (strikeRef.current > 0 && strikeRef.current < FORGE_TICKS) {
-        playSound("forge");
-        return;
-      }
-      if (strikeRef.current < FORGE_TICKS) return;
-
-      progressRepository.clear(key);
-      void enhanceRef.current(activeItem).then((landed) => {
-        if (landed) {
-          if (landed.message) notifyRef.current(landed.message, true, "Bigorna");
-          playSound(landed.raised ? "point" : "denied");
-        }
-        if (pendingRef.current) {
-          const next = pendingRef.current;
-          pendingRef.current = null;
-          setPending(null);
-          strikeRef.current = 0;
-          setStrike({ id: activeItem, beat: 0 });
-          setActivity(next);
+    const startBar = () => {
+      strikeRef.current = 0;
+      setStrike({ id: activeItem, beat: 0 });
+      barTimer = window.setInterval(() => {
+        strikeRef.current += 1;
+        setStrike({ id: activeItem, beat: strikeRef.current });
+        if (strikeRef.current < FORGE_TICKS) {
+          playSound("forge");
           return;
         }
-        if (landed && autoRef.current.forge) return;
-        strikeRef.current = 0;
-        setStrike({ id: activeItem, beat: 0 });
-        setActivity(
-          !landed && autoRef.current.forge ? { kind: "forge", id: activeItem, paused: true } : null,
-        );
-      });
-    }, tickMs);
+        window.clearInterval(barTimer);
+        barTimer = 0;
+        void enhanceRef.current(activeItem).then((landed) => {
+          if (!alive) return;
+          if (landed) {
+            if (landed.message) notifyRef.current(landed.message, true, "Bigorna");
+            playSound(landed.raised ? "point" : "denied");
+          }
+          strikeRef.current = 0;
+          setStrike({ id: activeItem, beat: 0 });
+          if (!landed) {
+            setActivity(
+              autoRef.current.forge ? { kind: "forge", id: activeItem, paused: true } : null,
+            );
+            return;
+          }
+          if (!autoRef.current.forge) {
+            setActivity(null);
+            return;
+          }
+          startCooldown();
+        });
+      }, tickMs);
+    };
+
+    const startCooldown = () => {
+      let left = CYCLE_OPTOUT_SECS;
+      setCooldown(left);
+      coolTimer = window.setInterval(() => {
+        left -= 1;
+        if (left <= 0) {
+          window.clearInterval(coolTimer);
+          coolTimer = 0;
+          setCooldown(null);
+          startBar();
+        } else {
+          setCooldown(left);
+        }
+      }, 1000);
+    };
+
+    startBar();
 
     return () => {
-      window.clearInterval(timer);
-      progressRepository.set("forge:" + activeItem, strikeRef.current);
+      alive = false;
+      if (barTimer) window.clearInterval(barTimer);
+      if (coolTimer) window.clearInterval(coolTimer);
     };
   }, [activeItem, setActivity]);
 
-  const [swing, setSwing] = useState<{ id: string; beat: number }>({ id: "", beat: 0 });
-  const swingRef = useRef(0);
-
   useEffect(() => {
     if (!activeOre) return;
+    let alive = true;
+    let barTimer = 0;
+    let coolTimer = 0;
+    swingRef.current = 0;
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setSwing({ id: activeOre, beat: 0 });
+    setCooldown(null);
+    /* eslint-enable react-hooks/set-state-in-effect */
 
-    const key = "mine:" + activeOre;
-    swingRef.current = progressRepository.get(key, MINING_TICKS);
-    setSwing({ id: activeOre, beat: swingRef.current });
-    const timer = window.setInterval(() => {
-      swingRef.current = swingRef.current >= MINING_TICKS ? 0 : swingRef.current + 1;
-      setSwing({ id: activeOre, beat: swingRef.current });
-
-      if (swingRef.current > 0) playSound("mine");
-
-      if (swingRef.current < MINING_TICKS) return;
-      progressRepository.clear(key);
-      void mineRef.current(activeOre).then((mined) => {
-        if (!mined) {
+    const startBar = () => {
+      swingRef.current = 0;
+      setSwing({ id: activeOre, beat: 0 });
+      barTimer = window.setInterval(() => {
+        swingRef.current += 1;
+        setSwing({ id: activeOre, beat: swingRef.current });
+        playSound("mine");
+        if (swingRef.current < MINING_TICKS) return;
+        window.clearInterval(barTimer);
+        barTimer = 0;
+        void mineRef.current(activeOre).then((mined) => {
+          if (!alive) return;
           swingRef.current = 0;
           setSwing({ id: activeOre, beat: 0 });
-          if (pendingRef.current) {
-            const next = pendingRef.current;
-            pendingRef.current = null;
-            setPending(null);
-            setActivity(next);
+          if (!mined) {
+            setActivity(autoRef.current.mine ? { kind: "mine", id: activeOre, paused: true } : null);
             return;
           }
-          setActivity(autoRef.current.mine ? { kind: "mine", id: activeOre, paused: true } : null);
-          return;
+          if (!autoRef.current.mine) {
+            setActivity(null);
+            return;
+          }
+          startCooldown();
+        });
+      }, MINING_TICK_MS);
+    };
+
+    const startCooldown = () => {
+      let left = CYCLE_OPTOUT_SECS;
+      setCooldown(left);
+      coolTimer = window.setInterval(() => {
+        left -= 1;
+        if (left <= 0) {
+          window.clearInterval(coolTimer);
+          coolTimer = 0;
+          setCooldown(null);
+          startBar();
+        } else {
+          setCooldown(left);
         }
-        if (pendingRef.current) {
-          const next = pendingRef.current;
-          pendingRef.current = null;
-          setPending(null);
-          swingRef.current = 0;
-          setSwing({ id: activeOre, beat: 0 });
-          setActivity(next);
-          return;
-        }
-        if (!autoRef.current.mine) {
-          swingRef.current = 0;
-          setSwing({ id: activeOre, beat: 0 });
-          setActivity(null);
-        }
-      });
-    }, MINING_TICK_MS);
+      }, 1000);
+    };
+
+    startBar();
 
     return () => {
-      window.clearInterval(timer);
-      progressRepository.set("mine:" + activeOre, swingRef.current);
+      alive = false;
+      if (barTimer) window.clearInterval(barTimer);
+      if (coolTimer) window.clearInterval(coolTimer);
     };
   }, [activeOre, setActivity]);
 
@@ -188,38 +222,20 @@ export function ForgeScreen() {
     ? (slots.find((entry) => entry.item.id === confirmingItem) ?? null)
     : null;
 
-  function queueSwitch(next: Activity | null) {
-    pendingRef.current = next;
-    setPending(next);
-  }
-
   function toggleMining(oreId: string, available: boolean) {
     if (activeOre === oreId) {
-      queueSwitch(null);
-      setActivity(null);
+      if (cooldown !== null) setActivity(null);
       return;
     }
-    if (pending?.kind === "mine" && pending.id === oreId) {
-      queueSwitch(null);
-      return;
-    }
-    if (!available) return;
-
-    const next: Activity = { kind: "mine", id: oreId };
-    if (activeOre !== null || activeItem !== null) {
-      queueSwitch(next);
-      return;
-    }
-    swingRef.current = 0;
-    setSwing({ id: oreId, beat: 0 });
-    setActivity(next);
+    if (!available || activeItem !== null) return;
+    setActivity({ kind: "mine", id: oreId });
   }
 
   return (
     <>
       <PageHeader
         title="Forja"
-        description="A bigorna não faz peça nova: ela bate de novo na que você já usa, e o que alimenta a marreta sai da rocha."
+        description="A bigorna não faz peça nova: ela bate de novo na que você já usa, e o que alimenta a marreta sai da rocha. Não dá para parar no meio de uma batida, mas entre uma e outra sobram três segundos para mandar parar."
         action={
           <div className="flex items-center gap-2">
             <Tag tone="neutral">Mineração NV. {formatNumber(mining.level)}</Tag>
@@ -257,7 +273,7 @@ export function ForgeScreen() {
             </ListRow>
             {mining.ores.map(({ ore, fragment, owned, unlocked, reason }) => {
               const active = activeOre === ore.id;
-              const queuedMine = pending?.kind === "mine" && pending.id === ore.id;
+              const opting = active && cooldown !== null;
               const available = unlocked && !mining.dailyExhausted;
               const limitReason =
                 unlocked && mining.dailyExhausted
@@ -272,15 +288,15 @@ export function ForgeScreen() {
                       title={ore.label}
                       description={
                         active
-                          ? state.automation.mine
-                            ? "Minerando sem parar..."
-                            : "Minerando..."
-                          : queuedMine
-                            ? "Na fila, começa quando o ciclo atual acabar"
-                            : waitingOre === ore.id
-                              ? "Esperando para bater de novo"
-                              : (limitReason ??
-                                "+" + formatNumber(ore.progress) + " de progresso por batida")
+                          ? opting
+                            ? "Pode parar agora ou seguir para a próxima."
+                            : state.automation.mine
+                              ? "Minerando sem parar..."
+                              : "Minerando..."
+                          : waitingOre === ore.id
+                            ? "Esperando para bater de novo"
+                            : (limitReason ??
+                              "+" + formatNumber(ore.progress) + " de progresso por batida")
                       }
                     />
                     <div className="flex shrink-0 items-center gap-3">
@@ -288,28 +304,27 @@ export function ForgeScreen() {
                         x{formatNumber(owned)}
                       </span>
                       <Button
-                        variant={active || queuedMine ? "secondary" : available ? "primary" : "outline"}
-                        disabled={!available && !active && !queuedMine}
+                        variant={active ? "secondary" : available ? "primary" : "outline"}
+                        disabled={
+                          active ? !opting : !available || activeItem !== null
+                        }
                         onClick={() => toggleMining(ore.id, available)}
                         aria-label={
-                          (queuedMine
-                            ? "Cancelar fila de "
-                            : active
-                              ? "Parar de minerar "
-                              : "Minerar ") + ore.label
+                          (active ? "Parar de minerar " : "Minerar ") + ore.label
                         }
                       >
-                        {queuedMine ? "Na fila" : active ? "Parar" : "Minerar"}
+                        {opting ? "Parar (" + cooldown + ")" : active ? "Minerando..." : "Minerar"}
                       </Button>
                     </div>
                   </div>
 
-                  {active || (swing.id === ore.id && swing.beat > 0) ? (
+                  {active ? (
                     <div className="pt-2">
                       <Bar
-                        label={active ? "Minerando..." : "Pausado"}
-                        current={swing.beat}
+                        label="Minerando..."
+                        current={swing.id === ore.id ? swing.beat : 0}
                         maximum={MINING_TICKS}
+                        glows
                         wraps
                       />
                     </div>
@@ -341,7 +356,8 @@ export function ForgeScreen() {
               slots.map((row) => {
                 const entry = row;
                 const maxed = entry.level >= MAX_ENHANCEMENT;
-                const queuedForge = pending?.kind === "forge" && pending.id === row.item.id;
+                const active = activeItem === row.item.id;
+                const opting = active && cooldown !== null;
 
                 return (
                   <ListRow key={row.item.id} layout="column" padding="art">
@@ -368,32 +384,29 @@ export function ForgeScreen() {
                         ))}
                       </div>
                       <Button
-                        variant={queuedForge ? "secondary" : entry.canForge ? "primary" : "outline"}
-                        disabled={queuedForge ? false : !entry.canForge || activeItem !== null}
+                        variant={active ? "secondary" : entry.canForge ? "primary" : "outline"}
+                        disabled={
+                          active ? !opting : !entry.canForge || activeOre !== null
+                        }
                         onClick={() =>
-                          queuedForge ? queueSwitch(null) : setConfirmingItem(row.item.id)
+                          active
+                            ? cooldown !== null && setActivity(null)
+                            : setConfirmingItem(row.item.id)
                         }
-                        aria-label={
-                          (queuedForge ? "Cancelar fila de forja de " : "Forjar ") + entry.item.name
-                        }
+                        aria-label={(active ? "Parar de forjar " : "Forjar ") + entry.item.name}
                       >
-                        {queuedForge
-                          ? "Na fila"
-                          : activeItem === row.item.id
-                            ? "Forjando..."
-                            : "Forjar"}
+                        {opting ? "Parar (" + cooldown + ")" : active ? "Forjando..." : "Forjar"}
                       </Button>
                     </div>
 
-                    {(activeItem === row.item.id && strike.id === row.item.id) ||
-                    waitingItem === row.item.id ||
-                    entry.reason ? (
+                    {active || waitingItem === row.item.id || entry.reason ? (
                       <div className="space-y-1 pt-2">
-                        {activeItem === row.item.id && strike.id === row.item.id ? (
+                        {active ? (
                           <Bar
                             label="Forjando..."
-                            current={strike.beat}
+                            current={strike.id === row.item.id ? strike.beat : 0}
                             maximum={FORGE_TICKS}
+                            glows
                             wraps
                           />
                         ) : null}
@@ -434,13 +447,9 @@ export function ForgeScreen() {
         confirmLabel="Forjar"
         onCancel={() => setConfirmingItem(null)}
         onConfirm={() => {
-          if (confirming) {
+          if (confirming && activeOre === null && activeItem === null) {
             const next: Activity = { kind: "forge", id: confirming.item.id };
-            if (activeOre !== null || activeItem !== null) {
-              queueSwitch(next);
-            } else {
-              setActivity(next);
-            }
+            setActivity(next);
           }
           setConfirmingItem(null);
         }}
