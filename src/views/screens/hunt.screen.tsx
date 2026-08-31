@@ -7,6 +7,7 @@ import { usePageActivity } from "@/controllers/use-page-activity";
 import { playSound } from "@/controllers/sound";
 import { emphasizeDamage, narrationOf, type NarrationLine } from "../presenters/hunt.presenter";
 import { DANGER_LABEL } from "@/models/entities/territory";
+import { canPetFight, isPetActive, petLevelOf, petMaxEnergy } from "@/models/rules/pet";
 import { CYCLE_OPTOUT_SECS, HUNT_TICK_MS } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
 import { formatNumber } from "@/shared/utils/format";
@@ -144,12 +145,14 @@ function CombatReport({ report, lines }: { report: HuntReport; lines: NarrationL
   );
 }
 export function HuntScreen() {
-  const { state, character, hunt, sufferBlow, landHunt, notify, activity, setActivity } = useGame();
+  const { state, character, pet, hunt, sufferBlow, landHunt, notify, activity, setActivity } =
+    useGame();
   usePageActivity(["hunt"]);
   const art = useArt();
   const paused = activity?.paused === true;
   const activeId = activity?.kind === "hunt" && !paused ? (activity.id ?? null) : null;
   const waitingId = activity?.kind === "hunt" && paused ? (activity.id ?? null) : null;
+  const petAlong = canPetFight(pet) ? pet : null;
   const [report, setReport] = useState<HuntReport | null>(null);
   const [selection, setSelection] = useState<Record<string, string>>(() => loadHuntSelection());
   const [reportLines, setReportLines] = useState<NarrationLine[]>([]);
@@ -187,6 +190,7 @@ export function HuntScreen() {
     if (!activeId) return;
     let alive = true;
     let coolTimer = 0;
+    let fillTimer = 0;
     beatRef.current = 0;
     requestingRef.current = false;
     pendingRef.current = null;
@@ -203,8 +207,8 @@ export function HuntScreen() {
       requestingRef.current = true;
       void huntRef.current(activeId, selectionRef.current[activeId]).then((fight) => {
         if (!alive) return;
-        requestingRef.current = false;
         if (!fight) {
+          requestingRef.current = false;
           setActivity(autoRef.current ? { kind: "hunt", id: activeId, paused: true } : null);
           return;
         }
@@ -213,6 +217,9 @@ export function HuntScreen() {
         scriptRef.current = narrationOf({ foe: fight.creature, combat: fight.combat });
         setScript(scriptRef.current);
         setPending(fight);
+        fillTimer = window.setTimeout(() => {
+          requestingRef.current = false;
+        }, HUNT_TICK_MS);
       });
     };
     const startCooldown = () => {
@@ -306,6 +313,7 @@ export function HuntScreen() {
       alive = false;
       window.clearInterval(timer);
       if (coolTimer) window.clearInterval(coolTimer);
+      if (fillTimer) window.clearTimeout(fillTimer);
     };
   }, [activeId, setActivity]);
   if (!character) return null;
@@ -332,7 +340,17 @@ export function HuntScreen() {
       <PageHeader
         title="Caça"
         description="A caçada roda sozinha: cada luta toca ao vivo e grava no fim. Não dá para parar no meio de uma luta, mas entre uma e outra sobram três segundos para você mandar parar."
-        action={null}
+        action={
+          pet ? (
+            <Tag tone="neutral">
+              {petAlong
+                ? "Mascote acompanhando"
+                : isPetActive(pet)
+                  ? "Mascote sem energia"
+                  : "Mascote em repouso"}
+            </Tag>
+          ) : null
+        }
       />
 
       <div className="space-y-6">
@@ -348,17 +366,20 @@ export function HuntScreen() {
               ? script[Math.min(progress.beat, script.length) - 1]
               : null;
           const replaying = onThis && pending !== null && line !== null;
+          const filling = onThis && pending !== null && line === null;
           const foe = pending ?? report;
           const shownFoe =
-            replaying && foe
+            (replaying || filling) && foe
               ? foe.creature
               : (creatures.find((creature) => creature.id === selectedId) ?? prey ?? creatures[0]);
           const monsterMax = Math.max(1, shownFoe?.health ?? 1);
           const monsterCurrent =
             replaying && line
               ? Math.max(0, Math.min(monsterMax, line.creatureHealth))
-              : monsterMax;
-          const monsterStatus = replaying ? "Atacando" : "Aguardando";
+              : filling
+                ? monsterMax
+                : 0;
+          const monsterStatus = replaying ? "Atacando" : filling ? "Preparando" : "Aguardando";
           return (
             <Card
               key={territory.id}
@@ -404,6 +425,16 @@ export function HuntScreen() {
                       wraps
                     />
                   </div>
+                  {active && petAlong ? (
+                    <div className="px-4 py-3">
+                      <Bar
+                        label="Mascote - Energia"
+                        current={petAlong.energy}
+                        maximum={petMaxEnergy(petLevelOf(petAlong))}
+                        tone="vigor"
+                      />
+                    </div>
+                  ) : null}
                   {line ? (
                     <p
                       className={cn(

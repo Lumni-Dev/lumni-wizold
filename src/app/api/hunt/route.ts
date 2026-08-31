@@ -1,8 +1,14 @@
 import * as huntController from "@/controllers/hunt.controller";
+import { failure } from "@/models/entities/result";
+import { cooldownLeft, setCooldown } from "@/models/repositories/server/action-cooldown";
 import { interruptRest } from "@/models/repositories/server/game.store";
+import { HUNT_TICK_MS } from "@/shared/constants/game";
 import { asText, withGame } from "../_lib/api";
 export async function POST(request: Request) {
   return withGame(request, async (state, body, context) => {
+    if (cooldownLeft("hunt:" + context.characterId) > 0) {
+      return failure(state, "");
+    }
     const resolved = huntController.resolveHunt(
       state,
       asText(body.territoryId, 60),
@@ -11,7 +17,10 @@ export async function POST(request: Request) {
     );
     if (!resolved.ok || !resolved.data) return resolved;
     const landed = huntController.landHunt(state, resolved.data, 0);
-    if (landed.ok) await interruptRest(context.client, context.characterId);
+    if (landed.ok && landed.data) {
+      await interruptRest(context.client, context.characterId);
+      setCooldown("hunt:" + context.characterId, landed.data.combat.rounds.length * HUNT_TICK_MS);
+    }
     return landed;
   });
 }
