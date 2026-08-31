@@ -45,7 +45,7 @@ export function formatNumber(value: number): string {
   return formatExact(rounded);
 }
 export function formatBronze(value: number): string {
-  return formatNumber(value) + " de bronze";
+  return formatNumber(value) + " WCoin";
 }
 export function formatTime(iso: string): string {
   const date = new Date(iso);

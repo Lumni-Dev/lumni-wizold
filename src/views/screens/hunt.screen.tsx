@@ -6,10 +6,10 @@ import { listTerritories, type HuntReport } from "@/controllers/hunt.controller"
 import { usePageActivity } from "@/controllers/use-page-activity";
 import { playSound } from "@/controllers/sound";
 import { petLevelOf, petMaxEnergy } from "@/models/rules/pet";
-import { emphasizeDamage, narrationOf, type NarrationLine } from "../presenters/hunt.presenter";
+import { narrationOf, type NarrationLine } from "../presenters/hunt.presenter";
 import { DANGER_LABEL } from "@/models/entities/territory";
 import { canPetFight, isPetActive } from "@/models/rules/pet";
-import { HUNT_APPROACH_TICKS, HUNT_TICK_MS, HUNT_TICKS } from "@/shared/constants/game";
+import { HUNT_TICK_MS, HUNT_TICKS } from "@/shared/constants/game";
 import { progressRepository } from "@/models/repositories/progress.repository";
 import { cn } from "@/shared/utils/class-names";
 import { formatNumber } from "@/shared/utils/format";
@@ -23,7 +23,6 @@ import {
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
 import { Card } from "../components/card";
-import { useShake } from "../components/use-shake";
 import { Tag } from "../components/tag";
 import { DataRow } from "../components/data-row";
 import { List, ListRow } from "../components/list";
@@ -147,8 +146,7 @@ function CombatReport({ report, lines }: { report: HuntReport; lines: NarrationL
   );
 }
 export function HuntScreen() {
-  const { state, character, pet, hunt, sufferBlow, landHunt, notify, activity, setActivity } =
-    useGame();
+  const { state, character, pet, hunt, landHunt, notify, activity, setActivity } = useGame();
   usePageActivity(["hunt"]);
   const art = useArt();
   const paused = activity?.paused === true;
@@ -159,148 +157,90 @@ export function HuntScreen() {
   const [selection, setSelection] = useState<Record<string, string>>(() => loadHuntSelection());
   const [reportLines, setReportLines] = useState<NarrationLine[]>([]);
   const [session, setSession] = useState<HuntSession>(EMPTY_SESSION);
-  const [progress, setProgress] = useState<{
-    id: string;
-    phase: "approach" | "fight";
-    beat: number;
-  }>({ id: "", phase: "approach", beat: 0 });
-  const [script, setScript] = useState<NarrationLine[]>([]);
-  const [pending, setPending] = useState<HuntReport | null>(null);
-  const [preyJolt, setPreyJolt] = useState(0);
-  const [lapJolt, setLapJolt] = useState(0);
-  const shaking = useShake(preyJolt + lapJolt);
+  const [progress, setProgress] = useState<{ id: string; beat: number }>({ id: "", beat: 0 });
   const beatRef = useRef(0);
-  const approachRef = useRef(0);
-  const scriptRef = useRef<NarrationLine[]>([]);
-  const pendingRef = useRef<HuntReport | null>(null);
   const requestingRef = useRef(false);
-  const bledRef = useRef({ last: 0, total: 0 });
   const territories = useMemo(() => listTerritories(state), [state]);
   const autoRef = useRef(state.automation.hunt);
   const huntRef = useRef(hunt);
-  const sufferRef = useRef(sufferBlow);
   const landRef = useRef(landHunt);
   const notifyRef = useRef(notify);
-  const stateRef = useRef(state);
   const selectionRef = useRef(selection);
-  const nameRef = useRef("");
   useEffect(() => {
     autoRef.current = state.automation.hunt;
     huntRef.current = hunt;
-    sufferRef.current = sufferBlow;
     landRef.current = landHunt;
     notifyRef.current = notify;
-    stateRef.current = state;
     selectionRef.current = selection;
-    nameRef.current = character?.name ?? "";
   });
   useEffect(() => {
     if (!activeId) return;
     let alive = true;
     const key = "hunt:" + activeId;
-    approachRef.current = progressRepository.get(key, HUNT_APPROACH_TICKS);
+    beatRef.current = progressRepository.get(key, HUNT_TICKS);
     requestingRef.current = false;
-    pendingRef.current = null;
-    scriptRef.current = [];
-    beatRef.current = 0;
-    setProgress({ id: activeId, phase: "approach", beat: approachRef.current });
+    setProgress({ id: activeId, beat: beatRef.current });
     const timer = window.setInterval(() => {
-      if (!pendingRef.current) {
-        if (requestingRef.current) return;
-        approachRef.current += 1;
-        setProgress({ id: activeId, phase: "approach", beat: approachRef.current });
-        if (approachRef.current < HUNT_APPROACH_TICKS) return;
-        requestingRef.current = true;
-        progressRepository.clear(key);
-        void huntRef.current(activeId, selectionRef.current[activeId]).then((fight) => {
-          if (!alive) return;
-          requestingRef.current = false;
-          if (!fight) {
-            setActivity(autoRef.current ? { kind: "hunt", id: activeId, paused: true } : null);
-            return;
-          }
-          pendingRef.current = fight;
-          bledRef.current = { last: stateRef.current.character?.health ?? 0, total: 0 };
-          scriptRef.current = narrationOf({ foe: fight.creature, combat: fight.combat }, HUNT_TICKS);
-          setScript(scriptRef.current);
-          setPending(fight);
-          beatRef.current = 0;
-          setProgress({ id: activeId, phase: "fight", beat: 0 });
-        });
+      if (requestingRef.current) return;
+      beatRef.current = beatRef.current >= HUNT_TICKS ? 0 : beatRef.current + 1;
+      setProgress({ id: activeId, beat: beatRef.current });
+      if (beatRef.current < HUNT_TICKS) {
+        playSound("hit");
         return;
       }
-      beatRef.current += 1;
-      setProgress({ id: activeId, phase: "fight", beat: beatRef.current });
-      const line = scriptRef.current[Math.min(beatRef.current, scriptRef.current.length) - 1];
-      if (line?.blow === "ours") playSound(line.critical ? "crit" : "hit");
-      if (line?.blow === "pet") playSound("snap");
-      if (line?.blow === "theirs") playSound("hurt");
-      if (line?.critical) {
-        if (line.blow === "theirs") setLapJolt((count) => count + 1);
-        else setPreyJolt((count) => count + 1);
-      }
-      if (line?.characterHealth !== undefined) {
-        const delta = bledRef.current.last - line.characterHealth;
-        if (delta > 0) {
-          sufferRef.current(delta);
-          bledRef.current = { last: line.characterHealth, total: bledRef.current.total + delta };
+      requestingRef.current = true;
+      progressRepository.clear(key);
+      void huntRef.current(activeId, selectionRef.current[activeId]).then((fight) => {
+        if (!alive) return;
+        requestingRef.current = false;
+        if (!fight) {
+          setActivity(autoRef.current ? { kind: "hunt", id: activeId, paused: true } : null);
+          return;
         }
-      }
-      if (beatRef.current >= scriptRef.current.length) {
-        const held = pendingRef.current;
-        pendingRef.current = null;
-        setPending(null);
         landRef.current();
-        setReport(held);
-        setReportLines(scriptRef.current);
-        setSession((current) => accumulate(current, held));
-        if (held.combat.victory) {
-          const spoils = held.drops
+        setReport(fight);
+        setReportLines(narrationOf({ foe: fight.creature, combat: fight.combat }, HUNT_TICKS));
+        setSession((current) => accumulate(current, fight));
+        if (fight.combat.victory) {
+          const spoils = fight.drops
             .map((drop) => drop.name + (drop.quantity > 1 ? " x" + drop.quantity : ""))
             .join(", ");
           notifyRef.current(
-            held.creature.name +
+            fight.creature.name +
               " abatido: +" +
-              formatNumber(held.bronze) +
+              formatNumber(fight.bronze) +
               " de bronze e +" +
-              formatNumber(held.experience) +
+              formatNumber(fight.experience) +
               " de experiência." +
               (spoils ? " Espólio: " + spoils + "." : "") +
-              (held.levelsGained > 0 ? " Você subiu de nível!" : ""),
+              (fight.levelsGained > 0 ? " Você subiu de nível!" : ""),
             true,
             "Caça",
           );
-        } else if (held.combat.retreated) {
+        } else if (fight.combat.retreated) {
           notifyRef.current(
-            "A caçada com " + held.creature.name + " se arrastou e os dois recuaram.",
+            "A caçada com " + fight.creature.name + " se arrastou e os dois recuaram.",
             true,
             "Caça",
           );
         } else {
           notifyRef.current(
-            held.creature.name + " levou a melhor: a caçada não pagou nada.",
+            fight.creature.name + " levou a melhor: a caçada não pagou nada.",
             false,
             "Caça",
           );
           playSound("defeat");
         }
-        scriptRef.current = [];
-        setScript([]);
-        approachRef.current = 0;
         beatRef.current = 0;
-        setProgress({ id: activeId, phase: "approach", beat: 0 });
+        setProgress({ id: activeId, beat: 0 });
         if (!autoRef.current) setActivity(null);
-      }
+      });
     }, HUNT_TICK_MS);
     return () => {
       alive = false;
       window.clearInterval(timer);
-      if (pendingRef.current) {
-        pendingRef.current = null;
-        setPending(null);
-        landRef.current();
-      } else if (!requestingRef.current) {
-        progressRepository.set("hunt:" + activeId, approachRef.current);
+      if (!requestingRef.current) {
+        progressRepository.set("hunt:" + activeId, beatRef.current);
       }
     };
   }, [activeId, setActivity]);
@@ -354,33 +294,20 @@ export function HuntScreen() {
           const active = activeId === territory.id;
           const selectedId = selection[territory.id] ?? prey?.id ?? null;
           const onThis = active && progress.id === territory.id;
-          const line =
-            onThis && progress.phase === "fight" && progress.beat > 0 && script.length > 0
-              ? script[Math.min(progress.beat, script.length) - 1]
-              : null;
-          const foe = pending ?? report;
-          const fightingId = line && foe ? foe.creature.id : selectedId;
-          const selectedCreature =
-            creatures.find((creature) => creature.id === selectedId) ?? prey ?? creatures[0];
-          const replaying = onThis && pending !== null && line !== null;
-          const shownFoe = replaying && foe ? foe.creature : selectedCreature;
-          const monsterMax = Math.max(1, shownFoe?.health ?? 1);
-          const monsterCurrent =
-            replaying && line
-              ? Math.max(0, Math.min(monsterMax, line.creatureHealth))
-              : monsterMax;
-          const monsterStatus = replaying ? "Atacando" : "Aguardando";
           const frozen = !active && progress.id === territory.id && progress.beat > 0;
+          const filled = onThis || frozen ? progress.beat : 0;
+          const shownFoe =
+            creatures.find((creature) => creature.id === selectedId) ?? prey ?? creatures[0];
+          const monsterMax = Math.max(1, shownFoe?.health ?? 1);
+          const monsterCurrent = Math.round((monsterMax * (HUNT_TICKS - filled)) / HUNT_TICKS);
+          const monsterStatus = active ? "Atacando" : "Aguardando";
           return (
             <Card
               key={territory.id}
               height="content"
               interactive={available}
               tone={active ? "highlighted" : "default"}
-              className={cn(
-                !available && !active && "opacity-70",
-                active && shaking && "card-shake",
-              )}
+              className={cn(!available && !active && "opacity-70")}
             >
               <div className="grid md:grid-cols-2 md:divide-x md:divide-edge">
                 <div className="flex flex-col divide-y divide-edge">
@@ -413,16 +340,8 @@ export function HuntScreen() {
                   <div className="px-4 py-3">
                     <Bar
                       label={active ? "Caçando..." : frozen ? "Pausado" : "Caçar"}
-                      current={
-                        onThis
-                          ? progress.phase === "fight"
-                            ? HUNT_APPROACH_TICKS + progress.beat
-                            : progress.beat
-                          : frozen
-                            ? progress.beat
-                            : 0
-                      }
-                      maximum={HUNT_APPROACH_TICKS + Math.max(1, script.length || HUNT_TICKS)}
+                      current={onThis || frozen ? progress.beat : 0}
+                      maximum={HUNT_TICKS}
                       glows={active}
                       wraps
                     />
@@ -436,27 +355,6 @@ export function HuntScreen() {
                         tone="vigor"
                       />
                     </div>
-                  ) : null}
-                  {line ? (
-                    <p
-                      className={cn(
-                        "truncate px-4 py-3 font-mono text-[11px]",
-                        line.critical ? "text-ember" : "text-ink-faint",
-                      )}
-                    >
-                      {emphasizeDamage(line.text).map((part, index) =>
-                        typeof part === "string" ? (
-                          part
-                        ) : (
-                          <strong
-                            key={index}
-                            className={cn("font-bold", !line.critical && "text-ink")}
-                          >
-                            {part.damage}
-                          </strong>
-                        ),
-                      )}
-                    </p>
                   ) : null}
                   <div className="flex flex-wrap items-center justify-between gap-3 p-4">
                     <span className="text-[11px] text-ink-faint">
@@ -490,7 +388,7 @@ export function HuntScreen() {
                     <ul className="max-h-[560px] divide-y divide-edge overflow-y-auto border-t border-edge md:absolute md:inset-0 md:max-h-none">
                       {creatures.map((creature) => {
                         const isSelected = creature.id === selectedId;
-                        const isPrey = creature.id === fightingId;
+                        const isPrey = active && creature.id === selectedId;
                         const reached = character.level >= creature.level;
                         return (
                           <li key={creature.id}>
@@ -529,9 +427,11 @@ export function HuntScreen() {
                                 >
                                   {creature.name}
                                 </span>
-                                <span className="font-mono text-[11px] text-ink-faint">
+                                <span className="block font-mono text-[11px] text-ink-faint">
                                   NV. {formatNumber(creature.level)} a{" "}
-                                  {formatNumber(creature.level + 9)} · +
+                                  {formatNumber(creature.level + 9)}
+                                </span>
+                                <span className="block font-mono text-[11px] text-ink-faint">
                                   {formatNumber(creature.experience)} XP
                                 </span>
                               </span>
