@@ -109,10 +109,13 @@ export function buyItem(state: GameState, itemId: string, quantity = 1): Result 
   const cost = marketPriceOf(item, character.level) * quantity;
   if (character.bronze < cost) return failure(state, "Bronze insuficiente para " + item.name + ".");
 
+  const enhancements = { ...state.enhancements };
+  delete enhancements[itemId];
   const next: GameState = {
     ...state,
     character: { ...character, bronze: character.bronze - cost },
     inventory: addToInventory(state.inventory, itemId, quantity),
+    enhancements,
   };
 
   const message = item.name + " comprado por " + formatBronze(cost) + ".";
@@ -128,6 +131,9 @@ export function sellItem(state: GameState, itemId: string, quantity = 1): Result
   if (!isValidQuantity(quantity)) return failure(state, "Quantidade inválida.");
   if (isForgeMaterial(item)) {
     return failure(state, "Fragmentos não se vendem por bronze: só a forja os aceita.");
+  }
+  if ((state.enhancements[itemId] ?? 0) > 0) {
+    return failure(state, item.name + " está forjado: peças forjadas só se vendem no bazar.");
   }
   if (countInInventory(state.inventory, itemId) < quantity) {
     return failure(state, "Você não tem essa quantidade de " + item.name + ".");

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useGame } from "@/controllers/game.context";
 import { detailInventory } from "@/controllers/inventory.controller";
@@ -47,6 +47,16 @@ export function InventoryScreen() {
   const { state, character, equipItem, unequipItem, consumeItem } = useGame();
   const [filter, setFilter] = useState<Filter>("all");
   const [page, setPage] = useState(1);
+  const [now, setNow] = useState(() => Date.now());
+  const [equipLock, setEquipLock] = useState<Record<string, number>>({});
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 500);
+    return () => window.clearInterval(timer);
+  }, []);
+  function handleEquip(itemId: string, slot: string) {
+    equipItem(itemId);
+    setEquipLock((prev) => ({ ...prev, [slot]: Date.now() + 3000 }));
+  }
 
   const slots = useMemo(() => detailInventory(state), [state]);
   const visible = filter === "all" ? slots : slots.filter((slot) => slot.item.category === filter);
@@ -78,6 +88,7 @@ export function InventoryScreen() {
           {EQUIPMENT_SLOTS.map((slot) => {
             const itemId = state.equipment[slot];
             const item = itemId ? findItem(itemId) : undefined;
+            const lockSecs = Math.max(0, Math.ceil(((equipLock[slot] ?? 0) - now) / 1000));
 
             return (
               <Card key={slot} height="fill" tone={item ? "highlighted" : "empty"}>
@@ -119,8 +130,12 @@ export function InventoryScreen() {
                     {item ? "Equipado" : "Espaço livre"}
                   </span>
                   {item ? (
-                    <Button variant="outline" onClick={() => unequipItem(slot)}>
-                      Tirar
+                    <Button
+                      variant="outline"
+                      onClick={() => unequipItem(slot)}
+                      disabled={lockSecs > 0}
+                    >
+                      {lockSecs > 0 ? "Tirar (" + lockSecs + ")" : "Tirar"}
                     </Button>
                   ) : null}
                 </CardFooter>
@@ -172,9 +187,11 @@ export function InventoryScreen() {
                 note={
                   levelTooLow
                     ? "Requer NV. " + item.minLevel
-                    : sellable
-                      ? null
-                      : "Forja ou bazar"
+                    : !sellable
+                      ? "Forja ou bazar"
+                      : enhancement > 0
+                        ? "Forjado, vende só no bazar"
+                        : null
                 }
                 footer={
                   hasActions ? (
@@ -182,7 +199,7 @@ export function InventoryScreen() {
                       {isEquippable(item) ? (
                         <Button
                           variant="secondary"
-                          onClick={() => equipItem(item.id)}
+                          onClick={() => handleEquip(item.id, item.category)}
                           disabled={levelTooLow}
                         >
                           Equipar
@@ -196,9 +213,11 @@ export function InventoryScreen() {
                       {sellable ? (
                         <Button
                           variant="outline"
-                          onClick={() => router.push("/market?sell=" + item.id)}
+                          onClick={() =>
+                            router.push(enhancement > 0 ? "/bazaar" : "/market?sell=" + item.id)
+                          }
                         >
-                          Vender
+                          {enhancement > 0 ? "Bazar" : "Vender"}
                         </Button>
                       ) : null}
                     </>

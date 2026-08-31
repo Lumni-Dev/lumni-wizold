@@ -24,7 +24,6 @@ import { IconFrame } from "../components/icon-frame";
 import { ItemIcon } from "../components/item-icon";
 import { List, ListRow, RowText } from "../components/list";
 import { Panel } from "../components/panel";
-import { Tag } from "../components/tag";
 import { PageHeader } from "../layout/page-header";
 
 function formatCountdown(ms: number): string {
@@ -249,11 +248,6 @@ export function ForgeScreen() {
       <PageHeader
         title="Forja"
         description="A bigorna não faz peça nova: ela bate de novo na que você já usa, e o que alimenta a marreta sai da rocha. Não dá para parar no meio de uma batida, mas entre uma e outra sobram três segundos para mandar parar."
-        action={
-          <div className="flex items-center gap-2">
-            <Tag tone="neutral">Mineração NV. {formatNumber(mining.level)}</Tag>
-          </div>
-        }
       />
 
       <div className="grid items-start gap-6 lg:grid-cols-2">
