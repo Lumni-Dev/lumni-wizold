@@ -831,8 +831,8 @@ sec("caçada");
         clamp(100 - petHunt.data.combat.petSpent, 0, petRules.petMaxEnergy(1)),
     );
     ok(
-      "o lobo que caça aprende",
-      landed.state.pet.trainingProgress > 0 || landed.state.pet.level > 1,
+      "o lobo que caça não aprende, só treina",
+      landed.state.pet.trainingProgress === 0 && landed.state.pet.level === 1,
     );
   }
   const shortWind = {

@@ -24,6 +24,7 @@ import { IconFrame } from "../components/icon-frame";
 import { ItemIcon } from "../components/item-icon";
 import { List, ListRow, RowText } from "../components/list";
 import { Panel } from "../components/panel";
+import { useShake } from "../components/use-shake";
 import { PageHeader } from "../layout/page-header";
 
 function formatCountdown(ms: number): string {
@@ -80,6 +81,8 @@ export function ForgeScreen() {
   const [cooldown, setCooldown] = useState<number | null>(null);
   const [confirmingItem, setConfirmingItem] = useState<string | null>(null);
   const [selectedOre, setSelectedOre] = useState<string>("");
+  const [selectedForge, setSelectedForge] = useState<string>("");
+  const forgeShake = useShake(strike.beat);
 
   useEffect(() => {
     if (!activeItem) return;
@@ -234,6 +237,16 @@ export function ForgeScreen() {
   const selectedAvailable = Boolean(selectedEntry?.unlocked) && !mining.dailyExhausted;
   const mineOpting = activeOre !== null && cooldown !== null;
 
+  const effectiveForge =
+    activeItem ??
+    slots.find((entry) => entry.item.id === selectedForge)?.item.id ??
+    slots.find((entry) => entry.canForge)?.item.id ??
+    slots[0]?.item.id ??
+    "";
+  const forgeEntry = slots.find((entry) => entry.item.id === effectiveForge) ?? null;
+  const forgeOpting = activeItem !== null && cooldown !== null;
+  const forgeActive = activeItem !== null && forgeEntry !== null && activeItem === forgeEntry.item.id;
+
   function toggleMining(oreId: string, available: boolean) {
     if (activeOre === oreId) {
       if (cooldown !== null) setActivity(null);
@@ -241,6 +254,16 @@ export function ForgeScreen() {
     }
     if (!available || activeItem !== null) return;
     setActivity({ kind: "mine", id: oreId });
+  }
+
+  function toggleForge(itemId: string) {
+    if (activeItem === itemId) {
+      if (cooldown !== null) setActivity(null);
+      return;
+    }
+    const entry = slots.find((piece) => piece.item.id === itemId);
+    if (!entry || !entry.canForge || activeOre !== null) return;
+    setConfirmingItem(itemId);
   }
 
   return (
@@ -286,37 +309,34 @@ export function ForgeScreen() {
                 glows={activeOre !== null}
                 wraps
               />
-              <div className="flex items-center justify-between gap-3 pt-1">
-                <span className="min-w-0 flex-1 truncate text-[11px] text-ink-faint">
-                  {activeOre
-                    ? mineOpting
-                      ? "Segue sozinha..."
-                      : state.automation.mine
-                        ? "Minerando sem parar..."
-                        : "Minerando..."
-                    : waitingOre
-                      ? "Esperando fôlego para voltar a minerar"
-                      : mining.dailyExhausted
-                        ? "Fôlego esgotado, reabre em " + formatCountdown(miningResetLeft)
-                        : selectedEntry
-                          ? selectedEntry.unlocked
-                            ? selectedEntry.ore.label
-                            : (selectedEntry.reason ?? "Veio bloqueado")
-                          : "Escolha um veio"}
-                </span>
-                <Button
-                  variant={activeOre ? "secondary" : selectedAvailable ? "primary" : "outline"}
-                  disabled={activeOre ? !mineOpting : !selectedAvailable || activeItem !== null}
-                  onClick={() => toggleMining(effectiveOre, selectedAvailable)}
-                  aria-label={activeOre ? "Parar de minerar" : "Minerar o veio escolhido"}
-                >
-                  {mineOpting
-                    ? "Parar (" + cooldown + ")"
-                    : activeOre
-                      ? "Minerando..."
-                      : "Minerar"}
-                </Button>
-              </div>
+              <span className="block truncate text-[11px] text-ink-faint">
+                {activeOre
+                  ? mineOpting
+                    ? "Segue sozinha..."
+                    : state.automation.mine
+                      ? "Minerando sem parar..."
+                      : "Minerando..."
+                  : waitingOre
+                    ? "Esperando fôlego para voltar a minerar"
+                    : mining.dailyExhausted
+                      ? "Fôlego esgotado, reabre em " + formatCountdown(miningResetLeft)
+                      : selectedEntry
+                        ? selectedEntry.unlocked
+                          ? selectedEntry.ore.label
+                          : (selectedEntry.reason ?? "Veio bloqueado")
+                        : "Escolha um veio"}
+              </span>
+            </ListRow>
+            <ListRow layout="column">
+              <Button
+                size="medium"
+                variant={activeOre ? "secondary" : selectedAvailable ? "primary" : "outline"}
+                disabled={activeOre ? !mineOpting : !selectedAvailable || activeItem !== null}
+                onClick={() => toggleMining(effectiveOre, selectedAvailable)}
+                aria-label={activeOre ? "Parar de minerar" : "Minerar o veio escolhido"}
+              >
+                {mineOpting ? "Parar (" + cooldown + ")" : activeOre ? "Minerando..." : "Minerar"}
+              </Button>
             </ListRow>
             {mining.ores.map(({ ore, fragment, owned, unlocked, reason }) => {
               const isSelected = ore.id === effectiveOre;
@@ -370,96 +390,150 @@ export function ForgeScreen() {
           </List>
         </Panel>
 
-        <Panel
-          title="Bigorna"
-          description={
-            "A bigorna só bate em peça desequipada, na mochila: tire do corpo para forjar. Cada nível soma um ponto de força ou resistência mais 0,2% da peça original, até +" +
-            formatNumber(MAX_ENHANCEMENT) +
-            "."
-          }
-          padding="none"
-        >
-          <List>
-            {slots.length === 0 ? (
-              <ListRow layout="column" padding="art">
+        <div className="space-y-6">
+          <Panel
+            title="Bigorna"
+            description={
+              "Escolha uma peça em Disponíveis e ela entra na bigorna. Cada nível soma um ponto de força ou resistência mais 0,2% da peça original, até +" +
+              formatNumber(MAX_ENHANCEMENT) +
+              "."
+            }
+            padding="none"
+          >
+            {!forgeEntry ? (
+              <div className="p-4">
                 <RowText
                   title="Nada na mochila para forjar"
                   description="Desequipe uma peça para bater nela na bigorna."
                 />
-              </ListRow>
+              </div>
             ) : (
-              slots.map((row) => {
-                const entry = row;
-                const maxed = entry.level >= MAX_ENHANCEMENT;
-                const active = activeItem === row.item.id;
-                const opting = active && cooldown !== null;
+              <div className="space-y-3 p-4">
+                <div className="flex items-center gap-3">
+                  <span className={cn("inline-flex", forgeActive && forgeShake && "card-shake")}>
+                    <ItemIcon item={forgeEntry.item} enhancement={forgeEntry.level} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm text-ink">{forgeEntry.item.name}</p>
+                    {forgeEntry.attributes.map((attribute) => (
+                      <p key={attribute.key} className="font-mono text-[11px] text-ink-soft">
+                        {attribute.name} {formatNumber(attribute.value)}
+                        {forgeEntry.level >= MAX_ENHANCEMENT
+                          ? ""
+                          : " → " + formatNumber(attribute.nextValue)}
+                      </p>
+                    ))}
+                  </div>
+                </div>
 
-                return (
-                  <ListRow key={row.item.id} layout="column" padding="art">
-                    <div className="flex items-center gap-3">
-                      <ItemIcon item={entry.item} enhancement={entry.level} />
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm text-ink">{entry.item.name}</p>
-                        {entry.fragment && !maxed ? (
-                          <p className="font-mono text-[11px] text-ink-soft">
-                            {formatNumber(entry.owned)} / {formatNumber(entry.cost)}{" "}
-                            {entry.fragment.name}
-                          </p>
-                        ) : null}
-                        {entry.fragment && !maxed ? (
-                          <p className="font-mono text-[11px] text-ink-soft">
-                            Forjar custa {formatBronze(entry.bronzeCost)}
-                          </p>
-                        ) : null}
-                        {entry.attributes.map((attribute) => (
-                          <p key={attribute.key} className="font-mono text-[11px] text-ink-soft">
-                            {attribute.name} {formatNumber(attribute.value)}
-                            {maxed ? "" : " → " + formatNumber(attribute.nextValue)}
-                          </p>
-                        ))}
-                      </div>
-                      <Button
-                        variant={active ? "secondary" : entry.canForge ? "primary" : "outline"}
-                        disabled={
-                          active ? !opting : !entry.canForge || activeOre !== null
-                        }
-                        onClick={() =>
-                          active
-                            ? cooldown !== null && setActivity(null)
-                            : setConfirmingItem(row.item.id)
-                        }
-                        aria-label={(active ? "Parar de forjar " : "Forjar ") + entry.item.name}
-                      >
-                        {opting ? "Parar (" + cooldown + ")" : active ? "Forjando..." : "Forjar"}
-                      </Button>
-                    </div>
+                {forgeEntry.fragment && forgeEntry.level < MAX_ENHANCEMENT ? (
+                  <Bar
+                    label={forgeEntry.fragment.name}
+                    tone="tide"
+                    current={forgeEntry.owned}
+                    maximum={forgeEntry.cost}
+                  />
+                ) : null}
 
-                    {active || waitingItem === row.item.id || entry.reason ? (
-                      <div className="space-y-1 pt-2">
-                        {active ? (
-                          <Bar
-                            label="Forjando..."
-                            current={strike.id === row.item.id ? strike.beat : 0}
-                            maximum={FORGE_TICKS}
-                            glows
-                            wraps
-                          />
-                        ) : null}
-                        {waitingItem === row.item.id ? (
-                          <p className="text-[11px] text-ink-faint">
-                            Esperando fragmentos e WCoins para a próxima martelada
-                          </p>
-                        ) : entry.reason ? (
-                          <p className="text-[11px] text-ink-faint">{entry.reason}</p>
-                        ) : null}
-                      </div>
-                    ) : null}
-                  </ListRow>
-                );
-              })
+                <Bar
+                  label={forgeActive ? "Forjando..." : "Forjar"}
+                  current={strike.id === forgeEntry.item.id ? strike.beat : 0}
+                  maximum={FORGE_TICKS}
+                  glows={forgeActive}
+                  wraps
+                />
+
+                <div className="flex items-center justify-between gap-3">
+                  <span className="min-w-0 flex-1 truncate text-[11px] text-ink-faint">
+                    {forgeActive
+                      ? forgeOpting
+                        ? "Segue sozinho..."
+                        : state.automation.forge
+                          ? "Forjando sem parar..."
+                          : "Forjando..."
+                      : waitingItem === forgeEntry.item.id
+                        ? "Esperando fragmentos e WCoins para a próxima martelada"
+                        : forgeEntry.fragment && forgeEntry.level < MAX_ENHANCEMENT
+                          ? "Forjar custa " + formatBronze(forgeEntry.bronzeCost)
+                          : (forgeEntry.reason ?? "Peça no teto")}
+                  </span>
+                  <Button
+                    size="medium"
+                    variant={
+                      forgeActive ? "secondary" : forgeEntry.canForge ? "primary" : "outline"
+                    }
+                    disabled={forgeActive ? !forgeOpting : !forgeEntry.canForge || activeOre !== null}
+                    onClick={() => toggleForge(forgeEntry.item.id)}
+                    aria-label={forgeActive ? "Parar de forjar" : "Forjar a peça escolhida"}
+                  >
+                    {forgeOpting && forgeActive
+                      ? "Parar (" + cooldown + ")"
+                      : forgeActive
+                        ? "Forjando..."
+                        : "Forjar"}
+                  </Button>
+                </div>
+              </div>
             )}
-          </List>
-        </Panel>
+          </Panel>
+
+          <Panel
+            title="Disponíveis"
+            description="As peças da mochila fora do corpo. Escolha uma para a bigorna."
+            padding="none"
+          >
+            {slots.length === 0 ? (
+              <div className="p-4">
+                <RowText title="Nada disponível" description="Desequipe uma peça para forjá-la." />
+              </div>
+            ) : (
+              <List>
+                {slots.map((row) => {
+                  const isSelected = row.item.id === effectiveForge;
+                  return (
+                    <ListRow key={row.item.id}>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedForge(row.item.id)}
+                        aria-pressed={isSelected}
+                        disabled={activeItem !== null}
+                        className="flex w-full items-center gap-3 text-left transition-colors"
+                      >
+                        <ItemIcon item={row.item} enhancement={row.level} />
+                        <div className="min-w-0 flex-1">
+                          <p
+                            className={cn(
+                              "truncate text-sm",
+                              isSelected ? "text-ember" : "text-ink-soft",
+                            )}
+                          >
+                            {row.item.name}
+                          </p>
+                          <p className="text-[11px] text-ink-faint">
+                            {row.level >= MAX_ENHANCEMENT
+                              ? "No teto"
+                              : "+" +
+                                formatNumber(row.level) +
+                                " → +" +
+                                formatNumber(row.level + 1)}
+                          </p>
+                        </div>
+                        <span
+                          className={cn(
+                            "grid h-4 w-4 shrink-0 place-items-center rounded-full border",
+                            isSelected ? "border-ember" : "border-edge-strong",
+                          )}
+                        >
+                          {isSelected ? <span className="h-2 w-2 rounded-full bg-ember" /> : null}
+                        </span>
+                      </button>
+                    </ListRow>
+                  );
+                })}
+              </List>
+            )}
+          </Panel>
+        </div>
       </div>
 
       <ConfirmDialog

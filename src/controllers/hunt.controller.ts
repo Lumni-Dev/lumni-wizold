@@ -11,13 +11,7 @@ import type { GameState } from "@/models/entities/game-state";
 import { failure, success, type Result } from "@/models/entities/result";
 import type { Territory } from "@/models/entities/territory";
 import { simulateCombat, type CombatOutcome } from "@/models/rules/combat";
-import {
-  growPet,
-  canPetFight,
-  petHuntEffort,
-  petLevelOf,
-  spendPetEnergy,
-} from "@/models/rules/pet";
+import { canPetFight, spendPetEnergy } from "@/models/rules/pet";
 import { deriveStats } from "@/models/rules/stats";
 import { gainItems } from "./inventory.controller";
 import { grantExperience, syncCharacter } from "./character.controller";
@@ -188,9 +182,7 @@ export function landHunt(
   const tired =
     state.pet && combat.petSpent > 0 ? spendPetEnergy(state.pet, combat.petSpent) : state.pet;
 
-  const along = canPetFight(state.pet);
-  const grown = along && tired ? growPet(tired, petHuntEffort(petLevelOf(tired))) : null;
-  const pet = grown ? grown.pet : tired;
+  const pet = tired;
 
   let next: GameState = {
     ...state,
@@ -241,16 +233,11 @@ export function landHunt(
 
   next = addLog(next, "hunt", message);
 
-  if (grown?.leveled && pet) {
-    const climbed = "O mascote sobe para NV. " + formatNumber(petLevelOf(pet)) + ".";
-    next = addLog(next, "training", climbed);
-  }
-
   return success<HuntReport>(next, message, {
     ...resolution,
     experience: granted,
     levelsGained: levels,
-    petEffort: along ? petHuntEffort(petLevelOf(state.pet)) : 0,
-    petLeveled: grown?.leveled === true,
+    petEffort: 0,
+    petLeveled: false,
   });
 }
