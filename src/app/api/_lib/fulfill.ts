@@ -10,6 +10,7 @@ import * as storeController from "@/controllers/store.controller";
 import { lockListing, logSale, settleSale } from "@/models/repositories/server/bazaar.store";
 import { loadGame, recordWalletMovement, saveGame } from "@/models/repositories/server/game.store";
 import { refundPayment, type StripeSession } from "./stripe";
+import { VIP_PRICE_CENTS } from "@/models/rules/vip";
 
 export interface FulfillOutcome {
   ok: boolean;
@@ -101,6 +102,30 @@ export async function fulfillSession(
        on conflict (id) do update set
          bronze_granted = excluded.bronze_granted, status = 'approved', settled_at = now()`,
       [session.id, characterId, pack.id, pack.priceCents, result.data.bronze],
+    );
+    return { ok: true, message: result.message };
+  }
+
+  if (session.metadata.kind === "vip") {
+    if (session.amount_total !== VIP_PRICE_CENTS) {
+      const returned = await returnMoney(client, session, characterId);
+      return { ok: false, message: "Pagamento não bate com o VIP: " + returned + "." };
+    }
+    const result = storeController.purchaseVip(loaded.state, Date.now());
+    if (!result.ok || !result.data) {
+      const returned = await returnMoney(client, session, characterId);
+      await client.query(
+        "update store_purchases set status = 'refunded', settled_at = now() where id = $1",
+        [session.id],
+      );
+      return { ok: false, message: result.message + " " + returned + "." };
+    }
+    await saveGame(client, characterId, loaded.state, result.state);
+    await client.query(
+      `insert into store_purchases (id, character_id, pack_id, price_cents, bronze_granted, status, settled_at)
+       values ($1, $2, 'vip', $3, 0, 'approved', now())
+       on conflict (id) do update set status = 'approved', settled_at = now()`,
+      [session.id, characterId, VIP_PRICE_CENTS],
     );
     return { ok: true, message: result.message };
   }

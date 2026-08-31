@@ -13,6 +13,7 @@ import {
 import { findItem } from "@/models/data/items";
 import type { Activity } from "@/models/entities/activity";
 import type { AutomationKey } from "@/models/entities/automation";
+import { isVip } from "@/models/rules/vip";
 import type { EquipmentSlot } from "@/models/entities/item";
 import { initialState, type GameState } from "@/models/entities/game-state";
 import type { Character, Gender } from "@/models/entities/character";
@@ -87,6 +88,7 @@ interface GameContextValue {
   purchaseListing: (listingId: string, quantity: number) => Promise<boolean>;
   requestWithdraw: (pixKey: string, fullName: string, cpf: string) => Promise<boolean>;
   buyPack: (packId: string) => Promise<boolean>;
+  buyVip: () => Promise<boolean>;
   confirmPayment: (sessionId: string) => Promise<boolean>;
   mine: (oreId: string) => Promise<boolean>;
   enhance: (itemId: string) => Promise<{ message: string; raised: boolean } | null>;
@@ -330,6 +332,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     const beat = async () => {
       if (busy) return;
       if (inFlightRef.current > 0 || heldHuntRef.current || heldArenaRef.current) return;
+      if (!isVip(stateRef.current.character, Date.now())) return;
       busy = true;
       try {
         const step = automationController.nextAutomationStep(stateRef.current, activityRef.current);
@@ -626,6 +629,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
       },
       buyPack: async (packId) => {
         const answer = await act<{ url: string }>("POST", "/api/store/checkout", { packId }, "Loja");
+        if (answer.ok && answer.data?.url) {
+          window.location.assign(answer.data.url);
+          return true;
+        }
+        return false;
+      },
+      buyVip: async () => {
+        const answer = await act<{ url: string }>("POST", "/api/vip/checkout", undefined, "Loja");
         if (answer.ok && answer.data?.url) {
           window.location.assign(answer.data.url);
           return true;

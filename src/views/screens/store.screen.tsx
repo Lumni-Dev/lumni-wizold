@@ -5,6 +5,7 @@ import { api } from "@/controllers/api.client";
 import { useGame } from "@/controllers/game.context";
 import { listPacks } from "@/controllers/store.controller";
 import { findPack } from "@/models/data/store-packs";
+import { isVip, VIP_DAYS, VIP_PRICE_CENTS } from "@/models/rules/vip";
 import { formatDay, formatNumber, formatReais, formatBronze } from "@/shared/utils/format";
 import { Button } from "../components/button";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
@@ -47,7 +48,8 @@ const STATUS_TONE: Record<string, "light" | "neutral" | "faint"> = {
 };
 
 export function StoreScreen() {
-  const { state, character, buyPack, confirmPayment } = useGame();
+  const { state, character, buyPack, buyVip, confirmPayment } = useGame();
+  const [now] = useState(() => Date.now());
   const [historyPage, setHistoryPage] = useState(1);
   const [historyStamp, setHistoryStamp] = useState(0);
   const [history, setHistory] = useState<HistoryView | null>(null);
@@ -73,12 +75,49 @@ export function StoreScreen() {
 
   if (!character) return null;
 
+  const vip = isVip(character, now);
+
   return (
     <>
       <PageHeader
         title="Wizold Store"
         description="WCoins por dinheiro, para quem quer pular a espera. Nada aqui compra nível: experiência só a caça dá."
       />
+
+      <Panel
+        title="VIP"
+        description={
+          "Libera todas as chaves de Automação nas configurações: a partida caça, treina, minera e forja sozinha, e se recupera sozinha. Passe de " +
+          VIP_DAYS +
+          " dias."
+        }
+        action={
+          vip ? (
+            <Tag tone="light">Ativo até {formatDay(character.vipUntil ?? "")}</Tag>
+          ) : (
+            <Tag tone="neutral">{formatReais(VIP_PRICE_CENTS)} por 30 dias</Tag>
+          )
+        }
+        footer={
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <span className="text-[11px] text-ink-faint">
+              {vip
+                ? "Renovar soma 30 dias ao que ainda falta."
+                : "Pagamento pelo Stripe. O VIP entra assim que o pagamento confirma."}
+            </span>
+            <Button variant="primary" onClick={() => buyVip()}>
+              {vip ? "Renovar VIP" : "Ativar VIP por " + formatReais(VIP_PRICE_CENTS)}
+            </Button>
+          </div>
+        }
+      >
+        <p className="text-xs leading-relaxed text-ink-soft">
+          Sem VIP, cada clique faz uma coisa só: uma caçada, um treino, um golpe na veia, uma
+          martelada. Com VIP, as chaves das configurações passam a repetir tudo sozinhas e a se
+          encadear. É conforto, não vantagem de números: o que a caça, o treino e a mina rendem
+          continua o mesmo.
+        </p>
+      </Panel>
 
       <Panel
         title="Como o preço é feito"
@@ -158,7 +197,11 @@ export function StoreScreen() {
             {history.entries.map((entry) => (
               <ListRow key={entry.id} className="justify-between">
                 <RowText
-                  title={findPack(entry.packId)?.name ?? entry.packId}
+                  title={
+                    entry.packId === "vip"
+                      ? "VIP (" + VIP_DAYS + " dias)"
+                      : (findPack(entry.packId)?.name ?? entry.packId)
+                  }
                   description={formatDay(entry.at)}
                 />
                 <span className="flex shrink-0 items-center gap-3">

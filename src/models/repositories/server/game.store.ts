@@ -51,6 +51,7 @@ function rowToCharacter(row: CharacterRow): Character {
     createdAt: iso(row.created_at),
     renamedAt: stamp(row.renamed_at),
     furyUntil: stamp(row.fury_until),
+    vipUntil: stamp(row.vip_until),
   };
 }
 export interface LoadedGame {
@@ -263,7 +264,7 @@ export async function saveGame(
        hunts = $22, wins = $23, losses = $24, arena_wins = $25, arena_losses = $26,
        renamed_at = $27, transformed_at = $28,
        mining_window_start = $29, mining_count = $30,
-       fury_until = $31
+       fury_until = $31, vip_until = $32
      where id = $1`,
     [
       characterId,
@@ -297,6 +298,7 @@ export async function saveGame(
       after.mining.windowStart ?? null,
       after.mining.count,
       character.furyUntil ?? null,
+      character.vipUntil ?? null,
     ],
   );
   await savePieces(client, characterId, before, after);

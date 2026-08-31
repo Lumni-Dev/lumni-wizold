@@ -48,6 +48,7 @@ export interface Character {
   createdAt: string;
   renamedAt?: string;
   furyUntil?: string;
+  vipUntil?: string;
 }
 
 export function findGender(key: Gender): GenderDefinition {

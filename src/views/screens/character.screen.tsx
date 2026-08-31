@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import { api } from "@/controllers/api.client";
 import { useGame } from "@/controllers/game.context";
 import { profileOf } from "@/controllers/ranking.controller";
@@ -12,7 +11,6 @@ import { EQUIPMENT_SLOTS } from "@/models/entities/item";
 import { findGender } from "@/models/entities/character";
 import type { Hunter } from "@/models/entities/ranking";
 import { formatNumber } from "@/shared/utils/format";
-import { Button } from "../components/button";
 import { CopyNick } from "../components/copy-nick";
 import { Tag } from "../components/tag";
 import { DataRow } from "../components/data-row";
@@ -130,11 +128,6 @@ export function CharacterScreen() {
                 "Onde você aparece em cada quadro, entre " + formatNumber(profile.boardSize) + "."
               }
               padding="none"
-              footer={
-                <Link href="/ranking">
-                  <Button variant="outline">Ver ranking completo</Button>
-                </Link>
-              }
             >
               <List>
                 {profile.positions.map((position) => (

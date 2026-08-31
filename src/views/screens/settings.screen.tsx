@@ -6,6 +6,7 @@ import { api } from "@/controllers/api.client";
 import { useArt } from "@/controllers/art.context";
 import { renameCost, renameDaysLeft } from "@/controllers/character.controller";
 import { AUTOMATIONS } from "@/models/entities/automation";
+import { isVip } from "@/models/rules/vip";
 import { useGame } from "@/controllers/game.context";
 import { playSound } from "@/controllers/sound";
 import { disableTavernPush, enableTavernPush, testTavernPush } from "@/controllers/tavern-notify";
@@ -38,6 +39,7 @@ export function SettingsScreen() {
     setAutomation,
   } = useGame();
   const router = useRouter();
+  const [now] = useState(() => Date.now());
 
   const [accountEmail, setAccountEmail] = useState<string | null>(null);
   const [accountPicture, setAccountPicture] = useState<string | null>(null);
@@ -120,6 +122,7 @@ export function SettingsScreen() {
   const canRename = daysLeft === 0;
   const cost = renameCost();
   const affordable = character.bronze >= cost;
+  const vip = isVip(character, now);
 
   function submitRename(event: FormEvent) {
     event.preventDefault();
@@ -235,27 +238,47 @@ export function SettingsScreen() {
 
       <Panel
         title="Automação"
-        description="O que a partida faz sozinha. Cada chave faz uma coisa só, e elas se ajudam: a caçada bebe, a poção acaba, o corpo descansa, a caçada volta."
+        description="O que a partida faz sozinha. Cada chave faz uma coisa só, e elas se ajudam: a caçada bebe, a poção acaba, o corpo descansa, a caçada volta. É um recurso VIP."
         action={
-          <Tag tone="neutral">
-            {formatNumber(active)} de {AUTOMATIONS.length} ativadas
-          </Tag>
+          vip ? (
+            <Tag tone="light">
+              {formatNumber(active)} de {AUTOMATIONS.length} ativadas
+            </Tag>
+          ) : (
+            <Tag tone="neutral">Requer VIP</Tag>
+          )
         }
         padding="none"
+        footer={
+          vip ? undefined : (
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <span className="text-[11px] text-ink-faint">
+                A automação é um recurso VIP. Ative na loja para ligar as chaves.
+              </span>
+              <Button variant="primary" onClick={() => router.push("/store")}>
+                Ativar VIP
+              </Button>
+            </div>
+          )
+        }
       >
         <List>
           {AUTOMATIONS.map((entry) => (
             <ListRow key={entry.key} layout="split">
               <RowText title={entry.label} description={entry.effect} />
-              <div className="flex shrink-0 gap-2">
+              <div
+                className={"flex shrink-0 gap-2" + (vip ? "" : " pointer-events-none opacity-50")}
+              >
                 <Chip
                   active={state.automation[entry.key]}
+                  disabled={!vip}
                   onClick={() => setAutomation(entry.key, true)}
                 >
                   Ativado
                 </Chip>
                 <Chip
                   active={!state.automation[entry.key]}
+                  disabled={!vip}
                   onClick={() => setAutomation(entry.key, false)}
                 >
                   Desativado

@@ -3,6 +3,7 @@ import { findPack, STORE_PACKS, type StorePack } from "@/models/data/store-packs
 import type { GameState } from "@/models/entities/game-state";
 import { failure, success, type Result } from "@/models/entities/result";
 import { packBronze, bronzePerReal } from "@/models/rules/store";
+import { vipUntilAfter, VIP_DAYS } from "@/models/rules/vip";
 import { addLog } from "./log.controller";
 import { updateCharacter } from "./character.controller";
 
@@ -48,4 +49,15 @@ export function purchasePack(state: GameState, packId: string): Result<StoreOffe
     bronze,
     perReal: bronzePerReal(pack, character.level),
   });
+}
+
+export function purchaseVip(state: GameState, now: number): Result<{ vipUntil: string }> {
+  const character = state.character;
+  if (!character) return failure(state, "Nenhum personagem ativo.");
+
+  const vipUntil = vipUntilAfter(character.vipUntil, now);
+  const next = updateCharacter(state, (current) => ({ ...current, vipUntil }));
+  const message = "VIP ativado por " + VIP_DAYS + " dias.";
+
+  return success(addLog(next, "character", message), message, { vipUntil });
 }
