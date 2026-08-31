@@ -165,6 +165,9 @@ export function consumeItem(state: GameState, itemId: string): Result {
 
   const furyMinutes = item.effect.furyMinutes ?? 0;
   if (furyMinutes > 0) {
+    if (character.furyUntil && Date.now() < Date.parse(character.furyUntil)) {
+      return failure(state, "Você já está em fúria: espere ela passar para beber de novo.");
+    }
     const until = new Date(Date.now() + furyMinutes * 60_000).toISOString();
     const consumed: GameState = {
       ...state,

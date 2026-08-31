@@ -58,8 +58,12 @@ export function CharacterScreen() {
     [state, roster, character],
   );
 
+  const healthPotions = useMemo(
+    () => detailInventory(state).filter((slot) => slot.item.potion === "health"),
+    [state],
+  );
   const furyPotions = useMemo(
-    () => detailInventory(state).filter((slot) => slot.item.effect.furyMinutes !== undefined),
+    () => detailInventory(state).filter((slot) => slot.item.potion === "rage"),
     [state],
   );
 
@@ -69,6 +73,7 @@ export function CharacterScreen() {
   const endurance = stats.totalAttributes.endurance;
 
   const genderDefinition = findGender(character.gender);
+  const healthFull = character.health >= stats.maxHealth;
 
   const furyRemaining = character.furyUntil ? Date.parse(character.furyUntil) - now : 0;
   const furyActive = furyRemaining > 0;
@@ -108,7 +113,7 @@ export function CharacterScreen() {
         <div className="space-y-6 lg:col-span-1">
           <Panel title="Ficha" padding="none">
             <GenderBanner gender={character.gender} />
-            <div className="space-y-3 border-b border-edge p-4">
+            <div className="border-b border-edge p-4">
               <div className="min-w-0 space-y-1">
                 <div className="flex items-center gap-2">
                   <p className="min-w-0 truncate text-sm text-ink">{character.name}</p>
@@ -118,7 +123,6 @@ export function CharacterScreen() {
                   {genderDefinition.label}
                 </p>
               </div>
-              <VitalActionButton size="medium" fullWidth />
             </div>
 
             <List>
@@ -177,6 +181,44 @@ export function CharacterScreen() {
 
         <div className="space-y-6 lg:col-span-2">
           <Panel
+            title="Suprimentos"
+            description="A poção de vida recupera uma fatia da vida máxima na hora. Repousar faz o mesmo de graça, aos poucos."
+            action={<VitalActionButton size="small" />}
+            padding="none"
+          >
+            {healthPotions.length === 0 ? (
+              <div className="p-4">
+                <EmptyState
+                  title="Sem poção de vida"
+                  description="A poção de vida é vendida no mercado."
+                />
+              </div>
+            ) : (
+              <List>
+                {healthPotions.map(({ item, quantity }) => (
+                  <ListRow key={item.id} padding="art">
+                    <ItemIcon item={item} />
+                    <RowText
+                      title={item.name}
+                      description={
+                        "Recupera " +
+                        Math.round((item.effect.healthRatio ?? 0) * 100) +
+                        "% da vida máxima"
+                      }
+                    />
+                    <span className="font-mono text-xs text-ink-soft">
+                      x{formatNumber(quantity)}
+                    </span>
+                    <Button variant="primary" disabled={healthFull} onClick={() => consumeItem(item.id)}>
+                      Usar
+                    </Button>
+                  </ListRow>
+                ))}
+              </List>
+            )}
+          </Panel>
+
+          <Panel
             title={furyActive ? "Fúria (Em fúria " + furyClock(furyRemaining) + ")" : "Fúria"}
             description="A poção de fúria dá +10 em cada atributo enquanto dura, e não devolve vida."
             padding="none"
@@ -206,7 +248,7 @@ export function CharacterScreen() {
                     <span className="font-mono text-xs text-ink-soft">
                       x{formatNumber(quantity)}
                     </span>
-                    <Button variant="primary" onClick={() => consumeItem(item.id)}>
+                    <Button variant="primary" disabled={furyActive} onClick={() => consumeItem(item.id)}>
                       Usar
                     </Button>
                   </ListRow>
