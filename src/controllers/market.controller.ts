@@ -40,7 +40,8 @@ export interface MarketOffer {
 function ownsWearable(state: GameState, item: Item): boolean {
   if (!(EQUIPMENT_SLOTS as readonly string[]).includes(item.category)) return false;
   if (state.equipment[item.category as EquipmentSlot] === item.id) return true;
-  return countInInventory(state.inventory, item.id) > 0;
+  if (countInInventory(state.inventory, item.id) > 0) return true;
+  return state.bazaarListings.some((listing) => listing.itemId === item.id);
 }
 
 export function listOffers(state: GameState): MarketOffer[] {
