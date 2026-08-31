@@ -43,9 +43,15 @@ export interface Item {
 export interface InventorySlot {
   itemId: string;
   quantity: number;
+  enhancement: number;
 }
 
-export type Equipment = Record<EquipmentSlot, string | null>;
+export interface EquippedPiece {
+  itemId: string;
+  enhancement: number;
+}
+
+export type Equipment = Record<EquipmentSlot, EquippedPiece | null>;
 
 export const EQUIPMENT_SLOTS: readonly EquipmentSlot[] = [
   "helmet",

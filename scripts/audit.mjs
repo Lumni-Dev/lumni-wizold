@@ -108,12 +108,7 @@ function baseState({ level = 1, gender = "male", bronze = 700000 } = {}) {
       willpower: trained,
     },
   };
-  const derived = stats.deriveStats(
-    state.character,
-    state.equipment,
-    state.pet,
-    state.enhancements,
-  );
+  const derived = stats.deriveStats(state.character, state.equipment, state.pet);
   state.character.health = derived.maxHealth;
   return state;
 }
@@ -137,7 +132,6 @@ function benchHunter(id, level, over = {}) {
     arena: 0,
     bronze: 5000,
     forge: 0,
-    enhancements: {},
     mining: 1,
     pet: null,
     equipment: entItem.emptyEquipment(),
@@ -214,11 +208,10 @@ sec("stats");
     );
   }
   const state = baseState({ level: 1 });
-  state.equipment.claw = "bronze-claw";
-  state.enhancements["bronze-claw"] = 10;
+  state.equipment.claw = { itemId: "bronze-claw", enhancement: 10 };
   const item = items.findItem("bronze-claw");
   const effect = forgeRules.enhancedEffect(item, 10);
-  const withGear = stats.deriveStats(state.character, state.equipment, null, state.enhancements);
+  const withGear = stats.deriveStats(state.character, state.equipment, null);
   ok(
     "garra forjada soma o efeito forjado",
     withGear.sources.equipment.strength === effect.attributes.strength,
@@ -761,7 +754,7 @@ sec("caçada");
 {
   const random = seededRandom(2024);
   const state = baseState({ level: 170 });
-  state.equipment.claw = "silver-claw";
+  state.equipment.claw = { itemId: "silver-claw", enhancement: 0 };
   const weak = { ...state, character: { ...state.character, health: 1 } };
   ok("vida no chão não caça", huntCtrl.resolveHunt(weak, "dew-woods", random).ok === false);
   ok(
@@ -792,7 +785,7 @@ sec("caçada");
     const landed = huntCtrl.landHunt(state, resolved.data, 0);
     const before = state.character;
     const after = landed.state.character;
-    const derived = stats.deriveStats(before, state.equipment, state.pet, state.enhancements);
+    const derived = stats.deriveStats(before, state.equipment, state.pet);
     ok("bronze soma o saque", after.bronze === before.bronze + resolved.data.bronze);
     ok("caçadas contam", after.hunts === before.hunts + 1);
     ok(
@@ -1018,7 +1011,7 @@ sec("mascote");
   );
   const state = baseState({ level: 10 });
   state.pet = { ...pet, energy: 10, active: true };
-  state.inventory = [...state.inventory, { itemId: "pet-ration", quantity: 2 }];
+  state.inventory = [...state.inventory, { itemId: "pet-ration", quantity: 2, enhancement: 0 }];
   const fed = petCtrl.feedPet(state, "pet-ration");
   ok(
     "ração devolve metade do teto",
@@ -1088,13 +1081,19 @@ sec("forja e mina");
   const state = baseState({ level: 1 });
   state.inventory = [
     ...state.inventory,
-    { itemId: "bronze-claw", quantity: 1 },
-    { itemId: "bronze-fragment", quantity: 500 },
+    { itemId: "bronze-claw", quantity: 1, enhancement: 4 },
+    { itemId: "bronze-fragment", quantity: 500, enhancement: 0 },
   ];
-  state.enhancements["bronze-claw"] = 4;
   const strikeFee = forgeRules.forgeBronzeCost(state.character.level, 4);
-  const enhanced = forgeCtrl.enhance(state, "bronze-claw", () => 0);
-  ok("martelada certeira sobe um nível", enhanced.ok && enhanced.state.enhancements["bronze-claw"] === 5);
+  const enhanced = forgeCtrl.enhance(state, "bronze-claw", 4, () => 0);
+  ok(
+    "martelada certeira sobe um nível",
+    enhanced.ok && inventoryCtrl.countInInventory(enhanced.state.inventory, "bronze-claw", 5) === 1,
+  );
+  ok(
+    "martelada certeira consome a cópia antiga",
+    enhanced.ok && inventoryCtrl.countInInventory(enhanced.state.inventory, "bronze-claw", 4) === 0,
+  );
   ok("martelada certeira responde raised", enhanced.ok && enhanced.data.raised === true);
   ok(
     "forja consome o fragmento do conjunto",
@@ -1106,10 +1105,12 @@ sec("forja e mina");
     "martelada cobra bronze",
     enhanced.ok && enhanced.state.character.bronze === state.character.bronze - strikeFee,
   );
-  const missed = forgeCtrl.enhance(state, "bronze-claw", () => 0.99);
+  const missed = forgeCtrl.enhance(state, "bronze-claw", 4, () => 0.99);
   ok(
     "martelada falha mantém o nível",
-    missed.ok && missed.state.enhancements["bronze-claw"] === 4 && missed.data.raised === false,
+    missed.ok &&
+      inventoryCtrl.countInInventory(missed.state.inventory, "bronze-claw", 4) === 1 &&
+      missed.data.raised === false,
   );
   ok(
     "martelada falha ainda consome fragmentos",
@@ -1122,7 +1123,10 @@ sec("forja e mina");
     missed.ok && missed.state.character.bronze === state.character.bronze - strikeFee,
   );
   const broke = { ...state, character: { ...state.character, bronze: strikeFee - 1 } };
-  ok("sem bronze a bigorna recusa", forgeCtrl.enhance(broke, "bronze-claw", () => 0).ok === false);
+  ok(
+    "sem bronze a bigorna recusa",
+    forgeCtrl.enhance(broke, "bronze-claw", 4, () => 0).ok === false,
+  );
   ok(
     "a martelada encarece com a peça e com a banda",
     forgeRules.forgeBronzeCost(1, 5) > forgeRules.forgeBronzeCost(1, 4) &&
@@ -1131,24 +1135,30 @@ sec("forja e mina");
   const wrongFragments = {
     ...state,
     inventory: [
-      { itemId: "bronze-claw", quantity: 1 },
-      { itemId: "silver-fragment", quantity: 99 },
+      { itemId: "bronze-claw", quantity: 1, enhancement: 4 },
+      { itemId: "silver-fragment", quantity: 99, enhancement: 0 },
     ],
   };
   ok(
     "fragmento de outro conjunto não serve",
-    forgeCtrl.enhance(wrongFragments, "bronze-claw").ok === false,
+    forgeCtrl.enhance(wrongFragments, "bronze-claw", 4).ok === false,
   );
-  const equippedClaw = { ...state, equipment: { ...state.equipment, claw: "bronze-claw" } };
-  ok("peça equipada não forja", forgeCtrl.enhance(equippedClaw, "bronze-claw").ok === false);
   ok(
-    "a bigorna lista só o que está na mochila",
-    forgeCtrl.listForge(state).some((piece) => piece.item.id === "bronze-claw") &&
-      !forgeCtrl.listForge(equippedClaw).some((piece) => piece.item.id === "bronze-claw"),
+    "cópia fora da mochila não forja",
+    forgeCtrl.enhance(state, "bronze-claw", 7).ok === false,
+  );
+  ok(
+    "a bigorna lista a cópia da mochila",
+    forgeCtrl
+      .listForge(state)
+      .some((piece) => piece.item.id === "bronze-claw" && piece.level === 4),
   );
   if (enhanced.ok) {
-    const on = inventoryCtrl.equipItem(enhanced.state, "bronze-claw");
-    ok("equipar carrega a forja", on.ok && on.state.enhancements["bronze-claw"] === 5);
+    const on = inventoryCtrl.equipItem(enhanced.state, "bronze-claw", 5);
+    ok(
+      "equipar carrega a forja",
+      on.ok && on.state.equipment.claw && on.state.equipment.claw.enhancement === 5,
+    );
   }
   const ores = oresData.ORES;
   for (let index = 1; index < ores.length; index += 1) {
@@ -1257,11 +1267,10 @@ sec("bazar");
   ok("peça lisa de mercado não entra", bazaarRules.checkTrade(plain, 0).tradable === false);
   ok("material de caça não entra", bazaarRules.checkTrade(material, 0).tradable === false);
   const state = baseState({ level: 1 });
-  state.enhancements["bronze-claw"] = 2;
   state.inventory = [
     ...state.inventory,
-    { itemId: "bronze-claw", quantity: 1 },
-    { itemId: "bronze-fragment", quantity: 30 },
+    { itemId: "bronze-claw", quantity: 1, enhancement: 2 },
+    { itemId: "bronze-fragment", quantity: 30, enhancement: 0 },
   ];
   const tooCheap = bazaarCtrl.announceListing(state, "bronze-fragment", 5, 50);
   ok("anúncio abaixo do mínimo recusa", tooCheap.ok === false);
@@ -1353,7 +1362,8 @@ sec("bazar");
   ok("compra lembra o anúncio", bought.ok && bought.state.bazaarPurchases[offer.id] === 1);
   ok(
     "forja maior viaja com a peça",
-    bought.ok && bought.state.enhancements["gold-claw"] === offer.enhancement,
+    bought.ok &&
+      inventoryCtrl.countInInventory(bought.state.inventory, "gold-claw", offer.enhancement) === 1,
   );
   ok(
     "compra grava a insígnia do bazar",
@@ -1435,10 +1445,10 @@ sec("inventário e mercado");
     "compra desconta o preço",
     bought.ok && bought.state.character.bronze === state.character.bronze - clawPrice,
   );
-  ok("peça em dupla recusa", marketCtrl.buyItem(state, "bronze-claw", 2).ok === false);
+  ok("peça em dupla agora entra", marketCtrl.buyItem(state, "bronze-claw", 2).ok === true);
   ok(
-    "peça já na mochila recusa",
-    bought.ok && marketCtrl.buyItem(bought.state, "bronze-claw", 1).ok === false,
+    "peça já na mochila agora entra",
+    bought.ok && marketCtrl.buyItem(bought.state, "bronze-claw", 1).ok === true,
   );
   ok(
     "poção compra em quantidade",
@@ -1478,13 +1488,13 @@ sec("inventário e mercado");
       items.findItem("bronze-claw").price,
   );
   const fragmentSale = marketCtrl.sellItem(
-    { ...state, inventory: [{ itemId: "bronze-fragment", quantity: 5 }] },
+    { ...state, inventory: [{ itemId: "bronze-fragment", quantity: 5, enhancement: 0 }] },
     "bronze-fragment",
     1,
   );
   ok("fragmento não se vende por bronze", fragmentSale.ok === false);
   const sale = marketCtrl.sellItem(
-    { ...state, inventory: [{ itemId: "rabbit-fur", quantity: 5 }] },
+    { ...state, inventory: [{ itemId: "rabbit-fur", quantity: 5, enhancement: 0 }] },
     "rabbit-fur",
     2,
   );
@@ -1500,14 +1510,21 @@ sec("inventário e mercado");
     "equipar tira da mochila",
     dressed.ok &&
       inventoryCtrl.countInInventory(dressed.state.inventory, "bronze-claw") === 0 &&
-      dressed.state.equipment.claw === "bronze-claw",
+      dressed.state.equipment.claw &&
+      dressed.state.equipment.claw.itemId === "bronze-claw",
   );
   ok(
-    "peça no corpo recusa comprar de novo",
-    dressed.ok && marketCtrl.buyItem(dressed.state, "bronze-claw", 1).ok === false,
+    "peça no corpo deixa comprar outra cópia",
+    dressed.ok && marketCtrl.buyItem(dressed.state, "bronze-claw", 1).ok === true,
   );
   const spareState = dressed.ok
-    ? { ...dressed.state, inventory: [...dressed.state.inventory, { itemId: "bronze-claw", quantity: 1 }] }
+    ? {
+        ...dressed.state,
+        inventory: [
+          ...dressed.state.inventory,
+          { itemId: "bronze-claw", quantity: 1, enhancement: 0 },
+        ],
+      }
     : dressed.state;
   const swapped = inventoryCtrl.equipItem(spareState, "bronze-claw");
   ok(
@@ -1515,17 +1532,17 @@ sec("inventário e mercado");
     swapped.ok && inventoryCtrl.countInInventory(swapped.state.inventory, "bronze-claw") === 1,
   );
   const potion = inventoryCtrl.consumeItem(
-    { ...state, inventory: [{ itemId: "health-potion-small", quantity: 1 }] },
+    { ...state, inventory: [{ itemId: "health-potion-small", quantity: 1, enhancement: 0 }] },
     "health-potion-small",
   );
   ok("poção sem ferida recusa", potion.ok === false);
   const hurt = {
     ...state,
     character: { ...state.character, health: 1 },
-    inventory: [{ itemId: "health-potion-small", quantity: 1 }],
+    inventory: [{ itemId: "health-potion-small", quantity: 1, enhancement: 0 }],
   };
   const healed = inventoryCtrl.consumeItem(hurt, "health-potion-small");
-  const derived = stats.deriveStats(state.character, state.equipment, null, {});
+  const derived = stats.deriveStats(state.character, state.equipment, null);
   ok(
     "poção cura 25% do teto",
     healed.ok &&
@@ -1644,7 +1661,7 @@ sec("ranking");
 sec("personagem");
 {
   const run = factory.createRun("Luna", "female");
-  const derived = stats.deriveStats(run.character, run.equipment, null, {});
+  const derived = stats.deriveStats(run.character, run.equipment, null);
   ok(
     "nasce inteiro",
     run.character.health === derived.maxHealth && run.character.rage === derived.maxRage,
@@ -1661,12 +1678,15 @@ sec("personagem");
   );
   const state = baseState({ level: 10 });
 
-  const withPotion = { ...state, inventory: [{ itemId: "rage-potion-small", quantity: 1 }] };
+  const withPotion = {
+    ...state,
+    inventory: [{ itemId: "rage-potion-small", quantity: 1, enhancement: 0 }],
+  };
   const drank = inventoryCtrl.consumeItem(withPotion, "rage-potion-small");
   ok("poção de fúria vira buff", drank.ok && typeof drank.state.character.furyUntil === "string");
   ok("o buff está ativo agora", Date.parse(drank.state.character.furyUntil) > Date.now());
-  const buffedStats = stats.deriveStats(drank.state.character, drank.state.equipment, null, {});
-  const plainStats = stats.deriveStats(state.character, state.equipment, null, {});
+  const buffedStats = stats.deriveStats(drank.state.character, drank.state.equipment, null);
+  const plainStats = stats.deriveStats(state.character, state.equipment, null);
   ok(
     "o buff levanta a Força em " + CONST.FURY_ATTRIBUTE_BONUS,
     buffedStats.totalAttributes.strength ===
@@ -1676,7 +1696,7 @@ sec("personagem");
 
   const bloated = { ...state, character: { ...state.character, health: 99999 } };
   const squeezed = characterCtrl.syncCharacter(bloated);
-  const ceiling = stats.deriveStats(state.character, state.equipment, null, {});
+  const ceiling = stats.deriveStats(state.character, state.equipment, null);
   ok("teto encolhido aperta a vida", squeezed.character.health === ceiling.maxHealth);
   ok("corpo em dia não troca referência", characterCtrl.syncCharacter(state) === state);
 
@@ -1684,7 +1704,7 @@ sec("personagem");
   const resting = characterCtrl.startRest(tired);
   ok("repousar quando ferido é permitido", resting.ok);
   const tick = characterCtrl.restTick(resting.state);
-  const max = stats.deriveStats(resting.state.character, state.equipment, null, {}).maxHealth;
+  const max = stats.deriveStats(resting.state.character, state.equipment, null).maxHealth;
   ok(
     "o tique devolve vida pelo passo do descanso",
     tick.ok &&
@@ -1708,7 +1728,7 @@ sec("automação");
   const quiet = baseState({ level: 10 });
   ok("tudo desligado, nada acontece", automationCtrl.nextAutomationStep(quiet, null) === null);
   const low = baseState({ level: 10 });
-  const floor = stats.deriveStats(low.character, low.equipment, null, {}).maxHealth;
+  const floor = stats.deriveStats(low.character, low.equipment, null).maxHealth;
   low.character.health = Math.max(1, Math.floor(floor * 0.1));
   ok(
     "ferido bebe sozinho ao zerar, sem chave",
@@ -1739,7 +1759,7 @@ sec("automação");
     trainingProgress: 0,
     adoptedAt: "",
   };
-  petState.inventory = [{ itemId: "pet-ration", quantity: 1 }];
+  petState.inventory = [{ itemId: "pet-ration", quantity: 1, enhancement: 0 }];
   const fed = { ...petState, automation: { ...petState.automation, petFeed: true } };
   ok("lobo vazio come sozinho", automationCtrl.nextAutomationStep(fed, null)?.kind === "feed");
   const noRation = {
@@ -2061,16 +2081,14 @@ sec("imutabilidade");
     trainingProgress: 5,
     adoptedAt: new Date().toISOString(),
   };
-  state.equipment.claw = "silver-claw";
-  state.enhancements["silver-claw"] = 3;
+  state.equipment.claw = { itemId: "silver-claw", enhancement: 3 };
   state.inventory = [
-    { itemId: "health-potion-small", quantity: 5 },
-    { itemId: "silver-fragment", quantity: 20 },
-    { itemId: "bronze-claw", quantity: 1 },
-    { itemId: "pet-ration", quantity: 2 },
-    { itemId: "rabbit-fur", quantity: 3 },
+    { itemId: "health-potion-small", quantity: 5, enhancement: 0 },
+    { itemId: "silver-fragment", quantity: 20, enhancement: 0 },
+    { itemId: "bronze-claw", quantity: 1, enhancement: 1 },
+    { itemId: "pet-ration", quantity: 2, enhancement: 0 },
+    { itemId: "rabbit-fur", quantity: 3, enhancement: 0 },
   ];
-  state.enhancements["bronze-claw"] = 1;
   state.bazaarListings = [];
   deepFreeze(state);
   const rival = benchHunter("pit-immut", 170);
@@ -2114,10 +2132,10 @@ sec("imutabilidade");
     ["buyItem", () => marketCtrl.buyItem(state, "health-potion-small", 2)],
     ["sellItem", () => marketCtrl.sellItem(state, "rabbit-fur", 1)],
     ["listOffers", () => marketCtrl.listOffers(state)],
-    ["equipItem", () => inventoryCtrl.equipItem(state, "bronze-claw")],
+    ["equipItem", () => inventoryCtrl.equipItem(state, "bronze-claw", 1)],
     ["unequipItem", () => inventoryCtrl.unequipItem(state, "claw")],
     ["consumeItem", () => inventoryCtrl.consumeItem(state, "health-potion-small")],
-    ["enhance", () => forgeCtrl.enhance(state, "bronze-claw")],
+    ["enhance", () => forgeCtrl.enhance(state, "bronze-claw", 1)],
     ["mine", () => forgeCtrl.mine(state, "bronze-vein", random)],
     ["listForge", () => forgeCtrl.listForge(state)],
     ["listMining", () => forgeCtrl.listMining(state)],
@@ -2225,8 +2243,11 @@ sec("persistência");
   );
   loaded = repo.load();
   ok("casaco antigo migra na mochila", loaded.inventory[0].itemId === "bronze-armor-female");
-  ok("casaco antigo migra no corpo", loaded.equipment.armor === "bronze-armor-female");
-  ok("casaco antigo migra na forja", loaded.enhancements["bronze-armor-female"] === 3);
+  ok("casaco antigo migra no corpo", loaded.equipment.armor?.itemId === "bronze-armor-female");
+  ok(
+    "casaco antigo migra a forja pra cópia e pro corpo",
+    loaded.inventory[0].enhancement === 3 && loaded.equipment.armor?.enhancement === 3,
+  );
   ok("casaco antigo migra no bazar", loaded.bazaarListings[0]?.itemId === "bronze-armor-female");
   put(
     shell({
@@ -2273,7 +2294,7 @@ sec("persistência");
     loaded.inventory.length === 1 && loaded.inventory[0].itemId === "rabbit-fur",
   );
   ok("id morto sai do corpo", loaded.equipment.claw === null);
-  ok("id morto sai da forja", !("espada-fantasma" in loaded.enhancements));
+  ok("a era da forja por id acabou", !("enhancements" in loaded));
   put("{{{isso não é json");
   loaded = repo.load();
   ok("json rasgado volta ao início", loaded.character === null);

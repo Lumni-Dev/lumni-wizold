@@ -215,7 +215,7 @@ export function MarketScreen() {
 
           <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
             {offersOnPage.map(
-              ({ item, levelAllowed, affordable, ofLineage, ownedQuantity, alreadyOwned, reason }) => {
+              ({ item, levelAllowed, affordable, ofLineage, ownedQuantity, reason }) => {
                 const petless = item.category === "pet" && !state.pet;
                 return (
                   <ItemCard
@@ -232,7 +232,7 @@ export function MarketScreen() {
                         <Button
                           fullWidth
                           variant={
-                            ofLineage && levelAllowed && affordable && !petless && !alreadyOwned
+                            ofLineage && levelAllowed && affordable && !petless
                               ? "primary"
                               : "outline"
                           }
@@ -240,17 +240,13 @@ export function MarketScreen() {
                             setBuying("1");
                             setDeal({ kind: "buy", item, quantity: 1, total: priceOf(item) });
                           }}
-                          disabled={
-                            !ofLineage || !levelAllowed || !affordable || petless || alreadyOwned
-                          }
+                          disabled={!ofLineage || !levelAllowed || !affordable || petless}
                         >
                           {petless
                             ? "Sem mascote"
-                            : alreadyOwned
-                              ? "Já possuo"
-                              : ofLineage
-                                ? "Comprar por " + formatBronze(priceOf(item))
-                                : "Apenas " + lineageName(item)}
+                            : ofLineage
+                              ? "Comprar por " + formatBronze(priceOf(item))
+                              : "Apenas " + lineageName(item)}
                         </Button>
                       </div>
                     }

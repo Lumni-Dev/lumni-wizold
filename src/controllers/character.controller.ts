@@ -18,7 +18,7 @@ import { addLog } from "./log.controller";
 
 export function syncCharacter(state: GameState): GameState {
   if (!state.character) return state;
-  const stats = deriveStats(state.character, state.equipment, state.pet, state.enhancements);
+  const stats = deriveStats(state.character, state.equipment, state.pet);
   const clamped = clampVitals(state.character, stats);
   return clamped === state.character ? state : { ...state, character: clamped };
 }
@@ -128,7 +128,7 @@ export function startRest(state: GameState): Result {
   const character = state.character;
   if (!character) return failure(state, "Nenhum personagem ativo.");
 
-  const stats = deriveStats(character, state.equipment, state.pet, state.enhancements);
+  const stats = deriveStats(character, state.equipment, state.pet);
   if (character.health >= stats.maxHealth) {
     return failure(state, "Você já está inteiro.");
   }
@@ -145,7 +145,7 @@ export function restTick(state: GameState): Result<{ done: boolean }> {
   const character = state.character;
   if (!character) return failure(state, "Nenhum personagem ativo.");
 
-  const stats = deriveStats(character, state.equipment, state.pet, state.enhancements);
+  const stats = deriveStats(character, state.equipment, state.pet);
   const healthGained =
     Math.min(stats.maxHealth, character.health + restRecovery(stats.maxHealth, REST_HEALTH_RATIO)) -
     character.health;

@@ -36,13 +36,6 @@ export function forgeDurationMs(level: number): number {
   return FORGE_BASE_MS + Math.max(0, level) * FORGE_MS_PER_LEVEL;
 }
 
-export function enhancementOf(
-  enhancements: Record<string, number> | undefined,
-  itemId: string,
-): number {
-  return enhancements?.[itemId] ?? 0;
-}
-
 export function enhancedName(name: string, level: number): string {
   return level > 0 ? name + " +" + level : name;
 }

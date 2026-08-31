@@ -13,7 +13,6 @@ export interface GameState {
   character: Character | null;
   pet: Pet | null;
   mining: MiningState;
-  enhancements: Record<string, number>;
   bazaarListings: BazaarListing[];
   bazaarPurchases: Record<string, number>;
   bazaarFinds: string[];
@@ -32,7 +31,6 @@ export function initialState(): GameState {
     character: null,
     pet: null,
     mining: initialMining(),
-    enhancements: {},
     bazaarListings: [],
     bazaarPurchases: {},
     bazaarFinds: [],

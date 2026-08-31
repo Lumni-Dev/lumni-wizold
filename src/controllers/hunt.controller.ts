@@ -79,7 +79,7 @@ function chosenCreature(
 export function listTerritories(state: GameState): AvailableTerritory[] {
   const character = state.character;
   const stats = character
-    ? deriveStats(character, state.equipment, state.pet, state.enhancements)
+    ? deriveStats(character, state.equipment, state.pet)
     : null;
 
   return TERRITORIES.map((territory) => {
@@ -131,7 +131,7 @@ export function resolveHunt(
   const territory = findTerritory(territoryId);
   if (!territory) return failure(state, "Território desconhecido.");
 
-  const stats = deriveStats(character, state.equipment, state.pet, state.enhancements);
+  const stats = deriveStats(character, state.equipment, state.pet);
   if (character.health <= stats.maxHealth * MIN_HEALTH_RATIO_TO_ACT) {
     return failure(state, "Vida baixa demais para caçar. Recupere-se ou use uma poção.");
   }

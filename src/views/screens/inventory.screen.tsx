@@ -22,7 +22,6 @@ import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
 import { Chip } from "../components/chip";
 import { Pagination } from "../components/pagination";
 import { IconFrame } from "../components/icon-frame";
-import { enhancementOf } from "@/models/rules/forge";
 import { ItemCard } from "../components/item-card";
 import { ItemIcon } from "../components/item-icon";
 import { Tag } from "../components/tag";
@@ -53,8 +52,8 @@ export function InventoryScreen() {
     const timer = window.setInterval(() => setNow(Date.now()), 500);
     return () => window.clearInterval(timer);
   }, []);
-  function handleEquip(itemId: string, slot: string) {
-    equipItem(itemId);
+  function handleEquip(itemId: string, slot: string, enhancement: number) {
+    equipItem(itemId, enhancement);
     setEquipLock((prev) => ({ ...prev, [slot]: Date.now() + 3000 }));
   }
 
@@ -86,18 +85,15 @@ export function InventoryScreen() {
       >
         <div className="grid auto-rows-fr gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {EQUIPMENT_SLOTS.map((slot) => {
-            const itemId = state.equipment[slot];
-            const item = itemId ? findItem(itemId) : undefined;
+            const piece = state.equipment[slot];
+            const item = piece ? findItem(piece.itemId) : undefined;
             const lockSecs = Math.max(0, Math.ceil(((equipLock[slot] ?? 0) - now) / 1000));
 
             return (
               <Card key={slot} height="fill" tone={item ? "highlighted" : "empty"}>
                 <CardHeader>
                   {item ? (
-                    <ItemIcon
-                      item={item}
-                      enhancement={enhancementOf(state.enhancements, item.id)}
-                    />
+                    <ItemIcon item={item} enhancement={piece?.enhancement ?? 0} />
                   ) : (
                     <IconFrame>--</IconFrame>
                   )}
@@ -114,7 +110,7 @@ export function InventoryScreen() {
                 {item ? (
                   <CardBody direction="row">
                     <div className="flex flex-wrap gap-2">
-                      {summarizeEffect(item, enhancementOf(state.enhancements, item.id)).map(
+                      {summarizeEffect(item, piece?.enhancement ?? 0).map(
                         (effect, index) => (
                           <Tag key={index} tone="neutral">
                             {effect}
@@ -199,7 +195,7 @@ export function InventoryScreen() {
                       {isEquippable(item) ? (
                         <Button
                           variant="secondary"
-                          onClick={() => handleEquip(item.id, item.category)}
+                          onClick={() => handleEquip(item.id, item.category, enhancement)}
                           disabled={levelTooLow}
                         >
                           Equipar

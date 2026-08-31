@@ -1,5 +1,5 @@
 import type { PoolClient } from "pg";
-import type { Equipment } from "@/models/entities/item";
+import { emptyEquipment, type Equipment, type EquipmentSlot } from "@/models/entities/item";
 import type { PetGender } from "@/models/entities/pet";
 import type { Hunter, HunterPet } from "@/models/entities/ranking";
 import type { TavernIdentity } from "@/models/entities/tavern";
@@ -9,8 +9,9 @@ export async function loadHunters(client: PoolClient): Promise<Hunter[]> {
   const pets = await client.query(
     "select character_id, name, gender, level, energy, active from pets",
   );
-  const equipped = await client.query("select character_id, slot, item_id from equipped_items");
-  const enhancements = await client.query("select character_id, item_id, level from enhancements");
+  const equipped = await client.query(
+    "select character_id, slot, item_id, enhancement from equipped_items",
+  );
   const petBy = new Map<string, HunterPet>();
   for (const row of pets.rows) {
     petBy.set(row.character_id, {
@@ -21,23 +22,19 @@ export async function loadHunters(client: PoolClient): Promise<Hunter[]> {
       active: row.active !== false,
     });
   }
-  const equipmentBy = new Map<string, Record<string, string>>();
+  const equipmentBy = new Map<string, Equipment>();
   for (const row of equipped.rows) {
-    const worn = equipmentBy.get(row.character_id) ?? {};
-    worn[row.slot] = row.item_id;
+    const worn = equipmentBy.get(row.character_id) ?? emptyEquipment();
+    worn[row.slot as EquipmentSlot] = {
+      itemId: row.item_id,
+      enhancement: Number(row.enhancement),
+    };
     equipmentBy.set(row.character_id, worn);
   }
-  const enhancementsBy = new Map<string, Record<string, number>>();
-  for (const row of enhancements.rows) {
-    const forged = enhancementsBy.get(row.character_id) ?? {};
-    forged[row.item_id] = Number(row.level);
-    enhancementsBy.set(row.character_id, forged);
-  }
   return characters.rows.map((row): Hunter => {
-    const equipment = (equipmentBy.get(row.id) ?? {}) as Equipment;
-    const forged = enhancementsBy.get(row.id) ?? {};
+    const equipment = equipmentBy.get(row.id) ?? emptyEquipment();
     const forge = Object.values(equipment).reduce(
-      (total, itemId) => total + (itemId ? (forged[itemId] ?? 0) : 0),
+      (total, piece) => total + (piece ? piece.enhancement : 0),
       0,
     );
     return {
@@ -59,7 +56,6 @@ export async function loadHunters(client: PoolClient): Promise<Hunter[]> {
       arenaLosses: Number(row.arena_losses),
       bronze: Number(row.bronze),
       forge,
-      enhancements: forged,
       mining: Number(row.mining_level),
       pet: petBy.get(row.id) ?? null,
       equipment,

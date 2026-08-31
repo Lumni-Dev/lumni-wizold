@@ -15,7 +15,7 @@ import {
   MIN_WITHDRAW_CENTS,
   suggestedPriceCents,
 } from "@/models/rules/bazaar";
-import { enhancedName, enhancementOf } from "@/models/rules/forge";
+import { enhancedName } from "@/models/rules/forge";
 import {
   addToInventory,
   countInInventory,
@@ -81,6 +81,7 @@ export function announceListing(
   itemId: string,
   quantity: number,
   priceCents: number,
+  enhancement = 0,
 ): Result {
   const character = state.character;
   if (!character) return failure(state, "Nenhum personagem ativo.");
@@ -88,12 +89,11 @@ export function announceListing(
   const item = findItem(itemId);
   if (!item) return failure(state, "Item desconhecido.");
 
-  const enhancement = enhancementOf(state.enhancements, itemId);
   const { tradable, reason } = checkTrade(item, enhancement);
   if (!tradable) return failure(state, reason ?? item.name + " não entra no bazar.");
 
   if (!isValidQuantity(quantity)) return failure(state, "Quantidade inválida.");
-  if (countInInventory(state.inventory, itemId) < quantity) {
+  if (countInInventory(state.inventory, itemId, enhancement) < quantity) {
     return failure(state, "Você não tem " + quantity + " de " + item.name + " na mochila.");
   }
 
@@ -131,7 +131,7 @@ export function announceListing(
   const next: GameState = {
     ...state,
     character: { ...character, bronze: character.bronze - BAZAAR_LISTING_FEE },
-    inventory: removeFromInventory(state.inventory, itemId, quantity),
+    inventory: removeFromInventory(state.inventory, itemId, quantity, enhancement),
     bazaarListings: [...state.bazaarListings, listing],
   };
 
@@ -158,7 +158,12 @@ export function cancelListing(state: GameState, listingId: string): Result {
   const next: GameState = {
     ...state,
     bazaarListings: state.bazaarListings.filter((candidate) => candidate.id !== listingId),
-    inventory: addToInventory(state.inventory, listing.itemId, listing.quantity),
+    inventory: addToInventory(
+      state.inventory,
+      listing.itemId,
+      listing.quantity,
+      listing.enhancement,
+    ),
   };
 
   const message = "Anúncio removido: " + (item?.name ?? listing.itemId) + " voltou para a mochila.";
@@ -194,19 +199,15 @@ export function purchaseListing(
 
   const total = listing.priceCents * quantity;
   const carried = Math.min(MAX_ENHANCEMENT, listing.enhancement);
-  const current = enhancementOf(state.enhancements, listing.itemId);
-  const enhancements =
-    carried > current ? { ...state.enhancements, [listing.itemId]: carried } : state.enhancements;
 
   const bought = state.bazaarPurchases[listing.id] ?? 0;
   const next: GameState = {
     ...state,
-    inventory: addToInventory(state.inventory, listing.itemId, quantity),
+    inventory: addToInventory(state.inventory, listing.itemId, quantity, carried),
     bazaarPurchases: { ...state.bazaarPurchases, [listing.id]: bought + quantity },
     bazaarFinds: state.bazaarFinds.includes(listing.itemId)
       ? state.bazaarFinds
       : [...state.bazaarFinds, listing.itemId],
-    enhancements,
   };
 
   const message =

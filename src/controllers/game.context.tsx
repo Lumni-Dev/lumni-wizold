@@ -78,12 +78,17 @@ interface GameContextValue {
   } | null>;
   challengeArena: (hunterId: string) => Promise<ArenaResolution | null>;
   landArena: () => void;
-  equipItem: (itemId: string) => Promise<void>;
+  equipItem: (itemId: string, enhancement?: number) => Promise<void>;
   unequipItem: (slot: EquipmentSlot) => Promise<void>;
   consumeItem: (itemId: string) => Promise<void>;
   buyItem: (itemId: string, quantity?: number) => Promise<void>;
   sellItem: (itemId: string, quantity?: number) => Promise<void>;
-  announceListing: (itemId: string, quantity: number, priceCents: number) => Promise<boolean>;
+  announceListing: (
+    itemId: string,
+    quantity: number,
+    priceCents: number,
+    enhancement?: number,
+  ) => Promise<boolean>;
   cancelListing: (listingId: string) => Promise<void>;
   purchaseListing: (listingId: string, quantity: number) => Promise<boolean>;
   requestWithdraw: (pixKey: string, fullName: string, cpf: string) => Promise<boolean>;
@@ -91,7 +96,10 @@ interface GameContextValue {
   buyVip: () => Promise<boolean>;
   confirmPayment: (sessionId: string) => Promise<boolean>;
   mine: (oreId: string) => Promise<boolean>;
-  enhance: (itemId: string) => Promise<{ message: string; raised: boolean } | null>;
+  enhance: (
+    itemId: string,
+    enhancement?: number,
+  ) => Promise<{ message: string; raised: boolean } | null>;
   adoptPet: (gender: PetGender, name: string) => Promise<void>;
   releasePet: () => Promise<void>;
   setAutomation: (key: AutomationKey, on: boolean) => void;
@@ -404,7 +412,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [ready, authenticated, request, announce]);
   const value = useMemo<GameContextValue>(() => {
     const stats = state.character
-      ? deriveStats(state.character, state.equipment, state.pet, state.enhancements)
+      ? deriveStats(state.character, state.equipment, state.pet)
       : null;
     const character =
       state.character && stats
@@ -566,8 +574,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
         if (!held) return;
         applyState(held.state, held.seq);
       },
-      equipItem: async (itemId) => {
-        await act("POST", "/api/inventory/equip", { itemId }, "Inventário", () =>
+      equipItem: async (itemId, enhancement = 0) => {
+        await act("POST", "/api/inventory/equip", { itemId, enhancement }, "Inventário", () =>
           playSound("equip"),
         );
       },
@@ -591,11 +599,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
           playSound("sell"),
         );
       },
-      announceListing: async (itemId, quantity, priceCents) => {
+      announceListing: async (itemId, quantity, priceCents, enhancement = 0) => {
         const answer = await act(
           "POST",
           "/api/bazaar/announce",
-          { itemId, quantity, priceCents },
+          { itemId, quantity, priceCents, enhancement },
           "Bazar",
           () => playSound("ui"),
         );
@@ -657,8 +665,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
         });
         return answer.ok;
       },
-      enhance: async (itemId) => {
-        const answer = await request<{ raised: boolean }>("POST", "/api/forge", { itemId });
+      enhance: async (itemId, enhancement = 0) => {
+        const answer = await request<{ raised: boolean }>("POST", "/api/forge", {
+          itemId,
+          enhancement,
+        });
         if (!answer.ok) {
           if (answer.message) announce(answer.message, false, "Bigorna");
           return null;

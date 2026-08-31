@@ -18,7 +18,9 @@ const STARTING_ATTRIBUTES: Attributes = {
   willpower: BASE_ATTRIBUTE_VALUE,
 };
 
-const STARTING_INVENTORY: InventorySlot[] = [{ itemId: "health-potion-small", quantity: 10 }];
+const STARTING_INVENTORY: InventorySlot[] = [
+  { itemId: "health-potion-small", quantity: 10, enhancement: 0 },
+];
 
 function createCharacter(name: string, gender: Gender): Character {
   const definition = findGender(gender);
@@ -60,7 +62,6 @@ export function createRun(name: string, gender: Gender): GameState {
     character,
     pet: null,
     mining: initialMining(),
-    enhancements: {},
     bazaarListings: [],
     bazaarPurchases: {},
     bazaarFinds: [],

@@ -60,7 +60,7 @@ function expiryLine(listing: BazaarListing, now: number): string {
 const FEE_LABEL = Math.round(BAZAAR_FEE_RATIO * 100) + "%";
 
 type Flow =
-  | { kind: "announce"; itemId: string | null; quantity: string; price: string }
+  | { kind: "announce"; itemId: string | null; enhancement: number; quantity: string; price: string }
   | { kind: "buy"; listingId: string; quantity: string }
   | { kind: "withdraw"; pixKey: string };
 
@@ -114,7 +114,9 @@ export function BazaarScreen() {
 
   const announcing =
     flow?.kind === "announce" && flow.itemId
-      ? (sellable.find((entry) => entry.item.id === flow.itemId) ?? null)
+      ? (sellable.find(
+          (entry) => entry.item.id === flow.itemId && entry.enhancement === flow.enhancement,
+        ) ?? null)
       : null;
   const buying =
     flow?.kind === "buy"
@@ -140,7 +142,9 @@ export function BazaarScreen() {
         action={
           <Button
             variant="primary"
-            onClick={() => setFlow({ kind: "announce", itemId: null, quantity: "1", price: "" })}
+            onClick={() =>
+              setFlow({ kind: "announce", itemId: null, enhancement: 0, quantity: "1", price: "" })
+            }
           >
             Anunciar
           </Button>
@@ -259,7 +263,13 @@ export function BazaarScreen() {
               <Button
                 variant="ghost"
                 onClick={() =>
-                  setFlow({ kind: "announce", itemId: null, quantity: "1", price: "" })
+                  setFlow({
+                    kind: "announce",
+                    itemId: null,
+                    enhancement: 0,
+                    quantity: "1",
+                    price: "",
+                  })
                 }
               >
                 Voltar
@@ -273,11 +283,14 @@ export function BazaarScreen() {
                 }
                 onClick={() => {
                   if (askedCents === null) return;
-                  return announceListing(announcing.item.id, askedQuantity, askedCents).then(
-                    (ok) => {
-                      if (ok) setFlow(null);
-                    },
-                  );
+                  return announceListing(
+                    announcing.item.id,
+                    askedQuantity,
+                    askedCents,
+                    announcing.enhancement,
+                  ).then((ok) => {
+                    if (ok) setFlow(null);
+                  });
                 }}
               >
                 Anunciar
@@ -353,7 +366,7 @@ export function BazaarScreen() {
           ) : (
             <List>
               {sellable.map((entry) => (
-                <ListRow key={entry.item.id} padding="art">
+                <ListRow key={entry.item.id + "@" + entry.enhancement} padding="art">
                   <ItemIcon item={entry.item} />
                   <RowText
                     title={enhancedName(entry.item.name, entry.enhancement)}
@@ -370,6 +383,7 @@ export function BazaarScreen() {
                       setFlow({
                         kind: "announce",
                         itemId: entry.item.id,
+                        enhancement: entry.enhancement,
                         quantity: "1",
                         price: (entry.suggestedCents / 100).toFixed(2).replace(".", ","),
                       })

@@ -11,7 +11,7 @@ import { EQUIPMENT_SLOTS, type Equipment } from "../entities/item";
 import type { Character } from "../entities/character";
 import type { Pet } from "../entities/pet";
 import { findItem } from "../data/items";
-import { enhancedEffect, enhancementOf } from "./forge";
+import { enhancedEffect } from "./forge";
 import { moonAttributeBonus } from "./moon";
 import { petBonus } from "./pet";
 import { experienceForLevel } from "./progression";
@@ -54,19 +54,16 @@ function furyAttributes(active: boolean): Attributes {
   };
 }
 
-function equipmentAttributes(
-  equipment: Equipment,
-  enhancements: Record<string, number> = {},
-): Attributes {
+function equipmentAttributes(equipment: Equipment): Attributes {
   let attributes = emptyAttributes();
 
   for (const slot of EQUIPMENT_SLOTS) {
-    const itemId = equipment[slot];
-    if (!itemId) continue;
-    const item = findItem(itemId);
+    const piece = equipment[slot];
+    if (!piece) continue;
+    const item = findItem(piece.itemId);
     if (!item) continue;
 
-    const effect = enhancedEffect(item, enhancementOf(enhancements, itemId));
+    const effect = enhancedEffect(item, piece.enhancement);
     if (effect.attributes) attributes = addAttributes(attributes, effect.attributes);
   }
 
@@ -80,28 +77,22 @@ export interface StatSubject {
   furyActive?: boolean;
 
   petAttributes?: Attributes;
-
-  enhancements?: Record<string, number>;
 }
 
 export function deriveStats(
   character: Character,
   equipment: Equipment,
   pet: Pet | null = null,
-  enhancements: Record<string, number> = {},
 ): DerivedStats {
   const furyActive = character.furyUntil ? Date.now() < Date.parse(character.furyUntil) : false;
-  return deriveStatsOf(
-    { ...character, furyActive, petAttributes: petBonus(pet), enhancements },
-    equipment,
-  );
+  return deriveStatsOf({ ...character, furyActive, petAttributes: petBonus(pet) }, equipment);
 }
 
 export function deriveStatsOf(subject: StatSubject, equipment: Equipment): DerivedStats {
   const sky = moonAttributeBonus();
 
   const trained = subject.attributes;
-  const equipped = equipmentAttributes(equipment, subject.enhancements ?? {});
+  const equipped = equipmentAttributes(equipment);
   const pet = subject.petAttributes ?? emptyAttributes();
   const moon: Attributes = {
     strength: sky,

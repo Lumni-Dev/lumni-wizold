@@ -8,6 +8,7 @@ export async function POST(request: Request) {
       asText(body.itemId, 60),
       asQuantity(body.quantity),
       asInt(body.priceCents, 0),
+      asInt(body.enhancement, 0),
     ),
   );
 }

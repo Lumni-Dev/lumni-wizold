@@ -14,7 +14,7 @@ import { generateId } from "@/shared/utils/id";
 import type { Attributes } from "../entities/attribute";
 import type { Character } from "../entities/character";
 import { initialWallet, type BazaarListing } from "../entities/bazaar";
-import { emptyEquipment } from "../entities/item";
+import { emptyEquipment, EQUIPMENT_SLOTS, type EquipmentSlot } from "../entities/item";
 import { initialMining } from "../entities/mining";
 import { MINING_MAX_LEVEL } from "../data/ores";
 import { initialState, type GameState } from "../entities/game-state";
@@ -101,18 +101,42 @@ function normalizePet(pet: Pet): Pet {
   normalized.energy = clamp(finiteInt(pet.energy, 0), 0, petMaxEnergy(petLevelOf(normalized)));
   return normalized;
 }
-function normalizeInventory(inventory: GameState["inventory"]): GameState["inventory"] {
-  return inventory
+function normalizeInventory(raw: unknown, legacy: Record<string, number>): GameState["inventory"] {
+  if (!Array.isArray(raw)) return [];
+  return raw
     .filter(
-      (
-        slot,
-      ): slot is {
-        itemId: string;
-        quantity: number;
-      } => Boolean(slot) && typeof slot.itemId === "string",
+      (slot): slot is { itemId: string; quantity?: unknown; enhancement?: unknown } =>
+        Boolean(slot) && typeof (slot as { itemId?: unknown }).itemId === "string",
     )
-    .map((slot) => ({ itemId: slot.itemId, quantity: finiteInt(slot.quantity, 0) }))
+    .map((slot) => ({
+      itemId: slot.itemId,
+      quantity: finiteInt(slot.quantity, 0),
+      enhancement:
+        slot.enhancement !== undefined
+          ? Math.max(0, finiteInt(slot.enhancement, 0))
+          : (legacy[slot.itemId] ?? 0),
+    }))
     .filter((slot) => slot.quantity > 0);
+}
+
+function normalizeEquipment(raw: unknown, legacy: Record<string, number>): GameState["equipment"] {
+  const equipment = emptyEquipment();
+  if (typeof raw !== "object" || raw === null) return equipment;
+  for (const [slot, value] of Object.entries(raw as Record<string, unknown>)) {
+    if (!(EQUIPMENT_SLOTS as readonly string[]).includes(slot)) continue;
+    if (typeof value === "string") {
+      equipment[slot as EquipmentSlot] = { itemId: value, enhancement: legacy[value] ?? 0 };
+    } else if (value && typeof value === "object") {
+      const piece = value as { itemId?: unknown; enhancement?: unknown };
+      if (typeof piece.itemId === "string") {
+        equipment[slot as EquipmentSlot] = {
+          itemId: piece.itemId,
+          enhancement: Math.max(0, finiteInt(piece.enhancement, 0)),
+        };
+      }
+    }
+  }
+  return equipment;
 }
 function normalizeListings(listings: BazaarListing[]): BazaarListing[] {
   return listings
@@ -180,11 +204,11 @@ function migrateLineage(state: GameState): GameState {
     ...state,
     inventory: state.inventory.map((slot) => ({ ...slot, itemId: moved(slot.itemId) })),
     equipment: Object.fromEntries(
-      Object.entries(state.equipment).map(([slot, id]) => [slot, id ? moved(id) : id]),
+      Object.entries(state.equipment).map(([slot, piece]) => [
+        slot,
+        piece ? { ...piece, itemId: moved(piece.itemId) } : null,
+      ]),
     ) as GameState["equipment"],
-    enhancements: Object.fromEntries(
-      Object.entries(state.enhancements).map(([id, level]) => [moved(id), level]),
-    ),
     bazaarListings: state.bazaarListings.map((listing) => ({
       ...listing,
       itemId: moved(listing.itemId),
@@ -196,22 +220,30 @@ function pruneUnknown(state: GameState): GameState {
     ...state,
     inventory: state.inventory.filter((slot) => Boolean(findItem(slot.itemId))),
     equipment: Object.fromEntries(
-      Object.entries(state.equipment).map(([slot, id]) => [slot, id && findItem(id) ? id : null]),
+      Object.entries(state.equipment).map(([slot, piece]) => [
+        slot,
+        piece && findItem(piece.itemId) ? piece : null,
+      ]),
     ) as GameState["equipment"],
-    enhancements: Object.fromEntries(
-      Object.entries(state.enhancements).filter(([id]) => Boolean(findItem(id))),
-    ),
     bazaarListings: state.bazaarListings.filter((listing) => Boolean(findItem(listing.itemId))),
   };
 }
 function normalize(data: Partial<GameState>): GameState {
   const base = initialState();
+  const raw = data as Record<string, unknown>;
+  const legacy = normalizeRecord(
+    raw.enhancements as Record<string, number> | undefined,
+    (value) => {
+      const level = finiteInt(value, 0);
+      return level >= 1 ? Math.min(level, MAX_ENHANCEMENT) : null;
+    },
+  );
   const mining = data.mining as Partial<GameState["mining"]> | undefined;
   const state: GameState = {
     ...base,
     ...data,
     version: STATE_VERSION,
-    equipment: { ...emptyEquipment(), ...data.equipment },
+    equipment: normalizeEquipment(raw.equipment, legacy),
     mining:
       typeof mining?.level === "number"
         ? {
@@ -221,10 +253,6 @@ function normalize(data: Partial<GameState>): GameState {
             count: Math.max(0, finiteInt(mining.count, 0)),
           }
         : initialMining(),
-    enhancements: normalizeRecord(data.enhancements, (value) => {
-      const level = finiteInt(value, 0);
-      return level >= 1 ? Math.min(level, MAX_ENHANCEMENT) : null;
-    }),
     bazaarListings: Array.isArray(data.bazaarListings)
       ? normalizeListings(data.bazaarListings)
       : [],
@@ -241,10 +269,11 @@ function normalize(data: Partial<GameState>): GameState {
     pack: Array.isArray(data.pack) ? normalizePack(data.pack) : [],
     automation: fillAutomation(data.automation),
     wallet: { cents: Math.max(0, finiteInt(data.wallet?.cents, initialWallet().cents)) },
-    inventory: normalizeInventory(Array.isArray(data.inventory) ? data.inventory : []),
+    inventory: normalizeInventory(raw.inventory, legacy),
     log: Array.isArray(data.log) ? normalizeLog(data.log) : [],
     pet: data.pet ? normalizePet(data.pet) : null,
   };
+  delete (state as unknown as Record<string, unknown>).enhancements;
   const migrated = state.character
     ? migrateLineage({ ...state, character: normalizeCharacter(state.character) })
     : state;

@@ -24,7 +24,6 @@ export interface Hunter {
   arenaLosses: number;
   bronze: number;
   forge: number;
-  enhancements: Record<string, number>;
   mining: number;
   pet: HunterPet | null;
   equipment: Equipment;

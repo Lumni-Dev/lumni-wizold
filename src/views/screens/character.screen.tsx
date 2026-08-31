@@ -7,7 +7,6 @@ import { detailInventory } from "@/controllers/inventory.controller";
 import { profileOf } from "@/controllers/ranking.controller";
 import { criticalMultiplierOf } from "@/models/rules/combat";
 import { findItem } from "@/models/data/items";
-import { enhancementOf } from "@/models/rules/forge";
 import { EQUIPMENT_SLOTS } from "@/models/entities/item";
 import { findGender } from "@/models/entities/character";
 import type { Hunter } from "@/models/entities/ranking";
@@ -78,16 +77,16 @@ export function CharacterScreen() {
   const furyRemaining = character.furyUntil ? Date.parse(character.furyUntil) - now : 0;
   const furyActive = furyRemaining > 0;
 
-  const forge = EQUIPMENT_SLOTS.reduce((total, slot) => {
-    const itemId = state.equipment[slot];
-    return total + (itemId ? enhancementOf(state.enhancements, itemId) : 0);
-  }, 0);
+  const forge = EQUIPMENT_SLOTS.reduce(
+    (total, slot) => total + (state.equipment[slot]?.enhancement ?? 0),
+    0,
+  );
   const gear = EQUIPMENT_SLOTS.map((slot) => {
-    const itemId = state.equipment[slot];
+    const piece = state.equipment[slot];
     return {
       slot,
-      item: itemId ? (findItem(itemId) ?? null) : null,
-      level: itemId ? enhancementOf(state.enhancements, itemId) : 0,
+      item: piece ? (findItem(piece.itemId) ?? null) : null,
+      level: piece ? piece.enhancement : 0,
     };
   });
 

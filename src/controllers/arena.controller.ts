@@ -73,7 +73,7 @@ export function listArena(
     };
   }
   const band = arenaBand(character.level);
-  const stats = deriveStats(character, state.equipment, state.pet, state.enhancements);
+  const stats = deriveStats(character, state.equipment, state.pet);
   const healthy = character.health > stats.maxHealth * MIN_HEALTH_RATIO_TO_ACT;
   const charges = arenaCharges(state.arenaDuels, now);
   const ready = healthy && charges.left > 0;
@@ -219,7 +219,7 @@ export function resolveArena(
       hunter.name + " ainda se recupera do último duelo: faltam " + formatCooldown(resting) + ".",
     );
   }
-  const stats = deriveStats(character, state.equipment, state.pet, state.enhancements);
+  const stats = deriveStats(character, state.equipment, state.pet);
   if (character.health <= stats.maxHealth * MIN_HEALTH_RATIO_TO_ACT) {
     return failure(state, "Vida baixa demais para subir na arena. Recupere-se ou use uma poção.");
   }

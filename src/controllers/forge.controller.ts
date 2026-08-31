@@ -14,8 +14,8 @@ import { failure, success, type Result } from "@/models/entities/result";
 import { formatBronze, formatCooldown } from "@/shared/utils/format";
 import {
   enhancementCost,
-  enhancementOf,
   enhancedEffect,
+  enhancedName,
   forgeBronzeCost,
 } from "@/models/rules/forge";
 import {
@@ -138,6 +138,7 @@ export function mine(
 export interface ForgePiece {
   item: Item;
   level: number;
+  quantity: number;
   fragment: Item | null;
   cost: number;
   owned: number;
@@ -159,9 +160,8 @@ export function listForge(state: GameState): ForgePiece[] {
   for (const entry of state.inventory) {
     const item = findItem(entry.itemId);
     if (!item || !isEquippable(item)) continue;
-    if (EQUIPMENT_SLOTS.some((slot) => state.equipment[slot] === item.id)) continue;
 
-    const level = enhancementOf(state.enhancements, item.id);
+    const level = entry.enhancement;
     const fragment = fragmentOf(item);
     const cost = enhancementCost(level + 1);
     const owned = fragment ? countInInventory(state.inventory, fragment.id) : 0;
@@ -174,6 +174,7 @@ export function listForge(state: GameState): ForgePiece[] {
     pieces.push({
       item,
       level,
+      quantity: entry.quantity,
       fragment,
       cost,
       owned,
@@ -198,13 +199,14 @@ export function listForge(state: GameState): ForgePiece[] {
   return pieces.sort(
     (a, b) =>
       EQUIPMENT_SLOTS.indexOf(a.item.category as EquipmentSlot) -
-      EQUIPMENT_SLOTS.indexOf(b.item.category as EquipmentSlot),
+        EQUIPMENT_SLOTS.indexOf(b.item.category as EquipmentSlot) || a.level - b.level,
   );
 }
 
 export function enhance(
   state: GameState,
   itemId: string,
+  enhancement: number,
   random: Random = defaultRandom,
 ): Result<{ raised: boolean }> {
   const character = state.character;
@@ -213,14 +215,11 @@ export function enhance(
   const item = findItem(itemId);
   if (!item || !isEquippable(item)) return failure(state, "Item desconhecido.");
 
-  if (EQUIPMENT_SLOTS.some((slot) => state.equipment[slot] === itemId)) {
-    return failure(state, "Desequipe " + item.name + " para forjar.");
-  }
-  if (countInInventory(state.inventory, itemId) < 1) {
-    return failure(state, item.name + " não está na mochila.");
+  if (countInInventory(state.inventory, itemId, enhancement) < 1) {
+    return failure(state, enhancedName(item.name, enhancement) + " não está na mochila.");
   }
 
-  const level = enhancementOf(state.enhancements, itemId);
+  const level = enhancement;
   if (level >= MAX_ENHANCEMENT) {
     return failure(state, item.name + " já está no teto de +" + MAX_ENHANCEMENT + ".");
   }
@@ -246,11 +245,15 @@ export function enhance(
   }
 
   const struck = chance(FORGE_SUCCESS_RATIO, random);
+  let inventory = removeFromInventory(state.inventory, fragment.id, cost);
+  if (struck) {
+    inventory = removeFromInventory(inventory, itemId, 1, level);
+    inventory = addToInventory(inventory, itemId, 1, level + 1);
+  }
   const next: GameState = {
     ...state,
     character: { ...character, bronze: character.bronze - bronzeCost },
-    inventory: removeFromInventory(state.inventory, fragment.id, cost),
-    enhancements: struck ? { ...state.enhancements, [itemId]: level + 1 } : state.enhancements,
+    inventory,
   };
 
   const message = struck

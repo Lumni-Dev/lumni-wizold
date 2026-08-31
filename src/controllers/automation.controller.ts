@@ -38,7 +38,7 @@ function canWork(state: GameState, activity: Activity): boolean {
 
   switch (activity.kind) {
     case "hunt": {
-      const stats = deriveStats(character, state.equipment, state.pet, state.enhancements);
+      const stats = deriveStats(character, state.equipment, state.pet);
       return character.health > stats.maxHealth * MIN_HEALTH_RATIO_TO_ACT;
     }
     case "train": {
@@ -66,7 +66,7 @@ export function nextAutomationStep(
   if (!character) return null;
 
   const on = state.automation;
-  const stats = deriveStats(character, state.equipment, state.pet, state.enhancements);
+  const stats = deriveStats(character, state.equipment, state.pet);
   const floor = stats.maxHealth * MIN_HEALTH_RATIO_TO_ACT;
   const resting = activity?.kind === "rest";
 

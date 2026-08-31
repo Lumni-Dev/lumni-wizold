@@ -3,7 +3,7 @@ import { isValidQuantity } from "@/shared/utils/quantity";
 import { findItem, lineageName, marketItems, servesLineage } from "@/models/data/items";
 import { huntPurse } from "@/models/data/species";
 import type { GameState } from "@/models/entities/game-state";
-import { EQUIPMENT_SLOTS, type EquipmentSlot, type Item } from "@/models/entities/item";
+import { type Item } from "@/models/entities/item";
 import { failure, success, type Result } from "@/models/entities/result";
 import { isForgeMaterial } from "@/models/rules/bazaar";
 import {
@@ -33,15 +33,7 @@ export interface MarketOffer {
   affordable: boolean;
   ofLineage: boolean;
   ownedQuantity: number;
-  alreadyOwned: boolean;
   reason: string | null;
-}
-
-function ownsWearable(state: GameState, item: Item): boolean {
-  if (!(EQUIPMENT_SLOTS as readonly string[]).includes(item.category)) return false;
-  if (state.equipment[item.category as EquipmentSlot] === item.id) return true;
-  if (countInInventory(state.inventory, item.id) > 0) return true;
-  return state.bazaarListings.some((listing) => listing.itemId === item.id);
 }
 
 export function listOffers(state: GameState): MarketOffer[] {
@@ -55,7 +47,6 @@ export function listOffers(state: GameState): MarketOffer[] {
       const levelAllowed = character !== null && character.level >= item.minLevel;
       const affordable = character !== null && character.bronze >= price;
       const ofLineage = character !== null && servesLineage(item, character.gender);
-      const alreadyOwned = ownsWearable(state, item);
 
       return {
         item,
@@ -63,17 +54,14 @@ export function listOffers(state: GameState): MarketOffer[] {
         levelAllowed,
         affordable,
         ofLineage,
-        ownedQuantity: countInInventory(state.inventory, item.id),
-        alreadyOwned,
+        ownedQuantity: countInInventory(state.inventory, item.id, 0),
         reason: !ofLineage
           ? "Apenas " + lineageName(item)
           : !levelAllowed
             ? "Requer NV. " + item.minLevel
-            : alreadyOwned
-              ? "Uma peça basta: a forja sobe na bigorna"
-              : !affordable
-                ? "WCoins insuficientes"
-                : null,
+            : !affordable
+              ? "WCoins insuficientes"
+              : null,
       };
     })
     .sort((a, b) => a.price - b.price);
@@ -100,30 +88,27 @@ export function buyItem(state: GameState, itemId: string, quantity = 1): Result 
   if (item.category === "pet" && !state.pet) {
     return failure(state, "Sem mascote para alimentar: adote um lobo antes.");
   }
-  if ((EQUIPMENT_SLOTS as readonly string[]).includes(item.category) && quantity > 1) {
-    return failure(state, item.name + " se compra uma por vez: uma peça basta.");
-  }
-  if (ownsWearable(state, item)) {
-    return failure(state, item.name + " já é do seu corpo: uma peça basta.");
-  }
 
   const cost = marketPriceOf(item, character.level) * quantity;
   if (character.bronze < cost) return failure(state, "WCoins insuficientes para " + item.name + ".");
 
-  const enhancements = { ...state.enhancements };
-  delete enhancements[itemId];
   const next: GameState = {
     ...state,
     character: { ...character, bronze: character.bronze - cost },
-    inventory: addToInventory(state.inventory, itemId, quantity),
-    enhancements,
+    inventory: addToInventory(state.inventory, itemId, quantity, 0),
   };
 
-  const message = item.name + " comprado por " + formatBronze(cost) + ".";
+  const message =
+    item.name + (quantity > 1 ? " x" + quantity : "") + " comprado por " + formatBronze(cost) + ".";
   return success(addLog(next, "market", message), message);
 }
 
-export function sellItem(state: GameState, itemId: string, quantity = 1): Result {
+export function sellItem(
+  state: GameState,
+  itemId: string,
+  quantity = 1,
+  enhancement = 0,
+): Result {
   const character = state.character;
   if (!character) return failure(state, "Nenhum personagem ativo.");
 
@@ -133,10 +118,10 @@ export function sellItem(state: GameState, itemId: string, quantity = 1): Result
   if (isForgeMaterial(item)) {
     return failure(state, "Fragmentos não se vendem por bronze: só a forja os aceita.");
   }
-  if ((state.enhancements[itemId] ?? 0) > 0) {
+  if (enhancement > 0) {
     return failure(state, item.name + " está forjado: peças forjadas só se vendem no bazar.");
   }
-  if (countInInventory(state.inventory, itemId) < quantity) {
+  if (countInInventory(state.inventory, itemId, enhancement) < quantity) {
     return failure(state, "Você não tem essa quantidade de " + item.name + ".");
   }
 
@@ -144,7 +129,7 @@ export function sellItem(state: GameState, itemId: string, quantity = 1): Result
   const next: GameState = {
     ...state,
     character: { ...character, bronze: capBronze(character.bronze + gain) },
-    inventory: removeFromInventory(state.inventory, itemId, quantity),
+    inventory: removeFromInventory(state.inventory, itemId, quantity, enhancement),
   };
 
   const message = item.name + " vendido por " + formatBronze(gain) + ".";

@@ -79,7 +79,6 @@ export function arenaStats(hunter: Hunter): DerivedStats {
     {
       level: hunter.level,
       attributes: hunter.attributes,
-      enhancements: hunter.enhancements,
     },
     hunter.equipment,
   );

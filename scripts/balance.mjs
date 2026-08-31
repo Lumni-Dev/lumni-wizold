@@ -63,17 +63,13 @@ function trainedAt(level) {
   };
 }
 
-function gearAt(level) {
+function gearAt(level, forge = referenceForge(level)) {
   const set = setForLevel(level);
-  const forge = referenceForge(level);
   const equipment = {};
-  const enhancements = {};
   for (const slot of EQUIPMENT_SLOTS) {
-    const id = pieceId(set.key, slot);
-    equipment[slot] = id;
-    enhancements[id] = forge;
+    equipment[slot] = { itemId: pieceId(set.key, slot), enhancement: forge };
   }
-  return { equipment, enhancements, set, forge };
+  return { equipment, set, forge };
 }
 
 const PET_FROM_AREA = 5;
@@ -98,8 +94,8 @@ function preyAt(level) {
 
 function measure(level, fights = 400) {
   const attributes = trainedAt(level);
-  const { equipment, enhancements, set, forge } = gearAt(level);
-  const stats = deriveStatsOf({ level, attributes, enhancements }, equipment);
+  const { equipment, set, forge } = gearAt(level);
+  const stats = deriveStatsOf({ level, attributes }, equipment);
   const prey = preyAt(level);
   const pet = petAt(level);
   const random = seeded(level * 7919 + 13);
@@ -143,8 +139,8 @@ function measure(level, fights = 400) {
 
 function session(level, nights = 300) {
   const attributes = trainedAt(level);
-  const { equipment, enhancements } = gearAt(level);
-  const stats = deriveStatsOf({ level, attributes, enhancements }, equipment);
+  const { equipment } = gearAt(level);
+  const stats = deriveStatsOf({ level, attributes }, equipment);
   const prey = preyAt(level);
   const pet = petAt(level);
   const random = seeded(level * 104729 + 7);
@@ -179,9 +175,8 @@ function session(level, nights = 300) {
 
 function verify(level, mode) {
   const attributes = trainedAt(level);
-  const { equipment, enhancements: ramp } = gearAt(level);
-  const enhancements = mode === "noforge" ? {} : ramp;
-  const stats = deriveStatsOf({ level, attributes, enhancements }, equipment);
+  const { equipment } = gearAt(level, mode === "noforge" ? 0 : referenceForge(level));
+  const stats = deriveStatsOf({ level, attributes }, equipment);
   const prey = preyAt(level);
   const pet = mode === "nopet" ? null : petAt(level);
   const random = seeded(level * 7919 + 13);

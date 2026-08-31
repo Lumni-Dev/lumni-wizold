@@ -37,12 +37,19 @@ function formatCountdown(ms: number): string {
 
 const RESET_LABEL = String(MINING_RESET_HOUR).padStart(2, "0") + ":00";
 
+function pieceKey(itemId: string, level: number): string {
+  return itemId + "@" + level;
+}
+
 export function ForgeScreen() {
   const { state, character, mine, enhance, activity, setActivity, notify } = useGame();
   usePageActivity(["mine", "forge"]);
   const paused = activity?.paused === true;
   const activeOre = activity?.kind === "mine" && !paused ? (activity.id ?? null) : null;
-  const activeItem = activity?.kind === "forge" && !paused ? (activity.id ?? null) : null;
+  const forgeItemId = activity?.kind === "forge" ? (activity.id ?? null) : null;
+  const activityLevel = activity?.kind === "forge" ? (activity.enhancement ?? 0) : 0;
+  const activeItem = forgeItemId !== null && !paused ? forgeItemId : null;
+  const activeStartLevel = activeItem !== null ? activityLevel : 0;
   const waitingOre = activity?.kind === "mine" && paused ? (activity.id ?? null) : null;
   const waitingItem = activity?.kind === "forge" && paused ? (activity.id ?? null) : null;
 
@@ -65,13 +72,11 @@ export function ForgeScreen() {
   const mineRef = useRef(mine);
   const enhanceRef = useRef(enhance);
   const notifyRef = useRef(notify);
-  const slotsRef = useRef(slots);
   useEffect(() => {
     autoRef.current = state.automation;
     mineRef.current = mine;
     enhanceRef.current = enhance;
     notifyRef.current = notify;
-    slotsRef.current = slots;
   });
 
   const [strike, setStrike] = useState<{ id: string; beat: number }>({ id: "", beat: 0 });
@@ -79,7 +84,8 @@ export function ForgeScreen() {
   const [swing, setSwing] = useState<{ id: string; beat: number }>({ id: "", beat: 0 });
   const swingRef = useRef(0);
   const [cooldown, setCooldown] = useState<number | null>(null);
-  const [confirmingItem, setConfirmingItem] = useState<string | null>(null);
+  const [confirmingKey, setConfirmingKey] = useState<string | null>(null);
+  const [activeForgeLevel, setActiveForgeLevel] = useState<number | null>(null);
   const [selectedOre, setSelectedOre] = useState<string>("");
   const [selectedForge, setSelectedForge] = useState<string>("");
   const forgeShake = useShake(strike.beat);
@@ -89,15 +95,16 @@ export function ForgeScreen() {
     let alive = true;
     let barTimer = 0;
     let coolTimer = 0;
-    const level = slotsRef.current.find((entry) => entry.item.id === activeItem)?.level ?? 0;
-    const tickMs = forgeDurationMs(level) / FORGE_TICKS;
+    let level = activeStartLevel;
     strikeRef.current = 0;
     /* eslint-disable react-hooks/set-state-in-effect */
     setStrike({ id: activeItem, beat: 0 });
+    setActiveForgeLevel(level);
     setCooldown(null);
     /* eslint-enable react-hooks/set-state-in-effect */
 
     const startBar = () => {
+      const tickMs = forgeDurationMs(level) / FORGE_TICKS;
       strikeRef.current = 0;
       setStrike({ id: activeItem, beat: 0 });
       barTimer = window.setInterval(() => {
@@ -109,18 +116,28 @@ export function ForgeScreen() {
         }
         window.clearInterval(barTimer);
         barTimer = 0;
-        void enhanceRef.current(activeItem).then((landed) => {
+        void enhanceRef.current(activeItem, level).then((landed) => {
           if (!alive) return;
           if (landed) {
             if (landed.message) notifyRef.current(landed.message, true, "Bigorna");
             playSound(landed.raised ? "point" : "denied");
+            if (landed.raised) {
+              level += 1;
+              setActiveForgeLevel(level);
+            }
           }
           strikeRef.current = 0;
           setStrike({ id: activeItem, beat: 0 });
           if (!landed) {
             setActivity(
-              autoRef.current.forge ? { kind: "forge", id: activeItem, paused: true } : null,
+              autoRef.current.forge
+                ? { kind: "forge", id: activeItem, enhancement: level, paused: true }
+                : null,
             );
+            return;
+          }
+          if (level >= MAX_ENHANCEMENT) {
+            setActivity(null);
             return;
           }
           if (!autoRef.current.forge) {
@@ -155,7 +172,7 @@ export function ForgeScreen() {
       if (barTimer) window.clearInterval(barTimer);
       if (coolTimer) window.clearInterval(coolTimer);
     };
-  }, [activeItem, setActivity]);
+  }, [activeItem, activeStartLevel, setActivity]);
 
   useEffect(() => {
     if (!activeOre) return;
@@ -222,8 +239,8 @@ export function ForgeScreen() {
 
   if (!character) return null;
 
-  const confirming = confirmingItem
-    ? (slots.find((entry) => entry.item.id === confirmingItem) ?? null)
+  const confirming = confirmingKey
+    ? (slots.find((entry) => pieceKey(entry.item.id, entry.level) === confirmingKey) ?? null)
     : null;
 
   const unlockedOres = mining.ores.filter((entry) => entry.unlocked);
@@ -237,15 +254,24 @@ export function ForgeScreen() {
   const selectedAvailable = Boolean(selectedEntry?.unlocked) && !mining.dailyExhausted;
   const mineOpting = activeOre !== null && cooldown !== null;
 
+  const forgeFallback = slots.find((entry) => entry.canForge) ?? slots[0] ?? null;
+  const selectedValid = slots.some(
+    (entry) => pieceKey(entry.item.id, entry.level) === selectedForge,
+  );
+  const displayLevel = activeItem !== null ? (activeForgeLevel ?? activeStartLevel) : activityLevel;
   const effectiveForge =
-    activeItem ??
-    slots.find((entry) => entry.item.id === selectedForge)?.item.id ??
-    slots.find((entry) => entry.canForge)?.item.id ??
-    slots[0]?.item.id ??
-    "";
-  const forgeEntry = slots.find((entry) => entry.item.id === effectiveForge) ?? null;
+    forgeItemId !== null
+      ? pieceKey(forgeItemId, displayLevel)
+      : selectedValid
+        ? selectedForge
+        : forgeFallback
+          ? pieceKey(forgeFallback.item.id, forgeFallback.level)
+          : "";
+  const forgeEntry =
+    slots.find((entry) => pieceKey(entry.item.id, entry.level) === effectiveForge) ?? null;
   const forgeOpting = activeItem !== null && cooldown !== null;
-  const forgeActive = activeItem !== null && forgeEntry !== null && activeItem === forgeEntry.item.id;
+  const forgeActive =
+    activeItem !== null && forgeEntry !== null && activeItem === forgeEntry.item.id;
 
   function toggleMining(oreId: string, available: boolean) {
     if (activeOre === oreId) {
@@ -256,14 +282,14 @@ export function ForgeScreen() {
     setActivity({ kind: "mine", id: oreId });
   }
 
-  function toggleForge(itemId: string) {
-    if (activeItem === itemId) {
+  function toggleForge() {
+    if (!forgeEntry) return;
+    if (activeItem !== null) {
       if (cooldown !== null) setActivity(null);
       return;
     }
-    const entry = slots.find((piece) => piece.item.id === itemId);
-    if (!entry || !entry.canForge || activeOre !== null) return;
-    setConfirmingItem(itemId);
+    if (!forgeEntry.canForge || activeOre !== null) return;
+    setConfirmingKey(pieceKey(forgeEntry.item.id, forgeEntry.level));
   }
 
   return (
@@ -468,7 +494,7 @@ export function ForgeScreen() {
                       forgeActive ? "secondary" : forgeEntry.canForge ? "primary" : "outline"
                     }
                     disabled={forgeActive ? !forgeOpting : !forgeEntry.canForge || activeOre !== null}
-                    onClick={() => toggleForge(forgeEntry.item.id)}
+                    onClick={() => toggleForge()}
                     aria-label={forgeActive ? "Parar de forjar" : "Forjar a peça escolhida"}
                   >
                     {forgeOpting && forgeActive
@@ -494,12 +520,13 @@ export function ForgeScreen() {
             ) : (
               <List>
                 {slots.map((row) => {
-                  const isSelected = row.item.id === effectiveForge;
+                  const key = pieceKey(row.item.id, row.level);
+                  const isSelected = key === effectiveForge;
                   return (
-                    <ListRow key={row.item.id}>
+                    <ListRow key={key}>
                       <button
                         type="button"
-                        onClick={() => setSelectedForge(row.item.id)}
+                        onClick={() => setSelectedForge(key)}
                         aria-pressed={isSelected}
                         disabled={activeItem !== null}
                         className="flex w-full items-center gap-3 text-left transition-colors"
@@ -512,9 +539,12 @@ export function ForgeScreen() {
                               isSelected ? "text-ember" : "text-ink-soft",
                             )}
                           >
-                            {row.item.name}
+                            {enhancedName(row.item.name, row.level)}
                           </p>
                         </div>
+                        <span className="shrink-0 font-mono text-[11px] text-ink-faint">
+                          x{formatNumber(row.quantity)}
+                        </span>
                         <span
                           className={cn(
                             "grid h-4 w-4 shrink-0 place-items-center rounded-full border",
@@ -551,13 +581,17 @@ export function ForgeScreen() {
             : undefined
         }
         confirmLabel="Forjar"
-        onCancel={() => setConfirmingItem(null)}
+        onCancel={() => setConfirmingKey(null)}
         onConfirm={() => {
           if (confirming && activeOre === null && activeItem === null) {
-            const next: Activity = { kind: "forge", id: confirming.item.id };
+            const next: Activity = {
+              kind: "forge",
+              id: confirming.item.id,
+              enhancement: confirming.level,
+            };
             setActivity(next);
           }
-          setConfirmingItem(null);
+          setConfirmingKey(null);
         }}
       />
     </>

@@ -76,15 +76,11 @@ export async function loadGame(
   const character = rowToCharacter(row);
   const pet = await client.query("select * from pets where character_id = $1", [characterId]);
   const equipped = await client.query(
-    "select slot, item_id from equipped_items where character_id = $1",
+    "select slot, item_id, enhancement from equipped_items where character_id = $1",
     [characterId],
   );
   const inventory = await client.query(
-    "select item_id, quantity from inventory_items where character_id = $1",
-    [characterId],
-  );
-  const enhancements = await client.query(
-    "select item_id, level from enhancements where character_id = $1",
+    "select item_id, quantity, enhancement from inventory_items where character_id = $1",
     [characterId],
   );
   const listings = await client.query(
@@ -123,7 +119,12 @@ export async function loadGame(
     [characterId],
   );
   const equipment = emptyEquipment();
-  for (const entry of equipped.rows) equipment[entry.slot as EquipmentSlot] = entry.item_id;
+  for (const entry of equipped.rows) {
+    equipment[entry.slot as EquipmentSlot] = {
+      itemId: entry.item_id,
+      enhancement: int(entry.enhancement),
+    };
+  }
   const petRow = pet.rows[0];
   const automationRow = automation.rows[0] ?? {};
   const walletValue: Wallet = { cents: int(wallet.rows[0]?.cents) };
@@ -148,9 +149,6 @@ export async function loadGame(
       windowStart: stamp(row.mining_window_start),
       count: int(row.mining_count),
     },
-    enhancements: Object.fromEntries(
-      enhancements.rows.map((entry) => [entry.item_id, int(entry.level)]),
-    ),
     bazaarListings: listings.rows.map(
       (entry): BazaarListing => ({
         id: entry.id,
@@ -192,6 +190,7 @@ export async function loadGame(
     inventory: inventory.rows.map((entry) => ({
       itemId: entry.item_id,
       quantity: int(entry.quantity),
+      enhancement: int(entry.enhancement),
     })),
     equipment,
     log: log.rows.map(
@@ -318,21 +317,10 @@ async function savePieces(
       characterId,
       [
         { name: "item_id", cast: "text" },
+        { name: "enhancement", cast: "integer" },
         { name: "quantity", cast: "integer" },
       ],
-      after.inventory.map((slot) => [slot.itemId, slot.quantity]),
-    );
-  }
-  if (after.enhancements !== before.enhancements) {
-    await replace(
-      client,
-      "enhancements",
-      characterId,
-      [
-        { name: "item_id", cast: "text" },
-        { name: "level", cast: "integer" },
-      ],
-      Object.entries(after.enhancements).map(([itemId, level]) => [itemId, level]),
+      after.inventory.map((slot) => [slot.itemId, slot.enhancement, slot.quantity]),
     );
   }
   if (after.arenaDuels !== before.arenaDuels) {
@@ -426,10 +414,15 @@ async function saveEquipment(
   const worn = EQUIPMENT_SLOTS.filter((slot) => after.equipment[slot]);
   if (worn.length > 0) {
     await client.query(
-      `insert into equipped_items (character_id, slot, item_id)
-       select $1, slot::equipment_slot, item
-       from unnest($2::text[], $3::text[]) as pieces (slot, item)`,
-      [characterId, worn, worn.map((slot) => after.equipment[slot])],
+      `insert into equipped_items (character_id, slot, item_id, enhancement)
+       select $1, slot::equipment_slot, item, level::integer
+       from unnest($2::text[], $3::text[], $4::integer[]) as pieces (slot, item, level)`,
+      [
+        characterId,
+        worn,
+        worn.map((slot) => after.equipment[slot]?.itemId),
+        worn.map((slot) => after.equipment[slot]?.enhancement ?? 0),
+      ],
     );
   }
 }

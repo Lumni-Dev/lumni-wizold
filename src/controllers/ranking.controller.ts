@@ -17,7 +17,6 @@ import {
 } from "@/models/rules/ranking";
 import { findItem } from "@/models/data/items";
 import { EQUIPMENT_SLOTS, type EquipmentSlot, type Item } from "@/models/entities/item";
-import { enhancementOf } from "@/models/rules/forge";
 import { petBonus } from "@/models/rules/pet";
 import { deriveStatsOf, type DerivedStats } from "@/models/rules/stats";
 import { normalizeText } from "@/shared/utils/text";
@@ -59,11 +58,10 @@ function playerAsHunter(state: GameState): Hunter | null {
         }
       : null,
     equipment: state.equipment,
-    enhancements: state.enhancements ?? {},
-    forge: EQUIPMENT_SLOTS.reduce((total, slot) => {
-      const itemId = state.equipment[slot];
-      return total + (itemId ? enhancementOf(state.enhancements, itemId) : 0);
-    }, 0),
+    forge: EQUIPMENT_SLOTS.reduce(
+      (total, slot) => total + (state.equipment[slot]?.enhancement ?? 0),
+      0,
+    ),
     mining: state.mining?.level ?? 1,
   };
 }
@@ -159,17 +157,16 @@ export function profileOf(
       level: hunter.level,
       attributes: hunter.attributes,
       petAttributes: hunter.id === playerId ? petBonus(state.pet) : undefined,
-      enhancements: hunter.enhancements,
     },
     hunter.equipment,
   );
 
   const gear = EQUIPMENT_SLOTS.map((slot) => {
-    const itemId = hunter.equipment[slot];
+    const piece = hunter.equipment[slot];
     return {
       slot,
-      item: itemId ? (findItem(itemId) ?? null) : null,
-      level: itemId ? enhancementOf(hunter.enhancements, itemId) : 0,
+      item: piece ? (findItem(piece.itemId) ?? null) : null,
+      level: piece ? piece.enhancement : 0,
     };
   });
 
