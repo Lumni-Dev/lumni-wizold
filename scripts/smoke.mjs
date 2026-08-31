@@ -106,12 +106,17 @@ const state1 = (await call("POST", "/api/state")).payload?.data;
 check("nasce com 100 de bronze", state1?.character?.bronze === 100);
 check("carteira nasce com R$ 10", state1?.wallet?.cents === 1000);
 check("dez poções na mochila", state1?.inventory?.[0]?.quantity === 10);
-const turned = await call("POST", "/api/character/transform");
-check("transformação cobra 40 de fúria", turned.payload?.ok === true);
-const laidDown = await call("POST", "/api/character/rest");
-check("repouso aceito com a fúria gasta", laidDown.payload?.ok === true, laidDown.payload?.message);
-const turnedAgain = await call("POST", "/api/character/transform");
-check("virar a fera de novo", turnedAgain.payload?.ok === true, turnedAgain.payload?.message);
+const stockFury = await call("POST", "/api/market/buy", {
+  itemId: "rage-potion-small",
+  quantity: 2,
+});
+check("compra poção de fúria", stockFury.payload?.ok === true, stockFury.payload?.message);
+const raged = await call("POST", "/api/inventory/consume", { itemId: "rage-potion-small" });
+check("poção de fúria acende a fera", raged.payload?.ok === true, raged.payload?.message);
+const afterFury = (await call("POST", "/api/state")).payload?.data;
+check("fúria fica marcada no personagem", typeof afterFury?.character?.furyUntil === "string");
+const ragedAgain = await call("POST", "/api/inventory/consume", { itemId: "rage-potion-small" });
+check("em fúria recusa nova poção", ragedAgain.payload?.ok === false, ragedAgain.payload?.message);
 const staleCollect = await call("PATCH", "/api/character/rest");
 check(
   "atividade derruba o repouso no servidor",
