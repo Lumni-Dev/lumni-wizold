@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "@/controllers/api.client";
 import { useGame } from "@/controllers/game.context";
+import { detailInventory } from "@/controllers/inventory.controller";
 import { profileOf } from "@/controllers/ranking.controller";
 import { criticalMultiplierOf } from "@/models/rules/combat";
 import { findItem } from "@/models/data/items";
@@ -10,22 +11,37 @@ import { enhancementOf } from "@/models/rules/forge";
 import { EQUIPMENT_SLOTS } from "@/models/entities/item";
 import { findGender } from "@/models/entities/character";
 import type { Hunter } from "@/models/entities/ranking";
+import { FURY } from "@/shared/constants/tuning/fury";
 import { formatNumber } from "@/shared/utils/format";
+import { Button } from "../components/button";
 import { CopyNick } from "../components/copy-nick";
 import { Tag } from "../components/tag";
 import { DataRow } from "../components/data-row";
+import { EmptyState } from "../components/empty-state";
 import { GenderBanner } from "../components/gender-icon";
+import { ItemIcon } from "../components/item-icon";
 import { VitalActionButton } from "../components/vital-action-button";
-import { List, ListRow } from "../components/list";
+import { List, ListRow, RowText } from "../components/list";
 import { Panel } from "../components/panel";
 import { AttributesPanel } from "../components/attributes-panel";
 import { EquipmentPanel } from "../components/equipment-panel";
 import { ActivityLog } from "../components/activity-log";
 import { PageHeader } from "../layout/page-header";
 
+function furyClock(ms: number): string {
+  const total = Math.max(0, Math.ceil(ms / 1000));
+  return Math.floor(total / 60) + ":" + String(total % 60).padStart(2, "0");
+}
+
 export function CharacterScreen() {
-  const { state, character, stats } = useGame();
+  const { state, character, stats, consumeItem } = useGame();
   const [roster, setRoster] = useState<Hunter[] | null>(null);
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     let alive = true;
@@ -42,12 +58,20 @@ export function CharacterScreen() {
     [state, roster, character],
   );
 
+  const furyPotions = useMemo(
+    () => detailInventory(state).filter((slot) => slot.item.effect.furyMinutes !== undefined),
+    [state],
+  );
+
   if (!character || !stats) return null;
 
   const strength = stats.totalAttributes.strength;
   const endurance = stats.totalAttributes.endurance;
 
   const genderDefinition = findGender(character.gender);
+
+  const furyRemaining = character.furyUntil ? Date.parse(character.furyUntil) - now : 0;
+  const furyActive = furyRemaining > 0;
 
   const forge = EQUIPMENT_SLOTS.reduce((total, slot) => {
     const itemId = state.equipment[slot];
@@ -82,9 +106,9 @@ export function CharacterScreen() {
 
       <div className="grid items-start gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-1">
-          <Panel title="Ficha" action={<VitalActionButton size="small" />} padding="none">
+          <Panel title="Ficha" padding="none">
             <GenderBanner gender={character.gender} />
-            <div className="border-b border-edge p-4">
+            <div className="space-y-3 border-b border-edge p-4">
               <div className="min-w-0 space-y-1">
                 <div className="flex items-center gap-2">
                   <p className="min-w-0 truncate text-sm text-ink">{character.name}</p>
@@ -94,6 +118,7 @@ export function CharacterScreen() {
                   {genderDefinition.label}
                 </p>
               </div>
+              <VitalActionButton size="medium" fullWidth />
             </div>
 
             <List>
@@ -151,6 +176,45 @@ export function CharacterScreen() {
         </div>
 
         <div className="space-y-6 lg:col-span-2">
+          <Panel
+            title={furyActive ? "Fúria (Em fúria " + furyClock(furyRemaining) + ")" : "Fúria"}
+            description="A poção de fúria dá +10 em cada atributo enquanto dura, e não devolve vida."
+            padding="none"
+          >
+            {furyPotions.length === 0 ? (
+              <div className="p-4">
+                <EmptyState
+                  title="Sem poção de fúria"
+                  description="A poção de fúria é vendida no mercado."
+                />
+              </div>
+            ) : (
+              <List>
+                {furyPotions.map(({ item, quantity }) => (
+                  <ListRow key={item.id} padding="art">
+                    <ItemIcon item={item} />
+                    <RowText
+                      title={item.name}
+                      description={
+                        "+" +
+                        formatNumber(FURY.attributeBonus) +
+                        " em cada atributo por " +
+                        formatNumber(item.effect.furyMinutes ?? 0) +
+                        " min"
+                      }
+                    />
+                    <span className="font-mono text-xs text-ink-soft">
+                      x{formatNumber(quantity)}
+                    </span>
+                    <Button variant="primary" onClick={() => consumeItem(item.id)}>
+                      Usar
+                    </Button>
+                  </ListRow>
+                ))}
+              </List>
+            )}
+          </Panel>
+
           <Panel title="Combate" description="Cada linha diz de qual atributo ela sai." padding="none">
             <List>
               <DataRow label="Golpe (Força)" value={formatNumber(strength)} />

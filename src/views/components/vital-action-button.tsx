@@ -4,7 +4,13 @@ import { useGame } from "@/controllers/game.context";
 import { REST_TICK_MS } from "@/shared/constants/game";
 import { RecoveryButton } from "./recovery-button";
 
-export function VitalActionButton({ size = "medium" }: { size?: "small" | "medium" }) {
+export function VitalActionButton({
+  size = "medium",
+  fullWidth = false,
+}: {
+  size?: "small" | "medium";
+  fullWidth?: boolean;
+}) {
   const { character, stats, activity, setActivity, rest } = useGame();
   if (!character || !stats) return null;
 
@@ -15,6 +21,7 @@ export function VitalActionButton({ size = "medium" }: { size?: "small" | "mediu
   return (
     <RecoveryButton
       size={size}
+      fullWidth={fullWidth}
       recovering={resting}
       beat={String(character.health)}
       recoveringLabel="Recuperando-se..."

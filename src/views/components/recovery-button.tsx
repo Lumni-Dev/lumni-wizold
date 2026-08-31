@@ -13,6 +13,7 @@ export function RecoveryButton({
   tooltip,
   onClick,
   size,
+  fullWidth,
 }: {
   recovering: boolean;
   beat: string | number;
@@ -21,9 +22,15 @@ export function RecoveryButton({
   tooltip?: string | null;
   onClick: () => void;
   size?: "small" | "medium";
+  fullWidth?: boolean;
 }) {
   const button = (
-    <Button size={size} variant={recovering ? "secondary" : "primary"} onClick={onClick}>
+    <Button
+      size={size}
+      fullWidth={fullWidth}
+      variant={recovering ? "secondary" : "primary"}
+      onClick={onClick}
+    >
       {recovering ? (
         <>
           {recoveringLabel} <RestSeconds key={beat} />
