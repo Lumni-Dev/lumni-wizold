@@ -562,14 +562,20 @@ sec("arena");
   ok("banda no teto encosta em 1000", arena.arenaBand(1000).end === 1000);
   const band500 = arena.arenaBand(500);
   ok("banda de 500 tem 12%", band500.start === 440 && band500.end === 560);
-  const now = Date.now();
-  const iso = (msAgo) => new Date(now - msAgo).toISOString();
-  ok("sem selos, três ataques", arena.arenaCharges({}, now).left === 3);
-  ok("um selo ativo gasta um", arena.arenaCharges({ a: iso(60000) }, now).left === 2);
-  const spent = arena.arenaCharges({ a: iso(1000), b: iso(2000), c: iso(3000) }, now);
-  ok("três selos zeram", spent.left === 0 && spent.returnsIn > 0);
-  ok("selo vencido devolve", arena.arenaCharges({ a: iso(25 * 3600000) }, now).left === 3);
+  const now = Date.parse("2026-01-15T18:00:00.000Z");
+  const since06 = (h, m) => new Date(Date.UTC(2026, 0, 15, h, m ?? 0)).toISOString();
+  const before06 = (h) => new Date(Date.UTC(2026, 0, 14, h)).toISOString();
+  ok("sem selos, dez ataques", arena.arenaCharges({}, now).left === 10);
+  ok("um selo de hoje gasta um", arena.arenaCharges({ a: since06(17) }, now).left === 9);
+  const spent = arena.arenaCharges(
+    Object.fromEntries(Array.from({ length: 10 }, (_, i) => ["r" + i, since06(10, i)])),
+    now,
+  );
+  ok("dez selos zeram", spent.left === 0 && spent.returnsIn > 0);
+  ok("selo de ontem não conta", arena.arenaCharges({ a: before06(20) }, now).left === 10);
   ok("selo inválido não trava", arena.arenaCooldownLeft("data-podre", now) === 0);
+  ok("selo de hoje descansa até as 06:00", arena.arenaCooldownLeft(since06(17), now) > 0);
+  ok("selo de ontem já descansou", arena.arenaCooldownLeft(before06(20), now) === 0);
   const random = seededRandom(99);
   for (const level of [1, 100, 500, 1000]) {
     const range = arena.arenaSpoilsRange(level);
@@ -603,16 +609,14 @@ sec("arena");
   );
   const cooling = { ...inBand, arenaDuels: { [rival.id]: new Date().toISOString() } };
   ok(
-    "descanso de 24h é recusado",
+    "descanso até as 06:00 é recusado",
     arenaCtrl.resolveArena(cooling, pit, rival.id, random).ok === false,
   );
   const drained = {
     ...inBand,
-    arenaDuels: {
-      x: new Date().toISOString(),
-      y: new Date().toISOString(),
-      z: new Date().toISOString(),
-    },
+    arenaDuels: Object.fromEntries(
+      Array.from({ length: 10 }, (_, i) => ["r" + i, new Date().toISOString()]),
+    ),
   };
   ok(
     "sem ataques do dia é recusado",

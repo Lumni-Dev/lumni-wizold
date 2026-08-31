@@ -1,5 +1,5 @@
 import { huntPurse } from "../data/species";
-import { MAX_CHARACTER_LEVEL } from "@/shared/constants/game";
+import { MAX_CHARACTER_LEVEL, MINING_RESET_HOUR_UTC } from "@/shared/constants/game";
 import { clamp } from "@/shared/utils/format";
 import { intBetween, type Random } from "@/shared/utils/random";
 import type { LevelBand } from "../entities/creature";
@@ -10,20 +10,34 @@ import { deriveStatsOf, type DerivedStats } from "./stats";
 export const ARENA_BAND_RATIO = 0.12;
 export const ARENA_MIN_BAND = 5;
 
-export const ARENA_COOLDOWN_HOURS = 24;
+const DAY_MS = 86_400_000;
 
-const HOUR_MS = 3_600_000;
+export function arenaPeriodStart(now: number): number {
+  const at = new Date(now);
+  let boundary = Date.UTC(
+    at.getUTCFullYear(),
+    at.getUTCMonth(),
+    at.getUTCDate(),
+    MINING_RESET_HOUR_UTC,
+  );
+  if (now < boundary) boundary -= DAY_MS;
+  return boundary;
+}
+
+export function arenaResetsInMs(now: number): number {
+  return Math.max(0, arenaPeriodStart(now) + DAY_MS - now);
+}
 
 export function arenaCooldownLeft(lastDuelAt: string | undefined, now = Date.now()): number {
   if (!lastDuelAt) return 0;
 
-  const elapsed = now - Date.parse(lastDuelAt);
-  if (!Number.isFinite(elapsed)) return 0;
+  const stamp = Date.parse(lastDuelAt);
+  if (!Number.isFinite(stamp)) return 0;
 
-  return Math.max(0, ARENA_COOLDOWN_HOURS * HOUR_MS - elapsed);
+  return stamp >= arenaPeriodStart(now) ? arenaResetsInMs(now) : 0;
 }
 
-export const ARENA_DAILY_ATTACKS = 3;
+export const ARENA_DAILY_ATTACKS = 10;
 
 export interface ArenaCharges {
   left: number;
@@ -33,17 +47,18 @@ export interface ArenaCharges {
 }
 
 export function arenaCharges(duels: Record<string, string>, now = Date.now()): ArenaCharges {
-  const spent = Object.values(duels)
-    .map((at) => arenaCooldownLeft(at, now))
-    .filter((left) => left > 0)
-    .sort((first, second) => first - second);
+  const period = arenaPeriodStart(now);
+  const used = Object.values(duels).filter((at) => {
+    const stamp = Date.parse(at);
+    return Number.isFinite(stamp) && stamp >= period;
+  }).length;
 
-  const left = Math.max(0, ARENA_DAILY_ATTACKS - spent.length);
+  const left = Math.max(0, ARENA_DAILY_ATTACKS - used);
 
   return {
     left,
-    used: Math.min(ARENA_DAILY_ATTACKS, spent.length),
-    returnsIn: left > 0 ? 0 : (spent[0] ?? 0),
+    used: Math.min(ARENA_DAILY_ATTACKS, used),
+    returnsIn: left > 0 ? 0 : arenaResetsInMs(now),
   };
 }
 

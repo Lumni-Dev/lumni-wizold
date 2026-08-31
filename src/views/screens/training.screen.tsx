@@ -209,17 +209,15 @@ export function TrainingScreen() {
                     <Tag>+{effort.progress} de progresso por treinamento</Tag>
                     <Tag>Treino por {formatBronze(cost)}</Tag>
                   </div>
+                </CardBody>
 
-                  {row ? (
-                    <Bar
-                      label="Progresso"
-                      current={row.progress}
-                      maximum={row.needed}
-                      wraps
-                      className="mt-auto"
-                    />
-                  ) : null}
+                {row ? (
+                  <div className="border-t border-edge px-4 py-3">
+                    <Bar label="Progresso" current={row.progress} maximum={row.needed} wraps />
+                  </div>
+                ) : null}
 
+                <div className="border-t border-edge px-4 py-3">
                   <Bar
                     label="Treinamento"
                     current={session.id === exercise.id ? session.beat : 0}
@@ -227,13 +225,13 @@ export function TrainingScreen() {
                     glows={active}
                     wraps
                   />
-                </CardBody>
+                </div>
 
                 <CardFooter>
-                  <span className="text-[11px] text-ink-faint">
+                  <span className="min-w-0 flex-1 truncate text-[11px] text-ink-faint">
                     {active
                       ? opting
-                        ? "Pode parar agora ou seguir para a próxima."
+                        ? "Segue sozinho..."
                         : state.automation.train
                           ? "Treinando sem parar..."
                           : "Treinando..."
@@ -288,15 +286,18 @@ export function TrainingScreen() {
                   <Tag>+{petTraining.effort.progress} de progresso por treinamento</Tag>
                   <Tag>Treino por {formatBronze(petTraining.cost)}</Tag>
                 </div>
+              </CardBody>
 
+              <div className="border-t border-edge px-4 py-3">
                 <Bar
                   label="Progresso"
                   current={petTraining.progress}
                   maximum={petTraining.needed}
                   wraps
-                  className="mt-auto"
                 />
+              </div>
 
+              <div className="border-t border-edge px-4 py-3">
                 <Bar
                   label="Treinamento"
                   current={session.id === PET_EXERCISE_ID ? session.beat : 0}
@@ -304,13 +305,13 @@ export function TrainingScreen() {
                   glows={petActive}
                   wraps
                 />
-              </CardBody>
+              </div>
 
               <CardFooter>
-                <span className="text-[11px] text-ink-faint">
+                <span className="min-w-0 flex-1 truncate text-[11px] text-ink-faint">
                   {petActive
                     ? cooldown !== null
-                      ? "Pode parar agora ou seguir para a próxima."
+                      ? "Segue sozinho..."
                       : state.automation.train
                         ? "Treinando sem parar..."
                         : "Treinando..."

@@ -106,7 +106,7 @@ export function listArena(
     reason: !healthy
       ? "Vida baixa demais para subir na arena. Recupere-se ou use uma poção."
       : charges.left === 0
-        ? "Os três ataques do dia acabaram: o próximo volta em " +
+        ? "Os ataques do dia acabaram: o próximo volta em " +
           formatCooldown(charges.returnsIn) +
           "."
         : null,
@@ -190,7 +190,7 @@ export function resolveArena(
   if (charges.left === 0) {
     return failure(
       state,
-      "Os três ataques do dia acabaram: o próximo volta em " +
+      "Os ataques do dia acabaram: o próximo volta em " +
         formatCooldown(charges.returnsIn) +
         ".",
     );

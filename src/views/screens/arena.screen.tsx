@@ -13,12 +13,7 @@ import { ARENA_HISTORY_SIZE, type ArenaHistoryEntry } from "@/models/entities/ar
 import { ATTRIBUTES } from "@/models/entities/attribute";
 import type { Gender } from "@/models/entities/character";
 import type { Hunter } from "@/models/entities/ranking";
-import {
-  ARENA_COOLDOWN_HOURS,
-  ARENA_DAILY_ATTACKS,
-  arenaSpoilsRange,
-  arenaStats,
-} from "@/models/rules/arena";
+import { ARENA_DAILY_ATTACKS, arenaSpoilsRange, arenaStats } from "@/models/rules/arena";
 import type { DerivedStats } from "@/models/rules/stats";
 import { canPetFight, isPetActive } from "@/models/rules/pet";
 import { playSound } from "@/controllers/sound";
@@ -313,9 +308,7 @@ export function ArenaScreen() {
           formatNumber(view.spoils.min) +
           " a " +
           formatNumber(view.spoils.max) +
-          " de bronze, sorteados, e nunca mais que um quarto do que ele carrega. Quem perde paga pela mesma régua. Quem já duelou com você descansa " +
-          ARENA_COOLDOWN_HOURS +
-          " horas antes de subir de novo."
+          " de bronze, sorteados, e nunca mais que um quarto do que ele carrega. Quem perde paga pela mesma régua. Quem já duelou com você descansa até as 06:00 antes de subir de novo."
         }
         action={
           <Tag tone="neutral">
@@ -477,9 +470,7 @@ export function ArenaScreen() {
                               formatNumber(view.band.end) +
                               "."
                             : resting
-                              ? "Vocês já duelaram: ninguém sobe duas vezes contra o mesmo em " +
-                                ARENA_COOLDOWN_HOURS +
-                                " horas. Faltam " +
+                              ? "Vocês já duelaram hoje: o próximo desafio a ele reabre às 06:00. Faltam " +
                                 formatCooldown(cooldownLeft) +
                                 "."
                               : view.reason

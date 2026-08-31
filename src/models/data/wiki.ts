@@ -31,7 +31,6 @@ import {
 import { ARENA_HISTORY_SIZE } from "../entities/arena";
 import {
   ARENA_BAND_RATIO,
-  ARENA_COOLDOWN_HOURS,
   ARENA_DAILY_ATTACKS,
   ARENA_MIN_BAND,
   ARENA_SPOILS_MAX_HUNTS,
@@ -342,12 +341,8 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "Você escolhe o nome pela busca ou pede um adversário qualquer da sua faixa.",
       "São " +
         ARENA_DAILY_ATTACKS +
-        " ataques por dia: cada duelo gasta um, e cada um volta " +
-        ARENA_COOLDOWN_HOURS +
-        " horas depois de gasto.",
-      "Quem você enfrentou descansa as mesmas " +
-        ARENA_COOLDOWN_HOURS +
-        " horas antes de aceitar outro desafio seu.",
+        " ataques por dia, e todos voltam juntos às 06:00, a mesma hora que a mina reabre.",
+      "Quem você enfrentou descansa até as 06:00 antes de aceitar outro desafio seu.",
       "O fosso tem memória: as " +
         ARENA_HISTORY_SIZE +
         " últimas lutas do seu nome ficam registradas, as que você marcou e as que marcaram contra você, com o resultado e o bronze que mudou de mãos.",
