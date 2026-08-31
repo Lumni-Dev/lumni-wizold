@@ -15,6 +15,7 @@ import {
   MINING_TICK_MS,
   MINING_TICKS,
 } from "@/shared/constants/game";
+import { cn } from "@/shared/utils/class-names";
 import { formatBronze, formatNumber } from "@/shared/utils/format";
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
@@ -79,6 +80,7 @@ export function ForgeScreen() {
   const swingRef = useRef(0);
   const [cooldown, setCooldown] = useState<number | null>(null);
   const [confirmingItem, setConfirmingItem] = useState<string | null>(null);
+  const [selectedOre, setSelectedOre] = useState<string>("");
 
   useEffect(() => {
     if (!activeItem) return;
@@ -222,6 +224,17 @@ export function ForgeScreen() {
     ? (slots.find((entry) => entry.item.id === confirmingItem) ?? null)
     : null;
 
+  const unlockedOres = mining.ores.filter((entry) => entry.unlocked);
+  const effectiveOre =
+    activeOre ??
+    mining.ores.find((entry) => entry.ore.id === selectedOre)?.ore.id ??
+    unlockedOres.at(-1)?.ore.id ??
+    mining.ores[0]?.ore.id ??
+    "";
+  const selectedEntry = mining.ores.find((entry) => entry.ore.id === effectiveOre) ?? null;
+  const selectedAvailable = Boolean(selectedEntry?.unlocked) && !mining.dailyExhausted;
+  const mineOpting = activeOre !== null && cooldown !== null;
+
   function toggleMining(oreId: string, available: boolean) {
     if (activeOre === oreId) {
       if (cooldown !== null) setActivity(null);
@@ -246,7 +259,7 @@ export function ForgeScreen() {
       <div className="grid items-start gap-6 lg:grid-cols-2">
         <Panel
           title="Mina"
-          description="Cada veio pede um nível de mineração, e só o pique abre o próximo."
+          description="Escolha o veio e a picareta bate nele. Cada veio pede um nível de mineração, e só o pique abre o próximo."
           padding="none"
         >
           <List>
@@ -271,64 +284,92 @@ export function ForgeScreen() {
                 {"Reseta às " + RESET_LABEL + ", faltam " + formatCountdown(miningResetLeft)}
               </p>
             </ListRow>
+            <ListRow layout="column">
+              <Bar
+                label={activeOre ? "Minerando..." : "Minerar"}
+                current={swing.id === activeOre ? swing.beat : 0}
+                maximum={MINING_TICKS}
+                glows={activeOre !== null}
+                wraps
+              />
+              <div className="flex items-center justify-between gap-3 pt-1">
+                <span className="min-w-0 flex-1 truncate text-[11px] text-ink-faint">
+                  {activeOre
+                    ? mineOpting
+                      ? "Segue sozinha..."
+                      : state.automation.mine
+                        ? "Minerando sem parar..."
+                        : "Minerando..."
+                    : waitingOre
+                      ? "Esperando fôlego para voltar a minerar"
+                      : mining.dailyExhausted
+                        ? "Fôlego esgotado, reabre em " + formatCountdown(miningResetLeft)
+                        : selectedEntry
+                          ? selectedEntry.unlocked
+                            ? selectedEntry.ore.label
+                            : (selectedEntry.reason ?? "Veio bloqueado")
+                          : "Escolha um veio"}
+                </span>
+                <Button
+                  variant={activeOre ? "secondary" : selectedAvailable ? "primary" : "outline"}
+                  disabled={activeOre ? !mineOpting : !selectedAvailable || activeItem !== null}
+                  onClick={() => toggleMining(effectiveOre, selectedAvailable)}
+                  aria-label={activeOre ? "Parar de minerar" : "Minerar o veio escolhido"}
+                >
+                  {mineOpting
+                    ? "Parar (" + cooldown + ")"
+                    : activeOre
+                      ? "Minerando..."
+                      : "Minerar"}
+                </Button>
+              </div>
+            </ListRow>
             {mining.ores.map(({ ore, fragment, owned, unlocked, reason }) => {
-              const active = activeOre === ore.id;
-              const opting = active && cooldown !== null;
-              const available = unlocked && !mining.dailyExhausted;
-              const limitReason =
-                unlocked && mining.dailyExhausted
-                  ? "Limite de hoje atingido. Reabre em " + formatCountdown(miningResetLeft)
-                  : reason;
-
+              const isSelected = ore.id === effectiveOre;
               return (
-                <ListRow key={ore.id} layout="column" padding="art">
-                  <div className="flex items-center gap-3">
+                <ListRow key={ore.id}>
+                  <button
+                    type="button"
+                    onClick={() => unlocked && setSelectedOre(ore.id)}
+                    aria-pressed={isSelected}
+                    disabled={!unlocked || activeOre !== null}
+                    className={cn(
+                      "flex w-full items-center gap-3 text-left transition-colors",
+                      !unlocked && "opacity-60",
+                    )}
+                  >
                     {fragment ? <ItemIcon item={fragment} /> : <IconFrame>--</IconFrame>}
-                    <RowText
-                      title={ore.label}
-                      description={
-                        active
-                          ? opting
-                            ? "Pode parar agora ou seguir para a próxima."
-                            : state.automation.mine
-                              ? "Minerando sem parar..."
-                              : "Minerando..."
-                          : waitingOre === ore.id
-                            ? "Esperando para bater de novo"
-                            : (limitReason ??
-                              "+" + formatNumber(ore.progress) + " de progresso por batida")
-                      }
-                    />
-                    <div className="flex shrink-0 items-center gap-3">
-                      <span className="font-mono text-[11px] text-ink-faint">
-                        x{formatNumber(owned)}
-                      </span>
-                      <Button
-                        variant={active ? "secondary" : available ? "primary" : "outline"}
-                        disabled={
-                          active ? !opting : !available || activeItem !== null
-                        }
-                        onClick={() => toggleMining(ore.id, available)}
-                        aria-label={
-                          (active ? "Parar de minerar " : "Minerar ") + ore.label
-                        }
+                    <div className="min-w-0 flex-1">
+                      <p
+                        className={cn(
+                          "truncate text-sm",
+                          isSelected
+                            ? "text-ember"
+                            : unlocked
+                              ? "text-ink-soft"
+                              : "text-ink-faint",
+                        )}
                       >
-                        {opting ? "Parar (" + cooldown + ")" : active ? "Minerando..." : "Minerar"}
-                      </Button>
+                        {ore.label}
+                      </p>
+                      <p className="text-[11px] text-ink-faint">
+                        {unlocked
+                          ? "+" + formatNumber(ore.progress) + " de progresso por batida"
+                          : reason}
+                      </p>
                     </div>
-                  </div>
-
-                  {active ? (
-                    <div className="pt-2">
-                      <Bar
-                        label="Minerando..."
-                        current={swing.id === ore.id ? swing.beat : 0}
-                        maximum={MINING_TICKS}
-                        glows
-                        wraps
-                      />
-                    </div>
-                  ) : null}
+                    <span className="shrink-0 font-mono text-[11px] text-ink-faint">
+                      x{formatNumber(owned)}
+                    </span>
+                    <span
+                      className={cn(
+                        "grid h-4 w-4 shrink-0 place-items-center rounded-full border",
+                        isSelected ? "border-ember" : "border-edge-strong",
+                      )}
+                    >
+                      {isSelected ? <span className="h-2 w-2 rounded-full bg-ember" /> : null}
+                    </span>
+                  </button>
                 </ListRow>
               );
             })}
