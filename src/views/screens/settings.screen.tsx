@@ -6,14 +6,14 @@ import { api } from "@/controllers/api.client";
 import { useArt } from "@/controllers/art.context";
 import { renameCost, renameDaysLeft } from "@/controllers/character.controller";
 import { AUTOMATIONS } from "@/models/entities/automation";
-import { isVip } from "@/models/rules/vip";
+import { isVip, VIP_PRICE_CENTS } from "@/models/rules/vip";
 import { useGame } from "@/controllers/game.context";
 import { playSound } from "@/controllers/sound";
 import { disableTavernPush, enableTavernPush, testTavernPush } from "@/controllers/tavern-notify";
 import { soundRepository } from "@/models/repositories/sound.repository";
 import { tavernPushRepository } from "@/models/repositories/tavern-push.repository";
 import { NAME_MAX_LENGTH, RENAME_COOLDOWN_DAYS } from "@/shared/constants/game";
-import { formatNumber, formatBronze } from "@/shared/utils/format";
+import { formatNumber, formatBronze, formatReais, formatDay } from "@/shared/utils/format";
 import { sanitizeName } from "@/shared/utils/text";
 import { Button } from "../components/button";
 import { Chip } from "../components/chip";
@@ -37,6 +37,9 @@ export function SettingsScreen() {
     logout,
     logoutEverywhere,
     setAutomation,
+    buyVip,
+    cancelVip,
+    reactivateVip,
   } = useGame();
   const router = useRouter();
   const [now] = useState(() => Date.now());
@@ -64,6 +67,7 @@ export function SettingsScreen() {
   const art = useArt();
   const [confirmingClear, setConfirmingClear] = useState(false);
   const [clearing, setClearing] = useState(false);
+  const [cancelingVip, setCancelingVip] = useState(false);
 
   async function clearGameCache() {
     setClearing(true);
@@ -250,13 +254,30 @@ export function SettingsScreen() {
         }
         padding="none"
         footer={
-          vip ? undefined : (
+          vip ? (
             <div className="flex flex-wrap items-center justify-between gap-3">
               <span className="text-[11px] text-ink-faint">
-                A automação é um recurso VIP. Ative na loja para ligar as chaves.
+                {character.vipCanceling
+                  ? "VIP ativo até " + formatDay(character.vipUntil ?? "") + ", sem renovar."
+                  : "Assinatura ativa, renova em " + formatDay(character.vipUntil ?? "") + "."}
               </span>
-              <Button variant="primary" onClick={() => router.push("/store")}>
-                Ativar VIP
+              {character.vipCanceling ? (
+                <Button variant="primary" onClick={() => reactivateVip()}>
+                  Reativar assinatura
+                </Button>
+              ) : (
+                <Button variant="outline" onClick={() => setCancelingVip(true)}>
+                  Cancelar assinatura
+                </Button>
+              )}
+            </div>
+          ) : (
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <span className="text-[11px] text-ink-faint">
+                A automação é um recurso VIP. Ative para ligar as chaves.
+              </span>
+              <Button variant="primary" onClick={() => buyVip()}>
+                Ativar VIP por {formatReais(VIP_PRICE_CENTS)}/mês
               </Button>
             </div>
           )
@@ -387,6 +408,18 @@ export function SettingsScreen() {
         onConfirm={() => {
           setConfirmingClear(false);
           void clearGameCache();
+        }}
+      />
+
+      <ConfirmDialog
+        open={cancelingVip}
+        title="Cancelar assinatura VIP"
+        description="A cobrança mensal para de renovar. O VIP continua ativo até o fim do período já pago, e dá para reativar antes disso."
+        confirmLabel="Cancelar assinatura"
+        onCancel={() => setCancelingVip(false)}
+        onConfirm={() => {
+          setCancelingVip(false);
+          void cancelVip();
         }}
       />
 

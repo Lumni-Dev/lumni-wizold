@@ -1,7 +1,15 @@
 import { NextResponse } from "next/server";
 import { withTransaction } from "@/models/repositories/server/database";
-import { fulfillSession } from "../../_lib/fulfill";
-import { verifyStripeSignature, type StripeSession } from "../../_lib/stripe";
+import { fulfillInvoice, fulfillSession, fulfillSubscriptionEnded } from "../../_lib/fulfill";
+import { sessionFromRaw, subscriptionFromRaw, verifyStripeSignature } from "../../_lib/stripe";
+
+function invoiceSubscriptionId(raw: Record<string, unknown>): string {
+  if (typeof raw.subscription === "string") return raw.subscription;
+  const parent = raw.parent as Record<string, unknown> | undefined;
+  const details = parent?.subscription_details as Record<string, unknown> | undefined;
+  if (typeof details?.subscription === "string") return details.subscription;
+  return "";
+}
 
 export async function POST(request: Request) {
   const payload = await request.text();
@@ -17,22 +25,31 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json({ received: false }, { status: 400 });
   }
-  if (event.type !== "checkout.session.completed" || !event.data?.object) {
+  const object = event.data?.object;
+  if (!object || typeof object !== "object") {
     return NextResponse.json({ received: true });
   }
-  const raw = event.data.object as Record<string, unknown>;
-  const session: StripeSession = {
-    id: String(raw.id ?? ""),
-    url: null,
-    payment_status: String(raw.payment_status ?? ""),
-    payment_intent: typeof raw.payment_intent === "string" ? raw.payment_intent : null,
-    amount_total: typeof raw.amount_total === "number" ? raw.amount_total : null,
-    currency: String(raw.currency ?? ""),
-    metadata: (raw.metadata ?? {}) as Record<string, string>,
-  };
+  const raw = object as Record<string, unknown>;
   try {
-    const outcome = await withTransaction((client) => fulfillSession(client, session));
-    return NextResponse.json({ received: true, ok: outcome.ok });
+    if (event.type === "checkout.session.completed") {
+      const outcome = await withTransaction((client) =>
+        fulfillSession(client, sessionFromRaw(raw)),
+      );
+      return NextResponse.json({ received: true, ok: outcome.ok });
+    }
+    if (event.type === "invoice.paid") {
+      const subscriptionId = invoiceSubscriptionId(raw);
+      if (!subscriptionId) return NextResponse.json({ received: true });
+      const outcome = await withTransaction((client) => fulfillInvoice(client, subscriptionId));
+      return NextResponse.json({ received: true, ok: outcome.ok });
+    }
+    if (event.type === "customer.subscription.deleted") {
+      const outcome = await withTransaction((client) =>
+        fulfillSubscriptionEnded(client, subscriptionFromRaw(raw)),
+      );
+      return NextResponse.json({ received: true, ok: outcome.ok });
+    }
+    return NextResponse.json({ received: true });
   } catch (error) {
     console.error("[api] POST /api/stripe/webhook", error);
     return NextResponse.json({ received: false }, { status: 500 });

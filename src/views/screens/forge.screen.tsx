@@ -425,7 +425,7 @@ export function ForgeScreen() {
           <Panel
             title="Bigorna"
             description={
-              "Escolha uma peça em Disponíveis e ela entra na bigorna. Cada nível soma um ponto de força ou resistência mais 0,2% da peça original, até +" +
+              "Escolha uma peça em Disponíveis e ela entra na bigorna. Cada nível soma 0,3% dos atributos da peça original, então um set forte rende muito e uma peça barata sobe devagar, até +" +
               formatNumber(MAX_ENHANCEMENT) +
               "."
             }
@@ -454,6 +454,11 @@ export function ForgeScreen() {
                           : " → " + formatNumber(attribute.nextValue)}
                       </p>
                     ))}
+                    {forgeEntry.level > 0 ? (
+                      <p className="font-mono text-[10px] text-ink-faint">
+                        Já somou +{formatNumber(forgeEntry.forgeBonus)} de forja
+                      </p>
+                    ) : null}
                   </div>
                 </div>
 

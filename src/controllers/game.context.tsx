@@ -94,6 +94,8 @@ interface GameContextValue {
   requestWithdraw: (pixKey: string, fullName: string, cpf: string) => Promise<boolean>;
   buyPack: (packId: string) => Promise<boolean>;
   buyVip: () => Promise<boolean>;
+  cancelVip: () => Promise<boolean>;
+  reactivateVip: () => Promise<boolean>;
   confirmPayment: (sessionId: string) => Promise<boolean>;
   mine: (oreId: string) => Promise<boolean>;
   enhance: (
@@ -650,6 +652,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
           return true;
         }
         return false;
+      },
+      cancelVip: async () => {
+        const answer = await act("POST", "/api/vip/cancel", undefined, "Loja");
+        return answer.ok;
+      },
+      reactivateVip: async () => {
+        const answer = await act("POST", "/api/vip/reactivate", undefined, "Loja");
+        return answer.ok;
       },
       confirmPayment: async (sessionId) => {
         const answer = await act("POST", "/api/stripe/confirm", { sessionId }, "Pagamento", () =>

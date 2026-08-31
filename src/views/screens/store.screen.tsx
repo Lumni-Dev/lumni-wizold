@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { api } from "@/controllers/api.client";
 import { useGame } from "@/controllers/game.context";
 import { listPacks } from "@/controllers/store.controller";
 import { findPack } from "@/models/data/store-packs";
-import { isVip, VIP_DAYS, VIP_PRICE_CENTS } from "@/models/rules/vip";
+import { isVip, VIP_PRICE_CENTS } from "@/models/rules/vip";
 import { formatDay, formatNumber, formatReais, formatBronze } from "@/shared/utils/format";
 import { Button } from "../components/button";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
@@ -49,6 +50,7 @@ const STATUS_TONE: Record<string, "light" | "neutral" | "faint"> = {
 
 export function StoreScreen() {
   const { state, character, buyPack, buyVip, confirmPayment } = useGame();
+  const router = useRouter();
   const [now] = useState(() => Date.now());
   const [historyPage, setHistoryPage] = useState(1);
   const [historyStamp, setHistoryStamp] = useState(0);
@@ -86,28 +88,28 @@ export function StoreScreen() {
 
       <Panel
         title="VIP"
-        description={
-          "Libera todas as chaves de Automação nas configurações: a partida caça, treina, minera e forja sozinha, e se recupera sozinha. Passe de " +
-          VIP_DAYS +
-          " dias."
-        }
+        description="Libera todas as chaves de Automação nas configurações: a partida caça, treina, minera e forja sozinha, e se recupera sozinha. Assinatura mensal, cancele quando quiser."
         action={
-          vip ? (
-            <Tag tone="light">Ativo até {formatDay(character.vipUntil ?? "")}</Tag>
-          ) : (
-            <Tag tone="neutral">{formatReais(VIP_PRICE_CENTS)} por 30 dias</Tag>
-          )
+          vip ? <Tag tone="light">Ativo até {formatDay(character.vipUntil ?? "")}</Tag> : undefined
         }
         footer={
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span className="text-[11px] text-ink-faint">
               {vip
-                ? "Renovar soma 30 dias ao que ainda falta."
-                : "Pagamento pelo Stripe. O VIP entra assim que o pagamento confirma."}
+                ? character.vipCanceling
+                  ? "Ativo até " + formatDay(character.vipUntil ?? "") + ", sem renovar."
+                  : "Renova sozinho a cada mês. Cancele nas configurações."
+                : "O VIP entra assim que o pagamento confirma."}
             </span>
-            <Button variant="primary" onClick={() => buyVip()}>
-              {vip ? "Renovar VIP" : "Ativar VIP por " + formatReais(VIP_PRICE_CENTS)}
-            </Button>
+            {vip ? (
+              <Button variant="outline" onClick={() => router.push("/settings")}>
+                Gerenciar nas configurações
+              </Button>
+            ) : (
+              <Button variant="primary" onClick={() => buyVip()}>
+                Ativar VIP por {formatReais(VIP_PRICE_CENTS)}/mês
+              </Button>
+            )}
           </div>
         }
       >
@@ -116,18 +118,6 @@ export function StoreScreen() {
           martelada. Com VIP, as chaves das configurações passam a repetir tudo sozinhas e a se
           encadear. É conforto, não vantagem de números: o que a caça, o treino e a mina rendem
           continua o mesmo.
-        </p>
-      </Panel>
-
-      <Panel
-        title="Como o preço é feito"
-        description="Pagamento pelo Stripe, e a mesma conta da economia."
-      >
-        <p className="text-xs leading-relaxed text-ink-soft">
-          Cada pacote vale um número de caçadas da sua faixa, não um número solto de WCoins. Uma
-          caçada sua paga {formatBronze(offers[0].bronze / offers[0].pack.hunts)} hoje, então é isso
-          que o pacote multiplica. Subir de faixa aumenta o que você recebe pelo mesmo preço, e é
-          por isso que comprar cedo nunca vira atalho: o pacote entrega tempo, sempre o mesmo tempo.
         </p>
       </Panel>
 
@@ -199,7 +189,7 @@ export function StoreScreen() {
                 <RowText
                   title={
                     entry.packId === "vip"
-                      ? "VIP (" + VIP_DAYS + " dias)"
+                      ? "Assinatura VIP"
                       : (findPack(entry.packId)?.name ?? entry.packId)
                   }
                   description={formatDay(entry.at)}

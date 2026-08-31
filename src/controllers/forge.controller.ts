@@ -145,6 +145,7 @@ export interface ForgePiece {
   bronzeCost: number;
   canForge: boolean;
   reason: string | null;
+  forgeBonus: number;
   attributes: { key: AttributeKey; name: string; value: number; nextValue: number }[];
 }
 
@@ -170,6 +171,11 @@ export function listForge(state: GameState): ForgePiece[] {
 
     const current = enhancedEffect(item, level);
     const next = enhancedEffect(item, level + 1);
+    const forgeBonus = ATTRIBUTES.reduce((sum, definition) => {
+      const enhanced = current.attributes?.[definition.key] ?? 0;
+      const rawBase = item.effect.attributes?.[definition.key] ?? 0;
+      return sum + Math.max(0, enhanced - rawBase);
+    }, 0);
 
     pieces.push({
       item,
@@ -179,6 +185,7 @@ export function listForge(state: GameState): ForgePiece[] {
       cost,
       owned,
       bronzeCost,
+      forgeBonus,
       canForge: Boolean(fragment) && !maxed && owned >= cost && bronze >= bronzeCost,
       reason: maxed
         ? "No teto de +" + MAX_ENHANCEMENT

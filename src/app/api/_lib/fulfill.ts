@@ -9,8 +9,13 @@ import * as bazaarController from "@/controllers/bazaar.controller";
 import * as storeController from "@/controllers/store.controller";
 import { lockListing, logSale, settleSale } from "@/models/repositories/server/bazaar.store";
 import { loadGame, recordWalletMovement, saveGame } from "@/models/repositories/server/game.store";
-import { refundPayment, type StripeSession } from "./stripe";
-import { VIP_PRICE_CENTS } from "@/models/rules/vip";
+import {
+  refundPayment,
+  retrieveSubscription,
+  type StripeSession,
+  type StripeSubscription,
+} from "./stripe";
+import { VIP_DAYS, VIP_PRICE_CENTS } from "@/models/rules/vip";
 
 export interface FulfillOutcome {
   ok: boolean;
@@ -107,25 +112,31 @@ export async function fulfillSession(
   }
 
   if (session.metadata.kind === "vip") {
-    if (session.amount_total !== VIP_PRICE_CENTS) {
+    const subscriptionId = session.subscription;
+    if (!subscriptionId) {
       const returned = await returnMoney(client, session, characterId);
-      return { ok: false, message: "Pagamento não bate com o VIP: " + returned + "." };
+      return { ok: false, message: "Assinatura VIP sem identificador: " + returned + "." };
     }
-    const result = storeController.purchaseVip(loaded.state, Date.now());
+    const subscription = await retrieveSubscription(subscriptionId);
+    const periodEnd =
+      subscription && subscription.currentPeriodEnd > 0
+        ? subscription.currentPeriodEnd * 1000
+        : Date.now() + VIP_DAYS * 86_400_000;
+    const result = storeController.applyVipSubscription(
+      loaded.state,
+      subscriptionId,
+      periodEnd,
+      subscription?.cancelAtPeriodEnd === true,
+    );
     if (!result.ok || !result.data) {
-      const returned = await returnMoney(client, session, characterId);
-      await client.query(
-        "update store_purchases set status = 'refunded', settled_at = now() where id = $1",
-        [session.id],
-      );
-      return { ok: false, message: result.message + " " + returned + "." };
+      return { ok: false, message: result.message };
     }
     await saveGame(client, characterId, loaded.state, result.state);
     await client.query(
       `insert into store_purchases (id, character_id, pack_id, price_cents, bronze_granted, status, settled_at)
        values ($1, $2, 'vip', $3, 0, 'approved', now())
        on conflict (id) do update set status = 'approved', settled_at = now()`,
-      [session.id, characterId, VIP_PRICE_CENTS],
+      [session.id, characterId, session.amount_total ?? VIP_PRICE_CENTS],
     );
     return { ok: true, message: result.message };
   }
@@ -174,4 +185,59 @@ export async function fulfillSession(
   }
 
   return { ok: false, message: "Tipo de pagamento desconhecido." };
+}
+
+async function applySubscriptionState(
+  client: PoolClient,
+  subscription: StripeSubscription,
+  ended: boolean,
+): Promise<FulfillOutcome> {
+  const userId = subscription.metadata.userId ?? "";
+  const characterId = subscription.metadata.characterId ?? "";
+  if (!userId || !characterId) return { ok: true, message: "Assinatura sem dono conhecido." };
+
+  const loaded = await loadGame(client, userId, true);
+  if (!loaded || loaded.characterId !== characterId) {
+    return { ok: true, message: "Partida deste pagamento não encontrada." };
+  }
+
+  if (ended) {
+    if ((loaded.state.character?.vipSubscriptionId ?? "") !== subscription.id) {
+      return { ok: true, message: "Assinatura já substituída." };
+    }
+    const result = storeController.endVipSubscription(loaded.state);
+    if (!result.ok) return { ok: false, message: result.message };
+    await saveGame(client, characterId, loaded.state, result.state);
+    return { ok: true, message: result.message };
+  }
+
+  const periodEnd =
+    subscription.currentPeriodEnd > 0
+      ? subscription.currentPeriodEnd * 1000
+      : Date.now() + VIP_DAYS * 86_400_000;
+  const result = storeController.applyVipSubscription(
+    loaded.state,
+    subscription.id,
+    periodEnd,
+    subscription.cancelAtPeriodEnd,
+  );
+  if (!result.ok) return { ok: false, message: result.message };
+  await saveGame(client, characterId, loaded.state, result.state);
+  return { ok: true, message: result.message };
+}
+
+export async function fulfillInvoice(
+  client: PoolClient,
+  subscriptionId: string,
+): Promise<FulfillOutcome> {
+  const subscription = await retrieveSubscription(subscriptionId);
+  if (!subscription) return { ok: false, message: "Assinatura não encontrada no Stripe." };
+  return applySubscriptionState(client, subscription, false);
+}
+
+export async function fulfillSubscriptionEnded(
+  client: PoolClient,
+  subscription: StripeSubscription,
+): Promise<FulfillOutcome> {
+  return applySubscriptionState(client, subscription, true);
 }

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { Item } from "@/models/entities/item";
+import { enhancedName } from "@/models/rules/forge";
 import { itemSubtitle, summarizeEffect } from "../presenters/item.presenter";
 import { Card, CardBody, CardFooter, CardHeader } from "./card";
 import { ItemIcon } from "./item-icon";
@@ -32,7 +33,9 @@ export function ItemCard({
         <ItemIcon item={item} enhancement={enhancement} />
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="truncate text-sm font-medium text-ink">{item.name}</h3>
+            <h3 className="truncate text-sm font-medium text-ink">
+              {enhancedName(item.name, enhancement)}
+            </h3>
             {quantity && quantity > 1 ? (
               <span className="font-mono text-xs text-ink-soft">x{quantity}</span>
             ) : null}

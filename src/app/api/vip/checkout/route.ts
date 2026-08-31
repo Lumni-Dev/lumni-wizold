@@ -1,14 +1,17 @@
 import { failure, success } from "@/models/entities/result";
-import { VIP_DAYS, VIP_PRICE_CENTS } from "@/models/rules/vip";
-import { createCheckoutSession } from "../../_lib/stripe";
+import { hasVipSubscription, VIP_PRICE_CENTS } from "@/models/rules/vip";
+import { createSubscriptionSession } from "../../_lib/stripe";
 import { withGame } from "../../_lib/api";
 
 export async function POST(request: Request) {
   return withGame(request, async (state, _body, context) => {
+    if (state.character && hasVipSubscription(state.character)) {
+      return failure(state, "Você já tem uma assinatura VIP. Gerencie nas configurações.");
+    }
     const origin = new URL(request.url).origin;
     try {
-      const session = await createCheckoutSession({
-        name: "VIP Wizold (" + VIP_DAYS + " dias) - Wizold",
+      const session = await createSubscriptionSession({
+        name: "VIP Wizold - assinatura mensal",
         amountCents: VIP_PRICE_CENTS,
         metadata: {
           kind: "vip",

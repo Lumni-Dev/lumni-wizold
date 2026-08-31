@@ -1,5 +1,5 @@
 import { ATTRIBUTES } from "@/models/entities/attribute";
-import { CATEGORY_LABEL, RARITY_LABEL, SET_LABEL, type Item } from "@/models/entities/item";
+import { CATEGORY_LABEL, type Item } from "@/models/entities/item";
 import { enhancedEffect } from "@/models/rules/forge";
 
 export function itemInitials(name: string): string {
@@ -11,10 +11,7 @@ export function itemInitials(name: string): string {
 }
 
 export function itemSubtitle(item: Item): string {
-  const category = CATEGORY_LABEL[item.category];
-  return item.set
-    ? category + " - " + SET_LABEL[item.set]
-    : category + " - " + RARITY_LABEL[item.rarity];
+  return CATEGORY_LABEL[item.category];
 }
 
 function percent(ratio: number): string {

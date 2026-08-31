@@ -702,7 +702,6 @@ export function TavernScreen() {
           <form onSubmit={submitMessage} className="flex items-center gap-2">
             <div className="relative min-w-0 flex-1">
               <Field
-                compact
                 aria-label="Mensagem"
                 placeholder="Diga alguma coisa"
                 maxLength={MESSAGE_MAX_LENGTH}
@@ -755,7 +754,7 @@ export function TavernScreen() {
                   if (!emojiOpen) setEmojiRect(emojiRef.current?.getBoundingClientRect() ?? null);
                   setEmojiOpen((open) => !open);
                 }}
-                className="grid h-8 w-8 place-items-center rounded-md border border-edge text-ink-faint transition-colors hover:border-edge-strong hover:bg-surface-high hover:text-ink"
+                className="grid h-10 w-10 place-items-center rounded-md border border-edge text-ink-faint transition-colors hover:border-edge-strong hover:bg-surface-high hover:text-ink"
               >
                 <ActionIcon action="smile" className="h-4 w-4" />
               </button>
@@ -763,6 +762,7 @@ export function TavernScreen() {
             <Button
               type="submit"
               variant="primary"
+              size="medium"
               disabled={draft.trim().length === 0 || cooldownLeft > 0}
             >
               {cooldownLeft > 0 ? Math.ceil(cooldownLeft / 1000) : "Enviar"}

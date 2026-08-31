@@ -44,21 +44,49 @@ async function stripeCall(
 export interface StripeSession {
   id: string;
   url: string | null;
+  mode: string;
   payment_status: string;
   payment_intent: string | null;
+  subscription: string | null;
   amount_total: number | null;
   currency: string;
   metadata: Record<string, string>;
 }
 
-function asSession(body: Record<string, unknown>): StripeSession {
+export function sessionFromRaw(body: Record<string, unknown>): StripeSession {
   return {
     id: String(body.id),
     url: typeof body.url === "string" ? body.url : null,
+    mode: String(body.mode ?? ""),
     payment_status: String(body.payment_status ?? ""),
     payment_intent: typeof body.payment_intent === "string" ? body.payment_intent : null,
+    subscription: typeof body.subscription === "string" ? body.subscription : null,
     amount_total: typeof body.amount_total === "number" ? body.amount_total : null,
     currency: String(body.currency ?? ""),
+    metadata: (body.metadata ?? {}) as Record<string, string>,
+  };
+}
+
+export interface StripeSubscription {
+  id: string;
+  status: string;
+  currentPeriodEnd: number;
+  cancelAtPeriodEnd: boolean;
+  metadata: Record<string, string>;
+}
+
+export function subscriptionFromRaw(body: Record<string, unknown>): StripeSubscription {
+  const topPeriodEnd = typeof body.current_period_end === "number" ? body.current_period_end : 0;
+  const items = (body.items as { data?: Array<Record<string, unknown>> } | undefined)?.data;
+  const itemPeriodEnd =
+    items && items[0] && typeof items[0].current_period_end === "number"
+      ? (items[0].current_period_end as number)
+      : 0;
+  return {
+    id: String(body.id),
+    status: String(body.status ?? ""),
+    currentPeriodEnd: topPeriodEnd > 0 ? topPeriodEnd : itemPeriodEnd,
+    cancelAtPeriodEnd: body.cancel_at_period_end === true,
     metadata: (body.metadata ?? {}) as Record<string, string>,
   };
 }
@@ -86,12 +114,65 @@ export async function createCheckoutSession(input: {
   for (const [key, value] of Object.entries(input.metadata)) {
     data["metadata[" + key + "]"] = value;
   }
-  return asSession(await stripeCall("POST", "/checkout/sessions", data));
+  return sessionFromRaw(await stripeCall("POST", "/checkout/sessions", data));
+}
+
+export async function createSubscriptionSession(input: {
+  name: string;
+  amountCents: number;
+  metadata: Record<string, string>;
+  successUrl: string;
+  cancelUrl: string;
+}): Promise<StripeSession> {
+  const data: Record<string, string> = {
+    mode: "subscription",
+    success_url: input.successUrl,
+    cancel_url: input.cancelUrl,
+    "line_items[0][quantity]": "1",
+    "line_items[0][price_data][currency]": "brl",
+    "line_items[0][price_data][unit_amount]": String(input.amountCents),
+    "line_items[0][price_data][recurring][interval]": "month",
+    "line_items[0][price_data][product_data][name]": input.name,
+  };
+  for (const [key, value] of Object.entries(input.metadata)) {
+    data["metadata[" + key + "]"] = value;
+    data["subscription_data[metadata][" + key + "]"] = value;
+  }
+  return sessionFromRaw(await stripeCall("POST", "/checkout/sessions", data));
 }
 
 export async function retrieveSession(sessionId: string): Promise<StripeSession | null> {
   try {
-    return asSession(await stripeCall("GET", "/checkout/sessions/" + encodeURIComponent(sessionId)));
+    return sessionFromRaw(
+      await stripeCall("GET", "/checkout/sessions/" + encodeURIComponent(sessionId)),
+    );
+  } catch {
+    return null;
+  }
+}
+
+export async function retrieveSubscription(
+  subscriptionId: string,
+): Promise<StripeSubscription | null> {
+  try {
+    return subscriptionFromRaw(
+      await stripeCall("GET", "/subscriptions/" + encodeURIComponent(subscriptionId)),
+    );
+  } catch {
+    return null;
+  }
+}
+
+export async function setSubscriptionCancel(
+  subscriptionId: string,
+  cancelAtPeriodEnd: boolean,
+): Promise<StripeSubscription | null> {
+  try {
+    return subscriptionFromRaw(
+      await stripeCall("POST", "/subscriptions/" + encodeURIComponent(subscriptionId), {
+        cancel_at_period_end: cancelAtPeriodEnd ? "true" : "false",
+      }),
+    );
   } catch {
     return null;
   }
