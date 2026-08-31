@@ -120,13 +120,12 @@ check(
 );
 const hunt = await call("POST", "/api/hunt", { territoryId: "village-field" });
 const report = hunt.payload?.data;
-check("caçada resolve e segura", hunt.payload?.ok === true && Array.isArray(report?.combat?.rounds));
-const held = (await call("POST", "/api/state")).payload?.data;
-check("resolve não grava antes do commit", held?.character?.hunts === 0);
-const commit = await call("POST", "/api/hunt/commit", {});
-check("commit fecha a caçada", commit.payload?.ok === true, commit.payload?.message);
+check(
+  "caçada resolve e grava atômica",
+  hunt.payload?.ok === true && Array.isArray(report?.combat?.rounds),
+);
 const state2 = (await call("POST", "/api/state")).payload?.data;
-check("caçada contou só no commit", state2?.character?.hunts === 1);
+check("caçada contou no servidor", state2?.character?.hunts === 1);
 const bought = await call("POST", "/api/market/buy", {
   itemId: "health-potion-small",
   quantity: 1,

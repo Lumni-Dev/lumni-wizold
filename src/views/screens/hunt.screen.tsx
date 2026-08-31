@@ -5,12 +5,9 @@ import { useGame } from "@/controllers/game.context";
 import { listTerritories, type HuntReport } from "@/controllers/hunt.controller";
 import { usePageActivity } from "@/controllers/use-page-activity";
 import { playSound } from "@/controllers/sound";
-import { petLevelOf, petMaxEnergy } from "@/models/rules/pet";
 import { emphasizeDamage, narrationOf, type NarrationLine } from "../presenters/hunt.presenter";
 import { DANGER_LABEL } from "@/models/entities/territory";
-import { canPetFight, isPetActive } from "@/models/rules/pet";
-import { HUNT_TICK_MS, HUNT_TICKS } from "@/shared/constants/game";
-import { progressRepository } from "@/models/repositories/progress.repository";
+import { CYCLE_OPTOUT_SECS, HUNT_TICK_MS, HUNT_TICKS } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
 import { formatNumber } from "@/shared/utils/format";
 import { ArtImage } from "../components/art-image";
@@ -147,19 +144,18 @@ function CombatReport({ report, lines }: { report: HuntReport; lines: NarrationL
   );
 }
 export function HuntScreen() {
-  const { state, character, pet, hunt, sufferBlow, commitHunt, notify, activity, setActivity } =
-    useGame();
+  const { state, character, hunt, sufferBlow, landHunt, notify, activity, setActivity } = useGame();
   usePageActivity(["hunt"]);
   const art = useArt();
   const paused = activity?.paused === true;
   const activeId = activity?.kind === "hunt" && !paused ? (activity.id ?? null) : null;
   const waitingId = activity?.kind === "hunt" && paused ? (activity.id ?? null) : null;
-  const petAlong = canPetFight(pet) ? pet : null;
   const [report, setReport] = useState<HuntReport | null>(null);
   const [selection, setSelection] = useState<Record<string, string>>(() => loadHuntSelection());
   const [reportLines, setReportLines] = useState<NarrationLine[]>([]);
   const [session, setSession] = useState<HuntSession>(EMPTY_SESSION);
   const [progress, setProgress] = useState<{ id: string; beat: number }>({ id: "", beat: 0 });
+  const [cooldown, setCooldown] = useState<number | null>(null);
   const [script, setScript] = useState<NarrationLine[]>([]);
   const [pending, setPending] = useState<HuntReport | null>(null);
   const [preyJolt, setPreyJolt] = useState(0);
@@ -174,7 +170,7 @@ export function HuntScreen() {
   const autoRef = useRef(state.automation.hunt);
   const huntRef = useRef(hunt);
   const sufferRef = useRef(sufferBlow);
-  const commitRef = useRef(commitHunt);
+  const landRef = useRef(landHunt);
   const notifyRef = useRef(notify);
   const stateRef = useRef(state);
   const selectionRef = useRef(selection);
@@ -182,7 +178,7 @@ export function HuntScreen() {
     autoRef.current = state.automation.hunt;
     huntRef.current = hunt;
     sufferRef.current = sufferBlow;
-    commitRef.current = commitHunt;
+    landRef.current = landHunt;
     notifyRef.current = notify;
     stateRef.current = state;
     selectionRef.current = selection;
@@ -190,17 +186,20 @@ export function HuntScreen() {
   useEffect(() => {
     if (!activeId) return;
     let alive = true;
-    const key = "hunt:" + activeId;
-    beatRef.current = progressRepository.get(key, HUNT_TICKS);
+    let coolTimer = 0;
+    beatRef.current = 0;
     requestingRef.current = false;
     pendingRef.current = null;
     scriptRef.current = [];
     /* eslint-disable react-hooks/set-state-in-effect */
     setPending(null);
     setScript([]);
-    setProgress({ id: activeId, beat: beatRef.current });
+    setProgress({ id: activeId, beat: 0 });
+    setCooldown(null);
     /* eslint-enable react-hooks/set-state-in-effect */
     const resolve = () => {
+      beatRef.current = 0;
+      setProgress({ id: activeId, beat: 0 });
       requestingRef.current = true;
       void huntRef.current(activeId, selectionRef.current[activeId]).then((fight) => {
         if (!alive) return;
@@ -215,6 +214,21 @@ export function HuntScreen() {
         setScript(scriptRef.current);
         setPending(fight);
       });
+    };
+    const startCooldown = () => {
+      let left = CYCLE_OPTOUT_SECS;
+      setCooldown(left);
+      coolTimer = window.setInterval(() => {
+        left -= 1;
+        if (left <= 0) {
+          window.clearInterval(coolTimer);
+          coolTimer = 0;
+          setCooldown(null);
+          resolve();
+        } else {
+          setCooldown(left);
+        }
+      }, 1000);
     };
     resolve();
     const timer = window.setInterval(() => {
@@ -240,60 +254,58 @@ export function HuntScreen() {
         const held = pendingRef.current;
         pendingRef.current = null;
         setPending(null);
-        progressRepository.clear(key);
-        requestingRef.current = true;
-        void commitRef.current().then(() => {
-          if (!alive) return;
-          requestingRef.current = false;
-          setReport(held);
-          setReportLines(scriptRef.current);
-          setSession((current) => accumulate(current, held));
-          if (held.combat.victory) {
-            const spoils = held.drops
-              .map((drop) => drop.name + (drop.quantity > 1 ? " x" + drop.quantity : ""))
-              .join(", ");
-            notifyRef.current(
-              held.creature.name +
-                " abatido: +" +
-                formatNumber(held.bronze) +
-                " WCoin e +" +
-                formatNumber(held.experience) +
-                " de experiência." +
-                (spoils ? " Espólio: " + spoils + "." : "") +
-                (held.levelsGained > 0 ? " Você subiu de nível!" : ""),
-              true,
-              "Caça",
-            );
-          } else if (held.combat.retreated) {
-            notifyRef.current(
-              "A caçada com " + held.creature.name + " se arrastou e os dois recuaram.",
-              true,
-              "Caça",
-            );
-          } else {
-            notifyRef.current(
-              held.creature.name + " levou a melhor: a caçada não pagou nada.",
-              false,
-              "Caça",
-            );
-            playSound("defeat");
-          }
-          scriptRef.current = [];
-          setScript([]);
-          beatRef.current = 0;
-          setProgress({ id: activeId, beat: 0 });
-          if (!autoRef.current) {
-            setActivity(null);
-            return;
-          }
-          resolve();
-        });
+        landRef.current();
+        setReport(held);
+        setReportLines(scriptRef.current);
+        setSession((current) => accumulate(current, held));
+        if (held.combat.victory) {
+          playSound("spoils");
+          if (held.levelsGained > 0) playSound("levelup", 700);
+          if (held.petLeveled) playSound("pet-up", 1100);
+          const spoils = held.drops
+            .map((drop) => drop.name + (drop.quantity > 1 ? " x" + drop.quantity : ""))
+            .join(", ");
+          notifyRef.current(
+            held.creature.name +
+              " abatido: +" +
+              formatNumber(held.bronze) +
+              " WCoin e +" +
+              formatNumber(held.experience) +
+              " de experiência." +
+              (spoils ? " Espólio: " + spoils + "." : "") +
+              (held.levelsGained > 0 ? " Você subiu de nível!" : ""),
+            true,
+            "Caça",
+          );
+        } else if (held.combat.retreated) {
+          notifyRef.current(
+            "A caçada com " + held.creature.name + " se arrastou e os dois recuaram.",
+            true,
+            "Caça",
+          );
+        } else {
+          playSound("defeat");
+          notifyRef.current(
+            held.creature.name + " levou a melhor: a caçada não pagou nada.",
+            false,
+            "Caça",
+          );
+        }
+        scriptRef.current = [];
+        setScript([]);
+        beatRef.current = 0;
+        setProgress({ id: activeId, beat: 0 });
+        if (!autoRef.current) {
+          setActivity(null);
+          return;
+        }
+        startCooldown();
       }
     }, HUNT_TICK_MS);
     return () => {
       alive = false;
       window.clearInterval(timer);
-      progressRepository.set("hunt:" + activeId, beatRef.current);
+      if (coolTimer) window.clearInterval(coolTimer);
     };
   }, [activeId, setActivity]);
   if (!character) return null;
@@ -307,7 +319,7 @@ export function HuntScreen() {
   }
   function toggleHunt(territoryId: string, available: boolean) {
     if (activeId === territoryId) {
-      setActivity(null);
+      if (cooldown !== null) setActivity(null);
       return;
     }
     if (!available) return;
@@ -319,24 +331,8 @@ export function HuntScreen() {
     <>
       <PageHeader
         title="Caça"
-        description={
-          state.automation.hunt
-            ? "A caçada roda sozinha: a barra enche com a luta, o combate grava no fim e o loot cai. Ela só para quando você mandar parar."
-            : "A caçada roda sozinha: a barra enche com a luta e grava no fim. Cada clique vale uma luta; ligue a caçada automática nas configurações para encadear."
-        }
-        action={
-          <div className="flex items-center gap-2">
-            {pet ? (
-              <Tag tone="neutral">
-                {petAlong
-                  ? "Mascote acompanhando"
-                  : isPetActive(pet)
-                    ? "Mascote sem energia"
-                    : "Mascote em repouso"}
-              </Tag>
-            ) : null}
-          </div>
-        }
+        description="A caçada roda sozinha: cada luta toca ao vivo e grava no fim. Não dá para parar no meio de uma luta, mas entre uma e outra sobram três segundos para você mandar parar."
+        action={null}
       />
 
       <div className="space-y-6">
@@ -344,9 +340,9 @@ export function HuntScreen() {
           const ready = unlocked && hasHealth;
           const available = ready;
           const active = activeId === territory.id;
+          const opting = active && cooldown !== null;
           const selectedId = selection[territory.id] ?? prey?.id ?? null;
           const onThis = active && progress.id === territory.id;
-          const frozen = !active && progress.id === territory.id && progress.beat > 0;
           const line =
             onThis && progress.beat > 0 && script.length > 0
               ? script[Math.min(progress.beat, script.length) - 1]
@@ -401,23 +397,13 @@ export function HuntScreen() {
                   ) : null}
                   <div className="px-4 py-3">
                     <Bar
-                      label={active ? "Caçando..." : frozen ? "Pausado" : "Caçar"}
-                      current={onThis || frozen ? progress.beat : 0}
+                      label={active ? "Caçando..." : "Caçar"}
+                      current={onThis ? progress.beat : 0}
                       maximum={HUNT_TICKS}
                       glows={active}
                       wraps
                     />
                   </div>
-                  {active && petAlong ? (
-                    <div className="px-4 py-3">
-                      <Bar
-                        label="Mascote - Energia"
-                        current={petAlong.energy}
-                        maximum={petMaxEnergy(petLevelOf(petAlong))}
-                        tone="vigor"
-                      />
-                    </div>
-                  ) : null}
                   {line ? (
                     <p
                       className={cn(
@@ -442,8 +428,8 @@ export function HuntScreen() {
                   <div className="flex flex-wrap items-center justify-between gap-3 p-4">
                     <span className="text-[11px] text-ink-faint">
                       {active
-                        ? petAlong
-                          ? "Caçando com o mascote..."
+                        ? opting
+                          ? "Pode parar agora ou seguir para a próxima."
                           : state.automation.hunt
                             ? "Caçando sem parar..."
                             : "Caçando..."
@@ -454,9 +440,9 @@ export function HuntScreen() {
                     <Button
                       variant={active ? "secondary" : available ? "primary" : "outline"}
                       onClick={() => toggleHunt(territory.id, available)}
-                      disabled={!available && !active}
+                      disabled={active ? !opting : !available}
                     >
-                      {active ? "Parar" : "Caçar"}
+                      {opting ? "Parar (" + cooldown + ")" : active ? "Caçando..." : "Caçar"}
                     </Button>
                   </div>
                 </div>

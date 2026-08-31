@@ -33,6 +33,7 @@ export const MIN_HEALTH_RATIO_TO_ACT = 0.2;
 export const AUTOMATION_TICK_MS = 2000;
 export const HUNT_TICK_MS = 1400;
 export const HUNT_TICKS = 8;
+export const CYCLE_OPTOUT_SECS = 3;
 export const HUNT_APPROACH_TICKS = 3;
 export const MAX_COMBAT_ROUNDS = 24;
 export const CRITICAL_DAMAGE_BONUS = 0.35;

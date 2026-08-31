@@ -69,7 +69,7 @@ interface GameContextValue {
   setActivity: (activity: Activity | null) => void;
   train: (exerciseId: string) => Promise<{ message: string; raised: boolean } | null>;
   hunt: (territoryId: string, creatureId?: string) => Promise<HuntReport | null>;
-  commitHunt: () => Promise<void>;
+  landHunt: () => void;
   sufferBlow: (damage: number) => void;
   drawOpponent: () => Promise<{
     hunterId: string;
@@ -505,23 +505,23 @@ export function GameProvider({ children }: { children: ReactNode }) {
         return { message: answer.message, raised: answer.data?.attributeRaised === true };
       },
       hunt: async (territoryId, creatureId) => {
-        const answer = await request<HuntReport>("POST", "/api/hunt", { territoryId, creatureId });
+        const answer = await request<HuntReport>(
+          "POST",
+          "/api/hunt",
+          { territoryId, creatureId },
+          "hunt",
+        );
         if (!answer.ok) {
           if (answer.message) announce(answer.message, false, "Caça");
           return null;
         }
         return answer.data;
       },
-      commitHunt: async () => {
-        const answer = await request<HuntReport>("POST", "/api/hunt/commit", {});
-        if (!answer.ok) {
-          if (answer.message) announce(answer.message, false, "Caça");
-          return;
-        }
-        const report = answer.data;
-        if (report?.combat.victory) playSound("spoils");
-        if (report && report.levelsGained > 0) playSound("levelup", 700);
-        if (report?.petLeveled) playSound("pet-up", 1100);
+      landHunt: () => {
+        const held = heldHuntRef.current;
+        heldHuntRef.current = null;
+        if (!held) return;
+        applyState(held.state, held.seq);
       },
       sufferBlow: (damage) => {
         setState((current) =>
