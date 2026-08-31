@@ -213,7 +213,6 @@ export function ArenaScreen() {
           scriptRef.current = narrationOf(
             { foe: resolution.foe, combat: resolution.combat },
             HUNT_TICKS,
-            characterRef.current?.name ?? "",
           );
           setScript(scriptRef.current);
           phaseRef.current = "fight";

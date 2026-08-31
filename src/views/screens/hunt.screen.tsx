@@ -9,7 +9,8 @@ import { petLevelOf, petMaxEnergy } from "@/models/rules/pet";
 import { emphasizeDamage, narrationOf, type NarrationLine } from "../presenters/hunt.presenter";
 import { DANGER_LABEL } from "@/models/entities/territory";
 import { canPetFight, isPetActive } from "@/models/rules/pet";
-import { HUNT_TICK_MS, HUNT_TICKS } from "@/shared/constants/game";
+import { HUNT_APPROACH_TICKS, HUNT_TICK_MS, HUNT_TICKS } from "@/shared/constants/game";
+import { progressRepository } from "@/models/repositories/progress.repository";
 import { cn } from "@/shared/utils/class-names";
 import { formatNumber } from "@/shared/utils/format";
 import { ArtImage } from "../components/art-image";
@@ -158,13 +159,18 @@ export function HuntScreen() {
   const [selection, setSelection] = useState<Record<string, string>>(() => loadHuntSelection());
   const [reportLines, setReportLines] = useState<NarrationLine[]>([]);
   const [session, setSession] = useState<HuntSession>(EMPTY_SESSION);
-  const [progress, setProgress] = useState<{ id: string; beat: number }>({ id: "", beat: 0 });
+  const [progress, setProgress] = useState<{
+    id: string;
+    phase: "approach" | "fight";
+    beat: number;
+  }>({ id: "", phase: "approach", beat: 0 });
   const [script, setScript] = useState<NarrationLine[]>([]);
   const [pending, setPending] = useState<HuntReport | null>(null);
   const [preyJolt, setPreyJolt] = useState(0);
   const [lapJolt, setLapJolt] = useState(0);
   const shaking = useShake(preyJolt + lapJolt);
   const beatRef = useRef(0);
+  const approachRef = useRef(0);
   const scriptRef = useRef<NarrationLine[]>([]);
   const pendingRef = useRef<HuntReport | null>(null);
   const requestingRef = useRef(false);
@@ -191,14 +197,21 @@ export function HuntScreen() {
   useEffect(() => {
     if (!activeId) return;
     let alive = true;
+    const key = "hunt:" + activeId;
+    approachRef.current = progressRepository.get(key, HUNT_APPROACH_TICKS);
     requestingRef.current = false;
     pendingRef.current = null;
     scriptRef.current = [];
     beatRef.current = 0;
-    setProgress({ id: activeId, beat: beatRef.current });
+    setProgress({ id: activeId, phase: "approach", beat: approachRef.current });
     const timer = window.setInterval(() => {
-      if (!pendingRef.current && !requestingRef.current) {
+      if (!pendingRef.current) {
+        if (requestingRef.current) return;
+        approachRef.current += 1;
+        setProgress({ id: activeId, phase: "approach", beat: approachRef.current });
+        if (approachRef.current < HUNT_APPROACH_TICKS) return;
         requestingRef.current = true;
+        progressRepository.clear(key);
         void huntRef.current(activeId, selectionRef.current[activeId]).then((fight) => {
           if (!alive) return;
           requestingRef.current = false;
@@ -208,21 +221,16 @@ export function HuntScreen() {
           }
           pendingRef.current = fight;
           bledRef.current = { last: stateRef.current.character?.health ?? 0, total: 0 };
-          scriptRef.current = narrationOf(
-            { foe: fight.creature, combat: fight.combat },
-            HUNT_TICKS,
-            nameRef.current,
-          );
+          scriptRef.current = narrationOf({ foe: fight.creature, combat: fight.combat }, HUNT_TICKS);
           setScript(scriptRef.current);
           setPending(fight);
           beatRef.current = 0;
-          setProgress({ id: activeId, beat: 0 });
+          setProgress({ id: activeId, phase: "fight", beat: 0 });
         });
         return;
       }
-      if (!pendingRef.current) return;
       beatRef.current += 1;
-      setProgress({ id: activeId, beat: beatRef.current });
+      setProgress({ id: activeId, phase: "fight", beat: beatRef.current });
       const line = scriptRef.current[Math.min(beatRef.current, scriptRef.current.length) - 1];
       if (line?.blow === "ours") playSound(line.critical ? "crit" : "hit");
       if (line?.blow === "pet") playSound("snap");
@@ -278,8 +286,9 @@ export function HuntScreen() {
         }
         scriptRef.current = [];
         setScript([]);
+        approachRef.current = 0;
         beatRef.current = 0;
-        setProgress({ id: activeId, beat: 0 });
+        setProgress({ id: activeId, phase: "approach", beat: 0 });
         if (!autoRef.current) setActivity(null);
       }
     }, HUNT_TICK_MS);
@@ -290,6 +299,8 @@ export function HuntScreen() {
         pendingRef.current = null;
         setPending(null);
         landRef.current();
+      } else if (!requestingRef.current) {
+        progressRepository.set("hunt:" + activeId, approachRef.current);
       }
     };
   }, [activeId, setActivity]);
@@ -344,7 +355,7 @@ export function HuntScreen() {
           const selectedId = selection[territory.id] ?? prey?.id ?? null;
           const onThis = active && progress.id === territory.id;
           const line =
-            onThis && progress.beat > 0 && script.length > 0
+            onThis && progress.phase === "fight" && progress.beat > 0 && script.length > 0
               ? script[Math.min(progress.beat, script.length) - 1]
               : null;
           const foe = pending ?? report;
@@ -359,6 +370,7 @@ export function HuntScreen() {
               ? Math.max(0, Math.min(monsterMax, line.creatureHealth))
               : monsterMax;
           const monsterStatus = replaying ? "Atacando" : "Aguardando";
+          const frozen = !active && progress.id === territory.id && progress.beat > 0;
           return (
             <Card
               key={territory.id}
@@ -400,9 +412,17 @@ export function HuntScreen() {
                   ) : null}
                   <div className="px-4 py-3">
                     <Bar
-                      label={active ? "Caçando..." : "Caçar"}
-                      current={onThis ? progress.beat : 0}
-                      maximum={Math.max(1, script.length || HUNT_TICKS)}
+                      label={active ? "Caçando..." : frozen ? "Pausado" : "Caçar"}
+                      current={
+                        onThis
+                          ? progress.phase === "fight"
+                            ? HUNT_APPROACH_TICKS + progress.beat
+                            : progress.beat
+                          : frozen
+                            ? progress.beat
+                            : 0
+                      }
+                      maximum={HUNT_APPROACH_TICKS + Math.max(1, script.length || HUNT_TICKS)}
                       glows={active}
                       wraps
                     />
@@ -511,7 +531,8 @@ export function HuntScreen() {
                                 </span>
                                 <span className="font-mono text-[11px] text-ink-faint">
                                   NV. {formatNumber(creature.level)} a{" "}
-                                  {formatNumber(creature.level + 9)}
+                                  {formatNumber(creature.level + 9)} · +
+                                  {formatNumber(creature.experience)} XP
                                 </span>
                               </span>
                               <span

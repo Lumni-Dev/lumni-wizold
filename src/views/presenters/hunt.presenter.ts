@@ -18,15 +18,6 @@ function pick(pool: string[]): string {
   return pickOne(pool);
 }
 
-function openerOf(hunter: string, prey: string): string {
-  return pick([
-    hunter + " fareja " + prey + " na escuridão.",
-    hunter + " se aproxima baixo, sem quebrar um galho.",
-    "Os olhos de " + prey + " brilham quando percebem " + hunter + ".",
-    hunter + " encontra o rastro fresco de " + prey + ".",
-  ]);
-}
-
 function closerOf(report: NarratedFight, prey: string): string {
   if (report.combat.victory) {
     return pick([prey + " tomba e não levanta mais.", prey + " cai. A noite fica quieta."]);
@@ -51,11 +42,7 @@ function sampleRounds<T>(rounds: readonly T[], amount: number): T[] {
   return sampled;
 }
 
-export function narrationOf(
-  report: NarratedFight,
-  maxBeats: number,
-  hunter: string,
-): NarrationLine[] {
+export function narrationOf(report: NarratedFight, maxBeats: number): NarrationLine[] {
   const prey = report.foe.name;
   const full = report.foe.health;
   const slots = Math.max(1, maxBeats - 2);
@@ -78,12 +65,6 @@ export function narrationOf(
   const last = middle[middle.length - 1]?.creatureHealth ?? full;
 
   return [
-    {
-      text: openerOf(hunter, prey) + " " + prey + " se ergue inteiro.",
-      blow: null,
-      critical: false,
-      creatureHealth: full,
-    },
     ...middle,
     { text: closerOf(report, prey), blow: null, critical: false, creatureHealth: last },
   ];
