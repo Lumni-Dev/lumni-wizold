@@ -79,6 +79,7 @@ export function TavernScreen() {
   const [joinPasswords, setJoinPasswords] = useState<Record<string, string>>({});
   const [draft, setDraft] = useState("");
   const [emojiOpen, setEmojiOpen] = useState(false);
+  const [emojiRect, setEmojiRect] = useState<DOMRect | null>(null);
   const emojiRef = useRef<HTMLDivElement>(null);
   const [page, setPage] = useState(1);
   const [nick, setNick] = useState("");
@@ -716,7 +717,17 @@ export function TavernScreen() {
             </div>
             <div className="relative shrink-0" ref={emojiRef}>
               {emojiOpen ? (
-                <div className="absolute bottom-full right-0 z-30 mb-2 grid grid-cols-4 gap-1 rounded-md border border-edge-strong bg-surface p-2 shadow-[0_18px_40px_-12px_rgba(0,0,0,0.9)]">
+                <div
+                  className="fixed z-[55] grid grid-cols-4 gap-1 rounded-md border border-edge-strong bg-surface p-2 shadow-[0_18px_40px_-12px_rgba(0,0,0,0.9)]"
+                  style={
+                    emojiRect
+                      ? {
+                          bottom: window.innerHeight - emojiRect.top + 8,
+                          right: window.innerWidth - emojiRect.right,
+                        }
+                      : undefined
+                  }
+                >
                   {["😂", "❤️", "👍", "😮", "😢", "🔥", "🎉", "🍺"].map((emoji) => (
                     <button
                       key={emoji}
@@ -740,7 +751,10 @@ export function TavernScreen() {
                 type="button"
                 aria-label="Emojis"
                 aria-expanded={emojiOpen}
-                onClick={() => setEmojiOpen((open) => !open)}
+                onClick={() => {
+                  if (!emojiOpen) setEmojiRect(emojiRef.current?.getBoundingClientRect() ?? null);
+                  setEmojiOpen((open) => !open);
+                }}
                 className="grid h-8 w-8 place-items-center rounded-md border border-edge text-ink-faint transition-colors hover:border-edge-strong hover:bg-surface-high hover:text-ink"
               >
                 <ActionIcon action="smile" className="h-4 w-4" />
