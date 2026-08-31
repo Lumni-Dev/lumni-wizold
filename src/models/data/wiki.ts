@@ -46,7 +46,6 @@ import { enhancementCost } from "../rules/forge";
 import { experienceForLevel } from "../rules/progression";
 import { FULL_MOON_ATTRIBUTE_BONUS, MOON_PHASES, SYNODIC_MONTH_DAYS } from "../rules/moon";
 import { miningNeeded } from "../rules/mining";
-import { PET_HUNT_SHARE } from "../rules/pet";
 import { EQUIPMENT_SETS } from "./equipment-sets";
 import { STORE_PACKS } from "./store-packs";
 import { bandOf, SPECIES } from "./species";
@@ -116,7 +115,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     title: "Vitais",
     summary: "Todo personagem nasce com 100 de vida.",
     lines: [
-      "Vida: 100, mais 14 por ponto de Resistência acima de 4. O nível não entra aqui: quem engorda a barra é a Resistência, venha ela do treino, do equipamento, do mascote ou da lua.",
+      "Vida: 100 para todo mundo, fixa. Nem o nível nem a Resistência engordam a barra; a Resistência agora só corta o dano que cada golpe do inimigo tira.",
       "Poções de vida recuperam uma porcentagem do máximo. Recuperar-se devolve só vida: a cada " +
         REST_TICK_MS / 1000 +
         " segundos, " +
@@ -171,10 +170,10 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "Subir de nível não dá poder nenhum de graça: o que o nível abre é o próximo território, o próximo conjunto e a próxima veia da mina. A força vem do treino e do que você veste.",
       "Subir de nível restaura a vida por completo.",
       "Atributo não se distribui: só o treino levanta um ponto.",
-      "Treinar acumula progresso: o próximo ponto custa 10 + valor atual x 4.",
-      "Um exercício por atributo, e o rendimento da sessão cresce junto com o nível: um ponto fica perto de cinco sessões a corrida inteira.",
+      "Treinar acumula progresso, e o próximo ponto sobe pela mesma curva da experiência: barato no começo, caríssimo perto do teto.",
+      "Um exercício por atributo, e tanto a exigência quanto o rendimento da sessão crescem com o valor do atributo: um ponto sai em cerca de cinco sessões no começo e algumas centenas perto do teto, a mesma dificuldade de subir um nível.",
       "O pátio treina você e o lobo direto: uma sessão paga progresso de atributo, e o excedente carrega para o próximo ponto, como a experiência.",
-      "Cada treino é pago na hora: um quinto do ponto da sua faixa mais um bronze por nível do atributo treinado, cobrado no primeiro turno de cada volta. Dois atributos no mesmo nível custam o mesmo, e cada ponto conquistado encarece o próximo treino; o progresso que passar do ponto se perde, e é a caça que paga o corpo.",
+      "Cada treino é pago na hora: o preço do ponto da sua faixa dividido pelas sessões que ele leva, cobrado no primeiro turno de cada volta. Um ponto custa cerca de três caçadas de bronze em qualquer faixa, e é a caça que paga esse corpo.",
       "Equipamento soma por cima do teto: o limite vale para o valor treinado.",
     ],
   },
@@ -184,7 +183,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     summary: "Resolvido em rodadas, sem entrada do jogador durante a luta.",
     lines: [
       "O jogo tem cinco números e só: Força, Agilidade, Resistência, Instinto e Vontade. Não existe força de combate nem resistência de combate por trás deles.",
-      "Dano de um golpe: Força x Força dividido por Força mais a Resistência do alvo, com variação de 15% na Força.",
+      "Dano de um golpe: Força x Força dividido por Força mais a Resistência do alvo, com variação de 10% na Força.",
       "A fórmula vale em qualquer escala: Resistência alta reduz muito, mas nunca zera o golpe.",
       "Quem tem mais Agilidade começa a rodada.",
       "Esquiva e crítico sobem a vida toda sem nunca encostar no teto: 35% de esquiva e 45% de crítico ficam no horizonte, e cada ponto de Agilidade ou Instinto ainda compra alguma coisa no nível 1000.",
@@ -231,24 +230,24 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         MINING_DAILY_MININGS +
         " minerações por dia, contando a colheita e não cada batida. A cota zera às 06:00 de São Paulo, o mesmo horário para todo mundo.",
       ...oreLines(),
-      "Mineração começa em 1 e para em " +
+      "Mineração começa em 1 e vai até " +
         MINING_MAX_LEVEL +
-        ", o nível do veio mais fundo: acima disso não há o que destravar.",
+        ", o mesmo teto do personagem: tudo que evolui sobe pela mesma curva.",
       "O próximo nível de mineração pede " +
         miningNeeded(1) +
         " de progresso no nível 1, " +
-        miningNeeded(25) +
-        " no 25 e " +
-        miningNeeded(69) +
-        " no último: a escada da mina sobe como a de nível.",
+        miningNeeded(100) +
+        " no 100 e " +
+        miningNeeded(1000) +
+        " no teto: a escada da mina é a mesma da experiência.",
       "A cada 40 níveis de mineração cada golpe rende um múltiplo a mais de fragmentos, então a forja continua alimentada sem virar chuva de fragmento.",
       "A forja só aceita peça desequipada, na mochila: tire do corpo para forjar. Cada peça come só o fragmento do conjunto dela.",
-      "Preço do próximo nível: um fragmento a cada três níveis, então +" +
+      "Preço do próximo nível: metade da curva da experiência em fragmentos, então +" +
         5 +
         " custa " +
         enhancementCost(5) +
-        " e +100 custa " +
-        enhancementCost(100) +
+        " e +1000 custa " +
+        enhancementCost(1000) +
         ".",
       "Cada nível soma um ponto em cada atributo da peça, mais " +
         (ENHANCEMENT_STEP * 100).toFixed(1).replace(".", ",") +
@@ -281,10 +280,8 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "O lobo sobe o próprio nível, até " +
         PET_MAX_LEVEL +
         ": cada nível soma 1 de Força, 1 de Agilidade e 1 de Instinto ao que ele empresta.",
-      "São dois caminhos para a mesma barra: a sessão no pátio, paga a cada treino, e a caçada ao seu lado, que rende " +
-        Math.round(PET_HUNT_SHARE * 100) +
-        "% de uma sessão. São cinco sessões por nível, ou cerca de quatorze caçadas.",
-      "A experiência dele só entra acompanhando: em repouso ele não arrisca nada, não empresta nada e não aprende nada.",
+      "O lobo sobe de nível só no pátio: cada sessão paga o progresso dele, e a caçada ao seu lado não ensina mais nada.",
+      "Acompanhando, ele arrisca e empresta atributo; em repouso não arrisca nada e não empresta nada. De um jeito ou de outro, quem ensina o lobo é o treino.",
       "Energia é o único vital do lobo: começa em " +
         PET_BASE_ENERGY +
         " e ganha " +

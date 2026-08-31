@@ -25,6 +25,7 @@ import { List, ListRow } from "../components/list";
 import { Panel } from "../components/panel";
 import { AttributeIcon } from "../components/attribute-icon";
 import { chipClass } from "../components/chip";
+import { CreatureIcon } from "../components/creature-icon";
 import { ItemIcon } from "../components/item-icon";
 import { PageHeader } from "../layout/page-header";
 import { summarizeEffect } from "../presenters/item.presenter";
@@ -73,7 +74,7 @@ export function WikiScreen() {
             <ul className="space-y-2">
               {topic.lines.map((line) => (
                 <li key={line} className="flex gap-2 text-xs leading-relaxed text-ink-soft">
-                  <span className="text-ink-faint">-</span>
+                  <span className="text-ink-faint">•</span>
                   <span>{line}</span>
                 </li>
               ))}
@@ -148,7 +149,7 @@ export function WikiScreen() {
                       {pieceName(definition, slot)}
                     </span>
                     <span className="hidden text-right text-[11px] text-ink-soft sm:block">
-                      {item ? summarizeEffect(item).join(" - ") : null}
+                      {item ? summarizeEffect(item).join(", ") : null}
                     </span>
                     <span className="w-24 shrink-0 text-right font-mono text-[11px] text-ink-faint">
                       {item && item.inMarket ? formatBronze(item.price) : "drop"}
@@ -189,7 +190,7 @@ export function WikiScreen() {
             <ul className="space-y-1">
               {[1, 170, 340, 670, 1000].map((value) => (
                 <li key={value} className="font-mono text-[11px] text-ink-soft">
-                  Atributo {formatNumber(value)} - +{formatNumber(trainingEffort(value).progress)}{" "}
+                  Atributo {formatNumber(value)}: +{formatNumber(trainingEffort(value).progress)}{" "}
                   progresso por sessão
                 </li>
               ))}
@@ -223,7 +224,7 @@ export function WikiScreen() {
                         CREATURES.find((creature) => creature.id === creatureId)?.name,
                     )
                     .filter(Boolean)
-                    .join(" - ")}
+                    .join(", ")}
                 </p>
               </div>
             ))}
@@ -255,22 +256,25 @@ export function WikiScreen() {
             >
               <List>
                 {members.map((creature) => (
-                  <ListRow key={creature.id} layout="column">
-                    <div className="flex flex-wrap items-baseline justify-between gap-2">
-                      <p className="text-sm text-ink">{creature.name}</p>
-                      <span className="font-mono text-[11px] text-ink-faint">
-                        NV. {formatNumber(creature.level)}
-                      </span>
+                  <ListRow key={creature.id} padding="art">
+                    <CreatureIcon creature={creature} />
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="flex flex-wrap items-baseline justify-between gap-2">
+                        <p className="text-sm text-ink">{creature.name}</p>
+                        <span className="font-mono text-[11px] text-ink-faint">
+                          NV. {formatNumber(creature.level)}
+                        </span>
+                      </div>
+                      <p className="font-mono text-[11px] text-ink-soft">
+                        {formatNumber(creature.health)} vida, {formatNumber(creature.strength)} força,{" "}
+                        {formatNumber(creature.endurance)} resistência,{" "}
+                        {formatNumber(creature.agility)} agilidade
+                      </p>
+                      <p className="font-mono text-[11px] text-ink-faint">
+                        +{formatNumber(creature.experience)} exp, {formatNumber(creature.minBronze)} a{" "}
+                        {formatBronze(creature.maxBronze)}
+                      </p>
                     </div>
-                    <p className="font-mono text-[11px] text-ink-soft">
-                      {formatNumber(creature.health)} vida - {formatNumber(creature.strength)} força
-                      - {formatNumber(creature.endurance)} resistência -{" "}
-                      {formatNumber(creature.agility)} agilidade
-                    </p>
-                    <p className="font-mono text-[11px] text-ink-faint">
-                      +{formatNumber(creature.experience)} exp - {formatNumber(creature.minBronze)}{" "}
-                      a {formatBronze(creature.maxBronze)}
-                    </p>
                   </ListRow>
                 ))}
               </List>
@@ -315,10 +319,10 @@ export function WikiScreen() {
                       </span>
                     </div>
                     <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                      {RARITY_LABEL[item.rarity]} - NV. {item.minLevel}+
+                      {RARITY_LABEL[item.rarity]}, NV. {item.minLevel}+
                     </p>
                     <p className="mt-1 text-[11px] text-ink-soft">
-                      {summarizeEffect(item).join(" - ") || "Sem efeito, serve para venda."}
+                      {summarizeEffect(item).join(", ") || "Sem efeito, serve para venda."}
                     </p>
                   </div>
                 </div>

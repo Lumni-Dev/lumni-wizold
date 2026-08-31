@@ -19,7 +19,6 @@ import {
   formatBronze,
   formatNumber,
   formatReais,
-  formatTime,
   parseReais,
 } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
@@ -38,16 +37,24 @@ import { PageHeader } from "../layout/page-header";
 
 const PAGE_SIZE = 9;
 
-function expiryLine(listing: BazaarListing): string {
-  const expiresAt = listingExpiresAt(listing);
-  const daysLeft = Math.max(1, Math.ceil((expiresAt - Date.now()) / 86400000));
-  return (
-    "Expira em " +
-    daysLeft +
-    (daysLeft === 1 ? " dia" : " dias") +
-    ", às " +
-    formatTime(new Date(expiresAt).toISOString())
-  );
+function formatRemaining(ms: number): string {
+  const total = Math.floor(ms / 1000);
+  const days = Math.floor(total / 86400);
+  const hours = Math.floor((total % 86400) / 3600);
+  const minutes = Math.floor((total % 3600) / 60);
+  const seconds = total % 60;
+  const parts: string[] = [];
+  if (days > 0) parts.push(days + "d");
+  if (hours > 0 || days > 0) parts.push(hours + "h");
+  if (minutes > 0 || hours > 0 || days > 0) parts.push(minutes + "min");
+  parts.push(seconds + "s");
+  return parts.join(" ");
+}
+
+function expiryLine(listing: BazaarListing, now: number): string {
+  const remaining = listingExpiresAt(listing) - now;
+  if (remaining <= 0) return "Expira a qualquer instante.";
+  return "Expira em " + formatRemaining(remaining) + ".";
 }
 
 const FEE_LABEL = Math.round(BAZAAR_FEE_RATIO * 100) + "%";
@@ -76,6 +83,11 @@ export function BazaarScreen() {
   const [page, setPage] = useState(1);
   const [flow, setFlow] = useState<Flow | null>(null);
   const [cancelling, setCancelling] = useState<string | null>(null);
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   const ownListings = state.bazaarListings;
   const [board, setBoard] = useState<BoardEntry[]>(() => listBoard(state));
@@ -201,7 +213,7 @@ export function BazaarScreen() {
                       <span className="block">
                         {entry.expired
                           ? "Vencido: remova para recolher as peças."
-                          : expiryLine(entry.listing)}
+                          : expiryLine(entry.listing, now)}
                       </span>
                     </>
                   }

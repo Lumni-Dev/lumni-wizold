@@ -18,7 +18,6 @@ import {
 } from "@/models/entities/item";
 import { EQUIPMENT_SETS } from "@/models/data/equipment-sets";
 import { lineageName } from "@/models/data/items";
-import { GENDERS, type Gender } from "@/models/entities/character";
 import { formatNumber, formatBronze } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
 import { Button } from "../components/button";
@@ -53,7 +52,6 @@ type Tab = "buy" | "sell";
 type CategoryFilter = ItemCategory | "all";
 type SetFilter = EquipmentSet | "all";
 type SizeFilter = PotionSize | "all";
-type LineageFilter = Gender | "all";
 
 const TABS: readonly { key: Tab; label: string }[] = [
   { key: "buy", label: "Comprar" },
@@ -66,11 +64,6 @@ const CATEGORY_FILTERS: readonly { key: CategoryFilter; label: string }[] = [
     key: category,
     label: CATEGORY_PLURAL[category],
   })),
-];
-
-const LINEAGE_FILTERS: readonly { key: LineageFilter; label: string }[] = [
-  { key: "all", label: "Todas" },
-  ...GENDERS.map((gender) => ({ key: gender.key, label: gender.label })),
 ];
 
 const SET_FILTERS: readonly { key: SetFilter; label: string }[] = [
@@ -91,7 +84,6 @@ export function MarketScreen() {
   const [category, setCategory] = useState<CategoryFilter>("all");
   const [set, setSet] = useState<SetFilter>("all");
   const [size, setSize] = useState<SizeFilter>("all");
-  const [lineage, setLineage] = useState<LineageFilter>("all");
   const [deal, setDeal] = useState<PendingDeal | null>(null);
   const [page, setPage] = useState(1);
   const [buying, setBuying] = useState("1");
@@ -115,13 +107,9 @@ export function MarketScreen() {
 
   const isPotion = category === "potion";
   const isPet = category === "pet";
-  const hasLineage = offers.some((offer) => offer.item.lineage !== undefined);
 
   const visibleOffers = offers.filter((offer) => {
     if (category !== "all" && offer.item.category !== category) return false;
-    if (lineage !== "all" && offer.item.lineage !== undefined && offer.item.lineage !== lineage) {
-      return false;
-    }
     if (isPet) return true;
     if (isPotion) return size === "all" || offer.item.size === size;
     return set === "all" || offer.item.set === set;
@@ -222,23 +210,6 @@ export function MarketScreen() {
                       {option.label}
                     </Chip>
                   ))}
-            </div>
-            <div className={cn("flex flex-wrap items-center gap-2", !hasLineage && "hidden")}>
-              <span className="mr-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                Linhagem
-              </span>
-              {LINEAGE_FILTERS.map((option) => (
-                <Chip
-                  key={option.key}
-                  active={lineage === option.key}
-                  onClick={() => {
-                    setLineage(option.key);
-                    setPage(1);
-                  }}
-                >
-                  {option.label}
-                </Chip>
-              ))}
             </div>
           </div>
 

@@ -7,6 +7,7 @@ import { PETS } from "../entities/pet";
 import { ITEMS } from "../data/items";
 import { STORE_PACKS } from "../data/store-packs";
 import { TERRITORIES } from "../data/territories";
+import { CREATURES } from "../data/creatures";
 
 const ASSETS_ROOT = join(process.cwd(), "public", "assets");
 
@@ -17,12 +18,14 @@ const TRAINING_ROOT = "training";
 const PET_ROOT = "pet";
 const GENDER_ROOT = "genders";
 const STORE_ROOT = "store";
+const CREATURE_ROOT = "creatures";
 
 const IMAGE_EXTENSIONS = new Set([".png", ".webp", ".gif", ".jpg", ".jpeg", ".svg", ".avif"]);
 
 const ART_VERSION = "?v=25";
 
 const ITEM_IDS = new Set(ITEMS.map((item) => item.id));
+const CREATURE_IDS = new Set(CREATURES.map((creature) => creature.id));
 const SET_ALIASES: Record<string, string> = {
   bronze: "bronze",
   silver: "silver",
@@ -213,23 +216,44 @@ function collectPacks(files: FoundFile[]): Record<string, string> {
   return art;
 }
 
+function collectCreatures(files: FoundFile[]): Record<string, string> {
+  const art: Record<string, string> = {};
+
+  for (const file of files) {
+    const id = normalize(file.name);
+    if (CREATURE_IDS.has(id)) art[id] = file.url;
+  }
+
+  return art;
+}
+
 export async function readArtManifest(): Promise<ArtManifest> {
-  const [itemFiles, huntFiles, attributeFiles, trainingFiles, petFiles, genderFiles, packFiles] =
-    await Promise.all([
-      walk(ITEM_ROOT),
-      walk(HUNT_ROOT),
-      walk(ATTRIBUTE_ROOT),
-      walk(TRAINING_ROOT),
-      walk(PET_ROOT),
-      walk(GENDER_ROOT),
-      walk(STORE_ROOT),
-    ]);
+  const [
+    itemFiles,
+    huntFiles,
+    attributeFiles,
+    trainingFiles,
+    creatureFiles,
+    petFiles,
+    genderFiles,
+    packFiles,
+  ] = await Promise.all([
+    walk(ITEM_ROOT),
+    walk(HUNT_ROOT),
+    walk(ATTRIBUTE_ROOT),
+    walk(TRAINING_ROOT),
+    walk(CREATURE_ROOT),
+    walk(PET_ROOT),
+    walk(GENDER_ROOT),
+    walk(STORE_ROOT),
+  ]);
 
   return {
     items: collectItems(itemFiles),
     attributes: collectAttributes(attributeFiles),
     training: collectAttributes(trainingFiles),
     territories: collectTerritories(huntFiles),
+    creatures: collectCreatures(creatureFiles),
     pets: collectPets(petFiles),
     genders: collectGenders(genderFiles),
     packs: collectPacks(packFiles),
