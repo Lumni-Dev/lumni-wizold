@@ -4,11 +4,12 @@ import {
   FORGE_BRONZE_RATIO,
   FORGE_MS_PER_LEVEL,
 } from "@/shared/constants/game";
+import { forgeRequirement } from "@/shared/constants/tuning";
 import { huntPurse } from "../data/species";
 import type { Item, ItemEffect } from "../entities/item";
 
 export function enhancementCost(nextLevel: number): number {
-  return Math.max(1, Math.ceil(nextLevel / 3));
+  return forgeRequirement(nextLevel);
 }
 
 export function forgeBronzeCost(characterLevel: number, level: number): number {

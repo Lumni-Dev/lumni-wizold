@@ -1,11 +1,16 @@
 import { MINING_DAILY_MININGS, MINING_RESET_HOUR_UTC } from "@/shared/constants/game";
+import { levelRequirement, levelYield } from "@/shared/constants/tuning";
 import { type MiningState } from "../entities/mining";
 import { MINING_MAX_LEVEL } from "../data/ores";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 export function miningNeeded(level: number): number {
-  return Math.round(40 * level * (1 + level / 25));
+  return levelRequirement(level);
+}
+
+export function miningEffort(level: number): number {
+  return levelYield(level);
 }
 
 export function miningPeriodStart(now: number): number {
@@ -54,10 +59,10 @@ export function applyMiningProgress(mining: MiningState, gain: number): MiningOu
   let progress = mining.progress + Math.max(0, Math.round(gain));
   let levelsGained = 0;
 
-  if (level < MINING_MAX_LEVEL && progress >= miningNeeded(level)) {
-    progress = 0;
+  while (level < MINING_MAX_LEVEL && progress >= miningNeeded(level)) {
+    progress -= miningNeeded(level);
     level += 1;
-    levelsGained = 1;
+    levelsGained += 1;
   }
 
   if (level >= MINING_MAX_LEVEL) progress = 0;

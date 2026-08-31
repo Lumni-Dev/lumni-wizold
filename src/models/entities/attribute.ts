@@ -31,9 +31,9 @@ export const ATTRIBUTES: readonly AttributeDefinition[] = [
     key: "endurance",
     name: "Resistência",
     code: "RES",
-    description: "Sua defesa e sua vida. Quanto maior, menos dói e mais aguenta.",
+    description: "Sua defesa. Quanto maior, menos dói cada golpe do inimigo.",
     effect:
-      "Cada ponto soma 14 de vida máxima, e a Resistência entra na conta do dano que você sofre: quanto maior, menos vida cada golpe do inimigo tira.",
+      "A Resistência entra na conta do dano que você sofre: quanto maior, menos cada golpe do inimigo tira. A vida máxima é fixa e não sobe com ela.",
   },
   {
     key: "instinct",

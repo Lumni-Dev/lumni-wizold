@@ -1,3 +1,4 @@
+import { MAX_CHARACTER_LEVEL } from "@/shared/constants/game";
 import type { Ore } from "./types";
 import { bronzeVein } from "./bronze-vein";
 import { silverVein } from "./silver-vein";
@@ -9,7 +10,7 @@ export type { Ore } from "./types";
 
 export const ORES: readonly Ore[] = [bronzeVein, silverVein, goldVein, diamondVein, lunarVein];
 
-export const MINING_MAX_LEVEL = ORES[ORES.length - 1].requiredLevel;
+export const MINING_MAX_LEVEL = MAX_CHARACTER_LEVEL;
 
 export function findOre(oreId: string): Ore | undefined {
   return ORES.find((ore) => ore.id === oreId);

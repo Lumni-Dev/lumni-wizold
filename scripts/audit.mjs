@@ -425,16 +425,20 @@ sec("economia");
     );
     const trainedValue = Math.max(1, Math.round(level * 0.55));
     ok(
-      "sessão custa a fatia do ponto mais o nível do atributo NV " + level,
+      "sessão custa a fatia do ponto pelas sessões NV " + level,
       training.trainingSessionCost(level, trainedValue) ===
-        Math.max(1, Math.round(training.trainingPointCost(level) / 5)) +
-          Math.max(0, trainedValue - 1),
+        Math.max(
+          1,
+          Math.round(
+            training.trainingPointCost(level) / training.trainingSessionsPerPoint(trainedValue),
+          ),
+        ),
     );
     if (trainedValue > 1) {
       ok(
-        "treinar fica mais caro a cada ponto do atributo NV " + level,
-        training.trainingSessionCost(level, trainedValue) >
-          training.trainingSessionCost(level, trainedValue - 1),
+        "atributo mais alto exige mais sessões NV " + level,
+        training.trainingSessionsPerPoint(trainedValue) >=
+          training.trainingSessionsPerPoint(trainedValue - 1),
       );
     }
     for (const pack of packsData.STORE_PACKS) {
@@ -464,10 +468,12 @@ sec("economia");
   ok("o preço dos conjuntos sobe a cada banda", setsClimb);
   for (const level of [100, 340, 670, 1000]) {
     const value = Math.round(level * 0.55);
-    const sessions = Math.ceil(
-      progression.progressNeeded(value) / training.trainingEffort(level).progress,
+    const sessions = training.trainingSessionsPerPoint(value);
+    ok(
+      "treino sobe com a mesma curva do nível, atributo " + value,
+      sessions === Math.ceil(progression.experienceForLevel(value) / (12 + 7 * value)),
+      sessions,
     );
-    ok("ponto sai em 3..7 sessões NV " + level, sessions >= 3 && sessions <= 7, sessions);
     const perPoint = (sessions * training.trainingSessionCost(level, value)) / species.huntPurse(level);
     ok(
       "ponto custa 1..10 caçadas NV " + level,
@@ -513,10 +519,12 @@ sec("progressão");
   );
   const negative = progression.applyExperience({ ...character, experience: 50 }, -30);
   ok("ganho negativo não rouba", negative.character.experience === 50);
+  const need10 = progression.progressNeeded(10);
+  const need11 = progression.progressNeeded(11);
   const trainee = {
     ...character,
     attributes: { ...character.attributes, strength: 10 },
-    trainingProgress: { ...character.trainingProgress, strength: 49 },
+    trainingProgress: { ...character.trainingProgress, strength: need10 - 1 },
   };
   const raised = progression.applyTrainingProgress(trainee, "strength", 1);
   ok(
@@ -531,7 +539,7 @@ sec("progressão");
       carry.character.attributes.strength === 11 &&
       carry.character.trainingProgress.strength === 10,
   );
-  const leapt = progression.applyTrainingProgress(trainee, "strength", 60);
+  const leapt = progression.applyTrainingProgress(trainee, "strength", need11 + 6);
   ok(
     "um treino gordo sobe vários pontos carregando a sobra",
     leapt.pointsGained === 2 &&
@@ -1058,12 +1066,17 @@ sec("mascote");
 }
 sec("forja e mina");
 {
+  let forgeCostOk = true;
   for (let level = 1; level <= 1000; level += 1) {
-    if (forgeRules.enhancementCost(level) !== Math.max(1, Math.ceil(level / 3))) {
-      ok("custo de forja no nível " + level, false);
+    if (
+      forgeRules.enhancementCost(level) !==
+      Math.max(1, Math.round((100 * level * (1 + level / 25)) / 2))
+    ) {
+      forgeCostOk = false;
       break;
     }
   }
+  ok("custo de forja segue metade da curva (2.050.000 no teto)", forgeCostOk);
   const claw = items.findItem("lunar-claw");
   const forged = forgeRules.enhancedEffect(claw, 100);
   const base = claw.effect.attributes.strength;
@@ -1076,7 +1089,7 @@ sec("forja e mina");
   state.inventory = [
     ...state.inventory,
     { itemId: "bronze-claw", quantity: 1 },
-    { itemId: "bronze-fragment", quantity: 10 },
+    { itemId: "bronze-fragment", quantity: 500 },
   ];
   state.enhancements["bronze-claw"] = 4;
   const strikeFee = forgeRules.forgeBronzeCost(state.character.level, 4);
@@ -1087,7 +1100,7 @@ sec("forja e mina");
     "forja consome o fragmento do conjunto",
     enhanced.ok &&
       inventoryCtrl.countInInventory(enhanced.state.inventory, "bronze-fragment") ===
-        10 - forgeRules.enhancementCost(5),
+        500 - forgeRules.enhancementCost(5),
   );
   ok(
     "martelada cobra bronze",
@@ -1102,7 +1115,7 @@ sec("forja e mina");
     "martelada falha ainda consome fragmentos",
     missed.ok &&
       inventoryCtrl.countInInventory(missed.state.inventory, "bronze-fragment") ===
-        10 - forgeRules.enhancementCost(5),
+        500 - forgeRules.enhancementCost(5),
   );
   ok(
     "martelada falha também paga o ferreiro",
@@ -1145,11 +1158,11 @@ sec("forja e mina");
     );
   }
   ok(
-    "teto da mineração vem da última veia",
-    oresData.MINING_MAX_LEVEL === ores[ores.length - 1].requiredLevel,
+    "teto da mineração é o teto do personagem",
+    oresData.MINING_MAX_LEVEL === CONST.MAX_CHARACTER_LEVEL,
   );
   ok(
-    "veia pede o nível do equipamento do material",
+    "veia pede o nível de mineração da banda",
     ores.map((ore) => ore.requiredLevel).join(",") === "1,201,401,601,801",
   );
   for (const ore of ores) {
@@ -1162,7 +1175,7 @@ sec("forja e mina");
     "golpe rende fragmentos",
     swing.ok && inventoryCtrl.countInInventory(swing.state.inventory, "bronze-fragment") >= 1,
   );
-  ok("golpe avança a escada", swing.ok && swing.state.mining.progress === 10);
+  ok("golpe avança a escada", swing.ok && swing.state.mining.progress === miningRules.miningEffort(1));
   const deep = { ...miner, mining: { level: 40, progress: 0 } };
   const bonusSwing = forgeCtrl.mine(deep, "bronze-vein", seededRandom(2));
   const bonus = miningRules.miningYieldBonus(40);

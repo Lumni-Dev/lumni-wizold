@@ -8,5 +8,4 @@ export const lunarVein: Ore = {
   requiredLevel: 801,
   minYield: 1,
   maxYield: 2,
-  progress: 520,
 };

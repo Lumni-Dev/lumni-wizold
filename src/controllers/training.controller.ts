@@ -31,15 +31,11 @@ export interface AttributeProgress {
 export function listExercises(state: GameState): AvailableExercise[] {
   const character = state.character;
 
-  const effort = trainingEffort(character?.level ?? 1);
-
   return EXERCISES.map((exercise) => {
-    const maxed =
-      character !== null && character.attributes[exercise.attribute] >= MAX_ATTRIBUTE_VALUE;
-    const cost = trainingSessionCost(
-      character?.level ?? 1,
-      character?.attributes[exercise.attribute] ?? 1,
-    );
+    const value = character?.attributes[exercise.attribute] ?? 1;
+    const effort = trainingEffort(value);
+    const maxed = character !== null && value >= MAX_ATTRIBUTE_VALUE;
+    const cost = trainingSessionCost(character?.level ?? 1, value);
     const affordable = character !== null && character.bronze >= cost;
 
     return {
@@ -86,7 +82,7 @@ export function train(state: GameState, exerciseId: string): Result<TrainingRepo
   const exercise = findExercise(exerciseId);
   if (!exercise) return failure(state, "Exercício desconhecido.");
 
-  const effort = trainingEffort(character.level);
+  const effort = trainingEffort(character.attributes[exercise.attribute]);
 
   if (character.attributes[exercise.attribute] >= MAX_ATTRIBUTE_VALUE) {
     const definition = findAttribute(exercise.attribute);

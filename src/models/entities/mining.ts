@@ -8,7 +8,6 @@ export interface Ore {
   requiredLevel: number;
   minYield: number;
   maxYield: number;
-  progress: number;
 }
 
 export interface MiningState {

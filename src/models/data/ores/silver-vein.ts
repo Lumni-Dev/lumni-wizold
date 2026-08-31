@@ -8,5 +8,4 @@ export const silverVein: Ore = {
   requiredLevel: 201,
   minYield: 1,
   maxYield: 3,
-  progress: 45,
 };

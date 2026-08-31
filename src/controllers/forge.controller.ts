@@ -20,6 +20,7 @@ import {
 } from "@/models/rules/forge";
 import {
   applyMiningProgress,
+  miningEffort,
   miningExhausted,
   miningNeeded,
   miningRemaining,
@@ -55,16 +56,15 @@ export function listMining(state: GameState, now: number = Date.now()): MiningVi
   const dailyRemaining = miningRemaining(mining, now);
   const dailyExhausted = miningExhausted(mining, now);
 
-  const characterLevel = state.character?.level ?? 0;
   const ores = ORES.map((ore) => {
-    const unlocked = characterLevel >= ore.requiredLevel;
+    const unlocked = mining.level >= ore.requiredLevel;
 
     return {
       ore,
       fragment: findItem(ore.fragmentId) as Item,
       owned: countInInventory(state.inventory, ore.fragmentId),
       unlocked,
-      reason: !unlocked ? "Requer NV. " + ore.requiredLevel : null,
+      reason: !unlocked ? "Requer mineração NV. " + ore.requiredLevel : null,
     };
   });
 
@@ -95,8 +95,8 @@ export function mine(
 
   const ore = findOre(oreId);
   if (!ore) return failure(state, "Veio desconhecido.");
-  if (character.level < ore.requiredLevel) {
-    return failure(state, ore.label + " exige NV. " + ore.requiredLevel + ".");
+  if (state.mining.level < ore.requiredLevel) {
+    return failure(state, ore.label + " exige mineração NV. " + ore.requiredLevel + ".");
   }
 
   const rolled = rolloverMining(state.mining, now);
@@ -108,7 +108,7 @@ export function mine(
   }
 
   const yielded = intBetween(ore.minYield, ore.maxYield, random) * miningYieldBonus(rolled.level);
-  const { mining: advanced, levelsGained } = applyMiningProgress(rolled, ore.progress);
+  const { mining: advanced, levelsGained } = applyMiningProgress(rolled, miningEffort(rolled.level));
   const mining: MiningState = {
     ...advanced,
     windowStart: rolled.windowStart ?? new Date(now).toISOString(),

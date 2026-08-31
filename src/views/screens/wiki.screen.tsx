@@ -187,9 +187,9 @@ export function WikiScreen() {
               Rendimento da sessão
             </p>
             <ul className="space-y-1">
-              {[1, 170, 340, 670, 1000].map((level) => (
-                <li key={level} className="font-mono text-[11px] text-ink-soft">
-                  NV. {formatNumber(level)} - +{formatNumber(trainingEffort(level).progress)}{" "}
+              {[1, 170, 340, 670, 1000].map((value) => (
+                <li key={value} className="font-mono text-[11px] text-ink-soft">
+                  Atributo {formatNumber(value)} - +{formatNumber(trainingEffort(value).progress)}{" "}
                   progresso por sessão
                 </li>
               ))}

@@ -8,5 +8,4 @@ export const bronzeVein: Ore = {
   requiredLevel: 1,
   minYield: 1,
   maxYield: 3,
-  progress: 10,
 };

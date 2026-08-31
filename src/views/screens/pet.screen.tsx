@@ -7,7 +7,6 @@ import { PETS, findPet, type PetGender } from "@/models/entities/pet";
 import { ATTRIBUTES } from "@/models/entities/attribute";
 import {
   isPetActive,
-  petHuntEffort,
   isPetWhole,
   petMaxEnergy,
   petPrice,
@@ -15,7 +14,6 @@ import {
   petRestStep,
   petLevelBonus,
   petLevelOf,
-  petTrainingNeeded,
   servesPet,
 } from "@/models/rules/pet";
 import {
@@ -190,9 +188,7 @@ export function PetScreen() {
 
   const level = petLevelOf(pet);
   const maxEnergy = petMaxEnergy(level);
-  const maxed = level >= PET_MAX_LEVEL;
   const whole = isPetWhole(pet);
-  const needed = petTrainingNeeded(level);
 
   const lends = petLevelBonus(level);
   const ceiling = petLevelBonus(PET_MAX_LEVEL);
@@ -287,18 +283,6 @@ export function PetScreen() {
                   maximum={maxEnergy}
                   tone="vigor"
                   glows={!active && !whole}
-                />
-              </ListRow>
-              <ListRow layout="column">
-                <Bar
-                  label={
-                    maxed
-                      ? "Experiência no teto"
-                      : "Experiência (+" + formatNumber(petHuntEffort(level)) + " por caçada)"
-                  }
-                  current={maxed ? needed : (pet.trainingProgress ?? 0)}
-                  maximum={needed}
-                  wraps
                 />
               </ListRow>
             </List>

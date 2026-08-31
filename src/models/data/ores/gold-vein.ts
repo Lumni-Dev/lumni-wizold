@@ -8,5 +8,4 @@ export const goldVein: Ore = {
   requiredLevel: 401,
   minYield: 1,
   maxYield: 2,
-  progress: 120,
 };

@@ -77,15 +77,7 @@ function moonLines(): string[] {
 }
 
 function oreLines(): string[] {
-  return ORES.map(
-    (ore) =>
-      ore.label +
-      ": mineração NV. " +
-      ore.requiredLevel +
-      " e " +
-      ore.progress +
-      " de progresso por golpe.",
-  );
+  return ORES.map((ore) => ore.label + ": mineração NV. " + ore.requiredLevel + ".");
 }
 
 function boardLine(): string {

@@ -1,17 +1,14 @@
 import { MAX_ATTRIBUTE_VALUE, MAX_CHARACTER_LEVEL } from "@/shared/constants/game";
+import { levelRequirement } from "@/shared/constants/tuning";
 import type { AttributeKey } from "../entities/attribute";
 import type { Character } from "../entities/character";
 
-const EXPERIENCE_PER_LEVEL = 100;
-
-const LEVEL_CURVE = 25;
-
 export function experienceForLevel(level: number): number {
-  return Math.round(EXPERIENCE_PER_LEVEL * level * (1 + level / LEVEL_CURVE));
+  return levelRequirement(level);
 }
 
 export function progressNeeded(currentValue: number): number {
-  return 10 + currentValue * 4;
+  return levelRequirement(currentValue);
 }
 
 export interface ExperienceOutcome {

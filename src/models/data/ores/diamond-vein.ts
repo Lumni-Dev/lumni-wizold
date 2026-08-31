@@ -8,5 +8,4 @@ export const diamondVein: Ore = {
   requiredLevel: 601,
   minYield: 1,
   maxYield: 2,
-  progress: 260,
 };

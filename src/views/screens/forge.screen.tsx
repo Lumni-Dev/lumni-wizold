@@ -309,34 +309,35 @@ export function ForgeScreen() {
                 glows={activeOre !== null}
                 wraps
               />
-              <span className="block truncate text-[11px] text-ink-faint">
-                {activeOre
-                  ? mineOpting
-                    ? "Segue sozinha..."
-                    : state.automation.mine
-                      ? "Minerando sem parar..."
-                      : "Minerando..."
-                  : waitingOre
-                    ? "Esperando fôlego para voltar a minerar"
-                    : mining.dailyExhausted
-                      ? "Fôlego esgotado, reabre em " + formatCountdown(miningResetLeft)
-                      : selectedEntry
-                        ? selectedEntry.unlocked
-                          ? selectedEntry.ore.label
-                          : (selectedEntry.reason ?? "Veio bloqueado")
-                        : "Escolha um veio"}
-              </span>
             </ListRow>
             <ListRow layout="column">
-              <Button
-                size="medium"
-                variant={activeOre ? "secondary" : selectedAvailable ? "primary" : "outline"}
-                disabled={activeOre ? !mineOpting : !selectedAvailable || activeItem !== null}
-                onClick={() => toggleMining(effectiveOre, selectedAvailable)}
-                aria-label={activeOre ? "Parar de minerar" : "Minerar o veio escolhido"}
-              >
-                {mineOpting ? "Parar (" + cooldown + ")" : activeOre ? "Minerando..." : "Minerar"}
-              </Button>
+              <div className="flex items-center justify-between gap-3">
+                <span className="min-w-0 flex-1 truncate text-[11px] text-ink-faint">
+                  {activeOre
+                    ? mineOpting
+                      ? "Segue sozinha..."
+                      : state.automation.mine
+                        ? "Minerando sem parar..."
+                        : "Minerando..."
+                    : waitingOre
+                      ? "Esperando fôlego para voltar a minerar"
+                      : mining.dailyExhausted
+                        ? "Fôlego esgotado, reabre em " + formatCountdown(miningResetLeft)
+                        : selectedEntry
+                          ? selectedEntry.unlocked
+                            ? selectedEntry.ore.label
+                            : (selectedEntry.reason ?? "Veio bloqueado")
+                          : "Escolha um veio"}
+                </span>
+                <Button
+                  variant={activeOre ? "secondary" : selectedAvailable ? "primary" : "outline"}
+                  disabled={activeOre ? !mineOpting : !selectedAvailable || activeItem !== null}
+                  onClick={() => toggleMining(effectiveOre, selectedAvailable)}
+                  aria-label={activeOre ? "Parar de minerar" : "Minerar o veio escolhido"}
+                >
+                  {mineOpting ? "Parar (" + cooldown + ")" : activeOre ? "Minerando..." : "Minerar"}
+                </Button>
+              </div>
             </ListRow>
             {mining.ores.map(({ ore, fragment, owned, unlocked, reason }) => {
               const isSelected = ore.id === effectiveOre;
@@ -368,7 +369,11 @@ export function ForgeScreen() {
                       </p>
                       <p className="text-[11px] text-ink-faint">
                         {unlocked
-                          ? "+" + formatNumber(ore.progress) + " de progresso por batida"
+                          ? "+" +
+                            formatNumber(ore.minYield) +
+                            " a " +
+                            formatNumber(ore.maxYield) +
+                            " fragmentos por batida"
                           : reason}
                       </p>
                     </div>
@@ -403,7 +408,7 @@ export function ForgeScreen() {
             {!forgeEntry ? (
               <div className="p-4">
                 <RowText
-                  title="Nada na mochila para forjar"
+                  title="Nada no inventário para forjar"
                   description="Desequipe uma peça para bater nela na bigorna."
                 />
               </div>
@@ -429,7 +434,7 @@ export function ForgeScreen() {
                 {forgeEntry.fragment && forgeEntry.level < MAX_ENHANCEMENT ? (
                   <Bar
                     label={forgeEntry.fragment.name}
-                    tone="tide"
+                    tone="ember"
                     current={forgeEntry.owned}
                     maximum={forgeEntry.cost}
                   />
@@ -443,7 +448,7 @@ export function ForgeScreen() {
                   wraps
                 />
 
-                <div className="flex items-center justify-between gap-3">
+                <div className="-mx-4 flex items-center justify-between gap-3 border-t border-edge px-4 pt-4">
                   <span className="min-w-0 flex-1 truncate text-[11px] text-ink-faint">
                     {forgeActive
                       ? forgeOpting
@@ -479,7 +484,7 @@ export function ForgeScreen() {
 
           <Panel
             title="Disponíveis"
-            description="As peças da mochila fora do corpo. Escolha uma para a bigorna."
+            description="As peças do inventário fora do corpo. Escolha uma para a bigorna."
             padding="none"
           >
             {slots.length === 0 ? (
@@ -508,14 +513,6 @@ export function ForgeScreen() {
                             )}
                           >
                             {row.item.name}
-                          </p>
-                          <p className="text-[11px] text-ink-faint">
-                            {row.level >= MAX_ENHANCEMENT
-                              ? "No teto"
-                              : "+" +
-                                formatNumber(row.level) +
-                                " → +" +
-                                formatNumber(row.level + 1)}
                           </p>
                         </div>
                         <span
