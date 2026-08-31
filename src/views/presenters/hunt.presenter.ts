@@ -31,24 +31,11 @@ function closerOf(report: NarratedFight, prey: string): string {
   return pick([prey + " leva a melhor desta vez.", "Ferido, resta escapar de " + prey + "."]);
 }
 
-function sampleRounds<T>(rounds: readonly T[], amount: number): T[] {
-  if (rounds.length <= amount) return [...rounds];
-
-  const sampled: T[] = [];
-  for (let i = 0; i < amount - 1; i++) {
-    sampled.push(rounds[Math.floor((i * (rounds.length - 1)) / (amount - 1))]);
-  }
-  sampled.push(rounds[rounds.length - 1]);
-  return sampled;
-}
-
-export function narrationOf(report: NarratedFight, maxBeats: number): NarrationLine[] {
+export function narrationOf(report: NarratedFight): NarrationLine[] {
   const prey = report.foe.name;
   const full = report.foe.health;
-  const slots = Math.max(1, maxBeats - 2);
-  const rounds = sampleRounds(report.combat.rounds, slots);
 
-  const middle: NarrationLine[] = rounds.map((round) => ({
+  const middle: NarrationLine[] = report.combat.rounds.map((round) => ({
     text: round.text,
     blow: round.dodged
       ? null

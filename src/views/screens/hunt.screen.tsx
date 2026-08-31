@@ -7,7 +7,7 @@ import { usePageActivity } from "@/controllers/use-page-activity";
 import { playSound } from "@/controllers/sound";
 import { emphasizeDamage, narrationOf, type NarrationLine } from "../presenters/hunt.presenter";
 import { DANGER_LABEL } from "@/models/entities/territory";
-import { CYCLE_OPTOUT_SECS, HUNT_TICK_MS, HUNT_TICKS } from "@/shared/constants/game";
+import { CYCLE_OPTOUT_SECS, HUNT_TICK_MS } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
 import { formatNumber } from "@/shared/utils/format";
 import { ArtImage } from "../components/art-image";
@@ -210,7 +210,7 @@ export function HuntScreen() {
         }
         pendingRef.current = fight;
         bledRef.current = { last: stateRef.current.character?.health ?? 0, total: 0 };
-        scriptRef.current = narrationOf({ foe: fight.creature, combat: fight.combat }, HUNT_TICKS);
+        scriptRef.current = narrationOf({ foe: fight.creature, combat: fight.combat });
         setScript(scriptRef.current);
         setPending(fight);
       });
@@ -250,7 +250,7 @@ export function HuntScreen() {
           bledRef.current = { last: line.characterHealth, total: bledRef.current.total + delta };
         }
       }
-      if (beatRef.current >= HUNT_TICKS) {
+      if (beatRef.current >= scriptRef.current.length) {
         const held = pendingRef.current;
         pendingRef.current = null;
         setPending(null);
@@ -399,7 +399,7 @@ export function HuntScreen() {
                     <Bar
                       label={active ? "Caçando..." : "Caçar"}
                       current={onThis ? progress.beat : 0}
-                      maximum={HUNT_TICKS}
+                      maximum={Math.max(1, script.length)}
                       glows={active}
                       wraps
                     />

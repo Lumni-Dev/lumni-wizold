@@ -22,7 +22,7 @@ import {
 import type { DerivedStats } from "@/models/rules/stats";
 import { canPetFight, isPetActive } from "@/models/rules/pet";
 import { playSound } from "@/controllers/sound";
-import { ARENA_TICKS, HUNT_TICK_MS, NAME_MAX_LENGTH } from "@/shared/constants/game";
+import { HUNT_TICK_MS, NAME_MAX_LENGTH } from "@/shared/constants/game";
 import { sanitizeName } from "@/shared/utils/text";
 import { cn } from "@/shared/utils/class-names";
 import { formatDay, formatNumber, formatBronze } from "@/shared/utils/format";
@@ -204,10 +204,7 @@ export function ArenaScreen() {
       }
       pendingRef.current = resolution;
       bledRef.current = { last: characterRef.current?.health ?? 0, total: 0 };
-      scriptRef.current = narrationOf(
-        { foe: resolution.foe, combat: resolution.combat },
-        ARENA_TICKS,
-      );
+      scriptRef.current = narrationOf({ foe: resolution.foe, combat: resolution.combat });
       setScript(scriptRef.current);
       setBeat(0);
     });
@@ -230,7 +227,7 @@ export function ArenaScreen() {
           bledRef.current = { last: line.characterHealth, total: bledRef.current.total + delta };
         }
       }
-      if (beatRef.current >= ARENA_TICKS) {
+      if (beatRef.current >= scriptRef.current.length) {
         const held = pendingRef.current;
         pendingRef.current = null;
         window.clearInterval(timer);
@@ -396,7 +393,7 @@ export function ArenaScreen() {
           </div>
 
           <div className="space-y-3 p-4">
-            <Bar label="Duelo" current={beat} maximum={ARENA_TICKS} glows />
+            <Bar label="Duelo" current={beat} maximum={Math.max(1, script.length)} glows />
             {duelLine ? (
               <p
                 className={cn(
