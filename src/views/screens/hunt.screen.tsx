@@ -87,7 +87,7 @@ function CombatReport({ report, lines }: { report: HuntReport; lines: NarrationL
       <div className="grid items-start border-b border-edge sm:grid-cols-2 sm:divide-x sm:divide-edge">
         <List>
           <DataRow label="Experiência" value={"+" + formatNumber(report.experience)} />
-          <DataRow label="WCoin" value={"+" + formatNumber(report.bronze)} />
+          <DataRow label="WCoins" value={"+" + formatNumber(report.bronze)} />
           <DataRow label="Dano causado" value={formatNumber(combat.damageDealt)} />
           <DataRow label="Dano recebido" value={formatNumber(combat.damageTaken)} />
           {report.petEffort > 0 ? (
@@ -276,7 +276,7 @@ export function HuntScreen() {
             held.creature.name +
               " abatido: +" +
               formatNumber(held.bronze) +
-              " WCoin e +" +
+              " WCoins e +" +
               formatNumber(held.experience) +
               " de experiência." +
               (spoils ? " Espólio: " + spoils + "." : "") +
@@ -575,7 +575,7 @@ export function HuntScreen() {
               {session.retreats > 0 ? (
                 <DataRow label="Recuos" value={formatNumber(session.retreats)} />
               ) : null}
-              <DataRow label="WCoin" value={"+" + formatNumber(session.bronze)} />
+              <DataRow label="WCoins" value={"+" + formatNumber(session.bronze)} />
               <DataRow label="Experiência" value={"+" + formatNumber(session.experience)} />
             </List>
             <div className="space-y-2 p-4">

@@ -77,7 +77,7 @@ export function StoreScreen() {
     <>
       <PageHeader
         title="Wizold Store"
-        description="Bronze por dinheiro, para quem quer pular a espera. Nada aqui compra nível: experiência só a caça dá."
+        description="WCoins por dinheiro, para quem quer pular a espera. Nada aqui compra nível: experiência só a caça dá."
       />
 
       <Panel
@@ -85,7 +85,7 @@ export function StoreScreen() {
         description="Pagamento pelo Stripe, e a mesma conta da economia."
       >
         <p className="text-xs leading-relaxed text-ink-soft">
-          Cada pacote vale um número de caçadas da sua faixa, não um número solto de bronze. Uma
+          Cada pacote vale um número de caçadas da sua faixa, não um número solto de WCoins. Uma
           caçada sua paga {formatBronze(offers[0].bronze / offers[0].pack.hunts)} hoje, então é isso
           que o pacote multiplica. Subir de faixa aumenta o que você recebe pelo mesmo preço, e é
           por isso que comprar cedo nunca vira atalho: o pacote entrega tempo, sempre o mesmo tempo.
@@ -105,7 +105,7 @@ export function StoreScreen() {
               <div className="min-w-0 flex-1">
                 <h3 className="truncate text-sm text-ink">{pack.name}</h3>
                 <p className="mt-1 truncate text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                  Pacote de bronze
+                  Pacote de WCoins
                 </p>
               </div>
             </CardHeader>
@@ -150,7 +150,7 @@ export function StoreScreen() {
           <div className="p-4">
             <EmptyState
               title="Nenhuma compra ainda"
-              description="A primeira Bolsa de Bronze que você pagar abre esta lista."
+              description="A primeira compra de WCoins que você pagar abre esta lista."
             />
           </div>
         ) : (

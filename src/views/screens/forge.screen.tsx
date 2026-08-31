@@ -447,7 +447,7 @@ export function ForgeScreen() {
                         ) : null}
                         {waitingItem === row.item.id ? (
                           <p className="text-[11px] text-ink-faint">
-                            Esperando fragmentos e bronze para a próxima martelada
+                            Esperando fragmentos e WCoins para a próxima martelada
                           </p>
                         ) : entry.reason ? (
                           <p className="text-[11px] text-ink-faint">{entry.reason}</p>
@@ -465,7 +465,7 @@ export function ForgeScreen() {
       <ConfirmDialog
         open={confirming !== null}
         title="Forjar"
-        description="A bigorna consome os fragmentos e o bronze na hora, e marteladas não se desfazem."
+        description="A bigorna consome os fragmentos e as WCoins na hora, e marteladas não se desfazem."
         detail={
           confirming && confirming.fragment
             ? enhancedName(confirming.item.name, confirming.level) +

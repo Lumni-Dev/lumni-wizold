@@ -236,7 +236,7 @@ export function TrainingScreen() {
                           ? "Treinando sem parar..."
                           : "Treinando..."
                       : waitingExercise === exercise.id
-                        ? "Esperando bronze para continuar"
+                        ? "Esperando WCoins para continuar"
                         : reason}
                   </span>
                   <BodyGate open={ready && !active} reason="Vida baixa demais para treinar.">

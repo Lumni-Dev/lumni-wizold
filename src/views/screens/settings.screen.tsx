@@ -197,7 +197,7 @@ export function SettingsScreen() {
           description={
             "O nome pode mudar uma vez a cada " +
             RENAME_COOLDOWN_DAYS +
-            " dias, e a troca custa bronze: quanto mais fundo na partida, mais caro o novo nome."
+            " dias, e a troca custa WCoins: quanto mais fundo na partida, mais caro o novo nome."
           }
         >
           <form onSubmit={submitRename} className="space-y-3">
@@ -371,7 +371,7 @@ export function SettingsScreen() {
         open={confirmingRename}
         title="Alterar nome"
         description={
-          "O bronze sai na hora e o novo nome fica travado por " +
+          "As WCoins saem na hora e o novo nome fica travado por " +
           RENAME_COOLDOWN_DAYS +
           " dias, no ranking, na taverna e no bazar."
         }

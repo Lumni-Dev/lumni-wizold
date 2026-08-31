@@ -2141,7 +2141,8 @@ sec("imutabilidade");
 }
 sec("moeda e formato");
 {
-  ok("moeda fala WCoin", formatBronze(120) === "120 WCoin");
+  ok("moeda fala WCoin", formatBronze(120) === "120 WCoins");
+  ok("moeda no singular", formatBronze(1) === "1 WCoin");
   ok("parse simples", parseReais("50") === 5000);
   ok("parse com vírgula", parseReais("49,90") === 4990);
   ok("parse com milhar", parseReais("1.500,00") === 150000);

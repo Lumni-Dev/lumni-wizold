@@ -142,7 +142,7 @@ function Kennel({ bronze, level }: { bronze: number; level: number }) {
         open={confirming}
         title="Adotar"
         description={
-          "Adotar é compromisso: soltar depois não devolve bronze nenhum, e trocar o " +
+          "Adotar é compromisso: soltar depois não devolve WCoin nenhuma, e trocar o " +
           "apelido custa " +
           formatBronze(PET_RENAME_PRICE) +
           " no canil."
@@ -384,7 +384,7 @@ export function PetScreen() {
             }
           >
             <p className="text-xs leading-relaxed text-ink-faint">
-              Soltar não devolve bronze nenhum: adotar é um compromisso. Depois dá para adotar outro
+              Soltar não devolve WCoin nenhuma: adotar é um compromisso. Depois dá para adotar outro
               no canil, de qualquer linhagem, e o apelido fica livre para usar de novo. Este{" "}
               {pet.name} é que não volta.
             </p>
@@ -395,7 +395,7 @@ export function PetScreen() {
       <ConfirmDialog
         open={confirmingRename}
         title="Renomear o mascote"
-        description="O bronze fica no canil e o apelido novo vale na hora, em todas as telas."
+        description="As WCoins ficam no canil e o apelido novo vale na hora, em todas as telas."
         detail={pet.name + " → " + newPetName.trim() + " - " + formatBronze(PET_RENAME_PRICE)}
         confirmLabel="Renomear"
         onCancel={() => setConfirmingRename(false)}

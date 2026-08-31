@@ -141,7 +141,7 @@ export function petTrainingView(state: GameState): PetTrainingView | null {
     effort: { progress: petTrainingEffort(level) },
     affordable,
     maxed,
-    reason: maxed ? "Mascote no teto" : !affordable ? "Bronze insuficiente" : null,
+    reason: maxed ? "Mascote no teto" : !affordable ? "WCoins insuficientes" : null,
   };
 }
 

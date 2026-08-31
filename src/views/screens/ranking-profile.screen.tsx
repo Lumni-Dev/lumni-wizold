@@ -109,7 +109,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
             </div>
 
             <List>
-              <DataRow label="Bronze" value={formatNumber(hunter.bronze)} />
+              <DataRow label="WCoins" value={formatNumber(hunter.bronze)} />
               <DataRow label="Forja" value={"+" + formatNumber(hunter.forge)} />
               <DataRow label="Mineração" value={"NV. " + formatNumber(hunter.mining)} />
             </List>

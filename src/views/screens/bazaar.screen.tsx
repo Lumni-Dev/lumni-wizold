@@ -312,7 +312,7 @@ export function BazaarScreen() {
               />
 
               <p className="text-xs leading-relaxed text-ink-faint">
-                Anunciar custa {formatBronze(BAZAAR_LISTING_FEE)} de bronze, que não voltam no
+                Anunciar custa {formatBronze(BAZAAR_LISTING_FEE)}, que não voltam no
                 cancelamento. A plataforma fica com {FEE_LABEL} da venda. O anúncio fica no quadro
                 até outro caçador pagar por ele: o preço é seu, e a espera também.
               </p>

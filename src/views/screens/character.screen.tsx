@@ -121,7 +121,7 @@ export function CharacterScreen() {
             </div>
 
             <List>
-              <DataRow label="Bronze" value={formatNumber(character.bronze)} />
+              <DataRow label="WCoins" value={formatNumber(character.bronze)} />
               <DataRow label="Forja" value={"+" + formatNumber(forge)} />
               <DataRow label="Mineração" value={"NV. " + formatNumber(state.mining.level)} />
             </List>

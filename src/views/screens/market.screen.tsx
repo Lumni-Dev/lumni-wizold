@@ -167,7 +167,7 @@ export function MarketScreen() {
     <>
       <PageHeader
         title="Mercado"
-        description="O ferreiro do vilarejo não pergunta de onde vem o material. Só conta o bronze."
+        description="O ferreiro do vilarejo não pergunta de onde vem o material. Só contam as WCoins."
       />
 
       <div className="flex gap-2">
@@ -341,7 +341,7 @@ export function MarketScreen() {
           deal
             ? deal.kind === "sell"
               ? "O ferreiro paga metade da tabela e não devolve o item depois."
-              : "O bronze sai na hora e o item vai direto para o inventário."
+              : "As WCoins saem na hora e o item vai direto para o inventário."
             : ""
         }
         detail={

@@ -48,7 +48,7 @@ export function listExercises(state: GameState): AvailableExercise[] {
       cost,
       affordable,
       maxed,
-      reason: maxed ? "Atributo no teto" : !affordable ? "Bronze insuficiente" : null,
+      reason: maxed ? "Atributo no teto" : !affordable ? "WCoins insuficientes" : null,
     };
   });
 }

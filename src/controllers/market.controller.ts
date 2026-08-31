@@ -71,7 +71,7 @@ export function listOffers(state: GameState): MarketOffer[] {
             : alreadyOwned
               ? "Uma peça basta: a forja sobe na bigorna"
               : !affordable
-                ? "Bronze insuficiente"
+                ? "WCoins insuficientes"
                 : null,
       };
     })
@@ -107,7 +107,7 @@ export function buyItem(state: GameState, itemId: string, quantity = 1): Result 
   }
 
   const cost = marketPriceOf(item, character.level) * quantity;
-  if (character.bronze < cost) return failure(state, "Bronze insuficiente para " + item.name + ".");
+  if (character.bronze < cost) return failure(state, "WCoins insuficientes para " + item.name + ".");
 
   const enhancements = { ...state.enhancements };
   delete enhancements[itemId];

@@ -88,7 +88,7 @@ function DuelReport({ report }: { report: ArenaResolution }) {
       <div className="grid items-start border-b border-edge sm:grid-cols-2 sm:divide-x sm:divide-edge">
         <List>
           <DataRow
-            label={report.spoils < 0 ? "Bronze perdido" : "Bronze tomado"}
+            label={report.spoils < 0 ? "WCoins perdidas" : "WCoins tomadas"}
             value={(report.spoils < 0 ? "-" : "+") + formatNumber(Math.abs(report.spoils))}
           />
           <DataRow label="Dano causado" value={formatNumber(combat.damageDealt)} />
@@ -104,7 +104,7 @@ function DuelReport({ report }: { report: ArenaResolution }) {
                 : hunter.name + " levou a melhor. Você sai por baixo, mas sai."}
           </p>
           <p className="text-xs text-ink-faint">
-            O fosso não paga experiência: aqui o bronze só troca de dono.
+            O fosso não paga experiência: aqui as WCoins só trocam de dono.
           </p>
         </div>
       </div>
@@ -312,7 +312,7 @@ export function ArenaScreen() {
           formatNumber(view.spoils.min) +
           " a " +
           formatNumber(view.spoils.max) +
-          " de bronze, sorteados, e nunca mais que um quarto do que ele carrega. Quem perde paga pela mesma régua. Quem já duelou com você descansa até as 06:00 antes de subir de novo."
+          " WCoins, sorteadas, e nunca mais que um quarto do que ele carrega. Quem perde paga pela mesma régua. Quem já duelou com você descansa até as 06:00 antes de subir de novo."
         }
         action={
           <Tag tone="neutral">
@@ -583,7 +583,7 @@ export function ArenaScreen() {
                   )}
                 >
                   {line.outcome === "draw" || line.spoils === 0
-                    ? "0 de bronze"
+                    ? "0 WCoins"
                     : (line.outcome === "victory" ? "+" : "-") + formatBronze(line.spoils)}
                 </span>
               </ListRow>
