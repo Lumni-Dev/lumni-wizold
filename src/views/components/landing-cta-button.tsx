@@ -21,7 +21,7 @@ export function LandingCtaButton({ href, label, className }: LandingCtaButtonPro
     >
       <FuryRingFrame
         contentAlign="center"
-        fillClassName="h-12 w-full transition-colors hover:bg-surface-top"
+        fillClassName="min-h-12 w-full transition-colors hover:bg-surface-top"
       >
         <span className="px-8 text-xs font-medium uppercase tracking-[0.16em] text-ember">
           {label}

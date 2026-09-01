@@ -40,7 +40,7 @@ export function FuryUseButton({ onClick }: { onClick: () => void }) {
       disabled
       aria-disabled
       className="inline-block cursor-default border-0 bg-transparent p-0 font-[inherit]"
-      fillClassName="h-8"
+      fillClassName="min-h-8"
     >
       <span className="px-3 font-mono text-[11px] text-ink">{furyClock(remaining)}</span>
     </FuryRingFrame>

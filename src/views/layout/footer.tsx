@@ -7,7 +7,7 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mt-auto border-t border-edge bg-surface/40">
+    <footer className="relative mt-auto border-t border-edge bg-surface/40">
       <div className="mx-auto w-full max-w-5xl p-4 md:px-8 md:py-8">
         <div className="max-w-md space-y-3">
           <div className="flex items-center gap-3">

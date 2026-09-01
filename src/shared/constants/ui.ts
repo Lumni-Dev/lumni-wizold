@@ -19,7 +19,7 @@ export const FURY_RING_FILL = "bg-surface-high";
 export const FURY_RING_RADIUS = "rounded-md";
 
 /** Inner face, inset by the 1px animated border. */
-export const FURY_RING_INNER_RADIUS = "rounded-[calc(var(--radius-md)-1px)]";
+export const FURY_RING_INNER_RADIUS = "rounded-[calc(var(--radius-md)-2px)]";
 
 export const GLASS_CONTROL_ACTIVE = "bg-surface-high/50 backdrop-blur";
 

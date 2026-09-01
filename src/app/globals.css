@@ -84,11 +84,11 @@
   .landing-backdrop-shade {
     background-image: linear-gradient(
       to bottom,
-      rgba(7, 5, 3, 0.55) 0%,
-      rgba(7, 5, 3, 0.64) 30%,
-      rgba(7, 5, 3, 0.76) 55%,
-      rgba(7, 5, 3, 0.88) 75%,
-      rgba(7, 5, 3, 0.96) 90%,
+      rgba(7, 5, 3, 0.28) 0%,
+      rgba(7, 5, 3, 0.38) 30%,
+      rgba(7, 5, 3, 0.5) 55%,
+      rgba(7, 5, 3, 0.64) 75%,
+      rgba(7, 5, 3, 0.8) 90%,
       var(--color-base) 100%
     );
   }
@@ -322,9 +322,8 @@ button:not(:disabled) {
 }
 
 .fury-ring-frame__gradient {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
+  padding: 2px;
+  border-radius: inherit;
   background: conic-gradient(
     from var(--fury-ring-angle),
     var(--color-ember) 0deg,
@@ -338,11 +337,9 @@ button:not(:disabled) {
 }
 
 .fury-ring-frame__fill {
-  position: relative;
-  z-index: 1;
+  display: flex;
   box-sizing: border-box;
-  width: calc(100% - 3px);
-  margin: 1px auto;
+  width: 100%;
   overflow: hidden;
 }
 

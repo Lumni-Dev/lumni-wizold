@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 const WALLPAPER = "/assets/ui/background.jpg?v=2";
-const VIDEO = "/assets/ui/landing-background.mp4?v=6";
+const VIDEO = "/assets/ui/landing-background.mp4?v=9";
 
 const UNLOCK_EVENTS: Array<keyof DocumentEventMap> = [
   "pointerdown",
