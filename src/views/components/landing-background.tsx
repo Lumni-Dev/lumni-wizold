@@ -4,29 +4,24 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@/shared/utils/class-names";
 
 const WALLPAPER = "/assets/ui/background.jpg?v=2";
-const VIDEO = "/assets/ui/landing-background.mp4?v=2";
+const VIDEO = "/assets/ui/landing-background.mp4?v=3";
 const PLAYBACK_RATE = 0.55;
 const TURN_MARGIN_S = 0.5;
 
-function supportsReversePlayback(video: HTMLVideoElement): boolean {
-  try {
-    video.playbackRate = -PLAYBACK_RATE;
-    const ok = video.playbackRate < 0;
-    video.playbackRate = PLAYBACK_RATE;
-    return ok;
-  } catch {
-    return false;
-  }
-}
-
-function startScrubPingPong(video: HTMLVideoElement) {
-  video.pause();
+function startPingPong(video: HTMLVideoElement) {
   video.loop = false;
+  video.muted = true;
+  video.defaultMuted = true;
   video.currentTime = TURN_MARGIN_S;
 
   let direction = 1;
   let last = performance.now();
   let frame = 0;
+
+  const ensurePlaying = () => {
+    if (!video.paused) return;
+    void video.play().catch(() => undefined);
+  };
 
   const step = (now: number) => {
     const duration = video.duration;
@@ -35,6 +30,8 @@ function startScrubPingPong(video: HTMLVideoElement) {
       frame = requestAnimationFrame(step);
       return;
     }
+
+    ensurePlaying();
 
     const delta = Math.min((now - last) / 1000, 0.1);
     last = now;
@@ -56,78 +53,66 @@ function startScrubPingPong(video: HTMLVideoElement) {
     frame = requestAnimationFrame(step);
   };
 
+  ensurePlaying();
   frame = requestAnimationFrame(step);
-  return () => cancelAnimationFrame(frame);
-}
-
-function startNativePingPong(video: HTMLVideoElement, onPlayFail: () => void) {
-  video.loop = false;
-
-  const playForward = () => {
-    video.playbackRate = PLAYBACK_RATE;
-    void video.play().catch(onPlayFail);
-  };
-
-  const playBackward = () => {
-    video.playbackRate = -PLAYBACK_RATE;
-    void video.play().catch(onPlayFail);
-  };
-
-  const onTimeUpdate = () => {
-    const duration = video.duration;
-    if (!Number.isFinite(duration) || duration <= 0) return;
-
-    const endAt = Math.max(TURN_MARGIN_S, duration - TURN_MARGIN_S);
-    const startAt = Math.min(TURN_MARGIN_S, endAt);
-
-    if (video.playbackRate > 0 && video.currentTime >= endAt) {
-      video.pause();
-      video.currentTime = endAt;
-      playBackward();
-    } else if (video.playbackRate < 0 && video.currentTime <= startAt) {
-      video.pause();
-      video.currentTime = startAt;
-      playForward();
-    }
-  };
-
-  video.addEventListener("timeupdate", onTimeUpdate);
-  video.currentTime = TURN_MARGIN_S;
-  playForward();
 
   return () => {
-    video.removeEventListener("timeupdate", onTimeUpdate);
+    cancelAnimationFrame(frame);
     video.pause();
   };
 }
 
 export function LandingBackground() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [ready, setReady] = useState(false);
+  const [active, setActive] = useState(false);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    if (failed || !ready) return;
+    if (failed) return;
 
     const video = videoRef.current;
     if (!video) return;
 
-    let stop: () => void = () => undefined;
-    const onPlayFail = () => {
-      stop();
-      stop = startScrubPingPong(video);
+    const sync = () => {
+      if (video.readyState >= 1 && Number.isFinite(video.duration) && video.duration > 0) {
+        setActive(true);
+      }
     };
 
-    void video.play().catch(onPlayFail);
+    sync();
+    video.addEventListener("loadedmetadata", sync);
+    video.addEventListener("loadeddata", sync);
+    video.addEventListener("canplay", sync);
 
-    stop = supportsReversePlayback(video)
-      ? startNativePingPong(video, onPlayFail)
-      : startScrubPingPong(video);
+    return () => {
+      video.removeEventListener("loadedmetadata", sync);
+      video.removeEventListener("loadeddata", sync);
+      video.removeEventListener("canplay", sync);
+    };
+  }, [failed]);
 
-    return () => stop();
-  }, [failed, ready]);
+  useEffect(() => {
+    if (failed || !active) return;
 
-  const showVideo = !failed;
+    const video = videoRef.current;
+    if (!video) return;
+
+    return startPingPong(video);
+  }, [failed, active]);
+
+  useEffect(() => {
+    if (failed || !active) return;
+
+    const kick = () => {
+      const video = videoRef.current;
+      if (!video) return;
+      video.muted = true;
+      void video.play().catch(() => undefined);
+    };
+
+    document.addEventListener("pointerdown", kick, { once: true });
+    return () => document.removeEventListener("pointerdown", kick);
+  }, [failed, active]);
 
   return (
     <div
@@ -140,7 +125,7 @@ export function LandingBackground() {
         alt=""
         className={cn(
           "landing-backdrop-media absolute inset-0 h-full w-full object-cover object-top transition-opacity duration-700",
-          showVideo && ready ? "opacity-0" : "opacity-100",
+          active && !failed ? "opacity-0" : "opacity-100",
         )}
       />
 
@@ -150,11 +135,11 @@ export function LandingBackground() {
         muted
         playsInline
         preload="auto"
-        onLoadedData={() => setReady(true)}
+        poster={WALLPAPER}
         onError={() => setFailed(true)}
         className={cn(
           "landing-backdrop-media absolute inset-0 h-full w-full object-cover object-top transition-opacity duration-700",
-          showVideo && ready ? "opacity-100" : "opacity-0",
+          active && !failed ? "opacity-100" : "opacity-0",
         )}
       >
         <source src={VIDEO} type="video/mp4" />
