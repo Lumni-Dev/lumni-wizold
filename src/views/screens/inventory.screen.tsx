@@ -117,7 +117,7 @@ export function InventoryScreen() {
                   </span>
                   {item ? (
                     <Button
-                      variant="outline"
+                      variant="primary"
                       onClick={() => unequipItem(slot)}
                       disabled={lockSecs > 0}
                     >
@@ -180,34 +180,38 @@ export function InventoryScreen() {
                 footer={
                   hasActions ? (
                     <>
-                      {isEquippable(item) ? (
-                        <Button
-                          variant="secondary"
-                          onClick={() => handleEquip(item.id, item.category, enhancement)}
-                          disabled={levelTooLow}
-                        >
-                          Equipar
-                        </Button>
-                      ) : null}
-                      {consumable ? (
-                        item.potion === "rage" ? (
-                          <FuryUseButton onClick={() => consumeItem(item.id)} />
-                        ) : (
-                          <Button variant="primary" onClick={() => consumeItem(item.id)}>
-                            {item.category === "pet" ? "Alimentar" : "Beber"}
+                      <div className="flex flex-wrap gap-2">
+                        {sellable ? (
+                          <Button
+                            variant="outline"
+                            onClick={() =>
+                              router.push(enhancement > 0 ? "/bazaar" : "/market?sell=" + item.id)
+                            }
+                          >
+                            {enhancement > 0 ? "Bazar" : "Vender"}
                           </Button>
-                        )
-                      ) : null}
-                      {sellable ? (
-                        <Button
-                          variant="outline"
-                          onClick={() =>
-                            router.push(enhancement > 0 ? "/bazaar" : "/market?sell=" + item.id)
-                          }
-                        >
-                          {enhancement > 0 ? "Bazar" : "Vender"}
-                        </Button>
-                      ) : null}
+                        ) : null}
+                      </div>
+                      <div className="flex flex-wrap justify-end gap-2">
+                        {isEquippable(item) ? (
+                          <Button
+                            variant="primary"
+                            onClick={() => handleEquip(item.id, item.category, enhancement)}
+                            disabled={levelTooLow}
+                          >
+                            Equipar
+                          </Button>
+                        ) : null}
+                        {consumable ? (
+                          item.potion === "rage" ? (
+                            <FuryUseButton onClick={() => consumeItem(item.id)} />
+                          ) : (
+                            <Button variant="primary" onClick={() => consumeItem(item.id)}>
+                              {item.category === "pet" ? "Alimentar" : "Beber"}
+                            </Button>
+                          )
+                        ) : null}
+                      </div>
                     </>
                   ) : null
                 }
