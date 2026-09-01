@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Noiva Sangrenta (NV. 871 a 880) da área Castelo Escarlate.
 export const bloodyBride: Creature = {
   id: "bloody-bride",
   name: "Noiva Sangrenta",
@@ -12,8 +13,8 @@ export const bloodyBride: Creature = {
   endurance: 33779,
   agility: 575,
   experience: 6144,
-  minBronze: 498,
-  maxBronze: 924,
+  minBronze: 15,
+  maxBronze: 27,
   drops: [
     { itemId: "bride-veil", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "pale-blood", chance: 0.12, minimum: 1, maximum: 1 },

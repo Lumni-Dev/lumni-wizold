@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Cabelo de Bruxa: despojo de caça, trocado por bronze no mercado.
 export const witchHair: Item = {
   id: "witch-hair",
   name: "Cabelo de Bruxa",

@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Aberração Ocular (NV. 731 a 740) da área Abismo Uivante.
 export const eyeAberration: Creature = {
   id: "eye-aberration",
   name: "Aberração Ocular",
@@ -12,8 +13,8 @@ export const eyeAberration: Creature = {
   endurance: 9886,
   agility: 484,
   experience: 5164,
-  minBronze: 419,
-  maxBronze: 779,
+  minBronze: 13,
+  maxBronze: 23,
   drops: [
     { itemId: "aberrant-eye", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "shadow-essence", chance: 0.12, minimum: 1, maximum: 1 },

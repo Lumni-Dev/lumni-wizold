@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Súcubo (NV. 751 a 760) da área Abismo Uivante.
 export const succubus: Creature = {
   id: "succubus",
   name: "Súcubo",
@@ -12,8 +13,8 @@ export const succubus: Creature = {
   endurance: 10844,
   agility: 497,
   experience: 5304,
-  minBronze: 431,
-  maxBronze: 800,
+  minBronze: 13,
+  maxBronze: 23,
   drops: [
     { itemId: "succubus-wing", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "shadow-silk", chance: 0.12, minimum: 1, maximum: 1 },

@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Escama de Lagarto: despojo de caça, trocado por bronze no mercado.
 export const lizardScale: Item = {
   id: "lizard-scale",
   name: "Escama de Lagarto",

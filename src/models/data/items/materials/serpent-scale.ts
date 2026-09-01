@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Escama de Serpente: despojo de caça, trocado por bronze no mercado.
 export const serpentScale: Item = {
   id: "serpent-scale",
   name: "Escama de Serpente",

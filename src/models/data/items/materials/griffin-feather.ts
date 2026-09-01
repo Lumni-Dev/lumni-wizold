@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Pena de Grifo: despojo de caça, trocado por bronze no mercado.
 export const griffinFeather: Item = {
   id: "griffin-feather",
   name: "Pena de Grifo",

@@ -412,20 +412,11 @@ sec("economia");
 {
   for (const level of [1, 100, 340, 670, 1000]) {
     const purse = species.huntPurse(level);
-    ok(
-      "ponto custa 3 caçadas NV " + level,
-      training.trainingPointCost(level) === Math.max(1, Math.round(purse * 3)),
-    );
     const trainedValue = Math.max(1, Math.round(level * 0.55));
     ok(
-      "sessão custa a fatia do ponto pelas sessões NV " + level,
+      "sessão de treino custa a fatia da bolsa NV " + level,
       training.trainingSessionCost(level, trainedValue) ===
-        Math.max(
-          1,
-          Math.round(
-            training.trainingPointCost(level) / training.trainingSessionsPerPoint(trainedValue),
-          ),
-        ),
+        Math.max(1, Math.round(purse * training.TRAINING_SESSION_HUNTS)),
     );
     if (trainedValue > 1) {
       ok(
@@ -451,7 +442,10 @@ sec("economia");
   );
   const setTotal = (definition) =>
     entItem.EQUIPMENT_SLOTS.reduce((total, slot) => total + sets.piecePrice(definition, slot), 0);
-  ok("conjunto de bronze custa 1235", setTotal(sets.EQUIPMENT_SETS[0]) === 1235);
+  ok(
+    "conjunto de bronze vale 140 caçadas na abertura",
+    setTotal(sets.EQUIPMENT_SETS[0]) === species.huntPurse(1) * 140,
+  );
   let setsClimb = true;
   for (let index = 1; index < sets.EQUIPMENT_SETS.length; index += 1) {
     if (setTotal(sets.EQUIPMENT_SETS[index]) <= setTotal(sets.EQUIPMENT_SETS[index - 1])) {
@@ -467,14 +461,17 @@ sec("economia");
       sessions === Math.ceil(progression.experienceForLevel(value) / (12 + 7 * value)),
       sessions,
     );
-    const perPoint = (sessions * training.trainingSessionCost(level, value)) / species.huntPurse(level);
+    const perPoint = training.trainingPointCost(level, value) / species.huntPurse(level);
     ok(
-      "ponto custa 1..10 caçadas NV " + level,
-      perPoint >= 1 && perPoint <= 10,
+      "ponto sobe com as sessões NV " + level,
+      perPoint >= training.trainingSessionsPerPoint(value) * training.TRAINING_SESSION_HUNTS * 0.9,
       perPoint.toFixed(2),
     );
   }
-  ok("renomear custa 50 mil de bronze fixos", characterCtrl.renameCost() === CONST.RENAME_PRICE);
+  ok(
+    "renomear segue a bolsa da caçada",
+    characterCtrl.renameCost(500) === Math.round(species.huntPurse(500) * CONST.RENAME_HUNTS),
+  );
 }
 sec("progressão");
 {
@@ -1045,10 +1042,10 @@ sec("mascote");
     "Neve",
   );
   ok(
-    "adoção cobra o preço fixo do lobo",
+    "adoção cobra a bolsa da caçada",
     adopt.ok &&
       adopt.state.character.bronze ===
-        baseState({ level: adoptLevel }).character.bronze - CONST.PET_PRICE,
+        baseState({ level: adoptLevel }).character.bronze - petRules.petPrice(adoptLevel),
   );
   ok("segunda adoção recusa", petCtrl.adoptPet(adopt.state, "male", "Outro").ok === false);
   const released = petCtrl.releasePet(adopt.state);
@@ -1286,7 +1283,7 @@ sec("bazar");
     "anúncio cobra a taxa em bronze",
     announced.ok &&
       announced.state.character.bronze ===
-        state.character.bronze - bazaarRules.BAZAAR_LISTING_FEE,
+        state.character.bronze - bazaarRules.bazaarListingFee(state.character.level),
   );
   const freshListing = {
     id: "bz-1",
@@ -1666,7 +1663,7 @@ sec("personagem");
     "nasce inteiro",
     run.character.health === derived.maxHealth && run.character.rage === derived.maxRage,
   );
-  ok("nasce com 100 de bronze", run.character.bronze === CONST.STARTING_BRONZE);
+  ok("nasce com 50 de bronze", run.character.bronze === CONST.STARTING_BRONZE);
   ok(
     "nasce sem equipamento",
     Object.values(run.equipment).every((slot) => slot === null),

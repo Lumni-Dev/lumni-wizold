@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Texugo Furioso (NV. 81 a 90) da área Campo do Vilarejo.
 export const furiousBadger: Creature = {
   id: "furious-badger",
   name: "Texugo Furioso",
@@ -12,8 +13,8 @@ export const furiousBadger: Creature = {
   endurance: 114,
   agility: 33,
   experience: 614,
-  minBronze: 55,
-  maxBronze: 103,
+  minBronze: 4,
+  maxBronze: 7,
   drops: [
     { itemId: "badger-claw", chance: 0.35, minimum: 1, maximum: 2 },
     { itemId: "thick-hide", chance: 0.35, minimum: 1, maximum: 2 },

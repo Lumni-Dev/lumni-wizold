@@ -9,7 +9,7 @@ export const PET_SUPPLIES: readonly Item[] = [
       "Devolve o fôlego do lobo, que é o que ele gasta acompanhando você.",
     category: "pet",
     rarity: "common",
-    price: 40,
+    price: 2,
     huntCost: 1.5,
     minLevel: 1,
     stackable: true,

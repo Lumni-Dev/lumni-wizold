@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Lâmina Enferrujada: despojo de caça, trocado por bronze no mercado.
 export const rustedBlade: Item = {
   id: "rusted-blade",
   name: "Lâmina Enferrujada",

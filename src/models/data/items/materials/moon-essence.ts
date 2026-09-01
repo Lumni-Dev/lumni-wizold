@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Essência da Lua: despojo de caça, trocado por bronze no mercado.
 export const moonEssence: Item = {
   id: "moon-essence",
   name: "Essência da Lua",

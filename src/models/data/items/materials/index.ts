@@ -137,6 +137,7 @@ import { wormHide } from "./worm-hide";
 import { yetiFur } from "./yeti-fur";
 import type { Item } from "../../../entities/item";
 
+// Every material a creature drops. Assembled into the item catalog by items.ts.
 export const ALL_MATERIALS: readonly Item[] = [
   aberrantEye,
   abyssCrown,

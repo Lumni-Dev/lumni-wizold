@@ -1,12 +1,8 @@
 import type { AttributeKey } from "@/models/entities/attribute";
 import type { Gender } from "@/models/entities/character";
-import {
-  EQUIPMENT_SLOTS,
-  type EquipmentSet,
-  type EquipmentSlot,
-  type Item,
-  type ItemEffect,
-} from "@/models/entities/item";
+import { EQUIPMENT_SLOTS, type EquipmentSet, type EquipmentSlot, type Item, type ItemEffect } from "@/models/entities/item";
+import { huntPurse } from "@/models/rules/economy";
+import { SET_HUNT_COST } from "@/shared/config/equipment-economy";
 import { SLOTS } from "./slots";
 import { bronzeSet } from "./bronze";
 import { silverSet } from "./silver";
@@ -82,7 +78,10 @@ function pieceEffect(definition: SetDefinition, slot: EquipmentSlot): ItemEffect
 }
 
 export function piecePrice(definition: SetDefinition, slot: EquipmentSlot): number {
-  return Math.round(SLOTS[slot].priceFactor * definition.priceBase);
+  const purse = huntPurse(definition.minLevel);
+  const setHunts = SET_HUNT_COST[definition.key as EquipmentSet];
+  const slotTotal = EQUIPMENT_SLOTS.reduce((sum, key) => sum + SLOTS[key].priceFactor, 0);
+  return Math.max(1, Math.round((purse * setHunts * SLOTS[slot].priceFactor) / slotTotal));
 }
 
 function pieceOf(definition: SetDefinition, slot: EquipmentSlot, lineage?: Gender): Item {
@@ -100,6 +99,10 @@ function pieceOf(definition: SetDefinition, slot: EquipmentSlot, lineage?: Gende
     set: definition.key,
     lineage,
   };
+}
+
+export function setTotalPrice(definition: SetDefinition): number {
+  return EQUIPMENT_SLOTS.reduce((total, slot) => total + piecePrice(definition, slot), 0);
 }
 
 export function buildSetItems(): Item[] {

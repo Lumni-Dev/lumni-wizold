@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Crina Prateada: despojo de caça, trocado por bronze no mercado.
 export const silverMane: Item = {
   id: "silver-mane",
   name: "Crina Prateada",

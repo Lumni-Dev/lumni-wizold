@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Chifre Torto: despojo de caça, trocado por bronze no mercado.
 export const twistedAntler: Item = {
   id: "twisted-antler",
   name: "Chifre Torto",

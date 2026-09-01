@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Terra de Cova: despojo de caça, trocado por bronze no mercado.
 export const graveDirt: Item = {
   id: "grave-dirt",
   name: "Terra de Cova",

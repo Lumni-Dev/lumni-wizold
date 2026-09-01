@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Javali da Mata (NV. 131 a 140) da área Mata do Orvalho.
 export const woodBoar: Creature = {
   id: "wood-boar",
   name: "Javali da Mata",
@@ -12,8 +13,8 @@ export const woodBoar: Creature = {
   endurance: 166,
   agility: 50,
   experience: 964,
-  minBronze: 83,
-  maxBronze: 155,
+  minBronze: 4,
+  maxBronze: 8,
   drops: [
     { itemId: "boar-tusk", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "thick-hide", chance: 0.35, minimum: 1, maximum: 2 },

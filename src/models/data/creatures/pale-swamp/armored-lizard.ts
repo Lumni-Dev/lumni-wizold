@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Lagarto Blindado (NV. 341 a 350) da área Pântano Pálido.
 export const armoredLizard: Creature = {
   id: "armored-lizard",
   name: "Lagarto Blindado",
@@ -12,8 +13,8 @@ export const armoredLizard: Creature = {
   endurance: 647,
   agility: 124,
   experience: 2434,
-  minBronze: 201,
-  maxBronze: 373,
+  minBronze: 7,
+  maxBronze: 13,
   drops: [
     { itemId: "lizard-scale", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "thick-hide", chance: 0.35, minimum: 1, maximum: 2 },

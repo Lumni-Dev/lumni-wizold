@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Sanguessuga Gigante (NV. 321 a 330) da área Pântano Pálido.
 export const giantLeech: Creature = {
   id: "giant-leech",
   name: "Sanguessuga Gigante",
@@ -12,8 +13,8 @@ export const giantLeech: Creature = {
   endurance: 540,
   agility: 217,
   experience: 2294,
-  minBronze: 190,
-  maxBronze: 352,
+  minBronze: 7,
+  maxBronze: 13,
   drops: [
     { itemId: "leech-blood", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "venom-gland", chance: 0.2, minimum: 1, maximum: 2 },

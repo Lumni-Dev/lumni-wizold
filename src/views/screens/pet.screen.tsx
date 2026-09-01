@@ -15,12 +15,12 @@ import {
   petLevelBonus,
   petLevelOf,
   servesPet,
+  petRenamePrice,
 } from "@/models/rules/pet";
 import {
   NAME_MAX_LENGTH,
   PET_MAX_LEVEL,
   PET_MIN_LEVEL,
-  PET_RENAME_PRICE,
   REST_TICK_MS,
 } from "@/shared/constants/game";
 import { formatNumber, formatBronze } from "@/shared/utils/format";
@@ -45,7 +45,7 @@ function Kennel({ bronze, level }: { bronze: number; level: number }) {
   const [name, setName] = useState("");
   const [confirming, setConfirming] = useState(false);
 
-  const price = petPrice();
+  const price = petPrice(level);
   const oldEnough = level >= PET_MIN_LEVEL;
   const affordable = bronze >= price;
 
@@ -96,7 +96,7 @@ function Kennel({ bronze, level }: { bronze: number; level: number }) {
         title="Adoção"
         description={
           "O apelido é dado na porta; trocar depois custa " +
-          formatBronze(PET_RENAME_PRICE) +
+          formatBronze(petRenamePrice(level)) +
           " no canil. A adoção exige NV " +
           PET_MIN_LEVEL +
           " e custa " +
@@ -142,7 +142,7 @@ function Kennel({ bronze, level }: { bronze: number; level: number }) {
         description={
           "Adotar é compromisso: soltar depois não devolve WCoin nenhuma, e trocar o " +
           "apelido custa " +
-          formatBronze(PET_RENAME_PRICE) +
+          formatBronze(petRenamePrice(level)) +
           " no canil."
         }
         detail={findPet(gender).label + " - " + name.trim() + " - " + formatBronze(price)}
@@ -193,6 +193,7 @@ export function PetScreen() {
   const lends = petLevelBonus(level);
   const ceiling = petLevelBonus(PET_MAX_LEVEL);
   const lending = ATTRIBUTES.filter((attribute) => ceiling[attribute.key] > 0);
+  const petRenameCost = petRenamePrice(character.level);
 
   return (
     <>
@@ -352,7 +353,7 @@ export function PetScreen() {
                 fullWidth
                 disabled={newPetName.trim().length === 0}
               >
-                Renomear por {formatBronze(PET_RENAME_PRICE)}
+                Renomear por {formatBronze(petRenameCost)}
               </Button>
             </form>
           </Panel>
@@ -382,7 +383,7 @@ export function PetScreen() {
         open={confirmingRename}
         title="Renomear o mascote"
         description="As WCoins ficam no canil e o apelido novo vale na hora, em todas as telas."
-        detail={pet.name + " → " + newPetName.trim() + " - " + formatBronze(PET_RENAME_PRICE)}
+        detail={pet.name + " → " + newPetName.trim() + " - " + formatBronze(petRenameCost)}
         confirmLabel="Renomear"
         onCancel={() => setConfirmingRename(false)}
         onConfirm={() =>

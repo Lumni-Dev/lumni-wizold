@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Escama de Basilisco: despojo de caça, trocado por bronze no mercado.
 export const basiliskScale: Item = {
   id: "basilisk-scale",
   name: "Escama de Basilisco",

@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Lamento de Banshee: despojo de caça, trocado por bronze no mercado.
 export const bansheeWail: Item = {
   id: "banshee-wail",
   name: "Lamento de Banshee",

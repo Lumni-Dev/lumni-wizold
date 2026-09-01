@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Necromante (NV. 661 a 670) da área Necrópole de Pedra.
 export const necromancer: Creature = {
   id: "necromancer",
   name: "Necromante",
@@ -12,8 +13,8 @@ export const necromancer: Creature = {
   endurance: 6884,
   agility: 337,
   experience: 4674,
-  minBronze: 380,
-  maxBronze: 706,
+  minBronze: 11,
+  maxBronze: 21,
   drops: [
     { itemId: "necro-tome", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "cursed-charm", chance: 0.12, minimum: 1, maximum: 1 },

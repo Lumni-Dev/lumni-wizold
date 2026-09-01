@@ -1,16 +1,17 @@
 import {
   NAME_MAX_LENGTH,
   NAME_MIN_LENGTH,
-  RENAME_PRICE,
   RENAME_COOLDOWN_DAYS,
   REST_HEALTH_RATIO,
 } from "@/shared/constants/game";
+import { ECONOMY } from "@/shared/config/economy";
 import { formatBronze } from "@/shared/utils/format";
 import { capitalize } from "@/shared/utils/text";
 import { initialState, type GameState } from "@/models/entities/game-state";
 import type { Character, Gender } from "@/models/entities/character";
 import { failure, success, type Result } from "@/models/entities/result";
 import { createRun } from "@/models/factories/character.factory";
+import { huntPurse } from "@/models/rules/economy";
 import { clampVitals, deriveStats } from "@/models/rules/stats";
 import { applyExperience } from "@/models/rules/progression";
 import { withMoonBonus } from "@/models/rules/moon";
@@ -56,8 +57,8 @@ export function startRun(name: string, gender: Gender): Result {
   return success(createRun(capitalizeName(name), gender), "Personagem criado. A caçada aguarda.");
 }
 
-export function renameCost(): number {
-  return RENAME_PRICE;
+export function renameCost(level: number): number {
+  return Math.max(1, Math.round(huntPurse(level) * ECONOMY.renameHunts));
 }
 
 export function renameDaysLeft(character: Character): number {
@@ -86,7 +87,7 @@ export function renameCharacter(state: GameState, name: string): Result {
     );
   }
 
-  const cost = renameCost();
+  const cost = renameCost(character.level);
   if (character.bronze < cost) {
     return failure(
       state,

@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Lasca de Osso: despojo de caça, trocado por bronze no mercado.
 export const boneShard: Item = {
   id: "bone-shard",
   name: "Lasca de Osso",

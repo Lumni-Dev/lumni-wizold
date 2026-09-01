@@ -1,11 +1,16 @@
 import { BAZAAR } from "@/shared/config/bazaar";
 import type { EquipmentSet, Item } from "../entities/item";
+import { huntPurse } from "./economy";
 
 export const BAZAAR_FEE_RATIO = BAZAAR.feeRatio;
-export const BAZAAR_LISTING_FEE = BAZAAR.listingFee;
+export const BAZAAR_LISTING_HUNTS = BAZAAR.listingHunts;
 export const MIN_LISTING_CENTS = BAZAAR.minListingCents;
 export const MIN_WITHDRAW_CENTS = BAZAAR.minWithdrawCents;
 export const MAX_LISTING_CENTS = BAZAAR.maxListingCents;
+
+export function bazaarListingFee(level: number): number {
+  return Math.max(1, Math.round(huntPurse(level) * BAZAAR_LISTING_HUNTS));
+}
 
 export function feeOf(cents: number): number {
   return Math.round(cents * BAZAAR_FEE_RATIO);

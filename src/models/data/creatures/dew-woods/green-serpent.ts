@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Serpente Verde (NV. 141 a 150) da área Mata do Orvalho.
 export const greenSerpent: Creature = {
   id: "green-serpent",
   name: "Serpente Verde",
@@ -12,8 +13,8 @@ export const greenSerpent: Creature = {
   endurance: 160,
   agility: 100,
   experience: 1034,
-  minBronze: 89,
-  maxBronze: 165,
+  minBronze: 4,
+  maxBronze: 8,
   drops: [
     { itemId: "serpent-scale", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "venom-gland", chance: 0.2, minimum: 1, maximum: 2 },

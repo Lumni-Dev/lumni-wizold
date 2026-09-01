@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Máscara de Bandido: despojo de caça, trocado por bronze no mercado.
 export const banditMask: Item = {
   id: "bandit-mask",
   name: "Máscara de Bandido",

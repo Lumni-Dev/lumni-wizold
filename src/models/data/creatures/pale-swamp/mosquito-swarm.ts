@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Enxame de Mosquitos (NV. 351 a 360) da área Pântano Pálido.
 export const mosquitoSwarm: Creature = {
   id: "mosquito-swarm",
   name: "Enxame de Mosquitos",
@@ -12,8 +13,8 @@ export const mosquitoSwarm: Creature = {
   endurance: 368,
   agility: 255,
   experience: 2504,
-  minBronze: 207,
-  maxBronze: 384,
+  minBronze: 7,
+  maxBronze: 13,
   drops: [
     { itemId: "mosquito-wing", chance: 0.35, minimum: 1, maximum: 2 },
     { itemId: "venom-gland", chance: 0.2, minimum: 1, maximum: 2 },

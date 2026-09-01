@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Lobisomem Rival (NV. 851 a 860) da área Castelo Escarlate.
 export const rivalWerewolf: Creature = {
   id: "rival-werewolf",
   name: "Lobisomem Rival",
@@ -12,8 +13,8 @@ export const rivalWerewolf: Creature = {
   endurance: 29034,
   agility: 562,
   experience: 6004,
-  minBronze: 486,
-  maxBronze: 904,
+  minBronze: 14,
+  maxBronze: 26,
   drops: [
     { itemId: "rival-pelt", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "wolf-fang", chance: 0.2, minimum: 1, maximum: 2 },

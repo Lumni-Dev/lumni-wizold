@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Chifre Espectral: despojo de caça, trocado por bronze no mercado.
 export const spectralAntler: Item = {
   id: "spectral-antler",
   name: "Chifre Espectral",

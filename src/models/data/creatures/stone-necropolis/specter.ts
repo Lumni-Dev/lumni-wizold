@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Espectro (NV. 621 a 630) da área Necrópole de Pedra.
 export const specter: Creature = {
   id: "specter",
   name: "Espectro",
@@ -12,8 +13,8 @@ export const specter: Creature = {
   endurance: 4650,
   agility: 412,
   experience: 4394,
-  minBronze: 358,
-  maxBronze: 664,
+  minBronze: 11,
+  maxBronze: 21,
   drops: [
     { itemId: "ectoplasm", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "grave-dirt", chance: 0.35, minimum: 1, maximum: 2 },

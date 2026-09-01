@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Naga do Charco (NV. 371 a 380) da área Pântano Pálido.
 export const marshNaga: Creature = {
   id: "marsh-naga",
   name: "Naga do Charco",
@@ -12,8 +13,8 @@ export const marshNaga: Creature = {
   endurance: 662,
   agility: 250,
   experience: 2644,
-  minBronze: 218,
-  maxBronze: 404,
+  minBronze: 8,
+  maxBronze: 14,
   drops: [
     { itemId: "naga-scale", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "venom-gland", chance: 0.2, minimum: 1, maximum: 2 },

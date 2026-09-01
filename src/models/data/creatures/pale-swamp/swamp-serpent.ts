@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Serpente do Pântano (NV. 331 a 340) da área Pântano Pálido.
 export const swampSerpent: Creature = {
   id: "swamp-serpent",
   name: "Serpente do Pântano",
@@ -12,8 +13,8 @@ export const swampSerpent: Creature = {
   endurance: 564,
   agility: 224,
   experience: 2364,
-  minBronze: 195,
-  maxBronze: 363,
+  minBronze: 7,
+  maxBronze: 13,
   drops: [
     { itemId: "serpent-scale", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "venom-gland", chance: 0.2, minimum: 1, maximum: 2 },

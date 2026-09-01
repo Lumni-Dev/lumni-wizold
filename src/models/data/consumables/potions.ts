@@ -8,7 +8,7 @@ const POTION_TIERS = [
     hunts: 3,
     rarity: "common" as const,
     minLevel: 1,
-    price: 60,
+    price: 3,
   },
   {
     size: "medium" as PotionSize,
@@ -16,7 +16,7 @@ const POTION_TIERS = [
     hunts: 6,
     rarity: "uncommon" as const,
     minLevel: 334,
-    price: 2500,
+    price: 100,
   },
   {
     size: "large" as PotionSize,
@@ -24,7 +24,7 @@ const POTION_TIERS = [
     hunts: 12,
     rarity: "rare" as const,
     minLevel: 667,
-    price: 12000,
+    price: 480,
   },
 ];
 

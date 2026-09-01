@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Pele de Gato Selvagem: despojo de caça, trocado por bronze no mercado.
 export const wildcatPelt: Item = {
   id: "wildcat-pelt",
   name: "Pele de Gato Selvagem",

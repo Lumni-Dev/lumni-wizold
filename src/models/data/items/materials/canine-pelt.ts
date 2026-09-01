@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Pele Canina: despojo de caça, trocado por bronze no mercado.
 export const caninePelt: Item = {
   id: "canine-pelt",
   name: "Pele Canina",

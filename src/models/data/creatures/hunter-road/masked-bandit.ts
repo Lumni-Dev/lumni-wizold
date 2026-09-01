@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Bandido Mascarado (NV. 451 a 460) da área Estrada dos Caçadores.
 export const maskedBandit: Creature = {
   id: "masked-bandit",
   name: "Bandido Mascarado",
@@ -12,8 +13,8 @@ export const maskedBandit: Creature = {
   endurance: 1463,
   agility: 232,
   experience: 3204,
-  minBronze: 263,
-  maxBronze: 488,
+  minBronze: 8,
+  maxBronze: 16,
   drops: [
     { itemId: "bandit-mask", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "coin-purse", chance: 0.12, minimum: 1, maximum: 1 },

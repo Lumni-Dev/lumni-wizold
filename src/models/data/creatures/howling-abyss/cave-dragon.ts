@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Dragão das Cavernas (NV. 791 a 800) da área Abismo Uivante.
 export const caveDragon: Creature = {
   id: "cave-dragon",
   name: "Dragão das Cavernas",
@@ -12,8 +13,8 @@ export const caveDragon: Creature = {
   endurance: 14026,
   agility: 281,
   experience: 5584,
-  minBronze: 453,
-  maxBronze: 841,
+  minBronze: 13,
+  maxBronze: 25,
   drops: [
     { itemId: "dragon-scale", chance: 0.04, minimum: 1, maximum: 1 },
     { itemId: "dragon-fang", chance: 0.04, minimum: 1, maximum: 1 },

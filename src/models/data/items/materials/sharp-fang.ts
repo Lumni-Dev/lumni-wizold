@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Presa Afiada: despojo de caça, trocado por bronze no mercado.
 export const sharpFang: Item = {
   id: "sharp-fang",
   name: "Presa Afiada",

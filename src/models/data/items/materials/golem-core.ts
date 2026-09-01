@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Núcleo de Golem: despojo de caça, trocado por bronze no mercado.
 export const golemCore: Item = {
   id: "golem-core",
   name: "Núcleo de Golem",

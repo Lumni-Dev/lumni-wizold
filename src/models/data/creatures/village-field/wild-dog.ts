@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Cão Selvagem (NV. 51 a 60) da área Campo do Vilarejo.
 export const wildDog: Creature = {
   id: "wild-dog",
   name: "Cão Selvagem",
@@ -12,8 +13,8 @@ export const wildDog: Creature = {
   endurance: 69,
   agility: 38,
   experience: 404,
-  minBronze: 39,
-  maxBronze: 72,
+  minBronze: 3,
+  maxBronze: 5,
   drops: [
     { itemId: "canine-pelt", chance: 0.35, minimum: 1, maximum: 2 },
     { itemId: "sharp-fang", chance: 0.35, minimum: 1, maximum: 2 },

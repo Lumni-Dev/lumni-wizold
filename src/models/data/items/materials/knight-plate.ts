@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Placa de Cavaleiro: despojo de caça, trocado por bronze no mercado.
 export const knightPlate: Item = {
   id: "knight-plate",
   name: "Placa de Cavaleiro",

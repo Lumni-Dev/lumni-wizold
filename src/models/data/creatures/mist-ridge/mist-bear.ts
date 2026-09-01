@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Urso das Brumas (NV. 221 a 230) da área Serra das Brumas.
 export const mistBear: Creature = {
   id: "mist-bear",
   name: "Urso das Brumas",
@@ -12,8 +13,8 @@ export const mistBear: Creature = {
   endurance: 326,
   agility: 82,
   experience: 1594,
-  minBronze: 134,
-  maxBronze: 248,
+  minBronze: 6,
+  maxBronze: 10,
   drops: [
     { itemId: "bear-pelt", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "bear-claw", chance: 0.12, minimum: 1, maximum: 1 },

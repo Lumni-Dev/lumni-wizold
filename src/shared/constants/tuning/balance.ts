@@ -1,8 +1,8 @@
 export const BALANCE = {
   trainedPerLevel: 0.55,
 
-  bronzeBase: 10,
-  bronzePerLevel: 0.8,
+  bronzeBase: 3,
+  bronzePerLevel: 0.02,
 
   creatureHit: 3.0,
 

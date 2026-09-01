@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Guardião da Cripta (NV. 691 a 700) da área Necrópole de Pedra.
 export const cryptGuardian: Creature = {
   id: "crypt-guardian",
   name: "Guardião da Cripta",
@@ -12,8 +13,8 @@ export const cryptGuardian: Creature = {
   endurance: 8778,
   agility: 246,
   experience: 4884,
-  minBronze: 397,
-  maxBronze: 737,
+  minBronze: 12,
+  maxBronze: 22,
   drops: [
     { itemId: "guardian-relic", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "bone-shard", chance: 0.2, minimum: 1, maximum: 2 },

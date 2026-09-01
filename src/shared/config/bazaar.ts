@@ -1,6 +1,6 @@
 export const BAZAAR = {
   feeRatio: 0.1,
-  listingFee: 500,
+  listingHunts: 8,
   listingDays: 7,
   minListingCents: 100,
   maxListingCents: 1_000_000,

@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Unicórnio da Lua Cheia (NV. 981 a 990) da área Clareira Branca.
 export const fullMoonUnicorn: Creature = {
   id: "full-moon-unicorn",
   name: "Unicórnio da Lua Cheia",
@@ -12,8 +13,8 @@ export const fullMoonUnicorn: Creature = {
   endurance: 65737,
   agility: 547,
   experience: 6914,
-  minBronze: 559,
-  maxBronze: 1039,
+  minBronze: 16,
+  maxBronze: 30,
   drops: [
     { itemId: "moon-mane", chance: 0.04, minimum: 1, maximum: 1 },
     { itemId: "horn-dust", chance: 0.04, minimum: 1, maximum: 1 },

@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Cavaleiro Escarlate (NV. 831 a 840) da área Castelo Escarlate.
 export const scarletKnight: Creature = {
   id: "scarlet-knight",
   name: "Cavaleiro Escarlate",
@@ -12,8 +13,8 @@ export const scarletKnight: Creature = {
   endurance: 26769,
   agility: 295,
   experience: 5864,
-  minBronze: 475,
-  maxBronze: 883,
+  minBronze: 14,
+  maxBronze: 26,
   drops: [
     { itemId: "scarlet-plate", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "cursed-plate", chance: 0.12, minimum: 1, maximum: 1 },

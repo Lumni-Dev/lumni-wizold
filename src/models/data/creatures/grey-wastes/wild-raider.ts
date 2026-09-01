@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Saqueador Selvagem (NV. 551 a 560) da área Ermo Cinza.
 export const wildRaider: Creature = {
   id: "wild-raider",
   name: "Saqueador Selvagem",
@@ -12,8 +13,8 @@ export const wildRaider: Creature = {
   endurance: 2511,
   agility: 282,
   experience: 3904,
-  minBronze: 319,
-  maxBronze: 592,
+  minBronze: 10,
+  maxBronze: 18,
   drops: [
     { itemId: "raider-loot", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "coin-purse", chance: 0.12, minimum: 1, maximum: 1 },

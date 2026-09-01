@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Amuleto Amaldiçoado: despojo de caça, trocado por bronze no mercado.
 export const cursedCharm: Item = {
   id: "cursed-charm",
   name: "Amuleto Amaldiçoado",

@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Pele de Raposa: despojo de caça, trocado por bronze no mercado.
 export const foxPelt: Item = {
   id: "fox-pelt",
   name: "Pele de Raposa",

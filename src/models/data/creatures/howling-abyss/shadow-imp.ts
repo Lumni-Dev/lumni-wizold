@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Imp das Sombras (NV. 701 a 710) da área Abismo Uivante.
 export const shadowImp: Creature = {
   id: "shadow-imp",
   name: "Imp das Sombras",
@@ -12,8 +13,8 @@ export const shadowImp: Creature = {
   endurance: 5078,
   agility: 500,
   experience: 4954,
-  minBronze: 403,
-  maxBronze: 748,
+  minBronze: 12,
+  maxBronze: 22,
   drops: [
     { itemId: "imp-horn", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "shadow-essence", chance: 0.12, minimum: 1, maximum: 1 },

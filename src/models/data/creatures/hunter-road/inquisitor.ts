@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Inquisidor (NV. 471 a 480) da área Estrada dos Caçadores.
 export const inquisitor: Creature = {
   id: "inquisitor",
   name: "Inquisidor",
@@ -12,8 +13,8 @@ export const inquisitor: Creature = {
   endurance: 1674,
   agility: 242,
   experience: 3344,
-  minBronze: 274,
-  maxBronze: 508,
+  minBronze: 9,
+  maxBronze: 17,
   drops: [
     { itemId: "holy-water", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "silver-charm", chance: 0.12, minimum: 1, maximum: 1 },

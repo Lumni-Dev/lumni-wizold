@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Pena de Coruja: despojo de caça, trocado por bronze no mercado.
 export const owlFeather: Item = {
   id: "owl-feather",
   name: "Pena de Coruja",

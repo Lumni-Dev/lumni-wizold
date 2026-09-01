@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Pele em Brasa: despojo de caça, trocado por bronze no mercado.
 export const emberPelt: Item = {
   id: "ember-pelt",
   name: "Pele em Brasa",

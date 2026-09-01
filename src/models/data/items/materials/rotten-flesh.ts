@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Carne Podre: despojo de caça, trocado por bronze no mercado.
 export const rottenFlesh: Item = {
   id: "rotten-flesh",
   name: "Carne Podre",

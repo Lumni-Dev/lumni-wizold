@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Escama de Hidra: despojo de caça, trocado por bronze no mercado.
 export const hydraScale: Item = {
   id: "hydra-scale",
   name: "Escama de Hidra",

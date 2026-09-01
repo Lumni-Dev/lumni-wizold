@@ -1,21 +1,26 @@
-import { huntPurse } from "./economy";
+import { PET as PET_TUNING } from "@/shared/constants/tuning/pet";
 import {
   PET_BASE_BONUS,
   PET_BASE_ENERGY,
-  PET_PRICE,
-  PET_REST_RATIO,
   PET_ENERGY_PER_BLOW,
   PET_ENERGY_PER_HUNT,
   PET_ENERGY_PER_LEVEL,
   PET_MAX_LEVEL,
+  PET_REST_RATIO,
 } from "@/shared/constants/game";
 import { clamp } from "@/shared/utils/format";
 import { emptyAttributes, type Attributes } from "../entities/attribute";
 import type { Item } from "../entities/item";
 import type { Pet } from "../entities/pet";
+import { ECONOMY } from "@/shared/config/economy";
+import { huntPurse } from "./economy";
 
-export function petPrice(): number {
-  return PET_PRICE;
+export function petPrice(level: number): number {
+  return Math.max(1, Math.round(huntPurse(level) * PET_TUNING.adoptionHunts));
+}
+
+export function petRenamePrice(level: number): number {
+  return Math.max(1, Math.round(huntPurse(level) * PET_TUNING.renameHunts));
 }
 
 export function isPetAwake(pet: Pet | null | undefined): pet is Pet {
@@ -46,19 +51,13 @@ export function petTrainingNeeded(level: number): number {
   return Math.round(20 * level * (1 + level / 25));
 }
 
-export function petTrainingPointCost(level: number, hunterLevel: number): number {
-  return Math.max(1, Math.round(huntPurse(hunterLevel) * 3 * (1 + level / 50)));
-}
-
 export function petTrainingEffort(level: number): number {
   return Math.max(1, Math.round(petTrainingNeeded(level) / 5));
 }
 
 export function petTrainingSessionCost(level: number, hunterLevel: number): number {
-  return (
-    Math.max(1, Math.round(petTrainingPointCost(level, hunterLevel) / 5)) +
-    Math.max(0, level - 1)
-  );
+  const base = Math.max(1, Math.round(huntPurse(hunterLevel) * ECONOMY.trainingSessionHunts));
+  return base + Math.max(0, level - 1);
 }
 
 export const PET_HUNT_SHARE = 0.35;

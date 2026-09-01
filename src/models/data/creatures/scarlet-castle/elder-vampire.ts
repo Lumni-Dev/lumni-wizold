@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Vampiro Ancião (NV. 861 a 870) da área Castelo Escarlate.
 export const elderVampire: Creature = {
   id: "elder-vampire",
   name: "Vampiro Ancião",
@@ -12,8 +13,8 @@ export const elderVampire: Creature = {
   endurance: 31429,
   agility: 568,
   experience: 6074,
-  minBronze: 492,
-  maxBronze: 914,
+  minBronze: 14,
+  maxBronze: 26,
   drops: [
     { itemId: "black-blood", chance: 0.04, minimum: 1, maximum: 1 },
     { itemId: "empty-fang", chance: 0.12, minimum: 1, maximum: 1 },

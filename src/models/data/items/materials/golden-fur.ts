@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Pelo Dourado: despojo de caça, trocado por bronze no mercado.
 export const goldenFur: Item = {
   id: "golden-fur",
   name: "Pelo Dourado",

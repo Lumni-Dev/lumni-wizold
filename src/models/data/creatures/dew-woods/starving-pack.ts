@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Alcateia Faminta (NV. 191 a 200) da área Mata do Orvalho.
 export const starvingPack: Creature = {
   id: "starving-pack",
   name: "Alcateia Faminta",
@@ -12,8 +13,8 @@ export const starvingPack: Creature = {
   endurance: 217,
   agility: 102,
   experience: 1384,
-  minBronze: 117,
-  maxBronze: 217,
+  minBronze: 5,
+  maxBronze: 9,
   drops: [
     { itemId: "wolf-pelt", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "wolf-fang", chance: 0.2, minimum: 1, maximum: 2 },

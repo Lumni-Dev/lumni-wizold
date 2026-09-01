@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Cinza de Fênix: despojo de caça, trocado por bronze no mercado.
 export const phoenixAsh: Item = {
   id: "phoenix-ash",
   name: "Cinza de Fênix",

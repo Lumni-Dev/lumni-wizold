@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Golem de Lava (NV. 741 a 750) da área Abismo Uivante.
 export const lavaGolem: Creature = {
   id: "lava-golem",
   name: "Golem de Lava",
@@ -12,8 +13,8 @@ export const lavaGolem: Creature = {
   endurance: 11406,
   agility: 264,
   experience: 5234,
-  minBronze: 425,
-  maxBronze: 789,
+  minBronze: 13,
+  maxBronze: 23,
   drops: [
     { itemId: "lava-core", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "molten-rock", chance: 0.12, minimum: 1, maximum: 1 },

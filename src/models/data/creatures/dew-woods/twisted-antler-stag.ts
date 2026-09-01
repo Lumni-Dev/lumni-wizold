@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Cervo de Chifre Torto (NV. 171 a 180) da área Mata do Orvalho.
 export const twistedAntlerStag: Creature = {
   id: "twisted-antler-stag",
   name: "Cervo de Chifre Torto",
@@ -12,8 +13,8 @@ export const twistedAntlerStag: Creature = {
   endurance: 169,
   agility: 110,
   experience: 1244,
-  minBronze: 106,
-  maxBronze: 196,
+  minBronze: 5,
+  maxBronze: 9,
   drops: [
     { itemId: "twisted-antler", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "deer-hide", chance: 0.35, minimum: 1, maximum: 2 },

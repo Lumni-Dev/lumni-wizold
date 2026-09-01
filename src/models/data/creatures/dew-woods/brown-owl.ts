@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Coruja Parda (NV. 111 a 120) da área Mata do Orvalho.
 export const brownOwl: Creature = {
   id: "brown-owl",
   name: "Coruja Parda",
@@ -12,8 +13,8 @@ export const brownOwl: Creature = {
   endurance: 79,
   agility: 87,
   experience: 824,
-  minBronze: 72,
-  maxBronze: 134,
+  minBronze: 4,
+  maxBronze: 7,
   drops: [
     { itemId: "owl-feather", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "talon", chance: 0.35, minimum: 1, maximum: 2 },

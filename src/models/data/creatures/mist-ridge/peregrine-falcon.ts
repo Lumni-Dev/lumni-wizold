@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Falcão Peregrino (NV. 251 a 260) da área Serra das Brumas.
 export const peregrineFalcon: Creature = {
   id: "peregrine-falcon",
   name: "Falcão Peregrino",
@@ -12,8 +13,8 @@ export const peregrineFalcon: Creature = {
   endurance: 222,
   agility: 185,
   experience: 1804,
-  minBronze: 151,
-  maxBronze: 280,
+  minBronze: 6,
+  maxBronze: 10,
   drops: [
     { itemId: "falcon-feather", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "talon", chance: 0.35, minimum: 1, maximum: 2 },

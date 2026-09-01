@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Iéti Jovem (NV. 261 a 270) da área Serra das Brumas.
 export const youngYeti: Creature = {
   id: "young-yeti",
   name: "Iéti Jovem",
@@ -12,8 +13,8 @@ export const youngYeti: Creature = {
   endurance: 433,
   agility: 96,
   experience: 1874,
-  minBronze: 156,
-  maxBronze: 290,
+  minBronze: 6,
+  maxBronze: 10,
   drops: [
     { itemId: "yeti-fur", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "frost-heart", chance: 0.07, minimum: 1, maximum: 1 },

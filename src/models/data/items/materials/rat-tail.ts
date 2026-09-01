@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Rabo de Rato: despojo de caça, trocado por bronze no mercado.
 export const ratTail: Item = {
   id: "rat-tail",
   name: "Rabo de Rato",

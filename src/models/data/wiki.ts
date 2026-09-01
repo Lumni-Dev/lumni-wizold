@@ -18,10 +18,13 @@ import {
   REST_TICK_MS,
   REST_HEALTH_RATIO,
   PET_MIN_LEVEL,
-  PET_PRICE,
-  PET_RENAME_PRICE,
+  PET_ADOPTION_HUNTS,
+  PET_RENAME_HUNTS,
   RENAME_COOLDOWN_DAYS,
+  RENAME_HUNTS,
+  STARTING_BRONZE,
 } from "@/shared/constants/game";
+import { ECONOMY } from "@/shared/config/economy";
 import { SPECIES_LABEL, SPECIES_ORDER } from "../entities/creature";
 import { TERRITORIES } from "./territories";
 import { MAX_PACK } from "../entities/pack";
@@ -44,7 +47,7 @@ import {
 } from "../rules/arena";
 import { MINING_MAX_LEVEL, ORES } from "./ores";
 import { RANKING_BOARDS } from "../entities/ranking";
-import { BAZAAR_FEE_RATIO, BAZAAR_LISTING_FEE, MIN_WITHDRAW_CENTS } from "../rules/bazaar";
+import { BAZAAR_FEE_RATIO, BAZAAR_LISTING_HUNTS, MIN_WITHDRAW_CENTS } from "../rules/bazaar";
 import { BAZAAR_LISTING_DAYS, initialWallet } from "../entities/bazaar";
 import { enhancementCost } from "../rules/forge";
 import { experienceForLevel } from "../rules/progression";
@@ -121,18 +124,15 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     title: "Como jogar",
     summary: "O ciclo de uma noite qualquer em Wizold.",
     lines: [
-      "Você começa sem nada equipado, com 100 WCoins e dez poções de vida.",
-      "Escolha um território: a barra enche como \"Caçando...\" e só no último batimento a luta é decidida no servidor; depois o replay conta golpe a golpe. Parar na aproximação cancela; parar no replay aplica o resultado.",
-      "Cada clique vale uma luta. Para encadear caçadas sem tocar em nada, ligue a caçada automática nas configurações; o mesmo vale para treino, mina e forja.",
-      "Cada área tem dez criaturas de números fixos: você fica mais forte, elas não, então subir de área é o que renova o desafio.",
+      "Você começa sem nada equipado, com " +
+        STARTING_BRONZE +
+        " WCoins e dez poções de vida. Escolha um território: a barra enche como \"Caçando...\" e só no último batimento a luta é decidida no servidor; depois o replay conta golpe a golpe. Parar na aproximação cancela; parar no replay aplica o resultado.",
+      "Para encadear caçadas, treino, mina ou forja sem tocar em nada, ligue a automação nas configurações. Cada área tem dez criaturas de números fixos: você fica mais forte, elas não.",
       "O golpe crítico multiplica o dano por " +
         criticalMultiplierOf().toFixed(2).replace(".", ",") +
-        ", fixo. Instinto sobe a chance de crítico; Agilidade, a de esquiva.",
-      "Treine para acumular progresso de atributo.",
-      "Equipe o que serve, venda o que sobra e volte a caçar.",
-      "Na forja, minere fragmentos e bata na peça que está na mochila, fora do corpo, para levantá-la de +1 em diante.",
-      "No canil, adote um lobo: ele soma atributos enquanto estiver de pé.",
-      "O ranking mostra onde você está entre os caçadores, quadro por quadro.",
+        ", fixo; Instinto sobe a chance de crítico e Agilidade, a de esquiva.",
+      "Treine para acumular progresso de atributo; equipe o que serve, venda o que sobra e volte a caçar.",
+      "Na forja, minere fragmentos e bata na peça que está na mochila, fora do corpo, para levantá-la de +1 em diante. No canil, adote um lobo: ele soma atributos enquanto estiver de pé. O ranking mostra onde você está entre os caçadores.",
     ],
   },
   {
@@ -188,21 +188,16 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     lines: [
       "Experiência para o próximo nível: " +
         experienceForLevel(1) +
-        " no nível 1, " +
+        " no 1, " +
         experienceForLevel(10) +
         " no 10 e " +
         experienceForLevel(100) +
-        " no 100.",
-      "A curva sobe mais rápido do que a experiência que a presa dá, então cada nível custa mais caçadas que o anterior: cerca de 5 no começo e 585 no teto.",
-      "O teto da progressão é o nível 1000, e cada atributo treinado também para em 1000.",
-      "Subir de nível não dá poder nenhum de graça: o que o nível abre é o próximo território, o próximo conjunto e a próxima veia da mina. A força vem do treino e do que você veste.",
-      "Subir de nível não restaura a vida: só poção ou repouso enchem o corpo.",
-      "Atributo não se distribui: só o treino levanta um ponto.",
-      "Treinar acumula progresso, e o próximo ponto sobe pela mesma curva da experiência: barato no começo, caríssimo perto do teto.",
-      "Um exercício por atributo, e tanto a exigência quanto o rendimento da sessão crescem com o valor do atributo: um ponto sai em cerca de cinco sessões no começo e algumas centenas perto do teto, a mesma dificuldade de subir um nível.",
-      "O pátio treina você e o lobo direto: uma sessão paga progresso de atributo, e o excedente carrega para o próximo ponto, como a experiência.",
-      "Cada treino é pago na hora: o preço do ponto da sua faixa dividido pelas sessões que ele leva, cobrado no primeiro turno de cada volta. Um ponto custa cerca de três caçadas de bronze em qualquer faixa, e é a caça que paga esse corpo.",
-      "Equipamento soma por cima do teto: o limite vale para o valor treinado.",
+        " no 100. A curva sobe mais rápido do que a presa paga: cerca de 5 caçadas no começo e 585 no teto.",
+      "O teto é nível 1000 para personagem e atributo. Subir de nível não dá poder de graça: abre território, conjunto e veia; a força vem do treino e do que você veste. Nível não restaura vida.",
+      "Atributo só sobe no treino, pela mesma curva da experiência: barato no começo, caríssimo perto do teto; um ponto pede poucas sessões no começo e centenas no fim.",
+      "Cada sessão de treino cobra " +
+        ECONOMY.trainingSessionHunts.toString().replace(".", ",") +
+        " caçada da bolsa do seu nível; quanto mais alto o atributo, mais sessões cada ponto exige. Equipamento soma por cima do teto treinado.",
     ],
   },
   {
@@ -210,15 +205,11 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     title: "Combate",
     summary: "Resolvido em rodadas, sem entrada do jogador durante a luta.",
     lines: [
-      "O jogo tem cinco números e só: Força, Agilidade, Resistência, Instinto e Vontade. Não existe força de combate nem resistência de combate por trás deles.",
-      "Dano de um golpe: Força x Força dividido por Força mais a Resistência do alvo, com variação de 10% na Força.",
-      "A fórmula vale em qualquer escala: Resistência alta reduz muito, mas nunca zera o golpe.",
-      "Quem tem mais Agilidade começa a rodada.",
-      "Esquiva e crítico sobem a vida toda sem nunca encostar no teto: 35% de esquiva e 45% de crítico ficam no horizonte, e cada ponto de Agilidade ou Instinto ainda compra alguma coisa no nível 1000.",
-      "Crítico multiplica o dano por " +
+      "Cinco números e só: Força, Agilidade, Resistência, Instinto e Vontade. Dano = Força² ÷ (Força + Resistência do alvo), com 10% de variação na Força.",
+      "Quem tem mais Agilidade começa. Esquiva e crítico sobem a vida toda sem teto: 35% e 45% no horizonte.",
+      "Crítico multiplica por " +
         criticalMultiplierOf().toFixed(2).replace(".", ",") +
-        ", fixo, sem depender de nada que você acumule.",
-      "A luta trava em 24 rodadas: ninguém morre e a caçada termina em recuo.",
+        ", fixo. Luta trava em 24 rodadas: recuo, sem vencedor.",
     ],
   },
   {
@@ -226,16 +217,10 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     title: "Equipamento",
     summary: "Sete espaços, cinco conjuntos, um item por espaço.",
     lines: [
-      "Espaços: gorro, colar, casaco, calças, botas, luvas e anel.",
-      setRequirementsLine(),
-      "Toda peça dá atributo, e nada além de atributo: o que o card promete é exatamente o que soma na ficha.",
-      "Luvas e anel dão Força; casaco, calças e gorro dão Resistência; botas dão Agilidade; colar dá Instinto e Vontade.",
-      "O casaco tem corte de linhagem: o de Lumni veste Lumni, o de Luna veste Luna. O mercado mostra os dois e o botão avisa qual é o seu.",
-      "Equipar um item com o espaço ocupado devolve o anterior ao inventário.",
-      "O conjunto lunar é o teto: o mais forte e o mais caro, e só sai do mercado, nunca da caça.",
-      "O mercado vende uma peça de cada: o que já está na mochila ou no corpo não se compra de novo.",
-      "Nenhum equipamento cai na caça: conjunto só se compra no mercado.",
-      "Cada peça forjada na mochila carrega o +X consigo; desequipe para forjar, equipe de novo para usar o ganho.",
+      "Espaços: gorro, colar, casaco, calças, botas, luvas e anel. " + setRequirementsLine(),
+      "Toda peça dá atributo e nada além: luvas/anel = Força; casaco/calças/gorro = Resistência; botas = Agilidade; colar = Instinto e Vontade.",
+      "Casaco tem corte de linhagem (Lumni/Luna). Mercado vende uma peça de cada; o que já está na mochila ou no corpo não se compra de novo.",
+      "Nenhum equipamento cai na caça. Peça forjada na mochila carrega o +X; desequipe para forjar, equipe de novo para usar.",
     ],
   },
   {
@@ -303,41 +288,32 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     lines: [
       "A adoção exige NV " +
         PET_MIN_LEVEL +
-        " e custa " +
-        PET_PRICE +
-        " WCoins fixos. Soltar o lobo não paga nada: ele só parte.",
-      "O lobo já nasce com +" +
+        " e custa cerca de " +
+        PET_ADOPTION_HUNTS +
+        " caçadas do seu nível; soltar não paga. O lobo nasce com +" +
         PET_BASE_BONUS +
-        " de Força, Agilidade e Instinto; cada nível dele soma mais 1 em cada um desses três.",
-      "Trocar o apelido custa " +
-        PET_RENAME_PRICE +
-        " WCoins: o canil cobra caro pelos papéis novos.",
-      "O lobo sobe o próprio nível, até " +
+        " de Força, Agilidade e Instinto, +1 de cada por nível até " +
         PET_MAX_LEVEL +
-        ": cada nível soma 1 de Força, 1 de Agilidade e 1 de Instinto ao que ele empresta.",
-      "O lobo sobe de nível só no pátio: cada sessão paga o progresso dele, e a caçada ao seu lado não ensina mais nada.",
-      "Acompanhando, ele arrisca e empresta atributo; em repouso não arrisca nada e não empresta nada. De um jeito ou de outro, quem ensina o lobo é o treino.",
-      "Energia é o único vital do lobo: começa em " +
-        PET_BASE_ENERGY +
-        " e ganha " +
-        PET_ENERGY_PER_LEVEL +
-        " por nível, então quanto mais treinado, mais noites ele aguenta.",
-      "Acompanhando, ele entra na luta como um turno de ataque. A caçada em si cobra " +
-        PET_ENERGY_PER_HUNT +
-        " de energia, cada bote gasta " +
-        PET_ENERGY_PER_BLOW +
-        ", e a mordida que ele leva no lugar do seu ombro gasta " +
-        PET_BITE_ENERGY +
         ".",
-      "Sem energia ele para: sai da luta, não empresta nada e espera comida ou repouso.",
-      "Acompanhar e Repousar, na página do mascote, é o que decide se ele desce com você. Em repouso ele devolve " +
+      "Rename custa cerca de " +
+        PET_RENAME_HUNTS +
+        " caçadas do seu nível. Só o pátio ensina o lobo; caçada ao lado não sobe nível dele.",
+      "Energia é o único vital: começa em " +
+        PET_BASE_ENERGY +
+        ", +" +
+        PET_ENERGY_PER_LEVEL +
+        " por nível. Caçada cobra " +
+        PET_ENERGY_PER_HUNT +
+        " para entrar, " +
+        PET_ENERGY_PER_BLOW +
+        " por bote e " +
+        PET_BITE_ENERGY +
+        " quando mordem nele.",
+      "Acompanhar entra na luta e empresta atributo; repouso devolve " +
         Math.round(PET_REST_RATIO * 100) +
         "% da energia a cada " +
         REST_TICK_MS / 1000 +
-        " segundos, de graça: " +
-        Math.round(1 / PET_REST_RATIO) * (REST_TICK_MS / 1000) +
-        " segundos do zero ao cheio em qualquer nível, e o alimento faz o mesmo na hora.",
-      "Nas configurações, alimento automático e repouso automático cuidam disso sozinhos: come se houver comida na mochila, deita se não houver.",
+        " s. Alimento automático e repouso automático cuidam disso nas configurações.",
     ],
   },
   {
@@ -345,12 +321,9 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     title: "Ranking",
     summary: "Onde você está entre os caçadores que a lua conhece.",
     lines: [
-      boardLine(),
-      "Personagem filtra o quadro: todos, Lumni, Luna ou a sua linhagem, sem renumerar as posições.",
-      "A busca filtra pelo nome sem renumerar: a posição é sempre a do quadro inteiro.",
-      "Clicar em um nome abre a ficha de leitura dele: atributos, equipamento com o +X de cada peça, mascote e posições.",
-      "O seu nome leva para a sua própria ficha, que é a mesma pessoa com mais detalhe.",
-      "O quadro só tem gente de verdade: cada linha é um caçador que entrou pela mesma porta que você, e o quadro cresce a cada novo nome que a lua conhece.",
+      boardLine() +
+        " Personagem filtra por linhagem sem renumerar; a busca mantém a posição real do quadro.",
+      "Clicar em um nome abre a ficha de leitura; o seu leva para a ficha completa. Só entra caçador de verdade.",
     ],
   },
   {
@@ -431,9 +404,9 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     lines: [
       "Só entra o que a forja tocou: peça +1 ou mais fora do corpo, e fragmentos da mina.",
       "O que o mercado vende igual não entra: peça sem forja fica de fora.",
-      "Anunciar tira as peças da mochila e cobra " +
-        BAZAAR_LISTING_FEE +
-        " WCoins; remover o anúncio devolve as peças, nunca a taxa.",
+      "Anunciar tira as peças da mochila e cobra cerca de " +
+        BAZAAR_LISTING_HUNTS +
+        " caçadas do seu nível em WCoins; remover o anúncio devolve as peças, nunca a taxa.",
       "Quem compra é gente de verdade: o anúncio fica no quadro até outro caçador pagar por ele, e o preço é você quem decide.",
       "Todo anúncio dura " +
         BAZAAR_LISTING_DAYS +
@@ -476,10 +449,9 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     title: "Automação",
     summary: "O jogo pode repetir trabalho por você, nas configurações.",
     lines: [
-      "Cada interruptor nas configurações decide se caçada, treino, mina ou forja encadeiam sozinhos até você mandar parar.",
-      ...AUTOMATIONS.map((entry) => entry.label + ": " + entry.effect),
-      "No chão de vida, a poção de vida é sempre automática: bebe se houver na mochila, senão repousa, mesmo com tudo desligado.",
-      "Com automação ligada, um trabalho pausado por falta de vida, WCoins ou fragmentos espera e retoma quando der.",
+      "Cada interruptor decide se caçada, treino, mina ou forja encadeiam sozinhos. " +
+        AUTOMATIONS.map((entry) => entry.label + ": " + entry.effect).join(" "),
+      "No chão de vida, poção de vida é sempre automática: bebe se houver, senão repousa. Trabalho pausado por falta de recurso retoma quando der.",
     ],
   },
   {
@@ -487,19 +459,18 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     title: "Economia",
     summary: "WCoins entram pela caça e saem pelo mercado.",
     lines: [
-      "A partida começa com 100 WCoins.",
-      "A caçada é a unidade de preço do jogo: uma presa paga conforme a faixa em que ela vive, e treino, poção e bolsa da arena são todos contados em caçadas dessa mesma faixa. Trocar de nome foge à regra: custa 50 mil WCoins fixos e só pode repetir a cada " +
+      "A partida começa com " +
+        STARTING_BRONZE +
+        " WCoins. A caçada é a unidade de preço: treino, poção, arena e rename (" +
+        RENAME_HUNTS +
+        " caçadas do seu nível, a cada " +
         RENAME_COOLDOWN_DAYS +
-        " dias.",
-      "Subir de nível dentro de uma faixa não enche o bolso: o que muda o tamanho da bolsa é abrir a faixa seguinte, com presas mais caras e conjunto mais caro.",
-      setCostRangeLine(),
-      "O mercado vende pelo preço de tabela e recompra pela metade.",
-      "Materiais não têm uso além da venda: são a renda estável da caçada.",
-      "Nenhum equipamento cai na caça: conjunto só se compra. A carcaça larga materiais, e é isso que a caça rende além dos WCoins.",
-      "Poções de vida e fúria no mercado: pequena 3 caçadas (25%), média 6 (50%), grande 12 (75%) do corpo; ração do lobo, 1,5 caçada.",
-      "Fragmentos não são vendidos no mercado: saem da mina e servem só para a forja.",
-      "O alimento para mascote é a única compra que não é sua: cuida do lobo.",
-      "Comprar e vender sempre pedem confirmação, e a compra deixa você escolher a quantidade.",
+        " dias) seguem a bolsa da faixa.",
+      setCostRangeLine() +
+        " Subir de nível dentro de uma faixa não enche o bolso: quem muda o tamanho da bolsa é abrir a faixa seguinte.",
+      "O mercado vende pelo preço de tabela e recompra pela metade. Materiais só servem para venda; nenhum equipamento cai na caça.",
+      "Poções de vida e fúria: pequena 3 caçadas (25%), média 6 (50%), grande 12 (75%); ração do lobo, 1,5 caçada. Fragmentos saem da mina e só alimentam a forja.",
+      "Comprar e vender pedem confirmação; a compra deixa escolher a quantidade.",
     ],
   },
 ];

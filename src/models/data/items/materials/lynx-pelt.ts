@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Pele de Lince: despojo de caça, trocado por bronze no mercado.
 export const lynxPelt: Item = {
   id: "lynx-pelt",
   name: "Pele de Lince",

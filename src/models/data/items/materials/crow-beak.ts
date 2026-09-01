@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Bico de Corvo: despojo de caça, trocado por bronze no mercado.
 export const crowBeak: Item = {
   id: "crow-beak",
   name: "Bico de Corvo",

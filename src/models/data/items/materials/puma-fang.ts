@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Presa de Puma: despojo de caça, trocado por bronze no mercado.
 export const pumaFang: Item = {
   id: "puma-fang",
   name: "Presa de Puma",

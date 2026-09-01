@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Homem-Lodo (NV. 361 a 370) da área Pântano Pálido.
 export const mudMan: Creature = {
   id: "mud-man",
   name: "Homem-Lodo",
@@ -12,8 +13,8 @@ export const mudMan: Creature = {
   endurance: 701,
   agility: 131,
   experience: 2574,
-  minBronze: 212,
-  maxBronze: 394,
+  minBronze: 7,
+  maxBronze: 13,
   drops: [
     { itemId: "swamp-mud", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "thick-hide", chance: 0.35, minimum: 1, maximum: 2 },

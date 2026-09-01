@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Garra de Urso: despojo de caça, trocado por bronze no mercado.
 export const bearClaw: Item = {
   id: "bear-claw",
   name: "Garra de Urso",

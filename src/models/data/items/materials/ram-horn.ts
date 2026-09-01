@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Chifre de Bode: despojo de caça, trocado por bronze no mercado.
 export const ramHorn: Item = {
   id: "ram-horn",
   name: "Chifre de Bode",

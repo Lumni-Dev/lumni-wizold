@@ -7,7 +7,7 @@ import { listBoard, listSellable, type BoardEntry } from "@/controllers/bazaar.c
 import { api } from "@/controllers/api.client";
 import {
   BAZAAR_FEE_RATIO,
-  BAZAAR_LISTING_FEE,
+  bazaarListingFee,
   feeOf,
   MIN_LISTING_CENTS,
   MIN_WITHDRAW_CENTS,
@@ -107,6 +107,8 @@ export function BazaarScreen() {
   const sellable = useMemo(() => listSellable(state), [state]);
 
   if (!character) return null;
+
+  const listingFee = bazaarListingFee(character.level);
 
   const currentPage = clampPage(page, board.length, PAGE_SIZE);
   const pages = pageCount(board.length, PAGE_SIZE);
@@ -284,7 +286,7 @@ export function BazaarScreen() {
                 disabled={
                   askedCents === null ||
                   askedCents < MIN_LISTING_CENTS ||
-                  character.bronze < BAZAAR_LISTING_FEE
+                  character.bronze < listingFee
                 }
                 onClick={() => {
                   if (askedCents === null) return;
@@ -342,13 +344,13 @@ export function BazaarScreen() {
               />
 
               <p className="text-xs leading-relaxed text-ink-faint">
-                Anunciar custa {formatBronze(BAZAAR_LISTING_FEE)}, que não voltam no
+                Anunciar custa {formatBronze(listingFee)}, que não voltam no
                 cancelamento. A plataforma fica com {FEE_LABEL} da venda. O anúncio fica no quadro
                 até outro caçador pagar por ele: o preço é seu, e a espera também.
               </p>
-              {character.bronze < BAZAAR_LISTING_FEE ? (
+              {character.bronze < listingFee ? (
                 <p className="text-[11px] text-ink-faint">
-                  Faltam {formatBronze(BAZAAR_LISTING_FEE - character.bronze)} para a taxa do
+                  Faltam {formatBronze(listingFee - character.bronze)} para a taxa do
                   anúncio.
                 </p>
               ) : null}

@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Essência das Sombras: despojo de caça, trocado por bronze no mercado.
 export const shadowEssence: Item = {
   id: "shadow-essence",
   name: "Essência das Sombras",

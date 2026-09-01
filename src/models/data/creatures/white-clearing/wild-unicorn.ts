@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Unicórnio Selvagem (NV. 901 a 910) da área Clareira Branca.
 export const wildUnicorn: Creature = {
   id: "wild-unicorn",
   name: "Unicórnio Selvagem",
@@ -12,8 +13,8 @@ export const wildUnicorn: Creature = {
   endurance: 44960,
   agility: 503,
   experience: 6354,
-  minBronze: 515,
-  maxBronze: 956,
+  minBronze: 15,
+  maxBronze: 27,
   drops: [
     { itemId: "silver-mane", chance: 0.04, minimum: 1, maximum: 1 },
     { itemId: "horn-dust", chance: 0.04, minimum: 1, maximum: 1 },

@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Rainha da Noite (NV. 891 a 900) da área Castelo Escarlate.
 export const nightQueen: Creature = {
   id: "night-queen",
   name: "Rainha da Noite",
@@ -12,8 +13,8 @@ export const nightQueen: Creature = {
   endurance: 42325,
   agility: 497,
   experience: 6284,
-  minBronze: 509,
-  maxBronze: 945,
+  minBronze: 15,
+  maxBronze: 27,
   drops: [
     { itemId: "queen-tiara", chance: 0.04, minimum: 1, maximum: 1 },
     { itemId: "black-blood", chance: 0.04, minimum: 1, maximum: 1 },

@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Chifre de Imp: despojo de caça, trocado por bronze no mercado.
 export const impHorn: Item = {
   id: "imp-horn",
   name: "Chifre de Imp",

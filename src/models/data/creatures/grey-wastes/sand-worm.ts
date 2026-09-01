@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Verme das Areias (NV. 541 a 550) da área Ermo Cinza.
 export const sandWorm: Creature = {
   id: "sand-worm",
   name: "Verme das Areias",
@@ -12,8 +13,8 @@ export const sandWorm: Creature = {
   endurance: 2521,
   agility: 194,
   experience: 3834,
-  minBronze: 313,
-  maxBronze: 581,
+  minBronze: 10,
+  maxBronze: 18,
   drops: [
     { itemId: "worm-hide", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "sand-tooth", chance: 0.12, minimum: 1, maximum: 1 },

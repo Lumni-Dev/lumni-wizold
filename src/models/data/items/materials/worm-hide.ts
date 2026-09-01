@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Couro de Verme: despojo de caça, trocado por bronze no mercado.
 export const wormHide: Item = {
   id: "worm-hide",
   name: "Couro de Verme",

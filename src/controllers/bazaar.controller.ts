@@ -8,7 +8,7 @@ import type { GameState } from "@/models/entities/game-state";
 import { isEquippable, type Item } from "@/models/entities/item";
 import { failure, success, type Result } from "@/models/entities/result";
 import {
-  BAZAAR_LISTING_FEE,
+  bazaarListingFee,
   checkTrade,
   MAX_LISTING_CENTS,
   MIN_LISTING_CENTS,
@@ -108,11 +108,12 @@ export function announceListing(
     );
   }
 
-  if (character.bronze < BAZAAR_LISTING_FEE) {
+  const listingFee = bazaarListingFee(character.level);
+  if (character.bronze < listingFee) {
     return failure(
       state,
       "Faltam " +
-        formatBronze(BAZAAR_LISTING_FEE - character.bronze) +
+        formatBronze(listingFee - character.bronze) +
         " para a taxa do anúncio.",
     );
   }
@@ -130,7 +131,7 @@ export function announceListing(
 
   const next: GameState = {
     ...state,
-    character: { ...character, bronze: character.bronze - BAZAAR_LISTING_FEE },
+    character: { ...character, bronze: character.bronze - listingFee },
     inventory: removeFromInventory(state.inventory, itemId, quantity, enhancement),
     bazaarListings: [...state.bazaarListings, listing],
   };
@@ -142,7 +143,7 @@ export function announceListing(
     formatReais(priceCents) +
     (quantity > 1 ? " cada." : ".") +
     " Taxa de " +
-    formatBronze(BAZAAR_LISTING_FEE) +
+    formatBronze(listingFee) +
     " paga.";
 
   return success(addLog(next, "market", message), message);

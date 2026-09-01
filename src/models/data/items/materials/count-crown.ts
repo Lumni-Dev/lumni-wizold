@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Coroa do Conde: despojo de caça, trocado por bronze no mercado.
 export const countCrown: Item = {
   id: "count-crown",
   name: "Coroa do Conde",

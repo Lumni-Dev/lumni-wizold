@@ -3,7 +3,7 @@
 import { marketPriceOf } from "@/controllers/market.controller";
 import { useGame } from "@/controllers/game.context";
 import { CREATURES } from "@/models/data/creatures";
-import { EQUIPMENT_SETS, pieceId, pieceName } from "@/models/data/equipment-sets";
+import { EQUIPMENT_SETS, pieceId, pieceName, piecePrice } from "@/models/data/equipment-sets";
 import { SLOT_ROLE } from "@/models/data/equipment/slots";
 import { EXERCISES } from "@/models/data/exercises";
 import { trainingEffort } from "@/models/rules/training";
@@ -95,12 +95,9 @@ export function WikiScreen() {
             height="fill"
             className="scroll-mt-28"
           >
-            <ul className="space-y-2">
+            <ul className="space-y-1.5 text-xs leading-relaxed text-ink-soft">
               {topic.lines.map((line) => (
-                <li key={line} className="flex gap-2 text-xs leading-relaxed text-ink-soft">
-                  <span className="text-ink-faint">•</span>
-                  <span>{line}</span>
-                </li>
+                <li key={line}>{line}</li>
               ))}
             </ul>
           </Panel>
@@ -172,7 +169,7 @@ export function WikiScreen() {
                         {item ? summarizeEffect(item).join(", ") : "—"}
                       </span>
                       <span className="text-right font-mono text-[11px] text-ink-faint">
-                        {item && item.inMarket ? formatBronze(item.price) : "—"}
+                        {formatBronze(piecePrice(definition, slot))}
                       </span>
                     </div>
                   </ListRow>

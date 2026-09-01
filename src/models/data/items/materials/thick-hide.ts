@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Couro Grosso: despojo de caça, trocado por bronze no mercado.
 export const thickHide: Item = {
   id: "thick-hide",
   name: "Couro Grosso",

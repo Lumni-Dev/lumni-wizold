@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Escorpião Gigante (NV. 521 a 530) da área Ermo Cinza.
 export const giantScorpion: Creature = {
   id: "giant-scorpion",
   name: "Escorpião Gigante",
@@ -12,8 +13,8 @@ export const giantScorpion: Creature = {
   endurance: 2092,
   agility: 347,
   experience: 3694,
-  minBronze: 302,
-  maxBronze: 560,
+  minBronze: 10,
+  maxBronze: 18,
   drops: [
     { itemId: "scorpion-stinger", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "chitin-plate", chance: 0.12, minimum: 1, maximum: 1 },

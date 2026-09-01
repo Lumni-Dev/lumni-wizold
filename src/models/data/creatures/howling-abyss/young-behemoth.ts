@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Behemoth Jovem (NV. 761 a 770) da área Abismo Uivante.
 export const youngBehemoth: Creature = {
   id: "young-behemoth",
   name: "Behemoth Jovem",
@@ -12,8 +13,8 @@ export const youngBehemoth: Creature = {
   endurance: 12450,
   agility: 271,
   experience: 5374,
-  minBronze: 436,
-  maxBronze: 810,
+  minBronze: 13,
+  maxBronze: 23,
   drops: [
     { itemId: "behemoth-hide", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "behemoth-horn", chance: 0.07, minimum: 1, maximum: 1 },

@@ -1,4 +1,4 @@
-import { PET_MAX_LEVEL, PET_MIN_LEVEL, PET_RENAME_PRICE } from "@/shared/constants/game";
+import { PET_MAX_LEVEL, PET_MIN_LEVEL } from "@/shared/constants/game";
 import { formatBronze } from "@/shared/utils/format";
 import { generateId } from "@/shared/utils/id";
 import { findItem } from "@/models/data/items";
@@ -12,6 +12,7 @@ import {
   isPetWhole,
   petMaxEnergy,
   petPrice,
+  petRenamePrice,
   petRationOf,
   petRestStep,
   petLevelOf,
@@ -36,7 +37,7 @@ export function adoptPet(state: GameState, gender: PetGender, name: string): Res
   if (character.level < PET_MIN_LEVEL) {
     return failure(state, "O lobo só caça ao lado de um NV " + PET_MIN_LEVEL + " ou mais.");
   }
-  const price = petPrice();
+  const price = petPrice(character.level);
   if (character.bronze < price) {
     return failure(state, "Faltam " + formatBronze(price - character.bronze) + " para a adoção.");
   }
@@ -88,20 +89,21 @@ export function renamePet(state: GameState, name: string): Result {
   const clean = capitalizeName(name);
   if (clean === pet.name) return failure(state, "O mascote já responde por esse nome.");
 
-  if (character.bronze < PET_RENAME_PRICE) {
+  const renamePrice = petRenamePrice(character.level);
+  if (character.bronze < renamePrice) {
     return failure(
       state,
       "A troca de nome custa " +
-        formatBronze(PET_RENAME_PRICE) +
+        formatBronze(renamePrice) +
         " e faltam " +
-        formatBronze(PET_RENAME_PRICE - character.bronze) +
+        formatBronze(renamePrice - character.bronze) +
         ".",
     );
   }
 
   const next: GameState = {
     ...state,
-    character: { ...character, bronze: character.bronze - PET_RENAME_PRICE },
+    character: { ...character, bronze: character.bronze - renamePrice },
     pet: { ...pet, name: clean },
   };
 

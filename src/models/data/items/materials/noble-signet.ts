@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Anel de Nobre: despojo de caça, trocado por bronze no mercado.
 export const nobleSignet: Item = {
   id: "noble-signet",
   name: "Anel de Nobre",

@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Hiena do Ermo (NV. 511 a 520) da área Ermo Cinza.
 export const wastesHyena: Creature = {
   id: "wastes-hyena",
   name: "Hiena do Ermo",
@@ -12,8 +13,8 @@ export const wastesHyena: Creature = {
   endurance: 1793,
   agility: 314,
   experience: 3624,
-  minBronze: 296,
-  maxBronze: 550,
+  minBronze: 9,
+  maxBronze: 17,
   drops: [
     { itemId: "hyena-pelt", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "sharp-fang", chance: 0.35, minimum: 1, maximum: 2 },

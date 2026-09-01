@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Ceifador (NV. 771 a 780) da área Abismo Uivante.
 export const reaper: Creature = {
   id: "reaper",
   name: "Ceifador",
@@ -12,8 +13,8 @@ export const reaper: Creature = {
   endurance: 11793,
   agility: 510,
   experience: 5444,
-  minBronze: 442,
-  maxBronze: 820,
+  minBronze: 13,
+  maxBronze: 25,
   drops: [
     { itemId: "reaper-scythe", chance: 0.04, minimum: 1, maximum: 1 },
     { itemId: "soul-shard", chance: 0.07, minimum: 1, maximum: 1 },

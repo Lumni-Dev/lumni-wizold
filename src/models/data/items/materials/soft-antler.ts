@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Chifre Macio: despojo de caça, trocado por bronze no mercado.
 export const softAntler: Item = {
   id: "soft-antler",
   name: "Chifre Macio",

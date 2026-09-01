@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Pele Nevada: despojo de caça, trocado por bronze no mercado.
 export const snowPelt: Item = {
   id: "snow-pelt",
   name: "Pele Nevada",

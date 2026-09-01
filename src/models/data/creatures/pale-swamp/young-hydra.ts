@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Hidra Jovem (NV. 381 a 390) da área Pântano Pálido.
 export const youngHydra: Creature = {
   id: "young-hydra",
   name: "Hidra Jovem",
@@ -12,8 +13,8 @@ export const youngHydra: Creature = {
   endurance: 754,
   agility: 138,
   experience: 2714,
-  minBronze: 223,
-  maxBronze: 415,
+  minBronze: 8,
+  maxBronze: 14,
   drops: [
     { itemId: "hydra-scale", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "hydra-blood", chance: 0.07, minimum: 1, maximum: 1 },

@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Fragmento de Auréola: despojo de caça, trocado por bronze no mercado.
 export const haloShard: Item = {
   id: "halo-shard",
   name: "Fragmento de Auréola",

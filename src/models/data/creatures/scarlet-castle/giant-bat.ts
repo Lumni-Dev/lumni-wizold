@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Morcego Gigante (NV. 811 a 820) da área Castelo Escarlate.
 export const giantBat: Creature = {
   id: "giant-bat",
   name: "Morcego Gigante",
@@ -12,8 +13,8 @@ export const giantBat: Creature = {
   endurance: 11754,
   agility: 577,
   experience: 5724,
-  minBronze: 464,
-  maxBronze: 862,
+  minBronze: 13,
+  maxBronze: 25,
   drops: [
     { itemId: "bat-wing", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "bat-fang", chance: 0.2, minimum: 1, maximum: 2 },

@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Carne de Ave: despojo de caça, trocado por bronze no mercado.
 export const poultryMeat: Item = {
   id: "poultry-meat",
   name: "Carne de Ave",

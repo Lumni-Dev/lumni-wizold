@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Placa Escarlate: despojo de caça, trocado por bronze no mercado.
 export const scarletPlate: Item = {
   id: "scarlet-plate",
   name: "Placa Escarlate",

@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Seda de Aranha: despojo de caça, trocado por bronze no mercado.
 export const spiderSilk: Item = {
   id: "spider-silk",
   name: "Seda de Aranha",

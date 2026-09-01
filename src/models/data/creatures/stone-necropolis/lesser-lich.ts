@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Lich Menor (NV. 681 a 690) da área Necrópole de Pedra.
 export const lesserLich: Creature = {
   id: "lesser-lich",
   name: "Lich Menor",
@@ -12,8 +13,8 @@ export const lesserLich: Creature = {
   endurance: 8256,
   agility: 382,
   experience: 4814,
-  minBronze: 391,
-  maxBronze: 727,
+  minBronze: 12,
+  maxBronze: 22,
   drops: [
     { itemId: "lich-phylactery", chance: 0.04, minimum: 1, maximum: 1 },
     { itemId: "necro-tome", chance: 0.07, minimum: 1, maximum: 1 },

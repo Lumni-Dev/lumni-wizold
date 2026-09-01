@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Basilisco (NV. 581 a 590) da área Ermo Cinza.
 export const basilisk: Creature = {
   id: "basilisk",
   name: "Basilisco",
@@ -12,8 +13,8 @@ export const basilisk: Creature = {
   endurance: 2691,
   agility: 386,
   experience: 4114,
-  minBronze: 335,
-  maxBronze: 623,
+  minBronze: 11,
+  maxBronze: 20,
   drops: [
     { itemId: "basilisk-fang", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "basilisk-scale", chance: 0.07, minimum: 1, maximum: 1 },

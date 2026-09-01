@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Escama de Dragão: despojo de caça, trocado por bronze no mercado.
 export const dragonScale: Item = {
   id: "dragon-scale",
   name: "Escama de Dragão",

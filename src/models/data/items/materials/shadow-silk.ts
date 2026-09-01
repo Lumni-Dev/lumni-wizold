@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Seda Sombria: despojo de caça, trocado por bronze no mercado.
 export const shadowSilk: Item = {
   id: "shadow-silk",
   name: "Seda Sombria",

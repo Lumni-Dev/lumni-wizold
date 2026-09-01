@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Capitão da Ordem (NV. 481 a 490) da área Estrada dos Caçadores.
 export const orderCaptain: Creature = {
   id: "order-captain",
   name: "Capitão da Ordem",
@@ -12,8 +13,8 @@ export const orderCaptain: Creature = {
   endurance: 1777,
   agility: 247,
   experience: 3414,
-  minBronze: 279,
-  maxBronze: 519,
+  minBronze: 9,
+  maxBronze: 17,
   drops: [
     { itemId: "captain-medal", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "knight-plate", chance: 0.12, minimum: 1, maximum: 1 },

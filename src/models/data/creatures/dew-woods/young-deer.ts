@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Veado Jovem (NV. 101 a 110) da área Mata do Orvalho.
 export const youngDeer: Creature = {
   id: "young-deer",
   name: "Veado Jovem",
@@ -12,8 +13,8 @@ export const youngDeer: Creature = {
   endurance: 110,
   agility: 68,
   experience: 754,
-  minBronze: 67,
-  maxBronze: 124,
+  minBronze: 4,
+  maxBronze: 7,
   drops: [
     { itemId: "deer-hide", chance: 0.35, minimum: 1, maximum: 2 },
     { itemId: "soft-antler", chance: 0.35, minimum: 1, maximum: 2 },

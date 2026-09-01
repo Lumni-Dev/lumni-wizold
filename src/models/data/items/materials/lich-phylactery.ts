@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Filactério de Lich: despojo de caça, trocado por bronze no mercado.
 export const lichPhylactery: Item = {
   id: "lich-phylactery",
   name: "Filactério de Lich",

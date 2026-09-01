@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Cavaleiro Morto (NV. 641 a 650) da área Necrópole de Pedra.
 export const deadKnight: Creature = {
   id: "dead-knight",
   name: "Cavaleiro Morto",
@@ -12,8 +13,8 @@ export const deadKnight: Creature = {
   endurance: 6159,
   agility: 229,
   experience: 4534,
-  minBronze: 369,
-  maxBronze: 685,
+  minBronze: 11,
+  maxBronze: 21,
   drops: [
     { itemId: "cursed-plate", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "bone-shard", chance: 0.2, minimum: 1, maximum: 2 },

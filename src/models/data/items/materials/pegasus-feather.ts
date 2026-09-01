@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Pena de Pégaso: despojo de caça, trocado por bronze no mercado.
 export const pegasusFeather: Item = {
   id: "pegasus-feather",
   name: "Pena de Pégaso",

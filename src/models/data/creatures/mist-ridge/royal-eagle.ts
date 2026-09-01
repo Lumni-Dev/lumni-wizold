@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Águia Real (NV. 211 a 220) da área Serra das Brumas.
 export const royalEagle: Creature = {
   id: "royal-eagle",
   name: "Águia Real",
@@ -12,8 +13,8 @@ export const royalEagle: Creature = {
   endurance: 272,
   agility: 146,
   experience: 1524,
-  minBronze: 128,
-  maxBronze: 238,
+  minBronze: 5,
+  maxBronze: 9,
   drops: [
     { itemId: "eagle-feather", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "eagle-talon", chance: 0.12, minimum: 1, maximum: 1 },

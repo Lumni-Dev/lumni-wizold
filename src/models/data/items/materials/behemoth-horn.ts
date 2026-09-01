@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Chifre de Behemoth: despojo de caça, trocado por bronze no mercado.
 export const behemothHorn: Item = {
   id: "behemoth-horn",
   name: "Chifre de Behemoth",

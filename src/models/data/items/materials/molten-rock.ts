@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Rocha Fundida: despojo de caça, trocado por bronze no mercado.
 export const moltenRock: Item = {
   id: "molten-rock",
   name: "Rocha Fundida",

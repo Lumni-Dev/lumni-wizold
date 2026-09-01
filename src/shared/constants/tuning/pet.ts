@@ -1,6 +1,6 @@
 export const PET = {
-  price: 50_000,
-  renamePrice: 10_000,
+  adoptionHunts: 160,
+  renameHunts: 35,
   baseBonus: 5,
   baseEnergy: 100,
   energyPerLevel: 4,

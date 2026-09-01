@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Troféu do Mestre: despojo de caça, trocado por bronze no mercado.
 export const masterTrophy: Item = {
   id: "master-trophy",
   name: "Troféu do Mestre",

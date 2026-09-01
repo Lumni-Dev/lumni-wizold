@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Zumbi Rastejante (NV. 611 a 620) da área Necrópole de Pedra.
 export const crawlingZombie: Creature = {
   id: "crawling-zombie",
   name: "Zumbi Rastejante",
@@ -12,8 +13,8 @@ export const crawlingZombie: Creature = {
   endurance: 4584,
   agility: 218,
   experience: 4324,
-  minBronze: 352,
-  maxBronze: 654,
+  minBronze: 11,
+  maxBronze: 20,
   drops: [
     { itemId: "rotten-flesh", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "grave-dirt", chance: 0.35, minimum: 1, maximum: 2 },

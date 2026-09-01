@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Lobo Cinzento (NV. 121 a 130) da área Mata do Orvalho.
 export const greyWolf: Creature = {
   id: "grey-wolf",
   name: "Lobo Cinzento",
@@ -12,8 +13,8 @@ export const greyWolf: Creature = {
   endurance: 127,
   agility: 80,
   experience: 894,
-  minBronze: 78,
-  maxBronze: 144,
+  minBronze: 4,
+  maxBronze: 8,
   drops: [
     { itemId: "wolf-pelt", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "wolf-fang", chance: 0.2, minimum: 1, maximum: 2 },

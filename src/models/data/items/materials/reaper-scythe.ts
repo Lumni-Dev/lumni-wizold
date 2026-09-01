@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Foice do Ceifador: despojo de caça, trocado por bronze no mercado.
 export const reaperScythe: Item = {
   id: "reaper-scythe",
   name: "Foice do Ceifador",

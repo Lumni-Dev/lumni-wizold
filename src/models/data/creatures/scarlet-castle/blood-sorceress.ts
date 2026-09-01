@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Feiticeira de Sangue (NV. 841 a 850) da área Castelo Escarlate.
 export const bloodSorceress: Creature = {
   id: "blood-sorceress",
   name: "Feiticeira de Sangue",
@@ -12,8 +13,8 @@ export const bloodSorceress: Creature = {
   endurance: 28018,
   agility: 427,
   experience: 5934,
-  minBronze: 481,
-  maxBronze: 893,
+  minBronze: 14,
+  maxBronze: 26,
   drops: [
     { itemId: "blood-grimoire", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "black-blood", chance: 0.04, minimum: 1, maximum: 1 },

@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Couro de Veado: despojo de caça, trocado por bronze no mercado.
 export const deerHide: Item = {
   id: "deer-hide",
   name: "Couro de Veado",

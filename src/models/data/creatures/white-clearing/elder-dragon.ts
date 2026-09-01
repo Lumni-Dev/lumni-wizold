@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Dragão Ancião (NV. 961 a 970) da área Clareira Branca.
 export const elderDragon: Creature = {
   id: "elder-dragon",
   name: "Dragão Ancião",
@@ -12,8 +13,8 @@ export const elderDragon: Creature = {
   endurance: 60517,
   agility: 341,
   experience: 6774,
-  minBronze: 548,
-  maxBronze: 1018,
+  minBronze: 15,
+  maxBronze: 29,
   drops: [
     { itemId: "dragon-scale", chance: 0.04, minimum: 1, maximum: 1 },
     { itemId: "dragon-heart", chance: 0.04, minimum: 1, maximum: 1 },

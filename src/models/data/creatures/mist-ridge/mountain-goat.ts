@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Cabra Montesa (NV. 201 a 210) da área Serra das Brumas.
 export const mountainGoat: Creature = {
   id: "mountain-goat",
   name: "Cabra Montesa",
@@ -12,8 +13,8 @@ export const mountainGoat: Creature = {
   endurance: 223,
   agility: 128,
   experience: 1454,
-  minBronze: 122,
-  maxBronze: 228,
+  minBronze: 5,
+  maxBronze: 9,
   drops: [
     { itemId: "goat-horn", chance: 0.2, minimum: 1, maximum: 2 },
     { itemId: "thick-hide", chance: 0.35, minimum: 1, maximum: 2 },

@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Correia de Couro: despojo de caça, trocado por bronze no mercado.
 export const leatherStrap: Item = {
   id: "leather-strap",
   name: "Correia de Couro",

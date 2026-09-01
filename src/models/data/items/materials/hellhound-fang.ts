@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Presa Infernal: despojo de caça, trocado por bronze no mercado.
 export const hellhoundFang: Item = {
   id: "hellhound-fang",
   name: "Presa Infernal",

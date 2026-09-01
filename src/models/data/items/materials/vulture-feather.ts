@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Pena de Abutre: despojo de caça, trocado por bronze no mercado.
 export const vultureFeather: Item = {
   id: "vulture-feather",
   name: "Pena de Abutre",

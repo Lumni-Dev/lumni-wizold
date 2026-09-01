@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Banshee (NV. 651 a 660) da área Necrópole de Pedra.
 export const banshee: Creature = {
   id: "banshee",
   name: "Banshee",
@@ -12,8 +13,8 @@ export const banshee: Creature = {
   endurance: 6074,
   agility: 432,
   experience: 4604,
-  minBronze: 375,
-  maxBronze: 696,
+  minBronze: 11,
+  maxBronze: 21,
   drops: [
     { itemId: "banshee-wail", chance: 0.07, minimum: 1, maximum: 1 },
     { itemId: "ectoplasm", chance: 0.12, minimum: 1, maximum: 1 },

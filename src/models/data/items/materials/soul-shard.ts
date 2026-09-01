@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Fragmento de Alma: despojo de caça, trocado por bronze no mercado.
 export const soulShard: Item = {
   id: "soul-shard",
   name: "Fragmento de Alma",

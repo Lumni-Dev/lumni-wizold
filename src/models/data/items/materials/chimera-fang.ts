@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Presa de Quimera: despojo de caça, trocado por bronze no mercado.
 export const chimeraFang: Item = {
   id: "chimera-fang",
   name: "Presa de Quimera",

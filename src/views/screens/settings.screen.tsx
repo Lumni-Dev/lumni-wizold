@@ -124,7 +124,7 @@ export function SettingsScreen() {
 
   const daysLeft = renameDaysLeft(character);
   const canRename = daysLeft === 0;
-  const cost = renameCost();
+  const cost = renameCost(character.level);
   const affordable = character.bronze >= cost;
   const vip = isVip(character, now);
 

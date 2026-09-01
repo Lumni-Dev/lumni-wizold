@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Puma da Serra (NV. 231 a 240) da área Serra das Brumas.
 export const ridgePuma: Creature = {
   id: "ridge-puma",
   name: "Puma da Serra",
@@ -12,8 +13,8 @@ export const ridgePuma: Creature = {
   endurance: 321,
   agility: 159,
   experience: 1664,
-  minBronze: 139,
-  maxBronze: 259,
+  minBronze: 6,
+  maxBronze: 10,
   drops: [
     { itemId: "puma-pelt", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "puma-fang", chance: 0.12, minimum: 1, maximum: 1 },

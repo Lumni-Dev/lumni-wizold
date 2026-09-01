@@ -60,7 +60,7 @@ export const SPECIES: readonly SpeciesDefinition[] = [
         description:
           "Serve de forro para bota e de nada mais. O vilarejo compra aos punhados sem " +
           "perguntar quem arrancou, nem com que dentes.",
-        price: 20,
+        price: 1,
         rarity: "common",
         chance: 0.3,
       },
@@ -70,7 +70,7 @@ export const SPECIES: readonly SpeciesDefinition[] = [
         description:
           "Não deu sorte nenhuma para o dono anterior. Ainda assim há quem pague por " +
           "ela e a carregue no bolso a caçada inteira.",
-        price: 35,
+        price: 1,
         rarity: "common",
         chance: 0.15,
       },
@@ -107,7 +107,7 @@ export const SPECIES: readonly SpeciesDefinition[] = [
         description:
           "Osso duro, quebrado na base pela fuga e não pelo golpe. Bom para trocar por " +
           "moeda, melhor ainda para lembrar que o veado quase escapou.",
-        price: 120,
+        price: 5,
         rarity: "common",
         chance: 0.28,
       },
@@ -117,7 +117,7 @@ export const SPECIES: readonly SpeciesDefinition[] = [
         description:
           "Fino, resistente, e ainda cheirando a mato molhado. Curtido direito, aguenta " +
           "mais que couro de boi.",
-        price: 200,
+        price: 8,
         rarity: "uncommon",
         chance: 0.15,
       },
@@ -154,7 +154,7 @@ export const SPECIES: readonly SpeciesDefinition[] = [
         description:
           "Curva, grossa, ainda presa a um pedaço de dedo. Quem a arranca costuma levar " +
           "junto a marca do dono no antebraço.",
-        price: 400,
+        price: 16,
         rarity: "uncommon",
         chance: 0.25,
       },
@@ -164,7 +164,7 @@ export const SPECIES: readonly SpeciesDefinition[] = [
         description:
           "Os alquimistas do vilarejo pagam bem por ela e não explicam para quê. Dizem " +
           "que arde por três dias sem apagar.",
-        price: 650,
+        price: 26,
         rarity: "rare",
         chance: 0.12,
       },
@@ -201,7 +201,7 @@ export const SPECIES: readonly SpeciesDefinition[] = [
         description:
           "Sobra da lâmina de um caçador que apostou no aço em vez da prata. Ainda tem a " +
           "marca do ferreiro dele, e o dia em que a aposta parou de servir.",
-        price: 900,
+        price: 36,
         rarity: "rare",
         chance: 0.25,
       },
@@ -211,7 +211,7 @@ export const SPECIES: readonly SpeciesDefinition[] = [
         description:
           "Prata benta que devia manter a fera a três passos de distância. Protegeu " +
           "enquanto o dono acreditou nela, e agora troca de bolso pela quarta vez.",
-        price: 1400,
+        price: 56,
         rarity: "rare",
         chance: 0.12,
       },
@@ -247,7 +247,7 @@ export const SPECIES: readonly SpeciesDefinition[] = [
         description:
           "Oca por dentro, feita para sugar e não para rasgar. Continua quente horas " +
           "depois de arrancada, o que ninguém consegue explicar.",
-        price: 1800,
+        price: 72,
         rarity: "rare",
         chance: 0.22,
       },
@@ -257,7 +257,7 @@ export const SPECIES: readonly SpeciesDefinition[] = [
         description:
           "Não coagula, não seca e nunca esfria. Guardada em vidro fechado, ainda se " +
           "mexe sozinha quando a lua cresce.",
-        price: 2800,
+        price: 112,
         rarity: "epic",
         chance: 0.11,
       },
@@ -294,7 +294,7 @@ export const SPECIES: readonly SpeciesDefinition[] = [
         description:
           "Cada fio corta como linha de pescar mal enrolada. Vale uma fortuna, e quem " +
           "vende costuma mostrar as mãos como prova.",
-        price: 3500,
+        price: 140,
         rarity: "epic",
         chance: 0.22,
       },
@@ -304,7 +304,7 @@ export const SPECIES: readonly SpeciesDefinition[] = [
         description:
           "Brilha sozinho no escuro do bolso, fraco como brasa velha. Uma pitada basta " +
           "para o alquimista fechar a loja e atender só você.",
-        price: 5200,
+        price: 208,
         rarity: "legendary",
         chance: 0.1,
       },

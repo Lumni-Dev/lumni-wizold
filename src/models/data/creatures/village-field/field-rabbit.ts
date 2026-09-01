@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Coelho do Campo (NV. 1 a 10) da área Campo do Vilarejo.
 export const fieldRabbit: Creature = {
   id: "field-rabbit",
   name: "Coelho do Campo",
@@ -12,8 +13,8 @@ export const fieldRabbit: Creature = {
   endurance: 19,
   agility: 10,
   experience: 54,
-  minBronze: 11,
-  maxBronze: 20,
+  minBronze: 2,
+  maxBronze: 4,
   drops: [
     { itemId: "rabbit-fur", chance: 0.35, minimum: 1, maximum: 2 },
     { itemId: "lucky-foot", chance: 0.2, minimum: 1, maximum: 2 },

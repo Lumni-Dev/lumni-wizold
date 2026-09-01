@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Flecha de Prata: despojo de caça, trocado por bronze no mercado.
 export const silverArrow: Item = {
   id: "silver-arrow",
   name: "Flecha de Prata",

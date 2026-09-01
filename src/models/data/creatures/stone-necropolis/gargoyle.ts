@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Gárgula (NV. 671 a 680) da área Necrópole de Pedra.
 export const gargoyle: Creature = {
   id: "gargoyle",
   name: "Gárgula",
@@ -12,8 +13,8 @@ export const gargoyle: Creature = {
   endurance: 7735,
   agility: 239,
   experience: 4744,
-  minBronze: 386,
-  maxBronze: 716,
+  minBronze: 12,
+  maxBronze: 22,
   drops: [
     { itemId: "gargoyle-stone", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "stone-shard", chance: 0.2, minimum: 1, maximum: 2 },

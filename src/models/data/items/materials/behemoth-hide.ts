@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Couro de Behemoth: despojo de caça, trocado por bronze no mercado.
 export const behemothHide: Item = {
   id: "behemoth-hide",
   name: "Couro de Behemoth",

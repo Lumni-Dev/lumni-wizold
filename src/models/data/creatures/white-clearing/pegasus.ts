@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Pégaso (NV. 941 a 950) da área Clareira Branca.
 export const pegasus: Creature = {
   id: "pegasus",
   name: "Pégaso",
@@ -12,8 +13,8 @@ export const pegasus: Creature = {
   endurance: 55349,
   agility: 525,
   experience: 6634,
-  minBronze: 537,
-  maxBronze: 997,
+  minBronze: 15,
+  maxBronze: 29,
   drops: [
     { itemId: "pegasus-feather", chance: 0.04, minimum: 1, maximum: 1 },
     { itemId: "silver-mane", chance: 0.04, minimum: 1, maximum: 1 },

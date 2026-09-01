@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Pele de Chacal: despojo de caça, trocado por bronze no mercado.
 export const jackalPelt: Item = {
   id: "jackal-pelt",
   name: "Pele de Chacal",

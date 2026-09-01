@@ -1,5 +1,6 @@
 import type { Item } from "../../../entities/item";
 
+// Escama de Jacaré: despojo de caça, trocado por bronze no mercado.
 export const gatorScale: Item = {
   id: "gator-scale",
   name: "Escama de Jacaré",

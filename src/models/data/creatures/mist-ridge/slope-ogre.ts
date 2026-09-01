@@ -1,5 +1,6 @@
 import type { Creature } from "../types";
 
+// Ogro da Encosta (NV. 281 a 290) da área Serra das Brumas.
 export const slopeOgre: Creature = {
   id: "slope-ogre",
   name: "Ogro da Encosta",
@@ -12,8 +13,8 @@ export const slopeOgre: Creature = {
   endurance: 486,
   agility: 103,
   experience: 2014,
-  minBronze: 167,
-  maxBronze: 311,
+  minBronze: 6,
+  maxBronze: 12,
   drops: [
     { itemId: "ogre-tooth", chance: 0.12, minimum: 1, maximum: 1 },
     { itemId: "thick-hide", chance: 0.35, minimum: 1, maximum: 2 },
