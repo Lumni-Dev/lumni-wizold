@@ -4,8 +4,8 @@ export const VITALS = {
   baseVital: 150,
   healthPerResistance: 0,
   healthPerLevel: {
-    male: 8,
-    female: 6,
+    male: 16,
+    female: 12,
   } satisfies Record<Gender, number>,
 };
 
