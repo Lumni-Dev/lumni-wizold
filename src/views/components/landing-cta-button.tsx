@@ -15,7 +15,7 @@ export function LandingCtaButton({ href, label, className }: LandingCtaButtonPro
     <Link
       href={href}
       className={cn(
-        "landing-hero-shadow-button block w-full max-w-xs rounded-md transition-[filter] hover:brightness-110",
+        "landing-hero-shadow-button mx-auto block w-full max-w-xs rounded-md transition-[filter] hover:brightness-110",
         className,
       )}
     >

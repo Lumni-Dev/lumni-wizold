@@ -17,7 +17,7 @@ import { CopyNick } from "../components/copy-nick";
 import { DataRow } from "../components/data-row";
 import { EmptyState } from "../components/empty-state";
 import { GenderSheetHeader } from "../components/gender-icon";
-import { PetBanner } from "../components/pet-icon";
+import { PetSheetHeader } from "../components/pet-icon";
 import { List, ListRow } from "../components/list";
 import { AttributesPanel } from "../components/attributes-panel";
 import { EquipmentPanel } from "../components/equipment-panel";
@@ -181,10 +181,9 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
           >
             {wolf && hunter.pet ? (
               <>
-                <PetBanner gender={hunter.pet.gender} />
-                <div className="border-b border-edge p-4">
+                <PetSheetHeader gender={hunter.pet.gender}>
                   <p className="truncate text-sm text-ink">{hunter.pet.name}</p>
-                </div>
+                </PetSheetHeader>
                 <List>
                   <DataRow label="Sexo" value={wolf.label} />
                   <DataRow

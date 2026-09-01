@@ -5,22 +5,20 @@ import { useMemo } from "react";
 import { useGame } from "@/controllers/game.context";
 import { detailInventory } from "@/controllers/inventory.controller";
 import { playClick } from "@/controllers/sound";
-import { furyRemainingMs } from "@/models/rules/moon";
+import { potionFuryRemainingMs } from "@/models/rules/moon";
 import { FuryRingFrame } from "./fury-ring-frame";
 
 export function FuryDrinkAside() {
-  const { character, moon, state, consumeItem } = useGame();
+  const { character, state, consumeItem } = useGame();
 
-  const furyActive = character
-    ? furyRemainingMs(character, moon.phase.key, Date.now()) > 0
-    : false;
+  const potionFuryActive = character ? potionFuryRemainingMs(character) > 0 : false;
 
   const furyPotions = useMemo(
     () => detailInventory(state).filter((slot) => slot.item.potion === "rage"),
     [state],
   );
 
-  if (!character || furyActive || furyPotions.length === 0) return null;
+  if (!character || potionFuryActive || furyPotions.length === 0) return null;
 
   const { item, quantity } = furyPotions[0];
 

@@ -129,12 +129,16 @@ export function fullMoonRemainingMs(now = Date.now()): number {
   return halfWindow * 2 * DAY_MS;
 }
 
+export function potionFuryRemainingMs(character: FuryCarrier, now = Date.now()): number {
+  return character.furyUntil ? Math.max(0, Date.parse(character.furyUntil) - now) : 0;
+}
+
 export function furyRemainingMs(
   character: FuryCarrier,
   moonPhase?: MoonPhaseKey,
   now = Date.now(),
 ): number {
-  const potion = character.furyUntil ? Math.max(0, Date.parse(character.furyUntil) - now) : 0;
+  const potion = potionFuryRemainingMs(character, now);
   const sky = isFullMoon(moonPhase, now) ? fullMoonRemainingMs(now) : 0;
   return Math.max(potion, sky);
 }

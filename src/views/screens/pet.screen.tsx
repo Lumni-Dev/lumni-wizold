@@ -33,7 +33,7 @@ import { RowText } from "../components/list";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { Field } from "../components/field";
 import { ItemIcon } from "../components/item-icon";
-import { PetBanner, PetIcon } from "../components/pet-icon";
+import { PetSheetHeader, PetIcon } from "../components/pet-icon";
 import { List, ListRow } from "../components/list";
 import { SupplyRow } from "../components/supply-row";
 import { Panel } from "../components/panel";
@@ -204,15 +204,14 @@ export function PetScreen() {
 
       <div className="grid items-start gap-6 lg:grid-cols-3">
         <Panel title="Companheiro" padding="none" className="lg:col-span-1">
-          <PetBanner gender={pet.gender} />
-          <div className="border-b border-edge p-4">
+          <PetSheetHeader gender={pet.gender}>
             <div className="min-w-0">
               <p className="truncate text-sm text-ink">{pet.name}</p>
               <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                 {definition.title}
               </p>
             </div>
-          </div>
+          </PetSheetHeader>
 
           <List>
             <DataRow label="Sexo" value={definition.label} />

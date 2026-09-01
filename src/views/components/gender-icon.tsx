@@ -3,6 +3,8 @@
 import type { ReactNode } from "react";
 import { useArt } from "@/controllers/art.context";
 import { findGender, type Gender } from "@/models/entities/character";
+import { GLASS_SECTION } from "@/shared/constants/ui";
+import { cn } from "@/shared/utils/class-names";
 import { ArtImage } from "./art-image";
 import { IconArt, IconFrame, type IconSize } from "./icon-frame";
 
@@ -59,7 +61,7 @@ export function GenderSheetHeader({
       <div className="aspect-square w-full overflow-hidden">
         <ArtImage source={source} />
       </div>
-      <div className="absolute inset-x-0 bottom-0 border-t border-edge bg-surface-high px-4 py-3">
+      <div className={cn("absolute inset-x-0 bottom-0 border-t border-edge px-4 py-3", GLASS_SECTION)}>
         {children}
       </div>
     </div>

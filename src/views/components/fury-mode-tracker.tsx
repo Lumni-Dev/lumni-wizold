@@ -3,7 +3,7 @@
 import { Flame } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useGame } from "@/controllers/game.context";
-import { furyRemainingMs } from "@/models/rules/moon";
+import { potionFuryRemainingMs } from "@/models/rules/moon";
 import { FuryRingFrame } from "./fury-ring-frame";
 
 function furyClock(ms: number): string {
@@ -19,10 +19,10 @@ function furyClock(ms: number): string {
 }
 
 export function FuryModeTracker() {
-  const { character, moon } = useGame();
+  const { character } = useGame();
   const [now, setNow] = useState(() => Date.now());
 
-  const remaining = character ? furyRemainingMs(character, moon.phase.key, now) : 0;
+  const remaining = character ? potionFuryRemainingMs(character, now) : 0;
   const active = remaining > 0;
 
   useEffect(() => {
