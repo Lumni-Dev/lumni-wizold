@@ -447,8 +447,8 @@ sec("economia");
   const setTotal = (definition) =>
     entItem.EQUIPMENT_SLOTS.reduce((total, slot) => total + sets.piecePrice(definition, slot), 0);
   ok(
-    "conjunto de bronze vale 140 caçadas na abertura",
-    setTotal(sets.EQUIPMENT_SETS[0]) === species.huntPurse(1) * 140,
+    "conjunto de bronze vale 400 caçadas na abertura",
+    setTotal(sets.EQUIPMENT_SETS[0]) === species.huntPurse(1) * 400,
   );
   let setsClimb = true;
   for (let index = 1; index < sets.EQUIPMENT_SETS.length; index += 1) {
