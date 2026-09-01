@@ -58,19 +58,16 @@ export function Card({
 export function CardHeader({
   children,
   className,
-  align = "center",
 }: {
   children: ReactNode;
   className?: string;
-  align?: "start" | "center";
 }) {
   const tone = useCardTone();
 
   return (
     <div
       className={cn(
-        "flex gap-3 p-4",
-        align === "start" ? "items-start" : "items-center",
+        "flex items-center gap-3 p-4",
         ICON_FRAME_INSET,
         tone !== "empty" && "border-b border-edge",
         className,

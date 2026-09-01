@@ -624,7 +624,7 @@ export function TavernScreen() {
                   </CardHeader>
 
                   <CardBody>
-                    <ul className="flex grow items-start gap-3 overflow-x-auto pb-1">
+                    <ul className="flex grow items-center gap-3 overflow-x-auto pb-1">
                       {room.members.map((member) => (
                         <li key={member.id} className="shrink-0 whitespace-nowrap text-xs">
                           <MemberName
@@ -838,9 +838,9 @@ export function TavernScreen() {
               {activeRoom.messages.map((message, index) => (
                 <ListRow
                   key={message.id}
-                  className={cn("items-start", index % 2 === 1 && "bg-charcoal")}
+                  className={cn(index % 2 === 1 && "bg-charcoal")}
                 >
-                  <span className="mt-1 font-mono text-[10px] text-ink-faint">
+                  <span className="font-mono text-[10px] text-ink-faint">
                     {formatTime(message.at)}
                   </span>
                   <p className="min-w-0 flex-1 text-xs leading-relaxed">

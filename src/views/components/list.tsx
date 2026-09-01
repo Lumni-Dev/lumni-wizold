@@ -4,13 +4,10 @@ import { cn } from "@/shared/utils/class-names";
 
 type RowLayout = "row" | "column" | "split";
 
-const ROW_LAYOUT: Record<RowPadding, string> = {
-  text: "flex items-center gap-3",
-  art: "flex items-center gap-3",
-};
+const ROW_FLEX = "flex items-center gap-3";
 
 const LAYOUTS: Record<RowLayout, string> = {
-  row: ROW_LAYOUT.text,
+  row: ROW_FLEX,
   column: "space-y-1",
   split: "flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",
 };
@@ -32,35 +29,26 @@ export function List({
 }
 
 type RowPadding = "text" | "art";
-type RowAlign = "start" | "center";
-
-function artRowAlign(align: RowAlign): string {
-  return align === "start" ? "items-start" : "items-center";
-}
 
 export function ListRow({
   children,
   layout = "row",
   padding = "text",
-  align = "center",
   className,
 }: {
   children: ReactNode;
   layout?: RowLayout;
   padding?: RowPadding;
-  align?: RowAlign;
   className?: string;
 }) {
   const rowLayout =
     layout === "row"
-      ? padding === "art"
-        ? "flex gap-3 " + artRowAlign(align)
-        : ROW_LAYOUT.text
+      ? ROW_FLEX
       : layout === "column"
         ? padding === "art"
           ? "flex flex-col gap-3"
           : LAYOUTS.column
-      : LAYOUTS[layout];
+        : LAYOUTS[layout];
 
   return (
     <li
@@ -103,16 +91,14 @@ export function ArtRow({
   title,
   description,
   trailing,
-  align = "center",
 }: {
   art: ReactNode;
   title: ReactNode;
   description?: ReactNode;
   trailing?: ReactNode;
-  align?: RowAlign;
 }) {
   return (
-    <ListRow padding="art" align={align}>
+    <ListRow padding="art">
       {art}
       <RowText title={title} description={description} />
       {trailing}
@@ -125,7 +111,6 @@ export function ArtRowButton({
   title,
   description,
   trailing,
-  align = "center",
   onClick,
   disabled = false,
   pressed,
@@ -135,22 +120,20 @@ export function ArtRowButton({
   title: ReactNode;
   description?: ReactNode;
   trailing?: ReactNode;
-  align?: RowAlign;
   onClick: () => void;
   disabled?: boolean;
   pressed?: boolean;
   className?: string;
 }) {
   return (
-    <ListRow padding="art" align={align} className="p-0">
+    <ListRow padding="art" className="p-0">
       <button
         type="button"
         onClick={onClick}
         disabled={disabled}
         aria-pressed={pressed}
         className={cn(
-          "flex w-full gap-3 p-4 text-left transition-colors",
-          align === "start" ? "items-start" : "items-center",
+          "flex w-full items-center gap-3 p-4 text-left transition-colors",
           ICON_FRAME_INSET,
           disabled && "opacity-60",
           className,

@@ -128,8 +128,8 @@ function CombatReport({ report, lines }: { report: HuntReport; lines: NarrationL
 
       <List className="max-h-64 overflow-y-auto">
         {lines.map((line, index) => (
-          <ListRow key={index} className="items-start text-xs leading-relaxed">
-            <span className="mt-1 font-mono text-[10px] text-ink-faint">
+          <ListRow key={index} className="text-xs leading-relaxed">
+            <span className="font-mono text-[10px] text-ink-faint">
               {String(index + 1).padStart(2, "0")}
             </span>
             <span

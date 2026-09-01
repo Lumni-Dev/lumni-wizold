@@ -106,8 +106,8 @@ function DuelReport({ report }: { report: ArenaResolution }) {
 
       <List className="max-h-64 overflow-y-auto">
         {combat.rounds.map((round) => (
-          <ListRow key={round.index} className="items-start text-xs leading-relaxed">
-            <span className="mt-1 font-mono text-[10px] text-ink-faint">
+          <ListRow key={round.index} className="text-xs leading-relaxed">
+            <span className="font-mono text-[10px] text-ink-faint">
               {round.index.toString().padStart(2, "0")}
             </span>
             <span className={cn(round.author === "character" ? "text-ink-soft" : "text-ink-faint")}>
