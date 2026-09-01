@@ -399,7 +399,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         " caracteres, e a mesa aceita uma sua a cada " +
         MESSAGE_COOLDOWN_MS / 1000 +
         " segundos: conversa tem compasso.",
-      "Fechar a janela da conversa não é sair da mesa: o lugar continua seu e Entrar devolve a mesma cadeira.",
+      "Fechar a janela da conversa não é sair da mesa: o lugar continua seu e Sentar devolve a mesma cadeira.",
       "A mesa some do quadro quando a última pessoa sai, ou quando o dono a fecha.",
       "A matilha guarda até " +
         MAX_PACK +

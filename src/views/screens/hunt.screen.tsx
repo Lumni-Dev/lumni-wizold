@@ -15,7 +15,9 @@ import { DANGER_LABEL } from "@/models/entities/territory";
 import { canPetFight, isPetActive, petLevelOf, petMaxEnergy } from "@/models/rules/pet";
 import { cn } from "@/shared/utils/class-names";
 import { formatNumber } from "@/shared/utils/format";
+import { backgroundRepository } from "@/models/repositories/background.repository";
 import { ArtImage } from "../components/art-image";
+import { ArtVideo } from "../components/art-video";
 import { CreatureIcon } from "../components/creature-icon";
 import {
   loadHuntSelection,
@@ -176,6 +178,11 @@ export function HuntScreen() {
   const lastReportRef = useRef<HuntReport | null>(null);
   const territories = useMemo(() => listTerritories(state), [state]);
   const xpBonus = moon.phase.experienceBonus;
+  const animatedArt = useSyncExternalStore(
+    backgroundRepository.subscribe,
+    backgroundRepository.enabled,
+    backgroundRepository.serverSnapshot,
+  );
 
   useEffect(() => {
     const landed = runtime.lastHuntReport;
@@ -278,7 +285,14 @@ export function HuntScreen() {
                 <div className="flex flex-col divide-y divide-edge">
                   {art.territories[territory.id] ? (
                     <div className="aspect-video w-full overflow-hidden">
-                      <ArtImage source={art.territories[territory.id]} />
+                      {animatedArt && art.territoryVideos[territory.id] ? (
+                        <ArtVideo
+                          source={art.territoryVideos[territory.id]}
+                          poster={art.territories[territory.id]}
+                        />
+                      ) : (
+                        <ArtImage source={art.territories[territory.id]} />
+                      )}
                     </div>
                   ) : null}
                   <div className="p-4">

@@ -10,6 +10,7 @@ import { isVip, VIP_PRICE_CENTS } from "@/models/rules/vip";
 import { useGame } from "@/controllers/game.context";
 import { playSoundPreview } from "@/controllers/sound";
 import { disableTavernPush, enableTavernPush, testTavernPush, webPushConfigured, tavernPushSupported } from "@/controllers/tavern-notify";
+import { backgroundRepository } from "@/models/repositories/background.repository";
 import { soundRepository } from "@/models/repositories/sound.repository";
 import { tavernPushRepository } from "@/models/repositories/tavern-push.repository";
 import { NAME_MAX_LENGTH, RENAME_COOLDOWN_DAYS } from "@/shared/constants/game";
@@ -126,6 +127,12 @@ export function SettingsScreen() {
     if (on && soundRepository.volume() <= 0) soundRepository.setVolume(1);
     if (on) playSoundPreview("ui");
   }
+
+  const animatedBackground = useSyncExternalStore(
+    backgroundRepository.subscribe,
+    backgroundRepository.enabled,
+    backgroundRepository.serverSnapshot,
+  );
 
   const pushOn = useSyncExternalStore(
     tavernPushRepository.subscribe,
@@ -487,6 +494,26 @@ export function SettingsScreen() {
         </Panel>
 
         <Panel
+          title="Animação de fundo"
+          description="A noite viva atrás do jogo, a mesma da porta de entrada. Desligada, fica a imagem parada."
+          padding="none"
+        >
+          <List>
+            <ListRow layout="split">
+              <RowText title="Estado" description="Ligada ou desligada neste aparelho." />
+              <div className="flex shrink-0 gap-2">
+                <Chip active={animatedBackground} onClick={() => backgroundRepository.setEnabled(true)}>
+                  Ativado
+                </Chip>
+                <Chip active={!animatedBackground} onClick={() => backgroundRepository.setEnabled(false)}>
+                  Desativado
+                </Chip>
+              </div>
+            </ListRow>
+          </List>
+        </Panel>
+
+        <Panel
           title="Cache do jogo"
           description="O que este aparelho guarda para abrir mais rápido."
           footer={
@@ -502,7 +529,8 @@ export function SettingsScreen() {
         >
           <p className="text-xs leading-relaxed text-ink-faint">
             O navegador guarda cópias das imagens do jogo e as preferências deste aparelho: som,
-            volume, a data de nascimento lembrada na porta e o trabalho em andamento. Limpar o cache
+            volume, animação de fundo, a data de nascimento lembrada na porta e o trabalho em
+            andamento. Limpar o cache
             descarta essas cópias, baixa as imagens de novo do servidor e recarrega a página;
             serve para quando alguma arte aparece errada ou desatualizada.
           </p>
@@ -538,7 +566,7 @@ export function SettingsScreen() {
       <ConfirmDialog
         open={confirmingClear}
         title="Limpar cache"
-        description="As imagens serão baixadas de novo e as preferências deste aparelho (som, volume, data de nascimento lembrada e trabalho em andamento) voltam ao padrão. A partida no servidor não é tocada."
+        description="As imagens serão baixadas de novo e as preferências deste aparelho (som, volume, animação de fundo, data de nascimento lembrada e trabalho em andamento) voltam ao padrão. A partida no servidor não é tocada."
         detail="A página recarrega ao terminar."
         confirmLabel="Limpar"
         onCancel={() => setConfirmingClear(false)}

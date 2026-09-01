@@ -18,50 +18,48 @@ export const LORE_CHAPTERS: readonly LoreChapter[] = [
   {
     title: "O encontro",
     text:
-      "Foi combinado no alto do Campo do Vilarejo, longe da fumaça das casas, onde o capim cresce " +
-      "alto o bastante para esconder duas pessoas que ainda não queriam ser vistas juntas. Luna " +
-      "chegou antes, como sempre chegava, e ficou de pé no escuro contando os próprios batimentos. " +
-      "Lumni subiu a trilha devagar, ensaiando na boca uma frase que nunca chegou a dizer. Ela riu " +
-      "antes de ele começar, e o riso resolveu o que a frase não resolveria. Ficaram ali, ombro com " +
-      "ombro, falando baixo de coisas pequenas, porque a coisa grande não cabia em palavra nenhuma. " +
-      "Foi ela quem reparou primeiro: a lua tinha subido inteira atrás da serra, branca demais, " +
-      "perto demais, olhando.",
-    voice: "/assets/voice/meeting.mp3?v=2",
+      "Toda história que importa começa com alguém esperando no escuro. Luna subiu ao alto do " +
+      "campo quando o vilarejo ainda rezava, e ficou entre o capim alto contando os próprios " +
+      "batimentos. Lumni veio depois, devagar pela trilha, trazendo na boca uma frase ensaiada " +
+      "que o vento levou antes da hora. Ela riu, e o riso resolveu o que a frase não resolveria. " +
+      "Ficaram ombro com ombro, falando baixo de coisas pequenas, porque a grande não cabia em " +
+      "palavra nenhuma. Foi ela quem viu primeiro: a lua tinha subido inteira atrás da serra, " +
+      "branca demais, perto demais, olhando os dois como quem reconhece uma dívida antiga.",
+    voice: "/assets/voice/meeting.mp3?v=3",
   },
   {
     title: "A virada",
     text:
-      "A dor veio nos dois ao mesmo tempo, e é essa a parte que ninguém no vilarejo aceita. Não " +
-      "houve mordida, não houve maldição comprada em feira. Havia só o sangue que os dois " +
-      "carregavam desde que nasceram, esperando uma lua cheia para lembrar o que era. Os ossos " +
-      "viraram, a voz virou, e o capim que os escondia ficou pequeno. Ele quis correr para longe " +
-      "dela e não conseguiu. Ela quis gritar, e o que saiu foi um uivo. Então, no meio do pavor, os " +
-      "dois se reconheceram: não pelo rosto, que já não havia, mas pelo cheiro, que continuava " +
-      "sendo o mesmo de antes.",
-    voice: "/assets/voice/turning.mp3?v=2",
+      "A dor veio nos dois ao mesmo tempo, e é essa a parte que o vilarejo nunca aceitou. Não " +
+      "houve mordida, nem maldição comprada em feira: havia o sangue antigo que os dois " +
+      "carregavam desde o berço, esperando uma lua cheia para lembrar o que era. Lumni soltou " +
+      "primeiro. Os ossos viraram, a voz virou uivo, e a fera partiu campo adentro sem esperar " +
+      "por nome. Luna segurou a sua o bastante para vê-lo sumir; então entendeu que segurar " +
+      "também é escolher, e soltou, para que ele não atravessasse a primeira noite sozinho. No " +
+      "escuro, reconheceram-se pelo cheiro, que seguia sendo o mesmo de antes.",
+    voice: "/assets/voice/turning.mp3?v=3",
   },
   {
     title: "A escolha",
     text:
-      "Podiam ter descido a serra em direções opostas e nunca mais se falado. Era o que a prudência " +
-      "mandava, e no vilarejo a prudência tem nome de fé. Ficaram. Caçaram juntos até o céu " +
-      "clarear, e quando o corpo voltou ao que era, voltou sujo, tremendo e de mãos dadas. " +
-      "Aprenderam a voltar antes do primeiro galo, a esconder a roupa rasgada, a mentir bem para " +
-      "quem perguntava pouco. E passaram a contar os dias pela lua, nunca mais pelo calendário do " +
-      "padre, porque só a lua sabia quando os dois poderiam ser inteiros de novo.",
-    voice: "/assets/voice/choice.mp3?v=2",
+      "Podiam ter descido a serra em direções opostas e nunca mais se olhado. Era o que a " +
+      "prudência mandava, e no vilarejo a prudência tem nome de fé. Ficaram. Caçaram juntos até " +
+      "o céu clarear, e o corpo voltou ao que era: sujo, tremendo e de mãos dadas. Daquela noite " +
+      "saíram as primeiras leis, ditas baixinho antes do primeiro galo: esconder a roupa rasgada, " +
+      "mentir bem para quem pergunta pouco, e contar os dias pela lua, nunca pelo calendário do " +
+      "padre, porque só ela sabia quando os dois poderiam ser inteiros de novo.",
+    voice: "/assets/voice/choice.mp3?v=3",
   },
   {
     title: "A matilha",
     text:
-      "Depois vieram outros, como sempre vêm. Uns nascidos assim, sem entender por que a lua cheia " +
-      "dói. Outros com a marca ainda fresca e ninguém para explicar. Chegavam com medo de si " +
-      "mesmos, e era Luna quem os recebia na porta. Ela ensinou a segurar a fera até a hora certa; " +
-      "ele ensinou que existe uma hora certa. A matilha que hoje enche a taverna começou naquela " +
-      "noite, no alto do campo, com duas pessoas que só queriam conversar e acabaram tendo que " +
-      "inventar um jeito de viver. A lua ainda sobe. Ela ainda cobra. E ninguém, em noite nenhuma, " +
-      "caça sozinho.",
-    voice: "/assets/voice/pack.mp3?v=2",
+      "Depois vieram outros, como sempre vêm. Uns nascidos assim, sem entender por que a lua " +
+      "cheia dói; outros com a marca ainda fresca e ninguém para explicar. Chegavam com medo de " +
+      "si mesmos, e era Luna quem abria a porta. Ela ensinava a segurar a fera até a hora certa; " +
+      "Lumni ensinava que a hora certa existe, e que toda noite de caça ela chega. A matilha que " +
+      "hoje enche a taverna começou ali, no alto do campo, com dois que só queriam conversar. A " +
+      "lua ainda sobe. Ainda cobra. E ninguém, em noite nenhuma, caça sozinho.",
+    voice: "/assets/voice/pack.mp3?v=3",
   },
 ];
 

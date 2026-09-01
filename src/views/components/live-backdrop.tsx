@@ -13,7 +13,7 @@ const UNLOCK_EVENTS: Array<keyof DocumentEventMap> = [
   "mousemove",
 ];
 
-export function LandingBackground() {
+export function LiveBackdrop() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [failed, setFailed] = useState(false);
 
@@ -75,7 +75,7 @@ export function LandingBackground() {
         <img
           src={WALLPAPER}
           alt=""
-          className="landing-backdrop-media absolute inset-0 h-full w-full object-cover object-top"
+          className="live-backdrop-media absolute inset-0 h-full w-full object-cover object-top"
         />
       ) : (
         <video
@@ -88,11 +88,11 @@ export function LandingBackground() {
           preload="auto"
           poster={WALLPAPER}
           onError={() => setFailed(true)}
-          className="landing-backdrop-media absolute inset-0 h-full w-full object-cover object-top"
+          className="live-backdrop-media absolute inset-0 h-full w-full object-cover object-top"
         />
       )}
 
-      <div className="landing-backdrop-shade absolute inset-0" />
+      <div className="live-backdrop-shade absolute inset-0" />
     </div>
   );
 }

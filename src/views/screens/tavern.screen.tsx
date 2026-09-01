@@ -79,6 +79,7 @@ export function TavernScreen() {
   const [activeRoomId, setActiveRoomId] = useState<string | null>(null);
   const [roomName, setRoomName] = useState("");
   const [roomPassword, setRoomPassword] = useState("");
+  const [creatingRoom, setCreatingRoom] = useState(false);
   const [joinPasswords, setJoinPasswords] = useState<Record<string, string>>({});
   const [draft, setDraft] = useState("");
   const [emojiOpen, setEmojiOpen] = useState(false);
@@ -301,12 +302,18 @@ export function TavernScreen() {
 
   async function submitRoom(event: FormEvent) {
     event.preventDefault();
-    const result = await createRoom(roomName, roomPassword);
-    if (!result) return;
-    if (!result.ok) notify(result.message, false, "Taverna");
-    if (result.ok) {
-      setRoomName("");
-      setRoomPassword("");
+    if (creatingRoom) return;
+    setCreatingRoom(true);
+    try {
+      const result = await createRoom(roomName, roomPassword);
+      if (!result) return;
+      if (!result.ok) notify(result.message, false, "Taverna");
+      if (result.ok) {
+        setRoomName("");
+        setRoomPassword("");
+      }
+    } finally {
+      setCreatingRoom(false);
     }
   }
 
@@ -395,7 +402,7 @@ export function TavernScreen() {
       <div className="grid items-start gap-6 lg:grid-cols-3">
         <div className="space-y-6">
           <Panel
-            title="Abrir mesa"
+            title="Escolher mesa"
             description={
               ownRoom
                 ? "Você já tem uma mesa aberta: feche a sua para abrir outra."
@@ -444,14 +451,16 @@ export function TavernScreen() {
                   type="submit"
                   variant="primary"
                   fullWidth
+                  busy={creatingRoom}
                   disabled={
+                    creatingRoom ||
                     Boolean(ownRoom) ||
                     roomName.trim().length === 0 ||
                     (roomPassword.trim().length === 0 &&
                       (character?.level ?? 1) < OPEN_ROOM_MIN_LEVEL)
                   }
                 >
-                  {ownRoom ? "Sua mesa: " + ownRoom.room.name : "Abrir mesa"}
+                  {ownRoom ? "Sua mesa: " + ownRoom.room.name : "Escolher mesa"}
                 </Button>
               </Tooltip>
             </form>
@@ -709,7 +718,7 @@ export function TavernScreen() {
                           disabled={full && !isMember}
                           onClick={() => open(room.id, joinPasswords[room.id] ?? "")}
                         >
-                          {openRoomId === room.id ? "Aberta" : "Entrar"}
+                          {openRoomId === room.id ? "Aberta" : "Sentar"}
                         </Button>
                       </Tooltip>
                     </div>

@@ -1,6 +1,6 @@
 import { readFile, readdir } from "node:fs/promises";
 import { join, parse } from "node:path";
-import type { ArtManifest } from "../entities/art";
+import { EMPTY_ART, type ArtManifest } from "../entities/art";
 import { ATTRIBUTES } from "../entities/attribute";
 import { GENDERS } from "../entities/character";
 import { PETS } from "../entities/pet";
@@ -20,6 +20,7 @@ const STORE_ROOT = "store";
 const CREATURE_ROOT = "creatures";
 
 const IMAGE_EXTENSIONS = new Set([".png", ".webp", ".gif", ".jpg", ".jpeg", ".svg", ".avif"]);
+const VIDEO_EXTENSIONS = new Set([".mp4", ".webm"]);
 
 const ASSETS_ROOT = join(process.cwd(), "public", "assets");
 const MANIFEST_PATH = join(process.cwd(), "public", "art-manifest.json");
@@ -91,7 +92,10 @@ function equipmentIdFrom(name: string, folder: string): string | null {
   return set && slot ? set + "-" + slot : null;
 }
 
-async function walk(relative: string): Promise<FoundFile[]> {
+async function walk(
+  relative: string,
+  extensions: Set<string> = IMAGE_EXTENSIONS,
+): Promise<FoundFile[]> {
   let entries;
   try {
     entries = await readdir(join(ASSETS_ROOT, relative), { withFileTypes: true });
@@ -105,12 +109,12 @@ async function walk(relative: string): Promise<FoundFile[]> {
     const path = relative + "/" + entry.name;
 
     if (entry.isDirectory()) {
-      found.push(...(await walk(path)));
+      found.push(...(await walk(path, extensions)));
       continue;
     }
 
     const { name, ext } = parse(entry.name);
-    if (!IMAGE_EXTENSIONS.has(ext.toLowerCase())) continue;
+    if (!extensions.has(ext.toLowerCase())) continue;
 
     const parts = relative.split("/");
     found.push({
@@ -231,6 +235,7 @@ export async function scanArtManifestFromDisk(): Promise<ArtManifest> {
   const [
     itemFiles,
     huntFiles,
+    huntVideoFiles,
     attributeFiles,
     trainingFiles,
     creatureFiles,
@@ -240,6 +245,7 @@ export async function scanArtManifestFromDisk(): Promise<ArtManifest> {
   ] = await Promise.all([
     walk(ITEM_ROOT),
     walk(HUNT_ROOT),
+    walk(HUNT_ROOT, VIDEO_EXTENSIONS),
     walk(ATTRIBUTE_ROOT),
     walk(TRAINING_ROOT),
     walk(CREATURE_ROOT),
@@ -253,6 +259,7 @@ export async function scanArtManifestFromDisk(): Promise<ArtManifest> {
     attributes: collectAttributes(attributeFiles),
     training: collectAttributes(trainingFiles),
     territories: collectTerritories(huntFiles),
+    territoryVideos: collectTerritories(huntVideoFiles),
     creatures: collectCreatures(creatureFiles),
     pets: collectPets(petFiles),
     genders: collectGenders(genderFiles),
@@ -266,5 +273,5 @@ export async function readArtManifest(): Promise<ArtManifest> {
   }
 
   const raw = await readFile(MANIFEST_PATH, "utf8");
-  return JSON.parse(raw) as ArtManifest;
+  return { ...EMPTY_ART, ...(JSON.parse(raw) as Partial<ArtManifest>) };
 }

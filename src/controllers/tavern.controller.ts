@@ -167,7 +167,7 @@ export function joinRoom(
       room.password === null &&
       (identity.level ?? 1) < OPEN_ROOM_MIN_LEVEL
     ) {
-      return fail(state, "Entrar em mesa aberta é só a partir do NV " + OPEN_ROOM_MIN_LEVEL + ".");
+      return fail(state, "Sentar em mesa aberta é só a partir do NV " + OPEN_ROOM_MIN_LEVEL + ".");
     }
     if (isRoomFull(room))
       return fail(state, "A mesa está cheia (" + MAX_ROOM_MEMBERS + " pessoas).");
