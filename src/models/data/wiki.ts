@@ -510,7 +510,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       setCostRangeLine() +
         " Subir de nível dentro de uma faixa não enche o bolso: quem muda o tamanho da bolsa é abrir a faixa seguinte.",
       "O mercado vende pelo preço de tabela e recompra pela metade. Materiais só servem para venda; nenhum equipamento cai na caça.",
-      "Poções de vida: pequena 150 a 200, média 200 a 300, grande 300 a 500 de vida; fúria pequena 3 caçadas, média 6, grande 12; ração do lobo, 1,5 caçada. A poção de fúria não se bebe na lua cheia: o céu já mantém o Modo Fúria. Fragmentos saem da mina e só alimentam a forja.",
+      "Poções de vida: pequena 50 WCoins, média 150, grande 300; fúria pequena 3 caçadas, média 6, grande 12; ração do lobo, 1,5 caçada. A poção de fúria não se bebe na lua cheia: o céu já mantém o Modo Fúria. Fragmentos saem da mina e só alimentam a forja.",
       "Comprar e vender pedem confirmação e deixam escolher a quantidade.",
     ],
   },

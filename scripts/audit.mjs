@@ -1471,14 +1471,12 @@ sec("inventário e mercado");
   ok("mercado respeita o nível", highSet.ok === false);
   ok("ração sem lobo recusa", marketCtrl.buyItem(state, "pet-ration", 1).ok === false);
   ok(
-    "poção pequena custa três caçadas do nível",
-    marketCtrl.marketPriceOf(items.findItem("health-potion-small"), 100) ===
-      Math.round(species.huntPurse(100) * 3),
+    "poção pequena custa 50 WCoins",
+    marketCtrl.marketPriceOf(items.findItem("health-potion-small"), 100) === 50,
   );
   ok(
-    "poção grande custa doze caçadas",
-    marketCtrl.marketPriceOf(items.findItem("health-potion-large"), 100) ===
-      Math.round(species.huntPurse(100) * 12),
+    "poção grande custa 300 WCoins",
+    marketCtrl.marketPriceOf(items.findItem("health-potion-large"), 100) === 300,
   );
   ok(
     "ração custa uma caçada e meia",
