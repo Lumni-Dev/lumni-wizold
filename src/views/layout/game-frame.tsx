@@ -7,6 +7,7 @@ import { useTavernAlert } from "@/controllers/use-tavern-alert";
 import { Spinner } from "../components/spinner";
 import { GameFooter } from "./game-footer";
 import { Toast } from "./toast";
+import { ActivityDock } from "../components/activity-dock";
 import { MoonTracker } from "../components/moon-tracker";
 import { MobileNavigation, Sidebar } from "./sidebar";
 import { ResourceBar } from "./resource-bar";
@@ -38,7 +39,10 @@ export function GameFrame({ children }: { children: ReactNode }) {
     <div className="flex min-h-screen">
       <Sidebar tavernUnread={asideUnread} />
       <div className="flex min-h-screen w-full min-w-0 flex-col">
-        <ResourceBar />
+        <div className="sticky top-0 z-20">
+          <ResourceBar />
+          <ActivityDock />
+        </div>
         <MobileNavigation tavernUnread={asideUnread} />
         <div className="border-b border-edge px-3 py-2 lg:hidden">
           <MoonTracker />

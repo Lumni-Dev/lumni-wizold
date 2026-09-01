@@ -1,20 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { activityRuntimeStore } from "@/controllers/activity-runtime";
 import { useGame } from "@/controllers/game.context";
 import { listForge, listMining } from "@/controllers/forge.controller";
 import { usePageActivity } from "@/controllers/use-page-activity";
-import { playSound } from "@/controllers/sound";
 import type { Activity } from "@/models/entities/activity";
-import { enhancedName, forgeDurationMs } from "@/models/rules/forge";
-import {
-  CYCLE_OPTOUT_SECS,
-  FORGE_TICKS,
-  MAX_ENHANCEMENT,
-  MINING_RESET_HOUR,
-  MINING_TICK_MS,
-  MINING_TICKS,
-} from "@/shared/constants/game";
+import { enhancedName } from "@/models/rules/forge";
+import { FORGE_TICKS, MAX_ENHANCEMENT, MINING_RESET_HOUR, MINING_TICKS } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
 import { formatBronze, formatNumber } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf, pageOfPosition } from "@/shared/utils/pagination";
@@ -46,8 +39,13 @@ function pieceKey(itemId: string, level: number): string {
 const FORGE_PAGE_SIZE = 5;
 
 export function ForgeScreen() {
-  const { state, character, mine, enhance, activity, setActivity, notify } = useGame();
+  const { state, character, activity, setActivity } = useGame();
   usePageActivity(["mine", "forge"]);
+  const runtime = useSyncExternalStore(
+    activityRuntimeStore.subscribe,
+    activityRuntimeStore.snapshot,
+    activityRuntimeStore.serverSnapshot,
+  );
   const paused = activity?.paused === true;
   const activeOre = activity?.kind === "mine" && !paused ? (activity.id ?? null) : null;
   const forgeItemId = activity?.kind === "forge" ? (activity.id ?? null) : null;
@@ -56,6 +54,21 @@ export function ForgeScreen() {
   const activeStartLevel = activeItem !== null ? activityLevel : 0;
   const waitingOre = activity?.kind === "mine" && paused ? (activity.id ?? null) : null;
   const waitingItem = activity?.kind === "forge" && paused ? (activity.id ?? null) : null;
+  const mineRt = runtime.mine;
+  const forgeRt = runtime.forge;
+  const swing =
+    mineRt && activeOre === mineRt.id
+      ? { id: mineRt.id, beat: mineRt.beat }
+      : { id: activeOre ?? "", beat: 0 };
+  const strike =
+    forgeRt && activeItem === forgeRt.id
+      ? { id: forgeRt.id, beat: forgeRt.beat }
+      : { id: activeItem ?? "", beat: 0 };
+  const mineCooldown = mineRt && activeOre === mineRt.id ? mineRt.cooldown : null;
+  const forgeCooldown = forgeRt && activeItem === forgeRt.id ? forgeRt.cooldown : null;
+  const cooldown = mineCooldown ?? forgeCooldown;
+  const activeForgeLevel =
+    forgeRt && activeItem === forgeRt.id ? forgeRt.level : activeStartLevel;
 
   const [now, setNow] = useState(0);
   useEffect(() => {
@@ -72,24 +85,7 @@ export function ForgeScreen() {
   const slots = useMemo(() => listForge(state), [state]);
   const miningResetLeft = mining.dailyResetsInMs;
 
-  const autoRef = useRef(state.automation);
-  const mineRef = useRef(mine);
-  const enhanceRef = useRef(enhance);
-  const notifyRef = useRef(notify);
-  useEffect(() => {
-    autoRef.current = state.automation;
-    mineRef.current = mine;
-    enhanceRef.current = enhance;
-    notifyRef.current = notify;
-  });
-
-  const [strike, setStrike] = useState<{ id: string; beat: number }>({ id: "", beat: 0 });
-  const strikeRef = useRef(0);
-  const [swing, setSwing] = useState<{ id: string; beat: number }>({ id: "", beat: 0 });
-  const swingRef = useRef(0);
-  const [cooldown, setCooldown] = useState<number | null>(null);
   const [confirmingKey, setConfirmingKey] = useState<string | null>(null);
-  const [activeForgeLevel, setActiveForgeLevel] = useState<number | null>(null);
   const [selectedOre, setSelectedOre] = useState<string>("");
   const [selectedForge, setSelectedForge] = useState<string>("");
   const [forgePage, setForgePage] = useState(1);
@@ -100,153 +96,6 @@ export function ForgeScreen() {
     const index = slots.findIndex((entry) => pieceKey(entry.item.id, entry.level) === key);
     if (index >= 0) setForgePage(pageOfPosition(index + 1, FORGE_PAGE_SIZE));
   }
-
-  useEffect(() => {
-    if (!activeItem) return;
-    let alive = true;
-    let barTimer = 0;
-    let coolTimer = 0;
-    let level = activeStartLevel;
-    strikeRef.current = 0;
-    /* eslint-disable react-hooks/set-state-in-effect */
-    setStrike({ id: activeItem, beat: 0 });
-    setActiveForgeLevel(level);
-    setCooldown(null);
-    /* eslint-enable react-hooks/set-state-in-effect */
-
-    const startBar = () => {
-      const tickMs = forgeDurationMs(level) / FORGE_TICKS;
-      strikeRef.current = 0;
-      setStrike({ id: activeItem, beat: 0 });
-      barTimer = window.setInterval(() => {
-        strikeRef.current += 1;
-        setStrike({ id: activeItem, beat: strikeRef.current });
-        if (strikeRef.current < FORGE_TICKS) {
-          playSound("forge");
-          return;
-        }
-        window.clearInterval(barTimer);
-        barTimer = 0;
-        void enhanceRef.current(activeItem, level).then((landed) => {
-          if (!alive) return;
-          if (landed) {
-            if (landed.message) notifyRef.current(landed.message, true, "Bigorna");
-            playSound(landed.raised ? "point" : "denied");
-            if (landed.raised) {
-              level += 1;
-              setActiveForgeLevel(level);
-            }
-          }
-          strikeRef.current = 0;
-          setStrike({ id: activeItem, beat: 0 });
-          if (!landed) {
-            setActivity(
-              autoRef.current.forge
-                ? { kind: "forge", id: activeItem, enhancement: level, paused: true }
-                : null,
-            );
-            return;
-          }
-          if (level >= MAX_ENHANCEMENT) {
-            setActivity(null);
-            return;
-          }
-          if (!autoRef.current.forge) {
-            setActivity(null);
-            return;
-          }
-          startCooldown();
-        });
-      }, tickMs);
-    };
-
-    const startCooldown = () => {
-      let left = CYCLE_OPTOUT_SECS;
-      setCooldown(left);
-      coolTimer = window.setInterval(() => {
-        left -= 1;
-        if (left <= 0) {
-          window.clearInterval(coolTimer);
-          coolTimer = 0;
-          setCooldown(null);
-          startBar();
-        } else {
-          setCooldown(left);
-        }
-      }, 1000);
-    };
-
-    startBar();
-
-    return () => {
-      alive = false;
-      if (barTimer) window.clearInterval(barTimer);
-      if (coolTimer) window.clearInterval(coolTimer);
-    };
-  }, [activeItem, activeStartLevel, setActivity]);
-
-  useEffect(() => {
-    if (!activeOre) return;
-    let alive = true;
-    let barTimer = 0;
-    let coolTimer = 0;
-    swingRef.current = 0;
-    /* eslint-disable react-hooks/set-state-in-effect */
-    setSwing({ id: activeOre, beat: 0 });
-    setCooldown(null);
-    /* eslint-enable react-hooks/set-state-in-effect */
-
-    const startBar = () => {
-      swingRef.current = 0;
-      setSwing({ id: activeOre, beat: 0 });
-      barTimer = window.setInterval(() => {
-        swingRef.current += 1;
-        setSwing({ id: activeOre, beat: swingRef.current });
-        playSound("mine");
-        if (swingRef.current < MINING_TICKS) return;
-        window.clearInterval(barTimer);
-        barTimer = 0;
-        void mineRef.current(activeOre).then((mined) => {
-          if (!alive) return;
-          swingRef.current = 0;
-          setSwing({ id: activeOre, beat: 0 });
-          if (!mined) {
-            setActivity(autoRef.current.mine ? { kind: "mine", id: activeOre, paused: true } : null);
-            return;
-          }
-          if (!autoRef.current.mine) {
-            setActivity(null);
-            return;
-          }
-          startCooldown();
-        });
-      }, MINING_TICK_MS);
-    };
-
-    const startCooldown = () => {
-      let left = CYCLE_OPTOUT_SECS;
-      setCooldown(left);
-      coolTimer = window.setInterval(() => {
-        left -= 1;
-        if (left <= 0) {
-          window.clearInterval(coolTimer);
-          coolTimer = 0;
-          setCooldown(null);
-          startBar();
-        } else {
-          setCooldown(left);
-        }
-      }, 1000);
-    };
-
-    startBar();
-
-    return () => {
-      alive = false;
-      if (barTimer) window.clearInterval(barTimer);
-      if (coolTimer) window.clearInterval(coolTimer);
-    };
-  }, [activeOre, setActivity]);
 
   if (!character) return null;
 

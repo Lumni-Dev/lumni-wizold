@@ -33,6 +33,7 @@ import type { HuntReport } from "./hunt.controller";
 import type { ArenaResolution } from "./arena.controller";
 import type { TrainingReport } from "./training.controller";
 import * as automationController from "./automation.controller";
+import { ActivityEngine } from "./activity-engine";
 import { api, type ApiAnswer } from "./api.client";
 import { playSound, preloadSounds, setVoiceProfile } from "./sound";
 export interface Notice {
@@ -798,7 +799,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
     applyState,
     setActivity,
   ]);
-  return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
+  return (
+    <GameContext.Provider value={value}>
+      <ActivityEngine />
+      {children}
+    </GameContext.Provider>
+  );
 }
 export function useGame(): GameContextValue {
   const context = useContext(GameContext);

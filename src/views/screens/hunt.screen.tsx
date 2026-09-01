@@ -1,14 +1,13 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useArt } from "@/controllers/art.context";
+import { activityRuntimeStore } from "@/controllers/activity-runtime";
 import { useGame } from "@/controllers/game.context";
 import { listTerritories, type HuntReport } from "@/controllers/hunt.controller";
 import { usePageActivity } from "@/controllers/use-page-activity";
-import { playSound } from "@/controllers/sound";
 import { emphasizeDamage, narrationOf, type NarrationLine } from "../presenters/hunt.presenter";
 import { DANGER_LABEL } from "@/models/entities/territory";
 import { canPetFight, isPetActive, petLevelOf, petMaxEnergy } from "@/models/rules/pet";
-import { CYCLE_OPTOUT_SECS, HUNT_TICK_MS } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
 import { formatNumber } from "@/shared/utils/format";
 import { ArtImage } from "../components/art-image";
@@ -142,178 +141,57 @@ function CombatReport({ report, lines }: { report: HuntReport; lines: NarrationL
   );
 }
 export function HuntScreen() {
-  const { state, character, pet, moon, hunt, sufferBlow, landHunt, notify, activity, setActivity } =
-    useGame();
+  const { state, character, pet, moon, activity, setActivity } = useGame();
   usePageActivity(["hunt"]);
-  const art = useArt();
+  const runtime = useSyncExternalStore(
+    activityRuntimeStore.subscribe,
+    activityRuntimeStore.snapshot,
+    activityRuntimeStore.serverSnapshot,
+  );
+  const huntRt = runtime.hunt;
   const paused = activity?.paused === true;
   const activeId = activity?.kind === "hunt" && !paused ? (activity.id ?? null) : null;
   const waitingId = activity?.kind === "hunt" && paused ? (activity.id ?? null) : null;
+  const progress =
+    huntRt && activeId === huntRt.territoryId
+      ? { id: huntRt.territoryId, beat: huntRt.beat }
+      : { id: activeId ?? "", beat: 0 };
+  const script = huntRt && activeId === huntRt.territoryId ? huntRt.script : [];
+  const pending = huntRt && activeId === huntRt.territoryId ? huntRt.pending : null;
+  const cooldown = huntRt && activeId === huntRt.territoryId ? huntRt.cooldown : null;
+  const art = useArt();
   const petAlong = canPetFight(pet) ? pet : null;
   const [report, setReport] = useState<HuntReport | null>(null);
   const [selection, setSelection] = useState<Record<string, string>>(() => loadHuntSelection());
   const [reportLines, setReportLines] = useState<NarrationLine[]>([]);
   const [session, setSession] = useState<HuntSession>(EMPTY_SESSION);
-  const [progress, setProgress] = useState<{ id: string; beat: number }>({ id: "", beat: 0 });
-  const [cooldown, setCooldown] = useState<number | null>(null);
-  const [script, setScript] = useState<NarrationLine[]>([]);
-  const [pending, setPending] = useState<HuntReport | null>(null);
   const [preyJolt, setPreyJolt] = useState(0);
   const [lapJolt, setLapJolt] = useState(0);
   const shaking = useShake(preyJolt + lapJolt);
-  const beatRef = useRef(0);
-  const scriptRef = useRef<NarrationLine[]>([]);
-  const pendingRef = useRef<HuntReport | null>(null);
-  const requestingRef = useRef(false);
-  const bledRef = useRef({ last: 0, total: 0 });
+  const lastReportRef = useRef<HuntReport | null>(null);
   const territories = useMemo(() => listTerritories(state), [state]);
   const xpBonus = moon.phase.experienceBonus;
-  const autoRef = useRef(state.automation.hunt);
-  const huntRef = useRef(hunt);
-  const sufferRef = useRef(sufferBlow);
-  const landRef = useRef(landHunt);
-  const notifyRef = useRef(notify);
-  const stateRef = useRef(state);
-  const selectionRef = useRef(selection);
+
   useEffect(() => {
-    autoRef.current = state.automation.hunt;
-    huntRef.current = hunt;
-    sufferRef.current = sufferBlow;
-    landRef.current = landHunt;
-    notifyRef.current = notify;
-    stateRef.current = state;
-    selectionRef.current = selection;
-  });
+    const landed = runtime.lastHuntReport;
+    if (!landed || landed === lastReportRef.current) return;
+    lastReportRef.current = landed;
+    setReport(landed);
+    setReportLines(narrationOf({ foe: landed.creature, combat: landed.combat }));
+    setSession((current) => accumulate(current, landed));
+  }, [runtime.lastHuntReport]);
+
   useEffect(() => {
-    if (!activeId) return;
-    let alive = true;
-    let coolTimer = 0;
-    let fillTimer = 0;
-    beatRef.current = 0;
-    requestingRef.current = false;
-    pendingRef.current = null;
-    scriptRef.current = [];
-    /* eslint-disable react-hooks/set-state-in-effect */
-    setPending(null);
-    setScript([]);
-    setProgress({ id: activeId, beat: 0 });
-    setCooldown(null);
-    /* eslint-enable react-hooks/set-state-in-effect */
-    const resolve = () => {
-      beatRef.current = 0;
-      setProgress({ id: activeId, beat: 0 });
-      requestingRef.current = true;
-      void huntRef.current(activeId, selectionRef.current[activeId]).then((fight) => {
-        if (!alive) return;
-        if (!fight) {
-          requestingRef.current = false;
-          setActivity(autoRef.current ? { kind: "hunt", id: activeId, paused: true } : null);
-          return;
-        }
-        pendingRef.current = fight;
-        bledRef.current = { last: stateRef.current.character?.health ?? 0, total: 0 };
-        scriptRef.current = narrationOf({ foe: fight.creature, combat: fight.combat });
-        setScript(scriptRef.current);
-        setPending(fight);
-        fillTimer = window.setTimeout(() => {
-          requestingRef.current = false;
-        }, HUNT_TICK_MS);
-      });
-    };
-    const startCooldown = () => {
-      let left = CYCLE_OPTOUT_SECS;
-      setCooldown(left);
-      coolTimer = window.setInterval(() => {
-        left -= 1;
-        if (left <= 0) {
-          window.clearInterval(coolTimer);
-          coolTimer = 0;
-          setCooldown(null);
-          resolve();
-        } else {
-          setCooldown(left);
-        }
-      }, 1000);
-    };
-    resolve();
-    const timer = window.setInterval(() => {
-      if (!pendingRef.current || requestingRef.current) return;
-      beatRef.current += 1;
-      setProgress({ id: activeId, beat: beatRef.current });
-      const line = scriptRef.current[Math.min(beatRef.current, scriptRef.current.length) - 1];
-      if (line?.blow === "ours") playSound(line.critical ? "crit" : "hit");
-      if (line?.blow === "pet") playSound("snap");
-      if (line?.blow === "theirs") playSound("hurt");
-      if (line?.critical) {
-        if (line.blow === "theirs") setLapJolt((count) => count + 1);
-        else setPreyJolt((count) => count + 1);
-      }
-      if (line?.characterHealth !== undefined) {
-        const delta = bledRef.current.last - line.characterHealth;
-        if (delta > 0) {
-          sufferRef.current(delta);
-          bledRef.current = { last: line.characterHealth, total: bledRef.current.total + delta };
-        }
-      }
-      if (beatRef.current >= scriptRef.current.length) {
-        const held = pendingRef.current;
-        pendingRef.current = null;
-        setPending(null);
-        landRef.current();
-        setReport(held);
-        setReportLines(scriptRef.current);
-        setSession((current) => accumulate(current, held));
-        if (held.combat.victory) {
-          playSound("spoils");
-          if (held.levelsGained > 0) playSound("levelup", 700);
-          if (held.petLeveled) playSound("pet-up", 1100);
-          const spoils = held.drops
-            .map((drop) => drop.name + (drop.quantity > 1 ? " x" + drop.quantity : ""))
-            .join(", ");
-          notifyRef.current(
-            held.creature.name +
-              " abatido: +" +
-              formatNumber(held.bronze) +
-              " WCoins e +" +
-              formatNumber(held.experience) +
-              " de experiência." +
-              (spoils ? " Espólio: " + spoils + "." : "") +
-              (held.levelsGained > 0 ? " Você subiu de nível!" : ""),
-            true,
-            "Caça",
-          );
-        } else if (held.combat.retreated) {
-          notifyRef.current(
-            "A caçada com " + held.creature.name + " se arrastou e os dois recuaram.",
-            true,
-            "Caça",
-          );
-        } else {
-          playSound("defeat");
-          notifyRef.current(
-            held.creature.name + " levou a melhor: a caçada não pagou nada.",
-            false,
-            "Caça",
-          );
-        }
-        scriptRef.current = [];
-        setScript([]);
-        beatRef.current = 0;
-        setProgress({ id: activeId, beat: 0 });
-        if (!autoRef.current) {
-          setActivity(null);
-          return;
-        }
-        startCooldown();
-      }
-    }, HUNT_TICK_MS);
-    return () => {
-      alive = false;
-      window.clearInterval(timer);
-      if (coolTimer) window.clearInterval(coolTimer);
-      if (fillTimer) window.clearTimeout(fillTimer);
-    };
-  }, [activeId, setActivity]);
+    if (!huntRt || !activeId || huntRt.territoryId !== activeId || huntRt.beat <= 0) return;
+    const line = huntRt.script[Math.min(huntRt.beat, huntRt.script.length) - 1];
+    if (line?.critical) {
+      /* eslint-disable react-hooks/set-state-in-effect */
+      if (line.blow === "theirs") setLapJolt((count) => count + 1);
+      else setPreyJolt((count) => count + 1);
+      /* eslint-enable react-hooks/set-state-in-effect */
+    }
+  }, [huntRt, activeId]);
+
   if (!character) return null;
   const drops = Object.entries(session.drops);
   function selectCreature(territoryId: string, creatureId: string) {

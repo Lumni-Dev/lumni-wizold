@@ -1,19 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useSyncExternalStore } from "react";
+import { activityRuntimeStore } from "@/controllers/activity-runtime";
 import { useGame } from "@/controllers/game.context";
-import { isGameSound, playSound } from "@/controllers/sound";
 import { petTrainingView } from "@/controllers/pet.controller";
 import { listAttributeProgress, listExercises } from "@/controllers/training.controller";
 import { usePageActivity } from "@/controllers/use-page-activity";
-import {
-  CYCLE_OPTOUT_SECS,
-  MAX_ATTRIBUTE_VALUE,
-  PET_EXERCISE_ID,
-  PET_MAX_LEVEL,
-  TRAINING_TICK_MS,
-  TRAINING_TICKS,
-} from "@/shared/constants/game";
+import { MAX_ATTRIBUTE_VALUE, PET_EXERCISE_ID, PET_MAX_LEVEL, TRAINING_TICKS } from "@/shared/constants/game";
 import { formatNumber, formatBronze } from "@/shared/utils/format";
 import { Bar } from "../components/bar";
 import { BodyGate } from "../components/body-gate";
@@ -26,119 +19,28 @@ import { Panel } from "../components/panel";
 import { PageHeader } from "../layout/page-header";
 
 export function TrainingScreen() {
-  const { state, character, stats, train, notify, activity, setActivity } = useGame();
+  const { state, character, stats, activity, setActivity } = useGame();
   usePageActivity(["train"]);
+  const runtime = useSyncExternalStore(
+    activityRuntimeStore.subscribe,
+    activityRuntimeStore.snapshot,
+    activityRuntimeStore.serverSnapshot,
+  );
+  const trainRt = runtime.train;
   const paused = activity?.paused === true;
   const activeExercise = activity?.kind === "train" && !paused ? (activity.id ?? null) : null;
   const waitingExercise = activity?.kind === "train" && paused ? (activity.id ?? null) : null;
+  const session =
+    trainRt && activeExercise === trainRt.id
+      ? { id: trainRt.id, beat: trainRt.beat }
+      : { id: activeExercise ?? "", beat: 0 };
+  const cooldown = trainRt && activeExercise === trainRt.id ? trainRt.cooldown : null;
 
   const exercises = useMemo(() => listExercises(state), [state]);
   const progress = useMemo(() => listAttributeProgress(state), [state]);
   const petTraining = useMemo(() => petTrainingView(state), [state]);
   const petActive = activeExercise === PET_EXERCISE_ID;
   const petReady = petTraining !== null && !petTraining.maxed && petTraining.affordable;
-
-  const [session, setSession] = useState<{ id: string; beat: number }>({ id: "", beat: 0 });
-  const [cooldown, setCooldown] = useState<number | null>(null);
-  const beatRef = useRef(0);
-
-  const autoRef = useRef(state.automation.train);
-  const trainRef = useRef(train);
-  const notifyRef = useRef(notify);
-  const resumableRef = useRef(false);
-  useEffect(() => {
-    autoRef.current = state.automation.train;
-    trainRef.current = train;
-    notifyRef.current = notify;
-    if (activeExercise === PET_EXERCISE_ID) {
-      if (petTraining) resumableRef.current = !petTraining.maxed;
-    } else if (activeExercise) {
-      const entry = exercises.find((candidate) => candidate.exercise.id === activeExercise);
-      if (entry) resumableRef.current = !entry.maxed;
-    }
-  });
-
-  const petGone = petTraining === null;
-  useEffect(() => {
-    if (activeExercise === PET_EXERCISE_ID && petGone) setActivity(null);
-  }, [activeExercise, petGone, setActivity]);
-
-  useEffect(() => {
-    if (!activeExercise) return;
-    if (activeExercise === PET_EXERCISE_ID && petGone) return;
-    let alive = true;
-    let barTimer = 0;
-    let coolTimer = 0;
-    beatRef.current = 0;
-    /* eslint-disable react-hooks/set-state-in-effect */
-    setSession({ id: activeExercise, beat: 0 });
-    setCooldown(null);
-    /* eslint-enable react-hooks/set-state-in-effect */
-
-    const startBar = () => {
-      beatRef.current = 0;
-      setSession({ id: activeExercise, beat: 0 });
-      barTimer = window.setInterval(() => {
-        beatRef.current += 1;
-        setSession({ id: activeExercise, beat: beatRef.current });
-        if (beatRef.current < TRAINING_TICKS) {
-          const effort = activeExercise === PET_EXERCISE_ID ? "growl" : activeExercise;
-          if (isGameSound(effort)) playSound(effort);
-          return;
-        }
-        window.clearInterval(barTimer);
-        barTimer = 0;
-        void trainRef.current(activeExercise).then((landed) => {
-          if (!alive) return;
-          if (landed) {
-            if (landed.message) notifyRef.current(landed.message, true, "Treino");
-            if (landed.raised) {
-              playSound(activeExercise === PET_EXERCISE_ID ? "pet-up" : "point");
-            }
-          }
-          beatRef.current = 0;
-          setSession({ id: activeExercise, beat: 0 });
-          if (!landed) {
-            setActivity(
-              autoRef.current && resumableRef.current
-                ? { kind: "train", id: activeExercise, paused: true }
-                : null,
-            );
-            return;
-          }
-          if (!autoRef.current) {
-            setActivity(null);
-            return;
-          }
-          startCooldown();
-        });
-      }, TRAINING_TICK_MS);
-    };
-
-    const startCooldown = () => {
-      let left = CYCLE_OPTOUT_SECS;
-      setCooldown(left);
-      coolTimer = window.setInterval(() => {
-        left -= 1;
-        if (left <= 0) {
-          window.clearInterval(coolTimer);
-          coolTimer = 0;
-          setCooldown(null);
-          startBar();
-        } else {
-          setCooldown(left);
-        }
-      }, 1000);
-    };
-
-    startBar();
-
-    return () => {
-      alive = false;
-      if (barTimer) window.clearInterval(barTimer);
-      if (coolTimer) window.clearInterval(coolTimer);
-    };
-  }, [activeExercise, petGone, setActivity]);
 
   if (!character || !stats) return null;
 
