@@ -7,17 +7,21 @@ import { listForge, listMining } from "@/controllers/forge.controller";
 import { usePageActivity } from "@/controllers/use-page-activity";
 import type { Activity } from "@/models/entities/activity";
 import {
-  EQUIPMENT_SET_KEYS,
-  EQUIPMENT_SLOTS,
-  SET_LABEL,
-  SLOT_LABEL,
   type EquipmentSet,
   type ItemCategory,
 } from "@/models/entities/item";
+import {
+  matchesCategoryAndSet,
+  setFilterOptions,
+  slotCategoryFilterOptions,
+  type CategoryFilter,
+  type SetFilter,
+} from "../presenters/item-filter.presenter";
 import { enhancedName } from "@/models/rules/forge";
 import { FORGE_TICKS, MAX_ENHANCEMENT, MINING_RESET_HOUR, MINING_TICKS } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
 import { FilterRow, FilterSelect } from "../components/filter-select";
+import { FilteredEmptyState } from "../components/filtered-empty-state";
 import { formatBronze, formatNumber } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf, pageOfPosition } from "@/shared/utils/pagination";
 import { Bar } from "../components/bar";
@@ -48,19 +52,6 @@ function pieceKey(itemId: string, level: number): string {
 }
 
 const FORGE_PAGE_SIZE = 9;
-
-type CategoryFilter = ItemCategory | "all";
-type SetFilter = EquipmentSet | "all";
-
-const FORGE_CATEGORY_FILTERS: readonly { key: CategoryFilter; label: string }[] = [
-  { key: "all", label: "Tudo" },
-  ...EQUIPMENT_SLOTS.map((slot) => ({ key: slot, label: SLOT_LABEL[slot] })),
-];
-
-const FORGE_SET_FILTERS: readonly { key: SetFilter; label: string }[] = [
-  { key: "all", label: "Todos" },
-  ...EQUIPMENT_SET_KEYS.map((key) => ({ key, label: SET_LABEL[key] })),
-];
 
 export function ForgeScreen() {
   const { state, character, activity, setActivity } = useGame();
@@ -118,11 +109,7 @@ export function ForgeScreen() {
   const forgeShake = useShake(strike.beat);
 
   const filteredSlots = useMemo(
-    () =>
-      slots.filter((row) => {
-        if (category !== "all" && row.item.category !== category) return false;
-        return set === "all" || row.item.set === set;
-      }),
+    () => slots.filter((row) => matchesCategoryAndSet(row.item, category, set)),
     [slots, category, set],
   );
 
@@ -342,7 +329,7 @@ export function ForgeScreen() {
               <FilterSelect
                 label="Forja"
                 value={category}
-                options={FORGE_CATEGORY_FILTERS}
+                options={slotCategoryFilterOptions()}
                 onChange={pickCategory}
               />
             </FilterRow>
@@ -447,7 +434,7 @@ export function ForgeScreen() {
             <FilterSelect
               label="Disponíveis"
               value={set}
-              options={FORGE_SET_FILTERS}
+              options={setFilterOptions()}
               onChange={pickSet}
             />
           </FilterRow>
@@ -458,10 +445,7 @@ export function ForgeScreen() {
               description="Desequipe uma peça para forjá-la."
             />
           ) : filteredSlots.length === 0 ? (
-            <EmptyState
-              title="Nada neste filtro"
-              description="Nenhuma peça do inventário combina com a categoria escolhida."
-            />
+            <FilteredEmptyState description="Nenhuma peça do inventário combina com a categoria escolhida." />
           ) : (
             <>
               <div className="grid auto-rows-fr gap-6 sm:grid-cols-2 xl:grid-cols-3">

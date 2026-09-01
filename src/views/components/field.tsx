@@ -4,14 +4,12 @@ import { cn } from "@/shared/utils/class-names";
 interface FieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   hint?: string;
-  compact?: boolean;
   numeric?: boolean;
 }
 
 export function Field({
   label,
   hint,
-  compact = false,
   numeric = false,
   className,
   onChange,
@@ -26,9 +24,8 @@ export function Field({
       ) : null}
       <input
         className={cn(
-          "w-full rounded-md border border-edge bg-base text-ink transition-colors",
+          "h-8 w-full rounded-md border border-edge bg-surface px-3 text-xs text-ink transition-colors",
           "placeholder:text-ink-faint focus:border-edge-strong focus:outline-none",
-          compact ? "h-8 px-3 text-xs" : "h-10 px-4 text-sm",
           className,
         )}
         {...rest}

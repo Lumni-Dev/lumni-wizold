@@ -616,7 +616,6 @@ export function TavernScreen() {
 
                     {locked && !isMember ? (
                       <Field
-                        compact
                         type="password"
                         maxLength={60}
                         aria-label={"Senha da mesa " + room.name}

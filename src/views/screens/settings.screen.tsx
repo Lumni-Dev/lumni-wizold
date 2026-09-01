@@ -507,7 +507,6 @@ export function SettingsScreen() {
             </p>
           ) : (
             <Field
-              compact
               numeric
               label="Código de 4 dígitos"
               hint="Chegou no e-mail da conta e vale por 10 minutos."

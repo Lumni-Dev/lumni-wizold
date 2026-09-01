@@ -17,8 +17,7 @@ import { ARENA_DAILY_ATTACKS, arenaSpoilsRange, arenaStats } from "@/models/rule
 import type { DerivedStats } from "@/models/rules/stats";
 import { canPetFight, isPetActive, petLevelOf, petMaxEnergy } from "@/models/rules/pet";
 import { playSound } from "@/controllers/sound";
-import { HUNT_TICK_MS, NAME_MAX_LENGTH } from "@/shared/constants/game";
-import { sanitizeName } from "@/shared/utils/text";
+import { HUNT_TICK_MS } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
 import { formatDay, formatNumber, formatBronze } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
@@ -29,7 +28,7 @@ import { BodyGate } from "../components/body-gate";
 import { Button } from "../components/button";
 import { DataRow } from "../components/data-row";
 import { EmptyState } from "../components/empty-state";
-import { Field } from "../components/field";
+import { HunterSearchField } from "../components/hunter-search-field";
 import { GenderIcon } from "../components/gender-icon";
 import { List, ListRow, RowText } from "../components/list";
 import { Pagination } from "../components/pagination";
@@ -340,15 +339,10 @@ export function ArenaScreen() {
           </div>
         }
       >
-        <Field
-          compact
-          aria-label="Buscar caçador pelo nome"
-          placeholder="Buscar caçador pelo nome"
+        <HunterSearchField
           value={search}
-          maxLength={NAME_MAX_LENGTH}
-          autoComplete="off"
-          onChange={(event) => {
-            setSearch(sanitizeName(event.target.value, NAME_MAX_LENGTH));
+          onChange={(term) => {
+            setSearch(term);
             setPage(1);
           }}
         />

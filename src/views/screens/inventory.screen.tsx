@@ -6,13 +6,12 @@ import { useGame } from "@/controllers/game.context";
 import { detailInventory } from "@/controllers/inventory.controller";
 import { findItem } from "@/models/data/items";
 import {
-  CATEGORY_PLURAL,
   EQUIPMENT_SLOTS,
-  ITEM_CATEGORIES,
   isEquippable,
   SLOT_LABEL,
   type ItemCategory,
 } from "@/models/entities/item";
+import { inventoryCategoryFilterOptions, type CategoryFilter } from "../presenters/item-filter.presenter";
 import { isForgeMaterial } from "@/models/rules/bazaar";
 import { formatNumber } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
@@ -23,6 +22,7 @@ import { FilterRow, FilterSelect } from "../components/filter-select";
 import { Pagination } from "../components/pagination";
 import { IconFrame } from "../components/icon-frame";
 import { ItemCard } from "../components/item-card";
+import { FuryUseButton } from "../components/fury-use-button";
 import { ItemIcon } from "../components/item-icon";
 import { Tag } from "../components/tag";
 import { Panel } from "../components/panel";
@@ -31,20 +31,10 @@ import { PageHeader } from "../layout/page-header";
 
 const PAGE_SIZE = 9;
 
-type Filter = ItemCategory | "all";
-
-const FILTERS: readonly { key: Filter; label: string }[] = [
-  { key: "all", label: "Tudo" },
-  ...ITEM_CATEGORIES.map((category) => ({
-    key: category,
-    label: CATEGORY_PLURAL[category],
-  })),
-];
-
 export function InventoryScreen() {
   const router = useRouter();
   const { state, character, equipItem, unequipItem, consumeItem } = useGame();
-  const [filter, setFilter] = useState<Filter>("all");
+  const [filter, setFilter] = useState<CategoryFilter>("all");
   const [page, setPage] = useState(1);
   const [now, setNow] = useState(() => Date.now());
   const [equipLock, setEquipLock] = useState<Record<string, number>>({});
@@ -145,11 +135,9 @@ export function InventoryScreen() {
         <FilterSelect
           label="Categoria"
           value={filter}
-          options={FILTERS}
-          onChange={(value) => {
-            setFilter(value);
-            setPage(1);
-          }}
+          options={inventoryCategoryFilterOptions()}
+          onChange={setFilter}
+          onPageReset={() => setPage(1)}
         />
       </FilterRow>
 
@@ -159,7 +147,10 @@ export function InventoryScreen() {
           description={
             filter === "all"
               ? "Cace criaturas ou compre no mercado para encher a mochila."
-              : "Nenhum item de " + CATEGORY_PLURAL[filter].toLowerCase() + " no momento."
+              : "Nenhum item de " +
+                (inventoryCategoryFilterOptions().find((option) => option.key === filter)?.label ??
+                  "categoria").toLowerCase() +
+                " no momento."
           }
         />
       ) : (
@@ -199,9 +190,13 @@ export function InventoryScreen() {
                         </Button>
                       ) : null}
                       {consumable ? (
-                        <Button variant="primary" onClick={() => consumeItem(item.id)}>
-                          Usar
-                        </Button>
+                        item.potion === "rage" ? (
+                          <FuryUseButton onClick={() => consumeItem(item.id)} />
+                        ) : (
+                          <Button variant="primary" onClick={() => consumeItem(item.id)}>
+                            Usar
+                          </Button>
+                        )
                       ) : null}
                       {sellable ? (
                         <Button

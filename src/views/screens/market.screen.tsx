@@ -5,33 +5,30 @@ import { useGame } from "@/controllers/game.context";
 import { listOffers, listSellables, marketPriceOf, sellPrice } from "@/controllers/market.controller";
 import {
   type Item,
-  CATEGORY_PLURAL,
-  EQUIPMENT_SET_KEYS,
-  ITEM_CATEGORIES,
-  POTION_SIZES,
   EQUIPMENT_SLOTS,
-  SET_LABEL,
-  SIZE_LABEL,
-  type EquipmentSet,
-  type ItemCategory,
-  type PotionSize,
 } from "@/models/entities/item";
-import { EQUIPMENT_SETS } from "@/models/data/equipment-sets";
 import { lineageName } from "@/models/data/items";
 import { formatNumber, formatBronze } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
+import {
+  matchesMarketItemFilter,
+  type CategoryFilter,
+  type SetFilter,
+  type SizeFilter,
+} from "../presenters/item-filter.presenter";
 import { Button } from "../components/button";
-import { Chip } from "../components/chip";
-import { FilterRow, FilterSelect } from "../components/filter-select";
+import { ChipTabs } from "../components/chip-tabs";
+import { ItemFilterRow } from "../components/item-filter-row";
 import { Pagination } from "../components/pagination";
 import { ConfirmDialog } from "../components/confirm-dialog";
-import { Field } from "../components/field";
+import { QuantityField } from "../components/quantity-field";
 import { enhancedName } from "@/models/rules/forge";
 import { ItemCard } from "../components/item-card";
 import { List, ListRow } from "../components/list";
 import { ItemIcon } from "../components/item-icon";
 import { Panel } from "../components/panel";
 import { EmptyState } from "../components/empty-state";
+import { FilteredEmptyState } from "../components/filtered-empty-state";
 import { PageHeader } from "../layout/page-header";
 
 function clampAmount(value: number, maximum: number): number {
@@ -49,81 +46,11 @@ interface PendingDeal {
 const PAGE_SIZE = 9;
 
 type Tab = "buy" | "sell";
-type CategoryFilter = ItemCategory | "all";
-type SetFilter = EquipmentSet | "all";
-type SizeFilter = PotionSize | "all";
 
 const TABS: readonly { key: Tab; label: string }[] = [
   { key: "buy", label: "Comprar" },
   { key: "sell", label: "Vender" },
 ];
-
-const CATEGORY_FILTERS: readonly { key: CategoryFilter; label: string }[] = [
-  { key: "all", label: "Tudo" },
-  ...ITEM_CATEGORIES.filter((category) => category !== "material").map((category) => ({
-    key: category,
-    label: CATEGORY_PLURAL[category],
-  })),
-];
-
-const SET_FILTERS: readonly { key: SetFilter; label: string }[] = [
-  { key: "all", label: "Todos" },
-  ...EQUIPMENT_SET_KEYS.filter((key) =>
-    EQUIPMENT_SETS.some((definition) => definition.key === key && definition.inMarket),
-  ).map((key) => ({ key, label: SET_LABEL[key] })),
-];
-
-const SIZE_FILTERS: readonly { key: SizeFilter; label: string }[] = [
-  { key: "all", label: "Todas" },
-  ...POTION_SIZES.map((key) => ({ key, label: SIZE_LABEL[key] })),
-];
-
-function matchesItemFilter(
-  item: Item,
-  category: CategoryFilter,
-  set: SetFilter,
-  size: SizeFilter,
-): boolean {
-  if (category !== "all" && item.category !== category) return false;
-  if (item.category === "pet") return true;
-  if (item.category === "potion") return size === "all" || item.size === size;
-  return set === "all" || item.set === set;
-}
-
-function MarketFilters({
-  category,
-  setCategory,
-  set,
-  setSet,
-  size,
-  setSize,
-}: {
-  category: CategoryFilter;
-  setCategory: (value: CategoryFilter) => void;
-  set: SetFilter;
-  setSet: (value: SetFilter) => void;
-  size: SizeFilter;
-  setSize: (value: SizeFilter) => void;
-}) {
-  const isPotion = category === "potion";
-  const isPet = category === "pet";
-
-  return (
-    <FilterRow>
-      <FilterSelect
-        label="Categoria"
-        value={category}
-        options={CATEGORY_FILTERS}
-        onChange={setCategory}
-      />
-      {isPet ? null : isPotion ? (
-        <FilterSelect label="Tamanho" value={size} options={SIZE_FILTERS} onChange={setSize} />
-      ) : (
-        <FilterSelect label="Conjunto" value={set} options={SET_FILTERS} onChange={setSet} />
-      )}
-    </FilterRow>
-  );
-}
 
 export function MarketScreen() {
   const { state, character, buyItem, sellItem } = useGame();
@@ -153,10 +80,10 @@ export function MarketScreen() {
   }, [sellables]);
 
   const visibleOffers = offers.filter((offer) =>
-    matchesItemFilter(offer.item, category, set, size),
+    matchesMarketItemFilter(offer.item, category, set, size),
   );
   const visibleSellables = sellables.filter(({ item }) =>
-    matchesItemFilter(item, category, set, size),
+    matchesMarketItemFilter(item, category, set, size),
   );
 
   const list = tab === "buy" ? visibleOffers : visibleSellables;
@@ -217,30 +144,24 @@ export function MarketScreen() {
         description="O ferreiro do vilarejo não pergunta de onde vem o material. Só contam as WCoins."
       />
 
-      <div className="flex gap-2">
-        {TABS.map((option) => (
-          <Chip
-            key={option.key}
-            active={tab === option.key}
-            onClick={() => {
-              setTab(option.key);
-              setPage(1);
-            }}
-          >
-            {option.label}
-          </Chip>
-        ))}
-      </div>
+      <ChipTabs
+        tabs={TABS}
+        value={tab}
+        onChange={(next) => {
+          setTab(next);
+          setPage(1);
+        }}
+      />
 
       {tab === "buy" ? (
         <>
-          <MarketFilters
+          <ItemFilterRow
             category={category}
-            setCategory={pickCategory}
             set={set}
-            setSet={pickSet}
             size={size}
-            setSize={pickSize}
+            onCategoryChange={pickCategory}
+            onSetChange={pickSet}
+            onSizeChange={pickSize}
           />
 
           <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
@@ -295,20 +216,17 @@ export function MarketScreen() {
         />
       ) : (
         <>
-          <MarketFilters
+          <ItemFilterRow
             category={category}
-            setCategory={pickCategory}
             set={set}
-            setSet={pickSet}
             size={size}
-            setSize={pickSize}
+            onCategoryChange={pickCategory}
+            onSetChange={pickSet}
+            onSizeChange={pickSize}
           />
 
           {visibleSellables.length === 0 ? (
-            <EmptyState
-              title="Nada neste filtro"
-              description="Nenhum item do inventário combina com a categoria escolhida."
-            />
+            <FilteredEmptyState description="Nenhum item do inventário combina com a categoria escolhida." />
           ) : (
             <Panel
               title="Sua oferta"
@@ -371,32 +289,24 @@ export function MarketScreen() {
         {...(deal?.kind === "buy" && !dealWearable
           ? {
               children: (
-                <Field
-                  compact
-                  numeric
-                  label="Quantidade"
+                <QuantityField
+                  className="w-full"
                   hint={"Você consegue pagar por " + formatNumber(affordableAmount) + "."}
                   aria-label={"Quantidade de " + deal.item.name + " para comprar"}
-                  maxLength={10}
-                  className="w-full font-mono"
                   value={buying}
-                  onChange={(event) => setBuying(event.target.value)}
+                  onChange={setBuying}
                 />
               ),
             }
           : deal?.kind === "sell" && sellOwned > 1
             ? {
                 children: (
-                  <Field
-                    compact
-                    numeric
-                    label="Quantidade"
+                  <QuantityField
+                    className="w-full"
                     hint={"Você tem " + formatNumber(sellOwned) + "."}
                     aria-label={"Quantidade de " + deal.item.name + " para vender"}
-                    maxLength={10}
-                    className="w-full font-mono"
                     value={selling}
-                    onChange={(event) => setSelling(event.target.value)}
+                    onChange={setSelling}
                   />
                 ),
               }

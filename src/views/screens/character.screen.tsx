@@ -20,6 +20,7 @@ import { EmptyState } from "../components/empty-state";
 import { GenderBanner } from "../components/gender-icon";
 import { ItemIcon } from "../components/item-icon";
 import { VitalActionButton } from "../components/vital-action-button";
+import { FuryUseButton } from "../components/fury-use-button";
 import { List, ListRow, RowText } from "../components/list";
 import { Panel } from "../components/panel";
 import { AttributesPanel } from "../components/attributes-panel";
@@ -27,20 +28,9 @@ import { EquipmentPanel } from "../components/equipment-panel";
 import { ActivityLog } from "../components/activity-log";
 import { PageHeader } from "../layout/page-header";
 
-function furyClock(ms: number): string {
-  const total = Math.max(0, Math.ceil(ms / 1000));
-  return Math.floor(total / 60) + ":" + String(total % 60).padStart(2, "0");
-}
-
 export function CharacterScreen() {
   const { state, character, stats, consumeItem } = useGame();
   const [roster, setRoster] = useState<Hunter[] | null>(null);
-  const [now, setNow] = useState(() => Date.now());
-
-  useEffect(() => {
-    const timer = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(timer);
-  }, []);
 
   useEffect(() => {
     let alive = true;
@@ -73,9 +63,6 @@ export function CharacterScreen() {
 
   const genderDefinition = findGender(character.gender);
   const healthFull = character.health >= stats.maxHealth;
-
-  const furyRemaining = character.furyUntil ? Date.parse(character.furyUntil) - now : 0;
-  const furyActive = furyRemaining > 0;
 
   const forge = EQUIPMENT_SLOTS.reduce(
     (total, slot) => total + (state.equipment[slot]?.enhancement ?? 0),
@@ -220,7 +207,7 @@ export function CharacterScreen() {
           </Panel>
 
           <Panel
-            title={furyActive ? "Fúria (Em fúria " + furyClock(furyRemaining) + ")" : "Fúria"}
+            title="Fúria"
             description="A poção de fúria dá +10 em cada atributo enquanto dura, e não devolve vida."
             padding="none"
           >
@@ -250,9 +237,7 @@ export function CharacterScreen() {
                       <span className="font-mono text-xs text-ink-soft">
                         x{formatNumber(quantity)}
                       </span>
-                      <Button variant="primary" disabled={furyActive} onClick={() => consumeItem(item.id)}>
-                        Usar
-                      </Button>
+                      <FuryUseButton onClick={() => consumeItem(item.id)} />
                     </span>
                   </ListRow>
                 ))}

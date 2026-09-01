@@ -88,7 +88,6 @@ export function PaymentModal({
         </div>
 
         <Field
-          compact
           label="Nome completo"
           placeholder="Como está no documento"
           maxLength={80}
@@ -97,7 +96,6 @@ export function PaymentModal({
           onChange={(event) => setPayer({ ...payer, name: event.target.value })}
         />
         <Field
-          compact
           label="CPF"
           placeholder="000.000.000-00"
           inputMode="numeric"
@@ -108,7 +106,6 @@ export function PaymentModal({
         />
         {needsPix ? (
           <Field
-            compact
             label="Chave Pix"
             placeholder="e-mail, CPF ou chave aleatória"
             maxLength={77}

@@ -6,15 +6,17 @@ import { api } from "@/controllers/api.client";
 import { useGame } from "@/controllers/game.context";
 import { listRanking } from "@/controllers/ranking.controller";
 import type { Gender } from "@/models/entities/character";
-import { RANKING_BOARDS, type Hunter, type RankingKey } from "@/models/entities/ranking";
-import { NAME_MAX_LENGTH } from "@/shared/constants/game";
-import { cn } from "@/shared/utils/class-names";
+import { type Hunter, type RankingKey } from "@/models/entities/ranking";
+import {
+  genderFilterOptions,
+  rankingBoardFilterOptions,
+} from "../presenters/item-filter.presenter";
 import { formatNumber } from "@/shared/utils/format";
-import { sanitizeName } from "@/shared/utils/text";
+import { cn } from "@/shared/utils/class-names";
 import { Chip } from "../components/chip";
 import { FilterRow, FilterSelect } from "../components/filter-select";
+import { HunterSearchField } from "../components/hunter-search-field";
 import { CopyNick } from "../components/copy-nick";
-import { Field } from "../components/field";
 import { List, ListRow } from "../components/list";
 import { EmptyState } from "../components/empty-state";
 import { Pagination } from "../components/pagination";
@@ -53,7 +55,7 @@ export function RankingScreen() {
   };
 
   const find = (term: string) => {
-    setSearch(sanitizeName(term, NAME_MAX_LENGTH));
+    setSearch(term);
     setPage(1);
   };
 
@@ -81,30 +83,18 @@ export function RankingScreen() {
         <FilterSelect
           label="Quadro"
           value={view.board.key}
-          options={RANKING_BOARDS.map((board) => ({ key: board.key, label: board.label }))}
+          options={rankingBoardFilterOptions()}
           onChange={openBoard}
         />
         <FilterSelect
           label="Personagem"
           value={gender}
-          options={[
-            { key: "all", label: "Todos" },
-            { key: "male", label: "Lumni" },
-            { key: "female", label: "Luna" },
-          ]}
+          options={genderFilterOptions()}
           onChange={cutGender}
         />
       </FilterRow>
 
-      <Field
-        compact
-        aria-label="Buscar caçador pelo nome"
-        placeholder="Buscar caçador pelo nome"
-        value={search}
-        maxLength={NAME_MAX_LENGTH}
-        autoComplete="off"
-        onChange={(event) => find(event.target.value)}
-      />
+      <HunterSearchField value={search} onChange={find} />
 
       <Panel
         title={view.board.label}

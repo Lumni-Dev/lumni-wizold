@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { activityRuntimeStore } from "@/controllers/activity-runtime";
 import { listForge, listMining } from "@/controllers/forge.controller";
 import { listTerritories } from "@/controllers/hunt.controller";
@@ -23,6 +23,7 @@ import { Bar } from "./bar";
 import { Button } from "./button";
 import { CornerAccents } from "./corner-accents";
 import { emphasizeDamage } from "../presenters/hunt.presenter";
+import { useShake } from "./use-shake";
 
 export function ActivityDock() {
   const pathname = usePathname();
@@ -199,6 +200,19 @@ export function ActivityDock() {
   }, [activity, character, stats]);
 
   const dockVisible = Boolean(activity && dock && pathname !== dock.href);
+  const [jolt, setJolt] = useState(0);
+  const shaking = useShake(jolt);
+
+  useEffect(() => {
+    const huntRt = runtime.hunt;
+    if (!huntRt || activity?.kind !== "hunt" || activity.paused || huntRt.beat <= 0) return;
+    const line = huntRt.script[Math.min(huntRt.beat, huntRt.script.length) - 1];
+    if (line?.critical) {
+      /* eslint-disable react-hooks/set-state-in-effect */
+      setJolt((count) => count + 1);
+      /* eslint-enable react-hooks/set-state-in-effect */
+    }
+  }, [activity, runtime.hunt]);
 
   useEffect(() => {
     if (!dockVisible || !dock) return undefined;
@@ -220,7 +234,12 @@ export function ActivityDock() {
 
   return (
     <aside aria-label="Atividade em andamento" className="pointer-events-auto relative w-full">
-      <div className="overflow-hidden rounded-lg border border-edge bg-surface/80 backdrop-blur shadow-[0_12px_32px_-12px_rgba(0,0,0,0.95)]">
+      <div
+        className={cn(
+          "overflow-hidden rounded-lg border border-edge bg-surface/80 backdrop-blur shadow-[0_12px_32px_-12px_rgba(0,0,0,0.95)]",
+          shaking && "card-shake",
+        )}
+      >
         <div className="flex items-center gap-2 border-b border-edge bg-surface-high/40 px-3 py-2">
           <NavIcon href={dock.href} className="shrink-0 text-ink-faint" />
           <Link

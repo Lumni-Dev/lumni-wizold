@@ -13,15 +13,7 @@ import {
   MIN_WITHDRAW_CENTS,
   sellerNet,
 } from "@/models/rules/bazaar";
-import {
-  EQUIPMENT_SET_KEYS,
-  EQUIPMENT_SLOTS,
-  SET_LABEL,
-  SLOT_LABEL,
-  CATEGORY_PLURAL,
-  type EquipmentSet,
-  type ItemCategory,
-} from "@/models/entities/item";
+import { type EquipmentSet, type ItemCategory } from "@/models/entities/item";
 import { listingExpiresAt, type BazaarListing } from "@/models/entities/bazaar";
 import { enhancedName } from "@/models/rules/forge";
 import {
@@ -31,11 +23,20 @@ import {
   parseReais,
 } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
+import {
+  matchesCategoryAndSet,
+  setFilterOptions,
+  slotCategoryFilterOptions,
+  type CategoryFilter,
+  type SetFilter,
+} from "../presenters/item-filter.presenter";
 import { Button } from "../components/button";
 import { FilterRow, FilterSelect } from "../components/filter-select";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { EmptyState } from "../components/empty-state";
+import { FilteredEmptyState } from "../components/filtered-empty-state";
 import { Field } from "../components/field";
+import { QuantityField } from "../components/quantity-field";
 import { ItemIcon } from "../components/item-icon";
 import { List, ListRow, RowText } from "../components/list";
 import { Modal } from "../components/modal";
@@ -46,20 +47,6 @@ import { Tag } from "../components/tag";
 import { PageHeader } from "../layout/page-header";
 
 const PAGE_SIZE = 9;
-
-type CategoryFilter = ItemCategory | "all";
-type SetFilter = EquipmentSet | "all";
-
-const BAZAAR_CATEGORY_FILTERS: readonly { key: CategoryFilter; label: string }[] = [
-  { key: "all", label: "Tudo" },
-  { key: "material", label: CATEGORY_PLURAL.material },
-  ...EQUIPMENT_SLOTS.map((slot) => ({ key: slot, label: SLOT_LABEL[slot] })),
-];
-
-const BAZAAR_SET_FILTERS: readonly { key: SetFilter; label: string }[] = [
-  { key: "all", label: "Todos" },
-  ...EQUIPMENT_SET_KEYS.map((key) => ({ key, label: SET_LABEL[key] })),
-];
 
 function formatRemaining(ms: number): string {
   const total = Math.floor(ms / 1000);
@@ -134,10 +121,7 @@ export function BazaarScreen() {
 
   const filteredBoard = useMemo(
     () =>
-      board.filter((entry) => {
-        if (category !== "all" && entry.item.category !== category) return false;
-        return set === "all" || entry.item.set === set;
-      }),
+      board.filter((entry) => matchesCategoryAndSet(entry.item, category, set)),
     [board, category, set],
   );
 
@@ -232,28 +216,21 @@ export function BazaarScreen() {
             <FilterSelect
               label="Categoria"
               value={category}
-              options={BAZAAR_CATEGORY_FILTERS}
-              onChange={(value) => {
-                setCategory(value);
-                setPage(1);
-              }}
+              options={slotCategoryFilterOptions({ includeMaterial: true })}
+              onChange={setCategory}
+              onPageReset={() => setPage(1)}
             />
             <FilterSelect
               label="Conjunto"
               value={set}
-              options={BAZAAR_SET_FILTERS}
-              onChange={(value) => {
-                setSet(value);
-                setPage(1);
-              }}
+              options={setFilterOptions()}
+              onChange={setSet}
+              onPageReset={() => setPage(1)}
             />
           </FilterRow>
 
           {filteredBoard.length === 0 ? (
-            <EmptyState
-              title="Nada neste filtro"
-              description="Nenhum anúncio combina com a categoria escolhida."
-            />
+            <FilteredEmptyState description="Nenhum anúncio combina com a categoria escolhida." />
           ) : (
             <Panel
               title="Anúncios"
@@ -383,19 +360,13 @@ export function BazaarScreen() {
               </div>
 
               {announcing.quantity > 1 ? (
-                <Field
-                  compact
-                  numeric
-                  label="Quantidade"
-                  maxLength={10}
-                  className="font-mono"
+                <QuantityField
                   value={flow.quantity}
-                  onChange={(event) => setFlow({ ...flow, quantity: event.target.value })}
+                  onChange={(quantity) => setFlow({ ...flow, quantity })}
                 />
               ) : null}
 
               <Field
-                compact
                 label="Preço por unidade"
                 placeholder="R$ 0,00"
                 inputMode="numeric"
@@ -502,15 +473,10 @@ export function BazaarScreen() {
 
             {buying.available > 1 ? (
               <div className="p-4">
-                <Field
-                  compact
-                  numeric
-                  label="Quantidade"
-                  maxLength={10}
+                <QuantityField
                   hint={"Disponíveis: " + formatNumber(buying.available) + "."}
-                  className="font-mono"
                   value={flow.quantity}
-                  onChange={(event) => setFlow({ ...flow, quantity: event.target.value })}
+                  onChange={(quantity) => setFlow({ ...flow, quantity })}
                 />
               </div>
             ) : null}
