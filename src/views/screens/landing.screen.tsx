@@ -16,14 +16,14 @@ import { SpinBorder } from "../components/spin-border";
 import { Footer } from "../layout/footer";
 
 const PLAY_INNER =
-  "inline-flex h-12 w-full items-center justify-center border-0 px-8 text-xs font-medium uppercase tracking-[0.16em] text-ember bg-surface/70 transition-colors hover:bg-surface-high/80";
+  "flex h-12 w-full items-center justify-center px-8 text-xs font-medium uppercase tracking-[0.16em] text-ember bg-surface/70 transition-colors hover:bg-surface-high/80";
 
 function PlayButton({ href, label }: { href: string; label: string }) {
   return (
     <SpinBorder
       as={Link}
       href={href}
-      className="landing-hero-shadow-button inline-block rounded-md transition-[filter] hover:brightness-110"
+      className="landing-hero-shadow-button block w-full max-w-xs rounded-md transition-[filter] hover:brightness-110"
       innerClassName={PLAY_INNER}
     >
       {label}

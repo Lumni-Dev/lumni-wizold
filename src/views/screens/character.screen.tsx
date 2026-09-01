@@ -207,7 +207,7 @@ export function CharacterScreen() {
 
           <Panel
             title="Fúria"
-            description="A poção de fúria dá +10 em cada atributo enquanto dura, e não devolve vida."
+            description="Modo Fúria dá +10 em cada atributo enquanto durar. Na lua cheia o céu liga sozinho; fora dela, beba a poção."
             padding="none"
           >
             {furyPotions.length === 0 ? (

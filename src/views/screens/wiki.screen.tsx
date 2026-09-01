@@ -51,9 +51,6 @@ function itemsOfCategory(category: ItemCategory) {
 const SET_GRID =
   "grid w-full grid-cols-[4.5rem_minmax(0,1fr)_4.5rem] items-center gap-x-3 sm:grid-cols-[4.5rem_minmax(0,1fr)_minmax(0,7rem)_4.5rem]";
 
-const CATALOG_GRID =
-  "grid w-full grid-cols-[4.5rem_minmax(0,1fr)_4.5rem] items-center gap-x-3 sm:grid-cols-[4.5rem_minmax(0,1fr)_minmax(0,7rem)_4.5rem]";
-
 function SetTableHeader() {
   return (
     <div
@@ -89,8 +86,7 @@ export function WikiScreen() {
         ))}
       </nav>
 
-      <div className="space-y-6">
-        <WikiMasonry>
+      <WikiMasonry>
         {WIKI_TOPICS.map((topic) => (
           <WikiMasonryItem key={topic.id} id={topic.id}>
             <Panel title={topic.title} description={topic.summary}>
@@ -102,10 +98,8 @@ export function WikiScreen() {
             </Panel>
           </WikiMasonryItem>
         ))}
-      </WikiMasonry>
 
-      <div className="grid items-start gap-6 lg:grid-cols-2">
-        <div id="attributes" className="scroll-mt-28">
+        <WikiMasonryItem id="attributes">
           <Panel title="Atributos" description="Cinco eixos, todos treináveis." padding="none">
             <List>
               {ATTRIBUTES.map((attribute) => (
@@ -119,9 +113,9 @@ export function WikiScreen() {
               ))}
             </List>
           </Panel>
-        </div>
+        </WikiMasonryItem>
 
-        <div id="slots" className="scroll-mt-28">
+        <WikiMasonryItem id="slots">
           <Panel
             title="Espaços de equipamento"
             description="Um item por espaço, sete no total."
@@ -137,12 +131,10 @@ export function WikiScreen() {
               ))}
             </List>
           </Panel>
-        </div>
-      </div>
+        </WikiMasonryItem>
 
-      <WikiMasonry id="sets" className="scroll-mt-28">
-        {EQUIPMENT_SETS.map((definition) => (
-          <WikiMasonryItem key={definition.key}>
+        {EQUIPMENT_SETS.map((definition, index) => (
+          <WikiMasonryItem key={definition.key} id={index === 0 ? "sets" : undefined}>
             <Panel
               title={"Conjunto " + definition.label}
               description={definition.description}
@@ -159,7 +151,7 @@ export function WikiScreen() {
                 {EQUIPMENT_SLOTS.map((slot) => {
                   const item = findItem(pieceId(definition.key, slot));
                   return (
-                    <ListRow key={slot} padding="text" className="!py-2.5">
+                    <ListRow key={slot} padding="text">
                       <div className={SET_GRID}>
                         <span className="truncate text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                           {SLOT_LABEL[slot]}
@@ -181,10 +173,8 @@ export function WikiScreen() {
             </Panel>
           </WikiMasonryItem>
         ))}
-      </WikiMasonry>
 
-      <div className="grid items-start gap-6 lg:grid-cols-2">
-        <div id="exercises" className="scroll-mt-28">
+        <WikiMasonryItem id="exercises">
           <Panel
             title="Exercícios"
             description="Um por atributo, do primeiro ao último nível."
@@ -217,9 +207,9 @@ export function WikiScreen() {
               </ul>
             </div>
           </Panel>
-        </div>
+        </WikiMasonryItem>
 
-        <div id="territories" className="scroll-mt-28">
+        <WikiMasonryItem id="territories">
           <Panel
             title="Territórios"
             description="Ordem natural de progressão da caça."
@@ -250,16 +240,14 @@ export function WikiScreen() {
               ))}
             </List>
           </Panel>
-        </div>
-      </div>
+        </WikiMasonryItem>
 
-      <WikiMasonry id="bestiary" className="scroll-mt-28">
-        {SPECIES_ORDER.map((species) => {
+        {SPECIES_ORDER.map((species, index) => {
           const members = CREATURES.filter((creature) => creature.species === species);
           const band = members.length > 0 ? members[0].description : "";
 
           return (
-            <WikiMasonryItem key={species}>
+            <WikiMasonryItem key={species} id={index === 0 ? "bestiary" : undefined}>
               <Panel
                 title={SPECIES_LABEL[species]}
                 description={band}
@@ -317,11 +305,9 @@ export function WikiScreen() {
             </WikiMasonryItem>
           );
         })}
-      </WikiMasonry>
 
-      <WikiMasonry id="catalog" className="scroll-mt-28">
-        {ITEM_CATEGORIES.map((category) => (
-          <WikiMasonryItem key={category}>
+        {ITEM_CATEGORIES.map((category, index) => (
+          <WikiMasonryItem key={category} id={index === 0 ? "catalog" : undefined}>
             <Panel
               title={CATEGORY_PLURAL[category]}
               description={itemsOfCategory(category).length + " itens no catálogo."}
@@ -329,19 +315,21 @@ export function WikiScreen() {
             >
               <List>
                 {itemsOfCategory(category).map((item) => (
-                  <ListRow key={item.id} padding="text" className="!py-2.5">
-                    <div className={CATALOG_GRID}>
-                      <ItemIcon item={item} size="small" />
-                      <span className="min-w-0 truncate text-sm text-ink">{item.name}</span>
-                      <span className="hidden min-w-0 truncate text-[11px] text-ink-soft sm:block">
+                  <ListRow key={item.id} padding="art">
+                    <ItemIcon item={item} />
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3">
+                        <p className="truncate text-sm text-ink">{item.name}</p>
+                        <span className="shrink-0 font-mono text-[11px] text-ink-faint">
+                          {item.inMarket ? formatBronze(marketPriceOf(item, level)) : "drop"}
+                        </span>
+                      </div>
+                      <p className="text-[11px] leading-relaxed text-ink-soft">
                         {RARITY_LABEL[item.rarity]}, NV. {item.minLevel}+
                         {summarizeEffect(item).length > 0
                           ? " · " + summarizeEffect(item).join(", ")
                           : ""}
-                      </span>
-                      <span className="truncate text-right font-mono text-[11px] text-ink-faint">
-                        {item.inMarket ? formatBronze(marketPriceOf(item, level)) : "drop"}
-                      </span>
+                      </p>
                     </div>
                   </ListRow>
                 ))}
@@ -349,8 +337,7 @@ export function WikiScreen() {
             </Panel>
           </WikiMasonryItem>
         ))}
-        </WikiMasonry>
-      </div>
+      </WikiMasonry>
     </>
   );
 }

@@ -165,7 +165,7 @@ export function SettingsScreen() {
         description="A conta, o nome que a matilha conhece e a própria partida."
       />
 
-      <div className="grid items-start gap-6 lg:grid-cols-2">
+      <div className="space-y-6">
         <Panel
           title="Conta"
           description="Com quem esta partida está assinada."
@@ -314,24 +314,30 @@ export function SettingsScreen() {
         <Panel
           title="Taverna"
           description="Avisos no desktop das mensagens das suas mesas: nome da mesa, quem falou, quando e o quê, com um botão para responder direto na taverna. Com Web Push ativo, chegam mesmo com o jogo fechado; sem ele, só enquanto uma aba do Wizold está aberta fora da taverna."
+          padding="none"
         >
-          <div className="space-y-3">
-            <div className="flex gap-2">
-              <Chip active={pushOn} onClick={() => void choosePush(true)} disabled={!tavernPushSupported()}>
-                Ativado
-              </Chip>
-              <Chip active={!pushOn} onClick={() => void choosePush(false)}>
-                Desativado
-              </Chip>
-            </div>
+          <List>
+            <ListRow layout="split">
+              <RowText title="Estado" description="Avisos de mesa neste aparelho." />
+              <div className="flex shrink-0 gap-2">
+                <Chip active={pushOn} onClick={() => void choosePush(true)} disabled={!tavernPushSupported()}>
+                  Ativado
+                </Chip>
+                <Chip active={!pushOn} onClick={() => void choosePush(false)}>
+                  Desativado
+                </Chip>
+              </div>
+            </ListRow>
             {!webPushConfigured() ? (
-              <p className="text-[11px] leading-relaxed text-ink-faint">
-                Web Push ainda não está configurado neste ambiente; avisos locais continuam
-                funcionando com o jogo aberto.
-              </p>
+              <ListRow layout="column">
+                <p className="text-[11px] leading-relaxed text-ink-faint">
+                  Web Push ainda não está configurado neste ambiente; avisos locais continuam
+                  funcionando com o jogo aberto.
+                </p>
+              </ListRow>
             ) : null}
             {pushOn ? (
-              <div className="space-y-2">
+              <ListRow layout="column">
                 <Button variant="secondary" onClick={testTavernPush}>
                   Testar notificação
                 </Button>
@@ -339,13 +345,12 @@ export function SettingsScreen() {
                   Não apareceu? O navegador ou o Windows pode estar silenciando: confira o Foco
                   assistido e as notificações do Chrome nas configurações do sistema.
                 </p>
-              </div>
+              </ListRow>
             ) : null}
-          </div>
+          </List>
         </Panel>
 
         <Panel
-          className="lg:col-span-2"
           title="Automação"
           description="O que a partida faz sozinha. Cada chave faz uma coisa só, e elas se ajudam: a caçada bebe, a poção acaba, o corpo descansa, a caçada volta. É um recurso VIP."
           action={

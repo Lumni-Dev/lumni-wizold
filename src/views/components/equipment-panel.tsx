@@ -18,9 +18,9 @@ export function EquipmentPanel({ gear, forge }: { gear: GearSlot[]; forge: numbe
         "Os sete espaços, do elmo ao anel, somando +" + formatNumber(forge) + " de forja."
       }
     >
-      <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-2">
         {gear.map(({ slot, item, level }) => (
-          <div key={slot} className="flex items-center gap-3 rounded-md border border-edge p-3">
+          <div key={slot} className="flex items-center gap-3 rounded-md border border-edge px-4 py-3">
             {item ? <ItemIcon item={item} enhancement={level} /> : <IconFrame>--</IconFrame>}
             <div className="min-w-0">
               <p className="truncate text-sm text-ink">{item ? item.name : "Nada equipado"}</p>

@@ -276,7 +276,7 @@ export function ForgeScreen() {
               {mining.ores.map(({ ore, fragment, owned, unlocked, reason }) => {
                 const isSelected = ore.id === effectiveOre;
                 return (
-                  <ListRow key={ore.id}>
+                  <ListRow key={ore.id} padding="art">
                     <button
                       type="button"
                       onClick={() => unlocked && setSelectedOre(ore.id)}
@@ -466,7 +466,7 @@ export function ForgeScreen() {
                       const key = pieceKey(row.item.id, row.level);
                       const isSelected = key === effectiveForge;
                       return (
-                        <ListRow key={key}>
+                        <ListRow key={key} padding="art">
                           <button
                             type="button"
                             onClick={() => selectForge(key)}

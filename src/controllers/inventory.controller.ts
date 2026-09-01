@@ -8,6 +8,7 @@ import {
   type InventorySlot,
 } from "@/models/entities/item";
 import { failure, success, type Result } from "@/models/entities/result";
+import { isFullMoon } from "@/models/rules/moon";
 import { deriveStats } from "@/models/rules/stats";
 import { syncCharacter, updateCharacter } from "./character.controller";
 import { enhancedName } from "@/models/rules/forge";
@@ -188,6 +189,9 @@ export function consumeItem(state: GameState, itemId: string): Result {
 
   const furyMinutes = item.effect.furyMinutes ?? 0;
   if (furyMinutes > 0) {
+    if (isFullMoon()) {
+      return failure(state, "A lua cheia já mantém você em fúria.");
+    }
     if (character.furyUntil && Date.now() < Date.parse(character.furyUntil)) {
       return failure(state, "Você já está em fúria: espere ela passar para beber de novo.");
     }

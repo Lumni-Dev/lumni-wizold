@@ -46,7 +46,7 @@ export const AUTOMATIONS: readonly { key: AutomationKey; label: string; effect: 
     key: "transform",
     label: "Fúria automática",
     effect:
-      "Bebe poção de fúria da mochila quando houver, antes de uma caçada ou duelo difícil. Desligado, você bebe na mão.",
+      "Bebe poção de fúria da mochila quando houver, antes de uma caçada ou duelo difícil; na lua cheia o céu já mantém o Modo Fúria. Desligado, você bebe na mão.",
   },
   {
     key: "potion",

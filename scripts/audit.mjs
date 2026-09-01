@@ -203,9 +203,11 @@ sec("stats");
   );
   for (const key of Object.keys(attrs)) {
     ok(
-      "lua cheia soma " + moon.FULL_MOON_ATTRIBUTE_BONUS + " em " + key,
-      underFull.totalAttributes[key] ===
-        underNew.totalAttributes[key] + moon.FULL_MOON_ATTRIBUTE_BONUS,
+      "lua cheia ativa fúria em " + key,
+      underFull.sources.fury[key] === CONST.FURY_ATTRIBUTE_BONUS &&
+        underFull.sources.moon[key] === 0 &&
+        underFull.totalAttributes[key] ===
+          underNew.totalAttributes[key] + CONST.FURY_ATTRIBUTE_BONUS,
     );
   }
   const state = baseState({ level: 1 });
@@ -1405,10 +1407,10 @@ sec("lua");
   ok("idade negativa não quebra", Number.isFinite(moon.computeMoonLocally(0).age));
   setMoon("full");
   ok("cheia não paga experiência", moon.withMoonBonus(100) === 100);
-  ok("cheia paga corpo", moon.moonAttributeBonus() === moon.FULL_MOON_ATTRIBUTE_BONUS);
+  ok("lua cheia está ativa", moon.isFullMoon());
   setMoon("waxing");
   ok("crescente paga 5%", moon.withMoonBonus(100) === 105);
-  ok("crescente não paga corpo", moon.moonAttributeBonus() === 0);
+  ok("crescente não é lua cheia", !moon.isFullMoon());
   setMoon("new");
 }
 sec("inventário e mercado");
@@ -1694,6 +1696,15 @@ sec("personagem");
       plainStats.totalAttributes.strength + CONST.FURY_ATTRIBUTE_BONUS,
   );
   ok("a poção de fúria não devolve vida", drank.state.character.health === state.character.health);
+
+  setMoon("full");
+  const fullMoonPotion = {
+    ...state,
+    inventory: [{ itemId: "rage-potion-small", quantity: 1, enhancement: 0 }],
+  };
+  const refusedFury = inventoryCtrl.consumeItem(fullMoonPotion, "rage-potion-small");
+  ok("lua cheia recusa poção de fúria", !refusedFury.ok);
+  setMoon("new");
 
   const bloated = { ...state, character: { ...state.character, health: 99999 } };
   const squeezed = characterCtrl.syncCharacter(bloated);

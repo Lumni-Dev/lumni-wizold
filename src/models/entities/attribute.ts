@@ -17,7 +17,7 @@ export const ATTRIBUTES: readonly AttributeDefinition[] = [
     code: "FOR",
     description: "É o seu golpe. Quanto maior, mais vida cada ataque tira.",
     effect:
-      "O dano de um golpe é Força x Força dividido por Força mais a Resistência do alvo. Treino, equipamento, mascote, lua e poção de fúria somam aqui.",
+      "O dano de um golpe é Força x Força dividido por Força mais a Resistência do alvo. Treino, equipamento, mascote e Modo Fúria somam aqui.",
   },
   {
     key: "agility",
@@ -49,7 +49,7 @@ export const ATTRIBUTES: readonly AttributeDefinition[] = [
     code: "VON",
     description: "Disciplina e foco. Sobe pelo treino e pelo colar.",
     effect:
-      "Entra na ficha como os demais atributos: treino, equipamento, mascote e lua somam aqui. A poção de fúria dá +10 em todos por alguns minutos, Vontade incluída.",
+      "Entra na ficha como os demais atributos: treino, equipamento e mascote somam aqui. Modo Fúria (poção ou lua cheia) dá +10 em todos enquanto durar, Vontade incluída.",
   },
 ] as const;
 

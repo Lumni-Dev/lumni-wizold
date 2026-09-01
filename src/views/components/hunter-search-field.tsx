@@ -13,6 +13,7 @@ interface HunterSearchFieldProps {
 export function HunterSearchField({ value, onChange, className }: HunterSearchFieldProps) {
   return (
     <Field
+      loose
       className={className}
       aria-label="Buscar caçador pelo nome"
       placeholder="Buscar caçador pelo nome"

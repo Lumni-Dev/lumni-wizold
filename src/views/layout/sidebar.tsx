@@ -23,13 +23,13 @@ function Brand() {
       href="/character"
       className="flex h-[74px] items-center gap-3 border-b border-edge px-3"
     >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/icon.png" alt="" className="h-10 w-10 shrink-0 rounded-md" />
       <div className="min-w-0 flex-1 text-left">
         <p className="text-[10px] uppercase leading-relaxed tracking-[0.16em] text-ink-faint">
           {GAME_TAGLINE}
         </p>
       </div>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/icon.png" alt="" className="h-8 w-8 shrink-0 rounded-md" />
     </Link>
   );
 }

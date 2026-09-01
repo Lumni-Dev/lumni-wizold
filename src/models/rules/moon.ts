@@ -43,7 +43,7 @@ export const MOON_PHASES: readonly MoonPhase[] = [
     label: "Lua Cheia",
     experienceBonus: 0,
     description:
-      "A noite da matilha: o corpo responde como nunca, mas a cabeça não aprende mais rápido.",
+      "A noite da matilha: a lua cheia mantém o Modo Fúria ativo enquanto durar a fase.",
   },
   {
     key: "waning",
@@ -101,11 +101,50 @@ function currentMoon(now = Date.now()): MoonState {
   return currentState ?? computeMoonLocally(now);
 }
 
-export const FULL_MOON_ATTRIBUTE_BONUS = 5;
+export interface FuryCarrier {
+  furyUntil?: string;
+}
 
-export function moonAttributeBonus(moonPhase?: MoonPhaseKey, now = Date.now()): number {
-  const key = moonPhase ?? currentMoon(now).phase.key;
-  return key === "full" ? FULL_MOON_ATTRIBUTE_BONUS : 0;
+export function moonPhaseKey(moonPhase?: MoonPhaseKey, now = Date.now()): MoonPhaseKey {
+  return moonPhase ?? currentMoon(now).phase.key;
+}
+
+export function isFullMoon(moonPhase?: MoonPhaseKey, now = Date.now()): boolean {
+  return moonPhaseKey(moonPhase, now) === "full";
+}
+
+export function fullMoonRemainingMs(now = Date.now()): number {
+  const state = currentMoon(now);
+  if (state.phase.key !== "full") return 0;
+
+  const halfWindow = SYNODIC_MONTH_DAYS / 16;
+  const fullMoon = SYNODIC_MONTH_DAYS / 2;
+  const startAge = fullMoon - halfWindow;
+  const endAge = fullMoon + halfWindow;
+
+  if (state.age >= startAge && state.age < endAge) {
+    return Math.max(0, (endAge - state.age) * DAY_MS);
+  }
+
+  return halfWindow * 2 * DAY_MS;
+}
+
+export function furyRemainingMs(
+  character: FuryCarrier,
+  moonPhase?: MoonPhaseKey,
+  now = Date.now(),
+): number {
+  const potion = character.furyUntil ? Math.max(0, Date.parse(character.furyUntil) - now) : 0;
+  const sky = isFullMoon(moonPhase, now) ? fullMoonRemainingMs(now) : 0;
+  return Math.max(potion, sky);
+}
+
+export function isFuryActive(
+  character: FuryCarrier,
+  moonPhase?: MoonPhaseKey,
+  now = Date.now(),
+): boolean {
+  return furyRemainingMs(character, moonPhase, now) > 0;
 }
 
 export function withMoonBonus(experience: number, moonPhase?: MoonPhaseKey, now = Date.now()): number {

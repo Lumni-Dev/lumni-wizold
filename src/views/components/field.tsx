@@ -1,17 +1,19 @@
 import type { InputHTMLAttributes } from "react";
-import { CONTROL_HEIGHT } from "@/shared/constants/ui";
+import { CONTROL_HEIGHT, LOOSE_CONTROL_SURFACE } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 
 interface FieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   hint?: string;
   numeric?: boolean;
+  loose?: boolean;
 }
 
 export function Field({
   label,
   hint,
   numeric = false,
+  loose = false,
   className,
   onChange,
   ...rest
@@ -25,9 +27,10 @@ export function Field({
       ) : null}
       <input
         className={cn(
-          CONTROL_HEIGHT +
-            " w-full rounded-md border border-edge bg-surface px-3 text-xs text-ink transition-colors",
-          "placeholder:text-ink-faint focus:border-edge-strong focus:outline-none",
+          CONTROL_HEIGHT + " w-full rounded-md px-3 text-xs text-ink",
+          loose
+            ? LOOSE_CONTROL_SURFACE + " placeholder:text-ink-faint focus:border-edge-strong focus:outline-none"
+            : "border border-edge bg-surface transition-colors placeholder:text-ink-faint focus:border-edge-strong focus:outline-none",
           className,
         )}
         {...rest}

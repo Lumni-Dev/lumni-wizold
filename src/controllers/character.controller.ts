@@ -109,10 +109,7 @@ export function renameCharacter(state: GameState, name: string): Result {
   return success(addLog(next, "character", message), message);
 }
 
-export function furyRemainingMs(character: Character): number {
-  if (!character.furyUntil) return 0;
-  return Math.max(0, Date.parse(character.furyUntil) - Date.now());
-}
+export { furyRemainingMs } from "@/models/rules/moon";
 
 export function sufferBlow(state: GameState, damage: number): Result {
   const character = state.character;

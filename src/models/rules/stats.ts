@@ -12,7 +12,7 @@ import type { Character } from "../entities/character";
 import type { Pet } from "../entities/pet";
 import { findItem } from "../data/items";
 import { enhancedEffect } from "./forge";
-import { moonAttributeBonus, type MoonPhaseKey } from "./moon";
+import { isFullMoon, isFuryActive, type MoonPhaseKey } from "./moon";
 import { petBonus } from "./pet";
 import { experienceForLevel } from "./progression";
 
@@ -85,7 +85,7 @@ export function deriveStats(
   pet: Pet | null = null,
   moonPhase?: MoonPhaseKey,
 ): DerivedStats {
-  const furyActive = character.furyUntil ? Date.now() < Date.parse(character.furyUntil) : false;
+  const furyActive = isFuryActive(character, moonPhase);
   return deriveStatsOf(
     { ...character, furyActive, petAttributes: petBonus(pet) },
     equipment,
@@ -98,19 +98,11 @@ export function deriveStatsOf(
   equipment: Equipment,
   moonPhase?: MoonPhaseKey,
 ): DerivedStats {
-  const sky = moonAttributeBonus(moonPhase);
-
   const trained = subject.attributes;
   const equipped = equipmentAttributes(equipment);
   const pet = subject.petAttributes ?? emptyAttributes();
-  const moon: Attributes = {
-    strength: sky,
-    agility: sky,
-    endurance: sky,
-    instinct: sky,
-    willpower: sky,
-  };
-  const fury = furyAttributes(subject.furyActive === true);
+  const moon = emptyAttributes();
+  const fury = furyAttributes(subject.furyActive === true || isFullMoon(moonPhase));
 
   const total = [equipped, pet, moon, fury].reduce(addAttributes, trained);
 

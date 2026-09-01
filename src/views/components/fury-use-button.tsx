@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useGame } from "@/controllers/game.context";
+import { furyRemainingMs, isFullMoon } from "@/models/rules/moon";
 import { Button } from "./button";
 
 function furyClock(ms: number): string {
@@ -10,19 +11,26 @@ function furyClock(ms: number): string {
 }
 
 export function FuryUseButton({ onClick }: { onClick: () => void }) {
-  const { character } = useGame();
+  const { character, moon } = useGame();
   const [now, setNow] = useState(() => Date.now());
 
+  const fullMoon = isFullMoon(moon.phase.key);
+  const remaining = character ? furyRemainingMs(character, moon.phase.key, now) : 0;
+  const furyActive = remaining > 0;
+  const potionActive =
+    !!character?.furyUntil && Date.parse(character.furyUntil) > now;
+
   useEffect(() => {
-    if (!character?.furyUntil) return undefined;
-    const remaining = Date.parse(character.furyUntil) - Date.now();
-    if (remaining <= 0) return undefined;
+    if (!furyActive) return undefined;
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(timer);
-  }, [character?.furyUntil]);
+  }, [furyActive]);
 
-  const furyRemaining = character?.furyUntil ? Date.parse(character.furyUntil) - now : 0;
-  const furyActive = furyRemaining > 0;
+  const label = fullMoon
+    ? "Lua cheia"
+    : potionActive
+      ? "Em fúria " + furyClock(remaining)
+      : "Beber";
 
   return (
     <Button
@@ -30,7 +38,7 @@ export function FuryUseButton({ onClick }: { onClick: () => void }) {
       disabled={furyActive}
       onClick={onClick}
     >
-      {furyActive ? "Em fúria " + furyClock(furyRemaining) : "Beber"}
+      {label}
     </Button>
   );
 }

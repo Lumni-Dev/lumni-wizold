@@ -52,7 +52,8 @@ import { BAZAAR_FEE_RATIO, BAZAAR_LISTING_HUNTS, MIN_WITHDRAW_CENTS } from "../r
 import { BAZAAR_LISTING_DAYS, initialWallet } from "../entities/bazaar";
 import { enhancementCost } from "../rules/forge";
 import { experienceForLevel } from "../rules/progression";
-import { FULL_MOON_ATTRIBUTE_BONUS, MOON_PHASES, SYNODIC_MONTH_DAYS } from "../rules/moon";
+import { MOON_PHASES, SYNODIC_MONTH_DAYS } from "../rules/moon";
+import { FURY_ATTRIBUTE_BONUS } from "@/shared/constants/game";
 import { miningNeeded } from "../rules/mining";
 import { criticalMultiplierOf } from "../rules/combat";
 import { huntPurse } from "../rules/economy";
@@ -81,7 +82,7 @@ function moonLines(): string[] {
     const bonus = Math.round(phase.experienceBonus * 100);
     if (bonus > 0) return phase.label + ": +" + bonus + "% de experiência.";
     if (phase.key === "full") {
-      return phase.label + ": +" + FULL_MOON_ATTRIBUTE_BONUS + " em todos os atributos.";
+      return phase.label + ": Modo Fúria ativo (+" + FURY_ATTRIBUTE_BONUS + " em todos os atributos).";
     }
     return phase.label + ": sem bônus.";
   });
@@ -161,12 +162,15 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
   {
     id: "fury",
     title: "Fúria",
-    summary: "A poção de fúria: um empurrão temporário em todos os atributos.",
+    summary: "Modo Fúria: poção paga ou lua cheia, +10 em todos os atributos por um tempo.",
     lines: [
       "Não existe transformação: você caça, treina e duela direto, do jeito que está.",
-      "A poção de fúria não devolve vida. Enquanto dura, dá +10 em cada atributo, o que levanta dano, esquiva e crítico de uma vez; a barra de vida continua fixa em 100.",
-      "A duração vem pelo tamanho do frasco: pequena 2,5 minutos, média 5, grande 7,5. Beber de novo reinicia o relógio cheio.",
-      "É um atalho pago para uma janela de força: guarde para uma banda dura ou um duelo que você não quer perder.",
+      "Modo Fúria dá +" +
+        FURY_ATTRIBUTE_BONUS +
+        " em cada atributo enquanto durar; o ganho aparece na coluna Fúria da ficha e levanta dano, esquiva e crítico de uma vez. A barra de vida continua fixa em 100.",
+      "A poção de fúria não devolve vida. A duração vem pelo tamanho do frasco: pequena 2,5 minutos, média 5, grande 7,5. Beber de novo reinicia o relógio cheio.",
+      "Na lua cheia o céu mantém o Modo Fúria ativo sozinho enquanto durar a fase; a poção fica desabilitada nesse período, porque o céu já faz esse trabalho.",
+      "É um atalho pago para uma janela de força: guarde a poção para uma banda dura ou um duelo que você não quer perder, fora da lua cheia.",
     ],
   },
   {
@@ -180,7 +184,12 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         SYNODIC_MONTH_DAYS.toFixed(2) +
         " dias, então cada fase dura cerca de uma semana.",
       "O bônus de experiência vale para a caça, a única fonte de experiência: o treino move só os atributos.",
-      "A lua cheia não ensina mais rápido: ela levanta o corpo, e o ganho aparece somado nos atributos da ficha.",
+      "A lua cheia não dá bônus pela coluna Lua: ela liga o Modo Fúria (+" +
+        FURY_ATTRIBUTE_BONUS +
+        " em todos os atributos) enquanto durar a fase, cerca de " +
+        (SYNODIC_MONTH_DAYS / 8).toFixed(1).replace(".", ",") +
+        " dias.",
+      "Durante a lua cheia a poção de fúria fica desabilitada na ficha; o relógio do Modo Fúria no menu lateral mostra quanto falta para a fase acabar.",
       "A fase atual e o bônus dela ficam no rodapé do menu lateral no desktop e na barra abaixo da navegação no celular.",
     ],
   },
@@ -478,7 +487,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       AUTOMATIONS.map((entry) => entry.label + ": " + entry.effect).join(" "),
       "Com VIP ativo, no chão de vida (" +
         Math.round(MIN_HEALTH_RATIO_TO_ACT * 100) +
-        "%) bebe poção se houver, senão repousa; trabalho pausado por falta de recurso retoma quando der.",
+        "%) bebe poção se houver, senão repousa; trabalho pausado por falta de recurso retoma quando der. Na lua cheia a fúria automática não bebe poção: o céu já mantém o Modo Fúria.",
     ],
   },
   {
@@ -496,7 +505,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       setCostRangeLine() +
         " Subir de nível dentro de uma faixa não enche o bolso: quem muda o tamanho da bolsa é abrir a faixa seguinte.",
       "O mercado vende pelo preço de tabela e recompra pela metade. Materiais só servem para venda; nenhum equipamento cai na caça.",
-      "Poções de vida e fúria: pequena 3 caçadas (25%), média 6 (50%), grande 12 (75%); ração do lobo, 1,5 caçada. Fragmentos saem da mina e só alimentam a forja.",
+      "Poções de vida e fúria: pequena 3 caçadas (25%), média 6 (50%), grande 12 (75%); ração do lobo, 1,5 caçada. A poção de fúria não se bebe na lua cheia: o céu já mantém o Modo Fúria. Fragmentos saem da mina e só alimentam a forja.",
       "Comprar e vender pedem confirmação e deixam escolher a quantidade.",
     ],
   },

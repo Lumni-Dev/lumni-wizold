@@ -2,21 +2,21 @@
 
 import { Moon } from "lucide-react";
 import { useGame } from "@/controllers/game.context";
-import { FULL_MOON_ATTRIBUTE_BONUS } from "@/models/rules/moon";
+import { FURY_ATTRIBUTE_BONUS } from "@/shared/constants/game";
 import { Tooltip } from "./tooltip";
 
 export function MoonTracker() {
   const { moon } = useGame();
 
   const xpBonus = Math.round(moon.phase.experienceBonus * 100);
-  const attrBonus = moon.phase.key === "full" ? FULL_MOON_ATTRIBUTE_BONUS : 0;
+  const furyBonus = moon.phase.key === "full" ? FURY_ATTRIBUTE_BONUS : 0;
   const bonusLine =
-    xpBonus > 0 && attrBonus > 0
-      ? "+" + xpBonus + "% de experiência · +" + attrBonus + " em todos os atributos"
+    xpBonus > 0 && furyBonus > 0
+      ? "+" + xpBonus + "% de experiência · Modo Fúria ativo"
       : xpBonus > 0
         ? "+" + xpBonus + "% de experiência na caça"
-        : attrBonus > 0
-          ? "+" + attrBonus + " em todos os atributos"
+        : furyBonus > 0
+          ? "Modo Fúria: +" + furyBonus + " em todos os atributos"
           : "Sem bônus nesta fase";
 
   return (

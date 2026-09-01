@@ -3,27 +3,33 @@
 import { Flame } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useGame } from "@/controllers/game.context";
+import { furyRemainingMs } from "@/models/rules/moon";
 import { SpinBorder } from "./spin-border";
 
 function furyClock(ms: number): string {
   const total = Math.max(0, Math.ceil(ms / 1000));
-  return Math.floor(total / 60) + ":" + String(total % 60).padStart(2, "0");
+  const days = Math.floor(total / 86_400);
+  const hours = Math.floor((total % 86_400) / 3600);
+  const minutes = Math.floor((total % 3600) / 60);
+  const seconds = total % 60;
+
+  if (days > 0) return days + "d " + hours + "h";
+  if (hours > 0) return hours + "h " + minutes + "m";
+  return Math.floor(total / 60) + ":" + String(seconds).padStart(2, "0");
 }
 
 export function FuryModeTracker() {
-  const { character } = useGame();
+  const { character, moon } = useGame();
   const [now, setNow] = useState(() => Date.now());
 
-  const remaining = character?.furyUntil
-    ? Math.max(0, Date.parse(character.furyUntil) - now)
-    : 0;
+  const remaining = character ? furyRemainingMs(character, moon.phase.key, now) : 0;
   const active = remaining > 0;
 
   useEffect(() => {
-    if (!character?.furyUntil) return undefined;
+    if (!active) return undefined;
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(timer);
-  }, [character?.furyUntil]);
+  }, [active]);
 
   if (!active || !character) return null;
 
@@ -31,7 +37,7 @@ export function FuryModeTracker() {
 
   return (
     <SpinBorder className="block w-full rounded-md">
-      <div className="relative flex items-stretch rounded-[calc(0.375rem-1px)] bg-surface/70">
+      <div className="relative flex w-full items-stretch overflow-hidden rounded-[inherit] bg-surface/70">
         <span className="flex w-8 shrink-0 items-center justify-center self-stretch border-r border-edge">
           <Flame aria-hidden strokeWidth={1.75} className="h-4 w-4 text-ember" />
         </span>
