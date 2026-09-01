@@ -30,7 +30,7 @@ export function FuryModeTracker() {
 
   return (
     <div className="fury-electric-shell">
-      <svg className="absolute h-0 w-0" aria-hidden="true">
+      <svg className="pointer-events-none absolute h-0 w-0" aria-hidden="true">
         <defs>
           <filter id={filterId}>
             <feTurbulence
@@ -49,7 +49,7 @@ export function FuryModeTracker() {
             <feDisplacementMap
               in="SourceGraphic"
               in2="noise"
-              scale="2.5"
+              scale="3"
               xChannelSelector="R"
               yChannelSelector="G"
             />
@@ -57,16 +57,21 @@ export function FuryModeTracker() {
         </defs>
       </svg>
 
-      <div className="fury-electric-outer">
-        <div className="fury-electric-card" style={{ filter: "url(#" + filterId + ")" }}>
-          <span aria-hidden="true" className="fury-electric-glow-1" />
-          <span aria-hidden="true" className="fury-electric-glow-2" />
-          <span aria-hidden="true" className="fury-electric-overlay-1" />
-          <span aria-hidden="true" className="fury-electric-overlay-2" />
-          <span aria-hidden="true" className="fury-electric-bg-glow" />
-          <div className="fury-electric-content">
-            <p className="text-[10px] uppercase tracking-[0.16em] text-ink">Modo Fúria</p>
-            <p className="font-mono text-[11px] text-ember">{clock}</p>
+      <div className="fury-electric-inner">
+        <div className="fury-electric-outer">
+          <div
+            className="fury-electric-card"
+            style={{ filter: "url(#" + filterId + ")" }}
+          >
+            <span aria-hidden="true" className="fury-electric-glow-1" />
+            <span aria-hidden="true" className="fury-electric-glow-2" />
+            <span aria-hidden="true" className="fury-electric-overlay-1" />
+            <span aria-hidden="true" className="fury-electric-overlay-2" />
+            <span aria-hidden="true" className="fury-electric-bg-glow" />
+            <div className="fury-electric-content">
+              <p className="text-[10px] uppercase tracking-[0.16em] text-ink">Modo Fúria</p>
+              <p className="font-mono text-[11px] text-ember">{clock}</p>
+            </div>
           </div>
         </div>
       </div>

@@ -265,9 +265,12 @@ button:not(:disabled) {
 }
 
 .fury-electric-shell {
-  --fury-electric-gradient: color-mix(in oklab, var(--color-ember) 40%, transparent);
+  --fury-electric-border: var(--color-ember);
+  --fury-electric-light: color-mix(in oklab, var(--color-ember) 72%, white);
+  --fury-electric-gradient: color-mix(in oklab, var(--color-ember) 30%, transparent);
+  position: relative;
   padding: 2px;
-  border-radius: 0.375rem;
+  border-radius: 0.75rem;
   background:
     linear-gradient(
       -30deg,
@@ -278,21 +281,24 @@ button:not(:disabled) {
     linear-gradient(to bottom, var(--color-surface), var(--color-surface));
 }
 
+.fury-electric-inner {
+  position: relative;
+}
+
 .fury-electric-outer {
-  border: 2px solid color-mix(in oklab, var(--color-ember) 50%, transparent);
-  border-radius: 0.375rem;
-  padding-right: 3px;
-  padding-bottom: 3px;
+  border: 2px solid color-mix(in oklab, var(--fury-electric-border) 50%, transparent);
+  border-radius: 0.75rem;
+  padding-right: 4px;
+  padding-bottom: 4px;
 }
 
 .fury-electric-card {
   position: relative;
-  margin-top: -3px;
-  margin-left: -3px;
-  overflow: hidden;
-  border: 2px solid var(--color-ember);
-  border-radius: 0.375rem;
-  background: color-mix(in oklab, var(--color-surface-high) 88%, var(--color-ember) 12%);
+  margin-top: -4px;
+  margin-left: -4px;
+  border: 2px solid var(--fury-electric-border);
+  border-radius: 0.75rem;
+  background: color-mix(in oklab, var(--color-surface-high) 86%, var(--color-ember) 14%);
 }
 
 .fury-electric-glow-1,
@@ -307,20 +313,20 @@ button:not(:disabled) {
 }
 
 .fury-electric-glow-1 {
-  border: 2px solid color-mix(in oklab, var(--color-ember) 60%, transparent);
+  border: 2px solid color-mix(in oklab, var(--fury-electric-border) 60%, transparent);
   filter: blur(1px);
 }
 
 .fury-electric-glow-2 {
-  border: 2px solid color-mix(in oklab, var(--color-ember) 35%, white);
+  border: 2px solid var(--fury-electric-light);
   filter: blur(4px);
 }
 
 .fury-electric-overlay-1 {
   opacity: 1;
   mix-blend-mode: overlay;
-  transform: scale(1.08);
-  filter: blur(12px);
+  transform: scale(1.1);
+  filter: blur(16px);
   background: linear-gradient(
     -30deg,
     white,
@@ -331,10 +337,10 @@ button:not(:disabled) {
 }
 
 .fury-electric-overlay-2 {
-  opacity: 0.45;
+  opacity: 0.5;
   mix-blend-mode: overlay;
-  transform: scale(1.08);
-  filter: blur(12px);
+  transform: scale(1.1);
+  filter: blur(16px);
   background: linear-gradient(
     -30deg,
     white,
@@ -346,14 +352,14 @@ button:not(:disabled) {
 
 .fury-electric-bg-glow {
   z-index: -1;
-  opacity: 0.35;
-  filter: blur(24px);
-  transform: scale(1.08);
+  opacity: 0.3;
+  filter: blur(32px);
+  transform: scale(1.1);
   background: linear-gradient(
     -30deg,
-    color-mix(in oklab, var(--color-ember) 70%, white),
+    var(--fury-electric-light),
     transparent,
-    var(--color-ember)
+    var(--fury-electric-border)
   );
 }
 

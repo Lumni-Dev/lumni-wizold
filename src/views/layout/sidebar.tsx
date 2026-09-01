@@ -53,7 +53,7 @@ function NavLink({
         highlighted ? "text-ember" : active ? "text-ink" : "text-ink-soft hover:text-ink",
       )}
     >
-      <span className={"flex " + CONTROL_HEIGHT + " w-10 shrink-0 items-center justify-center border-r border-edge"}>
+      <span className={"flex " + CONTROL_HEIGHT + " w-8 shrink-0 items-center justify-center border-r border-edge"}>
         <NavIcon href={item.href} />
       </span>
       <span className="min-w-0 truncate px-3 text-[10px] uppercase tracking-[0.16em]">

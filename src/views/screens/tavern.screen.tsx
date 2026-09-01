@@ -23,6 +23,7 @@ import {
   ROOM_NAME_MAX_LENGTH,
 } from "@/models/entities/tavern";
 import { NAME_MAX_LENGTH } from "@/shared/constants/game";
+import { CONTROL_HEIGHT } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { formatTime } from "@/shared/utils/format";
 import { sanitizeName } from "@/shared/utils/text";
@@ -742,7 +743,7 @@ export function TavernScreen() {
                             : current,
                         )
                       }
-                      className="grid h-10 w-10 place-items-center rounded-md text-lg hover:bg-surface-high"
+                      className={"grid " + CONTROL_HEIGHT + " w-8 place-items-center rounded-md text-lg hover:bg-surface-high"}
                     >
                       {emoji}
                     </button>
@@ -757,7 +758,7 @@ export function TavernScreen() {
                   if (!emojiOpen) setEmojiRect(emojiRef.current?.getBoundingClientRect() ?? null);
                   setEmojiOpen((open) => !open);
                 }}
-                className="grid h-10 w-10 place-items-center rounded-md border border-edge text-ink-faint transition-colors hover:border-edge-strong hover:bg-surface-high hover:text-ink"
+                className={"grid " + CONTROL_HEIGHT + " w-8 place-items-center rounded-md border border-edge text-ink-faint transition-colors hover:border-edge-strong hover:bg-surface-high hover:text-ink"}
               >
                 <ActionIcon action="smile" className="h-4 w-4" />
               </button>

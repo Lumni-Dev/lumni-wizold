@@ -26,7 +26,7 @@ export function Field({
       <input
         className={cn(
           CONTROL_HEIGHT +
-            " w-full rounded-md border border-edge bg-surface px-4 text-xs text-ink transition-colors",
+            " w-full rounded-md border border-edge bg-surface px-3 text-xs text-ink transition-colors",
           "placeholder:text-ink-faint focus:border-edge-strong focus:outline-none",
           className,
         )}
