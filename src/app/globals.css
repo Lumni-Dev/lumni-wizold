@@ -24,6 +24,8 @@
   --font-mono: var(--font-mono-stack), ui-monospace, "SFMono-Regular", monospace;
   
   --font-logo: var(--font-logo-stack), var(--font-sans-stack), sans-serif;
+
+  --radius-md: 0.375rem;
 }
 
 @layer base {
@@ -289,19 +291,19 @@ button:not(:disabled) {
 
 .fury-ring-frame {
   --fury-ring-border-size: 1px;
+  --fury-ring-radius: var(--radius-md);
   display: block;
-  border-radius: 0.375rem;
-  border: var(--fury-ring-border-size) solid transparent;
-  border-image: conic-gradient(
-      from var(--fury-ring-angle),
-      var(--color-ember) 0deg,
-      color-mix(in oklab, var(--color-ember) 42%, var(--color-edge)) 72deg,
-      var(--color-edge) 148deg,
-      var(--color-edge) 212deg,
-      color-mix(in oklab, var(--color-ember) 42%, var(--color-edge)) 288deg,
-      var(--color-ember) 360deg
-    )
-    1 stretch;
+  padding: var(--fury-ring-border-size);
+  border-radius: var(--fury-ring-radius);
+  background: conic-gradient(
+    from var(--fury-ring-angle),
+    var(--color-ember) 0deg,
+    color-mix(in oklab, var(--color-ember) 42%, var(--color-edge)) 72deg,
+    var(--color-edge) 148deg,
+    var(--color-edge) 212deg,
+    color-mix(in oklab, var(--color-ember) 42%, var(--color-edge)) 288deg,
+    var(--color-ember) 360deg
+  );
   animation: fury-ring-rotate 2.4s linear infinite;
   overflow: hidden;
 }
@@ -311,7 +313,7 @@ button:not(:disabled) {
   align-items: center;
   width: 100%;
   min-height: 100%;
-  border-radius: calc(0.375rem - var(--fury-ring-border-size));
+  border-radius: calc(var(--fury-ring-radius) - var(--fury-ring-border-size));
 }
 
 .fury-ring-frame__content--center {
