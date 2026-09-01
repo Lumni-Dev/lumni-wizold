@@ -250,7 +250,7 @@ export function HuntScreen() {
           const available = ready;
           const active = activeId === territory.id;
           const opting = active && cooldown !== null;
-          const selectedId = resolveHuntCreatureId(creatures, prey, selection[territory.id]);
+          const selectedId = resolveHuntCreatureId(creatures, selection[territory.id]);
           const onThis = active && progress.id === territory.id;
           const line =
             onThis && progress.beat > 0 && script.length > 0

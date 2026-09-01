@@ -46,7 +46,6 @@ export function ActivityDock() {
     const selection = loadHuntSelection();
     const selectedId = resolveHuntCreatureId(
       territory.creatures,
-      territory.prey,
       selection[huntRt.territoryId],
     );
     const beat = huntRt.beat;

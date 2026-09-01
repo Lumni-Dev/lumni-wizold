@@ -155,7 +155,7 @@ export function ActivityEngine() {
         (entry) => entry.territory.id === activeHunt,
       );
       const creatureId = row
-        ? resolveHuntCreatureId(row.creatures, row.prey, selection[activeHunt])
+        ? resolveHuntCreatureId(row.creatures, selection[activeHunt])
         : selection[activeHunt];
       void huntRef.current(activeHunt, creatureId || undefined).then((fight) => {
         if (!alive) return;
