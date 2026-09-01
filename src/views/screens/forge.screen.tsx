@@ -6,9 +6,18 @@ import { useGame } from "@/controllers/game.context";
 import { listForge, listMining } from "@/controllers/forge.controller";
 import { usePageActivity } from "@/controllers/use-page-activity";
 import type { Activity } from "@/models/entities/activity";
+import {
+  EQUIPMENT_SET_KEYS,
+  EQUIPMENT_SLOTS,
+  SET_LABEL,
+  SLOT_LABEL,
+  type EquipmentSet,
+  type ItemCategory,
+} from "@/models/entities/item";
 import { enhancedName } from "@/models/rules/forge";
 import { FORGE_TICKS, MAX_ENHANCEMENT, MINING_RESET_HOUR, MINING_TICKS } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
+import { Chip } from "../components/chip";
 import { formatBronze, formatNumber } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf, pageOfPosition } from "@/shared/utils/pagination";
 import { Bar } from "../components/bar";
@@ -37,6 +46,19 @@ function pieceKey(itemId: string, level: number): string {
 }
 
 const FORGE_PAGE_SIZE = 5;
+
+type CategoryFilter = ItemCategory | "all";
+type SetFilter = EquipmentSet | "all";
+
+const FORGE_CATEGORY_FILTERS: readonly { key: CategoryFilter; label: string }[] = [
+  { key: "all", label: "Tudo" },
+  ...EQUIPMENT_SLOTS.map((slot) => ({ key: slot, label: SLOT_LABEL[slot] })),
+];
+
+const FORGE_SET_FILTERS: readonly { key: SetFilter; label: string }[] = [
+  { key: "all", label: "Todos" },
+  ...EQUIPMENT_SET_KEYS.map((key) => ({ key, label: SET_LABEL[key] })),
+];
 
 export function ForgeScreen() {
   const { state, character, activity, setActivity } = useGame();
@@ -89,11 +111,22 @@ export function ForgeScreen() {
   const [selectedOre, setSelectedOre] = useState<string>("");
   const [selectedForge, setSelectedForge] = useState<string>("");
   const [forgePage, setForgePage] = useState(1);
+  const [category, setCategory] = useState<CategoryFilter>("all");
+  const [set, setSet] = useState<SetFilter>("all");
   const forgeShake = useShake(strike.beat);
+
+  const filteredSlots = useMemo(
+    () =>
+      slots.filter((row) => {
+        if (category !== "all" && row.item.category !== category) return false;
+        return set === "all" || row.item.set === set;
+      }),
+    [slots, category, set],
+  );
 
   function selectForge(key: string) {
     setSelectedForge(key);
-    const index = slots.findIndex((entry) => pieceKey(entry.item.id, entry.level) === key);
+    const index = filteredSlots.findIndex((entry) => pieceKey(entry.item.id, entry.level) === key);
     if (index >= 0) setForgePage(pageOfPosition(index + 1, FORGE_PAGE_SIZE));
   }
 
@@ -114,8 +147,8 @@ export function ForgeScreen() {
   const selectedAvailable = Boolean(selectedEntry?.unlocked) && !mining.dailyExhausted;
   const mineOpting = activeOre !== null && cooldown !== null;
 
-  const forgeFallback = slots.find((entry) => entry.canForge) ?? slots[0] ?? null;
-  const selectedValid = slots.some(
+  const forgeFallback = filteredSlots.find((entry) => entry.canForge) ?? filteredSlots[0] ?? null;
+  const selectedValid = filteredSlots.some(
     (entry) => pieceKey(entry.item.id, entry.level) === selectedForge,
   );
   const displayLevel = activeItem !== null ? (activeForgeLevel ?? activeStartLevel) : activityLevel;
@@ -128,14 +161,16 @@ export function ForgeScreen() {
           ? pieceKey(forgeFallback.item.id, forgeFallback.level)
           : "";
   const forgeEntry =
-    slots.find((entry) => pieceKey(entry.item.id, entry.level) === effectiveForge) ?? null;
+    filteredSlots.find((entry) => pieceKey(entry.item.id, entry.level) === effectiveForge) ??
+    slots.find((entry) => pieceKey(entry.item.id, entry.level) === effectiveForge) ??
+    null;
   const forgeOpting = activeItem !== null && cooldown !== null;
   const forgeActive =
     activeItem !== null && forgeEntry !== null && activeItem === forgeEntry.item.id;
 
-  const forgeCurrentPage = clampPage(forgePage, slots.length, FORGE_PAGE_SIZE);
-  const forgePages = pageCount(slots.length, FORGE_PAGE_SIZE);
-  const forgeOnPage = pageOf(slots, forgeCurrentPage, FORGE_PAGE_SIZE);
+  const forgeCurrentPage = clampPage(forgePage, filteredSlots.length, FORGE_PAGE_SIZE);
+  const forgePages = pageCount(filteredSlots.length, FORGE_PAGE_SIZE);
+  const forgeOnPage = pageOf(filteredSlots, forgeCurrentPage, FORGE_PAGE_SIZE);
 
   function toggleMining(oreId: string, available: boolean) {
     if (activeOre === oreId) {
@@ -377,12 +412,47 @@ export function ForgeScreen() {
             )}
           </Panel>
 
-          <Panel
+          <div className="space-y-3">
+            <div className="space-y-2">
+              <div className="flex flex-wrap gap-2">
+                {FORGE_CATEGORY_FILTERS.map((option) => (
+                  <Chip
+                    key={option.key}
+                    active={category === option.key}
+                    onClick={() => {
+                      setCategory(option.key);
+                      setForgePage(1);
+                    }}
+                  >
+                    {option.label}
+                  </Chip>
+                ))}
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="mr-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                  Conjunto
+                </span>
+                {FORGE_SET_FILTERS.map((option) => (
+                  <Chip
+                    key={option.key}
+                    active={set === option.key}
+                    onClick={() => {
+                      setSet(option.key);
+                      setForgePage(1);
+                    }}
+                  >
+                    {option.label}
+                  </Chip>
+                ))}
+              </div>
+            </div>
+
+            <Panel
             title="Disponíveis"
             description="As peças do inventário fora do corpo. Escolha uma para a bigorna."
             padding="none"
             footer={
-              slots.length > 0 ? (
+              filteredSlots.length > 0 ? (
                 <Pagination page={forgeCurrentPage} pages={forgePages} onChange={setForgePage} />
               ) : undefined
             }
@@ -390,6 +460,13 @@ export function ForgeScreen() {
             {slots.length === 0 ? (
               <div className="p-4">
                 <RowText title="Nada disponível" description="Desequipe uma peça para forjá-la." />
+              </div>
+            ) : filteredSlots.length === 0 ? (
+              <div className="p-4">
+                <RowText
+                  title="Nada neste filtro"
+                  description="Nenhuma peça do inventário combina com a categoria escolhida."
+                />
               </div>
             ) : (
               <List>
@@ -434,6 +511,7 @@ export function ForgeScreen() {
               </List>
             )}
           </Panel>
+          </div>
         </div>
       </div>
 

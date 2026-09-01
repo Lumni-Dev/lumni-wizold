@@ -50,6 +50,9 @@ function itemsOfCategory(category: ItemCategory) {
 const SET_GRID =
   "grid w-full grid-cols-[4.5rem_minmax(0,1fr)_4.5rem] items-center gap-x-3 sm:grid-cols-[4.5rem_minmax(0,1fr)_minmax(0,7rem)_4.5rem]";
 
+const CATALOG_GRID =
+  "grid w-full grid-cols-[4.5rem_minmax(0,1fr)_4.5rem] items-center gap-x-3 sm:grid-cols-[4.5rem_minmax(0,1fr)_minmax(0,7rem)_4.5rem]";
+
 function SetTableHeader() {
   return (
     <div
@@ -85,7 +88,7 @@ export function WikiScreen() {
         ))}
       </nav>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid items-stretch gap-6 lg:grid-cols-2">
         {WIKI_TOPICS.map((topic) => (
           <Panel
             key={topic.id}
@@ -138,12 +141,13 @@ export function WikiScreen() {
         </Panel>
       </div>
 
-      <div id="sets" className="scroll-mt-28 grid gap-6 lg:grid-cols-2">
+      <div id="sets" className="scroll-mt-28 grid items-stretch gap-6 lg:grid-cols-2">
         {EQUIPMENT_SETS.map((definition) => (
           <Panel
             key={definition.key}
             title={"Conjunto " + definition.label}
             description={definition.description}
+            height="fill"
             action={
               <div className="flex flex-wrap justify-end gap-2">
                 <Tag tone="neutral">NV. {definition.minLevel}+</Tag>
@@ -157,9 +161,9 @@ export function WikiScreen() {
               {EQUIPMENT_SLOTS.map((slot) => {
                 const item = findItem(pieceId(definition.key, slot));
                 return (
-                  <ListRow key={slot} layout="column">
+                  <ListRow key={slot} padding="text" className="!py-2.5">
                     <div className={SET_GRID}>
-                      <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                      <span className="truncate text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                         {SLOT_LABEL[slot]}
                       </span>
                       <span className="min-w-0 truncate text-sm text-ink">
@@ -168,7 +172,7 @@ export function WikiScreen() {
                       <span className="hidden min-w-0 truncate text-[11px] text-ink-soft sm:block">
                         {item ? summarizeEffect(item).join(", ") : "—"}
                       </span>
-                      <span className="text-right font-mono text-[11px] text-ink-faint">
+                      <span className="truncate text-right font-mono text-[11px] text-ink-faint">
                         {formatBronze(piecePrice(definition, slot))}
                       </span>
                     </div>
@@ -248,7 +252,7 @@ export function WikiScreen() {
         </Panel>
       </div>
 
-      <div id="bestiary" className="scroll-mt-28 grid gap-6 lg:grid-cols-2">
+      <div id="bestiary" className="scroll-mt-28 grid items-stretch gap-6 lg:grid-cols-2">
         {SPECIES_ORDER.map((species) => {
           const members = CREATURES.filter((creature) => creature.species === species);
           const band = members.length > 0 ? members[0].description : "";
@@ -258,6 +262,7 @@ export function WikiScreen() {
               key={species}
               title={SPECIES_LABEL[species]}
               description={band}
+              height="fill"
               action={
                 <div className="flex items-center gap-2">
                   {members.length > 0 ? (
@@ -315,33 +320,30 @@ export function WikiScreen() {
         })}
       </div>
 
-      <div id="catalog" className="scroll-mt-28 space-y-6">
+      <div id="catalog" className="scroll-mt-28 grid items-stretch gap-6 lg:grid-cols-2">
         {ITEM_CATEGORIES.map((category) => (
           <Panel
             key={category}
             title={CATEGORY_PLURAL[category]}
             description={itemsOfCategory(category).length + " itens no catálogo."}
+            height="fill"
             padding="none"
           >
             <List>
               {itemsOfCategory(category).map((item) => (
-                <ListRow key={item.id} padding="art" className="items-start">
-                  <ItemIcon item={item} />
-                  <div className="min-w-0 flex-1 space-y-1">
-                    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3">
-                      <p className="truncate text-sm text-ink">{item.name}</p>
-                      <span className="shrink-0 font-mono text-[11px] text-ink-faint">
-                        {item.inMarket
-                          ? formatBronze(marketPriceOf(item, level))
-                          : "somente drop"}
-                      </span>
-                    </div>
-                    <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                <ListRow key={item.id} padding="text" className="!py-2.5">
+                  <div className={CATALOG_GRID}>
+                    <ItemIcon item={item} size="small" />
+                    <span className="min-w-0 truncate text-sm text-ink">{item.name}</span>
+                    <span className="hidden min-w-0 truncate text-[11px] text-ink-soft sm:block">
                       {RARITY_LABEL[item.rarity]}, NV. {item.minLevel}+
-                    </p>
-                    <p className="text-[11px] leading-relaxed text-ink-soft">
-                      {summarizeEffect(item).join(", ") || "Sem efeito, serve para venda."}
-                    </p>
+                      {summarizeEffect(item).length > 0
+                        ? " · " + summarizeEffect(item).join(", ")
+                        : ""}
+                    </span>
+                    <span className="truncate text-right font-mono text-[11px] text-ink-faint">
+                      {item.inMarket ? formatBronze(marketPriceOf(item, level)) : "drop"}
+                    </span>
                   </div>
                 </ListRow>
               ))}

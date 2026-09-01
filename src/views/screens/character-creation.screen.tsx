@@ -9,6 +9,7 @@ import { GAME_NAME, GAME_TAGLINE, NAME_MAX_LENGTH } from "@/shared/constants/gam
 import { sanitizeName } from "@/shared/utils/text";
 import { cn } from "@/shared/utils/class-names";
 import { Button } from "../components/button";
+import { AiAuditNotice } from "../components/ai-audit-notice";
 import { CornerAccents } from "../components/corner-accents";
 import { GenderIcon } from "../components/gender-icon";
 import { Tag } from "../components/tag";
@@ -89,6 +90,7 @@ export function CharacterCreationScreen() {
               autoComplete="off"
               className="w-full rounded-md border border-edge bg-base px-4 py-3 text-sm text-ink placeholder:text-ink-faint focus:border-edge-strong focus:outline-none"
             />
+            <AiAuditNotice />
           </fieldset>
 
           <fieldset className="space-y-2">

@@ -67,3 +67,28 @@ export async function loadNames(client: PoolClient): Promise<TavernIdentity[]> {
   const found = await client.query("select id, name from characters");
   return found.rows.map((row) => ({ id: row.id, name: row.name }));
 }
+
+export async function loadHunterIds(client: PoolClient): Promise<{ id: string; name: string }[]> {
+  const found = await client.query<{ id: string; name: string }>(
+    "select id, name from characters order by level desc, name asc",
+  );
+  return found.rows;
+}
+
+export async function loadHunterSummary(
+  client: PoolClient,
+  id: string,
+): Promise<{ id: string; name: string; level: number; gender: string } | null> {
+  const found = await client.query<{ id: string; name: string; level: string; gender: string }>(
+    "select id, name, level, gender from characters where id = $1",
+    [id],
+  );
+  const row = found.rows[0];
+  if (!row) return null;
+  return {
+    id: row.id,
+    name: row.name,
+    level: Number(row.level),
+    gender: row.gender,
+  };
+}

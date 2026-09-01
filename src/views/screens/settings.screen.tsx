@@ -16,6 +16,7 @@ import { NAME_MAX_LENGTH, RENAME_COOLDOWN_DAYS } from "@/shared/constants/game";
 import { formatNumber, formatBronze, formatReais, formatDay } from "@/shared/utils/format";
 import { sanitizeName } from "@/shared/utils/text";
 import { Button } from "../components/button";
+import { AiAuditNotice } from "../components/ai-audit-notice";
 import { Chip } from "../components/chip";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { Field } from "../components/field";
@@ -225,6 +226,7 @@ export function SettingsScreen() {
               }
               onChange={(event) => setNewName(sanitizeName(event.target.value, NAME_MAX_LENGTH))}
             />
+            <AiAuditNotice />
             <Button
               type="submit"
               variant="primary"

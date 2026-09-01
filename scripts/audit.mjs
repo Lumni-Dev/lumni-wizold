@@ -1800,6 +1800,46 @@ sec("automação");
     "retomar volta ao mesmo trabalho",
     work?.activity.kind === "hunt" && work?.activity.id === "village-field",
   );
+  const furyHunt = {
+    ...resumed,
+    inventory: [{ itemId: "rage-potion-small", quantity: 1, enhancement: 0 }],
+    automation: { ...resumed.automation, hunt: true, transform: true },
+  };
+  const furyStep = automationCtrl.nextAutomationStep(furyHunt, idle);
+  ok(
+    "caçada pausada bebe fúria antes de retomar",
+    furyStep?.kind === "potion" && furyStep.itemId === "rage-potion-small",
+  );
+  const furyReady = {
+    ...furyHunt,
+    character: {
+      ...furyHunt.character,
+      furyUntil: new Date(Date.now() + 60000).toISOString(),
+    },
+  };
+  ok(
+    "com fúria ativa retoma a caçada",
+    automationCtrl.nextAutomationStep(furyReady, idle)?.kind === "work",
+  );
+  const healThenFury = { ...low };
+  healThenFury.character.health = Math.floor(
+    stats.deriveStats(healThenFury.character, healThenFury.equipment, null).maxHealth *
+      CONST.MIN_HEALTH_RATIO_TO_ACT,
+  );
+  healThenFury.inventory = [
+    { itemId: "health-potion-small", quantity: 1, enhancement: 0 },
+    { itemId: "rage-potion-small", quantity: 1, enhancement: 0 },
+  ];
+  healThenFury.automation = {
+    ...healThenFury.automation,
+    hunt: true,
+    transform: true,
+    potion: true,
+  };
+  ok(
+    "no chão a vida vem antes da fúria",
+    automationCtrl.nextAutomationStep(healThenFury, idle)?.itemId === "health-potion-small",
+  );
   const bothKeys = { ...low, automation: { ...low.automation, potion: true, rest: true } };
   ok(
     "com frasco na mochila a poção vence o descanso",
@@ -1811,8 +1851,9 @@ sec("automação");
     automation: { ...low.automation, transform: true },
   };
   ok(
-    "no chão a fúria não vira sozinha, recupera antes",
-    automationCtrl.nextAutomationStep(floorTurn, null)?.kind !== "transform",
+    "no chão a fúria espera, recupera antes",
+    automationCtrl.nextAutomationStep(floorTurn, idle)?.kind === "potion" &&
+      !automationCtrl.nextAutomationStep(floorTurn, idle)?.itemId?.startsWith("rage"),
   );
   ok(
     "descansando não deita de novo",

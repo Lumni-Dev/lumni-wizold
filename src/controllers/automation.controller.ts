@@ -5,6 +5,7 @@ import type { GameState } from "@/models/entities/game-state";
 import type { PotionKind } from "@/models/entities/item";
 import { isPetActive, isPetWhole, petShortOfBreath, servesPet } from "@/models/rules/pet";
 import { deriveStats } from "@/models/rules/stats";
+import { furyRemainingMs } from "./character.controller";
 import { countInInventory } from "./inventory.controller";
 import { listForge, listMining } from "./forge.controller";
 import { listExercises } from "./training.controller";
@@ -30,6 +31,13 @@ function smallestRation(state: GameState): string | null {
   ).sort((a, b) => a.price - b.price);
 
   return rations[0]?.id ?? null;
+}
+
+function huntAutomationContext(state: GameState, activity: Activity | null): boolean {
+  if (!state.automation.hunt) return false;
+  if (activity?.kind === "hunt") return true;
+  if (activity?.kind === "rest" && activity.resume?.kind === "hunt") return true;
+  return false;
 }
 
 function canWork(state: GameState, activity: Activity): boolean {
@@ -86,6 +94,16 @@ export function nextAutomationStep(
     if (on.petRest && !isPetActive(pet) && isPetWhole(pet)) {
       return { kind: "kennel", active: true };
     }
+  }
+
+  if (
+    !resting &&
+    on.transform &&
+    huntAutomationContext(state, activity) &&
+    furyRemainingMs(character) === 0
+  ) {
+    const rage = smallestPotion(state, "rage");
+    if (rage) return { kind: "potion", itemId: rage };
   }
 
   if (activity?.paused && on[activity.kind as keyof typeof on] && canWork(state, activity)) {

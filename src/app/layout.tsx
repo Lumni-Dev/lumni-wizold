@@ -1,24 +1,16 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Orbitron } from "next/font/google";
 import { GameProvider } from "@/controllers/game.context";
-import { GAME_NAME } from "@/shared/constants/game";
+import { rootMetadata } from "@/shared/seo/metadata";
 import { Shield } from "@/views/layout/shield";
 import { UpdateGate } from "@/views/components/update-gate";
+import { Geist, Geist_Mono, Orbitron } from "next/font/google";
 import "./globals.css";
 
 const sans = Geist({ variable: "--font-sans-stack", subsets: ["latin"] });
 const mono = Geist_Mono({ variable: "--font-mono-stack", subsets: ["latin"] });
 const logo = Orbitron({ variable: "--font-logo-stack", subsets: ["latin"] });
 
-export const metadata: Metadata = {
-  title: {
-    default: GAME_NAME,
-    template: GAME_NAME + " - %s",
-  },
-  description: "Jogo de navegador de lobisomem: treine, cace e sobreviva a cada noite.",
-  applicationName: GAME_NAME,
-  keywords: ["jogo", "navegador", "lobisomem", "rpg", GAME_NAME],
-};
+export const metadata: Metadata = rootMetadata();
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

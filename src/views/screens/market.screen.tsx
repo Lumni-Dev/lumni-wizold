@@ -78,6 +78,77 @@ const SIZE_FILTERS: readonly { key: SizeFilter; label: string }[] = [
   ...POTION_SIZES.map((key) => ({ key, label: SIZE_LABEL[key] })),
 ];
 
+function matchesItemFilter(
+  item: Item,
+  category: CategoryFilter,
+  set: SetFilter,
+  size: SizeFilter,
+): boolean {
+  if (category !== "all" && item.category !== category) return false;
+  if (item.category === "pet") return true;
+  if (item.category === "potion") return size === "all" || item.size === size;
+  return set === "all" || item.set === set;
+}
+
+function MarketFilters({
+  category,
+  setCategory,
+  set,
+  setSet,
+  size,
+  setSize,
+}: {
+  category: CategoryFilter;
+  setCategory: (value: CategoryFilter) => void;
+  set: SetFilter;
+  setSet: (value: SetFilter) => void;
+  size: SizeFilter;
+  setSize: (value: SizeFilter) => void;
+}) {
+  const isPotion = category === "potion";
+  const isPet = category === "pet";
+
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-2">
+        {CATEGORY_FILTERS.map((option) => (
+          <Chip
+            key={option.key}
+            active={category === option.key}
+            onClick={() => setCategory(option.key)}
+          >
+            {option.label}
+          </Chip>
+        ))}
+      </div>
+      <div className={cn("flex flex-wrap items-center gap-2", isPet && "hidden")}>
+        <span className="mr-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+          {isPotion ? "Tamanho" : "Conjunto"}
+        </span>
+        {isPotion
+          ? SIZE_FILTERS.map((option) => (
+              <Chip
+                key={option.key}
+                active={size === option.key}
+                onClick={() => setSize(option.key)}
+              >
+                {option.label}
+              </Chip>
+            ))
+          : SET_FILTERS.map((option) => (
+              <Chip
+                key={option.key}
+                active={set === option.key}
+                onClick={() => setSet(option.key)}
+              >
+                {option.label}
+              </Chip>
+            ))}
+      </div>
+    </div>
+  );
+}
+
 export function MarketScreen() {
   const { state, character, buyItem, sellItem } = useGame();
   const [tab, setTab] = useState<Tab>("buy");
@@ -105,21 +176,18 @@ export function MarketScreen() {
     /* eslint-enable react-hooks/set-state-in-effect */
   }, [sellables]);
 
-  const isPotion = category === "potion";
-  const isPet = category === "pet";
+  const visibleOffers = offers.filter((offer) =>
+    matchesItemFilter(offer.item, category, set, size),
+  );
+  const visibleSellables = sellables.filter(({ item }) =>
+    matchesItemFilter(item, category, set, size),
+  );
 
-  const visibleOffers = offers.filter((offer) => {
-    if (category !== "all" && offer.item.category !== category) return false;
-    if (isPet) return true;
-    if (isPotion) return size === "all" || offer.item.size === size;
-    return set === "all" || offer.item.set === set;
-  });
-
-  const list = tab === "buy" ? visibleOffers : sellables;
+  const list = tab === "buy" ? visibleOffers : visibleSellables;
   const currentPage = clampPage(page, list.length, PAGE_SIZE);
   const pages = pageCount(list.length, PAGE_SIZE);
   const offersOnPage = pageOf(visibleOffers, currentPage, PAGE_SIZE);
-  const sellablesOnPage = pageOf(sellables, currentPage, PAGE_SIZE);
+  const sellablesOnPage = pageOf(visibleSellables, currentPage, PAGE_SIZE);
 
   if (!character) return null;
 
@@ -151,6 +219,21 @@ export function MarketScreen() {
         ? sellOf(deal.item) * dealQuantity
         : 0;
 
+  function pickCategory(value: CategoryFilter) {
+    setCategory(value);
+    setPage(1);
+  }
+
+  function pickSet(value: SetFilter) {
+    setSet(value);
+    setPage(1);
+  }
+
+  function pickSize(value: SizeFilter) {
+    setSize(value);
+    setPage(1);
+  }
+
   return (
     <>
       <PageHeader
@@ -175,43 +258,14 @@ export function MarketScreen() {
 
       {tab === "buy" ? (
         <>
-          <div className="space-y-2">
-            <div className="flex flex-wrap gap-2">
-              {CATEGORY_FILTERS.map((option) => (
-                <Chip
-                  key={option.key}
-                  active={category === option.key}
-                  onClick={() => setCategory(option.key)}
-                >
-                  {option.label}
-                </Chip>
-              ))}
-            </div>
-            <div className={cn("flex flex-wrap items-center gap-2", isPet && "hidden")}>
-              <span className="mr-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                {isPotion ? "Tamanho" : "Conjunto"}
-              </span>
-              {isPotion
-                ? SIZE_FILTERS.map((option) => (
-                    <Chip
-                      key={option.key}
-                      active={size === option.key}
-                      onClick={() => setSize(option.key)}
-                    >
-                      {option.label}
-                    </Chip>
-                  ))
-                : SET_FILTERS.map((option) => (
-                    <Chip
-                      key={option.key}
-                      active={set === option.key}
-                      onClick={() => setSet(option.key)}
-                    >
-                      {option.label}
-                    </Chip>
-                  ))}
-            </div>
-          </div>
+          <MarketFilters
+            category={category}
+            setCategory={pickCategory}
+            set={set}
+            setSet={pickSet}
+            size={size}
+            setSize={pickSize}
+          />
 
           <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
             {offersOnPage.map(
@@ -264,42 +318,60 @@ export function MarketScreen() {
           description="Volte de uma caçada com loot e tente de novo."
         />
       ) : (
-        <Panel
-          title="Sua oferta"
-          description="A recompra é feita pela metade do preço de tabela."
-          padding="none"
-        >
-          <List>
-            {sellablesOnPage.map(({ item, quantity, enhancement }) => (
-              <ListRow key={item.id} layout="split">
-                <div className="flex min-w-0 flex-1 items-center gap-3">
-                  <ItemIcon item={item} />
-                  <div className="min-w-0">
-                    <p className="truncate text-sm text-ink">
-                      {enhancedName(item.name, enhancement)}
-                    </p>
-                    <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                      {formatNumber(quantity)} em estoque - {formatBronze(sellOf(item))} cada
-                    </p>
-                  </div>
-                </div>
+        <>
+          <MarketFilters
+            category={category}
+            setCategory={pickCategory}
+            set={set}
+            setSet={pickSet}
+            size={size}
+            setSize={pickSize}
+          />
 
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    setSelling(String(quantity));
-                    setDeal({ kind: "sell", item, quantity, total: 0 });
-                  }}
-                >
-                  Vender
-                </Button>
-              </ListRow>
-            ))}
-          </List>
-        </Panel>
+          {visibleSellables.length === 0 ? (
+            <EmptyState
+              title="Nada neste filtro"
+              description="Nenhum item do inventário combina com a categoria escolhida."
+            />
+          ) : (
+            <Panel
+              title="Sua oferta"
+              description="A recompra é feita pela metade do preço de tabela."
+              padding="none"
+            >
+              <List>
+                {sellablesOnPage.map(({ item, quantity, enhancement }) => (
+                  <ListRow key={item.id} layout="split">
+                    <div className="flex min-w-0 flex-1 items-center gap-3">
+                      <ItemIcon item={item} />
+                      <div className="min-w-0">
+                        <p className="truncate text-sm text-ink">
+                          {enhancedName(item.name, enhancement)}
+                        </p>
+                        <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                          {formatNumber(quantity)} em estoque - {formatBronze(sellOf(item))} cada
+                        </p>
+                      </div>
+                    </div>
+
+                    <Button
+                      variant="secondary"
+                      onClick={() => {
+                        setSelling(String(quantity));
+                        setDeal({ kind: "sell", item, quantity, total: 0 });
+                      }}
+                    >
+                      Vender
+                    </Button>
+                  </ListRow>
+                ))}
+              </List>
+            </Panel>
+          )}
+
+          <Pagination page={currentPage} pages={pages} onChange={setPage} />
+        </>
       )}
-
-      {tab === "sell" ? <Pagination page={currentPage} pages={pages} onChange={setPage} /> : null}
 
       <ConfirmDialog
         open={deal !== null}

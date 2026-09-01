@@ -6,6 +6,7 @@ import * as packController from "@/controllers/pack.controller";
 import { generateId } from "@/shared/utils/id";
 import { asText, withGame } from "../../_lib/api";
 import { sendPackInviteEmail } from "../../_lib/mail";
+import { moderationRefusal } from "../../_lib/moderation";
 
 export async function POST(request: Request) {
   return withGame(request, async (state, body, context) => {
@@ -18,7 +19,10 @@ export async function POST(request: Request) {
       if (!known) return failure(state, "Esse caçador não está no registro.");
       target = known;
     } else {
-      const found = packController.matchNick(asText(body.nick, 60), names);
+      const nick = asText(body.nick, 60);
+      const blocked = await moderationRefusal(context.client, context.userId, nick, "hunter_name");
+      if (blocked) return failure(state, blocked);
+      const found = packController.matchNick(nick, names);
       if (typeof found === "string") return failure(state, found);
       target = found;
     }

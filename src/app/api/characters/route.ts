@@ -13,6 +13,7 @@ import {
 } from "@/models/repositories/server/game.store";
 import { asText, bad, readBody, refuseAbuse, reply, sessionIsLive } from "../_lib/api";
 import { sendDepartureNoticeEmail, sendFarewellEmail } from "../_lib/mail";
+import { moderationRefusal } from "../_lib/moderation";
 import { rateLimit } from "../_lib/rate-limit";
 import { deletionCodeHash, dropSession, sessionClaims } from "../_lib/session";
 export async function DELETE(request: Request) {
@@ -135,6 +136,8 @@ export async function POST(request: Request) {
           state: existing.state,
         });
       }
+      const blocked = await moderationRefusal(client, userId, name, "hunter_name");
+      if (blocked) return reply(failure(initialState(), blocked));
       const result = characterController.startRun(name, gender);
       if (!result.ok) return reply(result);
       const chosen = result.state.character?.name ?? name;

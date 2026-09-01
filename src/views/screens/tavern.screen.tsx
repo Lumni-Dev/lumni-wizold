@@ -28,6 +28,7 @@ import { formatTime } from "@/shared/utils/format";
 import { sanitizeName } from "@/shared/utils/text";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
 import { ActionIcon } from "../components/app-icon";
+import { AiAuditNotice } from "../components/ai-audit-notice";
 import { Button } from "../components/button";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
 import { ConfirmDialog } from "../components/confirm-dialog";
@@ -390,6 +391,7 @@ export function TavernScreen() {
                   setRoomName(sanitizeName(event.target.value, ROOM_NAME_MAX_LENGTH))
                 }
               />
+              <AiAuditNotice />
               <Field
                 label="Senha (opcional)"
                 type="password"
@@ -490,6 +492,7 @@ export function TavernScreen() {
                 hint="Quem está numa mesa agora responde primeiro, depois o quadro do ranking."
                 onChange={(event) => setNick(sanitizeName(event.target.value, NAME_MAX_LENGTH))}
               />
+              <AiAuditNotice />
               <Tooltip block label={pack.length >= MAX_PACK ? "A matilha está cheia" : ""}>
                 <Button
                   type="submit"
@@ -699,7 +702,9 @@ export function TavernScreen() {
         }}
         className="max-w-lg"
         footer={
-          <form onSubmit={submitMessage} className="flex items-center gap-2">
+          <form onSubmit={submitMessage} className="space-y-2">
+            <AiAuditNotice />
+            <div className="flex items-center gap-2">
             <div className="relative min-w-0 flex-1">
               <Field
                 aria-label="Mensagem"
@@ -767,6 +772,7 @@ export function TavernScreen() {
             >
               {cooldownLeft > 0 ? Math.ceil(cooldownLeft / 1000) : "Enviar"}
             </Button>
+            </div>
           </form>
         }
       >

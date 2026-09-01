@@ -131,6 +131,7 @@ export async function withGame<T>(request: Request, action: GameAction<T>): Prom
 }
 export interface TavernContext {
   client: PoolClient;
+  userId: string;
   identity: TavernIdentity;
   tavern: LoadedTavern;
 }
@@ -173,7 +174,7 @@ export async function withTavern(
       if (options.write) await lockTavern(client);
       await pruneStale(client);
       const tavern = await loadTavern(client);
-      return action(tavern.state, body, { client, identity, tavern });
+      return action(tavern.state, body, { client, userId: guarded.userId, identity, tavern });
     });
   } catch (error) {
     console.error("[api]", request.method, new URL(request.url).pathname, error);
@@ -194,7 +195,7 @@ export async function withTavernRoom(
       const identity = await tavernIdentity(client, guarded.userId);
       if (!identity) return bad("Nenhum personagem ativo.", 404);
       const tavern = await loadRoomState(client, roomId, true);
-      return action(tavern.state, body, { client, identity, tavern });
+      return action(tavern.state, body, { client, userId: guarded.userId, identity, tavern });
     });
   } catch (error) {
     console.error("[api]", request.method, new URL(request.url).pathname, error);

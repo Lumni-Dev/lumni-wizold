@@ -13,6 +13,15 @@ import {
   MIN_WITHDRAW_CENTS,
   sellerNet,
 } from "@/models/rules/bazaar";
+import {
+  EQUIPMENT_SET_KEYS,
+  EQUIPMENT_SLOTS,
+  SET_LABEL,
+  SLOT_LABEL,
+  CATEGORY_PLURAL,
+  type EquipmentSet,
+  type ItemCategory,
+} from "@/models/entities/item";
 import { listingExpiresAt, type BazaarListing } from "@/models/entities/bazaar";
 import { enhancedName } from "@/models/rules/forge";
 import {
@@ -23,6 +32,7 @@ import {
 } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
 import { Button } from "../components/button";
+import { Chip } from "../components/chip";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { EmptyState } from "../components/empty-state";
 import { Field } from "../components/field";
@@ -36,6 +46,20 @@ import { Tag } from "../components/tag";
 import { PageHeader } from "../layout/page-header";
 
 const PAGE_SIZE = 9;
+
+type CategoryFilter = ItemCategory | "all";
+type SetFilter = EquipmentSet | "all";
+
+const BAZAAR_CATEGORY_FILTERS: readonly { key: CategoryFilter; label: string }[] = [
+  { key: "all", label: "Tudo" },
+  { key: "material", label: CATEGORY_PLURAL.material },
+  ...EQUIPMENT_SLOTS.map((slot) => ({ key: slot, label: SLOT_LABEL[slot] })),
+];
+
+const BAZAAR_SET_FILTERS: readonly { key: SetFilter; label: string }[] = [
+  { key: "all", label: "Todos" },
+  ...EQUIPMENT_SET_KEYS.map((key) => ({ key, label: SET_LABEL[key] })),
+];
 
 function formatRemaining(ms: number): string {
   const total = Math.floor(ms / 1000);
@@ -81,6 +105,8 @@ export function BazaarScreen() {
     void confirmPayment(sessionId);
   }, [confirmPayment]);
   const [page, setPage] = useState(1);
+  const [category, setCategory] = useState<CategoryFilter>("all");
+  const [set, setSet] = useState<SetFilter>("all");
   const [flow, setFlow] = useState<Flow | null>(null);
   const [cancelling, setCancelling] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
@@ -106,13 +132,22 @@ export function BazaarScreen() {
   }, [ownListings]);
   const sellable = useMemo(() => listSellable(state), [state]);
 
+  const filteredBoard = useMemo(
+    () =>
+      board.filter((entry) => {
+        if (category !== "all" && entry.item.category !== category) return false;
+        return set === "all" || entry.item.set === set;
+      }),
+    [board, category, set],
+  );
+
   if (!character) return null;
 
   const listingFee = bazaarListingFee(character.level);
 
-  const currentPage = clampPage(page, board.length, PAGE_SIZE);
-  const pages = pageCount(board.length, PAGE_SIZE);
-  const onPage = pageOf(board, currentPage, PAGE_SIZE);
+  const currentPage = clampPage(page, filteredBoard.length, PAGE_SIZE);
+  const pages = pageCount(filteredBoard.length, PAGE_SIZE);
+  const onPage = pageOf(filteredBoard, currentPage, PAGE_SIZE);
 
   const announcing =
     flow?.kind === "announce" && flow.itemId
@@ -192,72 +227,115 @@ export function BazaarScreen() {
           description="Nenhum anúncio no momento. Forje uma peça ou minere fragmentos e anuncie."
         />
       ) : (
-        <Panel
-          title="Anúncios"
-          description="O quadro inteiro: os seus primeiro, depois os dos outros caçadores."
-          padding="none"
-          footer={
-            pages > 1 ? (
-              <Pagination page={currentPage} pages={pages} onChange={setPage} />
-            ) : undefined
-          }
-        >
-          <List>
-            {onPage.map((entry) => (
-              <ListRow key={entry.listing.id} padding="art">
-                <ItemIcon item={entry.item} />
-                <RowText
-                  title={enhancedName(entry.item.name, entry.listing.enhancement)}
-                  description={
-                    <>
-                      <Link
-                        href={entry.mine ? "/character" : "/ranking/" + entry.listing.sellerId}
-                        className="transition-colors hover:text-highlight"
-                      >
-                        {entry.mine ? "Seu anúncio" : "por " + entry.listing.sellerName}
-                      </Link>
-                      {entry.mine
-                        ? " - " +
-                          formatReais(entry.listing.priceCents) +
-                          (entry.available > 1 ? " cada" : "")
-                        : null}
-                      <span className="block">
-                        {entry.expired
-                          ? "Vencido: remova para recolher as peças."
-                          : expiryLine(entry.listing, now)}
-                      </span>
-                    </>
-                  }
-                />
-                <span className="flex shrink-0 items-center gap-3">
-                  {entry.available > 1 ? (
-                    <span className="font-mono text-xs text-ink-soft">
-                      x{formatNumber(entry.available)}
-                    </span>
-                  ) : null}
-                  {entry.mine ? (
-                    <Button variant="outline" onClick={() => setCancelling(entry.listing.id)}>
-                      Remover
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="primary"
-                      onClick={() =>
-                        setFlow({
-                          kind: "buy",
-                          listingId: entry.listing.id,
-                          quantity: "1",
-                        })
+        <>
+          <div className="space-y-2">
+            <div className="flex flex-wrap gap-2">
+              {BAZAAR_CATEGORY_FILTERS.map((option) => (
+                <Chip
+                  key={option.key}
+                  active={category === option.key}
+                  onClick={() => {
+                    setCategory(option.key);
+                    setPage(1);
+                  }}
+                >
+                  {option.label}
+                </Chip>
+              ))}
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="mr-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                Conjunto
+              </span>
+              {BAZAAR_SET_FILTERS.map((option) => (
+                <Chip
+                  key={option.key}
+                  active={set === option.key}
+                  onClick={() => {
+                    setSet(option.key);
+                    setPage(1);
+                  }}
+                >
+                  {option.label}
+                </Chip>
+              ))}
+            </div>
+          </div>
+
+          {filteredBoard.length === 0 ? (
+            <EmptyState
+              title="Nada neste filtro"
+              description="Nenhum anúncio combina com a categoria escolhida."
+            />
+          ) : (
+            <Panel
+              title="Anúncios"
+              description="O quadro inteiro: os seus primeiro, depois os dos outros caçadores."
+              padding="none"
+              footer={
+                pages > 1 ? (
+                  <Pagination page={currentPage} pages={pages} onChange={setPage} />
+                ) : undefined
+              }
+            >
+              <List>
+                {onPage.map((entry) => (
+                  <ListRow key={entry.listing.id} padding="art">
+                    <ItemIcon item={entry.item} />
+                    <RowText
+                      title={enhancedName(entry.item.name, entry.listing.enhancement)}
+                      description={
+                        <>
+                          <Link
+                            href={entry.mine ? "/character" : "/ranking/" + entry.listing.sellerId}
+                            className="transition-colors hover:text-highlight"
+                          >
+                            {entry.mine ? "Seu anúncio" : "por " + entry.listing.sellerName}
+                          </Link>
+                          {entry.mine
+                            ? " - " +
+                              formatReais(entry.listing.priceCents) +
+                              (entry.available > 1 ? " cada" : "")
+                            : null}
+                          <span className="block">
+                            {entry.expired
+                              ? "Vencido: remova para recolher as peças."
+                              : expiryLine(entry.listing, now)}
+                          </span>
+                        </>
                       }
-                    >
-                      Comprar {formatReais(entry.listing.priceCents)}
-                    </Button>
-                  )}
-                </span>
-              </ListRow>
-            ))}
-          </List>
-        </Panel>
+                    />
+                    <span className="flex shrink-0 items-center gap-3">
+                      {entry.available > 1 ? (
+                        <span className="font-mono text-xs text-ink-soft">
+                          x{formatNumber(entry.available)}
+                        </span>
+                      ) : null}
+                      {entry.mine ? (
+                        <Button variant="outline" onClick={() => setCancelling(entry.listing.id)}>
+                          Remover
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="primary"
+                          onClick={() =>
+                            setFlow({
+                              kind: "buy",
+                              listingId: entry.listing.id,
+                              quantity: "1",
+                            })
+                          }
+                        >
+                          Comprar {formatReais(entry.listing.priceCents)}
+                        </Button>
+                      )}
+                    </span>
+                  </ListRow>
+                ))}
+              </List>
+            </Panel>
+          )}
+        </>
       )}
 
       <Modal

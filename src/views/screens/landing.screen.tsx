@@ -156,6 +156,9 @@ export function LandingScreen() {
           )}
         >
         <div className="space-y-5">
+          <h1 className="absolute h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
+            {GAME_NAME}: {GAME_TAGLINE}
+          </h1>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/assets/ui/logo.webp?v=3"

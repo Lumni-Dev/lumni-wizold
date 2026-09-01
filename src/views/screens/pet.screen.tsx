@@ -27,6 +27,7 @@ import { formatNumber, formatBronze } from "@/shared/utils/format";
 import { sanitizeName } from "@/shared/utils/text";
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
+import { AiAuditNotice } from "../components/ai-audit-notice";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { Field } from "../components/field";
@@ -119,6 +120,7 @@ function Kennel({ bronze, level }: { bronze: number; level: number }) {
             autoComplete="off"
             onChange={(event) => setName(sanitizeName(event.target.value, NAME_MAX_LENGTH))}
           />
+          <AiAuditNotice />
           {!oldEnough ? (
             <p className="text-[11px] text-ink-faint">
               O lobo só caça ao lado de um NV {PET_MIN_LEVEL} ou mais.
@@ -346,6 +348,7 @@ export function PetScreen() {
                   setNewPetName(sanitizeName(event.target.value, NAME_MAX_LENGTH))
                 }
               />
+              <AiAuditNotice />
               <Button
                 type="submit"
                 variant="primary"
