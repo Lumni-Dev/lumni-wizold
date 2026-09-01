@@ -39,6 +39,8 @@ const client = new pg.Client({
 });
 await client.connect();
 
+await client.query("delete from users where email = $1", [EMAIL]);
+
 const userId = "usr_" + Date.now().toString(36) + "_cap" + randomBytes(2).toString("hex");
 await client.query("insert into users (id, email, birth_date) values ($1, $2, $3)", [
   userId,

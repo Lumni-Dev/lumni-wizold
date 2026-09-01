@@ -14,7 +14,7 @@ export const PREVIEW_SHOTS: readonly PreviewShot[] = [
     text:
       "Atributos, forma, lobo e combate na mesma tela, com a origem de cada ponto separada: " +
       "treino, equipamento, mascote, lua e fúria.",
-    image: "/assets/landing/character.webp?v=7",
+    image: "/assets/landing/character.webp?v=8",
   },
   {
     key: "hunt",
@@ -23,7 +23,7 @@ export const PREVIEW_SHOTS: readonly PreviewShot[] = [
     text:
       "A trilha enche, a presa responde e a luta desce linha a linha. Só a fera caça: " +
       "em pele humana o campo recusa.",
-    image: "/assets/landing/hunt.webp?v=7",
+    image: "/assets/landing/hunt.webp?v=8",
   },
   {
     key: "training",
@@ -32,7 +32,7 @@ export const PREVIEW_SHOTS: readonly PreviewShot[] = [
     text:
       "Cada atributo tem o seu pátio, a sessão cobra WCoins e o ganho acompanha o nível " +
       "sem presente escondido na faixa.",
-    image: "/assets/landing/training.webp?v=7",
+    image: "/assets/landing/training.webp?v=8",
   },
   {
     key: "forge",
@@ -41,7 +41,7 @@ export const PREVIEW_SHOTS: readonly PreviewShot[] = [
     text:
       "A mina abre os veios por faixa, a bigorna bate na peça que você já usa e cada +1 " +
       "permanece na peça, não no slot.",
-    image: "/assets/landing/forge.webp?v=7",
+    image: "/assets/landing/forge.webp?v=8",
   },
   {
     key: "arena",
@@ -50,7 +50,7 @@ export const PREVIEW_SHOTS: readonly PreviewShot[] = [
     text:
       "Adversário do ranking, prêmio em WCoins na bolsa dele e replay da luta na mesma " +
       "cadência da caça.",
-    image: "/assets/landing/arena.webp?v=7",
+    image: "/assets/landing/arena.webp?v=8",
   },
   {
     key: "tavern",
@@ -59,6 +59,6 @@ export const PREVIEW_SHOTS: readonly PreviewShot[] = [
     text:
       "Salas abertas ou trancadas, mensagens ao vivo, convite de matilha e aviso quando " +
       "a cadeira acende.",
-    image: "/assets/landing/tavern.webp?v=7",
+    image: "/assets/landing/tavern.webp?v=8",
   },
 ];
