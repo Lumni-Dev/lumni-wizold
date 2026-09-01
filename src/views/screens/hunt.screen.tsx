@@ -12,8 +12,7 @@ import { CYCLE_OPTOUT_SECS, HUNT_TICK_MS } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
 import { formatNumber } from "@/shared/utils/format";
 import { ArtImage } from "../components/art-image";
-import { IconArt } from "../components/icon-frame";
-import { CornerAccents } from "../components/corner-accents";
+import { CreatureIcon } from "../components/creature-icon";
 import {
   loadHuntSelection,
   saveHuntSelection,
@@ -43,8 +42,6 @@ interface HuntSession {
     }
   >;
 }
-const CREATURE_ART_VERSION = "?v=3";
-
 const EMPTY_SESSION: HuntSession = {
   hunts: 0,
   wins: 0,
@@ -501,19 +498,7 @@ export function HuntScreen() {
                                 isSelected ? "bg-surface-high" : "hover:bg-surface-high/60",
                               )}
                             >
-                              <span aria-hidden="true" className="relative flex h-18 w-18 shrink-0">
-                                <span className="slot-well relative flex h-full w-full items-center justify-center overflow-hidden rounded-md border border-edge bg-base font-mono text-lg text-ink-faint">
-                                  {creature.image ? (
-                                    <IconArt
-                                      source={creature.image + CREATURE_ART_VERSION}
-                                      fit="contain"
-                                    />
-                                  ) : (
-                                    "?"
-                                  )}
-                                </span>
-                                <CornerAccents scale="icon" />
-                              </span>
+                              <CreatureIcon creature={creature} />
                               <span className="min-w-0 flex-1">
                                 <span
                                   className={cn(

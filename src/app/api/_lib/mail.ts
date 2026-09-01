@@ -12,7 +12,7 @@ const INK = "#f0e9e2";
 const INK_SOFT = "#ac9c8d";
 const INK_FAINT = "#79695a";
 const EMBER = "#e08d35";
-const LOGO_URL = GAME_URL + "/assets/ui/logo.png?v=1";
+const LOGO_URL = GAME_URL + "/assets/ui/logo.png?v=3";
 
 function transporter() {
   const host = process.env.SMTP_HOST;

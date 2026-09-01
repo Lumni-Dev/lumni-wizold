@@ -158,7 +158,7 @@ export function LandingScreen() {
         <div className="space-y-5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/assets/ui/logo.webp?v=2"
+            src="/assets/ui/logo.webp?v=3"
             alt={GAME_NAME}
             className="mx-auto w-72 max-w-full md:w-96"
           />

@@ -73,9 +73,9 @@ export function SettingsScreen() {
     setClearing(true);
     try {
       const urls = [
-        "/assets/ui/logo.webp?v=2",
-        "/assets/ui/logo.png?v=1",
-        "/assets/ui/background.jpg?v=1",
+        "/assets/ui/logo.webp?v=3",
+        "/assets/ui/logo.png?v=3",
+        "/assets/ui/background.jpg?v=2",
         ...Object.values(art.items),
         ...Object.values(art.attributes),
         ...Object.values(art.training),

@@ -60,7 +60,7 @@
         rgba(7, 5, 3, 0.96) 90%,
         var(--color-base) 100%
       ),
-      url("/assets/ui/background.jpg?v=1");
+      url("/assets/ui/background.jpg?v=2");
     background-size: auto, 100% auto;
     background-position: center top;
     background-repeat: no-repeat;

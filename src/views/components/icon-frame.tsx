@@ -72,6 +72,7 @@ export function IconArt({
   badge,
   inset,
   fit = "cover",
+  onFail,
 }: {
   source: string;
   padded?: boolean;
@@ -79,6 +80,7 @@ export function IconArt({
   badge?: string;
   inset?: string;
   fit?: "cover" | "contain";
+  onFail?: () => void;
 }) {
   const [preview, setPreview] = useState<{
     left: number;
@@ -109,6 +111,7 @@ export function IconArt({
           if (img && img.complete && img.naturalWidth > 0) setLoaded(true);
         }}
         onLoad={() => setLoaded(true)}
+        onError={() => onFail?.()}
         className={cn(
           "h-full w-full cursor-zoom-in drop-shadow-[0_2px_4px_rgba(0,0,0,0.55)] transition-opacity duration-300",
           fit === "contain" ? "object-contain" : "object-cover",
