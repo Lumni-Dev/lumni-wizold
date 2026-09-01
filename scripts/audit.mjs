@@ -1479,8 +1479,12 @@ sec("inventário e mercado");
     marketCtrl.marketPriceOf(items.findItem("health-potion-large"), 100) === 300,
   );
   ok(
-    "poção de fúria pequena custa 150 WCoins",
-    marketCtrl.marketPriceOf(items.findItem("rage-potion-small"), 100) === 150,
+    "poção de fúria pequena custa 300 WCoins",
+    marketCtrl.marketPriceOf(items.findItem("rage-potion-small"), 100) === 300,
+  );
+  ok(
+    "poção de fúria média custa 600 WCoins",
+    marketCtrl.marketPriceOf(items.findItem("rage-potion-medium"), 100) === 600,
   );
   ok(
     "poção de fúria grande custa 900 WCoins",

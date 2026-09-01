@@ -4,13 +4,13 @@ import { FURY } from "@/shared/constants/tuning/fury";
 const RAGE_TIERS = [
   {
     size: "small" as PotionSize,
-    price: 150,
+    price: 300,
     rarity: "common" as const,
     minLevel: 1,
   },
   {
     size: "medium" as PotionSize,
-    price: 450,
+    price: 600,
     rarity: "uncommon" as const,
     minLevel: 334,
   },
