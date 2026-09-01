@@ -112,7 +112,7 @@ export function LandingBackground() {
     const video = videoRef.current;
     if (!video) return;
 
-    let stop = () => undefined;
+    let stop: () => void = () => undefined;
     const onPlayFail = () => {
       stop();
       stop = startScrubPingPong(video);
