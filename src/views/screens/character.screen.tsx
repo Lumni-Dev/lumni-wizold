@@ -17,7 +17,7 @@ import { CopyNick } from "../components/copy-nick";
 import { Tag } from "../components/tag";
 import { DataRow } from "../components/data-row";
 import { EmptyState } from "../components/empty-state";
-import { GenderBanner } from "../components/gender-icon";
+import { GenderSheetHeader } from "../components/gender-icon";
 import { ItemIcon } from "../components/item-icon";
 import { VitalActionButton } from "../components/vital-action-button";
 import { FuryUseButton } from "../components/fury-use-button";
@@ -98,8 +98,7 @@ export function CharacterScreen() {
       <div className="grid items-start gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-1">
           <Panel title="Ficha" padding="none">
-            <GenderBanner gender={character.gender} />
-            <div className="border-b border-edge p-4">
+            <GenderSheetHeader gender={character.gender}>
               <div className="min-w-0 space-y-1">
                 <div className="flex items-center gap-2">
                   <p className="min-w-0 truncate text-sm text-ink">{character.name}</p>
@@ -109,7 +108,7 @@ export function CharacterScreen() {
                   {genderDefinition.label}
                 </p>
               </div>
-            </div>
+            </GenderSheetHeader>
 
             <List>
               <DataRow label="Nível" value={"NV. " + formatNumber(character.level)} />

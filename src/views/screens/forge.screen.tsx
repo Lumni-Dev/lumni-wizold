@@ -16,7 +16,7 @@ import {
 import { enhancedName } from "@/models/rules/forge";
 import { FORGE_TICKS, MAX_ENHANCEMENT, MINING_RESET_HOUR, MINING_TICKS } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
-import { FilterSelect } from "../components/filter-select";
+import { FilterRow, FilterSelect } from "../components/filter-select";
 import { FilteredEmptyState } from "../components/filtered-empty-state";
 import { formatBronze, formatNumber } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf, pageOfPosition } from "@/shared/utils/pagination";
@@ -46,7 +46,7 @@ function pieceKey(itemId: string, level: number): string {
   return itemId + "@" + level;
 }
 
-const FORGE_PAGE_SIZE = 9;
+const FORGE_PAGE_SIZE = 5;
 
 export function ForgeScreen() {
   const { state, character, activity, setActivity } = useGame();
@@ -337,8 +337,8 @@ export function ForgeScreen() {
                   />
                 </div>
               ) : (
-                <div className="space-y-3 p-4">
-                  <div className="flex items-center gap-3">
+                <List>
+                  <ListRow padding="art">
                     <span className={cn("inline-flex", forgeActive && forgeShake && "card-shake")}>
                       <ItemIcon item={forgeEntry.item} enhancement={forgeEntry.level} />
                     </span>
@@ -358,78 +358,84 @@ export function ForgeScreen() {
                         </p>
                       ) : null}
                     </div>
-                  </div>
+                  </ListRow>
 
                   {forgeEntry.fragment && forgeEntry.level < MAX_ENHANCEMENT ? (
-                    <Bar
-                      label={forgeEntry.fragment.name}
-                      tone="ember"
-                      current={forgeEntry.owned}
-                      maximum={forgeEntry.cost}
-                    />
+                    <ListRow layout="column">
+                      <Bar
+                        label={forgeEntry.fragment.name}
+                        tone="ember"
+                        current={forgeEntry.owned}
+                        maximum={forgeEntry.cost}
+                      />
+                    </ListRow>
                   ) : null}
 
-                  <Bar
-                    label={forgeActive ? "Forjando..." : "Forjar"}
-                    current={strike.id === forgeEntry.item.id ? strike.beat : 0}
-                    maximum={FORGE_TICKS}
-                    glows={forgeActive}
-                    wraps
-                  />
+                  <ListRow layout="column">
+                    <Bar
+                      label={forgeActive ? "Forjando..." : "Forjar"}
+                      current={strike.id === forgeEntry.item.id ? strike.beat : 0}
+                      maximum={FORGE_TICKS}
+                      glows={forgeActive}
+                      wraps
+                    />
+                  </ListRow>
 
-                  <div className="-mx-4 flex items-center justify-between gap-3 border-t border-edge px-4 pt-4">
-                    <span className="min-w-0 flex-1 truncate text-[11px] text-ink-faint">
-                      {forgeActive
-                        ? forgeOpting
-                          ? "Segue sozinho..."
-                          : state.automation.forge
-                            ? "Forjando sem parar..."
-                            : "Forjando..."
-                        : waitingItem === forgeEntry.item.id
-                          ? "Esperando fragmentos e WCoins para a próxima martelada"
-                          : forgeEntry.fragment && forgeEntry.level < MAX_ENHANCEMENT
-                            ? "Forjar custa " + formatBronze(forgeEntry.bronzeCost)
-                            : (forgeEntry.reason ?? "Peça no teto")}
-                    </span>
-                    <Button
-                      size="medium"
-                      variant={
-                        forgeActive ? "secondary" : forgeEntry.canForge ? "primary" : "outline"
-                      }
-                      disabled={
-                        forgeActive ? !forgeOpting : !forgeEntry.canForge || activeOre !== null
-                      }
-                      onClick={() => toggleForge()}
-                      aria-label={forgeActive ? "Parar de forjar" : "Forjar a peça escolhida"}
-                    >
-                      {forgeOpting && forgeActive
-                        ? "Parar (" + cooldown + ")"
-                        : forgeActive
-                          ? "Forjando..."
-                          : "Forjar"}
-                    </Button>
-                  </div>
-                </div>
+                  <ListRow layout="column">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="min-w-0 flex-1 truncate text-[11px] text-ink-faint">
+                        {forgeActive
+                          ? forgeOpting
+                            ? "Segue sozinho..."
+                            : state.automation.forge
+                              ? "Forjando sem parar..."
+                              : "Forjando..."
+                          : waitingItem === forgeEntry.item.id
+                            ? "Esperando fragmentos e WCoins para a próxima martelada"
+                            : forgeEntry.fragment && forgeEntry.level < MAX_ENHANCEMENT
+                              ? "Forjar custa " + formatBronze(forgeEntry.bronzeCost)
+                              : (forgeEntry.reason ?? "Peça no teto")}
+                      </span>
+                      <Button
+                        size="medium"
+                        variant={
+                          forgeActive ? "secondary" : forgeEntry.canForge ? "primary" : "outline"
+                        }
+                        disabled={
+                          forgeActive ? !forgeOpting : !forgeEntry.canForge || activeOre !== null
+                        }
+                        onClick={() => toggleForge()}
+                        aria-label={forgeActive ? "Parar de forjar" : "Forjar a peça escolhida"}
+                      >
+                        {forgeOpting && forgeActive
+                          ? "Parar (" + cooldown + ")"
+                          : forgeActive
+                            ? "Forjando..."
+                            : "Forjar"}
+                      </Button>
+                    </div>
+                  </ListRow>
+                </List>
               )}
             </Panel>
 
-            <FilterSelect
-              label="Forja"
-              className="w-full"
-              value={category}
-              options={slotCategoryFilterOptions()}
-              onChange={pickCategory}
-            />
-            <FilterSelect
-              label="Disponíveis"
-              className="w-full"
-              value={set}
-              options={setFilterOptions()}
-              onChange={pickSet}
-            />
+            <FilterRow>
+              <FilterSelect
+                label="Espaço"
+                value={category}
+                options={slotCategoryFilterOptions()}
+                onChange={pickCategory}
+              />
+              <FilterSelect
+                label="Conjunto"
+                value={set}
+                options={setFilterOptions()}
+                onChange={pickSet}
+              />
+            </FilterRow>
 
             <Panel
-              title="Peças"
+              title="Disponíveis"
               description="Escolha o que entra na bigorna. Só peças fora do corpo aparecem aqui."
               padding="none"
             >
