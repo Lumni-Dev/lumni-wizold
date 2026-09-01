@@ -18,6 +18,7 @@ import {
   PET_EXERCISE_ID,
   TRAINING_TICKS,
 } from "@/shared/constants/game";
+import { GLASS_SECTION } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { NavIcon } from "./app-icon";
 import { Bar } from "./bar";
@@ -277,11 +278,12 @@ export function ActivityDock() {
     <aside aria-label="Atividade em andamento" className="pointer-events-auto relative w-full">
       <div
         className={cn(
-          "overflow-hidden rounded-lg border border-edge bg-surface-high shadow-[0_12px_32px_-12px_rgba(0,0,0,0.95)]",
+          "overflow-hidden rounded-lg border border-edge shadow-[0_12px_32px_-12px_rgba(0,0,0,0.95)]",
+          GLASS_SECTION,
           shaking && "card-shake",
         )}
       >
-        <div className="flex items-center gap-2 border-b border-edge bg-surface-high/40 px-3 py-2">
+        <div className="flex items-center gap-2 border-b border-edge px-3 py-2">
           <NavIcon href={dock.href} className="shrink-0 text-ink-faint" />
           <Link
             href={dock.href}
