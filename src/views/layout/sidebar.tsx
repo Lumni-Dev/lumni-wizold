@@ -14,6 +14,7 @@ import { cn } from "@/shared/utils/class-names";
 import { CONTROL_HEIGHT } from "@/shared/constants/ui";
 import { chipClass, ChipFrame } from "../components/chip";
 import { MoonTracker } from "../components/moon-tracker";
+import { FuryModeTracker } from "../components/fury-mode-tracker";
 import { NavIcon } from "../components/app-icon";
 
 function Brand() {
@@ -90,6 +91,7 @@ export function Sidebar({ tavernUnread = 0 }: { tavernUnread?: number }) {
 
       <div className="space-y-3 border-t border-edge p-3">
         <MoonTracker />
+        <FuryModeTracker />
         <NavLink item={STORE_LINK} active={pathname === STORE_LINK.href} highlighted />
         <NavLink item={SETTINGS_LINK} active={pathname === SETTINGS_LINK.href} />
       </div>
