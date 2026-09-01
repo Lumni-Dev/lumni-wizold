@@ -7,10 +7,6 @@ import { listForge, listMining } from "@/controllers/forge.controller";
 import { usePageActivity } from "@/controllers/use-page-activity";
 import type { Activity } from "@/models/entities/activity";
 import {
-  type EquipmentSet,
-  type ItemCategory,
-} from "@/models/entities/item";
-import {
   matchesCategoryAndSet,
   setFilterOptions,
   slotCategoryFilterOptions,
@@ -20,7 +16,7 @@ import {
 import { enhancedName } from "@/models/rules/forge";
 import { FORGE_TICKS, MAX_ENHANCEMENT, MINING_RESET_HOUR, MINING_TICKS } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
-import { FilterRow, FilterSelect } from "../components/filter-select";
+import { FilterSelect } from "../components/filter-select";
 import { FilteredEmptyState } from "../components/filtered-empty-state";
 import { formatBronze, formatNumber } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf, pageOfPosition } from "@/shared/utils/pagination";
@@ -30,7 +26,6 @@ import { ConfirmDialog } from "../components/confirm-dialog";
 import { IconFrame } from "../components/icon-frame";
 import { ItemIcon } from "../components/item-icon";
 import { EmptyState } from "../components/empty-state";
-import { ItemCard } from "../components/item-card";
 import { RowText, List, ListRow } from "../components/list";
 import { Pagination } from "../components/pagination";
 import { Panel } from "../components/panel";
@@ -325,15 +320,6 @@ export function ForgeScreen() {
           </Panel>
 
           <div className="space-y-3">
-            <FilterRow>
-              <FilterSelect
-                label="Forja"
-                value={category}
-                options={slotCategoryFilterOptions()}
-                onChange={pickCategory}
-              />
-            </FilterRow>
-
             <Panel
               title="Bigorna"
               description={
@@ -426,56 +412,110 @@ export function ForgeScreen() {
                 </div>
               )}
             </Panel>
-          </div>
-        </div>
 
-        <div className="space-y-3">
-          <FilterRow>
+            <FilterSelect
+              label="Forja"
+              className="w-full"
+              value={category}
+              options={slotCategoryFilterOptions()}
+              onChange={pickCategory}
+            />
             <FilterSelect
               label="Disponíveis"
+              className="w-full"
               value={set}
               options={setFilterOptions()}
               onChange={pickSet}
             />
-          </FilterRow>
 
-          {slots.length === 0 ? (
-            <EmptyState
-              title="Nada disponível"
-              description="Desequipe uma peça para forjá-la."
-            />
-          ) : filteredSlots.length === 0 ? (
-            <FilteredEmptyState description="Nenhuma peça do inventário combina com a categoria escolhida." />
-          ) : (
-            <>
-              <div className="grid auto-rows-fr gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                {forgeOnPage.map((row) => {
-                  const key = pieceKey(row.item.id, row.level);
-                  const isSelected = key === effectiveForge;
-                  return (
-                    <button
-                      key={key}
-                      type="button"
-                      onClick={() => selectForge(key)}
-                      aria-pressed={isSelected}
-                      disabled={activeItem !== null}
-                      className="h-full text-left disabled:opacity-60"
-                    >
-                      <ItemCard
-                        item={row.item}
-                        quantity={row.quantity}
-                        enhancement={row.level}
-                        highlighted={isSelected}
+            <Panel
+              title="Peças"
+              description="Escolha o que entra na bigorna. Só peças fora do corpo aparecem aqui."
+              padding="none"
+            >
+              {slots.length === 0 ? (
+                <div className="p-4">
+                  <EmptyState
+                    title="Nada disponível"
+                    description="Desequipe uma peça para forjá-la."
+                  />
+                </div>
+              ) : filteredSlots.length === 0 ? (
+                <div className="p-4">
+                  <FilteredEmptyState description="Nenhuma peça do inventário combina com os filtros escolhidos." />
+                </div>
+              ) : (
+                <>
+                  <List>
+                    {forgeOnPage.map((row) => {
+                      const key = pieceKey(row.item.id, row.level);
+                      const isSelected = key === effectiveForge;
+                      return (
+                        <ListRow key={key}>
+                          <button
+                            type="button"
+                            onClick={() => selectForge(key)}
+                            aria-pressed={isSelected}
+                            disabled={activeItem !== null}
+                            className={cn(
+                              "flex w-full items-center gap-3 text-left transition-colors disabled:opacity-60",
+                            )}
+                          >
+                            <ItemIcon item={row.item} enhancement={row.level} />
+                            <div className="min-w-0 flex-1">
+                              <p
+                                className={cn(
+                                  "truncate text-sm",
+                                  isSelected ? "text-ember" : "text-ink-soft",
+                                )}
+                              >
+                                {row.item.name}
+                              </p>
+                              <p className="text-[11px] text-ink-faint">
+                                {row.canForge
+                                  ? row.fragment && row.level < MAX_ENHANCEMENT
+                                    ? formatNumber(row.cost) +
+                                      " " +
+                                      row.fragment.name +
+                                      " · " +
+                                      formatBronze(row.bronzeCost)
+                                    : (row.reason ?? "Pronta para forjar")
+                                  : (row.reason ?? "Indisponível")}
+                              </p>
+                            </div>
+                            {row.quantity > 1 ? (
+                              <span className="shrink-0 font-mono text-[11px] text-ink-faint">
+                                x{formatNumber(row.quantity)}
+                              </span>
+                            ) : null}
+                            <span
+                              className={cn(
+                                "grid h-4 w-4 shrink-0 place-items-center rounded-full border",
+                                isSelected ? "border-ember" : "border-edge-strong",
+                              )}
+                            >
+                              {isSelected ? (
+                                <span className="h-2 w-2 rounded-full bg-ember" />
+                              ) : null}
+                            </span>
+                          </button>
+                        </ListRow>
+                      );
+                    })}
+                  </List>
+                  {forgePages > 1 ? (
+                    <div className="border-t border-edge p-3">
+                      <Pagination
+                        page={forgeCurrentPage}
+                        pages={forgePages}
+                        onChange={setForgePage}
                       />
-                    </button>
-                  );
-                })}
-              </div>
-              {forgePages > 1 ? (
-                <Pagination page={forgeCurrentPage} pages={forgePages} onChange={setForgePage} />
-              ) : null}
-            </>
-          )}
+                    </div>
+                  ) : null}
+                </>
+              )}
+            </Panel>
+          </div>
         </div>
       </div>
 

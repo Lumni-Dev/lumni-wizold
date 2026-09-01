@@ -11,6 +11,7 @@ import {
   type NavigationItem,
 } from "@/shared/constants/navigation";
 import { cn } from "@/shared/utils/class-names";
+import { CONTROL_HEIGHT } from "@/shared/constants/ui";
 import { chipClass, ChipFrame } from "../components/chip";
 import { MoonTracker } from "../components/moon-tracker";
 import { NavIcon } from "../components/app-icon";
@@ -44,14 +45,14 @@ function NavLink({
       aria-current={active ? "page" : undefined}
       onClick={() => playSound("ui")}
       className={cn(
-        "relative flex items-center rounded-md border transition-colors",
+        "relative flex " + CONTROL_HEIGHT + " items-center rounded-md border transition-colors",
         active
           ? "border-edge-strong bg-surface-high"
           : "border-edge hover:border-edge-strong hover:bg-surface/70",
         highlighted ? "text-ember" : active ? "text-ink" : "text-ink-soft hover:text-ink",
       )}
     >
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center border-r border-edge">
+      <span className={"flex " + CONTROL_HEIGHT + " w-10 shrink-0 items-center justify-center border-r border-edge"}>
         <NavIcon href={item.href} />
       </span>
       <span className="min-w-0 truncate px-3 text-[10px] uppercase tracking-[0.16em]">

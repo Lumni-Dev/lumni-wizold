@@ -1,4 +1,5 @@
 import type { InputHTMLAttributes } from "react";
+import { CONTROL_HEIGHT } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 
 interface FieldProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -24,7 +25,8 @@ export function Field({
       ) : null}
       <input
         className={cn(
-          "h-8 w-full rounded-md border border-edge bg-surface px-3 text-xs text-ink transition-colors",
+          CONTROL_HEIGHT +
+            " w-full rounded-md border border-edge bg-surface px-4 text-xs text-ink transition-colors",
           "placeholder:text-ink-faint focus:border-edge-strong focus:outline-none",
           className,
         )}

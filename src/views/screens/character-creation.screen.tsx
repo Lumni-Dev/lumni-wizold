@@ -10,6 +10,7 @@ import { sanitizeName } from "@/shared/utils/text";
 import { cn } from "@/shared/utils/class-names";
 import { Button } from "../components/button";
 import { AiAuditNotice } from "../components/ai-audit-notice";
+import { Field } from "../components/field";
 import { CornerAccents } from "../components/corner-accents";
 import { GenderIcon } from "../components/gender-icon";
 import { Tag } from "../components/tag";
@@ -82,13 +83,12 @@ export function CharacterCreationScreen() {
         >
           <fieldset className="space-y-2">
             <legend className="heading text-[11px] text-ink">Nome</legend>
-            <input
+            <Field
               value={name}
               onChange={(event) => setName(sanitizeName(event.target.value, NAME_MAX_LENGTH))}
               maxLength={NAME_MAX_LENGTH}
               placeholder="Como a matilha vai te chamar"
               autoComplete="off"
-              className="w-full rounded-md border border-edge bg-base px-4 py-3 text-sm text-ink placeholder:text-ink-faint focus:border-edge-strong focus:outline-none"
             />
             <AiAuditNotice />
           </fieldset>

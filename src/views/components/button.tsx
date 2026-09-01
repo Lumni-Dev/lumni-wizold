@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState, type ButtonHTMLAttributes, type MouseEvent } from "react";
 import { playClick } from "@/controllers/sound";
+import { CONTROL_HEIGHT } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { Spinner } from "./spinner";
 type ButtonVariant = "primary" | "secondary" | "ghost" | "outline";
@@ -21,12 +22,12 @@ const VARIANTS: Record<ButtonVariant, string> = {
   outline: "border border-edge-strong text-ink-soft hover:bg-surface-high hover:text-ink",
 };
 const SIZES: Record<ButtonSize, string> = {
-  small: "h-8 px-3 text-[11px]",
-  medium: "h-10 px-4 text-xs",
+  small: CONTROL_HEIGHT + " px-3 text-[11px]",
+  medium: CONTROL_HEIGHT + " px-4 text-xs",
 };
 const ICON_SIZES: Record<ButtonSize, string> = {
-  small: "h-8 w-8",
-  medium: "h-10 w-10",
+  small: CONTROL_HEIGHT + " w-10",
+  medium: CONTROL_HEIGHT + " w-10",
 };
 export function Button({
   variant = "secondary",

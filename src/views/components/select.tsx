@@ -2,6 +2,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { playClick } from "@/controllers/sound";
+import { CONTROL_HEIGHT } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { chipClass, ChipFrame } from "./chip";
 export interface SelectOption {
@@ -211,7 +212,7 @@ export function Select({
                 onMouseDown={(event) => event.preventDefault()}
                 onClick={() => pick(index)}
                 className={cn(
-                  "flex h-8 cursor-pointer items-center px-3",
+                  "flex " + CONTROL_HEIGHT + " cursor-pointer items-center px-4",
                   "text-[10px] uppercase tracking-[0.16em] transition-colors",
                   index === highlighted || option.value === value
                     ? "bg-surface-high text-ink"

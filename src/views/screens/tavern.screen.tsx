@@ -742,7 +742,7 @@ export function TavernScreen() {
                             : current,
                         )
                       }
-                      className="grid h-8 w-8 place-items-center rounded-md text-lg hover:bg-surface-high"
+                      className="grid h-10 w-10 place-items-center rounded-md text-lg hover:bg-surface-high"
                     >
                       {emoji}
                     </button>
