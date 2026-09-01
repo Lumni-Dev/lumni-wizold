@@ -821,7 +821,7 @@ export function TavernScreen() {
               variant="primary"
               disabled={draft.trim().length === 0 || cooldownLeft > 0}
             >
-              {cooldownLeft > 0 ? Math.ceil(cooldownLeft / 1000) : "Enviar"}
+              {cooldownLeft > 0 ? Math.ceil(cooldownLeft / 1000) : "Falar"}
             </Button>
             </div>
           </form>
