@@ -186,9 +186,9 @@ export function CharacterScreen() {
                     item={item}
                     quantity={quantity}
                     description={
-                      "Recupera " +
-                      Math.round((item.effect.healthRatio ?? 0) * 100) +
-                      "% da vida máxima"
+                      item.effect.healthMin !== undefined && item.effect.healthMax !== undefined
+                        ? "Recupera entre " + item.effect.healthMin + " e " + item.effect.healthMax + " de vida"
+                        : "Recupera vida"
                     }
                     action={
                       <Button

@@ -156,6 +156,7 @@ export function profileOf(
     {
       level: hunter.level,
       attributes: hunter.attributes,
+      gender: hunter.gender,
       petAttributes: hunter.pet ? petLevelBonus(hunter.pet.level) : undefined,
     },
     hunter.equipment,

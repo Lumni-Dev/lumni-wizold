@@ -9,7 +9,9 @@ import {
 } from "@/models/entities/item";
 import { failure, success, type Result } from "@/models/entities/result";
 import { isFullMoon } from "@/models/rules/moon";
+import { rollHealthPotionHeal } from "@/models/rules/potion";
 import { deriveStats } from "@/models/rules/stats";
+import { defaultRandom, type Random } from "@/shared/utils/random";
 import { syncCharacter, updateCharacter } from "./character.controller";
 import { enhancedName } from "@/models/rules/forge";
 import { addLog } from "./log.controller";
@@ -175,7 +177,11 @@ export function unequipItem(state: GameState, slot: EquipmentSlot): Result {
   return success(addLog(syncCharacter(next), "inventory", message), message);
 }
 
-export function consumeItem(state: GameState, itemId: string): Result {
+export function consumeItem(
+  state: GameState,
+  itemId: string,
+  random: Random = defaultRandom,
+): Result {
   const character = state.character;
   if (!character) return failure(state, "Nenhum personagem ativo.");
 
@@ -210,8 +216,7 @@ export function consumeItem(state: GameState, itemId: string): Result {
   }
 
   const stats = deriveStats(character, state.equipment, state.pet);
-  const healthGain =
-    (item.effect.health ?? 0) + Math.round((item.effect.healthRatio ?? 0) * stats.maxHealth);
+  const healthGain = rollHealthPotionHeal(item, random);
 
   if (healthGain <= 0 || character.health >= stats.maxHealth) {
     return failure(state, "Nada a recuperar com " + item.name + " agora.");
@@ -222,11 +227,12 @@ export function consumeItem(state: GameState, itemId: string): Result {
     inventory: removeFromInventory(state.inventory, itemId, 1),
   };
 
+  const healed = Math.min(healthGain, stats.maxHealth - character.health);
   const next = updateCharacter(consumed, (current) => ({
     ...current,
-    health: current.health + healthGain,
+    health: current.health + healed,
   }));
 
-  const message = item.name + " consumida.";
-  return success(addLog(next, "inventory", message), message);
+  const message = item.name + " consumida: +" + healed + " vida.";
+  return success(addLog(syncCharacter(next), "inventory", message), message);
 }

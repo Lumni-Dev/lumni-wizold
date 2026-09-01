@@ -1,4 +1,4 @@
-import { formatReais } from "@/shared/utils/format";
+import { healthPerLevelFor, VITALS } from "@/shared/constants/tuning/vitals";
 import {
   ENHANCEMENT_STEP,
   FORGE_BRONZE_RATIO,
@@ -58,6 +58,7 @@ import { miningNeeded } from "../rules/mining";
 import { criticalMultiplierOf } from "../rules/combat";
 import { huntPurse } from "../rules/economy";
 import { VIP_DAYS, VIP_PRICE_CENTS } from "../rules/vip";
+import { formatReais } from "@/shared/utils/format";
 import { EQUIPMENT_SETS, piecePrice } from "./equipment-sets";
 import { EQUIPMENT_SLOTS } from "../entities/item";
 import { STORE_PACKS } from "./store-packs";
@@ -141,16 +142,20 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
   {
     id: "vitals",
     title: "Vitais",
-    summary: "Todo personagem nasce com 100 de vida.",
+    summary: "Vida sobe com o nível, como no Tibia: Lumni e Luna ganham ritmos diferentes.",
     lines: [
-      "Vida: 100 para todo mundo, fixa. Nem o nível nem a Resistência engordam a barra; a Resistência agora só corta o dano que cada golpe do inimigo tira.",
-      "Poções de vida recuperam uma porcentagem do máximo. Recuperar-se devolve só vida: a cada " +
-        REST_TICK_MS / 1000 +
-        " segundos, " +
+      "Vida máxima: " +
+        VITALS.baseVital +
+        " no nível 1, mais " +
+        healthPerLevelFor("male") +
+        " por nível para Lumni e " +
+        healthPerLevelFor("female") +
+        " por nível para Luna. A Resistência não engorda a barra; ela só corta o dano que cada golpe do inimigo tira.",
+      "Poções de vida curam um valor fixo e aleatório: pequena 150 a 200, média 200 a 300, grande 300 a 500. Recuperar-se devolve " +
         Math.round(REST_HEALTH_RATIO * 100) +
-        "% do máximo, então o corpo inteiro volta em " +
-        Math.round(REST_TICK_MS / 1000 / REST_HEALTH_RATIO) +
-        " segundos, em qualquer nível. A poção é o atalho pago.",
+        "% do máximo a cada " +
+        REST_TICK_MS / 1000 +
+        " segundos. A poção é o atalho pago quando o número fixo ainda vale a pena.",
       "Zerou a vida na caçada, você escapa com 1 de vida e registra uma derrota.",
       "Com menos de 1 de vida, o chão recusa caçada: Recuperar-se ou use uma poção.",
       "Com menos de " +
@@ -167,7 +172,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "Não existe transformação: você caça, treina e duela direto, do jeito que está.",
       "Modo Fúria dá +" +
         FURY_ATTRIBUTE_BONUS +
-        " em cada atributo enquanto durar; o ganho aparece na coluna Fúria da ficha e levanta dano, esquiva e crítico de uma vez. A barra de vida continua fixa em 100.",
+        " em cada atributo enquanto durar; o ganho aparece na coluna Fúria da ficha e levanta dano, esquiva e crítico de uma vez. A barra de vida continua subindo só com o nível.",
       "A poção de fúria não devolve vida. A duração vem pelo tamanho do frasco: pequena 2,5 minutos, média 5, grande 7,5. Beber de novo reinicia o relógio cheio.",
       "Na lua cheia o céu mantém o Modo Fúria ativo sozinho enquanto durar a fase; a poção fica desabilitada nesse período, porque o céu já faz esse trabalho.",
       "É um atalho pago para uma janela de força: guarde a poção para uma banda dura ou um duelo que você não quer perder, fora da lua cheia.",
@@ -505,7 +510,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       setCostRangeLine() +
         " Subir de nível dentro de uma faixa não enche o bolso: quem muda o tamanho da bolsa é abrir a faixa seguinte.",
       "O mercado vende pelo preço de tabela e recompra pela metade. Materiais só servem para venda; nenhum equipamento cai na caça.",
-      "Poções de vida e fúria: pequena 3 caçadas (25%), média 6 (50%), grande 12 (75%); ração do lobo, 1,5 caçada. A poção de fúria não se bebe na lua cheia: o céu já mantém o Modo Fúria. Fragmentos saem da mina e só alimentam a forja.",
+      "Poções de vida: pequena 150 a 200, média 200 a 300, grande 300 a 500 de vida; fúria pequena 3 caçadas, média 6, grande 12; ração do lobo, 1,5 caçada. A poção de fúria não se bebe na lua cheia: o céu já mantém o Modo Fúria. Fragmentos saem da mina e só alimentam a forja.",
       "Comprar e vender pedem confirmação e deixam escolher a quantidade.",
     ],
   },

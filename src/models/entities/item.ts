@@ -16,6 +16,8 @@ export type PotionSize = "small" | "medium" | "large";
 export interface ItemEffect {
   attributes?: Partial<Attributes>;
   health?: number;
+  healthMin?: number;
+  healthMax?: number;
   petEnergyRatio?: number;
   healthRatio?: number;
   furyMinutes?: number;

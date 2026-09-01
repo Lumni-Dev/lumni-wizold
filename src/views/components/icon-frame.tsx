@@ -30,10 +30,11 @@ const ICON_TEXT: Record<IconSize, string> = {
   large: "text-xl",
   huge: "text-2xl",
 };
-type FrameTone = "default" | "strong";
+type FrameTone = "default" | "strong" | "empty";
 const TONES: Record<FrameTone, string> = {
   default: "slot-well border-edge text-ink-faint",
   strong: "slot-well-strong border-edge-strong text-ink-soft",
+  empty: "border-edge bg-surface-high text-ink-faint",
 };
 export function IconFrame({
   size = "medium",

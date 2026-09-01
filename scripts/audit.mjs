@@ -158,7 +158,7 @@ sec("stats");
         Math.round(
           CONST.BASE_VITAL +
             (t.endurance - CONST.BASE_ATTRIBUTE_VALUE) * CONST.HEALTH_PER_ENDURANCE +
-            level * CONST.HEALTH_PER_LEVEL,
+            Math.max(0, level - 1) * CONST.HEALTH_PER_LEVEL.male,
         ),
     );
     ok(
@@ -1544,13 +1544,13 @@ sec("inventário e mercado");
     character: { ...state.character, health: 1 },
     inventory: [{ itemId: "health-potion-small", quantity: 1, enhancement: 0 }],
   };
-  const healed = inventoryCtrl.consumeItem(hurt, "health-potion-small");
+  const healed = inventoryCtrl.consumeItem(hurt, "health-potion-small", seededRandom(42));
   const derived = stats.deriveStats(state.character, state.equipment, null);
+  const expectedGain = load("shared/utils/random.js").intBetween(150, 200, seededRandom(42));
   ok(
-    "poção cura 25% do teto",
+    "poção cura faixa fixa",
     healed.ok &&
-      healed.state.character.health ===
-        Math.min(derived.maxHealth, 1 + Math.round(derived.maxHealth * 0.25)),
+      healed.state.character.health === Math.min(derived.maxHealth, 1 + expectedGain),
   );
   const store = storeCtrl.purchasePack(state, "two-pouches");
   ok(

@@ -80,6 +80,7 @@ export function arenaStats(hunter: Hunter): DerivedStats {
     {
       level: hunter.level,
       attributes: hunter.attributes,
+      gender: hunter.gender,
     },
     hunter.equipment,
   );

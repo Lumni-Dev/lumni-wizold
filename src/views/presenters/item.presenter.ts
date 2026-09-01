@@ -23,6 +23,11 @@ export function summarizeEffect(item: Item, enhancement = 0): string[] {
   const lines: string[] = [];
 
   if (effect.health) lines.push("+" + effect.health + " vida");
+  if (effect.healthMin !== undefined || effect.healthMax !== undefined) {
+    const min = effect.healthMin ?? effect.healthMax ?? 0;
+    const max = effect.healthMax ?? effect.healthMin ?? 0;
+    lines.push("+" + min + " a " + max + " vida");
+  }
   if (effect.petEnergyRatio) lines.push(percent(effect.petEnergyRatio) + " da energia do mascote");
   if (effect.healthRatio) lines.push(percent(effect.healthRatio) + " da vida");
   if (effect.furyMinutes)

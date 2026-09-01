@@ -278,7 +278,7 @@ export function ForgeScreen() {
                 return (
                   <ArtRowButton
                     key={ore.id}
-                    art={fragment ? <ItemIcon item={fragment} /> : <IconFrame>--</IconFrame>}
+                    art={fragment ? <ItemIcon item={fragment} /> : <IconFrame tone="empty">--</IconFrame>}
                     title={ore.label}
                     description={
                       unlocked

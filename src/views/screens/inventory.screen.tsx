@@ -86,7 +86,7 @@ export function InventoryScreen() {
                   {item ? (
                     <ItemIcon item={item} enhancement={piece?.enhancement ?? 0} />
                   ) : (
-                    <IconFrame>--</IconFrame>
+                    <IconFrame tone="empty">--</IconFrame>
                   )}
                   <RowText
                     label={SLOT_LABEL[slot]}

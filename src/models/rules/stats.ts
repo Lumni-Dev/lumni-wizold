@@ -3,12 +3,12 @@ import {
   BASE_VITAL,
   FURY_ATTRIBUTE_BONUS,
   HEALTH_PER_ENDURANCE,
-  HEALTH_PER_LEVEL,
 } from "@/shared/constants/game";
+import { healthPerLevelFor } from "@/shared/constants/tuning/vitals";
 import { clamp } from "@/shared/utils/format";
 import { addAttributes, emptyAttributes, type Attributes } from "../entities/attribute";
 import { EQUIPMENT_SLOTS, type Equipment } from "../entities/item";
-import type { Character } from "../entities/character";
+import type { Character, Gender } from "../entities/character";
 import type { Pet } from "../entities/pet";
 import { findItem } from "../data/items";
 import { enhancedEffect } from "./forge";
@@ -73,9 +73,8 @@ function equipmentAttributes(equipment: Equipment): Attributes {
 export interface StatSubject {
   level: number;
   attributes: Attributes;
-
+  gender?: Gender;
   furyActive?: boolean;
-
   petAttributes?: Attributes;
 }
 
@@ -109,7 +108,7 @@ export function deriveStatsOf(
   const maxHealth = Math.round(
     BASE_VITAL +
       (total.endurance - BASE_ATTRIBUTE_VALUE) * HEALTH_PER_ENDURANCE +
-      subject.level * HEALTH_PER_LEVEL,
+      Math.max(0, subject.level - 1) * healthPerLevelFor(subject.gender ?? "male"),
   );
 
   return {
