@@ -36,8 +36,11 @@ export function FuryModeTracker() {
   const clock = furyClock(remaining);
 
   return (
-    <FuryRingFrame className="block w-full" contentAlign="start">
-      <div className="flex w-full items-stretch overflow-hidden">
+    <FuryRingFrame
+      className="block w-full rounded-md"
+      contentAlign="start"
+    >
+      <div className="flex w-full items-stretch overflow-hidden rounded-[calc(var(--radius-md)-1px)]">
         <span className="flex w-8 shrink-0 items-center justify-center self-stretch border-r border-edge">
           <Flame aria-hidden strokeWidth={1.75} className="h-4 w-4 text-ember" />
         </span>

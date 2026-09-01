@@ -293,17 +293,18 @@ button:not(:disabled) {
   --fury-ring-border-size: 1px;
   --fury-ring-radius: var(--radius-md);
   display: block;
-  padding: var(--fury-ring-border-size);
   border-radius: var(--fury-ring-radius);
-  background: conic-gradient(
-    from var(--fury-ring-angle),
-    var(--color-ember) 0deg,
-    color-mix(in oklab, var(--color-ember) 42%, var(--color-edge)) 72deg,
-    var(--color-edge) 148deg,
-    var(--color-edge) 212deg,
-    color-mix(in oklab, var(--color-ember) 42%, var(--color-edge)) 288deg,
-    var(--color-ember) 360deg
-  );
+  border: var(--fury-ring-border-size) solid transparent;
+  border-image: conic-gradient(
+      from var(--fury-ring-angle),
+      var(--color-ember) 0deg,
+      color-mix(in oklab, var(--color-ember) 42%, var(--color-edge)) 72deg,
+      var(--color-edge) 148deg,
+      var(--color-edge) 212deg,
+      color-mix(in oklab, var(--color-ember) 42%, var(--color-edge)) 288deg,
+      var(--color-ember) 360deg
+    )
+    1 stretch;
   animation: fury-ring-rotate 2.4s linear infinite;
   overflow: hidden;
 }
