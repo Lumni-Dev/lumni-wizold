@@ -54,3 +54,4 @@ next-env.d.ts
 .sim-audit
 .sound-forge
 .art-forge
+public/assets/inventory/.tmp

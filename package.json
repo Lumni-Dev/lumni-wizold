@@ -9,6 +9,7 @@
     "lint": "eslint",
     "test": "node scripts/audit.mjs",
     "bench": "node scripts/balance.mjs",
+    "art:generate": "node scripts/generate-art.mjs",
     "migrate": "node scripts/migrate.mjs",
     "migrate:status": "node scripts/migrate.mjs status",
     "smoke": "node scripts/smoke.mjs",
