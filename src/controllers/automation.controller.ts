@@ -46,8 +46,7 @@ function canWork(state: GameState, activity: Activity): boolean {
 
   switch (activity.kind) {
     case "hunt": {
-      const stats = deriveStats(character, state.equipment, state.pet);
-      return character.health > stats.maxHealth * MIN_HEALTH_RATIO_TO_ACT;
+      return character.health >= 1;
     }
     case "train": {
       const entry = listExercises(state).find(({ exercise }) => exercise.id === activity.id);

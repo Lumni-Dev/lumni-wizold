@@ -81,6 +81,7 @@ export function SettingsScreen() {
         ...Object.values(art.attributes),
         ...Object.values(art.training),
         ...Object.values(art.territories),
+        ...Object.values(art.creatures),
         ...Object.values(art.pets),
         ...Object.values(art.genders),
         ...Object.values(art.packs),

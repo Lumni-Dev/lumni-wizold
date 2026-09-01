@@ -74,7 +74,7 @@ export function MarketScreen() {
     if (!slot) return;
     /* eslint-disable react-hooks/set-state-in-effect */
     setTab("sell");
-    setSelling(String(slot.quantity));
+    setSelling("1");
     setDeal({ kind: "sell", item: slot.item, quantity: slot.quantity, total: 0 });
     /* eslint-enable react-hooks/set-state-in-effect */
   }, [sellables]);
@@ -251,7 +251,7 @@ export function MarketScreen() {
                     <Button
                       variant="secondary"
                       onClick={() => {
-                        setSelling(String(quantity));
+                        setSelling("1");
                         setDeal({ kind: "sell", item, quantity, total: 0 });
                       }}
                     >
@@ -286,31 +286,6 @@ export function MarketScreen() {
             : null
         }
         confirmLabel={deal?.kind === "sell" ? "Vender" : "Pagar " + formatBronze(dealTotal)}
-        {...(deal?.kind === "buy" && !dealWearable
-          ? {
-              children: (
-                <QuantityField
-                  className="w-full"
-                  hint={"Você consegue pagar por " + formatNumber(affordableAmount) + "."}
-                  aria-label={"Quantidade de " + deal.item.name + " para comprar"}
-                  value={buying}
-                  onChange={setBuying}
-                />
-              ),
-            }
-          : deal?.kind === "sell" && sellOwned > 1
-            ? {
-                children: (
-                  <QuantityField
-                    className="w-full"
-                    hint={"Você tem " + formatNumber(sellOwned) + "."}
-                    aria-label={"Quantidade de " + deal.item.name + " para vender"}
-                    value={selling}
-                    onChange={setSelling}
-                  />
-                ),
-              }
-            : {})}
         onCancel={() => setDeal(null)}
         onConfirm={() => {
           if (!deal) return;
@@ -323,7 +298,25 @@ export function MarketScreen() {
 
           setDeal(null);
         }}
-      />
+      >
+        {deal?.kind === "buy" && !dealWearable ? (
+          <QuantityField
+            className="w-full"
+            hint={"Você consegue pagar por " + formatNumber(affordableAmount) + "."}
+            aria-label={"Quantidade de " + deal.item.name + " para comprar"}
+            value={buying}
+            onChange={setBuying}
+          />
+        ) : deal?.kind === "sell" ? (
+          <QuantityField
+            className="w-full"
+            hint={"Você tem " + formatNumber(sellOwned) + "."}
+            aria-label={"Quantidade de " + deal.item.name + " para vender"}
+            value={selling}
+            onChange={setSelling}
+          />
+        ) : null}
+      </ConfirmDialog>
     </>
   );
 }

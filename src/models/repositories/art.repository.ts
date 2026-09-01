@@ -8,8 +8,7 @@ import { ITEMS } from "../data/items";
 import { STORE_PACKS } from "../data/store-packs";
 import { TERRITORIES } from "../data/territories";
 import { CREATURES } from "../data/creatures";
-
-const ASSETS_ROOT = join(process.cwd(), "public", "assets");
+import { ART_VERSION } from "@/shared/constants/assets";
 
 const ITEM_ROOT = "inventory";
 const HUNT_ROOT = "hunt";
@@ -22,7 +21,7 @@ const CREATURE_ROOT = "creatures";
 
 const IMAGE_EXTENSIONS = new Set([".png", ".webp", ".gif", ".jpg", ".jpeg", ".svg", ".avif"]);
 
-const ART_VERSION = "?v=35";
+const ASSETS_ROOT = join(process.cwd(), "public", "assets");
 
 const ITEM_IDS = new Set(ITEMS.map((item) => item.id));
 const CREATURE_IDS = new Set(CREATURES.map((creature) => creature.id));

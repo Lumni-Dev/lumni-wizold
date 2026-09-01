@@ -752,8 +752,10 @@ sec("caçada");
   const random = seededRandom(2024);
   const state = baseState({ level: 170 });
   state.equipment.claw = { itemId: "silver-claw", enhancement: 0 };
-  const weak = { ...state, character: { ...state.character, health: 1 } };
-  ok("vida no chão não caça", huntCtrl.resolveHunt(weak, "dew-woods", random).ok === false);
+  const weak = { ...state, character: { ...state.character, health: 0 } };
+  ok("vida zerada não caça", huntCtrl.resolveHunt(weak, "dew-woods", random).ok === false);
+  const bleeding = { ...state, character: { ...state.character, health: 1 } };
+  ok("caça com 1 de vida", huntCtrl.resolveHunt(bleeding, "dew-woods", random).ok === true);
   ok(
     "toda área é aberta: a faixa virou só sugestão",
     huntCtrl.resolveHunt(state, "white-clearing", random).ok === true,

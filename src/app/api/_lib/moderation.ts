@@ -17,23 +17,55 @@ const CONTEXT_HINT: Record<ModerationContext, string> = {
   chat_message: "tavern chat message visible to other players",
 };
 
-const SYSTEM_PROMPT = `You moderate user text in Wizold, a Portuguese werewolf hunting browser game.
-Fantasy game context is normal: hunting creatures, arena duels, wolves, moons, potions, bronze loot, tavern banter.
+const NAME_SYSTEM_PROMPT = `You moderate short public display names in Wizold, a Portuguese werewolf hunting browser game.
+Context: hunter names, wolf names, and tavern table names shown in rankings, profiles, and room lists.
 
 Return ONLY valid JSON with a single boolean field "allowed".
-- allowed: true → text may be published in the game
-- allowed: false → block the text
+- allowed: true → the name may be published
+- allowed: false → block the name
 
-Block clearly harmful real-world content:
-- sexual violence or explicit sexual content
-- promotion or instructions for real-world crime
-- drug trafficking or hard-drug promotion (fantasy potions and game items are fine)
-- credible threats of harm against real people
+Block names that are clearly unfit for a public label:
+- profanity, sexual references, or shock-value spelling
 - hate slurs targeting protected groups
-- doxxing or sharing personal data
+- impersonation of staff, real brands, or public figures meant to mislead
+- credible real-world threats, doxxing attempts, or hard-drug/crime promotion
+- primary purpose is harassment or trolling other players
 
-Allow game-appropriate Portuguese text:
-- fantasy names and nicknames, mild in-game trash talk, hunting/wolf themes, fictional violence, emojis in chat.`;
+Allow game-appropriate Portuguese names:
+- fantasy, hunting, wolf, moon, and tavern themes
+- letters and digits, mild edge if still a usable in-game name
+
+Be stricter than tavern chat: a name is always visible and harder to ignore.`;
+
+const CHAT_SYSTEM_PROMPT = `You moderate tavern chat messages in Wizold, a Portuguese werewolf hunting browser game.
+Players talk casually about hunts, arena duels, wolves, loot, training, and tavern banter.
+
+Return ONLY valid JSON with a single boolean field "allowed".
+- allowed: true → the message may stay published
+- allowed: false → censor the message
+
+Default to allowed: true. Block ONLY content that is clearly inappropriate or prohibited in a real multiplayer game.
+
+Block only when obvious:
+- explicit sexual content or solicitation
+- any sexual content involving minors
+- credible real-world threats against a specific person
+- hate slurs and dehumanization targeting protected groups
+- doxxing: real private contact info, address, documents, or credentials
+- promotion or step-by-step instructions for real-world illegal activity
+- phishing, scams, or malware links (game URLs and normal conversation are fine)
+
+Allow even if rough or edgy:
+- fantasy violence, hunting, duels, defeats, potions, bronze, gear
+- mild profanity, frustration, rivalry, trash talk without slurs
+- dark humor about in-game danger, emojis, slang, sarcasm, jokes
+- strategy, prices, complaints, off-topic banter among adults
+
+When uncertain, allow. Chat is more flexible than names: only remove what is truly out of bounds.`;
+
+function systemPromptFor(context: ModerationContext): string {
+  return context === "chat_message" ? CHAT_SYSTEM_PROMPT : NAME_SYSTEM_PROMPT;
+}
 
 function buildUserPrompt(text: string, context: ModerationContext): string {
   return (
@@ -97,7 +129,7 @@ async function callModeration(text: string, context: ModerationContext): Promise
         temperature: 0,
         response_format: { type: "json_object" },
         messages: [
-          { role: "system", content: SYSTEM_PROMPT },
+          { role: "system", content: systemPromptFor(context) },
           { role: "user", content: buildUserPrompt(text, context) },
         ],
       }),

@@ -278,6 +278,17 @@ button:not(:disabled) {
     linear-gradient(to bottom, var(--color-surface), var(--color-surface));
 }
 
+.fury-electric-shell .electric-border {
+  --electric-light-color: var(--color-ember);
+}
+
+.fury-electric-shell .electric-border-overlay-1,
+.fury-electric-shell .electric-border-overlay-2,
+.fury-electric-shell .electric-border-bg-glow,
+.fury-electric-shell .electric-border-glow-2 {
+  display: none;
+}
+
 .electric-border {
   --electric-light-color: color-mix(in oklab, var(--color-ember) 72%, white);
   position: relative;

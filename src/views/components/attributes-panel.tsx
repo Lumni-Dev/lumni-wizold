@@ -12,7 +12,15 @@ function plus(value: number): string {
   return value > 0 ? "+" + formatNumber(value) : "0";
 }
 
-export function AttributesPanel({ stats, gender }: { stats: DerivedStats; gender: Gender }) {
+export function AttributesPanel({
+  stats,
+  gender,
+  publicProfile = false,
+}: {
+  stats: DerivedStats;
+  gender: Gender;
+  publicProfile?: boolean;
+}) {
   const genderBonus = findGender(gender).bonus;
 
   return (
@@ -32,7 +40,9 @@ export function AttributesPanel({ stats, gender }: { stats: DerivedStats; gender
             { label: "Equipamento", value: plus(lent(stats.sources.equipment)), sum: false },
             { label: "Mascote", value: plus(lent(stats.sources.pet)), sum: false },
             { label: "Lua", value: plus(lent(stats.sources.moon)), sum: false },
-            { label: "Fúria", value: plus(lent(stats.sources.fury)), sum: false },
+            ...(publicProfile
+              ? []
+              : [{ label: "Fúria", value: plus(lent(stats.sources.fury)), sum: false }]),
             { label: "Total", value: formatNumber(total), sum: true },
           ];
 

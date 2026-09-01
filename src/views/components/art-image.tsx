@@ -1,23 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
+import { artLoadedFromImg, isArtCached, markArtCached } from "@/shared/utils/art-cache";
 import { cn } from "@/shared/utils/class-names";
 
 export function ArtImage({ source, className }: { source: string; className?: string }) {
-  const [loaded, setLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+  const [loaded, setLoaded] = useState(() => isArtCached(source));
+
+  useLayoutEffect(() => {
+    if (artLoadedFromImg(source, imgRef.current)) {
+      setLoaded(true);
+      return;
+    }
+    setLoaded(false);
+  }, [source]);
 
   return (
     <span className={cn("relative block h-full w-full", className)}>
       {!loaded ? <span aria-hidden="true" className="art-shimmer absolute inset-0" /> : null}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
+        ref={imgRef}
         src={source}
         alt=""
         loading="lazy"
-        ref={(img) => {
-          if (img && img.complete && img.naturalWidth > 0) setLoaded(true);
+        onLoad={() => {
+          markArtCached(source);
+          setLoaded(true);
         }}
-        onLoad={() => setLoaded(true)}
         className={cn(
           "h-full w-full object-cover transition-opacity duration-300",
           loaded ? "opacity-100" : "opacity-0",

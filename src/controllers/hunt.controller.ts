@@ -1,4 +1,3 @@
-import { MIN_HEALTH_RATIO_TO_ACT } from "@/shared/constants/game";
 import { capBronze } from "@/shared/utils/format";
 import { formatNumber, formatBronze } from "@/shared/utils/format";
 import { chance, defaultRandom, intBetween, type Random } from "@/shared/utils/random";
@@ -78,18 +77,12 @@ function chosenCreature(
 
 export function listTerritories(state: GameState): AvailableTerritory[] {
   const character = state.character;
-  const stats = character
-    ? deriveStats(character, state.equipment, state.pet)
-    : null;
 
   return TERRITORIES.map((territory) => {
     const creatures = creaturesOf(territory);
 
     const unlocked = character !== null;
-    const hasHealth =
-      character !== null &&
-      stats !== null &&
-      character.health > stats.maxHealth * MIN_HEALTH_RATIO_TO_ACT;
+    const hasHealth = character !== null && character.health >= 1;
 
     return {
       territory,
@@ -97,7 +90,7 @@ export function listTerritories(state: GameState): AvailableTerritory[] {
       prey: character ? (pickCreature(territory, character.level) ?? null) : null,
       unlocked,
       hasHealth,
-      reason: !hasHealth ? "Vida baixa demais" : null,
+      reason: !hasHealth ? "Sem vida para caçar" : null,
     };
   });
 }
@@ -131,14 +124,14 @@ export function resolveHunt(
   const territory = findTerritory(territoryId);
   if (!territory) return failure(state, "Território desconhecido.");
 
-  const stats = deriveStats(character, state.equipment, state.pet);
-  if (character.health <= stats.maxHealth * MIN_HEALTH_RATIO_TO_ACT) {
-    return failure(state, "Vida baixa demais para caçar. Recupere-se ou use uma poção.");
+  if (character.health < 1) {
+    return failure(state, "Sem vida para caçar. Recupere-se ou use uma poção.");
   }
 
   const creature = chosenCreature(territory, creatureId, character.level);
   if (!creature) return failure(state, "A trilha não levou a nada.");
 
+  const stats = deriveStats(character, state.equipment, state.pet);
   const petJoining = canPetFight(state.pet) ? state.pet : null;
   const combat = simulateCombat({
     characterName: character.name,

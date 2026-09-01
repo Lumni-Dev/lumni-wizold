@@ -149,9 +149,10 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         Math.round(REST_TICK_MS / 1000 / REST_HEALTH_RATIO) +
         " segundos, em qualquer nível. A poção é o atalho pago.",
       "Zerou a vida na caçada, você escapa com 1 de vida e registra uma derrota.",
+      "Sem vida, o chão recusa caçada: Recuperar-se ou use uma poção.",
       "Com menos de " +
         Math.round(MIN_HEALTH_RATIO_TO_ACT * 100) +
-        "% de vida máxima, o chão recusa caçada e duelo: Recuperar-se primeiro.",
+        "% de vida máxima, o chão recusa duelo: Recuperar-se primeiro.",
       "Luta que se arrasta até o teto de rodadas termina em recuo: a caçada conta, mas ninguém vence nem perde.",
     ],
   },
@@ -470,7 +471,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         " Subir de nível dentro de uma faixa não enche o bolso: quem muda o tamanho da bolsa é abrir a faixa seguinte.",
       "O mercado vende pelo preço de tabela e recompra pela metade. Materiais só servem para venda; nenhum equipamento cai na caça.",
       "Poções de vida e fúria: pequena 3 caçadas (25%), média 6 (50%), grande 12 (75%); ração do lobo, 1,5 caçada. Fragmentos saem da mina e só alimentam a forja.",
-      "Comprar e vender pedem confirmação; a compra deixa escolher a quantidade.",
+      "Comprar e vender pedem confirmação e deixam escolher a quantidade.",
     ],
   },
 ];

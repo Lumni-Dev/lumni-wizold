@@ -5,6 +5,7 @@ import { useGame } from "@/controllers/game.context";
 import { cn } from "@/shared/utils/class-names";
 import { ActivityDock } from "../components/activity-dock";
 import { SourceIcon } from "../components/app-icon";
+import { CornerAccents } from "../components/corner-accents";
 
 const DURATION_MS = 4000;
 
@@ -46,6 +47,7 @@ export function GameCorner() {
               {line.text}
             </p>
           </div>
+          <CornerAccents />
         </div>
       ))}
       <ActivityDock />

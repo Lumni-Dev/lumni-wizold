@@ -1,5 +1,6 @@
 "use client";
-import { useState, type ReactNode } from "react";
+import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { artLoadedFromImg, isArtCached, markArtCached } from "@/shared/utils/art-cache";
 import { cn } from "@/shared/utils/class-names";
 import { CornerAccents } from "./corner-accents";
 export type IconSize = "mini" | "small" | "medium" | "large" | "huge";
@@ -82,11 +83,21 @@ export function IconArt({
   fit?: "cover" | "contain";
   onFail?: () => void;
 }) {
+  const imgRef = useRef<HTMLImageElement>(null);
   const [preview, setPreview] = useState<{
     left: number;
     top: number;
   } | null>(null);
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState(() => isArtCached(source));
+
+  useLayoutEffect(() => {
+    if (artLoadedFromImg(source, imgRef.current)) {
+      setLoaded(true);
+      return;
+    }
+    setLoaded(false);
+  }, [source]);
+
   const place = (event: { clientX: number; clientY: number }) => {
     const gap = 16;
     setPreview({
@@ -104,13 +115,14 @@ export function IconArt({
       ) : null}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
+        ref={imgRef}
         src={source}
         alt=""
         loading="lazy"
-        ref={(img) => {
-          if (img && img.complete && img.naturalWidth > 0) setLoaded(true);
+        onLoad={() => {
+          markArtCached(source);
+          setLoaded(true);
         }}
-        onLoad={() => setLoaded(true)}
         onError={() => onFail?.()}
         className={cn(
           "h-full w-full cursor-zoom-in drop-shadow-[0_2px_4px_rgba(0,0,0,0.55)] transition-opacity duration-300",

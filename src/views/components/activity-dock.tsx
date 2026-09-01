@@ -10,6 +10,7 @@ import { useGame } from "@/controllers/game.context";
 import { petTrainingView } from "@/controllers/pet.controller";
 import { listAttributeProgress, listExercises } from "@/controllers/training.controller";
 import { loadHuntSelection } from "@/models/repositories/hunt-selection.repository";
+import { canPetFight, petLevelOf, petMaxEnergy } from "@/models/rules/pet";
 import {
   FORGE_TICKS,
   MAX_ENHANCEMENT,
@@ -28,7 +29,7 @@ import { useShake } from "./use-shake";
 
 export function ActivityDock() {
   const pathname = usePathname();
-  const { activity, state, character, stats, setActivity } = useGame();
+  const { activity, state, character, stats, pet, setActivity } = useGame();
   const runtime = useSyncExternalStore(
     activityRuntimeStore.subscribe,
     activityRuntimeStore.snapshot,
@@ -73,6 +74,8 @@ export function ActivityDock() {
         ? "Caçando sem parar..."
         : "Caçando...";
 
+    const petAlong = pet && canPetFight(pet) ? pet : null;
+
     return {
       preyLabel: monsterStatus + " · " + (shownFoe?.name ?? "—"),
       preyCurrent: monsterCurrent,
@@ -84,8 +87,15 @@ export function ActivityDock() {
       line,
       status,
       cooldown,
+      pet: petAlong
+        ? {
+            label: "Mascote - Energia",
+            current: petAlong.energy,
+            maximum: petMaxEnergy(petLevelOf(petAlong)),
+          }
+        : null,
     };
-  }, [activity, runtime.hunt, state]);
+  }, [activity, pet, runtime.hunt, state]);
 
   const trainView = useMemo(() => {
     const trainRt = runtime.train;
@@ -97,10 +107,10 @@ export function ActivityDock() {
 
     if (petActive && petTraining) {
       return {
-        progressLabel: "Progresso",
+        progressLabel: "Mascote - Progresso",
         progressCurrent: petTraining.progress,
         progressMax: petTraining.needed,
-        sessionLabel: "Treinamento",
+        sessionLabel: "Mascote - Treinamento",
         sessionCurrent: trainRt.beat,
         sessionMax: TRAINING_TICKS,
         glows: true,
@@ -231,6 +241,7 @@ export function ActivityDock() {
   }, [activity, dock, dockVisible, setActivity]);
 
   if (!activity || !dock) return null;
+  if (activity.paused) return null;
   if (pathname === dock.href) return null;
 
   const statusText =
@@ -303,6 +314,16 @@ export function ActivityDock() {
                   wraps
                 />
               </ListRow>
+              {huntView.pet ? (
+                <ListRow layout="column">
+                  <Bar
+                    label={huntView.pet.label}
+                    current={huntView.pet.current}
+                    maximum={huntView.pet.maximum}
+                    tone="vigor"
+                  />
+                </ListRow>
+              ) : null}
               {huntView.line ? (
                 <ListRow layout="column">
                   <p

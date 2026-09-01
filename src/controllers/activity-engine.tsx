@@ -155,7 +155,9 @@ export function ActivityEngine() {
         requesting = false;
         if (!fight) {
           setActivityRef.current(
-            autoRef.current.hunt ? { kind: "hunt", id: activeHunt, paused: true } : null,
+            autoRef.current.hunt && autoRef.current.potion
+              ? { kind: "hunt", id: activeHunt, paused: true }
+              : null,
           );
           return;
         }
@@ -553,17 +555,14 @@ export function ActivityEngine() {
       return;
     }
     if (activity.paused) {
-      const label =
-        activity.kind === "hunt"
-          ? "Caçada pausada"
-          : activity.kind === "train"
-            ? "Treino pausado"
-            : activity.kind === "mine"
-              ? "Mineração pausada"
-              : "Forja pausada";
       patchActivityRuntime({
-        dock: dockOf(activity.kind, label, "Aguardando recursos", 0, 1, null, true),
+        hunt: null,
+        train: null,
+        mine: null,
+        forge: null,
+        dock: null,
       });
+      return;
     }
   }, [ready, activity]);
 

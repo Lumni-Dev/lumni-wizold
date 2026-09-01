@@ -18,13 +18,13 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
         return pageMetadata({
           title: hunter.name,
           description:
-            "Ficha de " +
+            "Ficha pública de " +
             hunter.name +
             ", caçador " +
             lineage +
             " NV " +
             hunter.level +
-            " no Wizold: atributos, equipamento, mascote e posição nos quadros.",
+            " no Wizold: progresso, equipamento, mascote e posição nos quadros.",
           path: "/ranking/" + id,
         });
       }

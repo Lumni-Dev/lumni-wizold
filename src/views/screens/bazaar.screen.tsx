@@ -359,12 +359,12 @@ export function BazaarScreen() {
                 />
               </div>
 
-              {announcing.quantity > 1 ? (
-                <QuantityField
-                  value={flow.quantity}
-                  onChange={(quantity) => setFlow({ ...flow, quantity })}
-                />
-              ) : null}
+              <QuantityField
+                hint={"Você tem " + formatNumber(announcing.quantity) + "."}
+                aria-label={"Quantidade de " + announcing.item.name + " para anunciar"}
+                value={flow.quantity}
+                onChange={(quantity) => setFlow({ ...flow, quantity })}
+              />
 
               <Field
                 label="Preço por unidade"

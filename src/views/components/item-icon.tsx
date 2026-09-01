@@ -2,6 +2,7 @@
 
 import { useArt } from "@/controllers/art.context";
 import type { Item } from "@/models/entities/item";
+import { assetUrl } from "@/shared/constants/assets";
 import { itemInitials } from "../presenters/item.presenter";
 import { IconArt, IconFrame, type IconSize } from "./icon-frame";
 
@@ -15,7 +16,7 @@ export function ItemIcon({
   enhancement?: number;
 }) {
   const art = useArt();
-  const source = art.items[item.id] ?? item.image;
+  const source = art.items[item.id] ?? (item.image ? assetUrl(item.image) : undefined);
 
   return (
     <IconFrame size={size} className={source ? undefined : "tracking-widest"}>

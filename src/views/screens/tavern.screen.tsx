@@ -40,6 +40,7 @@ import { Pagination } from "../components/pagination";
 import { Modal } from "../components/modal";
 import { Panel } from "../components/panel";
 import { EmptyState } from "../components/empty-state";
+import { FilteredEmptyState } from "../components/filtered-empty-state";
 import { Tooltip } from "../components/tooltip";
 import { PageHeader } from "../layout/page-header";
 
@@ -84,6 +85,7 @@ export function TavernScreen() {
   const [emojiRect, setEmojiRect] = useState<DOMRect | null>(null);
   const emojiRef = useRef<HTMLDivElement>(null);
   const [page, setPage] = useState(1);
+  const [roomSearch, setRoomSearch] = useState("");
   const [nick, setNick] = useState("");
   const [removing, setRemoving] = useState<PackMate | null>(null);
   const [invites, setInvites] = useState<PackInvite[]>([]);
@@ -263,9 +265,15 @@ export function TavernScreen() {
   const profileHref = (memberId: string): string | null =>
     memberId === identity.id ? "/character" : "/ranking/" + memberId;
 
-  const currentPage = clampPage(page, rooms.length, PAGE_SIZE);
-  const pages = pageCount(rooms.length, PAGE_SIZE);
-  const roomsOnPage = pageOf(rooms, currentPage, PAGE_SIZE);
+  const filteredRooms = useMemo(() => {
+    const query = roomSearch.trim().toLowerCase();
+    if (!query) return rooms;
+    return rooms.filter(({ room }) => room.name.toLowerCase().includes(query));
+  }, [rooms, roomSearch]);
+
+  const currentPage = clampPage(page, filteredRooms.length, PAGE_SIZE);
+  const pages = pageCount(filteredRooms.length, PAGE_SIZE);
+  const roomsOnPage = pageOf(filteredRooms, currentPage, PAGE_SIZE);
 
   async function open(roomId: string, password: string) {
     const result = await joinRoom(roomId, password);
@@ -556,11 +564,28 @@ export function TavernScreen() {
               description="Abra a primeira e espere alguém puxar a cadeira."
             />
           ) : (
-            <div className="grid gap-6 sm:grid-cols-2">
-              {roomsOnPage.map(({ room, locked, full, memberCount, isMember, isPrivate }) => {
-                const unread = unreadByRoom.get(room.id) ?? 0;
+            <>
+              <Field
+                aria-label="Buscar mesa pelo nome"
+                placeholder="Buscar mesa pelo nome"
+                value={roomSearch}
+                maxLength={ROOM_NAME_MAX_LENGTH}
+                autoComplete="off"
+                onChange={(event) => {
+                  setRoomSearch(sanitizeName(event.target.value, ROOM_NAME_MAX_LENGTH));
+                  setPage(1);
+                }}
+              />
 
-                return (
+              {filteredRooms.length === 0 ? (
+                <FilteredEmptyState description="Nenhuma mesa combina com esse nome." />
+              ) : (
+                <>
+                  <div className="grid gap-6 sm:grid-cols-2">
+                    {roomsOnPage.map(({ room, locked, full, memberCount, isMember, isPrivate }) => {
+                      const unread = unreadByRoom.get(room.id) ?? 0;
+
+                      return (
                 <Card
                   key={room.id}
                   height="fill"
@@ -677,10 +702,13 @@ export function TavernScreen() {
                 </Card>
                 );
               })}
-            </div>
-          )}
+                  </div>
 
-          <Pagination page={currentPage} pages={pages} onChange={setPage} />
+                  <Pagination page={currentPage} pages={pages} onChange={setPage} />
+                </>
+              )}
+            </>
+          )}
         </div>
       </div>
 
