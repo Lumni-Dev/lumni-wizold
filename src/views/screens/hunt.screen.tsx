@@ -429,9 +429,6 @@ export function HuntScreen() {
                             }
                             pressed={isSelected}
                             onClick={() => selectCreature(territory.id, creature.id)}
-                            className={cn(
-                              isSelected ? "bg-surface-high" : "hover:bg-surface-high/60",
-                            )}
                           />
                         );
                       })}
