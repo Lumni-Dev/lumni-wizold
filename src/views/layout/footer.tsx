@@ -54,7 +54,7 @@ export function Footer() {
           </nav>
         </div>
 
-        <div className="mt-8 flex flex-col gap-2 border-t border-edge pt-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-8 flex flex-col gap-4 border-t border-edge pt-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-[11px] text-ink-faint">
               {COMPANY.legalName} - CNPJ {COMPANY.taxId}
@@ -63,7 +63,25 @@ export function Footer() {
               © {year} {COMPANY.name}. Todos os direitos reservados.
             </p>
           </div>
-          <BackToTop />
+          <nav aria-label="Legal" className="flex flex-wrap items-center gap-4">
+            <a
+              href={COMPANY.privacyUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="text-[11px] text-ink-soft transition-colors hover:text-ink"
+            >
+              Privacidade
+            </a>
+            <a
+              href={COMPANY.termsUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="text-[11px] text-ink-soft transition-colors hover:text-ink"
+            >
+              Termos
+            </a>
+            <BackToTop />
+          </nav>
         </div>
       </div>
     </footer>

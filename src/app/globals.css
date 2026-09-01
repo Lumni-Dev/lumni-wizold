@@ -316,6 +316,24 @@ button:not(:disabled) {
   border-radius: calc(0.375rem - 1px);
 }
 
+.landing-hero-shadow-text {
+  text-shadow:
+    0 1px 8px color-mix(in oklab, var(--color-base) 62%, transparent),
+    0 2px 22px color-mix(in oklab, var(--color-base) 42%, transparent);
+}
+
+.landing-hero-shadow-logo {
+  filter:
+    drop-shadow(0 2px 10px color-mix(in oklab, var(--color-base) 58%, transparent))
+    drop-shadow(0 8px 28px color-mix(in oklab, var(--color-base) 38%, transparent));
+}
+
+.landing-hero-shadow-button {
+  filter:
+    drop-shadow(0 2px 10px color-mix(in oklab, var(--color-base) 48%, transparent))
+    drop-shadow(0 8px 24px color-mix(in oklab, var(--color-base) 32%, transparent));
+}
+
 .volume-slider {
   height: 32px;
   appearance: none;

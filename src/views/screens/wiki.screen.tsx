@@ -104,38 +104,40 @@ export function WikiScreen() {
         ))}
       </WikiMasonry>
 
-      <div id="attributes" className="scroll-mt-28">
-        <Panel title="Atributos" description="Cinco eixos, todos treináveis." padding="none">
-          <List>
-            {ATTRIBUTES.map((attribute) => (
-              <ListRow key={attribute.key} padding="art">
-                <AttributeIcon attribute={attribute.key} />
-                <div className="min-w-0 flex-1 space-y-1">
-                  <p className="text-sm text-ink">{attribute.name}</p>
-                  <p className="text-[11px] leading-relaxed text-ink-faint">{attribute.effect}</p>
-                </div>
-              </ListRow>
-            ))}
-          </List>
-        </Panel>
-      </div>
+      <div className="grid items-start gap-6 lg:grid-cols-2">
+        <div id="attributes" className="scroll-mt-28">
+          <Panel title="Atributos" description="Cinco eixos, todos treináveis." padding="none">
+            <List>
+              {ATTRIBUTES.map((attribute) => (
+                <ListRow key={attribute.key} padding="art">
+                  <AttributeIcon attribute={attribute.key} />
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <p className="text-sm text-ink">{attribute.name}</p>
+                    <p className="text-[11px] leading-relaxed text-ink-faint">{attribute.effect}</p>
+                  </div>
+                </ListRow>
+              ))}
+            </List>
+          </Panel>
+        </div>
 
-      <div id="slots" className="scroll-mt-28">
-        <Panel
-          title="Espaços de equipamento"
-          description="Um item por espaço, sete no total."
-          padding="none"
-        >
-          <List>
-            {EQUIPMENT_SLOTS.map((slot) => (
-              <ListRow key={slot}>
-                <div className="min-w-0 flex-1">
-                  <RowText title={SLOT_LABEL[slot]} description={SLOT_ROLE[slot]} />
-                </div>
-              </ListRow>
-            ))}
-          </List>
-        </Panel>
+        <div id="slots" className="scroll-mt-28">
+          <Panel
+            title="Espaços de equipamento"
+            description="Um item por espaço, sete no total."
+            padding="none"
+          >
+            <List>
+              {EQUIPMENT_SLOTS.map((slot) => (
+                <ListRow key={slot}>
+                  <div className="min-w-0 flex-1">
+                    <RowText title={SLOT_LABEL[slot]} description={SLOT_ROLE[slot]} />
+                  </div>
+                </ListRow>
+              ))}
+            </List>
+          </Panel>
+        </div>
       </div>
 
       <WikiMasonry id="sets" className="scroll-mt-28">
@@ -181,72 +183,74 @@ export function WikiScreen() {
         ))}
       </WikiMasonry>
 
-      <div id="exercises" className="scroll-mt-28">
-        <Panel
-          title="Exercícios"
-          description="Um por atributo, do primeiro ao último nível."
-          padding="none"
-        >
-          <List>
-            {EXERCISES.map((exercise) => (
-              <ListRow key={exercise.id} layout="column">
-                <div className="flex items-baseline justify-between gap-2">
-                  <p className="text-sm text-ink">{exercise.name}</p>
-                  <p className="shrink-0 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                    {findAttribute(exercise.attribute)?.name ?? exercise.attribute}
-                  </p>
-                </div>
-                <p className="text-[11px] leading-relaxed text-ink-faint">{exercise.description}</p>
-              </ListRow>
-            ))}
-          </List>
-          <div className="space-y-2 border-t border-edge px-4 py-3">
-            <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-              Rendimento da sessão
-            </p>
-            <ul className="space-y-1">
-              {[1, 170, 340, 670, 1000].map((value) => (
-                <li key={value} className="font-mono text-[11px] text-ink-soft">
-                  Atributo {formatNumber(value)}: +{formatNumber(trainingEffort(value).progress)}{" "}
-                  progresso por sessão
-                </li>
+      <div className="grid items-start gap-6 lg:grid-cols-2">
+        <div id="exercises" className="scroll-mt-28">
+          <Panel
+            title="Exercícios"
+            description="Um por atributo, do primeiro ao último nível."
+            padding="none"
+          >
+            <List>
+              {EXERCISES.map((exercise) => (
+                <ListRow key={exercise.id} layout="column">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <p className="text-sm text-ink">{exercise.name}</p>
+                    <p className="shrink-0 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                      {findAttribute(exercise.attribute)?.name ?? exercise.attribute}
+                    </p>
+                  </div>
+                  <p className="text-[11px] leading-relaxed text-ink-faint">{exercise.description}</p>
+                </ListRow>
               ))}
-            </ul>
-          </div>
-        </Panel>
-      </div>
+            </List>
+            <div className="space-y-2 border-t border-edge px-4 py-3">
+              <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                Rendimento da sessão
+              </p>
+              <ul className="space-y-1">
+                {[1, 170, 340, 670, 1000].map((value) => (
+                  <li key={value} className="font-mono text-[11px] text-ink-soft">
+                    Atributo {formatNumber(value)}: +{formatNumber(trainingEffort(value).progress)}{" "}
+                    progresso por sessão
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </Panel>
+        </div>
 
-      <div id="territories" className="scroll-mt-28">
-        <Panel
-          title="Territórios"
-          description="Ordem natural de progressão da caça."
-          padding="none"
-        >
-          <List>
-            {TERRITORIES.map((territory) => (
-              <ListRow key={territory.id} layout="column">
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-sm text-ink">{territory.name}</p>
-                  <Tag tone="faint">{DANGER_LABEL[territory.danger]}</Tag>
-                  <Tag tone="neutral">
-                    NV. {formatNumber(territory.minLevel)} a {formatNumber(territory.maxLevel)}
-                  </Tag>
-                  <Tag tone="neutral">{SPECIES_LABEL[territory.species]}</Tag>
-                </div>
-                <p className="text-xs text-ink-faint">{territory.description}</p>
-                <p className="text-[11px] text-ink-soft">
-                  {territory.creatures
-                    .map(
-                      (creatureId) =>
-                        CREATURES.find((creature) => creature.id === creatureId)?.name,
-                    )
-                    .filter(Boolean)
-                    .join(", ")}
-                </p>
-              </ListRow>
-            ))}
-          </List>
-        </Panel>
+        <div id="territories" className="scroll-mt-28">
+          <Panel
+            title="Territórios"
+            description="Ordem natural de progressão da caça."
+            padding="none"
+          >
+            <List>
+              {TERRITORIES.map((territory) => (
+                <ListRow key={territory.id} layout="column">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-sm text-ink">{territory.name}</p>
+                    <Tag tone="faint">{DANGER_LABEL[territory.danger]}</Tag>
+                    <Tag tone="neutral">
+                      NV. {formatNumber(territory.minLevel)} a {formatNumber(territory.maxLevel)}
+                    </Tag>
+                    <Tag tone="neutral">{SPECIES_LABEL[territory.species]}</Tag>
+                  </div>
+                  <p className="text-xs text-ink-faint">{territory.description}</p>
+                  <p className="text-[11px] text-ink-soft">
+                    {territory.creatures
+                      .map(
+                        (creatureId) =>
+                          CREATURES.find((creature) => creature.id === creatureId)?.name,
+                      )
+                      .filter(Boolean)
+                      .join(", ")}
+                  </p>
+                </ListRow>
+              ))}
+            </List>
+          </Panel>
+        </div>
       </div>
 
       <WikiMasonry id="bestiary" className="scroll-mt-28">

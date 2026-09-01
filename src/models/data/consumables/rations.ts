@@ -14,6 +14,6 @@ export const PET_SUPPLIES: readonly Item[] = [
     minLevel: 1,
     stackable: true,
     inMarket: true,
-    effect: { petEnergyRatio: 0.5 },
+    effect: { petEnergyRatio: 0.25 },
   },
 ];

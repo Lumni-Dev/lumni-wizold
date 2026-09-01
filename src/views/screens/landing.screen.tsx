@@ -16,14 +16,14 @@ import { SpinBorder } from "../components/spin-border";
 import { Footer } from "../layout/footer";
 
 const PLAY_INNER =
-  "inline-flex h-12 w-full items-center justify-center border-0 px-8 text-xs font-medium uppercase tracking-[0.16em] text-base bg-ember shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)]";
+  "inline-flex h-12 w-full items-center justify-center border-0 px-8 text-xs font-medium uppercase tracking-[0.16em] text-ember bg-surface/70 transition-colors hover:bg-surface-high/80";
 
 function PlayButton({ href, label }: { href: string; label: string }) {
   return (
     <SpinBorder
       as={Link}
       href={href}
-      className="inline-block rounded-md transition-[filter] hover:brightness-110"
+      className="landing-hero-shadow-button inline-block rounded-md transition-[filter] hover:brightness-110"
       innerClassName={PLAY_INNER}
     >
       {label}
@@ -169,14 +169,14 @@ export function LandingScreen() {
           <img
             src="/assets/ui/logo.webp?v=3"
             alt={GAME_NAME}
-            className="mx-auto w-72 max-w-full md:w-96"
+            className="landing-hero-shadow-logo mx-auto w-72 max-w-full md:w-96"
           />
-          <p className="text-[11px] uppercase leading-relaxed tracking-[0.24em] text-ink-faint">
+          <p className="landing-hero-shadow-text text-[11px] uppercase leading-relaxed tracking-[0.24em] text-ink-faint">
             {GAME_TAGLINE}
           </p>
         </div>
 
-        <p className="mx-auto max-w-xl text-sm leading-7 text-ink-soft">
+        <p className="landing-hero-shadow-text mx-auto max-w-xl text-sm leading-7 text-ink-soft">
           Dois se encontraram numa noite de lua cheia e desceram a serra sendo outra coisa. A
           matilha que eles começaram ainda caça, e a lua que decide o preço de cada noite é a que
           está no céu agora, lá fora.
@@ -277,7 +277,7 @@ export function LandingScreen() {
         </section>
 
         <section className="space-y-4 text-center">
-          <p className="mx-auto max-w-lg text-sm leading-relaxed text-ink-soft">
+          <p className="landing-hero-shadow-text mx-auto max-w-lg text-sm leading-relaxed text-ink-soft">
             Escolha um nome, escolha uma linhagem e desça. A primeira noite é a mais barata que você
             vai ter.
           </p>

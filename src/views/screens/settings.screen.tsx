@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useSyncExternalStore, type FormEvent } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { api } from "@/controllers/api.client";
 import { useArt } from "@/controllers/art.context";
 import { renameCost, renameDaysLeft } from "@/controllers/character.controller";
@@ -135,6 +135,14 @@ export function SettingsScreen() {
     else await disableTavernPush();
   }
 
+  const volumeDragging = useRef(false);
+
+  function finishVolumeAdjust() {
+    if (!volumeDragging.current) return;
+    volumeDragging.current = false;
+    if (soundRepository.volume() > 0) playSound("ui");
+  }
+
   if (!character) return null;
 
   const active = AUTOMATIONS.filter((entry) => state.automation[entry.key]).length;
@@ -163,12 +171,10 @@ export function SettingsScreen() {
           description="Com quem esta partida está assinada."
           action={<Tag tone="neutral">Google</Tag>}
           padding="none"
-        >
-          <List>
-            <ListRow>
+          footer={
+            <div className="flex flex-wrap gap-2">
               <Button
                 variant="outline"
-                fullWidth
                 onClick={() =>
                   logout().then(() => {
                     router.push("/");
@@ -177,11 +183,8 @@ export function SettingsScreen() {
               >
                 Sair da conta
               </Button>
-            </ListRow>
-            <ListRow>
               <Button
                 variant="outline"
-                fullWidth
                 onClick={() =>
                   logoutEverywhere().then(() => {
                     router.push("/");
@@ -190,8 +193,9 @@ export function SettingsScreen() {
               >
                 Sair de todos os aparelhos
               </Button>
-            </ListRow>
-          </List>
+            </div>
+          }
+        >
           <div className="flex items-center gap-3 border-b border-edge p-4">
             {accountPicture ? (
               <IconFrame size="medium" tone="strong">
@@ -222,8 +226,13 @@ export function SettingsScreen() {
 
         <Panel
           title="Verificação em duas etapas"
-          description="Um código de oito dígitos no e-mail confirma cada entrada, além do Google."
           padding="none"
+          footer={
+            <p className="text-xs leading-relaxed text-ink-faint">
+              Um código de oito dígitos no e-mail confirma cada entrada, além do Google. Com a
+              verificação ligada, a porta só abre depois que você digitar esse código.
+            </p>
+          }
         >
           <List>
             <ListRow layout="split">
@@ -260,10 +269,6 @@ export function SettingsScreen() {
               </div>
             </ListRow>
           </List>
-          <p className="p-4 text-xs leading-relaxed text-ink-faint">
-            Com a verificação ligada, depois do Google a porta só abre quando você digitar o código
-            que chega no e-mail da conta.
-          </p>
         </Panel>
 
         <Panel
@@ -441,11 +446,25 @@ export function SettingsScreen() {
                   value={Math.round(volume * 100)}
                   aria-label="Volume do som"
                   className="volume-slider w-full"
-                  onChange={(event) => {
-                    const next = Number(event.target.value) / 100;
-                    soundRepository.setVolume(next);
-                    if (next > 0) playSound("ui");
+                  onPointerDown={(event) => {
+                    volumeDragging.current = true;
+                    event.currentTarget.setPointerCapture(event.pointerId);
                   }}
+                  onChange={(event) => {
+                    soundRepository.setVolume(Number(event.target.value) / 100);
+                  }}
+                  onPointerUp={(event) => {
+                    event.currentTarget.releasePointerCapture(event.pointerId);
+                    finishVolumeAdjust();
+                  }}
+                  onPointerCancel={(event) => {
+                    event.currentTarget.releasePointerCapture(event.pointerId);
+                    volumeDragging.current = false;
+                  }}
+                  onKeyDown={() => {
+                    volumeDragging.current = true;
+                  }}
+                  onKeyUp={finishVolumeAdjust}
                 />
               </ListRow>
             ) : null}

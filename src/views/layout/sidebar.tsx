@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { playSound } from "@/controllers/sound";
-import { GAME_NAME } from "@/shared/constants/game";
+import { GAME_TAGLINE } from "@/shared/constants/game";
 import {
   NAVIGATION,
   SETTINGS_LINK,
@@ -21,10 +21,15 @@ function Brand() {
   return (
     <Link
       href="/character"
-      className="flex h-[74px] items-center justify-center border-b border-edge px-3"
+      className="flex h-[74px] items-center gap-3 border-b border-edge px-3"
     >
+      <div className="min-w-0 flex-1 text-left">
+        <p className="text-[10px] uppercase leading-relaxed tracking-[0.16em] text-ink-faint">
+          {GAME_TAGLINE}
+        </p>
+      </div>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/assets/ui/logo.webp?v=3" alt={GAME_NAME} className="h-10 w-auto" />
+      <img src="/icon.png" alt="" className="h-8 w-8 shrink-0 rounded-md" />
     </Link>
   );
 }

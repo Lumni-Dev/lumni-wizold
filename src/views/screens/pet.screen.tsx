@@ -196,6 +196,7 @@ export function PetScreen() {
   const ceiling = petLevelBonus(PET_MAX_LEVEL);
   const lending = ATTRIBUTES.filter((attribute) => ceiling[attribute.key] > 0);
   const petRenameCost = petRenamePrice(character.level);
+  const petRenameAffordable = character.bronze >= petRenameCost;
 
   return (
     <>
@@ -294,7 +295,7 @@ export function PetScreen() {
           <Panel
             title="Suprimentos"
             description={
-              "O alimento devolve metade do fôlego na hora. Sem ele, o repouso faz o mesmo de graça, um passo a cada " +
+              "O alimento devolve um quarto do fôlego na hora. Sem ele, o repouso faz o mesmo de graça, um passo a cada " +
               REST_TICK_MS / 1000 +
               " segundos."
             }
@@ -330,7 +331,10 @@ export function PetScreen() {
             )}
           </Panel>
 
-          <Panel title="Apelido" description="O canil troca os papéis, mas cobra caro por isso.">
+          <Panel
+            title="Nome do companheiro"
+            description="A troca custa WCoins na hora: quanto mais fundo na partida, mais caro o novo nome."
+          >
             <form
               onSubmit={(event) => {
                 event.preventDefault();
@@ -338,11 +342,12 @@ export function PetScreen() {
               }}
               className="space-y-3"
             >
+              <Field label="Nome atual" value={pet.name} disabled className="font-mono" />
               <Field
-                label="Novo apelido"
+                label="Novo nome"
                 value={newPetName}
                 maxLength={NAME_MAX_LENGTH}
-                placeholder={"Como " + pet.name + " vai atender"}
+                placeholder="Como a matilha vai chamá-lo"
                 autoComplete="off"
                 onChange={(event) =>
                   setNewPetName(sanitizeName(event.target.value, NAME_MAX_LENGTH))
@@ -352,11 +357,12 @@ export function PetScreen() {
               <Button
                 type="submit"
                 variant="primary"
-                size="medium"
                 fullWidth
-                disabled={newPetName.trim().length === 0}
+                disabled={newPetName.trim().length === 0 || !petRenameAffordable}
               >
-                Renomear por {formatBronze(petRenameCost)}
+                {petRenameAffordable
+                  ? "Alterar por " + formatBronze(petRenameCost)
+                  : "Faltam " + formatBronze(petRenameCost - character.bronze)}
               </Button>
             </form>
           </Panel>
@@ -384,10 +390,10 @@ export function PetScreen() {
 
       <ConfirmDialog
         open={confirmingRename}
-        title="Renomear o mascote"
-        description="As WCoins ficam no canil e o apelido novo vale na hora, em todas as telas."
+        title="Alterar nome"
+        description="As WCoins saem na hora e o novo nome vale na hora, na caçada e na taverna."
         detail={pet.name + " → " + newPetName.trim() + " - " + formatBronze(petRenameCost)}
-        confirmLabel="Renomear"
+        confirmLabel="Alterar"
         onCancel={() => setConfirmingRename(false)}
         onConfirm={() =>
           renamePet(newPetName).then((ok) => {

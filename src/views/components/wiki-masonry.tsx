@@ -13,7 +13,7 @@ export function WikiMasonry({
   className?: string;
 }) {
   return (
-    <div id={id} className={cn("columns-1 gap-6 md:columns-2 xl:columns-3", className)}>
+    <div id={id} className={cn("grid items-start gap-6 lg:grid-cols-2", className)}>
       {children}
     </div>
   );
@@ -29,7 +29,7 @@ export function WikiMasonryItem({
   className?: string;
 }) {
   return (
-    <div id={id} className={cn("mb-6 break-inside-avoid scroll-mt-28", className)}>
+    <div id={id} className={cn("scroll-mt-28", className)}>
       {children}
     </div>
   );

@@ -1015,8 +1015,8 @@ sec("mascote");
   state.inventory = [...state.inventory, { itemId: "pet-ration", quantity: 2, enhancement: 0 }];
   const fed = petCtrl.feedPet(state, "pet-ration");
   ok(
-    "ração devolve metade do teto",
-    fed.ok && fed.state.pet.energy === 10 + Math.round(petRules.petMaxEnergy(5) * 0.5),
+    "ração devolve um quarto do teto",
+    fed.ok && fed.state.pet.energy === 10 + Math.round(petRules.petMaxEnergy(5) * 0.25),
   );
   ok(
     "ração sai da mochila",

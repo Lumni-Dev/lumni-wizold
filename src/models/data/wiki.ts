@@ -316,7 +316,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         Math.round(PET_REST_RATIO * 100) +
         "% da energia a cada " +
         REST_TICK_MS / 1000 +
-        " s. Alimento automático e repouso automático cuidam disso nas configurações.",
+        " s. Alimento devolve 25% do fôlego na hora. Alimento automático e repouso automático cuidam disso nas configurações.",
     ],
   },
   {
