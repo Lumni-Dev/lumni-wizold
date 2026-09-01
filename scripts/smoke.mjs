@@ -103,7 +103,7 @@ check("nome repetido ignora maiúsculas", clashUpper.payload?.ok === false, clas
 await client.query("delete from users where id = $1", [rivalId]);
 cookie = mine;
 const state1 = (await call("POST", "/api/state")).payload?.data;
-check("nasce com 50 de bronze", state1?.character?.bronze === 50);
+check("nasce com 200 de bronze", state1?.character?.bronze === 200);
 check("carteira nasce com R$ 10", state1?.wallet?.cents === 1000);
 check("dez poções na mochila", state1?.inventory?.[0]?.quantity === 10);
 const stockFury = await call("POST", "/api/market/buy", {

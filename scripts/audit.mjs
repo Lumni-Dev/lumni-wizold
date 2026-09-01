@@ -1669,7 +1669,7 @@ sec("personagem");
     "nasce inteiro",
     run.character.health === derived.maxHealth && run.character.rage === derived.maxRage,
   );
-  ok("nasce com 50 de bronze", run.character.bronze === CONST.STARTING_BRONZE);
+  ok("nasce com 200 de bronze", run.character.bronze === CONST.STARTING_BRONZE);
   ok(
     "nasce sem equipamento",
     Object.values(run.equipment).every((slot) => slot === null),
