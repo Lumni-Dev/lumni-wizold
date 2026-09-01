@@ -8,7 +8,7 @@ import { renameCost, renameDaysLeft } from "@/controllers/character.controller";
 import { AUTOMATIONS } from "@/models/entities/automation";
 import { isVip, VIP_PRICE_CENTS } from "@/models/rules/vip";
 import { useGame } from "@/controllers/game.context";
-import { playSound, playSoundPreview } from "@/controllers/sound";
+import { playSoundPreview } from "@/controllers/sound";
 import { disableTavernPush, enableTavernPush, testTavernPush, webPushConfigured, tavernPushSupported } from "@/controllers/tavern-notify";
 import { soundRepository } from "@/models/repositories/sound.repository";
 import { tavernPushRepository } from "@/models/repositories/tavern-push.repository";

@@ -13,7 +13,6 @@ import {
   MIN_WITHDRAW_CENTS,
   sellerNet,
 } from "@/models/rules/bazaar";
-import { type EquipmentSet, type ItemCategory } from "@/models/entities/item";
 import { listingExpiresAt, type BazaarListing } from "@/models/entities/bazaar";
 import { enhancedName } from "@/models/rules/forge";
 import {

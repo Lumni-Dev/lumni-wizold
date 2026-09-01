@@ -32,7 +32,6 @@ import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
 import { RowText } from "../components/list";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { Field } from "../components/field";
-import { ItemIcon } from "../components/item-icon";
 import { PetSheetHeader, PetIcon } from "../components/pet-icon";
 import { List, ListRow } from "../components/list";
 import { SupplyRow } from "../components/supply-row";

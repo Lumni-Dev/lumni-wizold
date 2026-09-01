@@ -49,9 +49,6 @@ const HEALTH_TIERS = [
   },
 ];
 
-type RageTier = (typeof RAGE_TIERS)[number];
-type HealthTier = (typeof HEALTH_TIERS)[number];
-
 export const POTIONS: readonly Item[] = [
   ...HEALTH_TIERS.map((tier) => ({
     id: "health-potion-" + tier.size,

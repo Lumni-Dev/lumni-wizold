@@ -253,6 +253,12 @@ export function TavernScreen() {
     return () => window.clearTimeout(timer);
   }, [openRoomId, lastMessageAt]);
 
+  const filteredRooms = useMemo(() => {
+    const query = roomSearch.trim().toLowerCase();
+    if (!query) return rooms;
+    return rooms.filter(({ room }) => room.name.toLowerCase().includes(query));
+  }, [rooms, roomSearch]);
+
   if (!character || !identity) return null;
 
   const ownRoom =
@@ -266,12 +272,6 @@ export function TavernScreen() {
 
   const profileHref = (memberId: string): string | null =>
     memberId === identity.id ? "/character" : "/ranking/" + memberId;
-
-  const filteredRooms = useMemo(() => {
-    const query = roomSearch.trim().toLowerCase();
-    if (!query) return rooms;
-    return rooms.filter(({ room }) => room.name.toLowerCase().includes(query));
-  }, [rooms, roomSearch]);
 
   const currentPage = clampPage(page, filteredRooms.length, PAGE_SIZE);
   const pages = pageCount(filteredRooms.length, PAGE_SIZE);

@@ -27,7 +27,7 @@ import { Card } from "../components/card";
 import { useShake } from "../components/use-shake";
 import { Tag } from "../components/tag";
 import { DataRow } from "../components/data-row";
-import { ArtRowButton, List, ListRow, RowText } from "../components/list";
+import { ArtRowButton, List, ListRow } from "../components/list";
 import { Panel } from "../components/panel";
 import { EmptyState } from "../components/empty-state";
 import { PageHeader } from "../layout/page-header";
@@ -186,15 +186,10 @@ export function HuntScreen() {
     setSession((current) => accumulate(current, landed));
   }, [runtime.lastHuntReport]);
 
-  useEffect(() => {
-    if (!character) return;
-    setSelection((current) => {
-      const next = normalizeHuntSelection(state, current);
-      if (JSON.stringify(next) === JSON.stringify(current)) return current;
-      saveHuntSelection(next);
-      return next;
-    });
-  }, [state, character]);
+  const effectiveSelection = useMemo(
+    () => normalizeHuntSelection(state, selection),
+    [state, selection],
+  );
 
   useEffect(() => {
     if (!huntRt || !activeId || huntRt.territoryId !== activeId || huntRt.beat <= 0) return;
@@ -211,7 +206,7 @@ export function HuntScreen() {
   const drops = Object.entries(session.drops);
   function selectCreature(territoryId: string, creatureId: string) {
     setSelection((current) => {
-      const next = { ...current, [territoryId]: creatureId };
+      const next = { ...normalizeHuntSelection(state, current), [territoryId]: creatureId };
       saveHuntSelection(next);
       return next;
     });
@@ -250,7 +245,7 @@ export function HuntScreen() {
           const available = ready;
           const active = activeId === territory.id;
           const opting = active && cooldown !== null;
-          const selectedId = resolveHuntCreatureId(creatures, selection[territory.id]);
+          const selectedId = resolveHuntCreatureId(creatures, effectiveSelection[territory.id]);
           const onThis = active && progress.id === territory.id;
           const line =
             onThis && progress.beat > 0 && script.length > 0

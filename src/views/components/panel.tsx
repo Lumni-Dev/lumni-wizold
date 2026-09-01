@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { ICON_FRAME_INSET, GLASS_SECTION } from "@/shared/constants/ui";
+import { GLASS_SECTION } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { CornerAccents, MarkNested, useNested } from "./corner-accents";
 

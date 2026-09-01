@@ -9,7 +9,6 @@ import {
   EQUIPMENT_SLOTS,
   isEquippable,
   SLOT_LABEL,
-  type ItemCategory,
 } from "@/models/entities/item";
 import { inventoryCategoryFilterOptions, type CategoryFilter } from "../presenters/item-filter.presenter";
 import { isForgeMaterial } from "@/models/rules/bazaar";

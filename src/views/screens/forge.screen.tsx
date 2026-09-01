@@ -108,16 +108,6 @@ export function ForgeScreen() {
     [slots, category, set],
   );
 
-  useEffect(() => {
-    if (filteredSlots.length === 0) return;
-    const valid = filteredSlots.some(
-      (entry) => pieceKey(entry.item.id, entry.level) === selectedForge,
-    );
-    if (valid) return;
-    const first = filteredSlots[0];
-    setSelectedForge(pieceKey(first.item.id, first.level));
-  }, [filteredSlots, selectedForge]);
-
   function selectForge(key: string) {
     setSelectedForge(key);
     const index = filteredSlots.findIndex((entry) => pieceKey(entry.item.id, entry.level) === key);

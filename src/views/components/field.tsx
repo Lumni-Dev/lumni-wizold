@@ -13,7 +13,7 @@ export function Field({
   label,
   hint,
   numeric = false,
-  loose = false,
+  loose: _loose,
   className,
   onChange,
   ...rest
