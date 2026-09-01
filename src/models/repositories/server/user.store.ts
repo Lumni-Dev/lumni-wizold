@@ -6,11 +6,12 @@ export interface UserRow {
   email: string | null;
   birthDate: string;
   epoch: number;
+  twoFactorEnabled: boolean;
 }
 
 export async function findUserByEmail(client: PoolClient, email: string): Promise<UserRow | null> {
   const found = await client.query(
-    "select id, email, birth_date, session_epoch from users where lower(email) = lower($1)",
+    "select id, email, birth_date, session_epoch, two_factor_enabled from users where lower(email) = lower($1)",
     [email],
   );
   const row = found.rows[0];
@@ -20,6 +21,7 @@ export async function findUserByEmail(client: PoolClient, email: string): Promis
         email: row.email,
         birthDate: String(row.birth_date),
         epoch: Number(row.session_epoch),
+        twoFactorEnabled: row.two_factor_enabled === true,
       }
     : null;
 }
@@ -35,5 +37,5 @@ export async function createUser(
     email,
     birthDateIso,
   ]);
-  return { id, email, birthDate: birthDateIso, epoch: 0 };
+  return { id, email, birthDate: birthDateIso, epoch: 0, twoFactorEnabled: false };
 }

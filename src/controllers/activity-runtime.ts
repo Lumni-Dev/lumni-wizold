@@ -55,8 +55,8 @@ export function activityHref(kind: ActivityKind): string {
 
 export function activityTone(kind: ActivityKind): ActivityBarTone {
   if (kind === "hunt") return "blood";
-  if (kind === "train") return "vigor";
-  if (kind === "mine") return "tide";
+  if (kind === "train") return "ember";
+  if (kind === "mine") return "ember";
   if (kind === "forge") return "ember";
   return "blood";
 }

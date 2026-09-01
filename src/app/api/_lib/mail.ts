@@ -220,6 +220,14 @@ export async function sendAccessEmail(to: string, when: Date): Promise<void> {
 }
 
 export async function sendDeletionCodeEmail(to: string, code: string): Promise<void> {
+  await sendTwoFactorCodeEmail(to, code, "delete");
+}
+
+export async function sendTwoFactorCodeEmail(
+  to: string,
+  code: string,
+  reason: "login" | "enable" | "disable" | "delete",
+): Promise<void> {
   const codeBlock =
     '<div style="text-align:center;margin:6px 0 20px;">' +
     '<span style="display:inline-block;background-color:' +
@@ -228,19 +236,44 @@ export async function sendDeletionCodeEmail(to: string, code: string): Promise<v
     EDGE +
     ";color:" +
     INK +
-    ';font-size:28px;letter-spacing:12px;padding:14px 10px 14px 22px;border-radius:6px;font-family:Consolas,Menlo,monospace;">' +
+    ';font-size:28px;letter-spacing:8px;padding:14px 16px;border-radius:6px;font-family:Consolas,Menlo,monospace;">' +
     code +
     "</span></div>";
-  const paragraphs = [
-    "Você pediu para excluir a sua conta em Wizold. Este é o código de confirmação:",
-    codeBlock,
-    "Ele vale por 10 minutos. Confirmando, a conta e tudo o que ela guarda somem do servidor para sempre.",
-    "Se não foi você, ignore esta carta: sem o código, nada acontece.",
-  ];
+
+  const intro =
+    reason === "login"
+      ? "Alguém acabou de bater na porta com a sua conta Google. Para entrar, confirme com este código:"
+      : reason === "enable"
+        ? "Você pediu para ligar a verificação em duas etapas em Wizold. Confirme com este código:"
+        : reason === "disable"
+          ? "Você pediu para desligar a verificação em duas etapas em Wizold. Confirme com este código:"
+          : "Você pediu para excluir a sua conta em Wizold. Este é o código de confirmação:";
+
+  const tail =
+    reason === "login"
+      ? "Se não foi você, ignore esta carta e troque a senha da conta Google."
+      : reason === "delete"
+        ? "Confirmando, a conta e tudo o que ela guarda somem do servidor para sempre."
+        : "Sem o código, nada muda.";
+
+  const subject =
+    reason === "login"
+      ? "Código para entrar: " + code
+      : reason === "enable"
+        ? "Código para ligar a verificação: " + code
+        : reason === "disable"
+          ? "Código para desligar a verificação: " + code
+          : "Código para excluir a conta: " + code;
+
+  const paragraphs = [intro, codeBlock, "Ele vale por 10 minutos.", tail];
+  if (reason === "delete") {
+    paragraphs.push("Se não foi você, ignore esta carta: sem o código, nada acontece.");
+  }
+
   await deliver(
     to,
-    "Código para excluir a conta: " + code,
-    layout(paragraphs, "Voltar ao jogo"),
-    "Código para excluir a sua conta em Wizold: " + code + " (vale 10 minutos).",
+    subject,
+    layout(paragraphs, reason === "login" ? "Entrar na caçada" : "Voltar ao jogo"),
+    "Código Wizold: " + code + " (vale 10 minutos).",
   );
 }

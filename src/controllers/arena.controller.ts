@@ -288,7 +288,6 @@ export function landArena(
           formatBronze(-spoils) +
           " da sua bolsa."
         : hunter.name + " leva a melhor no fosso. Sua bolsa estava vazia, e foi o que ele levou.";
-  const humbled = lost ? message + " A fera não se sustentou: você volta à forma humana." : message;
-  next = addLog(next, "arena", humbled);
-  return success<ArenaResolution>(next, humbled, resolution);
+  next = addLog(next, "arena", message);
+  return success<ArenaResolution>(next, message, resolution);
 }

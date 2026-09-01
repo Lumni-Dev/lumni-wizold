@@ -37,6 +37,9 @@ export function SettingsScreen() {
     deleteRun,
     logout,
     logoutEverywhere,
+    sendTwoFactorCode,
+    enableTwoFactor,
+    disableTwoFactor,
     setAutomation,
     buyVip,
     cancelVip,
@@ -47,15 +50,21 @@ export function SettingsScreen() {
 
   const [accountEmail, setAccountEmail] = useState<string | null>(null);
   const [accountPicture, setAccountPicture] = useState<string | null>(null);
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [twoFactorSetup, setTwoFactorSetup] = useState<"enable" | "disable" | null>(null);
+  const [twoFactorCode, setTwoFactorCode] = useState("");
   useEffect(() => {
     let alive = true;
-    void api<{ email: string | null; picture: string | null }>("GET", "/api/auth/me").then(
-      (answer) => {
-        if (!alive || !answer.ok) return;
-        setAccountEmail(answer.data?.email ?? null);
-        setAccountPicture(answer.data?.picture ?? null);
-      },
-    );
+    void api<{
+      email: string | null;
+      picture: string | null;
+      twoFactorEnabled?: boolean;
+    }>("GET", "/api/auth/me").then((answer) => {
+      if (!alive || !answer.ok) return;
+      setAccountEmail(answer.data?.email ?? null);
+      setAccountPicture(answer.data?.picture ?? null);
+      setTwoFactorEnabled(answer.data?.twoFactorEnabled === true);
+    });
     return () => {
       alive = false;
     };
@@ -102,6 +111,12 @@ export function SettingsScreen() {
     soundRepository.subscribe,
     soundRepository.enabled,
     soundRepository.serverSnapshot,
+  );
+
+  const volume = useSyncExternalStore(
+    soundRepository.subscribe,
+    soundRepository.volume,
+    soundRepository.serverVolumeSnapshot,
   );
 
   function chooseSound(on: boolean) {
@@ -197,6 +212,48 @@ export function SettingsScreen() {
               >
                 Sair de todos os aparelhos
               </Button>
+            </div>
+          </div>
+        </Panel>
+
+        <Panel
+          title="Verificação em duas etapas"
+          description="Um código de oito dígitos no e-mail confirma cada entrada, além do Google."
+        >
+          <div className="space-y-3">
+            <p className="text-xs leading-relaxed text-ink-faint">
+              Com a verificação ligada, depois do Google a porta só abre quando você digitar o
+              código que chega no e-mail da conta.
+            </p>
+            <div className="flex gap-2">
+              <Chip
+                active={twoFactorEnabled}
+                onClick={() => {
+                  if (twoFactorEnabled) return;
+                  void sendTwoFactorCode("enable").then((sent) => {
+                    if (sent) {
+                      setTwoFactorCode("");
+                      setTwoFactorSetup("enable");
+                    }
+                  });
+                }}
+              >
+                Ativado
+              </Chip>
+              <Chip
+                active={!twoFactorEnabled}
+                onClick={() => {
+                  if (!twoFactorEnabled) return;
+                  void sendTwoFactorCode("disable").then((sent) => {
+                    if (sent) {
+                      setTwoFactorCode("");
+                      setTwoFactorSetup("disable");
+                    }
+                  });
+                }}
+              >
+                Desativado
+              </Chip>
             </div>
           </div>
         </Panel>
@@ -346,17 +403,6 @@ export function SettingsScreen() {
           </div>
         </Panel>
 
-        <Panel title="Som" description="Os efeitos do jogo: couro, moedas e o rugido da virada.">
-          <div className="flex gap-2">
-            <Chip active={sound} onClick={() => chooseSound(true)}>
-              Ativado
-            </Chip>
-            <Chip active={!sound} onClick={() => chooseSound(false)}>
-              Desativado
-            </Chip>
-          </div>
-        </Panel>
-
         <Panel
           title="Cache do jogo"
           description="O que este aparelho guarda para abrir mais rápido."
@@ -372,13 +418,48 @@ export function SettingsScreen() {
           }
         >
           <p className="text-xs leading-relaxed text-ink-faint">
-            O navegador guarda cópias das imagens do jogo e as preferências deste aparelho: o som,
-            a data de nascimento lembrada na porta e o trabalho em andamento. Limpar o cache
+            O navegador guarda cópias das imagens do jogo e as preferências deste aparelho: som,
+            volume, a data de nascimento lembrada na porta e o trabalho em andamento. Limpar o cache
             descarta essas cópias, baixa as imagens de novo do servidor e recarrega a página;
             serve para quando alguma arte aparece errada ou desatualizada.
           </p>
         </Panel>
       </div>
+
+      <Panel title="Som" description="Os efeitos do jogo: couro, moedas e o rugido da virada.">
+        <div className="space-y-3">
+          <div className="flex gap-2">
+            <Chip active={sound} onClick={() => chooseSound(true)}>
+              Ativado
+            </Chip>
+            <Chip active={!sound} onClick={() => chooseSound(false)}>
+              Desativado
+            </Chip>
+          </div>
+          {sound ? (
+            <div className="space-y-2 border-t border-edge pt-3">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">Volume</span>
+                <span className="font-mono text-[11px] text-ink">{Math.round(volume * 100)}%</span>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={1}
+                value={Math.round(volume * 100)}
+                aria-label="Volume do som"
+                className="volume-slider w-full"
+                onChange={(event) => {
+                  const next = Number(event.target.value) / 100;
+                  soundRepository.setVolume(next);
+                  if (next > 0) playSound("ui");
+                }}
+              />
+            </div>
+          ) : null}
+        </div>
+      </Panel>
 
       <Panel
         title="Excluir conta"
@@ -409,7 +490,7 @@ export function SettingsScreen() {
       <ConfirmDialog
         open={confirmingClear}
         title="Limpar cache"
-        description="As imagens serão baixadas de novo e as preferências deste aparelho (som, data de nascimento lembrada e trabalho em andamento) voltam ao padrão. A partida no servidor não é tocada."
+        description="As imagens serão baixadas de novo e as preferências deste aparelho (som, volume, data de nascimento lembrada e trabalho em andamento) voltam ao padrão. A partida no servidor não é tocada."
         detail="A página recarrega ao terminar."
         confirmLabel="Limpar"
         onCancel={() => setConfirmingClear(false)}
@@ -449,6 +530,49 @@ export function SettingsScreen() {
           })
         }
       />
+
+      <Modal
+        open={twoFactorSetup !== null}
+        title={twoFactorSetup === "enable" ? "Ligar verificação" : "Desligar verificação"}
+        onClose={() => setTwoFactorSetup(null)}
+        footer={
+          <div className="flex items-center justify-end gap-2">
+            <Button variant="ghost" onClick={() => setTwoFactorSetup(null)}>
+              Cancelar
+            </Button>
+            <Button
+              variant="primary"
+              disabled={!/^\d{8}$/.test(twoFactorCode)}
+              onClick={() => {
+                const action = twoFactorSetup === "enable" ? enableTwoFactor : disableTwoFactor;
+                void action(twoFactorCode).then((ok) => {
+                  if (!ok) return;
+                  setTwoFactorEnabled(twoFactorSetup === "enable");
+                  setTwoFactorSetup(null);
+                  setTwoFactorCode("");
+                });
+              }}
+            >
+              Confirmar
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-3 p-4">
+          <p className="text-xs leading-relaxed text-ink-soft">
+            Digite o código de oito dígitos enviado para{" "}
+            <span className="text-ink">{accountEmail ?? "o seu e-mail"}</span>.
+          </p>
+          <Field
+            label="Código"
+            numeric
+            maxLength={8}
+            value={twoFactorCode}
+            autoComplete="one-time-code"
+            onChange={(event) => setTwoFactorCode(event.target.value.slice(0, 8))}
+          />
+        </div>
+      </Modal>
 
       <Modal
         open={deleting !== null}

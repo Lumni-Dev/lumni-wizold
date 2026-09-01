@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { activityRuntimeStore } from "@/controllers/activity-runtime";
-import { listForge, listMining } from "@/controllers/forge.controller";
+import { findForgePiece, listMining } from "@/controllers/forge.controller";
 import { listTerritories } from "@/controllers/hunt.controller";
 import { useGame } from "@/controllers/game.context";
 import { petTrainingView } from "@/controllers/pet.controller";
@@ -77,7 +77,7 @@ export function ActivityDock() {
     const petAlong = pet && canPetFight(pet) ? pet : null;
 
     return {
-      preyLabel: monsterStatus + " · " + (shownFoe?.name ?? "—"),
+      preyLabel: monsterStatus + " · " + (shownFoe?.name ?? "?"),
       preyCurrent: monsterCurrent,
       preyMax: monsterMax,
       huntLabel: "Caçando...",
@@ -172,8 +172,7 @@ export function ActivityDock() {
   const forgeView = useMemo(() => {
     const forgeRt = runtime.forge;
     if (!forgeRt || activity?.kind !== "forge" || activity.paused) return null;
-    const slots = listForge(state);
-    const forgeEntry = slots.find((row) => row.item.id === forgeRt.id) ?? null;
+    const forgeEntry = findForgePiece(state, forgeRt.id, forgeRt.level);
     const cooldown = forgeRt.cooldown;
     const opting = cooldown !== null;
 
@@ -369,7 +368,6 @@ export function ActivityDock() {
                   }
                   current={trainView.sessionCurrent}
                   maximum={trainView.sessionMax}
-                  tone="vigor"
                   glows={trainView.glows && trainView.cooldown === null}
                   wraps
                 />
@@ -396,7 +394,6 @@ export function ActivityDock() {
                   }
                   current={mineView.swingCurrent}
                   maximum={mineView.swingMax}
-                  tone="tide"
                   glows={mineView.glows && mineView.cooldown === null}
                   wraps
                 />

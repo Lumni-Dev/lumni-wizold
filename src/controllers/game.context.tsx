@@ -59,7 +59,13 @@ interface GameContextValue {
     birth: BirthDate,
   ) => Promise<{
     hasCharacter: boolean;
+    needsTwoFactor?: boolean;
   } | null>;
+  verifyTwoFactor: (code: string) => Promise<{ hasCharacter: boolean } | null>;
+  resendTwoFactor: () => Promise<boolean>;
+  sendTwoFactorCode: (action: "enable" | "disable") => Promise<boolean>;
+  enableTwoFactor: (code: string) => Promise<boolean>;
+  disableTwoFactor: (code: string) => Promise<boolean>;
   startRun: (name: string, gender: Gender) => Promise<boolean>;
   renameCharacter: (name: string) => Promise<boolean>;
   requestDeleteCode: () => Promise<boolean>;
@@ -117,6 +123,7 @@ interface GameContextValue {
   setPetActive: (active: boolean) => Promise<void>;
   refresh: () => Promise<void>;
   updateAvailable: boolean;
+  updateVersion: string | null;
   applyUpdate: () => void;
 }
 const GameContext = createContext<GameContextValue | null>(null);
@@ -142,6 +149,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [notices, setNotices] = useState<Notice[]>([]);
   const [activity, setActivityState] = useState<Activity | null>(null);
   const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [updateVersion, setUpdateVersion] = useState<string | null>(null);
   const noticeCounter = useRef(0);
   const ready = hydrated && booted;
   const setActivity = useCallback((next: Activity | null) => {
@@ -181,6 +189,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     const check = async () => {
       const answer = await api("GET", "/api/version");
       if (alive && answer.version && answer.version !== GAME_VERSION) {
+        setUpdateVersion(answer.version);
         setUpdateAvailable(true);
       }
     };
@@ -328,7 +337,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         announce("O corpo se recompõe aos poucos.", true, "Recuperação");
       }
       if (answer.data?.done) {
-        announce("Recuperação completa: vida e fúria inteiras.", true, "Recuperação");
+        announce("Recuperação completa: vida inteira.", true, "Recuperação");
         setActivity(automationController.resumeAfterRest(stateRef.current, activityRef.current));
       }
     };
@@ -438,9 +447,30 @@ export function GameProvider({ children }: { children: ReactNode }) {
       enter: async (credential, birth) => {
         const answer = await api<{
           hasCharacter: boolean;
+          needsTwoFactor?: boolean;
         }>("POST", "/api/auth/enter", {
           credential,
           birth,
+        });
+        if (!answer.ok) {
+          announce(answer.message, false, "Conta");
+          return null;
+        }
+        if (answer.data?.needsTwoFactor) {
+          announce(answer.message, true, "Conta");
+          return {
+            hasCharacter: answer.data.hasCharacter === true,
+            needsTwoFactor: true,
+          };
+        }
+        setAuthenticated(true);
+        announce(answer.message, true, "Conta");
+        await request("POST", "/api/state");
+        return { hasCharacter: answer.data?.hasCharacter === true };
+      },
+      verifyTwoFactor: async (code) => {
+        const answer = await api<{ hasCharacter: boolean }>("POST", "/api/auth/two-factor/verify", {
+          code,
         });
         if (!answer.ok) {
           announce(answer.message, false, "Conta");
@@ -450,6 +480,23 @@ export function GameProvider({ children }: { children: ReactNode }) {
         announce(answer.message, true, "Conta");
         await request("POST", "/api/state");
         return { hasCharacter: answer.data?.hasCharacter === true };
+      },
+      resendTwoFactor: async () => {
+        const answer = await api("POST", "/api/auth/two-factor/resend");
+        announce(answer.message, answer.ok, "Conta");
+        return answer.ok;
+      },
+      sendTwoFactorCode: async (action) => {
+        const answer = await act("POST", "/api/auth/two-factor/send", { action }, "Conta");
+        return answer.ok;
+      },
+      enableTwoFactor: async (code) => {
+        const answer = await act("POST", "/api/auth/two-factor/enable", { code }, "Conta");
+        return answer.ok;
+      },
+      disableTwoFactor: async (code) => {
+        const answer = await act("POST", "/api/auth/two-factor/disable", { code }, "Conta");
+        return answer.ok;
       },
       startRun: async (name, gender) => {
         const answer = await act("POST", "/api/characters", { name, gender }, "Personagem", () =>
@@ -781,6 +828,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         await request("POST", "/api/state");
       },
       updateAvailable,
+      updateVersion,
       applyUpdate,
     };
   }, [
@@ -791,6 +839,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     activity,
     moon,
     updateAvailable,
+    updateVersion,
     applyUpdate,
     dismissNotice,
     announce,

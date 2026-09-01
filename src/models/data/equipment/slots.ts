@@ -15,7 +15,7 @@ export const SLOTS: Record<EquipmentSlot, SlotBlueprint> = {
     noun: "Colar",
     feminine: false,
     flavor:
-      "Pende sobre o peito e mantém o instinto desperto mesmo em forma humana. O metal " +
+      "Pende sobre o peito e mantém o instinto desperto mesmo longe da trilha. O metal " +
       "esquenta um instante antes de a presa aparecer, e a matilha aprendeu a confiar nisso.",
     attributes: { instinct: 0.4, willpower: 0.3 },
     priceFactor: 17,

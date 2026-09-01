@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { tavernPushRepository } from "@/models/repositories/tavern-push.repository";
 import { tavernReadRepository } from "@/models/repositories/tavern-read.repository";
+import { pushTavernAlert } from "./tavern-alert.store";
 import { useGame } from "./game.context";
 import { ensureTavernWorker, notifyTavernMessageLocal, tavernPushActive } from "./tavern-notify";
 import { subscribeTavernBoard } from "./tavern-stream";
@@ -59,16 +61,27 @@ export function useTavernAlert(watching: boolean) {
     ensureTavernWorker();
     return subscribeTavernBoard((board) => {
       setUnread(unreadFromBoard(board.rooms, selfId));
-      const pushOn = tavernPushActive();
+      const alertsOn = tavernPushRepository.enabled();
+      const hidden = document.hidden;
       let latest = notifiedRef.current ?? "";
       for (const { room } of board.rooms) {
         for (const message of room.messages) {
           if (message.at > latest) latest = message.at;
         }
       }
-      if (!pushOn && document.hidden && notifiedRef.current !== null) {
+      if (notifiedRef.current !== null) {
         for (const item of freshMessages(board.rooms, selfId, notifiedRef.current)) {
-          notifyTavernMessageLocal(item.roomName, item.authorName, item.text, item.at);
+          if (alertsOn && !hidden) {
+            pushTavernAlert({
+              id: item.at + ":" + item.roomName,
+              roomName: item.roomName,
+              authorName: item.authorName,
+              text: item.text,
+              at: item.at,
+            });
+          } else if (hidden && !tavernPushActive()) {
+            notifyTavernMessageLocal(item.roomName, item.authorName, item.text, item.at);
+          }
         }
       }
       notifiedRef.current = latest;

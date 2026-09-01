@@ -19,7 +19,7 @@ export default function WikiPage() {
         data={{
           "@context": "https://schema.org",
           "@type": "WebPage",
-          name: GAME_NAME + " — Wiki",
+          name: GAME_NAME + ": Wiki",
           url: SITE_URL + "/wiki",
           inLanguage: "pt-BR",
           description:

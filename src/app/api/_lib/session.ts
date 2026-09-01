@@ -1,7 +1,9 @@
 import { createHmac, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 export const SESSION_COOKIE = "wizold_session";
+export const TWO_FACTOR_COOKIE = "wizold_2fa_pending";
 const SESSION_DAYS = 30;
+const TWO_FACTOR_MINUTES = 15;
 function secret(): string {
   const value = process.env.SESSION_SECRET;
   if (!value || value.length < 32) {
@@ -67,6 +69,45 @@ export async function attachSession(userId: string, epoch: number): Promise<void
 export async function dropSession(): Promise<void> {
   const jar = await cookies();
   jar.delete(SESSION_COOKIE);
+  jar.delete(TWO_FACTOR_COOKIE);
+}
+
+export function mintTwoFactorPending(
+  userId: string,
+  epoch: number,
+): {
+  value: string;
+  maxAge: number;
+} {
+  const expiry = Date.now() + TWO_FACTOR_MINUTES * 60000;
+  const payload = userId + "." + epoch + "." + expiry;
+  return { value: payload + "." + sign(payload), maxAge: TWO_FACTOR_MINUTES * 60 };
+}
+
+export function verifyTwoFactorPending(token: string | undefined): SessionClaims | null {
+  return verifySession(token);
+}
+
+export async function twoFactorPendingClaims(): Promise<SessionClaims | null> {
+  const jar = await cookies();
+  return verifyTwoFactorPending(jar.get(TWO_FACTOR_COOKIE)?.value);
+}
+
+export async function attachTwoFactorPending(userId: string, epoch: number): Promise<void> {
+  const jar = await cookies();
+  const minted = mintTwoFactorPending(userId, epoch);
+  jar.set(TWO_FACTOR_COOKIE, minted.value, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: minted.maxAge,
+  });
+}
+
+export async function dropTwoFactorPending(): Promise<void> {
+  const jar = await cookies();
+  jar.delete(TWO_FACTOR_COOKIE);
 }
 export function deletionCodeHash(userId: string, code: string): string {
   return createHmac("sha256", secret()).update(userId + ":" + code).digest("hex");

@@ -10,6 +10,7 @@ import { ageOf, EMPTY_BIRTH, isRealBirth } from "@/shared/utils/birth";
 import { cn } from "@/shared/utils/class-names";
 import { Button } from "../components/button";
 import { CornerAccents } from "../components/corner-accents";
+import { Field } from "../components/field";
 import { Select, type SelectOption } from "../components/select";
 
 function GoogleMark() {
@@ -93,10 +94,13 @@ function daysInMonth(month: string, year: string): number {
   return new Date(Number(year || "2000"), Number(month), 0).getDate();
 }
 export function LoginScreen() {
-  const { ready, character, enter } = useGame();
+  const { ready, character, enter, verifyTwoFactor, resendTwoFactor } = useGame();
   const router = useRouter();
   const [birth, setBirth] = useState(EMPTY_BIRTH);
   const [entering, setEntering] = useState(false);
+  const [twoFactor, setTwoFactor] = useState<{ hasCharacter: boolean } | null>(null);
+  const [twoFactorCode, setTwoFactorCode] = useState("");
+  const [verifying, setVerifying] = useState(false);
   const birthRef = useRef(birth);
   const buttonHost = useRef<HTMLDivElement>(null);
   const age = ageOf(birth);
@@ -140,6 +144,11 @@ export function LoginScreen() {
             try {
               const opened = await enter(answer.credential, birthRef.current);
               if (!opened) return;
+              if (opened.needsTwoFactor) {
+                setTwoFactor({ hasCharacter: opened.hasCharacter });
+                setTwoFactorCode("");
+                return;
+              }
               saveBirth(birthRef.current);
               playSound("door");
               router.push(opened.hasCharacter ? "/character" : "/create");
@@ -197,11 +206,78 @@ export function LoginScreen() {
 
         <div className="relative rounded-lg border border-edge bg-surface/80">
           <div className="border-b border-edge px-4 py-3">
-            <h1 className="heading text-[11px] text-ink">Entrar</h1>
-            <p className="mt-1 text-xs text-ink-faint">A noite não cobra nada para começar.</p>
+            <h1 className="heading text-[11px] text-ink">
+              {twoFactor ? "Verificação" : "Entrar"}
+            </h1>
+            <p className="mt-1 text-xs text-ink-faint">
+              {twoFactor
+                ? "Confirme o código enviado ao seu e-mail."
+                : "A noite não cobra nada para começar."}
+            </p>
           </div>
 
           <div className="space-y-4 p-4">
+            {twoFactor ? (
+              <>
+                <p className="text-xs leading-relaxed text-ink-faint">
+                  Enviamos um código de oito dígitos para o e-mail da conta. Ele vale por 10
+                  minutos.
+                </p>
+                <Field
+                  label="Código"
+                  numeric
+                  maxLength={8}
+                  value={twoFactorCode}
+                  autoComplete="one-time-code"
+                  onChange={(event) => setTwoFactorCode(event.target.value.slice(0, 8))}
+                />
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    variant="primary"
+                    size="medium"
+                    fullWidth
+                    busy={verifying}
+                    disabled={!/^\d{8}$/.test(twoFactorCode)}
+                    onClick={() => {
+                      void (async () => {
+                        setVerifying(true);
+                        try {
+                          const opened = await verifyTwoFactor(twoFactorCode);
+                          if (!opened) return;
+                          saveBirth(birthRef.current);
+                          playSound("door");
+                          router.push(opened.hasCharacter ? "/character" : "/create");
+                        } finally {
+                          setVerifying(false);
+                        }
+                      })();
+                    }}
+                  >
+                    Confirmar
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="medium"
+                    fullWidth
+                    onClick={() => void resendTwoFactor()}
+                  >
+                    Reenviar código
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="medium"
+                    fullWidth
+                    onClick={() => {
+                      setTwoFactor(null);
+                      setTwoFactorCode("");
+                    }}
+                  >
+                    Voltar
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
             <div className="space-y-2">
               <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                 Data de nascimento
@@ -274,6 +350,8 @@ export function LoginScreen() {
               A porta é a conta Google: nada de senha nova para lembrar. Na primeira entrada a data
               de nascimento fica guardada, e nas seguintes basta o botão.
             </p>
+              </>
+            )}
           </div>
           <CornerAccents inside />
         </div>

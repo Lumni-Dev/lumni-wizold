@@ -4,13 +4,16 @@ self.addEventListener("push", (event) => {
     if (event.data) payload = { ...payload, ...event.data.json() };
   } catch {}
   event.waitUntil(
-    self.registration.showNotification(payload.title, {
-      body: payload.body,
-      icon: "/assets/ui/caneca.png",
-      tag: "tavern:" + payload.roomName,
-      data: { url: payload.url || "/tavern" },
-      requireInteraction: true,
-      actions: [{ action: "reply", title: "Responder" }],
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((windows) => {
+      if (windows.some((client) => client.visibilityState === "visible")) return;
+      return self.registration.showNotification(payload.title, {
+        body: payload.body,
+        icon: "/assets/ui/caneca.png",
+        tag: "tavern:" + payload.roomName,
+        data: { url: payload.url || "/tavern" },
+        requireInteraction: true,
+        actions: [{ action: "reply", title: "Responder" }],
+      });
     }),
   );
 });

@@ -1,11 +1,13 @@
 "use client";
 
 import { useGame } from "@/controllers/game.context";
+import { GAME_VERSION } from "@/shared/constants/version";
 import { Button } from "./button";
+import { DataRow } from "./data-row";
 import { Modal } from "./modal";
 
 export function UpdateGate() {
-  const { updateAvailable, applyUpdate } = useGame();
+  const { updateAvailable, updateVersion, applyUpdate } = useGame();
   return (
     <Modal
       open={updateAvailable}
@@ -22,6 +24,10 @@ export function UpdateGate() {
         <p className="text-xs leading-relaxed text-ink-faint">
           Uma nova versão do jogo já está disponível.
         </p>
+        <div className="divide-y divide-line rounded-md border border-line">
+          <DataRow label="Versão atual" value={"v" + GAME_VERSION} />
+          {updateVersion ? <DataRow label="Nova versão" value={"v" + updateVersion} /> : null}
+        </div>
         <p className="text-xs leading-relaxed text-ink-faint">
           Ao atualizar, a página recarrega limpando o cache, para você jogar sempre na versão mais
           recente.

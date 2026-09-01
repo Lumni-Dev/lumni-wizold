@@ -32,8 +32,8 @@ const ICON_TEXT: Record<IconSize, string> = {
 };
 type FrameTone = "default" | "strong";
 const TONES: Record<FrameTone, string> = {
-  default: "border-edge bg-base text-ink-faint",
-  strong: "border-edge-strong bg-charcoal text-ink-soft",
+  default: "slot-well border-edge text-ink-faint",
+  strong: "slot-well-strong border-edge-strong text-ink-soft",
 };
 export function IconFrame({
   size = "medium",
@@ -53,7 +53,7 @@ export function IconFrame({
     >
       <span
         className={cn(
-          "slot-well relative flex h-full w-full items-center justify-center overflow-hidden rounded-md border font-mono",
+          "relative flex h-full w-full items-center justify-center overflow-hidden rounded-md border font-mono",
           ICON_TEXT[size],
           TONES[tone],
         )}

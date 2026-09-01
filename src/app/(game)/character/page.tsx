@@ -4,7 +4,7 @@ import { privatePageMetadata } from "@/shared/seo/metadata";
 
 export const metadata: Metadata = privatePageMetadata({
   title: "Personagem",
-  description: "Ficha do caçador: atributos, equipamento, vitals e forma humana ou lobisomem.",
+  description: "Ficha do caçador: atributos, equipamento e vitais.",
   path: "/character",
 });
 

@@ -1,5 +1,5 @@
 export const ECONOMY = {
-  vipPriceCents: 500,
+  vipPriceCents: 990,
   startingBronze: 50,
   /** Hunter rename at the character's current band. */
   renameHunts: 90,

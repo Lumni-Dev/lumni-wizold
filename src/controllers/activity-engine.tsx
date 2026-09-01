@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { listForge } from "@/controllers/forge.controller";
+import { findForgePiece } from "@/controllers/forge.controller";
 import { listExercises } from "@/controllers/training.controller";
 import { loadHuntSelection } from "@/models/repositories/hunt-selection.repository";
 import { findItem } from "@/models/data/items";
@@ -462,7 +462,7 @@ export function ActivityEngine() {
     let level = startLevel;
 
     const push = (cooldown: number | null) => {
-      const slot = listForge(stateRef.current).find((entry) => entry.item.id === activeItem);
+      const slot = findForgePiece(stateRef.current, activeItem, level);
       const name = slot?.item.name ?? activeItem;
       patchActivityRuntime({
         forge: { id: activeItem, beat, max: FORGE_TICKS, cooldown, level },

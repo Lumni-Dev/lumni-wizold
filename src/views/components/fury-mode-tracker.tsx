@@ -3,7 +3,6 @@
 import { Flame } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useGame } from "@/controllers/game.context";
-import { CONTROL_HEIGHT } from "@/shared/constants/ui";
 
 function furyClock(ms: number): string {
   const total = Math.max(0, Math.ceil(ms / 1000));
@@ -31,12 +30,9 @@ export function FuryModeTracker() {
 
   return (
     <div className="fury-spin-border">
-      <div className={"relative flex items-stretch rounded-[calc(0.375rem-1px)] bg-surface/70"}>
-        <span
-          className={
-            "flex " + CONTROL_HEIGHT + " w-8 shrink-0 items-center justify-center border-r border-edge"
-          }
-        >
+      <span className="fury-spin-border-track" aria-hidden="true" />
+      <div className="fury-spin-border-inner">
+        <span className="flex w-8 shrink-0 items-center justify-center self-stretch border-r border-edge">
           <Flame aria-hidden strokeWidth={1.75} className="h-4 w-4 text-ember" />
         </span>
         <div className="min-w-0 flex-1 px-3 py-2">

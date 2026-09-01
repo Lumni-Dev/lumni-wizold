@@ -6,6 +6,7 @@ import { cn } from "@/shared/utils/class-names";
 import { ActivityDock } from "../components/activity-dock";
 import { SourceIcon } from "../components/app-icon";
 import { CornerAccents } from "../components/corner-accents";
+import { TavernAlertDock } from "../components/tavern-alert-dock";
 
 const DURATION_MS = 4000;
 
@@ -50,6 +51,7 @@ export function GameCorner() {
           <CornerAccents />
         </div>
       ))}
+      <TavernAlertDock />
       <ActivityDock />
     </div>
   );

@@ -3,7 +3,7 @@ import { GAME_NAME, GAME_TAGLINE } from "@/shared/constants/game";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: GAME_NAME + " — " + GAME_TAGLINE,
+    name: GAME_NAME + ": " + GAME_TAGLINE,
     short_name: GAME_NAME,
     description:
       "Jogo de navegador de lobisomem: caçada, treino, forja, arena e ranking de caçadores reais.",

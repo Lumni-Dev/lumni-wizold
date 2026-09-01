@@ -7,9 +7,10 @@ import { createUser, findUserByEmail } from "@/models/repositories/server/user.s
 import { loadGame } from "@/models/repositories/server/game.store";
 import { asText, bad, clientIp, readBody, refuseAbuse } from "../../_lib/api";
 import { verifyGoogleCredential } from "../../_lib/google";
-import { sendAccessEmail, sendWelcomeEmail } from "../../_lib/mail";
+import { sendAccessEmail, sendTwoFactorCodeEmail, sendWelcomeEmail } from "../../_lib/mail";
 import { rateLimit, rateLimitShared } from "../../_lib/rate-limit";
-import { attachSession } from "../../_lib/session";
+import { attachSession, attachTwoFactorPending } from "../../_lib/session";
+import { mintTwoFactorCode, saveTwoFactorCode } from "../../_lib/two-factor";
 export async function POST(request: Request) {
   const refused = refuseAbuse(request);
   if (refused) return refused;
@@ -61,7 +62,10 @@ export async function POST(request: Request) {
             console.error("[mail] boas-vindas", error),
           ),
         );
-      } else if (!identity.email.endsWith("@wizold.test")) {
+      } else if (
+        !identity.email.endsWith("@wizold.test") &&
+        !user.twoFactorEnabled
+      ) {
         const accessedAt = new Date();
         after(() =>
           sendAccessEmail(identity.email, accessedAt).catch((error) =>
@@ -73,8 +77,28 @@ export async function POST(request: Request) {
         user.id,
         identity.picture,
       ]);
-      await attachSession(user.id, user.epoch);
+
       const loaded = await loadGame(client, user.id, false);
+      const skipTwoFactor =
+        !user.twoFactorEnabled || identity.email.endsWith("@wizold.test");
+
+      if (!skipTwoFactor) {
+        const code = mintTwoFactorCode();
+        await saveTwoFactorCode(client, user.id, code);
+        after(() =>
+          sendTwoFactorCodeEmail(identity.email, code, "login").catch((error) =>
+            console.error("[mail] código 2fa", error),
+          ),
+        );
+        await attachTwoFactorPending(user.id, user.epoch);
+        return NextResponse.json({
+          ok: true,
+          message: "Código enviado para o seu e-mail.",
+          data: { userId: user.id, hasCharacter: loaded !== null, needsTwoFactor: true },
+        });
+      }
+
+      await attachSession(user.id, user.epoch);
       if (!identity.email.endsWith("@wizold.test")) {
         await client.query(
           `insert into account_accesses (id, email, character_name, first_time, ip)

@@ -24,7 +24,7 @@ function Brand() {
       className="flex h-[74px] items-center justify-center border-b border-edge px-3"
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/assets/ui/logo.webp?v=3" alt={GAME_NAME} className="h-8 w-auto" />
+      <img src="/assets/ui/logo.webp?v=3" alt={GAME_NAME} className="h-10 w-auto" />
     </Link>
   );
 }

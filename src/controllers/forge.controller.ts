@@ -153,6 +153,14 @@ function fragmentOf(item: Item): Item | null {
   return item.set ? (findItem(item.set + "-fragment") ?? null) : null;
 }
 
+export function findForgePiece(
+  state: GameState,
+  itemId: string,
+  enhancement: number,
+): ForgePiece | null {
+  return listForge(state).find((row) => row.item.id === itemId && row.level === enhancement) ?? null;
+}
+
 export function listForge(state: GameState): ForgePiece[] {
   const characterLevel = state.character?.level ?? 1;
   const bronze = state.character?.bronze ?? 0;

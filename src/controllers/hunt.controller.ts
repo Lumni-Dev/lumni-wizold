@@ -220,7 +220,7 @@ export function landHunt(
       : creature.name +
         " venceu a disputa. Você escapou por pouco de " +
         territory.name +
-        ", e a fera não se sustentou: você volta à forma humana. Pelo esforço: " +
+        ". Pelo esforço: " +
         formatNumber(granted) +
         " de experiência.";
 

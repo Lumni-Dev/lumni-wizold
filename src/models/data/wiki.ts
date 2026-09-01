@@ -55,6 +55,7 @@ import { FULL_MOON_ATTRIBUTE_BONUS, MOON_PHASES, SYNODIC_MONTH_DAYS } from "../r
 import { miningNeeded } from "../rules/mining";
 import { criticalMultiplierOf } from "../rules/combat";
 import { huntPurse } from "../rules/economy";
+import { VIP_DAYS, VIP_PRICE_CENTS } from "../rules/vip";
 import { EQUIPMENT_SETS, piecePrice } from "./equipment-sets";
 import { EQUIPMENT_SLOTS } from "../entities/item";
 import { STORE_PACKS } from "./store-packs";
@@ -127,7 +128,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "Você começa sem nada equipado, com " +
         STARTING_BRONZE +
         " WCoins e dez poções de vida. Escolha um território: a barra enche como \"Caçando...\" e só no último batimento a luta é decidida no servidor; depois o replay conta golpe a golpe. Parar na aproximação cancela; parar no replay aplica o resultado.",
-      "Para encadear caçadas, treino, mina ou forja sem tocar em nada, ligue a automação nas configurações. Cada área tem dez criaturas de números fixos: você fica mais forte, elas não.",
+      "Para encadear caçadas, treino, mina ou forja sem tocar em nada, ative a automação VIP nas configurações. Cada área tem dez criaturas de números fixos: você fica mais forte, elas não.",
       "O golpe crítico multiplica o dano por " +
         criticalMultiplierOf().toFixed(2).replace(".", ",") +
         ", fixo; Instinto sobe a chance de crítico e Agilidade, a de esquiva.",
@@ -149,7 +150,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         Math.round(REST_TICK_MS / 1000 / REST_HEALTH_RATIO) +
         " segundos, em qualquer nível. A poção é o atalho pago.",
       "Zerou a vida na caçada, você escapa com 1 de vida e registra uma derrota.",
-      "Sem vida, o chão recusa caçada: Recuperar-se ou use uma poção.",
+      "Com menos de 1 de vida, o chão recusa caçada: Recuperar-se ou use uma poção.",
       "Com menos de " +
         Math.round(MIN_HEALTH_RATIO_TO_ACT * 100) +
         "% de vida máxima, o chão recusa duelo: Recuperar-se primeiro.",
@@ -377,6 +378,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         MAX_ROOM_MESSAGES +
         " falas: o que veio antes a noite leva.",
       "A taverna não aceita links: fala que carrega endereço volta recusada.",
+      "Nomes de caçador, mesa e mensagens passam por moderação: o que fere as regras é recusado na hora ou censurado depois do envio.",
       "Cada fala cabe em " +
         MESSAGE_MAX_LENGTH +
         " caracteres, e a mesa aceita uma sua a cada " +
@@ -446,13 +448,31 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     ],
   },
   {
+    id: "vip",
+    title: "VIP",
+    summary: "Assinatura mensal que libera a automação.",
+    lines: [
+      "Custa " +
+        formatReais(VIP_PRICE_CENTS) +
+        " por mês e mantém o VIP por " +
+        VIP_DAYS +
+        " dias a cada cobrança confirmada.",
+      "Libera todos os interruptores de automação nas configurações: caçada, treino, mina, forja, descanso, fúria, poção e mascote.",
+      "Sem VIP, cada clique faz um ciclo só; com VIP, a partida repete o trabalho sozinha enquanto houver recurso.",
+      "Cancelar a assinatura mantém o VIP até o fim do período já pago; reativar antes do vencimento evita ficar sem o recurso.",
+      "O pagamento abre no checkout do Stripe; a confirmação liga o VIP na hora.",
+    ],
+  },
+  {
     id: "automation",
     title: "Automação",
-    summary: "O jogo pode repetir trabalho por você, nas configurações.",
+    summary: "Interruptores VIP que repetem trabalho por você.",
     lines: [
-      "Cada interruptor decide se caçada, treino, mina ou forja encadeiam sozinhos. " +
-        AUTOMATIONS.map((entry) => entry.label + ": " + entry.effect).join(" "),
-      "No chão de vida, poção de vida é sempre automática: bebe se houver, senão repousa. Trabalho pausado por falta de recurso retoma quando der.",
+      "Só quem tem VIP liga e desliga os interruptores nas configurações.",
+      AUTOMATIONS.map((entry) => entry.label + ": " + entry.effect).join(" "),
+      "Com VIP ativo, no chão de vida (" +
+        Math.round(MIN_HEALTH_RATIO_TO_ACT * 100) +
+        "%) bebe poção se houver, senão repousa; trabalho pausado por falta de recurso retoma quando der.",
     ],
   },
   {

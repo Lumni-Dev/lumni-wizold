@@ -4,7 +4,7 @@ import { privatePageMetadata } from "@/shared/seo/metadata";
 
 export const metadata: Metadata = privatePageMetadata({
   title: "Caça",
-  description: "Escolha um território, transforme-se e caçe criaturas sob a lua real.",
+  description: "Escolha um território e caçe criaturas sob a lua real.",
   path: "/hunt",
 });
 

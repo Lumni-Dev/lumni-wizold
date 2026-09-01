@@ -127,11 +127,22 @@
 
 
 @utility slot-well {
+  background-color: var(--color-base);
   background-image: radial-gradient(
     circle at 50% 45%,
     color-mix(in oklab, var(--color-ember) 12%, var(--color-edge-strong)) 0%,
     color-mix(in oklab, var(--color-ember) 5%, var(--color-surface-high)) 42%,
     var(--color-base) 82%
+  );
+}
+
+@utility slot-well-strong {
+  background-color: var(--color-charcoal);
+  background-image: radial-gradient(
+    circle at 50% 45%,
+    color-mix(in oklab, var(--color-ember) 16%, var(--color-edge-strong)) 0%,
+    color-mix(in oklab, var(--color-ember) 8%, var(--color-surface-high)) 42%,
+    var(--color-charcoal) 82%
   );
 }
 
@@ -275,10 +286,10 @@ button:not(:disabled) {
   overflow: hidden;
   border-radius: 0.375rem;
   padding: 1px;
+  isolation: isolate;
 }
 
-.fury-spin-border::before {
-  content: "";
+.fury-spin-border-track {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -296,7 +307,56 @@ button:not(:disabled) {
   animation: fury-border-spin 2.4s linear infinite;
 }
 
-.fury-spin-border > * {
+.fury-spin-border-inner {
   position: relative;
   z-index: 1;
+  display: flex;
+  align-items: stretch;
+  border-radius: calc(0.375rem - 1px);
+  background: var(--color-surface);
+}
+
+.volume-slider {
+  height: 32px;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.volume-slider:focus {
+  outline: none;
+}
+
+.volume-slider:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--color-edge-strong);
+  outline-offset: 2px;
+}
+
+.volume-slider::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 9999px;
+  background: var(--color-edge);
+}
+
+.volume-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-top: -6px;
+  border-radius: 9999px;
+  background: var(--color-ember);
+}
+
+.volume-slider::-moz-range-track {
+  height: 4px;
+  border-radius: 9999px;
+  background: var(--color-edge);
+}
+
+.volume-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: none;
+  border-radius: 9999px;
+  background: var(--color-ember);
 }

@@ -108,6 +108,16 @@ export function ForgeScreen() {
     [slots, category, set],
   );
 
+  useEffect(() => {
+    if (filteredSlots.length === 0) return;
+    const valid = filteredSlots.some(
+      (entry) => pieceKey(entry.item.id, entry.level) === selectedForge,
+    );
+    if (valid) return;
+    const first = filteredSlots[0];
+    setSelectedForge(pieceKey(first.item.id, first.level));
+  }, [filteredSlots, selectedForge]);
+
   function selectForge(key: string) {
     setSelectedForge(key);
     const index = filteredSlots.findIndex((entry) => pieceKey(entry.item.id, entry.level) === key);
@@ -131,7 +141,9 @@ export function ForgeScreen() {
   const selectedAvailable = Boolean(selectedEntry?.unlocked) && !mining.dailyExhausted;
   const mineOpting = activeOre !== null && cooldown !== null;
 
-  const forgeFallback = filteredSlots.find((entry) => entry.canForge) ?? filteredSlots[0] ?? null;
+  const forgeFallbackKey = filteredSlots[0]
+    ? pieceKey(filteredSlots[0].item.id, filteredSlots[0].level)
+    : "";
   const selectedValid = filteredSlots.some(
     (entry) => pieceKey(entry.item.id, entry.level) === selectedForge,
   );
@@ -141,9 +153,7 @@ export function ForgeScreen() {
       ? pieceKey(forgeItemId, displayLevel)
       : selectedValid
         ? selectedForge
-        : forgeFallback
-          ? pieceKey(forgeFallback.item.id, forgeFallback.level)
-          : "";
+        : forgeFallbackKey;
   const forgeEntry =
     filteredSlots.find((entry) => pieceKey(entry.item.id, entry.level) === effectiveForge) ??
     slots.find((entry) => pieceKey(entry.item.id, entry.level) === effectiveForge) ??
