@@ -22,7 +22,7 @@ const CREATURE_ROOT = "creatures";
 
 const IMAGE_EXTENSIONS = new Set([".png", ".webp", ".gif", ".jpg", ".jpeg", ".svg", ".avif"]);
 
-const ART_VERSION = "?v=30";
+const ART_VERSION = "?v=32";
 
 const ITEM_IDS = new Set(ITEMS.map((item) => item.id));
 const CREATURE_IDS = new Set(CREATURES.map((creature) => creature.id));

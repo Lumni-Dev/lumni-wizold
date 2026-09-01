@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "command": "node .cursor/hooks/strip-git-coauthor.mjs",
+        "matcher": "Shell"
+      }
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+#!/bin/sh
+# Fail closed if a Cursor co-author trailer survives prepare-commit-msg.
+COMMIT_MSG_FILE=$1
+
+if grep -qiE '^Co-authored-by:[[:space:]]*Cursor([[:space:]]|<|$)' "$COMMIT_MSG_FILE"; then
+  echo "Commit blocked: Cursor must not appear as co-author." >&2
+  exit 1
+fi
+
+if grep -qiE '^Co-authored-by:.*cursoragent@cursor\.com' "$COMMIT_MSG_FILE"; then
+  echo "Commit blocked: cursoragent@cursor.com must not appear as co-author." >&2
+  exit 1
+fi
+
+exit 0

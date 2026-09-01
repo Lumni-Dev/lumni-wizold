@@ -692,7 +692,6 @@ export function TavernScreen() {
             ? activeRoom.members.length + " de " + (activeRoom.privateFor ? 2 : MAX_ROOM_MEMBERS)
             : null
         }
-        dismissible={false}
         onClose={() => {
           if (activeRoom) {
             playSound("door");

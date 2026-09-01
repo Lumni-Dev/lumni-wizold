@@ -25,6 +25,8 @@ import { Button } from "../components/button";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { IconFrame } from "../components/icon-frame";
 import { ItemIcon } from "../components/item-icon";
+import { EmptyState } from "../components/empty-state";
+import { ItemCard } from "../components/item-card";
 import { List, ListRow, RowText } from "../components/list";
 import { Pagination } from "../components/pagination";
 import { Panel } from "../components/panel";
@@ -45,7 +47,7 @@ function pieceKey(itemId: string, level: number): string {
   return itemId + "@" + level;
 }
 
-const FORGE_PAGE_SIZE = 5;
+const FORGE_PAGE_SIZE = 9;
 
 type CategoryFilter = ItemCategory | "all";
 type SetFilter = EquipmentSet | "all";
@@ -59,6 +61,50 @@ const FORGE_SET_FILTERS: readonly { key: SetFilter; label: string }[] = [
   { key: "all", label: "Todos" },
   ...EQUIPMENT_SET_KEYS.map((key) => ({ key, label: SET_LABEL[key] })),
 ];
+
+function ForgeCategoryFilters({
+  category,
+  onChange,
+}: {
+  category: CategoryFilter;
+  onChange: (value: CategoryFilter) => void;
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="mr-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">Forja</span>
+      {FORGE_CATEGORY_FILTERS.map((option) => (
+        <Chip
+          key={option.key}
+          active={category === option.key}
+          onClick={() => onChange(option.key)}
+        >
+          {option.label}
+        </Chip>
+      ))}
+    </div>
+  );
+}
+
+function ForgeSetFilters({
+  set,
+  onChange,
+}: {
+  set: SetFilter;
+  onChange: (value: SetFilter) => void;
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="mr-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+        Disponíveis
+      </span>
+      {FORGE_SET_FILTERS.map((option) => (
+        <Chip key={option.key} active={set === option.key} onClick={() => onChange(option.key)}>
+          {option.label}
+        </Chip>
+      ))}
+    </div>
+  );
+}
 
 export function ForgeScreen() {
   const { state, character, activity, setActivity } = useGame();
@@ -191,6 +237,16 @@ export function ForgeScreen() {
     setConfirmingKey(pieceKey(forgeEntry.item.id, forgeEntry.level));
   }
 
+  function pickCategory(value: CategoryFilter) {
+    setCategory(value);
+    setForgePage(1);
+  }
+
+  function pickSet(value: SetFilter) {
+    setSet(value);
+    setForgePage(1);
+  }
+
   return (
     <>
       <PageHeader
@@ -198,12 +254,13 @@ export function ForgeScreen() {
         description="A bigorna não faz peça nova: ela bate de novo na que você já usa, e o que alimenta a marreta sai da rocha. Não dá para parar no meio de uma batida, mas entre uma e outra sobram três segundos para mandar parar."
       />
 
-      <div className="grid items-start gap-6 lg:grid-cols-2">
-        <Panel
-          title="Mina"
-          description="Escolha o veio e a picareta bate nele. Cada veio pede um nível de mineração, e só o pique abre o próximo."
-          padding="none"
-        >
+      <div className="space-y-6">
+        <div className="grid items-start gap-6 lg:grid-cols-2">
+          <Panel
+            title="Mina"
+            description="Escolha o veio e a picareta bate nele. Cada veio pede um nível de mineração, e só o pique abre o próximo."
+            padding="none"
+          >
           <List>
             <ListRow layout="column">
               <Bar
@@ -320,16 +377,18 @@ export function ForgeScreen() {
           </List>
         </Panel>
 
-        <div className="space-y-6">
-          <Panel
-            title="Bigorna"
-            description={
-              "Escolha uma peça em Disponíveis e ela entra na bigorna. Cada nível soma 0,3% dos atributos da peça original, então um set forte rende muito e uma peça barata sobe devagar, até +" +
-              formatNumber(MAX_ENHANCEMENT) +
-              "."
-            }
-            padding="none"
-          >
+          <div className="space-y-3">
+            <ForgeCategoryFilters category={category} onChange={pickCategory} />
+
+            <Panel
+              title="Bigorna"
+              description={
+                "Escolha uma peça em Disponíveis e ela entra na bigorna. Cada nível soma 0,3% dos atributos da peça original, então um set forte rende muito e uma peça barata sobe devagar, até +" +
+                formatNumber(MAX_ENHANCEMENT) +
+                "."
+              }
+              padding="none"
+            >
             {!forgeEntry ? (
               <div className="p-4">
                 <RowText
@@ -410,108 +469,53 @@ export function ForgeScreen() {
                 </div>
               </div>
             )}
-          </Panel>
+            </Panel>
+          </div>
+        </div>
 
-          <div className="space-y-3">
-            <div className="space-y-2">
-              <div className="flex flex-wrap gap-2">
-                {FORGE_CATEGORY_FILTERS.map((option) => (
-                  <Chip
-                    key={option.key}
-                    active={category === option.key}
-                    onClick={() => {
-                      setCategory(option.key);
-                      setForgePage(1);
-                    }}
-                  >
-                    {option.label}
-                  </Chip>
-                ))}
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="mr-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                  Conjunto
-                </span>
-                {FORGE_SET_FILTERS.map((option) => (
-                  <Chip
-                    key={option.key}
-                    active={set === option.key}
-                    onClick={() => {
-                      setSet(option.key);
-                      setForgePage(1);
-                    }}
-                  >
-                    {option.label}
-                  </Chip>
-                ))}
-              </div>
-            </div>
+        <div className="space-y-3">
+          <ForgeSetFilters set={set} onChange={pickSet} />
 
-            <Panel
-            title="Disponíveis"
-            description="As peças do inventário fora do corpo. Escolha uma para a bigorna."
-            padding="none"
-            footer={
-              filteredSlots.length > 0 ? (
-                <Pagination page={forgeCurrentPage} pages={forgePages} onChange={setForgePage} />
-              ) : undefined
-            }
-          >
-            {slots.length === 0 ? (
-              <div className="p-4">
-                <RowText title="Nada disponível" description="Desequipe uma peça para forjá-la." />
-              </div>
-            ) : filteredSlots.length === 0 ? (
-              <div className="p-4">
-                <RowText
-                  title="Nada neste filtro"
-                  description="Nenhuma peça do inventário combina com a categoria escolhida."
-                />
-              </div>
-            ) : (
-              <List>
+          {slots.length === 0 ? (
+            <EmptyState
+              title="Nada disponível"
+              description="Desequipe uma peça para forjá-la."
+            />
+          ) : filteredSlots.length === 0 ? (
+            <EmptyState
+              title="Nada neste filtro"
+              description="Nenhuma peça do inventário combina com a categoria escolhida."
+            />
+          ) : (
+            <>
+              <div className="grid auto-rows-fr gap-6 sm:grid-cols-2 xl:grid-cols-3">
                 {forgeOnPage.map((row) => {
                   const key = pieceKey(row.item.id, row.level);
                   const isSelected = key === effectiveForge;
                   return (
-                    <ListRow key={key}>
-                      <button
-                        type="button"
-                        onClick={() => selectForge(key)}
-                        aria-pressed={isSelected}
-                        disabled={activeItem !== null}
-                        className="flex w-full items-center gap-3 text-left transition-colors"
-                      >
-                        <ItemIcon item={row.item} enhancement={row.level} />
-                        <div className="min-w-0 flex-1">
-                          <p
-                            className={cn(
-                              "truncate text-sm",
-                              isSelected ? "text-ember" : "text-ink-soft",
-                            )}
-                          >
-                            {enhancedName(row.item.name, row.level)}
-                          </p>
-                        </div>
-                        <span className="shrink-0 font-mono text-[11px] text-ink-faint">
-                          x{formatNumber(row.quantity)}
-                        </span>
-                        <span
-                          className={cn(
-                            "grid h-4 w-4 shrink-0 place-items-center rounded-full border",
-                            isSelected ? "border-ember" : "border-edge-strong",
-                          )}
-                        >
-                          {isSelected ? <span className="h-2 w-2 rounded-full bg-ember" /> : null}
-                        </span>
-                      </button>
-                    </ListRow>
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => selectForge(key)}
+                      aria-pressed={isSelected}
+                      disabled={activeItem !== null}
+                      className="h-full text-left disabled:opacity-60"
+                    >
+                      <ItemCard
+                        item={row.item}
+                        quantity={row.quantity}
+                        enhancement={row.level}
+                        highlighted={isSelected}
+                      />
+                    </button>
                   );
                 })}
-              </List>
-            )}
-          </Panel>
-          </div>
+              </div>
+              {forgePages > 1 ? (
+                <Pagination page={forgeCurrentPage} pages={forgePages} onChange={setForgePage} />
+              ) : null}
+            </>
+          )}
         </div>
       </div>
 

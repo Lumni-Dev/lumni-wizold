@@ -12,7 +12,8 @@
     "migrate": "node scripts/migrate.mjs",
     "migrate:status": "node scripts/migrate.mjs status",
     "smoke": "node scripts/smoke.mjs",
-    "load": "node scripts/load.mjs"
+    "load": "node scripts/load.mjs",
+    "prepare": "git config core.hooksPath .githooks"
   },
   "dependencies": {
     "lucide-react": "^1.34.0",

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useMemo, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useSyncExternalStore } from "react";
 import { activityRuntimeStore } from "@/controllers/activity-runtime";
 import { listForge, listMining } from "@/controllers/forge.controller";
 import { listTerritories } from "@/controllers/hunt.controller";
@@ -197,6 +197,23 @@ export function ActivityDock() {
       status: "O corpo descansa.",
     };
   }, [activity, character, stats]);
+
+  const dockVisible = Boolean(activity && dock && pathname !== dock.href);
+
+  useEffect(() => {
+    if (!dockVisible || !dock) return undefined;
+
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      if (document.querySelector('[role="dialog"][aria-modal="true"]')) return;
+      if (!dock.canStop && activity?.kind !== "rest" && !activity?.paused) return;
+      event.preventDefault();
+      setActivity(null);
+    };
+
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [activity, dock, dockVisible, setActivity]);
 
   if (!activity || !dock) return null;
   if (pathname === dock.href) return null;
