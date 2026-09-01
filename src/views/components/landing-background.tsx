@@ -4,11 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@/shared/utils/class-names";
 
 const WALLPAPER = "/assets/ui/background.jpg?v=2";
-const VIDEO = "/assets/ui/landing-background.mp4?v=4";
+const VIDEO = "/assets/ui/landing-background.mp4?v=5";
 const PLAYBACK_RATE = 0.55;
 const TURN_MARGIN_S = 0.5;
-
-const UNLOCK_EVENTS = ["pointerdown", "mousemove", "wheel", "touchstart", "keydown"] as const;
 
 function startPingPong(video: HTMLVideoElement) {
   video.loop = false;
@@ -24,10 +22,6 @@ function startPingPong(video: HTMLVideoElement) {
       last = now;
       frame = requestAnimationFrame(step);
       return;
-    }
-
-    if (video.paused) {
-      void video.play().catch(() => undefined);
     }
 
     const delta = Math.min((now - last) / 1000, 0.1);
@@ -66,63 +60,38 @@ export function LandingBackground() {
     const video = videoRef.current;
     if (!video) return;
 
-    video.muted = true;
-    video.defaultMuted = true;
+    let stopPingPong: () => void = () => undefined;
 
-    void video.play().catch(() => undefined);
-
-    const stopPingPong = startPingPong(video);
-
-    let unlocked = false;
-
-    const tryPlay = () =>
-      video.play().then(
-        () => true,
-        () => false,
-      );
-
-    const unbind = () => {
-      for (const event of UNLOCK_EVENTS) {
-        window.removeEventListener(event, unlock);
-      }
+    const begin = () => {
+      video.muted = true;
+      video.defaultMuted = true;
+      stopPingPong = startPingPong(video);
+      void video.play().catch(() => undefined);
     };
 
-    const unlock = () => {
-      if (unlocked) return;
-      void tryPlay().then((ok) => {
-        if (!ok) return;
-        unlocked = true;
-        unbind();
-      });
-    };
-
-    void tryPlay().then((ok) => {
-      if (ok) {
-        unlocked = true;
-        return;
-      }
-      for (const event of UNLOCK_EVENTS) {
-        window.addEventListener(event, unlock, { passive: true });
-      }
-    });
+    if (video.readyState >= 1) {
+      begin();
+    } else {
+      video.addEventListener("loadedmetadata", begin, { once: true });
+    }
 
     return () => {
+      video.removeEventListener("loadedmetadata", begin);
       stopPingPong();
-      unbind();
     };
   }, []);
 
   return (
     <div
       aria-hidden
-      className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-base"
+      className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
     >
       {failed ? (
         /* eslint-disable-next-line @next/next/no-img-element */
         <img
           src={WALLPAPER}
           alt=""
-          className="landing-backdrop-media absolute inset-0 z-0 h-full w-full object-cover object-top"
+          className="landing-backdrop-media absolute inset-0 h-full w-full object-cover object-top"
         />
       ) : (
         <video
@@ -133,13 +102,13 @@ export function LandingBackground() {
           preload="auto"
           poster={WALLPAPER}
           onError={() => setFailed(true)}
-          className="landing-backdrop-media absolute inset-0 z-0 h-full w-full object-cover object-top"
+          className="landing-backdrop-media absolute inset-0 h-full w-full object-cover object-top"
         >
           <source src={VIDEO} type="video/mp4" />
         </video>
       )}
 
-      <div className={cn("landing-backdrop-shade absolute inset-0 z-[1]")} />
+      <div className={cn("landing-backdrop-shade absolute inset-0")} />
     </div>
   );
 }

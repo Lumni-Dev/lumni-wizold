@@ -70,7 +70,7 @@ export function LandingScreen() {
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="relative flex min-h-screen flex-col">
       <LandingBackground />
       <header className="relative flex min-h-screen flex-col items-center justify-center px-4 text-center">
         <div className="relative z-10 flex flex-col items-center gap-8">
@@ -105,7 +105,7 @@ export function LandingScreen() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-5xl space-y-16 px-4 py-16 md:px-8 md:py-24">
+      <main className="relative z-10 mx-auto w-full max-w-5xl space-y-16 px-4 py-16 md:px-8 md:py-24">
         <section className="relative">
           <div className="overflow-hidden rounded-lg border border-edge bg-surface/80">
             <div className="grid border-b border-edge sm:grid-cols-2">

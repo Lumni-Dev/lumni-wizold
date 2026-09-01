@@ -69,6 +69,10 @@
     filter: sepia(0.4) hue-rotate(-8deg) saturate(1.05);
   }
 
+  body.landing-page {
+    background-color: transparent;
+  }
+
   body.landing-page::before {
     opacity: 0;
   }
