@@ -62,6 +62,22 @@ async function isTestAccount(client: PoolClient, userId: string): Promise<boolea
   return typeof email === "string" && email.endsWith("@wizold.test");
 }
 
+export async function isModerationAllowed(
+  client: PoolClient,
+  userId: string,
+  text: string,
+  context: ModerationContext,
+): Promise<boolean | null> {
+  const trimmed = text.trim();
+  if (!trimmed) return true;
+  if (await isTestAccount(client, userId)) return true;
+
+  const key = process.env.OPENAI_API_KEY?.trim();
+  if (!key) return null;
+
+  return callModeration(trimmed, context);
+}
+
 async function callModeration(text: string, context: ModerationContext): Promise<boolean | null> {
   const key = process.env.OPENAI_API_KEY?.trim();
   if (!key) return null;

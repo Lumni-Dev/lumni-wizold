@@ -176,3 +176,17 @@ export async function heartbeat(
     [roomId, memberId, memberName],
   );
 }
+
+export async function censorTavernMessage(
+  client: PoolClient,
+  roomId: string,
+  messageId: string,
+  body: string,
+): Promise<boolean> {
+  const updated = await client.query(
+    `update tavern_messages set body = $1
+     where id = $2 and room_id = $3 and author_id <> 'system'`,
+    [body, messageId, roomId],
+  );
+  return (updated.rowCount ?? 0) > 0;
+}
