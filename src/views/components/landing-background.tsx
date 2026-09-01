@@ -4,24 +4,19 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@/shared/utils/class-names";
 
 const WALLPAPER = "/assets/ui/background.jpg?v=2";
-const VIDEO = "/assets/ui/landing-background.mp4?v=3";
+const VIDEO = "/assets/ui/landing-background.mp4?v=4";
 const PLAYBACK_RATE = 0.55;
 const TURN_MARGIN_S = 0.5;
 
+const UNLOCK_EVENTS = ["pointerdown", "mousemove", "wheel", "touchstart", "keydown"] as const;
+
 function startPingPong(video: HTMLVideoElement) {
   video.loop = false;
-  video.muted = true;
-  video.defaultMuted = true;
   video.currentTime = TURN_MARGIN_S;
 
   let direction = 1;
   let last = performance.now();
   let frame = 0;
-
-  const ensurePlaying = () => {
-    if (!video.paused) return;
-    void video.play().catch(() => undefined);
-  };
 
   const step = (now: number) => {
     const duration = video.duration;
@@ -31,7 +26,9 @@ function startPingPong(video: HTMLVideoElement) {
       return;
     }
 
-    ensurePlaying();
+    if (video.paused) {
+      void video.play().catch(() => undefined);
+    }
 
     const delta = Math.min((now - last) / 1000, 0.1);
     last = now;
@@ -53,7 +50,6 @@ function startPingPong(video: HTMLVideoElement) {
     frame = requestAnimationFrame(step);
   };
 
-  ensurePlaying();
   frame = requestAnimationFrame(step);
 
   return () => {
@@ -63,114 +59,87 @@ function startPingPong(video: HTMLVideoElement) {
 }
 
 export function LandingBackground() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [active, setActive] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    if (failed) return;
-
     const video = videoRef.current;
     if (!video) return;
 
-    const sync = () => {
-      if (video.readyState >= 1 && Number.isFinite(video.duration) && video.duration > 0) {
-        setActive(true);
-      }
-    };
+    video.muted = true;
+    video.defaultMuted = true;
 
-    sync();
-    video.addEventListener("loadedmetadata", sync);
-    video.addEventListener("loadeddata", sync);
-    video.addEventListener("canplay", sync);
+    void video.play().catch(() => undefined);
 
-    return () => {
-      video.removeEventListener("loadedmetadata", sync);
-      video.removeEventListener("loadeddata", sync);
-      video.removeEventListener("canplay", sync);
-    };
-  }, [failed]);
+    const stopPingPong = startPingPong(video);
 
-  useEffect(() => {
-    if (failed || !active) return;
+    let unlocked = false;
 
-    const video = videoRef.current;
-    if (!video) return;
-
-    return startPingPong(video);
-  }, [failed, active]);
-
-  useEffect(() => {
-    if (failed || !active) return;
-
-    const video = videoRef.current;
-    if (!video) return;
-
-    let unlocked = !video.paused;
-
-    const unlock = () => {
-      if (unlocked) return;
-      video.muted = true;
-      video.defaultMuted = true;
-      void video.play().then(() => {
-        if (!video.paused) {
-          unlocked = true;
-          unbind();
-        }
-      });
-    };
-
-    const events = ["pointerdown", "mousemove", "wheel", "touchstart", "keydown"] as const;
+    const tryPlay = () =>
+      video.play().then(
+        () => true,
+        () => false,
+      );
 
     const unbind = () => {
-      for (const event of events) {
+      for (const event of UNLOCK_EVENTS) {
         window.removeEventListener(event, unlock);
       }
     };
 
-    unlock();
+    const unlock = () => {
+      if (unlocked) return;
+      void tryPlay().then((ok) => {
+        if (!ok) return;
+        unlocked = true;
+        unbind();
+      });
+    };
 
-    if (!unlocked) {
-      for (const event of events) {
+    void tryPlay().then((ok) => {
+      if (ok) {
+        unlocked = true;
+        return;
+      }
+      for (const event of UNLOCK_EVENTS) {
         window.addEventListener(event, unlock, { passive: true });
       }
-    }
+    });
 
-    return unbind;
-  }, [failed, active]);
+    return () => {
+      stopPingPong();
+      unbind();
+    };
+  }, []);
 
   return (
     <div
       aria-hidden
       className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-base"
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={WALLPAPER}
-        alt=""
-        className={cn(
-          "landing-backdrop-media absolute inset-0 h-full w-full object-cover object-top transition-opacity duration-700",
-          active && !failed ? "opacity-0" : "opacity-100",
-        )}
-      />
+      {failed ? (
+        /* eslint-disable-next-line @next/next/no-img-element */
+        <img
+          src={WALLPAPER}
+          alt=""
+          className="landing-backdrop-media absolute inset-0 z-0 h-full w-full object-cover object-top"
+        />
+      ) : (
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          playsInline
+          preload="auto"
+          poster={WALLPAPER}
+          onError={() => setFailed(true)}
+          className="landing-backdrop-media absolute inset-0 z-0 h-full w-full object-cover object-top"
+        >
+          <source src={VIDEO} type="video/mp4" />
+        </video>
+      )}
 
-      <video
-        ref={videoRef}
-        autoPlay
-        muted
-        playsInline
-        preload="auto"
-        poster={WALLPAPER}
-        onError={() => setFailed(true)}
-        className={cn(
-          "landing-backdrop-media absolute inset-0 h-full w-full object-cover object-top transition-opacity duration-700",
-          active && !failed ? "opacity-100" : "opacity-0",
-        )}
-      >
-        <source src={VIDEO} type="video/mp4" />
-      </video>
-
-      <div className="landing-backdrop-shade absolute inset-0" />
+      <div className={cn("landing-backdrop-shade absolute inset-0 z-[1]")} />
     </div>
   );
 }
