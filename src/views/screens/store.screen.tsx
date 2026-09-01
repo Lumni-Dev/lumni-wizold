@@ -129,7 +129,7 @@ export function StoreScreen() {
             interactive
             tone={pack.highlight ? "highlighted" : "default"}
           >
-            <CardHeader align="start">
+            <CardHeader>
               <PackIcon pack={pack} size="huge" />
               <RowText title={pack.name} label="Pacote de WCoins" />
             </CardHeader>

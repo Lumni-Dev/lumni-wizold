@@ -65,7 +65,7 @@ function Kennel({ bronze, level }: { bronze: number; level: number }) {
               tone={chosen ? "highlighted" : "default"}
               interactive={!chosen}
             >
-              <CardHeader align="start">
+              <CardHeader>
                 <PetIcon gender={definition.key} size="medium" />
                 <RowText title={definition.label} label={definition.title} />
               </CardHeader>

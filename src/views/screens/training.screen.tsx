@@ -85,7 +85,7 @@ export function TrainingScreen() {
                 interactive={active || ready}
                 tone={active ? "highlighted" : "default"}
               >
-                <CardHeader align="start">
+                <CardHeader>
                   <TrainingIcon attribute={exercise.attribute} size="medium" />
                   <RowText
                     title={row?.name ?? exercise.name}
@@ -160,7 +160,7 @@ export function TrainingScreen() {
               interactive={petActive || petReady}
               tone={petActive ? "highlighted" : "default"}
             >
-              <CardHeader align="start">
+              <CardHeader>
                 <PetIcon gender={petTraining.pet.gender} size="medium" />
                 <RowText title="Mascote" label="Treino do mascote" />
                 <span className="shrink-0 self-center font-mono text-sm text-ink">

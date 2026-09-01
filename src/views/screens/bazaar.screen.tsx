@@ -246,7 +246,7 @@ export function BazaarScreen() {
             >
               <List>
                 {onPage.map((entry) => (
-                  <ListRow key={entry.listing.id} padding="art" align="start">
+                  <ListRow key={entry.listing.id} padding="art">
                     <ItemIcon item={entry.item} />
                     <RowText
                       title={enhancedName(entry.item.name, entry.listing.enhancement)}

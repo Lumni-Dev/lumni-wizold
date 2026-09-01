@@ -54,8 +54,8 @@ export function FuryUseButton({ onClick }: { onClick: () => void }) {
         "h-8 px-3 text-[11px] font-medium uppercase tracking-[0.16em]",
         "transition-[filter] duration-150",
         furyActive
-          ? "bg-surface-high text-ink"
-          : "bg-ember text-base hover:brightness-110",
+          ? "bg-surface-high/50 text-ink"
+          : "bg-ember/90 text-base hover:brightness-110",
       )}
     >
       {label}

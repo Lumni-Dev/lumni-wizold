@@ -264,7 +264,7 @@ export function WikiScreen() {
         >
           {(pageItems) =>
             pageItems.map((creature) => (
-              <ListRow key={creature.id} padding="art" align="start">
+              <ListRow key={creature.id} padding="art">
                 <CreatureIcon creature={creature} />
                 <RowText
                   title={creature.name}
@@ -283,7 +283,7 @@ export function WikiScreen() {
                     </>
                   }
                 />
-                <span className="shrink-0 self-start font-mono text-[11px] text-ink-faint">
+                <span className="shrink-0 font-mono text-[11px] text-ink-faint">
                   NV. {formatNumber(creature.level)}
                 </span>
               </ListRow>

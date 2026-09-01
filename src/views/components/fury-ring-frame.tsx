@@ -1,6 +1,7 @@
 "use client";
 
 import type { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
+import { FURY_RING_FILL } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 
 export type FuryRingContentAlign = "center" | "start";
@@ -30,6 +31,7 @@ export function FuryRingFrame<T extends ElementType = "div">({
         <span
           className={cn(
             "fury-ring-frame__content",
+            FURY_RING_FILL,
             contentAlign === "start"
               ? "fury-ring-frame__content--start"
               : "fury-ring-frame__content--center",

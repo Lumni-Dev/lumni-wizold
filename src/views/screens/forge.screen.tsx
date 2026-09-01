@@ -333,7 +333,7 @@ export function ForgeScreen() {
                 </div>
               ) : (
                 <List>
-                  <ListRow padding="art" align="start">
+                  <ListRow padding="art">
                     <span className={cn("inline-flex", forgeActive && forgeShake && "card-shake")}>
                       <ItemIcon item={forgeEntry.item} enhancement={forgeEntry.level} />
                     </span>

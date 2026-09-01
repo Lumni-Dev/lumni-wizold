@@ -39,7 +39,6 @@ export function FuryModeTracker() {
     <FuryRingFrame
       className="block w-full rounded-md"
       contentAlign="start"
-      fillClassName="bg-surface/70"
     >
       <div className="flex w-full items-stretch overflow-hidden rounded-[calc(0.375rem-1px)]">
         <span className="flex w-8 shrink-0 items-center justify-center self-stretch border-r border-edge">

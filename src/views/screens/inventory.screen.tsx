@@ -82,7 +82,7 @@ export function InventoryScreen() {
 
             return (
               <Card key={slot} height="fill" tone={item ? "highlighted" : "empty"}>
-                <CardHeader align="start">
+                <CardHeader>
                   {item ? (
                     <ItemIcon item={item} enhancement={piece?.enhancement ?? 0} />
                   ) : (

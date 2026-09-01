@@ -12,6 +12,9 @@ export const GLASS_SECTION_STRONG = "bg-surface-high/50 backdrop-blur";
 /** Fields, selects, chips and tags sit slightly denser for legibility. */
 export const GLASS_CONTROL = "bg-surface/70 backdrop-blur";
 
+/** Inner fill of the fury ring: hides the spinning border while staying translucent. */
+export const FURY_RING_FILL = "bg-surface/70 backdrop-blur";
+
 export const GLASS_CONTROL_ACTIVE = "bg-surface-high/50 backdrop-blur";
 
 /** Loose controls on the page shell: filters, search fields, filter selects. */

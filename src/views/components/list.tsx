@@ -6,7 +6,7 @@ type RowLayout = "row" | "column" | "split";
 
 const ROW_LAYOUT: Record<RowPadding, string> = {
   text: "flex items-center gap-3",
-  art: "flex items-start gap-3",
+  art: "flex items-center gap-3",
 };
 
 const LAYOUTS: Record<RowLayout, string> = {

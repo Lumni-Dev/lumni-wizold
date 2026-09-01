@@ -384,7 +384,6 @@ export function HuntScreen() {
                         return (
                           <ArtRowButton
                             key={creature.id}
-                            align="start"
                             art={<CreatureIcon creature={creature} />}
                             title={
                               <span

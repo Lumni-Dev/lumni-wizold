@@ -56,7 +56,7 @@ function Fighter({
 }) {
   const left = Math.max(0, Math.round(health));
   return (
-    <div className={cn("flex items-start gap-3 p-4", ICON_FRAME_INSET)}>
+    <div className={cn("flex items-center gap-3 p-4", ICON_FRAME_INSET)}>
       <GenderIcon gender={gender} size="large" />
       <div className="min-w-0 flex-1 space-y-2">
         <RowText title={name} label={side + " - NV. " + formatNumber(level)} />
@@ -441,7 +441,7 @@ export function ArenaScreen() {
               const resting = cooldownLeft > 0;
               return (
                 <Card key={hunter.id} height="fill">
-                  <CardHeader align="start">
+                  <CardHeader>
                     <GenderIcon gender={hunter.gender} size="medium" />
                     <RowText
                       title={

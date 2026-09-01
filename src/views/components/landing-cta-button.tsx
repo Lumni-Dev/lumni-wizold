@@ -24,7 +24,7 @@ export function LandingCtaButton({ href, label, className }: LandingCtaButtonPro
         contentAlign="center"
         fillClassName={
           "h-12 w-full px-8 text-xs font-medium uppercase tracking-[0.16em] text-ember " +
-          "bg-surface/70 transition-colors hover:bg-surface-high/80"
+          "transition-colors hover:bg-surface-high/50"
         }
       >
         {label}
