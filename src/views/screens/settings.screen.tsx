@@ -1,14 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type PointerEvent } from "react";
 import { api } from "@/controllers/api.client";
 import { useArt } from "@/controllers/art.context";
 import { renameCost, renameDaysLeft } from "@/controllers/character.controller";
 import { AUTOMATIONS } from "@/models/entities/automation";
 import { isVip, VIP_PRICE_CENTS } from "@/models/rules/vip";
 import { useGame } from "@/controllers/game.context";
-import { playSound } from "@/controllers/sound";
+import { playSound, playSoundPreview } from "@/controllers/sound";
 import { disableTavernPush, enableTavernPush, testTavernPush, webPushConfigured, tavernPushSupported } from "@/controllers/tavern-notify";
 import { soundRepository } from "@/models/repositories/sound.repository";
 import { tavernPushRepository } from "@/models/repositories/tavern-push.repository";
@@ -121,7 +121,7 @@ export function SettingsScreen() {
 
   function chooseSound(on: boolean) {
     soundRepository.setEnabled(on);
-    if (on) playSound("ui");
+    if (on) playSoundPreview("ui");
   }
 
   const pushOn = useSyncExternalStore(
@@ -140,7 +140,14 @@ export function SettingsScreen() {
   function finishVolumeAdjust() {
     if (!volumeDragging.current) return;
     volumeDragging.current = false;
-    if (soundRepository.volume() > 0) playSound("ui");
+    if (soundRepository.volume() > 0) playSoundPreview("ui");
+  }
+
+  function releaseVolumePointer(event: PointerEvent<HTMLInputElement>) {
+    const target = event.currentTarget;
+    if (target.hasPointerCapture(event.pointerId)) {
+      target.releasePointerCapture(event.pointerId);
+    }
   }
 
   if (!character) return null;
@@ -459,11 +466,11 @@ export function SettingsScreen() {
                     soundRepository.setVolume(Number(event.target.value) / 100);
                   }}
                   onPointerUp={(event) => {
-                    event.currentTarget.releasePointerCapture(event.pointerId);
+                    releaseVolumePointer(event);
                     finishVolumeAdjust();
                   }}
                   onPointerCancel={(event) => {
-                    event.currentTarget.releasePointerCapture(event.pointerId);
+                    releaseVolumePointer(event);
                     volumeDragging.current = false;
                   }}
                   onKeyDown={() => {

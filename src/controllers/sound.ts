@@ -73,10 +73,21 @@ export function preloadSounds(): void {
     elementOf(sound).preload = "auto";
   }
 }
+const PREVIEW_FLOOR = 0.4;
 let spokeAt = 0;
 
 function playbackVolume(): number {
   return soundRepository.volume();
+}
+
+export function playSoundPreview(sound: GameSound): void {
+  if (typeof window === "undefined" || !soundRepository.enabled()) return;
+  spokeAt = Date.now();
+  const level = Math.max(playbackVolume(), PREVIEW_FLOOR);
+  const audio = elementOf(sound);
+  const layer = audio.cloneNode(true) as HTMLAudioElement;
+  layer.volume = level;
+  void layer.play().catch(() => {});
 }
 
 export function playSound(sound: GameSound, delayMs = 0): void {
