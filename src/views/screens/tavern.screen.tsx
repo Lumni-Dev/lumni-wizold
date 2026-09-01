@@ -87,6 +87,8 @@ export function TavernScreen() {
   const [page, setPage] = useState(1);
   const [roomSearch, setRoomSearch] = useState("");
   const [nick, setNick] = useState("");
+  const [inviting, setInviting] = useState(false);
+  const [invitingMemberId, setInvitingMemberId] = useState<string | null>(null);
   const [removing, setRemoving] = useState<PackMate | null>(null);
   const [invites, setInvites] = useState<PackInvite[]>([]);
 
@@ -322,11 +324,25 @@ export function TavernScreen() {
     } else notify(result.message, false, "Taverna");
   }
 
-  function submitNick(event: FormEvent) {
+  async function submitNick(event: FormEvent) {
     event.preventDefault();
-    return inviteByNick(nick).then((ok) => {
-      if (ok) setNick("");
-    });
+    if (inviting || nick.trim().length === 0 || pack.length >= MAX_PACK) return;
+    setInviting(true);
+    try {
+      if (await inviteByNick(nick)) setNick("");
+    } finally {
+      setInviting(false);
+    }
+  }
+
+  async function inviteMember(member: { id: string; name: string }) {
+    if (invitingMemberId) return;
+    setInvitingMemberId(member.id);
+    try {
+      await invite(member);
+    } finally {
+      setInvitingMemberId(null);
+    }
   }
 
   async function accept(id: string) {
@@ -505,9 +521,9 @@ export function TavernScreen() {
                 <Button
                   type="submit"
                   variant="primary"
-                  size="medium"
                   fullWidth
-                  disabled={nick.trim().length === 0 || pack.length >= MAX_PACK}
+                  busy={inviting}
+                  disabled={nick.trim().length === 0 || pack.length >= MAX_PACK || inviting}
                 >
                   Convidar para a matilha
                 </Button>
@@ -819,14 +835,16 @@ export function TavernScreen() {
                     </Tag>
                     {!yourself && !kept ? (
                       <Tooltip label={"Convidar " + member.name + " para a matilha"}>
-                        <button
-                          type="button"
+                        <Button
+                          icon
+                          variant="secondary"
+                          busy={invitingMemberId === member.id}
+                          disabled={invitingMemberId !== null && invitingMemberId !== member.id}
                           aria-label={"Convidar " + member.name + " para a matilha"}
-                          className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-edge text-ink-faint transition-colors hover:border-edge-strong hover:text-highlight"
-                          onClick={() => invite({ id: member.id, name: member.name })}
+                          onClick={() => inviteMember(member)}
                         >
-                          <ActionIcon action="keep" className="h-3 w-3" />
-                        </button>
+                          <ActionIcon action="keep" />
+                        </Button>
                       </Tooltip>
                     ) : null}
                   </span>

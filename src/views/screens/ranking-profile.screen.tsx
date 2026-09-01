@@ -89,12 +89,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
             ) : isInPack(state, hunter.id) ? (
               <Tag tone="neutral">Na matilha</Tag>
             ) : (
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  void invite({ id: hunter.id, name: hunter.name });
-                }}
-              >
+              <Button variant="secondary" onClick={() => invite({ id: hunter.id, name: hunter.name })}>
                 Convidar para matilha
               </Button>
             )}

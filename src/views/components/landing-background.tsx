@@ -103,15 +103,40 @@ export function LandingBackground() {
   useEffect(() => {
     if (failed || !active) return;
 
-    const kick = () => {
-      const video = videoRef.current;
-      if (!video) return;
+    const video = videoRef.current;
+    if (!video) return;
+
+    let unlocked = !video.paused;
+
+    const unlock = () => {
+      if (unlocked) return;
       video.muted = true;
-      void video.play().catch(() => undefined);
+      video.defaultMuted = true;
+      void video.play().then(() => {
+        if (!video.paused) {
+          unlocked = true;
+          unbind();
+        }
+      });
     };
 
-    document.addEventListener("pointerdown", kick, { once: true });
-    return () => document.removeEventListener("pointerdown", kick);
+    const events = ["pointerdown", "mousemove", "wheel", "touchstart", "keydown"] as const;
+
+    const unbind = () => {
+      for (const event of events) {
+        window.removeEventListener(event, unlock);
+      }
+    };
+
+    unlock();
+
+    if (!unlocked) {
+      for (const event of events) {
+        window.addEventListener(event, unlock, { passive: true });
+      }
+    }
+
+    return unbind;
   }, [failed, active]);
 
   return (
