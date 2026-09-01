@@ -32,24 +32,38 @@ export function List({
 }
 
 type RowPadding = "text" | "art";
+type RowAlign = "start" | "center";
+
+function artRowAlign(align: RowAlign): string {
+  return align === "start" ? "items-start" : "items-center";
+}
 
 export function ListRow({
   children,
   layout = "row",
   padding = "text",
+  align = "center",
   className,
 }: {
   children: ReactNode;
   layout?: RowLayout;
   padding?: RowPadding;
+  align?: RowAlign;
   className?: string;
 }) {
+  const rowLayout =
+    layout === "row"
+      ? padding === "art"
+        ? "flex gap-3 " + artRowAlign(align)
+        : ROW_LAYOUT.text
+      : LAYOUTS[layout];
+
   return (
     <li
       className={cn(
         padding === "art" ? "p-4" : "px-4 py-3",
         ICON_FRAME_INSET,
-        layout === "row" ? ROW_LAYOUT[padding] : LAYOUTS[layout],
+        rowLayout,
         className,
       )}
     >

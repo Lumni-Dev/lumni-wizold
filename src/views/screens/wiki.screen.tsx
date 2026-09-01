@@ -72,23 +72,10 @@ const WIKI_ITEMS: readonly Item[] = [...itemsOfCategory("material"), ...itemsOfC
 
 const WIKI_POTIONS: readonly Item[] = itemsOfCategory("potion");
 
-const SET_GRID =
-  "grid w-full grid-cols-[4.5rem_minmax(0,1fr)_4.5rem] items-center gap-x-3 sm:grid-cols-[4.5rem_minmax(0,1fr)_minmax(0,7rem)_4.5rem]";
-
-function SetTableHeader() {
-  return (
-    <div
-      className={
-        SET_GRID +
-        " border-b border-edge px-4 py-2 text-[10px] uppercase tracking-[0.16em] text-ink-faint"
-      }
-    >
-      <span>Espaço</span>
-      <span>Peça</span>
-      <span className="hidden sm:block">Bônus</span>
-      <span className="text-right">Preço</span>
-    </div>
-  );
+function wikiItemDescription(item: Item): string {
+  const effects = summarizeEffect(item);
+  const base = RARITY_LABEL[item.rarity] + ", NV. " + item.minLevel + "+";
+  return effects.length > 0 ? base + " · " + effects.join(", ") : base;
 }
 
 export function WikiScreen() {
@@ -129,12 +116,9 @@ export function WikiScreen() {
           <Panel title="Atributos" description="Cinco eixos, todos treináveis." padding="none">
             <List>
               {ATTRIBUTES.map((attribute) => (
-                <ListRow key={attribute.key} padding="art">
+                <ListRow key={attribute.key} padding="art" align="start">
                   <AttributeIcon attribute={attribute.key} />
-                  <div className="min-w-0 flex-1 space-y-1">
-                    <p className="text-sm text-ink">{attribute.name}</p>
-                    <p className="text-[11px] leading-relaxed text-ink-faint">{attribute.effect}</p>
-                  </div>
+                  <RowText title={attribute.name} description={attribute.effect} />
                 </ListRow>
               ))}
             </List>
@@ -164,31 +148,32 @@ export function WikiScreen() {
           title="Equipamentos"
           description={
             equipmentCount +
-            " peças em cinco conjuntos, do bronze ao lunar. Cada linha traz espaço, bônus e preço no mercado."
+            " peças em cinco conjuntos, do bronze ao lunar. Cada linha traz a peça, o bônus e o preço no mercado."
           }
           items={WIKI_EQUIPMENT}
-          header={<SetTableHeader />}
         >
           {(pageItems) =>
             pageItems.map(({ id, definition, slot }) => {
               const item = findItem(id);
+              if (!item) return null;
+              const bonuses = summarizeEffect(item).join(", ");
               return (
-                <ListRow key={id} padding="text">
-                  <div className={SET_GRID}>
-                    <span className="truncate text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                      {SLOT_LABEL[slot]}
-                    </span>
-                    <span className="min-w-0 truncate text-sm text-ink">
-                      {pieceName(definition, slot)}
-                      <span className="text-ink-faint"> · {definition.label}</span>
-                    </span>
-                    <span className="hidden min-w-0 truncate text-[11px] text-ink-soft sm:block">
-                      {item ? summarizeEffect(item).join(", ") : "—"}
-                    </span>
-                    <span className="truncate text-right font-mono text-[11px] text-ink-faint">
-                      {formatBronze(piecePrice(definition, slot))}
-                    </span>
-                  </div>
+                <ListRow key={id} padding="art">
+                  <ItemIcon item={item} />
+                  <RowText
+                    title={
+                      <>
+                        {pieceName(definition, slot)}
+                        <span className="text-ink-faint"> · {definition.label}</span>
+                      </>
+                    }
+                    description={
+                      SLOT_LABEL[slot] + (bonuses ? " · " + bonuses : "")
+                    }
+                  />
+                  <span className="shrink-0 font-mono text-[11px] text-ink-faint">
+                    {formatBronze(piecePrice(definition, slot))}
+                  </span>
                 </ListRow>
               );
             })
@@ -274,10 +259,10 @@ export function WikiScreen() {
         >
           {(pageItems) =>
             pageItems.map((creature) => (
-              <ListRow key={creature.id} padding="art" className="items-start">
+              <ListRow key={creature.id} padding="art" align="start">
                 <CreatureIcon creature={creature} />
                 <div className="min-w-0 flex-1 space-y-1">
-                  <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3">
+                  <div className="flex items-baseline justify-between gap-3">
                     <p className="truncate text-sm text-ink">{creature.name}</p>
                     <span className="shrink-0 font-mono text-[11px] text-ink-faint">
                       NV. {formatNumber(creature.level)}
@@ -313,20 +298,10 @@ export function WikiScreen() {
             pageItems.map((item) => (
               <ListRow key={item.id} padding="art">
                 <ItemIcon item={item} />
-                <div className="min-w-0 flex-1 space-y-1">
-                  <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3">
-                    <p className="truncate text-sm text-ink">{item.name}</p>
-                    <span className="shrink-0 font-mono text-[11px] text-ink-faint">
-                      {item.inMarket ? formatBronze(marketPriceOf(item, level)) : "drop"}
-                    </span>
-                  </div>
-                  <p className="text-[11px] leading-relaxed text-ink-soft">
-                    {RARITY_LABEL[item.rarity]}, NV. {item.minLevel}+
-                    {summarizeEffect(item).length > 0
-                      ? " · " + summarizeEffect(item).join(", ")
-                      : ""}
-                  </p>
-                </div>
+                <RowText title={item.name} description={wikiItemDescription(item)} />
+                <span className="shrink-0 font-mono text-[11px] text-ink-faint">
+                  {item.inMarket ? formatBronze(marketPriceOf(item, level)) : "drop"}
+                </span>
               </ListRow>
             ))
           }
@@ -342,20 +317,10 @@ export function WikiScreen() {
             pageItems.map((item) => (
               <ListRow key={item.id} padding="art">
                 <ItemIcon item={item} />
-                <div className="min-w-0 flex-1 space-y-1">
-                  <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3">
-                    <p className="truncate text-sm text-ink">{item.name}</p>
-                    <span className="shrink-0 font-mono text-[11px] text-ink-faint">
-                      {formatBronze(marketPriceOf(item, level))}
-                    </span>
-                  </div>
-                  <p className="text-[11px] leading-relaxed text-ink-soft">
-                    {RARITY_LABEL[item.rarity]}, NV. {item.minLevel}+
-                    {summarizeEffect(item).length > 0
-                      ? " · " + summarizeEffect(item).join(", ")
-                      : ""}
-                  </p>
-                </div>
+                <RowText title={item.name} description={wikiItemDescription(item)} />
+                <span className="shrink-0 font-mono text-[11px] text-ink-faint">
+                  {formatBronze(marketPriceOf(item, level))}
+                </span>
               </ListRow>
             ))
           }
