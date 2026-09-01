@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { activityRuntimeStore } from "@/controllers/activity-runtime";
 import { findForgePiece, listMining } from "@/controllers/forge.controller";
-import { listTerritories } from "@/controllers/hunt.controller";
+import { listTerritories, resolveHuntCreatureId } from "@/controllers/hunt.controller";
 import { useGame } from "@/controllers/game.context";
 import { petTrainingView } from "@/controllers/pet.controller";
 import { listAttributeProgress, listExercises } from "@/controllers/training.controller";
@@ -44,7 +44,11 @@ export function ActivityDock() {
     if (!territory) return null;
 
     const selection = loadHuntSelection();
-    const selectedId = selection[huntRt.territoryId] ?? territory.prey?.id ?? null;
+    const selectedId = resolveHuntCreatureId(
+      territory.creatures,
+      territory.prey,
+      selection[huntRt.territoryId],
+    );
     const beat = huntRt.beat;
     const script = huntRt.script;
     const pending = huntRt.pending;

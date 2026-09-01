@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { findForgePiece } from "@/controllers/forge.controller";
+import { listTerritories, resolveHuntCreatureId } from "@/controllers/hunt.controller";
 import { listExercises } from "@/controllers/training.controller";
 import { loadHuntSelection } from "@/models/repositories/hunt-selection.repository";
 import { findItem } from "@/models/data/items";
@@ -150,7 +151,13 @@ export function ActivityEngine() {
       pending = null;
       requesting = true;
       push(null);
-      void huntRef.current(activeHunt, selection[activeHunt]).then((fight) => {
+      const row = listTerritories(stateRef.current).find(
+        (entry) => entry.territory.id === activeHunt,
+      );
+      const creatureId = row
+        ? resolveHuntCreatureId(row.creatures, row.prey, selection[activeHunt])
+        : selection[activeHunt];
+      void huntRef.current(activeHunt, creatureId || undefined).then((fight) => {
         if (!alive) return;
         requesting = false;
         if (!fight) {

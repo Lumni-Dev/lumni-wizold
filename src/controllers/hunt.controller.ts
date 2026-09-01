@@ -63,6 +63,27 @@ function pickCreature(territory: Territory, level: number): Creature | undefined
   return eligible[eligible.length - 1] ?? creatures[0];
 }
 
+export function resolveHuntCreatureId(
+  creatures: Creature[],
+  prey: Creature | null,
+  savedId: string | undefined,
+): string {
+  if (savedId && creatures.some((creature) => creature.id === savedId)) return savedId;
+  return prey?.id ?? creatures[0]?.id ?? "";
+}
+
+export function normalizeHuntSelection(
+  state: GameState,
+  saved: Record<string, string>,
+): Record<string, string> {
+  const next: Record<string, string> = {};
+  for (const { territory, creatures, prey } of listTerritories(state)) {
+    const id = resolveHuntCreatureId(creatures, prey, saved[territory.id]);
+    if (id) next[territory.id] = id;
+  }
+  return next;
+}
+
 function chosenCreature(
   territory: Territory,
   creatureId: string | null,

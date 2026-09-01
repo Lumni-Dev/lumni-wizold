@@ -3,7 +3,12 @@ import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "reac
 import { useArt } from "@/controllers/art.context";
 import { activityRuntimeStore } from "@/controllers/activity-runtime";
 import { useGame } from "@/controllers/game.context";
-import { listTerritories, type HuntReport } from "@/controllers/hunt.controller";
+import {
+  listTerritories,
+  normalizeHuntSelection,
+  resolveHuntCreatureId,
+  type HuntReport,
+} from "@/controllers/hunt.controller";
 import { usePageActivity } from "@/controllers/use-page-activity";
 import { emphasizeDamage, narrationOf, type NarrationLine } from "../presenters/hunt.presenter";
 import { DANGER_LABEL } from "@/models/entities/territory";
@@ -182,6 +187,16 @@ export function HuntScreen() {
   }, [runtime.lastHuntReport]);
 
   useEffect(() => {
+    if (!character) return;
+    setSelection((current) => {
+      const next = normalizeHuntSelection(state, current);
+      if (JSON.stringify(next) === JSON.stringify(current)) return current;
+      saveHuntSelection(next);
+      return next;
+    });
+  }, [state, character]);
+
+  useEffect(() => {
     if (!huntRt || !activeId || huntRt.territoryId !== activeId || huntRt.beat <= 0) return;
     const line = huntRt.script[Math.min(huntRt.beat, huntRt.script.length) - 1];
     if (line?.critical) {
@@ -235,7 +250,7 @@ export function HuntScreen() {
           const available = ready;
           const active = activeId === territory.id;
           const opting = active && cooldown !== null;
-          const selectedId = selection[territory.id] ?? prey?.id ?? null;
+          const selectedId = resolveHuntCreatureId(creatures, prey, selection[territory.id]);
           const onThis = active && progress.id === territory.id;
           const line =
             onThis && progress.beat > 0 && script.length > 0
