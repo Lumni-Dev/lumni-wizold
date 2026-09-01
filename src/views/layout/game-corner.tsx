@@ -7,6 +7,7 @@ import { cn } from "@/shared/utils/class-names";
 import { ActivityDock } from "../components/activity-dock";
 import { SourceIcon } from "../components/app-icon";
 import { CornerAccents } from "../components/corner-accents";
+import { PresenceDot } from "../components/presence-dot";
 import { TavernAlertDock } from "../components/tavern-alert-dock";
 
 const DURATION_MS = 4000;
@@ -38,6 +39,7 @@ export function GameCorner() {
           >
             <div className="flex items-center gap-2 border-b border-edge px-3 py-2">
               <SourceIcon source={line.source} className="shrink-0 text-ink-faint" />
+              {line.dot ? <PresenceDot status={line.dot} /> : null}
               <span className="heading min-w-0 flex-1 truncate text-[10px] text-ink">{line.source}</span>
               <button
                 type="button"

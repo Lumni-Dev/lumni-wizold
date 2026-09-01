@@ -19,6 +19,7 @@ import { initialState, type GameState } from "@/models/entities/game-state";
 import type { Character, Gender } from "@/models/entities/character";
 import type { Pet, PetGender } from "@/models/entities/pet";
 import type { PackInvite } from "@/models/entities/pack";
+import type { PresenceStatus } from "@/models/entities/presence";
 import { activityRepository } from "@/models/repositories/activity.repository";
 import { moonRepository } from "@/models/repositories/moon.repository";
 import type { MoonState } from "@/models/rules/moon";
@@ -42,6 +43,7 @@ export interface Notice {
   text: string;
   ok: boolean;
   source: string;
+  dot?: PresenceStatus;
 }
 export type { Activity };
 interface GameContextValue {
@@ -54,7 +56,7 @@ interface GameContextValue {
   moon: MoonState;
   notices: Notice[];
   dismissNotice: (id: number) => void;
-  notify: (text: string, ok: boolean, source: string) => void;
+  notify: (text: string, ok: boolean, source: string, dot?: PresenceStatus) => void;
   enter: (
     credential: string,
     birth: BirthDate,
@@ -159,12 +161,15 @@ export function GameProvider({ children }: { children: ReactNode }) {
     moonRepository.serverSnapshot,
   );
   const NOTICE_STACK = 4;
-  const announce = useCallback((text: string, ok: boolean, source: string) => {
-    noticeCounter.current += 1;
-    const line = { id: noticeCounter.current, text, ok, source };
-    setNotices((current) => [...current, line].slice(-NOTICE_STACK));
-    if (!ok) playSound("denied");
-  }, []);
+  const announce = useCallback(
+    (text: string, ok: boolean, source: string, dot?: PresenceStatus) => {
+      noticeCounter.current += 1;
+      const line = { id: noticeCounter.current, text, ok, source, dot };
+      setNotices((current) => [...current, line].slice(-NOTICE_STACK));
+      if (!ok) playSound("denied");
+    },
+    [],
+  );
   const dismissNotice = useCallback((id: number) => {
     setNotices((current) => current.filter((line) => line.id !== id));
   }, []);

@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useSyncExternalStore, type ReactNode } from "react";
 import { useGame } from "@/controllers/game.context";
+import { usePackAlert } from "@/controllers/use-pack-alert";
 import { useTavernAlert } from "@/controllers/use-tavern-alert";
 import { backgroundRepository } from "@/models/repositories/background.repository";
 import { LiveBackdrop } from "../components/live-backdrop";
@@ -29,6 +30,7 @@ export function GameFrame({ children }: { children: ReactNode }) {
   const inTavern = pathname.startsWith("/tavern");
   const tavernUnread = useTavernAlert(!inTavern);
   const asideUnread = inTavern ? 0 : tavernUnread;
+  usePackAlert(!inTavern);
   const animatedBackground = useSyncExternalStore(
     backgroundRepository.subscribe,
     backgroundRepository.enabled,
