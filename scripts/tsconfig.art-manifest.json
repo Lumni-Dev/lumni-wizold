@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "outDir": "../.sim-art",
+    "rootDir": "../src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "baseUrl": "../src",
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": ["../src/models/repositories/art.repository.ts"]
+}

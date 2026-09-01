@@ -264,127 +264,39 @@ button:not(:disabled) {
   animation: toast-in 220ms ease-out;
 }
 
-.fury-electric-shell {
-  --electric-border-gradient: color-mix(in oklab, var(--color-ember) 30%, transparent);
-  padding: 2px;
-  border-radius: 0.75rem;
-  background:
-    linear-gradient(
-      -30deg,
-      var(--electric-border-gradient),
-      transparent,
-      var(--electric-border-gradient)
-    ),
-    linear-gradient(to bottom, var(--color-surface), var(--color-surface));
+@keyframes fury-border-spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }
 
-.fury-electric-shell .electric-border {
-  --electric-light-color: var(--color-ember);
-}
-
-.fury-electric-shell .electric-border-overlay-1,
-.fury-electric-shell .electric-border-overlay-2,
-.fury-electric-shell .electric-border-bg-glow,
-.fury-electric-shell .electric-border-glow-2 {
-  display: none;
-}
-
-.electric-border {
-  --electric-light-color: color-mix(in oklab, var(--color-ember) 72%, white);
+.fury-spin-border {
   position: relative;
-  overflow: visible;
-  isolation: isolate;
+  overflow: hidden;
+  border-radius: 0.375rem;
+  padding: 1px;
 }
 
-.electric-border-canvas {
+.fury-spin-border::before {
+  content: "";
   position: absolute;
   top: 50%;
   left: 50%;
-  z-index: 2;
-  pointer-events: none;
-  transform: translate(-50%, -50%);
-}
-
-.electric-border-content {
-  position: relative;
-  z-index: 1;
-  border-radius: inherit;
-  background: color-mix(in oklab, var(--color-surface-high) 86%, var(--color-ember) 14%);
-}
-
-.electric-border-layers {
-  position: absolute;
-  inset: 0;
   z-index: 0;
-  border-radius: inherit;
-  pointer-events: none;
-}
-
-.electric-border-glow-1,
-.electric-border-glow-2,
-.electric-border-overlay-1,
-.electric-border-overlay-2,
-.electric-border-bg-glow {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-}
-
-.electric-border-glow-1 {
-  border: 2px solid color-mix(in oklab, var(--color-ember) 60%, transparent);
-  filter: blur(1px);
-}
-
-.electric-border-glow-2 {
-  border: 2px solid var(--electric-light-color);
-  filter: blur(4px);
-}
-
-.electric-border-overlay-1 {
-  opacity: 1;
-  mix-blend-mode: overlay;
-  transform: scale(1.1);
-  filter: blur(16px);
-  background: linear-gradient(
-    -30deg,
-    white,
-    transparent 30%,
-    transparent 70%,
-    white
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    from 0deg,
+    var(--color-ember) 0deg,
+    color-mix(in oklab, var(--color-ember) 35%, transparent) 55deg,
+    transparent 110deg,
+    transparent 360deg
   );
+  transform: translate(-50%, -50%);
+  animation: fury-border-spin 2.4s linear infinite;
 }
 
-.electric-border-overlay-2 {
-  opacity: 0.5;
-  mix-blend-mode: overlay;
-  transform: scale(1.1);
-  filter: blur(16px);
-  background: linear-gradient(
-    -30deg,
-    white,
-    transparent 30%,
-    transparent 70%,
-    white
-  );
-}
-
-.electric-border-bg-glow {
-  z-index: -1;
-  opacity: 0.3;
-  filter: blur(32px);
-  transform: scale(1.1);
-  background: linear-gradient(
-    -30deg,
-    var(--electric-light-color),
-    transparent,
-    var(--color-ember)
-  );
-}
-
-.fury-electric-content {
+.fury-spin-border > * {
   position: relative;
   z-index: 1;
-  padding: 0.5rem 0.75rem;
-  text-align: center;
 }

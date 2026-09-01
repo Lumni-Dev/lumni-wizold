@@ -52,6 +52,8 @@ next-env.d.ts
 # scratch output of scripts/balance.mjs, scripts/audit.mjs and scripts/forge-sounds.mjs
 .sim
 .sim-audit
+.sim-art
+public/art-manifest.json
 .sound-forge
 .art-forge
 public/assets/inventory/.tmp

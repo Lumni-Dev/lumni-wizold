@@ -78,7 +78,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
         description={
           isPlayer
             ? "O que os outros caçadores veem da sua ficha pública."
-            : "Amostra do que o quadro revela: progresso, equipamento e combate, sem vida, suprimentos nem fúria."
+            : "Amostra do que o quadro revela: progresso, equipamento e combate, sem vida nem suprimentos."
         }
         action={
           <div className="flex flex-wrap items-center justify-end gap-2">
@@ -213,7 +213,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
             </List>
           </Panel>
 
-          <AttributesPanel stats={stats} gender={hunter.gender} publicProfile />
+          <AttributesPanel stats={stats} gender={hunter.gender} />
 
           <EquipmentPanel gear={gear} forge={hunter.forge} />
         </div>

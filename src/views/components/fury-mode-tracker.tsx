@@ -1,8 +1,9 @@
 "use client";
 
+import { Flame } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useGame } from "@/controllers/game.context";
-import { ElectricBorder } from "./electric-border";
+import { CONTROL_HEIGHT } from "@/shared/constants/ui";
 
 function furyClock(ms: number): string {
   const total = Math.max(0, Math.ceil(ms / 1000));
@@ -29,13 +30,20 @@ export function FuryModeTracker() {
   const clock = furyClock(remaining);
 
   return (
-    <div className="fury-electric-shell">
-      <ElectricBorder borderRadius={12} speed={1} chaos={0.12}>
-        <div className="fury-electric-content">
-          <p className="text-[10px] uppercase tracking-[0.16em] text-ink">Modo Fúria</p>
+    <div className="fury-spin-border">
+      <div className={"relative flex items-stretch rounded-[calc(0.375rem-1px)] bg-surface/70"}>
+        <span
+          className={
+            "flex " + CONTROL_HEIGHT + " w-8 shrink-0 items-center justify-center border-r border-edge"
+          }
+        >
+          <Flame aria-hidden strokeWidth={1.75} className="h-4 w-4 text-ember" />
+        </span>
+        <div className="min-w-0 flex-1 px-3 py-2">
+          <p className="truncate text-[10px] uppercase tracking-[0.16em] text-ink">Modo Fúria</p>
           <p className="font-mono text-[11px] text-ember">{clock}</p>
         </div>
-      </ElectricBorder>
+      </div>
     </div>
   );
 }

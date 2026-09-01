@@ -397,7 +397,6 @@ export function ForgeScreen() {
                               : (forgeEntry.reason ?? "Peça no teto")}
                       </span>
                       <Button
-                        size="medium"
                         variant={
                           forgeActive ? "secondary" : forgeEntry.canForge ? "primary" : "outline"
                         }

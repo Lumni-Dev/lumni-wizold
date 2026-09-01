@@ -23,7 +23,7 @@ export function UpdateGate() {
           Uma nova versão do jogo já está disponível.
         </p>
         <p className="text-xs leading-relaxed text-ink-faint">
-          Ao fechar, a página recarrega limpando o cache, para você jogar sempre na versão mais
+          Ao atualizar, a página recarrega limpando o cache, para você jogar sempre na versão mais
           recente.
         </p>
       </div>

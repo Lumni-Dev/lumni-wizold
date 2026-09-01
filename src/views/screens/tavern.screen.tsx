@@ -427,7 +427,6 @@ export function TavernScreen() {
                 <Button
                   type="submit"
                   variant="primary"
-                  size="medium"
                   fullWidth
                   disabled={
                     Boolean(ownRoom) ||
@@ -778,23 +777,23 @@ export function TavernScreen() {
                   ))}
                 </div>
               ) : null}
-              <button
+              <Button
                 type="button"
+                icon
+                variant="outline"
                 aria-label="Emojis"
                 aria-expanded={emojiOpen}
                 onClick={() => {
                   if (!emojiOpen) setEmojiRect(emojiRef.current?.getBoundingClientRect() ?? null);
                   setEmojiOpen((open) => !open);
                 }}
-                className={"grid " + CONTROL_HEIGHT + " w-8 place-items-center rounded-md border border-edge text-ink-faint transition-colors hover:border-edge-strong hover:bg-surface-high hover:text-ink"}
               >
-                <ActionIcon action="smile" className="h-4 w-4" />
-              </button>
+                <ActionIcon action="smile" />
+              </Button>
             </div>
             <Button
               type="submit"
               variant="primary"
-              size="medium"
               disabled={draft.trim().length === 0 || cooldownLeft > 0}
             >
               {cooldownLeft > 0 ? Math.ceil(cooldownLeft / 1000) : "Enviar"}

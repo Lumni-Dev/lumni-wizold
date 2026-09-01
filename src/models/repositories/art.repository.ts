@@ -1,4 +1,4 @@
-import { readdir } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import { join, parse } from "node:path";
 import type { ArtManifest } from "../entities/art";
 import { ATTRIBUTES } from "../entities/attribute";
@@ -22,6 +22,7 @@ const CREATURE_ROOT = "creatures";
 const IMAGE_EXTENSIONS = new Set([".png", ".webp", ".gif", ".jpg", ".jpeg", ".svg", ".avif"]);
 
 const ASSETS_ROOT = join(process.cwd(), "public", "assets");
+const MANIFEST_PATH = join(process.cwd(), "public", "art-manifest.json");
 
 const ITEM_IDS = new Set(ITEMS.map((item) => item.id));
 const CREATURE_IDS = new Set(CREATURES.map((creature) => creature.id));
@@ -226,7 +227,7 @@ function collectCreatures(files: FoundFile[]): Record<string, string> {
   return art;
 }
 
-export async function readArtManifest(): Promise<ArtManifest> {
+export async function scanArtManifestFromDisk(): Promise<ArtManifest> {
   const [
     itemFiles,
     huntFiles,
@@ -257,4 +258,13 @@ export async function readArtManifest(): Promise<ArtManifest> {
     genders: collectGenders(genderFiles),
     packs: collectPacks(packFiles),
   };
+}
+
+export async function readArtManifest(): Promise<ArtManifest> {
+  if (process.env.NODE_ENV !== "production") {
+    return scanArtManifestFromDisk();
+  }
+
+  const raw = await readFile(MANIFEST_PATH, "utf8");
+  return JSON.parse(raw) as ArtManifest;
 }

@@ -25,6 +25,11 @@ const nextConfig: NextConfig = {
 
   serverExternalPackages: ["pg"],
 
+  // Art manifest reads file names only; static images stay on /assets (CDN).
+  outputFileTracingExcludes: {
+    "/*": ["public/assets/**"],
+  },
+
   async headers() {
     return [
       {

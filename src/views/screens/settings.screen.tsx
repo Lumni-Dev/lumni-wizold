@@ -231,7 +231,6 @@ export function SettingsScreen() {
             <Button
               type="submit"
               variant="primary"
-              size="medium"
               fullWidth
               disabled={!canRename || !affordable || newName.trim().length === 0}
             >
