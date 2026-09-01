@@ -19,7 +19,7 @@ import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
 import { summarizeEffect } from "../presenters/item.presenter";
 import { Button } from "../components/button";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
-import { FilterSelect } from "../components/filter-select";
+import { FilterRow, FilterSelect } from "../components/filter-select";
 import { Pagination } from "../components/pagination";
 import { IconFrame } from "../components/icon-frame";
 import { ItemCard } from "../components/item-card";
@@ -141,15 +141,17 @@ export function InventoryScreen() {
         </div>
       </Panel>
 
-      <FilterSelect
-        label="Categoria"
-        value={filter}
-        options={FILTERS}
-        onChange={(value) => {
-          setFilter(value);
-          setPage(1);
-        }}
-      />
+      <FilterRow className="sm:max-w-xs">
+        <FilterSelect
+          label="Categoria"
+          value={filter}
+          options={FILTERS}
+          onChange={(value) => {
+            setFilter(value);
+            setPage(1);
+          }}
+        />
+      </FilterRow>
 
       {visible.length === 0 ? (
         <EmptyState

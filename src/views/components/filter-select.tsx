@@ -28,20 +28,29 @@ export function FilterSelect<T extends string>({
   disabled,
 }: FilterSelectProps<T>) {
   return (
-    <Select
-      compact
-      className={cn("min-w-0 flex-1 basis-40 sm:basis-auto sm:min-w-[10rem]", className)}
-      label={label}
-      placeholder={options[0]?.label ?? label}
-      value={value}
-      options={toSelectOptions(options)}
-      onChange={(next) => onChange(next as T)}
-      disabled={disabled}
-      aria-label={label}
-    />
+    <div
+      className={cn(
+        "flex min-w-0 flex-1 basis-40 items-center gap-2 sm:basis-auto sm:min-w-[10rem]",
+        className,
+      )}
+    >
+      <span className="shrink-0 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+        {label}
+      </span>
+      <Select
+        compact
+        className="min-w-0 flex-1"
+        placeholder={options[0]?.label ?? label}
+        value={value}
+        options={toSelectOptions(options)}
+        onChange={(next) => onChange(next as T)}
+        disabled={disabled}
+        aria-label={label}
+      />
+    </div>
   );
 }
 
 export function FilterRow({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cn("flex flex-wrap items-end gap-3", className)}>{children}</div>;
+  return <div className={cn("flex flex-wrap items-center gap-2", className)}>{children}</div>;
 }

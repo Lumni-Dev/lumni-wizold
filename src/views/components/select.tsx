@@ -3,6 +3,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { playClick } from "@/controllers/sound";
 import { cn } from "@/shared/utils/class-names";
+import { chipClass, ChipFrame } from "./chip";
 export interface SelectOption {
   value: string;
   label: string;
@@ -126,36 +127,67 @@ export function Select({
       ) : null}
 
       <div ref={rootRef} className="relative">
-        <button
-          type="button"
-          role="combobox"
-          aria-expanded={open}
-          aria-haspopup="listbox"
-          aria-controls={baseId + "-list"}
-          aria-activedescendant={open && highlighted >= 0 ? baseId + "-" + highlighted : undefined}
-          aria-label={ariaLabel ?? label ?? placeholder}
-          disabled={disabled}
-          onClick={() => (open ? setOpen(false) : show())}
-          onKeyDown={onKeyDown}
-          className={cn(
-            "flex w-full items-center justify-between gap-2 rounded-md border border-edge",
-            "bg-base text-left transition-colors focus:border-edge-strong focus:outline-none",
-            compact ? "h-8 px-3 text-xs" : "h-10 px-4 text-sm",
-            disabled && "opacity-60",
-            open && "border-edge-strong",
-          )}
-        >
-          <span className={cn("truncate", selected ? "text-ink" : "text-ink-faint")}>
-            {selected ? selected.label : placeholder}
-          </span>
-          <ChevronDown
-            aria-hidden
+        {compact ? (
+          <ChipFrame active={open} className="w-full min-w-0">
+            <button
+              type="button"
+              role="combobox"
+              aria-expanded={open}
+              aria-haspopup="listbox"
+              aria-controls={baseId + "-list"}
+              aria-activedescendant={
+                open && highlighted >= 0 ? baseId + "-" + highlighted : undefined
+              }
+              aria-label={ariaLabel ?? label ?? placeholder}
+              disabled={disabled}
+              onClick={() => (open ? setOpen(false) : show())}
+              onKeyDown={onKeyDown}
+              className={cn(
+                chipClass(open || Boolean(selected)),
+                "w-full min-w-0 shrink justify-between gap-2",
+                disabled && "opacity-60",
+              )}
+            >
+              <span className="truncate">{selected ? selected.label : placeholder}</span>
+              <ChevronDown
+                aria-hidden
+                className={cn(
+                  "size-3 shrink-0 text-ink-faint transition-transform",
+                  open && "rotate-180",
+                )}
+              />
+            </button>
+          </ChipFrame>
+        ) : (
+          <button
+            type="button"
+            role="combobox"
+            aria-expanded={open}
+            aria-haspopup="listbox"
+            aria-controls={baseId + "-list"}
+            aria-activedescendant={
+              open && highlighted >= 0 ? baseId + "-" + highlighted : undefined
+            }
+            aria-label={ariaLabel ?? label ?? placeholder}
+            disabled={disabled}
+            onClick={() => (open ? setOpen(false) : show())}
+            onKeyDown={onKeyDown}
             className={cn(
-              "size-3.5 shrink-0 text-ink-faint transition-transform",
-              open && "rotate-180",
+              chipClass(open || Boolean(selected)),
+              "w-full min-w-0 justify-between gap-2",
+              disabled && "opacity-60",
             )}
-          />
-        </button>
+          >
+            <span className="truncate">{selected ? selected.label : placeholder}</span>
+            <ChevronDown
+              aria-hidden
+              className={cn(
+                "size-3 shrink-0 text-ink-faint transition-transform",
+                open && "rotate-180",
+              )}
+            />
+          </button>
+        )}
 
         {open ? (
           <ul
@@ -164,7 +196,7 @@ export function Select({
             role="listbox"
             className={cn(
               "absolute inset-x-0 top-full z-40 mt-1 max-h-56 overflow-y-auto rounded-md",
-              "border border-edge-strong bg-surface py-1",
+              "border border-edge bg-surface py-1",
               "shadow-[0_24px_60px_-20px_rgba(0,0,0,0.95)]",
             )}
           >
@@ -179,9 +211,11 @@ export function Select({
                 onMouseDown={(event) => event.preventDefault()}
                 onClick={() => pick(index)}
                 className={cn(
-                  "flex h-8 cursor-pointer items-center px-3 text-xs",
-                  index === highlighted ? "bg-surface-high text-ink" : "text-ink-soft",
-                  option.value === value && "text-ink",
+                  "flex h-8 cursor-pointer items-center px-3",
+                  "text-[10px] uppercase tracking-[0.16em] transition-colors",
+                  index === highlighted || option.value === value
+                    ? "bg-surface-high text-ink"
+                    : "text-ink-soft hover:bg-surface-high hover:text-ink",
                 )}
               >
                 {option.label}
