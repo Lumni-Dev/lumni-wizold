@@ -246,7 +246,7 @@ export function BazaarScreen() {
             >
               <List>
                 {onPage.map((entry) => (
-                  <ListRow key={entry.listing.id} padding="art">
+                  <ListRow key={entry.listing.id} padding="art" align="start">
                     <ItemIcon item={entry.item} />
                     <RowText
                       title={enhancedName(entry.item.name, entry.listing.enhancement)}
@@ -271,7 +271,7 @@ export function BazaarScreen() {
                         </>
                       }
                     />
-                    <span className="flex shrink-0 items-center gap-3">
+                    <span className="flex shrink-0 items-center gap-3 self-center">
                       {entry.available > 1 ? (
                         <span className="font-mono text-xs text-ink-soft">
                           x{formatNumber(entry.available)}

@@ -72,11 +72,88 @@ export function ListRow({
   );
 }
 
-export function RowText({ title, description }: { title: ReactNode; description?: ReactNode }) {
+export function RowText({
+  label,
+  title,
+  description,
+}: {
+  label?: ReactNode;
+  title: ReactNode;
+  description?: ReactNode;
+}) {
   return (
     <div className="min-w-0 flex-1">
+      {label ? (
+        <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">{label}</p>
+      ) : null}
       <p className="truncate text-sm text-ink">{title}</p>
-      {description ? <p className="text-[11px] text-ink-faint">{description}</p> : null}
+      {description ? <div className="text-[11px] text-ink-faint">{description}</div> : null}
     </div>
+  );
+}
+
+export function ArtRow({
+  art,
+  title,
+  description,
+  trailing,
+  align = "center",
+}: {
+  art: ReactNode;
+  title: ReactNode;
+  description?: ReactNode;
+  trailing?: ReactNode;
+  align?: RowAlign;
+}) {
+  return (
+    <ListRow padding="art" align={align}>
+      {art}
+      <RowText title={title} description={description} />
+      {trailing}
+    </ListRow>
+  );
+}
+
+export function ArtRowButton({
+  art,
+  title,
+  description,
+  trailing,
+  align = "center",
+  onClick,
+  disabled = false,
+  pressed,
+  className,
+}: {
+  art: ReactNode;
+  title: ReactNode;
+  description?: ReactNode;
+  trailing?: ReactNode;
+  align?: RowAlign;
+  onClick: () => void;
+  disabled?: boolean;
+  pressed?: boolean;
+  className?: string;
+}) {
+  return (
+    <ListRow padding="art" align={align} className="p-0">
+      <button
+        type="button"
+        onClick={onClick}
+        disabled={disabled}
+        aria-pressed={pressed}
+        className={cn(
+          "flex w-full gap-3 p-4 text-left transition-colors",
+          align === "start" ? "items-start" : "items-center",
+          ICON_FRAME_INSET,
+          disabled && "opacity-60",
+          className,
+        )}
+      >
+        {art}
+        <RowText title={title} description={description} />
+        {trailing}
+      </button>
+    </ListRow>
   );
 }

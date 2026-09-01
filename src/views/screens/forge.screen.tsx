@@ -26,7 +26,7 @@ import { ConfirmDialog } from "../components/confirm-dialog";
 import { IconFrame } from "../components/icon-frame";
 import { ItemIcon } from "../components/item-icon";
 import { EmptyState } from "../components/empty-state";
-import { RowText, List, ListRow } from "../components/list";
+import { ArtRowButton, RowText, List, ListRow } from "../components/list";
 import { Pagination } from "../components/pagination";
 import { Panel } from "../components/panel";
 import { useShake } from "../components/use-shake";
@@ -276,54 +276,55 @@ export function ForgeScreen() {
               {mining.ores.map(({ ore, fragment, owned, unlocked, reason }) => {
                 const isSelected = ore.id === effectiveOre;
                 return (
-                  <ListRow key={ore.id} padding="art">
-                    <button
-                      type="button"
-                      onClick={() => unlocked && setSelectedOre(ore.id)}
-                      aria-pressed={isSelected}
-                      disabled={!unlocked || activeOre !== null}
-                      className={cn(
-                        "flex w-full items-center gap-3 text-left transition-colors",
-                        !unlocked && "opacity-60",
-                      )}
-                    >
-                      {fragment ? <ItemIcon item={fragment} /> : <IconFrame>--</IconFrame>}
-                      <div className="min-w-0 flex-1">
-                        <p
-                          className={cn(
-                            "truncate text-sm",
-                            isSelected
-                              ? "text-ember"
-                              : unlocked
-                                ? "text-ink-soft"
-                                : "text-ink-faint",
-                          )}
-                        >
-                          {ore.label}
-                        </p>
-                        <p className="text-[11px] text-ink-faint">
-                          {unlocked
-                            ? "+" +
-                              formatNumber(ore.minYield) +
-                              " a " +
-                              formatNumber(ore.maxYield) +
-                              " fragmentos por batida"
-                            : reason}
-                        </p>
-                      </div>
-                      <span className="shrink-0 font-mono text-[11px] text-ink-faint">
-                        x{formatNumber(owned)}
-                      </span>
+                  <ArtRowButton
+                    key={ore.id}
+                    art={fragment ? <ItemIcon item={fragment} /> : <IconFrame>--</IconFrame>}
+                    title={
                       <span
                         className={cn(
-                          "grid h-4 w-4 shrink-0 place-items-center rounded-full border",
-                          isSelected ? "border-ember" : "border-edge-strong",
+                          isSelected
+                            ? "text-ember"
+                            : unlocked
+                              ? "text-ink-soft"
+                              : "text-ink-faint",
                         )}
                       >
-                        {isSelected ? <span className="h-2 w-2 rounded-full bg-ember" /> : null}
+                        {ore.label}
                       </span>
-                    </button>
-                  </ListRow>
+                    }
+                    description={
+                      unlocked
+                        ? "+" +
+                          formatNumber(ore.minYield) +
+                          " a " +
+                          formatNumber(ore.maxYield) +
+                          " fragmentos por batida"
+                        : reason
+                    }
+                    trailing={
+                      <>
+                        <span className="shrink-0 self-center font-mono text-[11px] text-ink-faint">
+                          x{formatNumber(owned)}
+                        </span>
+                        <span
+                          className={cn(
+                            "grid h-4 w-4 shrink-0 place-items-center self-center rounded-full border",
+                            isSelected ? "border-ember" : "border-edge-strong",
+                          )}
+                        >
+                          {isSelected ? <span className="h-2 w-2 rounded-full bg-ember" /> : null}
+                        </span>
+                      </>
+                    }
+                    pressed={isSelected}
+                    disabled={!unlocked || activeOre !== null}
+                    onClick={() => unlocked && setSelectedOre(ore.id)}
+                    className={cn(
+                      isSelected && "bg-surface-high",
+                      !isSelected && "hover:bg-surface-high/60",
+                      !unlocked && "opacity-60",
+                    )}
+                  />
                 );
               })}
             </List>
@@ -348,26 +349,30 @@ export function ForgeScreen() {
                 </div>
               ) : (
                 <List>
-                  <ListRow padding="art">
+                  <ListRow padding="art" align="start">
                     <span className={cn("inline-flex", forgeActive && forgeShake && "card-shake")}>
                       <ItemIcon item={forgeEntry.item} enhancement={forgeEntry.level} />
                     </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm text-ink">{forgeEntry.item.name}</p>
-                      {forgeEntry.attributes.map((attribute) => (
-                        <p key={attribute.key} className="font-mono text-[11px] text-ink-soft">
-                          {attribute.name} {formatNumber(attribute.value)}
-                          {forgeEntry.level >= MAX_ENHANCEMENT
-                            ? ""
-                            : " → " + formatNumber(attribute.nextValue)}
-                        </p>
-                      ))}
-                      {forgeEntry.level > 0 ? (
-                        <p className="font-mono text-[10px] text-ink-faint">
-                          Já somou +{formatNumber(forgeEntry.forgeBonus)} de forja
-                        </p>
-                      ) : null}
-                    </div>
+                    <RowText
+                      title={forgeEntry.item.name}
+                      description={
+                        <>
+                          {forgeEntry.attributes.map((attribute) => (
+                            <p key={attribute.key} className="font-mono text-ink-soft">
+                              {attribute.name} {formatNumber(attribute.value)}
+                              {forgeEntry.level >= MAX_ENHANCEMENT
+                                ? ""
+                                : " → " + formatNumber(attribute.nextValue)}
+                            </p>
+                          ))}
+                          {forgeEntry.level > 0 ? (
+                            <p className="font-mono text-[10px]">
+                              Já somou +{formatNumber(forgeEntry.forgeBonus)} de forja
+                            </p>
+                          ) : null}
+                        </>
+                      }
+                    />
                   </ListRow>
 
                   {forgeEntry.fragment && forgeEntry.level < MAX_ENHANCEMENT ? (
@@ -466,55 +471,49 @@ export function ForgeScreen() {
                       const key = pieceKey(row.item.id, row.level);
                       const isSelected = key === effectiveForge;
                       return (
-                        <ListRow key={key} padding="art">
-                          <button
-                            type="button"
-                            onClick={() => selectForge(key)}
-                            aria-pressed={isSelected}
-                            disabled={activeItem !== null}
-                            className={cn(
-                              "flex w-full items-center gap-3 text-left transition-colors disabled:opacity-60",
-                            )}
-                          >
-                            <ItemIcon item={row.item} enhancement={row.level} />
-                            <div className="min-w-0 flex-1">
-                              <p
+                        <ArtRowButton
+                          key={key}
+                          art={<ItemIcon item={row.item} enhancement={row.level} />}
+                          title={row.item.name}
+                          description={
+                            row.canForge
+                              ? row.fragment && row.level < MAX_ENHANCEMENT
+                                ? formatNumber(row.cost) +
+                                  " " +
+                                  row.fragment.name +
+                                  " · " +
+                                  formatBronze(row.bronzeCost)
+                                : (row.reason ?? "Pronta para forjar")
+                              : (row.reason ?? "Indisponível")
+                          }
+                          trailing={
+                            <>
+                              {row.quantity > 1 ? (
+                                <span className="shrink-0 self-center font-mono text-[11px] text-ink-faint">
+                                  x{formatNumber(row.quantity)}
+                                </span>
+                              ) : null}
+                              <span
                                 className={cn(
-                                  "truncate text-sm",
-                                  isSelected ? "text-ember" : "text-ink-soft",
+                                  "grid h-4 w-4 shrink-0 place-items-center self-center rounded-full border",
+                                  isSelected ? "border-ember" : "border-edge-strong",
                                 )}
                               >
-                                {row.item.name}
-                              </p>
-                              <p className="text-[11px] text-ink-faint">
-                                {row.canForge
-                                  ? row.fragment && row.level < MAX_ENHANCEMENT
-                                    ? formatNumber(row.cost) +
-                                      " " +
-                                      row.fragment.name +
-                                      " · " +
-                                      formatBronze(row.bronzeCost)
-                                    : (row.reason ?? "Pronta para forjar")
-                                  : (row.reason ?? "Indisponível")}
-                              </p>
-                            </div>
-                            {row.quantity > 1 ? (
-                              <span className="shrink-0 font-mono text-[11px] text-ink-faint">
-                                x{formatNumber(row.quantity)}
+                                {isSelected ? (
+                                  <span className="h-2 w-2 rounded-full bg-ember" />
+                                ) : null}
                               </span>
-                            ) : null}
-                            <span
-                              className={cn(
-                                "grid h-4 w-4 shrink-0 place-items-center rounded-full border",
-                                isSelected ? "border-ember" : "border-edge-strong",
-                              )}
-                            >
-                              {isSelected ? (
-                                <span className="h-2 w-2 rounded-full bg-ember" />
-                              ) : null}
-                            </span>
-                          </button>
-                        </ListRow>
+                            </>
+                          }
+                          pressed={isSelected}
+                          disabled={activeItem !== null}
+                          onClick={() => selectForge(key)}
+                          className={cn(
+                            isSelected && "bg-surface-high",
+                            !isSelected && "hover:bg-surface-high/60",
+                            isSelected && "[&_.truncate]:text-ember",
+                          )}
+                        />
                       );
                     })}
                   </List>

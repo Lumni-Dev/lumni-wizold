@@ -134,9 +134,7 @@ export function WikiScreen() {
             <List>
               {EQUIPMENT_SLOTS.map((slot) => (
                 <ListRow key={slot}>
-                  <div className="min-w-0 flex-1">
-                    <RowText title={SLOT_LABEL[slot]} description={SLOT_ROLE[slot]} />
-                  </div>
+                  <RowText title={SLOT_LABEL[slot]} description={SLOT_ROLE[slot]} />
                 </ListRow>
               ))}
             </List>
@@ -261,26 +259,26 @@ export function WikiScreen() {
             pageItems.map((creature) => (
               <ListRow key={creature.id} padding="art" align="start">
                 <CreatureIcon creature={creature} />
-                <div className="min-w-0 flex-1 space-y-1">
-                  <div className="flex items-baseline justify-between gap-3">
-                    <p className="truncate text-sm text-ink">{creature.name}</p>
-                    <span className="shrink-0 font-mono text-[11px] text-ink-faint">
-                      NV. {formatNumber(creature.level)}
-                    </span>
-                  </div>
-                  <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                    {SPECIES_LABEL[creature.species]}
-                  </p>
-                  <p className="font-mono text-[11px] leading-relaxed text-ink-soft">
-                    {formatNumber(creature.health)} vida · {formatNumber(creature.strength)} força ·{" "}
-                    {formatNumber(creature.endurance)} resistência ·{" "}
-                    {formatNumber(creature.agility)} agilidade
-                  </p>
-                  <p className="font-mono text-[11px] text-ink-faint">
-                    +{formatNumber(creature.experience)} exp · {formatNumber(creature.minBronze)} a{" "}
-                    {formatBronze(creature.maxBronze)}
-                  </p>
-                </div>
+                <RowText
+                  title={creature.name}
+                  label={SPECIES_LABEL[creature.species]}
+                  description={
+                    <>
+                      <p className="font-mono leading-relaxed text-ink-soft">
+                        {formatNumber(creature.health)} vida · {formatNumber(creature.strength)} força ·{" "}
+                        {formatNumber(creature.endurance)} resistência ·{" "}
+                        {formatNumber(creature.agility)} agilidade
+                      </p>
+                      <p className="font-mono">
+                        +{formatNumber(creature.experience)} exp · {formatNumber(creature.minBronze)} a{" "}
+                        {formatBronze(creature.maxBronze)}
+                      </p>
+                    </>
+                  }
+                />
+                <span className="shrink-0 self-start font-mono text-[11px] text-ink-faint">
+                  NV. {formatNumber(creature.level)}
+                </span>
               </ListRow>
             ))
           }

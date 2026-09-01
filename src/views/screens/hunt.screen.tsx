@@ -27,7 +27,7 @@ import { Card } from "../components/card";
 import { useShake } from "../components/use-shake";
 import { Tag } from "../components/tag";
 import { DataRow } from "../components/data-row";
-import { List, ListRow } from "../components/list";
+import { ArtRowButton, List, ListRow, RowText } from "../components/list";
 import { Panel } from "../components/panel";
 import { EmptyState } from "../components/empty-state";
 import { PageHeader } from "../layout/page-header";
@@ -376,41 +376,36 @@ export function HuntScreen() {
                     </p>
                   </div>
                   <div className="relative md:flex-1 md:min-h-0">
-                    <ul className="max-h-[560px] divide-y divide-edge overflow-y-auto border-t border-edge md:absolute md:inset-0 md:max-h-none">
+                    <List className="max-h-[560px] overflow-y-auto border-t border-edge md:absolute md:inset-0 md:max-h-none">
                       {creatures.map((creature) => {
                         const isSelected = creature.id === selectedId;
                         const isPrey = active && creature.id === selectedId;
                         const reached = character.level >= creature.level;
                         return (
-                          <li key={creature.id}>
-                            <button
-                              type="button"
-                              onClick={() => selectCreature(territory.id, creature.id)}
-                              aria-pressed={isSelected}
-                              className={cn(
-                                "flex w-full items-center gap-3 px-4 py-3 text-left transition-colors",
-                                isSelected ? "bg-surface-high" : "hover:bg-surface-high/60",
-                              )}
-                            >
-                              <CreatureIcon creature={creature} />
-                              <span className="min-w-0 flex-1">
-                                <span
-                                  className={cn(
-                                    "block truncate text-xs",
-                                    isPrey
-                                      ? "text-ember"
-                                      : reached
-                                        ? "text-ink-soft"
-                                        : "text-ink-faint",
-                                  )}
-                                >
-                                  {creature.name}
-                                </span>
-                                <span className="block font-mono text-[11px] text-ink-faint">
+                          <ArtRowButton
+                            key={creature.id}
+                            align="start"
+                            art={<CreatureIcon creature={creature} />}
+                            title={
+                              <span
+                                className={cn(
+                                  isPrey
+                                    ? "text-ember"
+                                    : reached
+                                      ? "text-ink-soft"
+                                      : "text-ink-faint",
+                                )}
+                              >
+                                {creature.name}
+                              </span>
+                            }
+                            description={
+                              <>
+                                <span className="block font-mono">
                                   NV. {formatNumber(creature.level)} a{" "}
                                   {formatNumber(creature.level + 9)}
                                 </span>
-                                <span className="block font-mono text-[11px] text-ink-faint">
+                                <span className="block font-mono">
                                   {formatNumber(
                                     Math.round(creature.experience * (1 + xpBonus)),
                                   )}{" "}
@@ -419,10 +414,12 @@ export function HuntScreen() {
                                     ? " (+" + Math.round(xpBonus * 100) + "% lua)"
                                     : ""}
                                 </span>
-                              </span>
+                              </>
+                            }
+                            trailing={
                               <span
                                 className={cn(
-                                  "grid h-4 w-4 shrink-0 place-items-center rounded-full border",
+                                  "grid h-4 w-4 shrink-0 place-items-center self-center rounded-full border",
                                   isSelected ? "border-ember" : "border-edge-strong",
                                 )}
                               >
@@ -430,11 +427,16 @@ export function HuntScreen() {
                                   <span className="h-2 w-2 rounded-full bg-ember" />
                                 ) : null}
                               </span>
-                            </button>
-                          </li>
+                            }
+                            pressed={isSelected}
+                            onClick={() => selectCreature(territory.id, creature.id)}
+                            className={cn(
+                              isSelected ? "bg-surface-high" : "hover:bg-surface-high/60",
+                            )}
+                          />
                         );
                       })}
-                    </ul>
+                    </List>
                   </div>
                 </div>
               </div>

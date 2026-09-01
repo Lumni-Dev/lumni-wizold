@@ -56,15 +56,10 @@ function Fighter({
 }) {
   const left = Math.max(0, Math.round(health));
   return (
-    <div className={cn("flex items-center gap-3 p-4", ICON_FRAME_INSET)}>
+    <div className={cn("flex items-start gap-3 p-4", ICON_FRAME_INSET)}>
       <GenderIcon gender={gender} size="large" />
       <div className="min-w-0 flex-1 space-y-2">
-        <div className="min-w-0">
-          <p className="truncate text-sm text-ink">{name}</p>
-          <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-            {side} - NV. {formatNumber(level)}
-          </p>
-        </div>
+        <RowText title={name} label={side + " - NV. " + formatNumber(level)} />
         <Bar
           label="Vida"
           current={left}
@@ -445,20 +440,23 @@ export function ArenaScreen() {
               const resting = cooldownLeft > 0;
               return (
                 <Card key={hunter.id} height="fill">
-                  <CardHeader>
+                  <CardHeader align="start">
                     <GenderIcon gender={hunter.gender} size="medium" />
-                    <div className="min-w-0 flex-1">
-                      <Link
-                        href={"/ranking/" + hunter.id}
-                        className="block truncate text-sm text-ink transition-colors hover:text-highlight"
-                      >
-                        {hunter.name}
-                      </Link>
-                      <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                        {hunter.gender === "male" ? "Lumni" : "Luna"} - NV.{" "}
-                        {formatNumber(hunter.level)}
-                      </p>
-                    </div>
+                    <RowText
+                      title={
+                        <Link
+                          href={"/ranking/" + hunter.id}
+                          className="transition-colors hover:text-highlight"
+                        >
+                          {hunter.name}
+                        </Link>
+                      }
+                      label={
+                        (hunter.gender === "male" ? "Lumni" : "Luna") +
+                        " - NV. " +
+                        formatNumber(hunter.level)
+                      }
+                    />
                   </CardHeader>
 
                   <CardBody>

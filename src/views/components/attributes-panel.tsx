@@ -44,7 +44,7 @@ export function AttributesPanel({
 
           return (
             <ListRow key={definition.key} layout="column" padding="art">
-              <div className="flex min-w-0 items-center gap-3">
+              <div className="flex min-w-0 items-start gap-3">
                 <AttributeIcon attribute={definition.key} />
                 <RowText title={definition.name} description={definition.description} />
               </div>

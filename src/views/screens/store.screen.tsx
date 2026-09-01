@@ -129,14 +129,9 @@ export function StoreScreen() {
             interactive
             tone={pack.highlight ? "highlighted" : "default"}
           >
-            <CardHeader>
+            <CardHeader align="start">
               <PackIcon pack={pack} size="huge" />
-              <div className="min-w-0 flex-1">
-                <h3 className="truncate text-sm text-ink">{pack.name}</h3>
-                <p className="mt-1 truncate text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                  Pacote de WCoins
-                </p>
-              </div>
+              <RowText title={pack.name} label="Pacote de WCoins" />
             </CardHeader>
 
             <CardBody>

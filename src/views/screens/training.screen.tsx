@@ -15,6 +15,7 @@ import { Tag } from "../components/tag";
 import { PetIcon } from "../components/pet-icon";
 import { TrainingIcon } from "../components/training-icon";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
+import { RowText } from "../components/list";
 import { Panel } from "../components/panel";
 import { PageHeader } from "../layout/page-header";
 
@@ -84,15 +85,13 @@ export function TrainingScreen() {
                 interactive={active || ready}
                 tone={active ? "highlighted" : "default"}
               >
-                <CardHeader>
+                <CardHeader align="start">
                   <TrainingIcon attribute={exercise.attribute} size="medium" />
-                  <div className="min-w-0 flex-1">
-                    <h3 className="truncate text-sm text-ink">{row?.name ?? exercise.name}</h3>
-                    <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                      {exercise.name}
-                    </p>
-                  </div>
-                  <span className="shrink-0 font-mono text-sm text-ink">
+                  <RowText
+                    title={row?.name ?? exercise.name}
+                    label={exercise.name}
+                  />
+                  <span className="shrink-0 self-center font-mono text-sm text-ink">
                     NV. {formatNumber(row?.value ?? 0)}
                     <span className="text-ink-faint">
                       {" / " + formatNumber(MAX_ATTRIBUTE_VALUE)}
@@ -161,15 +160,10 @@ export function TrainingScreen() {
               interactive={petActive || petReady}
               tone={petActive ? "highlighted" : "default"}
             >
-              <CardHeader>
+              <CardHeader align="start">
                 <PetIcon gender={petTraining.pet.gender} size="medium" />
-                <div className="min-w-0 flex-1">
-                  <h3 className="truncate text-sm text-ink">Mascote</h3>
-                  <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                    Treino do mascote
-                  </p>
-                </div>
-                <span className="shrink-0 font-mono text-sm text-ink">
+                <RowText title="Mascote" label="Treino do mascote" />
+                <span className="shrink-0 self-center font-mono text-sm text-ink">
                   NV. {formatNumber(petTraining.level)}
                   <span className="text-ink-faint">{" / " + formatNumber(PET_MAX_LEVEL)}</span>
                   {petTraining.level >= PET_MAX_LEVEL ? (

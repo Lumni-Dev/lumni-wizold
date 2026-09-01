@@ -29,6 +29,7 @@ import { Bar } from "../components/bar";
 import { Button } from "../components/button";
 import { AiAuditNotice } from "../components/ai-audit-notice";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
+import { RowText } from "../components/list";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { Field } from "../components/field";
 import { ItemIcon } from "../components/item-icon";
@@ -64,14 +65,9 @@ function Kennel({ bronze, level }: { bronze: number; level: number }) {
               tone={chosen ? "highlighted" : "default"}
               interactive={!chosen}
             >
-              <CardHeader>
+              <CardHeader align="start">
                 <PetIcon gender={definition.key} size="medium" />
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm text-ink">{definition.label}</p>
-                  <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                    {definition.title}
-                  </p>
-                </div>
+                <RowText title={definition.label} label={definition.title} />
               </CardHeader>
 
               <CardBody>

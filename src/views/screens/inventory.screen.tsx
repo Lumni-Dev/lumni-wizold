@@ -24,6 +24,7 @@ import { IconFrame } from "../components/icon-frame";
 import { ItemCard } from "../components/item-card";
 import { FuryUseButton } from "../components/fury-use-button";
 import { ItemIcon } from "../components/item-icon";
+import { RowText } from "../components/list";
 import { Tag } from "../components/tag";
 import { Panel } from "../components/panel";
 import { EmptyState } from "../components/empty-state";
@@ -81,20 +82,16 @@ export function InventoryScreen() {
 
             return (
               <Card key={slot} height="fill" tone={item ? "highlighted" : "empty"}>
-                <CardHeader>
+                <CardHeader align="start">
                   {item ? (
                     <ItemIcon item={item} enhancement={piece?.enhancement ?? 0} />
                   ) : (
                     <IconFrame>--</IconFrame>
                   )}
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                      {SLOT_LABEL[slot]}
-                    </p>
-                    <p className="truncate text-xs text-ink">
-                      {item ? item.name : "Nada equipado"}
-                    </p>
-                  </div>
+                  <RowText
+                    label={SLOT_LABEL[slot]}
+                    title={item ? item.name : "Nada equipado"}
+                  />
                 </CardHeader>
 
                 {item ? (

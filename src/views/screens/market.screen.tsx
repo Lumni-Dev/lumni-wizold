@@ -24,7 +24,7 @@ import { ConfirmDialog } from "../components/confirm-dialog";
 import { QuantityField } from "../components/quantity-field";
 import { enhancedName } from "@/models/rules/forge";
 import { ItemCard } from "../components/item-card";
-import { List, ListRow } from "../components/list";
+import { List, ListRow, RowText } from "../components/list";
 import { ItemIcon } from "../components/item-icon";
 import { Panel } from "../components/panel";
 import { EmptyState } from "../components/empty-state";
@@ -235,19 +235,17 @@ export function MarketScreen() {
             >
               <List>
                 {sellablesOnPage.map(({ item, quantity, enhancement }) => (
-                  <ListRow key={item.id} layout="split">
-                    <div className="flex min-w-0 flex-1 items-center gap-3">
-                      <ItemIcon item={item} />
-                      <div className="min-w-0">
-                        <p className="truncate text-sm text-ink">
-                          {enhancedName(item.name, enhancement)}
-                        </p>
-                        <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                          {formatNumber(quantity)} em estoque - {formatBronze(sellOf(item))} cada
-                        </p>
-                      </div>
-                    </div>
-
+                  <ListRow key={item.id} padding="art">
+                    <ItemIcon item={item} enhancement={enhancement} />
+                    <RowText
+                      title={enhancedName(item.name, enhancement)}
+                      label={
+                        formatNumber(quantity) +
+                        " em estoque · " +
+                        formatBronze(sellOf(item)) +
+                        " cada"
+                      }
+                    />
                     <Button
                       variant="secondary"
                       onClick={() => {
