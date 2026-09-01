@@ -1677,7 +1677,7 @@ sec("personagem");
   ok("nasce no nível 1", run.character.level === 1);
   ok(
     "linhagem soma o bônus dela",
-    run.character.attributes.agility === 9 && run.character.attributes.strength === 4,
+    run.character.attributes.agility === 18 && run.character.attributes.strength === 4,
   );
   const state = baseState({ level: 10 });
 

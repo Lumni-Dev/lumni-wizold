@@ -17,16 +17,16 @@ export const GENDERS: readonly GenderDefinition[] = [
     label: "Lumni",
     title: "Herdeiro da Presa",
     description: "Linhagem que responde à lua com músculo e brutalidade direta.",
-    bonus: { strength: 5, endurance: 5, willpower: 5 },
-    bonusLabel: "+5 Força, +5 Resistência, +5 Vontade",
+    bonus: { strength: 14, endurance: 14, willpower: 14 },
+    bonusLabel: "+14 Força, +14 Resistência, +14 Vontade",
   },
   {
     key: "female",
     label: "Luna",
     title: "Herdeira da Lua",
     description: "Linhagem que responde à lua com precisão, faro e silêncio.",
-    bonus: { agility: 5, instinct: 5, willpower: 5 },
-    bonusLabel: "+5 Agilidade, +5 Instinto, +5 Vontade",
+    bonus: { agility: 14, instinct: 14, willpower: 14 },
+    bonusLabel: "+14 Agilidade, +14 Instinto, +14 Vontade",
   },
 ] as const;
 
