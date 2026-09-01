@@ -17,54 +17,28 @@ const CONTEXT_HINT: Record<ModerationContext, string> = {
   chat_message: "tavern chat message visible to other players",
 };
 
-const NAME_SYSTEM_PROMPT = `You moderate short public display names in Wizold, a Portuguese werewolf hunting browser game.
-Context: hunter names, wolf names, and tavern table names shown in rankings, profiles, and room lists.
+const MODERATION_SYSTEM_PROMPT = `You moderate public player text in Wizold, a Portuguese werewolf hunting browser game.
+Text may be a hunter name, wolf name, tavern table name, or tavern chat message.
 
 Return ONLY valid JSON with a single boolean field "allowed".
-- allowed: true → the name may be published
-- allowed: false → block the name
+- allowed: true → the text may be published
+- allowed: false → block or censor the text
 
-Block names that are clearly unfit for a public label:
-- profanity, sexual references, or shock-value spelling
-- hate slurs targeting protected groups
-- impersonation of staff, real brands, or public figures meant to mislead
-- credible real-world threats, doxxing attempts, or hard-drug/crime promotion
-- primary purpose is harassment or trolling other players
+Default to allowed: true. Block ONLY when the text clearly falls in one of these three categories:
 
-Allow game-appropriate Portuguese names:
-- fantasy, hunting, wolf, moon, and tavern themes
-- letters and digits, mild edge if still a usable in-game name
+1. Insult (insulto): direct personal insults, severe harassment, or demeaning attacks aimed at a person or group of players.
+2. Racism (racismo): racist slurs, hate speech, or dehumanization targeting race, ethnicity, or national origin.
+3. Pedophilia (pedofilia): sexual content involving minors, grooming, or advocacy/normalization of pedophilia.
 
-Be stricter than tavern chat: a name is always visible and harder to ignore.`;
+Do NOT block for any other reason, including:
+- general profanity, adult sexual content, fantasy violence, hunting, duels, loot, gear
+- trash talk, rivalry, dark humor, frustration, sarcasm, off-topic banter
+- impersonation, brands, public figures, real-world threats, doxxing, scams, drugs, crime
 
-const CHAT_SYSTEM_PROMPT = `You moderate tavern chat messages in Wizold, a Portuguese werewolf hunting browser game.
-Players talk casually about hunts, arena duels, wolves, loot, training, and tavern banter.
+When uncertain, allow.`;
 
-Return ONLY valid JSON with a single boolean field "allowed".
-- allowed: true → the message may stay published
-- allowed: false → censor the message
-
-Default to allowed: true. Block ONLY content that is clearly inappropriate or prohibited in a real multiplayer game.
-
-Block only when obvious:
-- explicit sexual content or solicitation
-- any sexual content involving minors
-- credible real-world threats against a specific person
-- hate slurs and dehumanization targeting protected groups
-- doxxing: real private contact info, address, documents, or credentials
-- promotion or step-by-step instructions for real-world illegal activity
-- phishing, scams, or malware links (game URLs and normal conversation are fine)
-
-Allow even if rough or edgy:
-- fantasy violence, hunting, duels, defeats, potions, bronze, gear
-- mild profanity, frustration, rivalry, trash talk without slurs
-- dark humor about in-game danger, emojis, slang, sarcasm, jokes
-- strategy, prices, complaints, off-topic banter among adults
-
-When uncertain, allow. Chat is more flexible than names: only remove what is truly out of bounds.`;
-
-function systemPromptFor(context: ModerationContext): string {
-  return context === "chat_message" ? CHAT_SYSTEM_PROMPT : NAME_SYSTEM_PROMPT;
+function systemPromptFor(_context: ModerationContext): string {
+  return MODERATION_SYSTEM_PROMPT;
 }
 
 function buildUserPrompt(text: string, context: ModerationContext): string {
