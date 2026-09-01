@@ -35,6 +35,7 @@ import type { TrainingReport } from "./training.controller";
 import * as automationController from "./automation.controller";
 import { ActivityEngine } from "./activity-engine";
 import { api, type ApiAnswer } from "./api.client";
+import { usePresenceHeartbeat } from "./use-presence-heartbeat";
 import { playSound, preloadSounds, setVoiceProfile } from "./sound";
 export interface Notice {
   id: number;
@@ -210,6 +211,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     preloadSounds();
   }, []);
+  usePresenceHeartbeat(authenticated && state.character !== null);
   const lineage = state.character?.gender ?? "male";
   useEffect(() => {
     setVoiceProfile(lineage);

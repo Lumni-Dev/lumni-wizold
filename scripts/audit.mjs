@@ -32,6 +32,7 @@ const forgeRules = load("models/rules/forge.js");
 const miningRules = load("models/rules/mining.js");
 const bazaarRules = load("models/rules/bazaar.js");
 const moon = load("models/rules/moon.js");
+const presenceRules = load("models/rules/presence.js");
 const storeRules = load("models/rules/store.js");
 const rankingRules = load("models/rules/ranking.js");
 const species = load("models/data/species.js");
@@ -1206,20 +1207,28 @@ sec("forja e mina");
     swing.ok && inventoryCtrl.countInInventory(swing.state.inventory, "bronze-fragment") >= 1,
   );
   ok("golpe avança a escada", swing.ok && swing.state.mining.progress === miningRules.miningEffort(1));
-  const deep = { ...miner, mining: { level: 40, progress: 0 } };
-  const bonusSwing = forgeCtrl.mine(deep, "bronze-vein", seededRandom(2));
-  const bonus = miningRules.miningYieldBonus(40);
-  ok(
-    "rendimento multiplica a cada 40 níveis",
-    miningRules.miningYieldBonus(20) === 1 &&
-      miningRules.miningYieldBonus(40) === 2 &&
-      miningRules.miningYieldBonus(80) === 3,
-  );
-  ok(
-    "golpe fundo rende no múltiplo do bônus",
-    bonusSwing.ok &&
-      inventoryCtrl.countInInventory(bonusSwing.state.inventory, "bronze-fragment") % bonus === 0,
-  );
+  const YIELD_TABLE = {
+    "bronze-vein": [1, 3],
+    "silver-vein": [3, 6],
+    "gold-vein": [6, 9],
+    "diamond-vein": [9, 12],
+    "lunar-vein": [12, 15],
+  };
+  for (const ore of ores) {
+    const [min, max] = YIELD_TABLE[ore.id];
+    ok(
+      "veia " + ore.id + " rende de " + min + " a " + max + " por mineração",
+      ore.minYield === min && ore.maxYield === max,
+    );
+  }
+  const deep = { ...miner, mining: { level: 400, progress: 0 } };
+  let deepInRange = true;
+  for (let seed = 1; seed <= 40; seed += 1) {
+    const deepSwing = forgeCtrl.mine(deep, "bronze-vein", seededRandom(seed));
+    const got = inventoryCtrl.countInInventory(deepSwing.state.inventory, "bronze-fragment");
+    if (!deepSwing.ok || got < 1 || got > 3) deepInRange = false;
+  }
+  ok("o nível da mineração não multiplica o rendimento da veia", deepInRange);
   const noon = 1_700_000_000_000;
   const period = miningRules.miningPeriodStart(noon);
   const fresh = { ...baseState({ level: 1 }), mining: { level: 1, progress: 0, count: 0 } };
@@ -2192,6 +2201,23 @@ sec("matilha");
   ok("nick sem dono recusa", typeof nobody === "string");
   const removed = packCtrl.removeMate(added.state, "mate-3");
   ok("excluir devolve a vaga", removed.ok && removed.state.pack.length === 0);
+  const fresh = new Date().toISOString();
+  ok(
+    "presença ativa recente fica verde",
+    presenceRules.resolvePresence("active", fresh) === "active",
+  );
+  ok(
+    "presença ausente recente fica vermelha",
+    presenceRules.resolvePresence("away", fresh) === "away",
+  );
+  ok(
+    "presença velha vira offline",
+    presenceRules.resolvePresence(
+      "active",
+      new Date(Date.now() - presenceRules.PRESENCE_STALE_MS - 1).toISOString(),
+    ) === "offline",
+  );
+  ok("offline explícito fica cinza", presenceRules.resolvePresence("offline", fresh) === "offline");
 }
 sec("imutabilidade");
 {

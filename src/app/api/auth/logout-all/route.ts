@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { withTransaction } from "@/models/repositories/server/database";
+import { clearPresenceForUser } from "@/models/repositories/server/presence.store";
 import { bad, refuseAbuse } from "../../_lib/api";
 import { dropSession, sessionClaims } from "../../_lib/session";
 
@@ -10,6 +11,7 @@ export async function POST(request: Request) {
   if (!claims) return bad("Entre para jogar.", 401);
   try {
     await withTransaction(async (client) => {
+      await clearPresenceForUser(client, claims.userId);
       await client.query("update users set session_epoch = session_epoch + 1 where id = $1", [
         claims.userId,
       ]);

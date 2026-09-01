@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useGame } from "@/controllers/game.context";
 import { isInPack, listPack } from "@/controllers/pack.controller";
+import { usePackPresence } from "@/controllers/use-pack-presence";
 import { playSound } from "@/controllers/sound";
 import { useTavern } from "@/controllers/use-tavern";
 import { MAX_PACK, type PackInvite, type PackMate } from "@/models/entities/pack";
@@ -43,6 +44,7 @@ import { EmptyState } from "../components/empty-state";
 import { FilteredEmptyState } from "../components/filtered-empty-state";
 import { Tooltip } from "../components/tooltip";
 import { PageHeader } from "../layout/page-header";
+import { PRESENCE_LABELS, PresenceDot } from "../components/presence-dot";
 
 const PAGE_SIZE = 6;
 
@@ -270,6 +272,10 @@ export function TavernScreen() {
   const closingRoom = rooms.find(({ room }) => room.id === closingRoomId) ?? null;
 
   const pack = listPack(state);
+  const packPresence = usePackPresence(
+    useMemo(() => pack.map((mate) => mate.id), [pack]),
+    Boolean(character),
+  );
 
   const profileHref = (memberId: string): string | null =>
     memberId === identity.id ? "/character" : "/ranking/" + memberId;
@@ -550,9 +556,16 @@ export function TavernScreen() {
               <List>
                 {pack.map((mate) => (
                   <ListRow key={mate.id}>
-                    <p className="min-w-0 flex-1 truncate text-sm text-ink">
-                      <MemberName href={profileHref(mate.id)} name={mate.name} />
-                    </p>
+                    <div className="flex min-w-0 flex-1 items-center gap-2">
+                      <Tooltip
+                        label={PRESENCE_LABELS[packPresence[mate.id] ?? "offline"]}
+                      >
+                        <PresenceDot status={packPresence[mate.id] ?? "offline"} />
+                      </Tooltip>
+                      <p className="min-w-0 flex-1 truncate text-sm text-ink">
+                        <MemberName href={profileHref(mate.id)} name={mate.name} />
+                      </p>
+                    </div>
 
                     <Tooltip label={"Falar com " + mate.name}>
                       <Button

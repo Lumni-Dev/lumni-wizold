@@ -1,0 +1,46 @@
+"use client";
+
+import { useEffect } from "react";
+import { api } from "./api.client";
+import { PRESENCE_HEARTBEAT_MS } from "@/models/rules/presence";
+
+function currentStatus(): "active" | "away" {
+  return document.visibilityState === "visible" ? "active" : "away";
+}
+
+export function usePresenceHeartbeat(enabled: boolean) {
+  useEffect(() => {
+    if (!enabled) return;
+
+    const ping = (status: "active" | "away") => {
+      void api("PATCH", "/api/presence", { status });
+    };
+
+    const sync = () => {
+      ping(currentStatus());
+    };
+
+    sync();
+    const timer = window.setInterval(sync, PRESENCE_HEARTBEAT_MS);
+
+    const onVisibility = () => {
+      sync();
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+
+    const offline = () => {
+      if (typeof navigator.sendBeacon === "function") {
+        navigator.sendBeacon("/api/presence/offline");
+        return;
+      }
+      void api("POST", "/api/presence/offline");
+    };
+    window.addEventListener("pagehide", offline);
+
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("pagehide", offline);
+    };
+  }, [enabled]);
+}
