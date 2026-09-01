@@ -61,8 +61,8 @@
         var(--color-base) 100%
       ),
       url("/assets/ui/background.jpg?v=2");
-    background-size: auto, 100% auto;
-    background-position: center top;
+    background-size: auto, cover;
+    background-position: center top, center top;
     background-repeat: no-repeat;
     filter: sepia(0.4) hue-rotate(-8deg) saturate(1.05);
   }
