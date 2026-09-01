@@ -5,6 +5,8 @@ import { findForgePiece } from "@/controllers/forge.controller";
 import { listTerritories, resolveHuntCreatureId } from "@/controllers/hunt.controller";
 import { listExercises } from "@/controllers/training.controller";
 import { loadHuntSelection } from "@/models/repositories/hunt-selection.repository";
+import type { Activity } from "@/models/entities/activity";
+import type { GameState } from "@/models/entities/game-state";
 import { findItem } from "@/models/data/items";
 import { TERRITORIES } from "@/models/data/territories";
 import { forgeDurationMs } from "@/models/rules/forge";
@@ -55,6 +57,33 @@ function dockOf(
     href: activityHref(kind),
     canStop,
   };
+}
+
+function pausedDock(state: GameState, activity: Activity): ActivityDockView {
+  const name =
+    activity.kind === "hunt" && activity.id
+      ? territoryName(activity.id)
+      : activity.kind === "mine" && activity.id
+        ? (findItem(activity.id)?.name ?? "Mina")
+        : activity.kind === "forge" && activity.id
+          ? (findForgePiece(state, activity.id, activity.enhancement ?? 0)?.item.name ?? "Peça")
+          : null;
+  const titles: Record<ActivityDockView["kind"], string> = {
+    hunt: "Caçada pausada",
+    train: "Treino pausado",
+    mine: "Mina pausada",
+    forge: "Forja pausada",
+    rest: "Recuperando-se",
+  };
+  const details: Record<ActivityDockView["kind"], string> = {
+    hunt: "Esperando vida ou poção para continuar",
+    train: "Esperando WCoins para continuar",
+    mine: "Esperando fôlego para voltar a minerar",
+    forge: "Esperando fragmentos e WCoins para a próxima martelada",
+    rest: "O corpo descansa.",
+  };
+  const prefix = name ? name + " · " : "";
+  return dockOf(activity.kind, prefix + titles[activity.kind], details[activity.kind], 0, 1, null, true);
 }
 
 export function ActivityEngine() {
@@ -162,7 +191,7 @@ export function ActivityEngine() {
         requesting = false;
         if (!fight) {
           setActivityRef.current(
-            autoRef.current.hunt && autoRef.current.potion
+            autoRef.current.hunt
               ? { kind: "hunt", id: activeHunt, paused: true }
               : null,
           );
@@ -567,7 +596,7 @@ export function ActivityEngine() {
         train: null,
         mine: null,
         forge: null,
-        dock: null,
+        dock: pausedDock(stateRef.current, activity),
       });
       return;
     }

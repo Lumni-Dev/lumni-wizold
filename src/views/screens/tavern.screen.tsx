@@ -262,6 +262,10 @@ export function TavernScreen() {
     return rooms.filter(({ room }) => room.name.toLowerCase().includes(query));
   }, [rooms, roomSearch]);
 
+  const pack = useMemo(() => listPack(state), [state]);
+  const packIds = useMemo(() => pack.map((mate) => mate.id), [pack]);
+  const packPresence = usePackPresence(packIds, Boolean(character));
+
   if (!character || !identity) return null;
 
   const ownRoom =
@@ -270,12 +274,6 @@ export function TavernScreen() {
   const openTables = rooms.filter(({ isPrivate }) => !isPrivate).length;
 
   const closingRoom = rooms.find(({ room }) => room.id === closingRoomId) ?? null;
-
-  const pack = listPack(state);
-  const packPresence = usePackPresence(
-    useMemo(() => pack.map((mate) => mate.id), [pack]),
-    Boolean(character),
-  );
 
   const profileHref = (memberId: string): string | null =>
     memberId === identity.id ? "/character" : "/ranking/" + memberId;

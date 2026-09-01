@@ -5,15 +5,15 @@ import type { PresenceStatus } from "@/models/entities/presence";
 import { PRESENCE_POLL_MS } from "@/models/rules/presence";
 import { api } from "./api.client";
 
+const NOBODY: Record<string, PresenceStatus> = {};
+
 export function usePackPresence(mateIds: string[], enabled: boolean) {
   const [presence, setPresence] = useState<Record<string, PresenceStatus>>({});
   const roster = mateIds.join(",");
+  const watching = enabled && mateIds.length > 0;
 
   useEffect(() => {
-    if (!enabled || mateIds.length === 0) {
-      setPresence({});
-      return;
-    }
+    if (!watching) return;
 
     let alive = true;
     const load = async () => {
@@ -39,7 +39,7 @@ export function usePackPresence(mateIds: string[], enabled: boolean) {
       window.clearInterval(timer);
       document.removeEventListener("visibilitychange", onVisible);
     };
-  }, [enabled, roster, mateIds.length]);
+  }, [watching, roster]);
 
-  return presence;
+  return watching ? presence : NOBODY;
 }

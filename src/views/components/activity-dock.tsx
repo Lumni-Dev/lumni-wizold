@@ -252,18 +252,22 @@ export function ActivityDock() {
   }, [activity, dock, dockVisible, setActivity]);
 
   if (!activity || !dock) return null;
-  if (activity.paused) return null;
   if (pathname === dock.href) return null;
 
-  const statusText =
-    huntView?.status ??
+  const paused = activity.paused === true;
+
+  const statusText = paused
+    ? dock.detail
+    : huntView?.status ??
     trainView?.status ??
     mineView?.status ??
     forgeView?.status ??
     restView?.status ??
     dock.detail;
 
-  const runningLabel = huntView
+  const runningLabel = paused
+    ? "Pausado"
+    : huntView
     ? "Caçando..."
     : trainView
       ? "Treinando..."
@@ -320,7 +324,13 @@ export function ActivityDock() {
         {minimized ? null : (
           <>
             <List>
-              {huntView ? (
+              {paused ? (
+                <ListRow layout="column">
+                  <p className="text-xs text-ink-faint">{dock.detail}</p>
+                </ListRow>
+              ) : null}
+
+              {!paused && huntView ? (
                 <>
                   <ListRow layout="column">
                     <Bar
@@ -380,7 +390,7 @@ export function ActivityDock() {
                 </>
               ) : null}
 
-              {trainView ? (
+              {!paused && trainView ? (
                 <>
                   <ListRow layout="column">
                     <Bar
@@ -406,7 +416,7 @@ export function ActivityDock() {
                 </>
               ) : null}
 
-              {mineView ? (
+              {!paused && mineView ? (
                 <>
                   <ListRow layout="column">
                     <Bar
@@ -432,7 +442,7 @@ export function ActivityDock() {
                 </>
               ) : null}
 
-              {forgeView ? (
+              {!paused && forgeView ? (
                 <>
                   {forgeView.fragment ? (
                     <ListRow layout="column">
@@ -461,7 +471,7 @@ export function ActivityDock() {
                 </>
               ) : null}
 
-              {restView ? (
+              {!paused && restView ? (
                 <ListRow layout="column">
                   <Bar
                     label={
@@ -477,7 +487,7 @@ export function ActivityDock() {
                 </ListRow>
               ) : null}
 
-              {!huntView && !trainView && !mineView && !forgeView && !restView ? (
+              {!paused && !huntView && !trainView && !mineView && !forgeView && !restView ? (
                 <ListRow layout="column">
                   <Bar
                     label={dock.cooldown !== null ? "Parar em " + dock.cooldown + "s" : dock.detail}

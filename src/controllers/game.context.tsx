@@ -153,10 +153,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [updateVersion, setUpdateVersion] = useState<string | null>(null);
   const noticeCounter = useRef(0);
   const ready = hydrated && booted;
-  const setActivity = useCallback((next: Activity | null) => {
-    activityRepository.save(next);
-    setActivityState(next);
-  }, []);
   const moon = useSyncExternalStore(
     moonRepository.subscribe,
     moonRepository.snapshot,
@@ -232,6 +228,18 @@ export function GameProvider({ children }: { children: ReactNode }) {
     appliedRef.current = seq;
     setState(next);
   }, []);
+  const setActivity = useCallback((next: Activity | null) => {
+    const prev = activityRef.current;
+    if (prev?.kind === "hunt" && (next?.kind !== "hunt" || next.id !== prev.id)) {
+      const held = heldHuntRef.current;
+      if (held) {
+        heldHuntRef.current = null;
+        applyState(held.state, held.seq);
+      }
+    }
+    activityRepository.save(next);
+    setActivityState(next);
+  }, [applyState]);
   const request = useCallback(
     async <T,>(
       method: "GET" | "POST" | "PATCH" | "PUT" | "DELETE",
