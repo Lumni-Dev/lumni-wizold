@@ -4,27 +4,21 @@ import { FURY } from "@/shared/constants/tuning/fury";
 const RAGE_TIERS = [
   {
     size: "small" as PotionSize,
-    ratio: 0.25,
-    hunts: 3,
+    price: 150,
     rarity: "common" as const,
     minLevel: 1,
-    price: 3,
   },
   {
     size: "medium" as PotionSize,
-    ratio: 0.5,
-    hunts: 6,
+    price: 450,
     rarity: "uncommon" as const,
     minLevel: 334,
-    price: 100,
   },
   {
     size: "large" as PotionSize,
-    ratio: 0.75,
-    hunts: 12,
+    price: 900,
     rarity: "rare" as const,
     minLevel: 667,
-    price: 480,
   },
 ];
 
@@ -84,7 +78,6 @@ export const POTIONS: readonly Item[] = [
     category: "potion" as const,
     rarity: tier.rarity,
     price: tier.price,
-    huntCost: tier.hunts,
     minLevel: tier.minLevel,
     stackable: true,
     inMarket: true,

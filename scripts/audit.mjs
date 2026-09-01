@@ -1479,6 +1479,14 @@ sec("inventário e mercado");
     marketCtrl.marketPriceOf(items.findItem("health-potion-large"), 100) === 300,
   );
   ok(
+    "poção de fúria pequena custa 150 WCoins",
+    marketCtrl.marketPriceOf(items.findItem("rage-potion-small"), 100) === 150,
+  );
+  ok(
+    "poção de fúria grande custa 900 WCoins",
+    marketCtrl.marketPriceOf(items.findItem("rage-potion-large"), 100) === 900,
+  );
+  ok(
     "ração custa uma caçada e meia",
     marketCtrl.marketPriceOf(items.findItem("pet-ration"), 100) ===
       Math.max(1, Math.round(species.huntPurse(100) * 1.5)),
