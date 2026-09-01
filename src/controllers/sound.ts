@@ -39,10 +39,14 @@ const SOURCES = {
   chat: "/assets/sounds/tavern/chat.mp3",
 } as const;
 export type GameSound = keyof typeof SOURCES;
-const VERSION = "?v=19";
+const VERSION = "?v=20";
 const VOICED: readonly GameSound[] = ["hit", "crit", "hurt"];
 const LINEAGE_VOICED: readonly GameSound[] = ["rest"];
+const PREVIEW_FLOOR = 0.4;
 let voice = { lineage: "male" as Gender };
+let spokeAt = 0;
+let unlocked = false;
+let unlockBound = false;
 export function setVoiceProfile(lineage: Gender): void {
   if (voice.lineage === lineage) return;
   voice = { lineage };
@@ -61,59 +65,76 @@ function elementOf(sound: GameSound): HTMLAudioElement {
   const cached = cache.get(source);
   if (cached) return cached;
   const audio = new Audio(source + VERSION);
+  audio.preload = "auto";
   cache.set(source, audio);
   return audio;
 }
 export function isGameSound(name: string): name is GameSound {
   return name in SOURCES;
 }
-export function preloadSounds(): void {
-  if (typeof window === "undefined") return;
-  for (const sound of Object.keys(SOURCES) as GameSound[]) {
-    elementOf(sound).preload = "auto";
+function bindAudioUnlock(): void {
+  if (typeof window === "undefined" || unlockBound) return;
+  unlockBound = true;
+  const unlock = () => {
+    void primeAudio();
+  };
+  document.addEventListener("pointerdown", unlock, { capture: true, passive: true });
+  document.addEventListener("keydown", unlock, { capture: true, passive: true });
+}
+async function primeAudio(): Promise<boolean> {
+  if (typeof window === "undefined" || !soundRepository.enabled()) return false;
+  if (unlocked) return true;
+  try {
+    const audio = elementOf("ui");
+    audio.volume = 0.001;
+    audio.currentTime = 0;
+    await audio.play();
+    audio.pause();
+    audio.currentTime = 0;
+    unlocked = true;
+    return true;
+  } catch {
+    return false;
   }
 }
-const PREVIEW_FLOOR = 0.4;
-let spokeAt = 0;
-
 function playbackVolume(): number {
   return soundRepository.volume();
 }
-
+function playLayer(sound: GameSound, level: number): void {
+  if (!soundRepository.enabled() || level <= 0) return;
+  spokeAt = Date.now();
+  const source = sourceOf(sound);
+  const layer = elementOf(sound).cloneNode(true) as HTMLAudioElement;
+  layer.volume = level;
+  void layer.play().catch(() => {
+    cache.delete(source);
+    unlocked = false;
+    bindAudioUnlock();
+  });
+}
+export function preloadSounds(): void {
+  if (typeof window === "undefined") return;
+  bindAudioUnlock();
+  for (const sound of Object.keys(SOURCES) as GameSound[]) {
+    elementOf(sound);
+  }
+}
 export function playSoundPreview(sound: GameSound): void {
   if (typeof window === "undefined" || !soundRepository.enabled()) return;
-  spokeAt = Date.now();
-  const level = Math.max(playbackVolume(), PREVIEW_FLOOR);
-  const audio = elementOf(sound);
-  const layer = audio.cloneNode(true) as HTMLAudioElement;
-  layer.volume = level;
-  void layer.play().catch(() => {});
+  void primeAudio();
+  playLayer(sound, Math.max(playbackVolume(), PREVIEW_FLOOR));
 }
-
 export function playSound(sound: GameSound, delayMs = 0): void {
   if (typeof window === "undefined" || !soundRepository.enabled()) return;
-  const fire = () => {
-    if (!soundRepository.enabled()) return;
-    spokeAt = Date.now();
-    const level = playbackVolume();
-    const audio = elementOf(sound);
-    if (!audio.paused && !audio.ended) {
-      const layer = audio.cloneNode(true) as HTMLAudioElement;
-      layer.volume = level;
-      void layer.play().catch(() => {});
-      return;
-    }
-    audio.volume = level;
-    audio.currentTime = 0;
-    void audio.play().catch(() => {});
-  };
+  const fire = () => playLayer(sound, playbackVolume());
   if (delayMs > 0) window.setTimeout(fire, delayMs);
   else fire();
 }
 export function playClick(): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || !soundRepository.enabled()) return;
+  void primeAudio();
   const at = Date.now();
   window.setTimeout(() => {
-    if (spokeAt < at) playSound("ui");
+    if (spokeAt < at) playLayer("ui", playbackVolume());
   }, 0);
 }

@@ -121,6 +121,7 @@ export function SettingsScreen() {
 
   function chooseSound(on: boolean) {
     soundRepository.setEnabled(on);
+    if (on && soundRepository.volume() <= 0) soundRepository.setVolume(1);
     if (on) playSoundPreview("ui");
   }
 
