@@ -33,7 +33,8 @@ import { ConfirmDialog } from "../components/confirm-dialog";
 import { Field } from "../components/field";
 import { ItemIcon } from "../components/item-icon";
 import { PetBanner, PetIcon } from "../components/pet-icon";
-import { List, ListRow, RowText } from "../components/list";
+import { List, ListRow } from "../components/list";
+import { SupplyRow } from "../components/supply-row";
 import { Panel } from "../components/panel";
 import { RecoveryButton } from "../components/recovery-button";
 import { DataRow } from "../components/data-row";
@@ -311,21 +312,17 @@ export function PetScreen() {
             ) : (
               <List>
                 {supplies.map(({ item, quantity }) => (
-                  <ListRow key={item.id} padding="art">
-                    <ItemIcon item={item} />
-                    <RowText
-                      title={item.name}
-                      description={"+" + formatNumber(petRationOf(item, pet)) + " de energia"}
-                    />
-                    <span className="flex shrink-0 items-center gap-3">
-                      <span className="font-mono text-xs text-ink-soft">
-                        x{formatNumber(quantity)}
-                      </span>
+                  <SupplyRow
+                    key={item.id}
+                    item={item}
+                    quantity={quantity}
+                    description={"+" + formatNumber(petRationOf(item, pet)) + " de energia"}
+                    action={
                       <Button variant="primary" onClick={() => feedPet(item.id)}>
                         Alimentar
                       </Button>
-                    </span>
-                  </ListRow>
+                    }
+                  />
                 ))}
               </List>
             )}

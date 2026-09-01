@@ -11,8 +11,9 @@ export function Footer() {
       <div className="mx-auto w-full max-w-5xl p-4 md:px-8 md:py-8">
         <div className="grid gap-8 sm:grid-cols-[2fr_1fr]">
           <div className="max-w-md space-y-3">
-            <div>
-              <p className="heading text-[11px] text-ink">{GAME_NAME}</p>
+            <div className="flex items-center gap-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/icon.png" alt={GAME_NAME} className="h-8 w-8 shrink-0 rounded-md" />
               <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                 {GAME_TAGLINE}
               </p>

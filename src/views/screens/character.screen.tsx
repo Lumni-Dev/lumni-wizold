@@ -18,10 +18,10 @@ import { Tag } from "../components/tag";
 import { DataRow } from "../components/data-row";
 import { EmptyState } from "../components/empty-state";
 import { GenderSheetHeader } from "../components/gender-icon";
-import { ItemIcon } from "../components/item-icon";
 import { VitalActionButton } from "../components/vital-action-button";
 import { FuryUseButton } from "../components/fury-use-button";
-import { List, ListRow, RowText } from "../components/list";
+import { List, ListRow } from "../components/list";
+import { SupplyRow } from "../components/supply-row";
 import { Panel } from "../components/panel";
 import { AttributesPanel } from "../components/attributes-panel";
 import { EquipmentPanel } from "../components/equipment-panel";
@@ -181,25 +181,25 @@ export function CharacterScreen() {
             ) : (
               <List>
                 {healthPotions.map(({ item, quantity }) => (
-                  <ListRow key={item.id} padding="art">
-                    <ItemIcon item={item} />
-                    <RowText
-                      title={item.name}
-                      description={
-                        "Recupera " +
-                        Math.round((item.effect.healthRatio ?? 0) * 100) +
-                        "% da vida máxima"
-                      }
-                    />
-                    <span className="flex shrink-0 items-center gap-3">
-                      <span className="font-mono text-xs text-ink-soft">
-                        x{formatNumber(quantity)}
-                      </span>
-                      <Button variant="primary" disabled={healthFull} onClick={() => consumeItem(item.id)}>
+                  <SupplyRow
+                    key={item.id}
+                    item={item}
+                    quantity={quantity}
+                    description={
+                      "Recupera " +
+                      Math.round((item.effect.healthRatio ?? 0) * 100) +
+                      "% da vida máxima"
+                    }
+                    action={
+                      <Button
+                        variant="primary"
+                        disabled={healthFull}
+                        onClick={() => consumeItem(item.id)}
+                      >
                         Beber
                       </Button>
-                    </span>
-                  </ListRow>
+                    }
+                  />
                 ))}
               </List>
             )}
@@ -220,25 +220,19 @@ export function CharacterScreen() {
             ) : (
               <List>
                 {furyPotions.map(({ item, quantity }) => (
-                  <ListRow key={item.id} padding="art">
-                    <ItemIcon item={item} />
-                    <RowText
-                      title={item.name}
-                      description={
-                        "+" +
-                        formatNumber(FURY.attributeBonus) +
-                        " em cada atributo por " +
-                        formatNumber(item.effect.furyMinutes ?? 0) +
-                        " min"
-                      }
-                    />
-                    <span className="flex shrink-0 items-center gap-3">
-                      <span className="font-mono text-xs text-ink-soft">
-                        x{formatNumber(quantity)}
-                      </span>
-                      <FuryUseButton onClick={() => consumeItem(item.id)} />
-                    </span>
-                  </ListRow>
+                  <SupplyRow
+                    key={item.id}
+                    item={item}
+                    quantity={quantity}
+                    description={
+                      "+" +
+                      formatNumber(FURY.attributeBonus) +
+                      " em cada atributo por " +
+                      formatNumber(item.effect.furyMinutes ?? 0) +
+                      " min"
+                    }
+                    action={<FuryUseButton onClick={() => consumeItem(item.id)} />}
+                  />
                 ))}
               </List>
             )}

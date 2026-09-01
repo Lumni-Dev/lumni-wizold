@@ -42,12 +42,12 @@ export function Panel({
         )}
       >
         {title ? (
-          <header className="flex items-center justify-between gap-3 border-b border-edge bg-surface-high/40 px-4 py-3">
-            <div className="space-y-1">
+          <header className="flex items-start justify-between gap-3 border-b border-edge bg-surface-high/40 px-4 py-3">
+            <div className="min-w-0 space-y-1">
               <h2 className="heading text-[11px] text-ink">{title}</h2>
               {description ? <p className="text-xs text-ink-faint">{description}</p> : null}
             </div>
-            {action ? <div className="shrink-0">{action}</div> : null}
+            {action ? <div className="shrink-0 pt-0.5">{action}</div> : null}
           </header>
         ) : null}
         <div className={cn(padding === "normal" && "p-4", height === "fill" && "flex-1")}>

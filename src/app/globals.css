@@ -291,26 +291,20 @@ button:not(:disabled) {
 .fury-spin-border::before {
   content: "";
   position: absolute;
-  inset: 0;
-  z-index: 2;
-  border-radius: inherit;
-  padding: 1px;
+  z-index: 0;
+  top: 50%;
+  left: 50%;
+  width: 150%;
+  height: 150%;
+  transform: translate(-50%, -50%);
   background: conic-gradient(
     from 0deg,
     var(--color-ember) 0deg,
-    color-mix(in oklab, var(--color-ember) 45%, var(--color-edge)) 55deg,
-    var(--color-edge) 110deg,
-    var(--color-edge) 360deg
+    color-mix(in oklab, var(--color-ember) 45%, var(--color-edge)) 90deg,
+    var(--color-edge) 180deg,
+    var(--color-edge) 270deg,
+    var(--color-ember) 360deg
   );
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  mask-composite: exclude;
-  transform-origin: center;
   animation: fury-border-spin 2.4s linear infinite;
   pointer-events: none;
 }
@@ -319,7 +313,8 @@ button:not(:disabled) {
   position: relative;
   z-index: 1;
   display: block;
-  border-radius: inherit;
+  margin: 1px;
+  border-radius: calc(0.375rem - 1px);
 }
 
 .landing-hero-shadow-text {

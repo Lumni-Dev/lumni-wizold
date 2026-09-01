@@ -36,8 +36,8 @@ export function FuryModeTracker() {
   const clock = furyClock(remaining);
 
   return (
-    <SpinBorder className="block w-full rounded-md">
-      <div className="relative flex w-full items-stretch overflow-hidden rounded-[inherit] bg-surface/70">
+    <SpinBorder className="block w-full rounded-md" innerClassName="bg-surface/70">
+      <div className="flex w-full items-stretch overflow-hidden rounded-[inherit]">
         <span className="flex w-8 shrink-0 items-center justify-center self-stretch border-r border-edge">
           <Flame aria-hidden strokeWidth={1.75} className="h-4 w-4 text-ember" />
         </span>
