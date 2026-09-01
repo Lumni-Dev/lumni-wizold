@@ -18,10 +18,11 @@ import {
   TRAINING_TICKS,
 } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
-import { ActionIcon, NavIcon } from "./app-icon";
+import { NavIcon } from "./app-icon";
 import { Bar } from "./bar";
 import { Button } from "./button";
 import { CornerAccents } from "./corner-accents";
+import { List, ListRow } from "./list";
 import { emphasizeDamage } from "../presenters/hunt.presenter";
 import { useShake } from "./use-shake";
 
@@ -232,6 +233,33 @@ export function ActivityDock() {
   if (!activity || !dock) return null;
   if (pathname === dock.href) return null;
 
+  const statusText =
+    huntView?.status ??
+    trainView?.status ??
+    mineView?.status ??
+    forgeView?.status ??
+    restView?.status ??
+    dock.detail;
+
+  const runningLabel = huntView
+    ? "Caçando..."
+    : trainView
+      ? "Treinando..."
+      : mineView
+        ? "Minerando..."
+        : forgeView
+          ? "Forjando..."
+          : restView
+            ? "Recuperando-se..."
+            : dock.detail;
+
+  const stopLabel =
+    dock.canStop && dock.cooldown !== null
+      ? "Parar (" + dock.cooldown + ")"
+      : dock.canStop
+        ? "Parar"
+        : runningLabel;
+
   return (
     <aside aria-label="Atividade em andamento" className="pointer-events-auto relative w-full">
       <div
@@ -248,135 +276,144 @@ export function ActivityDock() {
           >
             {dock.title}
           </Link>
-          {dock.canStop ? (
-            <Button icon variant="ghost" aria-label="Parar atividade" onClick={() => setActivity(null)}>
-              <ActionIcon action="stop" />
-            </Button>
-          ) : null}
         </div>
 
-        <div className="space-y-3 p-3">
+        <List>
           {huntView ? (
             <>
-              <Bar
-                label={huntView.preyLabel}
-                current={huntView.preyCurrent}
-                maximum={huntView.preyMax}
-                tone="blood"
-              />
-              <Bar
-                label={
-                  huntView.cooldown !== null
-                    ? "Parar em " + huntView.cooldown + "s"
-                    : huntView.huntLabel
-                }
-                current={huntView.huntCurrent}
-                maximum={huntView.huntMax}
-                tone="blood"
-                glows={huntView.glows && huntView.cooldown === null}
-                wraps
-              />
+              <ListRow layout="column">
+                <Bar
+                  label={huntView.preyLabel}
+                  current={huntView.preyCurrent}
+                  maximum={huntView.preyMax}
+                  tone="blood"
+                />
+              </ListRow>
+              <ListRow layout="column">
+                <Bar
+                  label={
+                    huntView.cooldown !== null
+                      ? "Parar em " + huntView.cooldown + "s"
+                      : huntView.huntLabel
+                  }
+                  current={huntView.huntCurrent}
+                  maximum={huntView.huntMax}
+                  tone="blood"
+                  glows={huntView.glows && huntView.cooldown === null}
+                  wraps
+                />
+              </ListRow>
               {huntView.line ? (
-                <p
-                  className={cn(
-                    "truncate font-mono text-[11px]",
-                    huntView.line.critical ? "text-ember" : "text-ink-faint",
-                  )}
-                >
-                  {emphasizeDamage(huntView.line.text).map((part, index) =>
-                    typeof part === "string" ? (
-                      part
-                    ) : (
-                      <strong
-                        key={index}
-                        className={cn("font-bold", !huntView.line?.critical && "text-ink")}
-                      >
-                        {part.damage}
-                      </strong>
-                    ),
-                  )}
-                </p>
+                <ListRow layout="column">
+                  <p
+                    className={cn(
+                      "truncate font-mono text-[11px]",
+                      huntView.line.critical ? "text-ember" : "text-ink-faint",
+                    )}
+                  >
+                    {emphasizeDamage(huntView.line.text).map((part, index) =>
+                      typeof part === "string" ? (
+                        part
+                      ) : (
+                        <strong
+                          key={index}
+                          className={cn("font-bold", !huntView.line?.critical && "text-ink")}
+                        >
+                          {part.damage}
+                        </strong>
+                      ),
+                    )}
+                  </p>
+                </ListRow>
               ) : null}
-              <p className="truncate text-[11px] text-ink-faint">{huntView.status}</p>
             </>
           ) : null}
 
           {trainView ? (
             <>
-              <Bar
-                label={trainView.progressLabel}
-                current={trainView.progressCurrent}
-                maximum={trainView.progressMax}
-                wraps
-              />
-              <Bar
-                label={
-                  trainView.cooldown !== null
-                    ? "Parar em " + trainView.cooldown + "s"
-                    : trainView.sessionLabel
-                }
-                current={trainView.sessionCurrent}
-                maximum={trainView.sessionMax}
-                tone="vigor"
-                glows={trainView.glows && trainView.cooldown === null}
-                wraps
-              />
-              <p className="truncate text-[11px] text-ink-faint">{trainView.status}</p>
+              <ListRow layout="column">
+                <Bar
+                  label={trainView.progressLabel}
+                  current={trainView.progressCurrent}
+                  maximum={trainView.progressMax}
+                  wraps
+                />
+              </ListRow>
+              <ListRow layout="column">
+                <Bar
+                  label={
+                    trainView.cooldown !== null
+                      ? "Parar em " + trainView.cooldown + "s"
+                      : trainView.sessionLabel
+                  }
+                  current={trainView.sessionCurrent}
+                  maximum={trainView.sessionMax}
+                  tone="vigor"
+                  glows={trainView.glows && trainView.cooldown === null}
+                  wraps
+                />
+              </ListRow>
             </>
           ) : null}
 
           {mineView ? (
             <>
-              <Bar
-                label={mineView.dailyLabel}
-                tone="tide"
-                current={mineView.dailyCurrent}
-                maximum={mineView.dailyMax}
-              />
-              <Bar
-                label={
-                  mineView.cooldown !== null
-                    ? "Parar em " + mineView.cooldown + "s"
-                    : mineView.swingLabel
-                }
-                current={mineView.swingCurrent}
-                maximum={mineView.swingMax}
-                tone="tide"
-                glows={mineView.glows && mineView.cooldown === null}
-                wraps
-              />
-              <p className="truncate text-[11px] text-ink-faint">{mineView.status}</p>
+              <ListRow layout="column">
+                <Bar
+                  label={mineView.dailyLabel}
+                  tone="tide"
+                  current={mineView.dailyCurrent}
+                  maximum={mineView.dailyMax}
+                />
+              </ListRow>
+              <ListRow layout="column">
+                <Bar
+                  label={
+                    mineView.cooldown !== null
+                      ? "Parar em " + mineView.cooldown + "s"
+                      : mineView.swingLabel
+                  }
+                  current={mineView.swingCurrent}
+                  maximum={mineView.swingMax}
+                  tone="tide"
+                  glows={mineView.glows && mineView.cooldown === null}
+                  wraps
+                />
+              </ListRow>
             </>
           ) : null}
 
           {forgeView ? (
             <>
               {forgeView.fragment ? (
-                <Bar
-                  label={forgeView.fragment.label}
-                  tone="ember"
-                  current={forgeView.fragment.current}
-                  maximum={forgeView.fragment.maximum}
-                />
+                <ListRow layout="column">
+                  <Bar
+                    label={forgeView.fragment.label}
+                    tone="ember"
+                    current={forgeView.fragment.current}
+                    maximum={forgeView.fragment.maximum}
+                  />
+                </ListRow>
               ) : null}
-              <Bar
-                label={
-                  forgeView.cooldown !== null
-                    ? "Parar em " + forgeView.cooldown + "s"
-                    : forgeView.strikeLabel
-                }
-                current={forgeView.strikeCurrent}
-                maximum={forgeView.strikeMax}
-                tone="ember"
-                glows={forgeView.glows && forgeView.cooldown === null}
-                wraps
-              />
-              <p className="truncate text-[11px] text-ink-faint">{forgeView.status}</p>
+              <ListRow layout="column">
+                <Bar
+                  label={
+                    forgeView.cooldown !== null
+                      ? "Parar em " + forgeView.cooldown + "s"
+                      : forgeView.strikeLabel
+                  }
+                  current={forgeView.strikeCurrent}
+                  maximum={forgeView.strikeMax}
+                  tone="ember"
+                  glows={forgeView.glows && forgeView.cooldown === null}
+                  wraps
+                />
+              </ListRow>
             </>
           ) : null}
 
           {restView ? (
-            <>
+            <ListRow layout="column">
               <Bar
                 label={restView.healthLabel}
                 current={restView.healthCurrent}
@@ -384,20 +421,33 @@ export function ActivityDock() {
                 tone="blood"
                 glows={restView.glows}
               />
-              <p className="truncate text-[11px] text-ink-faint">{restView.status}</p>
-            </>
+            </ListRow>
           ) : null}
 
           {!huntView && !trainView && !mineView && !forgeView && !restView ? (
-            <Bar
-              label={dock.cooldown !== null ? "Parar em " + dock.cooldown + "s" : dock.detail}
-              current={dock.beat}
-              maximum={dock.max}
-              tone={dock.tone}
-              glows={dock.cooldown === null && dock.beat > 0}
-              wraps
-            />
+            <ListRow layout="column">
+              <Bar
+                label={dock.cooldown !== null ? "Parar em " + dock.cooldown + "s" : dock.detail}
+                current={dock.beat}
+                maximum={dock.max}
+                tone={dock.tone}
+                glows={dock.cooldown === null && dock.beat > 0}
+                wraps
+              />
+            </ListRow>
           ) : null}
+        </List>
+
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-edge px-4 py-3">
+          <span className="min-w-0 flex-1 truncate text-[11px] text-ink-faint">{statusText}</span>
+          <Button
+            variant={dock.canStop ? "secondary" : "outline"}
+            disabled={!dock.canStop}
+            onClick={() => setActivity(null)}
+            aria-label={dock.canStop ? "Parar atividade" : runningLabel}
+          >
+            {stopLabel}
+          </Button>
         </div>
       </div>
       <CornerAccents />
