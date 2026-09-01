@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { preload } from "react-dom";
 import { useGame } from "@/controllers/game.context";
@@ -12,24 +11,10 @@ import { ActionIcon } from "../components/app-icon";
 import { CornerAccents } from "../components/corner-accents";
 import { GenderBanner } from "../components/gender-icon";
 import { PreviewGallery } from "../components/preview-gallery";
-import { SpinBorder } from "../components/spin-border";
+import { LandingCtaButton } from "../components/landing-cta-button";
 import { Footer } from "../layout/footer";
 
-const PLAY_INNER =
-  "flex h-12 w-full items-center justify-center px-8 text-xs font-medium uppercase tracking-[0.16em] text-ember bg-surface/70 transition-colors hover:bg-surface-high/80";
-
-function PlayButton({ href, label }: { href: string; label: string }) {
-  return (
-    <SpinBorder
-      as={Link}
-      href={href}
-      className="landing-hero-shadow-button block w-full max-w-xs rounded-md transition-[filter] hover:brightness-110"
-      innerClassName={PLAY_INNER}
-    >
-      {label}
-    </SpinBorder>
-  );
-}
+const INTRO_VIDEO = "/assets/ui/backvideo.mp4?v=3";
 
 function useNarration() {
   const audio = useRef<HTMLAudioElement | null>(null);
@@ -75,8 +60,6 @@ function NarrationButton({ playing, onClick }: { playing: boolean; onClick: () =
     </button>
   );
 }
-
-const INTRO_VIDEO = "/assets/ui/backvideo.mp4?v=3";
 
 export function LandingScreen() {
   const { ready, character } = useGame();
@@ -184,9 +167,9 @@ export function LandingScreen() {
 
         <div className="flex flex-col items-center gap-4">
           {hasRun ? (
-            <PlayButton href="/character" label={"Continuar com " + character.name} />
+            <LandingCtaButton href="/character" label={"Continuar com " + character.name} />
           ) : (
-            <PlayButton href="/login" label="Jogar grátis" />
+            <LandingCtaButton href="/login" label="Jogar grátis" />
           )}
         </div>
         </div>
@@ -281,7 +264,7 @@ export function LandingScreen() {
             Escolha um nome, escolha uma linhagem e desça. A primeira noite é a mais barata que você
             vai ter.
           </p>
-          <PlayButton
+          <LandingCtaButton
             href={hasRun ? "/character" : "/login"}
             label={hasRun ? "Voltar para a caçada" : "Jogar grátis"}
           />

@@ -1,11 +1,12 @@
 import type { ReactNode } from "react";
+import { GLASS_CONTROL_ACTIVE } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 
 type TagTone = "neutral" | "light" | "faint";
 
 const TONES: Record<TagTone, string> = {
-  neutral: "border-edge-strong bg-surface-high text-ink-soft",
-  light: "border-edge-strong bg-surface-top text-ink",
+  neutral: "border-edge-strong " + GLASS_CONTROL_ACTIVE + " text-ink-soft",
+  light: "border-edge-strong bg-surface-top/50 backdrop-blur text-ink",
   faint: "border-edge bg-transparent text-ink-faint",
 };
 

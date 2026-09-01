@@ -2,7 +2,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { playClick } from "@/controllers/sound";
-import { CONTROL_HEIGHT } from "@/shared/constants/ui";
+import { CONTROL_HEIGHT, GLASS_CONTROL, GLASS_CONTROL_ACTIVE, GLASS_SECTION } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { ChipFrame } from "./chip";
 
@@ -11,8 +11,8 @@ function selectTriggerClass(active: boolean, className?: string): string {
     "inline-flex " + CONTROL_HEIGHT + " shrink-0 items-center rounded-md border px-3",
     "text-[10px] uppercase tracking-[0.16em] transition-colors",
     active
-      ? "border-edge bg-surface-high text-ink"
-      : "border-edge bg-surface text-ink-soft hover:border-edge-strong hover:bg-surface-high hover:text-ink",
+      ? "border-edge " + GLASS_CONTROL_ACTIVE + " text-ink"
+      : "border-edge " + GLASS_CONTROL + " text-ink-soft hover:border-edge-strong hover:bg-surface-high/50 hover:text-ink",
     className,
   );
 }
@@ -208,7 +208,7 @@ export function Select({
             role="listbox"
             className={cn(
               "absolute inset-x-0 top-full z-40 mt-1 max-h-56 overflow-y-auto rounded-md",
-              "border border-edge bg-surface-high py-1",
+              "border border-edge " + GLASS_SECTION + " py-1",
               "shadow-[0_24px_60px_-20px_rgba(0,0,0,0.95)]",
             )}
           >
@@ -226,8 +226,8 @@ export function Select({
                   "flex " + CONTROL_HEIGHT + " cursor-pointer items-center px-4",
                   "text-[10px] uppercase tracking-[0.16em] transition-colors",
                   index === highlighted || option.value === value
-                    ? "bg-surface-high text-ink"
-                    : "text-ink-soft hover:bg-surface-high hover:text-ink",
+                    ? GLASS_CONTROL_ACTIVE + " text-ink"
+                    : "text-ink-soft hover:bg-surface-high/50 hover:text-ink",
                 )}
               >
                 {option.label}

@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useGame } from "@/controllers/game.context";
+import { playClick } from "@/controllers/sound";
 import { furyRemainingMs, isFullMoon } from "@/models/rules/moon";
-import { Button } from "./button";
+import { cn } from "@/shared/utils/class-names";
+import { FuryRingFrame } from "./fury-ring-frame";
 
 function furyClock(ms: number): string {
   const total = Math.max(0, Math.ceil(ms / 1000));
@@ -33,12 +35,29 @@ export function FuryUseButton({ onClick }: { onClick: () => void }) {
       : "Beber";
 
   return (
-    <Button
-      variant={furyActive ? "secondary" : "primary"}
+    <FuryRingFrame
+      as="button"
+      type="button"
       disabled={furyActive}
-      onClick={onClick}
+      aria-disabled={furyActive}
+      onClick={() => {
+        if (furyActive) return;
+        playClick();
+        onClick();
+      }}
+      className={cn(
+        "inline-block rounded-md border-0 bg-transparent p-0 font-[inherit] text-left",
+        furyActive && "cursor-default",
+      )}
+      fillClassName={cn(
+        "flex h-8 items-center justify-center px-3 text-[11px] font-medium uppercase tracking-[0.16em]",
+        "transition-[filter] duration-150",
+        furyActive
+          ? "bg-surface-high text-ink"
+          : "bg-ember text-base hover:brightness-110",
+      )}
     >
       {label}
-    </Button>
+    </FuryRingFrame>
   );
 }

@@ -4,7 +4,7 @@ import { Flame } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useGame } from "@/controllers/game.context";
 import { furyRemainingMs } from "@/models/rules/moon";
-import { SpinBorder } from "./spin-border";
+import { FuryRingFrame } from "./fury-ring-frame";
 
 function furyClock(ms: number): string {
   const total = Math.max(0, Math.ceil(ms / 1000));
@@ -36,8 +36,8 @@ export function FuryModeTracker() {
   const clock = furyClock(remaining);
 
   return (
-    <SpinBorder className="block w-full rounded-md" innerClassName="bg-surface/70">
-      <div className="flex w-full items-stretch overflow-hidden rounded-[inherit]">
+    <FuryRingFrame className="block w-full rounded-md" fillClassName="bg-surface/70">
+      <div className="flex w-full items-stretch overflow-hidden rounded-[calc(0.375rem-1px)]">
         <span className="flex w-8 shrink-0 items-center justify-center self-stretch border-r border-edge">
           <Flame aria-hidden strokeWidth={1.75} className="h-4 w-4 text-ember" />
         </span>
@@ -46,6 +46,6 @@ export function FuryModeTracker() {
           <p className="font-mono text-[11px] text-ember">{clock}</p>
         </div>
       </div>
-    </SpinBorder>
+    </FuryRingFrame>
   );
 }

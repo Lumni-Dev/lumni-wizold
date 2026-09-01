@@ -43,12 +43,12 @@ export function AttributesPanel({
           ];
 
           return (
-            <ListRow key={definition.key} layout="column" padding="art">
-              <div className="flex min-w-0 items-start gap-3">
-                <AttributeIcon attribute={definition.key} />
+            <ListRow key={definition.key} layout="column" padding="art" align="start">
+              <div className="flex w-full min-w-0 items-start gap-3">
+                <AttributeIcon attribute={definition.key} size="medium" />
                 <RowText title={definition.name} description={definition.description} />
               </div>
-              <div className="grid w-full grid-cols-4 divide-x divide-y divide-edge sm:grid-cols-7 sm:divide-y-0 overflow-hidden rounded-md border border-edge">
+              <div className="grid w-full grid-cols-4 divide-x divide-y divide-edge overflow-hidden rounded-md border border-edge sm:grid-cols-7 sm:divide-y-0">
                 {cells.map((cell) => (
                   <div
                     key={cell.label}

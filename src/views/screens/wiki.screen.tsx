@@ -22,6 +22,7 @@ import {
 } from "@/models/entities/item";
 import type { SetDefinition } from "@/models/data/equipment";
 import type { Creature } from "@/models/entities/creature";
+import { isForgeMaterial } from "@/models/rules/bazaar";
 import { DANGER_LABEL } from "@/models/entities/territory";
 import { formatNumber, formatBronze } from "@/shared/utils/format";
 import { Tag } from "../components/tag";
@@ -44,6 +45,7 @@ const SECTIONS: readonly { id: string; label: string }[] = [
   { id: "territories", label: "Territórios" },
   { id: "equipamentos", label: "Equipamentos" },
   { id: "bestiary", label: "Bestiário" },
+  { id: "fragmentos", label: "Fragmentos" },
   { id: "itens", label: "Itens" },
   { id: "pocoes", label: "Poções" },
 ];
@@ -68,7 +70,12 @@ function itemsOfCategory(category: ItemCategory): Item[] {
   return ITEMS.filter((item) => item.category === category);
 }
 
-const WIKI_ITEMS: readonly Item[] = [...itemsOfCategory("material"), ...itemsOfCategory("pet")];
+const WIKI_FRAGMENTS: readonly Item[] = itemsOfCategory("material").filter(isForgeMaterial);
+
+const WIKI_ITEMS: readonly Item[] = [
+  ...itemsOfCategory("material").filter((item) => !isForgeMaterial(item)),
+  ...itemsOfCategory("pet"),
+];
 
 const WIKI_POTIONS: readonly Item[] = itemsOfCategory("potion");
 
@@ -279,6 +286,26 @@ export function WikiScreen() {
                 <span className="shrink-0 self-start font-mono text-[11px] text-ink-faint">
                   NV. {formatNumber(creature.level)}
                 </span>
+              </ListRow>
+            ))
+          }
+        </WikiPaginatedPanel>
+
+        <WikiPaginatedPanel
+          id="fragmentos"
+          title="Fragmentos"
+          description={
+            WIKI_FRAGMENTS.length +
+            " lascas da mina, uma por conjunto. Só alimentam a forja; não caem na caça nem entram no mercado."
+          }
+          items={WIKI_FRAGMENTS}
+        >
+          {(pageItems) =>
+            pageItems.map((item) => (
+              <ListRow key={item.id} padding="art">
+                <ItemIcon item={item} />
+                <RowText title={item.name} description={wikiItemDescription(item)} />
+                <span className="shrink-0 font-mono text-[11px] text-ink-faint">mina</span>
               </ListRow>
             ))
           }

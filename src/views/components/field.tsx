@@ -28,9 +28,8 @@ export function Field({
       <input
         className={cn(
           CONTROL_HEIGHT + " w-full rounded-md px-3 text-xs text-ink",
-          loose
-            ? LOOSE_CONTROL_SURFACE + " placeholder:text-ink-faint focus:border-edge-strong focus:outline-none"
-            : "border border-edge bg-surface transition-colors placeholder:text-ink-faint focus:border-edge-strong focus:outline-none",
+          LOOSE_CONTROL_SURFACE +
+            " placeholder:text-ink-faint focus:border-edge-strong focus:outline-none",
           className,
         )}
         {...rest}

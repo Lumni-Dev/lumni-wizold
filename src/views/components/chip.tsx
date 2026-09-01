@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes, MouseEvent, ReactNode } from "react";
 import { playClick } from "@/controllers/sound";
-import { CONTROL_HEIGHT, LOOSE_CONTROL_SURFACE_ACTIVE, LOOSE_CONTROL_SURFACE_HOVER } from "@/shared/constants/ui";
+import { CONTROL_HEIGHT, LOOSE_CONTROL_SURFACE, LOOSE_CONTROL_SURFACE_ACTIVE, LOOSE_CONTROL_SURFACE_HOVER } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { CornerAccents } from "./corner-accents";
 
@@ -10,7 +10,7 @@ export function chipClass(active = false, className?: string): string {
     "text-[10px] uppercase tracking-[0.16em] transition-colors",
     active
       ? LOOSE_CONTROL_SURFACE_ACTIVE
-      : "border-edge bg-surface text-ink-soft " + LOOSE_CONTROL_SURFACE_HOVER,
+      : LOOSE_CONTROL_SURFACE + " text-ink-soft " + LOOSE_CONTROL_SURFACE_HOVER,
     className,
   );
 }

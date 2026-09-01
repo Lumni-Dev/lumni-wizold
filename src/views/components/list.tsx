@@ -56,6 +56,10 @@ export function ListRow({
       ? padding === "art"
         ? "flex gap-3 " + artRowAlign(align)
         : ROW_LAYOUT.text
+      : layout === "column"
+        ? padding === "art"
+          ? "flex flex-col gap-3"
+          : LAYOUTS.column
       : LAYOUTS[layout];
 
   return (
