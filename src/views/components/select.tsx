@@ -4,7 +4,18 @@ import { ChevronDown } from "lucide-react";
 import { playClick } from "@/controllers/sound";
 import { CONTROL_HEIGHT } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
-import { chipClass, ChipFrame } from "./chip";
+import { ChipFrame } from "./chip";
+
+function selectTriggerClass(active: boolean, className?: string): string {
+  return cn(
+    "inline-flex " + CONTROL_HEIGHT + " shrink-0 items-center rounded-md border px-3",
+    "text-[10px] uppercase tracking-[0.16em] transition-colors",
+    active
+      ? "border-edge bg-surface-high text-ink"
+      : "border-edge bg-surface text-ink-soft hover:border-edge-strong hover:bg-surface-high hover:text-ink",
+    className,
+  );
+}
 export interface SelectOption {
   value: string;
   label: string;
@@ -144,7 +155,7 @@ export function Select({
               onClick={() => (open ? setOpen(false) : show())}
               onKeyDown={onKeyDown}
               className={cn(
-                chipClass(open || Boolean(selected)),
+                selectTriggerClass(open || Boolean(selected)),
                 "w-full min-w-0 shrink justify-between gap-2",
                 disabled && "opacity-60",
               )}
@@ -174,7 +185,7 @@ export function Select({
             onClick={() => (open ? setOpen(false) : show())}
             onKeyDown={onKeyDown}
             className={cn(
-              chipClass(open || Boolean(selected)),
+              selectTriggerClass(open || Boolean(selected)),
               "w-full min-w-0 justify-between gap-2",
               disabled && "opacity-60",
             )}
@@ -197,7 +208,7 @@ export function Select({
             role="listbox"
             className={cn(
               "absolute inset-x-0 top-full z-40 mt-1 max-h-56 overflow-y-auto rounded-md",
-              "border border-edge bg-surface py-1",
+              "border border-edge bg-surface-high py-1",
               "shadow-[0_24px_60px_-20px_rgba(0,0,0,0.95)]",
             )}
           >

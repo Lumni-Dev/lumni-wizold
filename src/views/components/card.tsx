@@ -22,7 +22,7 @@ interface CardProps {
 }
 
 const TONES: Record<CardTone, string> = {
-  default: "border-edge bg-surface-high/50",
+  default: "border-edge bg-surface-high",
   highlighted: "border-edge-strong bg-surface-high",
   empty: "border-dashed border-edge bg-transparent",
 };
