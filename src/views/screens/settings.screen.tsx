@@ -9,7 +9,7 @@ import { AUTOMATIONS } from "@/models/entities/automation";
 import { isVip, VIP_PRICE_CENTS } from "@/models/rules/vip";
 import { useGame } from "@/controllers/game.context";
 import { playSound } from "@/controllers/sound";
-import { disableTavernPush, enableTavernPush, testTavernPush } from "@/controllers/tavern-notify";
+import { disableTavernPush, enableTavernPush, testTavernPush, webPushConfigured, tavernPushSupported } from "@/controllers/tavern-notify";
 import { soundRepository } from "@/models/repositories/sound.repository";
 import { tavernPushRepository } from "@/models/repositories/tavern-push.repository";
 import { NAME_MAX_LENGTH, RENAME_COOLDOWN_DAYS } from "@/shared/constants/game";
@@ -313,17 +313,23 @@ export function SettingsScreen() {
       <div className="grid items-start gap-6 lg:grid-cols-2">
         <Panel
           title="Taverna"
-          description="Avisos no desktop das mensagens das suas mesas: nome da mesa, quem falou, quando e o quê, com um botão para responder direto na taverna. Chegam enquanto o jogo está aberto numa página fora da taverna."
+          description="Avisos no desktop das mensagens das suas mesas: nome da mesa, quem falou, quando e o quê, com um botão para responder direto na taverna. Com Web Push ativo, chegam mesmo com o jogo fechado; sem ele, só enquanto uma aba do Wizold está aberta fora da taverna."
         >
           <div className="space-y-3">
             <div className="flex gap-2">
-              <Chip active={pushOn} onClick={() => choosePush(true)}>
+              <Chip active={pushOn} onClick={() => choosePush(true)} disabled={!tavernPushSupported()}>
                 Ativado
               </Chip>
               <Chip active={!pushOn} onClick={() => choosePush(false)}>
                 Desativado
               </Chip>
             </div>
+            {!webPushConfigured() ? (
+              <p className="text-[11px] leading-relaxed text-ink-faint">
+                Web Push ainda não está configurado neste ambiente; avisos locais continuam
+                funcionando com o jogo aberto.
+              </p>
+            ) : null}
             {pushOn ? (
               <div className="space-y-2">
                 <Button variant="secondary" onClick={testTavernPush}>

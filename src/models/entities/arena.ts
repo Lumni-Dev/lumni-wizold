@@ -1,3 +1,5 @@
+import { ARENA } from "@/shared/config/arena";
+
 export type ArenaOutcome = "victory" | "draw" | "defeat";
 
 export interface ArenaHistoryEntry {
@@ -11,4 +13,4 @@ export interface ArenaHistoryEntry {
   at: string;
 }
 
-export const ARENA_HISTORY_SIZE = 6;
+export const ARENA_HISTORY_SIZE = ARENA.historySize;

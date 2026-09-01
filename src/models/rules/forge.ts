@@ -5,7 +5,7 @@ import {
   FORGE_MS_PER_LEVEL,
 } from "@/shared/constants/game";
 import { forgeRequirement } from "@/shared/constants/tuning";
-import { huntPurse } from "../data/species";
+import { huntPurse } from "./economy";
 import type { Item, ItemEffect } from "../entities/item";
 
 export function enhancementCost(nextLevel: number): number {

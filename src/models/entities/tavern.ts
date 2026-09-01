@@ -1,16 +1,13 @@
-import { numberFromEnv } from "@/shared/utils/env";
+import { SOCIAL } from "@/shared/config/social";
 
-export const MAX_ROOM_MEMBERS = numberFromEnv(process.env.NEXT_PUBLIC_MAX_ROOM_MEMBERS, 20);
-export const MAX_ROOM_MESSAGES = 40;
-const ROOM_NAME_MIN_LENGTH = 3;
-export const ROOM_NAME_MAX_LENGTH = 25;
-export const MESSAGE_MAX_LENGTH = 150;
-export const MESSAGE_COOLDOWN_MS = numberFromEnv(
-  process.env.NEXT_PUBLIC_MESSAGE_COOLDOWN_MS,
-  10000,
-);
-export const MEMBER_TIMEOUT_MS = 150000;
-export const OPEN_ROOM_MIN_LEVEL = 50;
+export const MAX_ROOM_MEMBERS = SOCIAL.roomMembers;
+export const MAX_ROOM_MESSAGES = SOCIAL.roomMessages;
+export const ROOM_NAME_MAX_LENGTH = SOCIAL.roomNameMaxLength;
+export const MESSAGE_MAX_LENGTH = SOCIAL.messageMaxLength;
+export const MESSAGE_COOLDOWN_MS = SOCIAL.messageCooldownMs;
+export const MEMBER_TIMEOUT_MS = SOCIAL.memberTimeoutMs;
+export const OPEN_ROOM_MIN_LEVEL = SOCIAL.openRoomMinLevel;
+
 export interface TavernIdentity {
   id: string;
   name: string;
@@ -59,8 +56,8 @@ export function isRoomFull(room: TavernRoom): boolean {
 }
 export function validateRoomName(name: string): string | null {
   const clean = name.trim();
-  if (clean.length < ROOM_NAME_MIN_LENGTH) {
-    return "O nome da mesa precisa de pelo menos " + ROOM_NAME_MIN_LENGTH + " letras.";
+  if (clean.length < SOCIAL.roomNameMinLength) {
+    return "O nome da mesa precisa de pelo menos " + SOCIAL.roomNameMinLength + " letras.";
   }
   if (clean.length > ROOM_NAME_MAX_LENGTH) {
     return "O nome da mesa pode ter no máximo " + ROOM_NAME_MAX_LENGTH + " letras.";

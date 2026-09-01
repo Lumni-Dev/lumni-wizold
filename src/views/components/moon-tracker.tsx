@@ -8,8 +8,16 @@ import { Tooltip } from "./tooltip";
 export function MoonTracker() {
   const { moon } = useGame();
 
-  const bonus = Math.round(moon.phase.experienceBonus * 100);
-  const attributes = moon.phase.key === "full" ? FULL_MOON_ATTRIBUTE_BONUS : 0;
+  const xpBonus = Math.round(moon.phase.experienceBonus * 100);
+  const attrBonus = moon.phase.key === "full" ? FULL_MOON_ATTRIBUTE_BONUS : 0;
+  const bonusLine =
+    xpBonus > 0 && attrBonus > 0
+      ? "+" + xpBonus + "% de experiência · +" + attrBonus + " em todos os atributos"
+      : xpBonus > 0
+        ? "+" + xpBonus + "% de experiência na caça"
+        : attrBonus > 0
+          ? "+" + attrBonus + " em todos os atributos"
+          : "Sem bônus nesta fase";
 
   return (
     <Tooltip block label={moon.phase.description}>
@@ -21,10 +29,7 @@ export function MoonTracker() {
           <p className="truncate text-[10px] uppercase tracking-[0.16em] text-ink">
             {moon.phase.label}
           </p>
-          <p className="text-[10px] text-ink-faint">
-            {bonus > 0 ? "+" + bonus + "% de experiência" : "sem bônus"}
-            {attributes > 0 ? " - +" + attributes + " em todos os atributos" : ""}
-          </p>
+          <p className="text-[10px] text-ink-faint">{bonusLine}</p>
         </div>
       </div>
     </Tooltip>

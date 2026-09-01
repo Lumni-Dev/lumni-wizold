@@ -17,7 +17,7 @@ import {
 } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
 import { formatBronze, formatNumber } from "@/shared/utils/format";
-import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
+import { clampPage, pageCount, pageOf, pageOfPosition } from "@/shared/utils/pagination";
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
 import { ConfirmDialog } from "../components/confirm-dialog";
@@ -94,6 +94,12 @@ export function ForgeScreen() {
   const [selectedForge, setSelectedForge] = useState<string>("");
   const [forgePage, setForgePage] = useState(1);
   const forgeShake = useShake(strike.beat);
+
+  function selectForge(key: string) {
+    setSelectedForge(key);
+    const index = slots.findIndex((entry) => pieceKey(entry.item.id, entry.level) === key);
+    if (index >= 0) setForgePage(pageOfPosition(index + 1, FORGE_PAGE_SIZE));
+  }
 
   useEffect(() => {
     if (!activeItem) return;
@@ -527,7 +533,7 @@ export function ForgeScreen() {
             description="As peças do inventário fora do corpo. Escolha uma para a bigorna."
             padding="none"
             footer={
-              forgePages > 1 ? (
+              slots.length > 0 ? (
                 <Pagination page={forgeCurrentPage} pages={forgePages} onChange={setForgePage} />
               ) : undefined
             }
@@ -545,7 +551,7 @@ export function ForgeScreen() {
                     <ListRow key={key}>
                       <button
                         type="button"
-                        onClick={() => setSelectedForge(key)}
+                        onClick={() => selectForge(key)}
                         aria-pressed={isSelected}
                         disabled={activeItem !== null}
                         className="flex w-full items-center gap-3 text-left transition-colors"

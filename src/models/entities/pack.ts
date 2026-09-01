@@ -1,4 +1,4 @@
-import { numberFromEnv } from "@/shared/utils/env";
+import { LIMITS } from "@/shared/config/limits";
 
 export interface PackMate {
   id: string;
@@ -13,4 +13,4 @@ export interface PackInvite {
   createdAt: string;
 }
 
-export const MAX_PACK = numberFromEnv(process.env.NEXT_PUBLIC_MAX_PACK, 20);
+export const MAX_PACK = LIMITS.pack;

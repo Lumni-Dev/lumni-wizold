@@ -52,7 +52,13 @@ export async function serverMoon(): Promise<MoonState> {
     const days: unknown = await response.json();
     if (!Array.isArray(days) || days.length === 0) throw new Error("formato inesperado");
     const entries = days as MoonApiEntry[];
-    const entry = entries.find((day) => day.date === new Date().toISOString().slice(0, 10));
+    const today = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Sao_Paulo",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+    const entry = entries.find((day) => day.date === today);
     if (!entry) throw new Error("dia atual ausente na resposta");
     const age = parseNumber(entry.moon_age);
     if (age === null) throw new Error("idade da lua ausente");

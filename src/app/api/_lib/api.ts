@@ -13,6 +13,7 @@ import {
   pruneStale,
   type LoadedTavern,
 } from "@/models/repositories/server/tavern.store";
+import { originAllowed } from "./cors";
 import { syncServerMoon } from "./moon";
 import { rateLimit } from "./rate-limit";
 import { sessionClaims, type SessionClaims } from "./session";
@@ -62,17 +63,8 @@ function tooMany(retryAfterMs: number): NextResponse {
   return response;
 }
 export function refuseAbuse(request: Request): NextResponse | null {
-  if (request.method !== "GET" && request.method !== "HEAD") {
-    const origin = request.headers.get("origin");
-    if (origin) {
-      try {
-        if (new URL(origin).host !== new URL(request.url).host) {
-          return bad("Origem não permitida.", 403);
-        }
-      } catch {
-        return bad("Origem não permitida.", 403);
-      }
-    }
+  if (request.method !== "GET" && request.method !== "HEAD" && request.headers.get("origin")) {
+    if (!originAllowed(request)) return bad("Origem não permitida.", 403);
   }
   const length = Number(request.headers.get("content-length") ?? 0);
   if (length > MAX_BODY_BYTES) return bad("Corpo da requisição grande demais.", 413);

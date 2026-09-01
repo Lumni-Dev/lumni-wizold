@@ -1,4 +1,4 @@
-import { huntPurse } from "../data/species";
+import { huntPurse } from "./economy";
 import {
   PET_BASE_BONUS,
   PET_BASE_ENERGY,

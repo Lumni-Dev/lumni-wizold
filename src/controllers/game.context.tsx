@@ -414,7 +414,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [ready, authenticated, request, announce]);
   const value = useMemo<GameContextValue>(() => {
     const stats = state.character
-      ? deriveStats(state.character, state.equipment, state.pet)
+      ? deriveStats(state.character, state.equipment, state.pet, moon.phase.key)
       : null;
     const character =
       state.character && stats

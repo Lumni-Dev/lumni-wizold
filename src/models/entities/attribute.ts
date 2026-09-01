@@ -17,7 +17,7 @@ export const ATTRIBUTES: readonly AttributeDefinition[] = [
     code: "FOR",
     description: "É o seu golpe. Quanto maior, mais vida cada ataque tira.",
     effect:
-      "O dano de um golpe é Força x Força dividido por Força mais a Resistência do alvo. Treino, equipamento, mascote e lua somam aqui, e a fera acrescenta 35%.",
+      "O dano de um golpe é Força x Força dividido por Força mais a Resistência do alvo. Treino, equipamento, mascote, lua e poção de fúria somam aqui.",
   },
   {
     key: "agility",
@@ -41,15 +41,15 @@ export const ATTRIBUTES: readonly AttributeDefinition[] = [
     code: "INS",
     description: "Sua chance de crítico, o golpe que dói bem mais.",
     effect:
-      "O crítico é 5 mais 40 x Instinto dividido por Instinto mais 250, rumo ao teto de 45%. Um crítico multiplica o dano por 1,7, e chega a 2,2 com a fúria cheia.",
+      "O crítico é 5 mais 40 x Instinto dividido por Instinto mais 250, rumo ao teto de 45%. Um crítico multiplica o dano por 1,85, fixo.",
   },
   {
     key: "willpower",
     name: "Vontade",
     code: "VON",
-    description: "Sua fúria máxima, que paga a transformação.",
+    description: "Disciplina e foco. Sobe pelo treino e pelo colar.",
     effect:
-      "Cada ponto soma 2 de fúria máxima: mais transformações por noite, e o bônus de dano do crítico se mantém alto por mais tempo na luta.",
+      "Entra na ficha como os demais atributos: treino, equipamento, mascote e lua somam aqui. A poção de fúria dá +10 em todos por alguns minutos, Vontade incluída.",
   },
 ] as const;
 

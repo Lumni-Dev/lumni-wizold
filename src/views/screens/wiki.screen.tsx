@@ -1,5 +1,7 @@
 "use client";
 
+import { marketPriceOf } from "@/controllers/market.controller";
+import { useGame } from "@/controllers/game.context";
 import { CREATURES } from "@/models/data/creatures";
 import { EQUIPMENT_SETS, pieceId, pieceName } from "@/models/data/equipment-sets";
 import { SLOT_ROLE } from "@/models/data/equipment/slots";
@@ -21,7 +23,7 @@ import {
 import { DANGER_LABEL } from "@/models/entities/territory";
 import { formatNumber, formatBronze } from "@/shared/utils/format";
 import { Tag } from "../components/tag";
-import { List, ListRow } from "../components/list";
+import { List, ListRow, RowText } from "../components/list";
 import { Panel } from "../components/panel";
 import { AttributeIcon } from "../components/attribute-icon";
 import { chipClass } from "../components/chip";
@@ -45,7 +47,29 @@ function itemsOfCategory(category: ItemCategory) {
   return ITEMS.filter((item) => item.category === category);
 }
 
+const SET_GRID =
+  "grid w-full grid-cols-[4.5rem_minmax(0,1fr)_4.5rem] items-center gap-x-3 sm:grid-cols-[4.5rem_minmax(0,1fr)_minmax(0,7rem)_4.5rem]";
+
+function SetTableHeader() {
+  return (
+    <div
+      className={
+        SET_GRID +
+        " border-b border-edge px-4 py-2 text-[10px] uppercase tracking-[0.16em] text-ink-faint"
+      }
+    >
+      <span>Espaço</span>
+      <span>Peça</span>
+      <span className="hidden sm:block">Bônus</span>
+      <span className="text-right">Preço</span>
+    </div>
+  );
+}
+
 export function WikiScreen() {
+  const { character } = useGame();
+  const level = character?.level ?? 1;
+
   return (
     <>
       <PageHeader
@@ -85,22 +109,17 @@ export function WikiScreen() {
 
       <div id="attributes" className="scroll-mt-28">
         <Panel title="Atributos" description="Cinco eixos, todos treináveis." padding="none">
-          <div className="grid gap-3 p-4 sm:grid-cols-2 xl:grid-cols-3">
+          <List>
             {ATTRIBUTES.map((attribute) => (
-              <div
-                key={attribute.key}
-                className="flex items-start gap-3 rounded-md border border-edge p-3"
-              >
+              <ListRow key={attribute.key} padding="art">
                 <AttributeIcon attribute={attribute.key} />
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1 space-y-1">
                   <p className="text-sm text-ink">{attribute.name}</p>
-                  <p className="mt-1 text-[11px] leading-relaxed text-ink-faint">
-                    {attribute.effect}
-                  </p>
+                  <p className="text-[11px] leading-relaxed text-ink-faint">{attribute.effect}</p>
                 </div>
-              </div>
+              </ListRow>
             ))}
-          </div>
+          </List>
         </Panel>
       </div>
 
@@ -110,14 +129,15 @@ export function WikiScreen() {
           description="Um item por espaço, sete no total."
           padding="none"
         >
-          <div className="grid gap-3 p-4 sm:grid-cols-2 xl:grid-cols-3">
+          <List>
             {EQUIPMENT_SLOTS.map((slot) => (
-              <div key={slot} className="rounded-md border border-edge p-3">
-                <p className="text-sm text-ink">{SLOT_LABEL[slot]}</p>
-                <p className="mt-1 text-[11px] leading-relaxed text-ink-faint">{SLOT_ROLE[slot]}</p>
-              </div>
+              <ListRow key={slot}>
+                <div className="min-w-0 flex-1">
+                  <RowText title={SLOT_LABEL[slot]} description={SLOT_ROLE[slot]} />
+                </div>
+              </ListRow>
             ))}
-          </div>
+          </List>
         </Panel>
       </div>
 
@@ -130,30 +150,31 @@ export function WikiScreen() {
             action={
               <div className="flex flex-wrap justify-end gap-2">
                 <Tag tone="neutral">NV. {definition.minLevel}+</Tag>
-                <Tag tone={definition.inMarket ? "faint" : "light"}>
-                  {definition.inMarket ? "No mercado" : "Somente drop"}
-                </Tag>
+                {definition.inMarket ? <Tag tone="faint">No mercado</Tag> : null}
               </div>
             }
             padding="none"
           >
+            <SetTableHeader />
             <List>
               {EQUIPMENT_SLOTS.map((slot) => {
                 const item = findItem(pieceId(definition.key, slot));
                 return (
-                  <ListRow key={slot}>
-                    <span className="w-24 shrink-0 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                      {SLOT_LABEL[slot]}
-                    </span>
-                    <span className="min-w-0 flex-1 truncate text-sm text-ink">
-                      {pieceName(definition, slot)}
-                    </span>
-                    <span className="hidden text-right text-[11px] text-ink-soft sm:block">
-                      {item ? summarizeEffect(item).join(", ") : null}
-                    </span>
-                    <span className="w-24 shrink-0 text-right font-mono text-[11px] text-ink-faint">
-                      {item && item.inMarket ? formatBronze(item.price) : "drop"}
-                    </span>
+                  <ListRow key={slot} layout="column">
+                    <div className={SET_GRID}>
+                      <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                        {SLOT_LABEL[slot]}
+                      </span>
+                      <span className="min-w-0 truncate text-sm text-ink">
+                        {pieceName(definition, slot)}
+                      </span>
+                      <span className="hidden min-w-0 truncate text-[11px] text-ink-soft sm:block">
+                        {item ? summarizeEffect(item).join(", ") : "—"}
+                      </span>
+                      <span className="text-right font-mono text-[11px] text-ink-faint">
+                        {item && item.inMarket ? formatBronze(item.price) : "—"}
+                      </span>
+                    </div>
                   </ListRow>
                 );
               })}
@@ -168,21 +189,19 @@ export function WikiScreen() {
           description="Um por atributo, do primeiro ao último nível."
           padding="none"
         >
-          <div className="grid gap-3 p-4 sm:grid-cols-2 xl:grid-cols-3">
+          <List>
             {EXERCISES.map((exercise) => (
-              <div key={exercise.id} className="rounded-md border border-edge p-3">
+              <ListRow key={exercise.id} layout="column">
                 <div className="flex items-baseline justify-between gap-2">
                   <p className="text-sm text-ink">{exercise.name}</p>
                   <p className="shrink-0 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                     {findAttribute(exercise.attribute)?.name ?? exercise.attribute}
                   </p>
                 </div>
-                <p className="mt-1 text-[11px] leading-relaxed text-ink-faint">
-                  {exercise.description}
-                </p>
-              </div>
+                <p className="text-[11px] leading-relaxed text-ink-faint">{exercise.description}</p>
+              </ListRow>
             ))}
-          </div>
+          </List>
           <div className="space-y-2 border-t border-edge px-4 py-3">
             <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
               Rendimento da sessão
@@ -205,9 +224,9 @@ export function WikiScreen() {
           description="Ordem natural de progressão da caça."
           padding="none"
         >
-          <div className="grid gap-3 p-4 lg:grid-cols-2">
+          <List>
             {TERRITORIES.map((territory) => (
-              <div key={territory.id} className="space-y-2 rounded-md border border-edge p-3">
+              <ListRow key={territory.id} layout="column">
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="text-sm text-ink">{territory.name}</p>
                   <Tag tone="faint">{DANGER_LABEL[territory.danger]}</Tag>
@@ -226,9 +245,9 @@ export function WikiScreen() {
                     .filter(Boolean)
                     .join(", ")}
                 </p>
-              </div>
+              </ListRow>
             ))}
-          </div>
+          </List>
         </Panel>
       </div>
 
@@ -256,23 +275,23 @@ export function WikiScreen() {
             >
               <List>
                 {members.map((creature) => (
-                  <ListRow key={creature.id} padding="art">
+                  <ListRow key={creature.id} padding="art" className="items-start">
                     <CreatureIcon creature={creature} />
                     <div className="min-w-0 flex-1 space-y-1">
-                      <div className="flex flex-wrap items-baseline justify-between gap-2">
-                        <p className="text-sm text-ink">{creature.name}</p>
-                        <span className="font-mono text-[11px] text-ink-faint">
+                      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3">
+                        <p className="truncate text-sm text-ink">{creature.name}</p>
+                        <span className="shrink-0 font-mono text-[11px] text-ink-faint">
                           NV. {formatNumber(creature.level)}
                         </span>
                       </div>
-                      <p className="font-mono text-[11px] text-ink-soft">
-                        {formatNumber(creature.health)} vida, {formatNumber(creature.strength)} força,{" "}
-                        {formatNumber(creature.endurance)} resistência,{" "}
+                      <p className="font-mono text-[11px] leading-relaxed text-ink-soft">
+                        {formatNumber(creature.health)} vida · {formatNumber(creature.strength)}{" "}
+                        força · {formatNumber(creature.endurance)} resistência ·{" "}
                         {formatNumber(creature.agility)} agilidade
                       </p>
                       <p className="font-mono text-[11px] text-ink-faint">
-                        +{formatNumber(creature.experience)} exp, {formatNumber(creature.minBronze)} a{" "}
-                        {formatBronze(creature.maxBronze)}
+                        +{formatNumber(creature.experience)} exp · {formatNumber(creature.minBronze)}{" "}
+                        a {formatBronze(creature.maxBronze)}
                       </p>
                     </div>
                   </ListRow>
@@ -307,27 +326,29 @@ export function WikiScreen() {
             description={itemsOfCategory(category).length + " itens no catálogo."}
             padding="none"
           >
-            <div className="grid gap-3 p-4 sm:grid-cols-2 xl:grid-cols-3">
+            <List>
               {itemsOfCategory(category).map((item) => (
-                <div key={item.id} className="flex gap-3 rounded-md border border-edge p-3">
+                <ListRow key={item.id} padding="art" className="items-start">
                   <ItemIcon item={item} />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-baseline justify-between gap-2">
-                      <p className="text-sm text-ink">{item.name}</p>
-                      <span className="font-mono text-[11px] text-ink-faint">
-                        {item.inMarket ? formatBronze(item.price) : "somente drop"}
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3">
+                      <p className="truncate text-sm text-ink">{item.name}</p>
+                      <span className="shrink-0 font-mono text-[11px] text-ink-faint">
+                        {item.inMarket
+                          ? formatBronze(marketPriceOf(item, level))
+                          : "somente drop"}
                       </span>
                     </div>
                     <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                       {RARITY_LABEL[item.rarity]}, NV. {item.minLevel}+
                     </p>
-                    <p className="mt-1 text-[11px] text-ink-soft">
+                    <p className="text-[11px] leading-relaxed text-ink-soft">
                       {summarizeEffect(item).join(", ") || "Sem efeito, serve para venda."}
                     </p>
                   </div>
-                </div>
+                </ListRow>
               ))}
-            </div>
+            </List>
           </Panel>
         ))}
       </div>

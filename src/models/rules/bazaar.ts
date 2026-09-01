@@ -1,14 +1,11 @@
+import { BAZAAR } from "@/shared/config/bazaar";
 import type { EquipmentSet, Item } from "../entities/item";
 
-export const BAZAAR_FEE_RATIO = 0.1;
-
-export const BAZAAR_LISTING_FEE = 500;
-
-export const MIN_LISTING_CENTS = 100;
-
-export const MIN_WITHDRAW_CENTS = 10_000;
-
-export const MAX_LISTING_CENTS = 1_000_000;
+export const BAZAAR_FEE_RATIO = BAZAAR.feeRatio;
+export const BAZAAR_LISTING_FEE = BAZAAR.listingFee;
+export const MIN_LISTING_CENTS = BAZAAR.minListingCents;
+export const MIN_WITHDRAW_CENTS = BAZAAR.minWithdrawCents;
+export const MAX_LISTING_CENTS = BAZAAR.maxListingCents;
 
 export function feeOf(cents: number): number {
   return Math.round(cents * BAZAAR_FEE_RATIO);

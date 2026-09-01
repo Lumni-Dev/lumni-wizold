@@ -3,19 +3,22 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { TavernIdentity } from "@/models/entities/tavern";
 import { api } from "./api.client";
 import { useGame } from "./game.context";
+import { subscribeTavernBoard } from "./tavern-stream";
 import type { RoomSummary } from "./tavern.controller";
-const POLL_MS = 5000;
-const ACTIVE_POLL_MS = 3000;
+
 const HEARTBEAT_MS = 12000;
+
 export interface TavernAnswer {
   ok: boolean;
   message: string;
   roomId?: string;
 }
+
 interface TavernBoard {
   identity: TavernIdentity | null;
   rooms: RoomSummary[];
 }
+
 export function useTavern(activeRoomId: string | null) {
   const { character, authenticated } = useGame();
   const [board, setBoard] = useState<TavernBoard>({ identity: null, rooms: [] });
@@ -24,20 +27,14 @@ export function useTavern(activeRoomId: string | null) {
     boardRef.current = board;
   }, [board]);
   const enabled = authenticated && character !== null;
-  const refresh = useCallback(async () => {
-    if (!enabled) return;
-    const answer = await api<TavernBoard>("POST", "/api/tavern");
-    if (answer.ok && answer.data) setBoard(answer.data);
-  }, [enabled]);
+
   useEffect(() => {
     if (!enabled) return;
-    const first = window.setTimeout(() => void refresh(), 0);
-    const timer = window.setInterval(() => void refresh(), activeRoomId ? ACTIVE_POLL_MS : POLL_MS);
-    return () => {
-      window.clearTimeout(first);
-      window.clearInterval(timer);
-    };
-  }, [enabled, activeRoomId, refresh]);
+    return subscribeTavernBoard((payload) => {
+      setBoard({ identity: payload.identity, rooms: payload.rooms });
+    });
+  }, [enabled]);
+
   useEffect(() => {
     if (!enabled) return;
     const beat = () => {
@@ -50,16 +47,17 @@ export function useTavern(activeRoomId: string | null) {
     const timer = window.setInterval(beat, HEARTBEAT_MS);
     return () => window.clearInterval(timer);
   }, [enabled]);
+
   const perform = useCallback(
     async (method: "POST", path: string, body?: unknown): Promise<TavernAnswer> => {
       const answer = await api<{
         roomId?: string;
       }>(method, path, body);
-      await refresh();
       return { ok: answer.ok, message: answer.message, roomId: answer.data?.roomId };
     },
-    [refresh],
+    [],
   );
+
   const identity = useMemo<TavernIdentity | null>(
     () => board.identity ?? (character ? { id: character.id, name: character.name } : null),
     [board.identity, character],
@@ -79,12 +77,16 @@ export function useTavern(activeRoomId: string | null) {
     }
     return [...seen.values()];
   }, [rooms, identity]);
+
   return {
     identity,
     rooms,
     activeRoom,
     atTables,
-    refresh,
+    refresh: async () => {
+      const answer = await api<TavernBoard>("POST", "/api/tavern");
+      if (answer.ok && answer.data) setBoard(answer.data);
+    },
     createRoom: (name: string, password: string) =>
       perform("POST", "/api/tavern/rooms", { name, password }),
     joinRoom: (roomId: string, password: string) =>

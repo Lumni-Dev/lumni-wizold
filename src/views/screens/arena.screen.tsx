@@ -280,7 +280,7 @@ export function ArenaScreen() {
     <>
       <PageHeader
         title="Arena"
-        description="O fosso onde um lobisomem desafia outro, transformados os dois. Mascote ativo e com fôlego desce junto, o seu e o do rival."
+        description="O fosso onde um lobisomem desafia outro. Mascote ativo e com fôlego desce junto, o seu e o do rival."
         action={
           <div className="flex items-center gap-2">
             {pet ? (
@@ -324,9 +324,9 @@ export function ArenaScreen() {
         footer={
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span className="text-[11px] text-ink-faint">
-              {view.reason ?? "Os dois descem transformados: no fosso ninguém luta de pele humana."}
+              {view.reason ?? "Escolha um adversário da sua faixa ou busque um ao acaso."}
             </span>
-            <BodyGate open={!busy && view.charges.left > 0} reason="Só a fera desce ao fosso.">
+            <BodyGate open={!busy && view.charges.left > 0} reason="Com pouca vida, recupere-se antes do fosso.">
               <Tooltip label={view.reason}>
                 <Button
                   variant="primary"
@@ -360,7 +360,7 @@ export function ArenaScreen() {
           description={
             "Você contra " +
             fighting.hunter.name +
-            ", os dois transformados. Em jogo, um pedaço da bolsa de quem cair: de " +
+            ". Em jogo, um pedaço da bolsa de quem cair: de " +
             formatNumber(arenaSpoilsRange(fighting.hunter.level).min) +
             " a " +
             formatBronze(arenaSpoilsRange(fighting.hunter.level).max) +

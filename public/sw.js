@@ -1,6 +1,20 @@
-// Notification-only service worker. It caches nothing and never touches fetch,
-// it exists so a tavern message notification can carry a "Responder" action and
-// open the tavern when the notification (or that action) is clicked.
+self.addEventListener("push", (event) => {
+  let payload = { title: "Wizold", body: "Nova mensagem na taverna.", url: "/tavern", roomName: "Taverna" };
+  try {
+    if (event.data) payload = { ...payload, ...event.data.json() };
+  } catch {}
+  event.waitUntil(
+    self.registration.showNotification(payload.title, {
+      body: payload.body,
+      icon: "/assets/ui/caneca.png",
+      tag: "tavern:" + payload.roomName,
+      data: { url: payload.url || "/tavern" },
+      requireInteraction: true,
+      actions: [{ action: "reply", title: "Responder" }],
+    }),
+  );
+});
+
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
   const url = (event.notification.data && event.notification.data.url) || "/tavern";

@@ -1,7 +1,7 @@
-import { numberFromEnv } from "@/shared/utils/env";
+import { ECONOMY } from "@/shared/config/economy";
 import type { Character } from "../entities/character";
 
-export const VIP_PRICE_CENTS = numberFromEnv(process.env.NEXT_PUBLIC_VIP_PRICE_CENTS, 500);
+export const VIP_PRICE_CENTS = ECONOMY.vipPriceCents;
 export const VIP_DAYS = 30;
 
 type VipView = Pick<Character, "vipUntil" | "vipSubscriptionId" | "vipCanceling">;

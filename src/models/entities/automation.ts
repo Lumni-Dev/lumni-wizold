@@ -46,7 +46,7 @@ export const AUTOMATIONS: readonly { key: AutomationKey; label: string; effect: 
     key: "transform",
     label: "Fúria automática",
     effect:
-      "Transforma sozinho quando houver fúria e vida para isso. Com poção de fúria na mochila, bebe antes.",
+      "Bebe poção de fúria da mochila quando houver, antes de uma caçada ou duelo difícil. Desligado, você bebe na mão.",
   },
   {
     key: "potion",

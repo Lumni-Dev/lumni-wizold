@@ -7,8 +7,8 @@ export function chipClass(active = false, className?: string): string {
     "inline-flex h-8 shrink-0 items-center rounded-md border px-3",
     "text-[10px] uppercase tracking-[0.16em] transition-colors",
     active
-      ? "border-edge-strong bg-surface-high text-ink"
-      : "border-edge text-ink-faint hover:border-edge-strong hover:text-ink",
+      ? "border-ember bg-surface-high text-ink"
+      : "border-edge bg-surface text-ink-soft hover:border-edge-strong hover:text-ink",
     className,
   );
 }

@@ -3,8 +3,13 @@ import { cn } from "@/shared/utils/class-names";
 
 type RowLayout = "row" | "column" | "split";
 
+const ROW_LAYOUT: Record<RowPadding, string> = {
+  text: "flex items-center gap-3",
+  art: "flex items-start gap-3",
+};
+
 const LAYOUTS: Record<RowLayout, string> = {
-  row: "flex items-center gap-3",
+  row: ROW_LAYOUT.text,
   column: "space-y-1",
   split: "flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",
 };
@@ -39,7 +44,13 @@ export function ListRow({
   className?: string;
 }) {
   return (
-    <li className={cn(padding === "art" ? "p-4" : "px-4 py-3", LAYOUTS[layout], className)}>
+    <li
+      className={cn(
+        padding === "art" ? "p-4" : "px-4 py-3",
+        layout === "row" ? ROW_LAYOUT[padding] : LAYOUTS[layout],
+        className,
+      )}
+    >
       {children}
     </li>
   );

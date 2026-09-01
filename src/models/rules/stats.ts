@@ -12,7 +12,7 @@ import type { Character } from "../entities/character";
 import type { Pet } from "../entities/pet";
 import { findItem } from "../data/items";
 import { enhancedEffect } from "./forge";
-import { moonAttributeBonus } from "./moon";
+import { moonAttributeBonus, type MoonPhaseKey } from "./moon";
 import { petBonus } from "./pet";
 import { experienceForLevel } from "./progression";
 
@@ -83,13 +83,22 @@ export function deriveStats(
   character: Character,
   equipment: Equipment,
   pet: Pet | null = null,
+  moonPhase?: MoonPhaseKey,
 ): DerivedStats {
   const furyActive = character.furyUntil ? Date.now() < Date.parse(character.furyUntil) : false;
-  return deriveStatsOf({ ...character, furyActive, petAttributes: petBonus(pet) }, equipment);
+  return deriveStatsOf(
+    { ...character, furyActive, petAttributes: petBonus(pet) },
+    equipment,
+    moonPhase,
+  );
 }
 
-export function deriveStatsOf(subject: StatSubject, equipment: Equipment): DerivedStats {
-  const sky = moonAttributeBonus();
+export function deriveStatsOf(
+  subject: StatSubject,
+  equipment: Equipment,
+  moonPhase?: MoonPhaseKey,
+): DerivedStats {
+  const sky = moonAttributeBonus(moonPhase);
 
   const trained = subject.attributes;
   const equipped = equipmentAttributes(equipment);

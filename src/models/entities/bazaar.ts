@@ -1,3 +1,5 @@
+import { BAZAAR } from "@/shared/config/bazaar";
+
 export interface BazaarListing {
   id: string;
   sellerId: string;
@@ -9,7 +11,7 @@ export interface BazaarListing {
   announcedAt?: string;
 }
 
-export const BAZAAR_LISTING_DAYS = 7;
+export const BAZAAR_LISTING_DAYS = BAZAAR.listingDays;
 export const BAZAAR_LISTING_LIFETIME_MS = BAZAAR_LISTING_DAYS * 24 * 60 * 60 * 1000;
 
 export function listingExpiresAt(listing: BazaarListing): number {
@@ -25,8 +27,6 @@ export interface Wallet {
   cents: number;
 }
 
-const STARTING_WALLET_CENTS = 1_000;
-
 export function initialWallet(): Wallet {
-  return { cents: STARTING_WALLET_CENTS };
+  return { cents: BAZAAR.startingWalletCents };
 }

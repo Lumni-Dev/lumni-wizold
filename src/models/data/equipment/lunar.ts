@@ -9,7 +9,7 @@ export const lunarSet: SetDefinition = {
   minLevel: 801,
   inMarket: true,
   description:
-    "O último conjunto. Custa uma fortuna no mercado e também sai do corpo de vampiros e unicórnios.",
+    "O último conjunto. Custa uma fortuna no mercado e não cai na caça: é a peça que se compra de propósito.",
   flavor:
     "Forjado sob lua cheia, com a fera acordada segurando o martelo. Responde ao céu: " +
     "brilha fraco no escuro e respira junto com quem veste, na noite da virada.",

@@ -1,4 +1,4 @@
-import { huntPurse } from "../data/species";
+import { huntPurse } from "./economy";
 import type { StorePack } from "../data/store-packs";
 
 export function packBronze(pack: StorePack, level: number): number {

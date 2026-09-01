@@ -103,10 +103,14 @@ function currentMoon(now = Date.now()): MoonState {
 
 export const FULL_MOON_ATTRIBUTE_BONUS = 5;
 
-export function moonAttributeBonus(now = Date.now()): number {
-  return currentMoon(now).phase.key === "full" ? FULL_MOON_ATTRIBUTE_BONUS : 0;
+export function moonAttributeBonus(moonPhase?: MoonPhaseKey, now = Date.now()): number {
+  const key = moonPhase ?? currentMoon(now).phase.key;
+  return key === "full" ? FULL_MOON_ATTRIBUTE_BONUS : 0;
 }
 
-export function withMoonBonus(experience: number): number {
-  return Math.round(experience * (1 + currentMoon().phase.experienceBonus));
+export function withMoonBonus(experience: number, moonPhase?: MoonPhaseKey, now = Date.now()): number {
+  const bonus = moonPhase
+    ? findMoonPhase(moonPhase).experienceBonus
+    : currentMoon(now).phase.experienceBonus;
+  return Math.round(experience * (1 + bonus));
 }

@@ -142,7 +142,7 @@ function CombatReport({ report, lines }: { report: HuntReport; lines: NarrationL
   );
 }
 export function HuntScreen() {
-  const { state, character, pet, hunt, sufferBlow, landHunt, notify, activity, setActivity } =
+  const { state, character, pet, moon, hunt, sufferBlow, landHunt, notify, activity, setActivity } =
     useGame();
   usePageActivity(["hunt"]);
   const art = useArt();
@@ -167,6 +167,7 @@ export function HuntScreen() {
   const requestingRef = useRef(false);
   const bledRef = useRef({ last: 0, total: 0 });
   const territories = useMemo(() => listTerritories(state), [state]);
+  const xpBonus = moon.phase.experienceBonus;
   const autoRef = useRef(state.automation.hunt);
   const huntRef = useRef(hunt);
   const sufferRef = useRef(sufferBlow);
@@ -517,7 +518,13 @@ export function HuntScreen() {
                                   {formatNumber(creature.level + 9)}
                                 </span>
                                 <span className="block font-mono text-[11px] text-ink-faint">
-                                  {formatNumber(creature.experience)} de experiência
+                                  {formatNumber(
+                                    Math.round(creature.experience * (1 + xpBonus)),
+                                  )}{" "}
+                                  de experiência
+                                  {xpBonus > 0
+                                    ? " (+" + Math.round(xpBonus * 100) + "% lua)"
+                                    : ""}
                                 </span>
                               </span>
                               <span

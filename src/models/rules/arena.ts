@@ -1,4 +1,5 @@
-import { huntPurse } from "../data/species";
+import { ARENA } from "@/shared/config/arena";
+import { huntPurse } from "./economy";
 import { MAX_CHARACTER_LEVEL, MINING_RESET_HOUR_UTC } from "@/shared/constants/game";
 import { clamp } from "@/shared/utils/format";
 import { intBetween, type Random } from "@/shared/utils/random";
@@ -7,8 +8,8 @@ import type { Hunter } from "../entities/ranking";
 import type { CombatOpponent } from "./combat";
 import { deriveStatsOf, type DerivedStats } from "./stats";
 
-export const ARENA_BAND_RATIO = 0.12;
-export const ARENA_MIN_BAND = 5;
+export const ARENA_BAND_RATIO = ARENA.bandRatio;
+export const ARENA_MIN_BAND = ARENA.minBand;
 
 const DAY_MS = 86_400_000;
 
@@ -37,7 +38,7 @@ export function arenaCooldownLeft(lastDuelAt: string | undefined, now = Date.now
   return stamp >= arenaPeriodStart(now) ? arenaResetsInMs(now) : 0;
 }
 
-export const ARENA_DAILY_ATTACKS = 10;
+export const ARENA_DAILY_ATTACKS = ARENA.dailyAttacks;
 
 export interface ArenaCharges {
   left: number;
@@ -98,11 +99,11 @@ export function arenaCombatant(hunter: Hunter): CombatOpponent {
   return combatantOf(hunter, arenaStats(hunter));
 }
 
-export const ARENA_SPOILS_MIN_SHARE = 0.1;
-export const ARENA_SPOILS_MAX_SHARE = 0.25;
+export const ARENA_SPOILS_MIN_SHARE = ARENA.spoilsMinShare;
+export const ARENA_SPOILS_MAX_SHARE = ARENA.spoilsMaxShare;
 
-export const ARENA_SPOILS_MIN_HUNTS = 1.5;
-export const ARENA_SPOILS_MAX_HUNTS = 3;
+export const ARENA_SPOILS_MIN_HUNTS = ARENA.spoilsMinHunts;
+export const ARENA_SPOILS_MAX_HUNTS = ARENA.spoilsMaxHunts;
 
 export interface SpoilsRange {
   min: number;

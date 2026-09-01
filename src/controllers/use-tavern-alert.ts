@@ -1,13 +1,51 @@
 "use client";
+
 import { useEffect, useRef, useState } from "react";
 import { tavernReadRepository } from "@/models/repositories/tavern-read.repository";
-import { api } from "./api.client";
 import { useGame } from "./game.context";
-import { ensureTavernWorker, notifyTavernMessage, tavernPushActive } from "./tavern-notify";
+import { ensureTavernWorker, notifyTavernMessageLocal, tavernPushActive } from "./tavern-notify";
+import { subscribeTavernBoard } from "./tavern-stream";
 import type { RoomSummary } from "./tavern.controller";
 
-const ALERT_POLL_MS = 15000;
 const ALERT_FLASH_MS = 1500;
+
+function unreadFromBoard(rooms: RoomSummary[], selfId: string): number {
+  const readMap = tavernReadRepository.load();
+  let total = 0;
+  for (const { room } of rooms) {
+    const lastRead = readMap[room.id] ?? "";
+    for (const message of room.messages) {
+      if (message.authorId === "system" || message.authorId === selfId) continue;
+      if (message.at > lastRead) total += 1;
+    }
+  }
+  return total;
+}
+
+function freshMessages(
+  rooms: RoomSummary[],
+  selfId: string,
+  since: string | null,
+): { roomName: string; authorName: string; text: string; at: string }[] {
+  if (!since) return [];
+  const readMap = tavernReadRepository.load();
+  const found: { roomName: string; authorName: string; text: string; at: string }[] = [];
+  for (const { room, isMember } of rooms) {
+    if (!isMember) continue;
+    const lastRead = readMap[room.id] ?? "";
+    for (const message of room.messages) {
+      if (message.authorId === "system" || message.authorId === selfId) continue;
+      if (message.at <= since || message.at <= lastRead) continue;
+      found.push({
+        roomName: room.name,
+        authorName: message.authorName,
+        text: message.text,
+        at: message.at,
+      });
+    }
+  }
+  return found;
+}
 
 export function useTavernAlert(watching: boolean) {
   const { character, authenticated } = useGame();
@@ -19,54 +57,22 @@ export function useTavernAlert(watching: boolean) {
   useEffect(() => {
     if (!enabled) return;
     ensureTavernWorker();
-    let alive = true;
-    const look = async () => {
-      const answer = await api<{ rooms: RoomSummary[] }>("POST", "/api/tavern");
-      if (!alive || !answer.ok || !answer.data) return;
-      const readMap = tavernReadRepository.load();
+    return subscribeTavernBoard((board) => {
+      setUnread(unreadFromBoard(board.rooms, selfId));
       const pushOn = tavernPushActive();
-      let total = 0;
       let latest = notifiedRef.current ?? "";
-      const fresh = new Map<
-        string,
-        { roomName: string; authorName: string; text: string; at: string }
-      >();
-      for (const { room, isMember } of answer.data.rooms) {
-        const lastRead = readMap[room.id] ?? "";
+      for (const { room } of board.rooms) {
         for (const message of room.messages) {
-          if (message.authorId === "system" || message.authorId === selfId) continue;
-          if (message.at > lastRead) total += 1;
           if (message.at > latest) latest = message.at;
-          if (
-            pushOn &&
-            isMember &&
-            notifiedRef.current !== null &&
-            message.at > notifiedRef.current
-          ) {
-            const prev = fresh.get(room.id);
-            if (!prev || message.at > prev.at) {
-              fresh.set(room.id, {
-                roomName: room.name,
-                authorName: message.authorName,
-                text: message.text,
-                at: message.at,
-              });
-            }
-          }
         }
       }
-      setUnread(total);
-      for (const item of fresh.values()) {
-        notifyTavernMessage(item.roomName, item.authorName, item.text, item.at);
+      if (!pushOn && document.hidden && notifiedRef.current !== null) {
+        for (const item of freshMessages(board.rooms, selfId, notifiedRef.current)) {
+          notifyTavernMessageLocal(item.roomName, item.authorName, item.text, item.at);
+        }
       }
       notifiedRef.current = latest;
-    };
-    void look();
-    const timer = window.setInterval(() => void look(), ALERT_POLL_MS);
-    return () => {
-      alive = false;
-      window.clearInterval(timer);
-    };
+    });
   }, [enabled, selfId]);
 
   const baseRef = useRef<string | null>(null);

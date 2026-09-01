@@ -2,6 +2,7 @@
 
 import { tavernPushRepository } from "@/models/repositories/tavern-push.repository";
 import { formatDay } from "@/shared/utils/format";
+import { api } from "./api.client";
 
 const SW_URL = "/sw.js";
 const ICON = "/assets/ui/caneca.png";
@@ -10,8 +11,21 @@ interface NotificationOptionsWithActions extends NotificationOptions {
   actions?: { action: string; title: string }[];
 }
 
+export function vapidPublicKey(): string {
+  return process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? "";
+}
+
+export function webPushConfigured(): boolean {
+  return vapidPublicKey().length > 0;
+}
+
 export function tavernPushSupported(): boolean {
-  return typeof window !== "undefined" && "Notification" in window;
+  return (
+    typeof window !== "undefined" &&
+    "Notification" in window &&
+    "serviceWorker" in navigator &&
+    "PushManager" in window
+  );
 }
 
 export function tavernPushActive(): boolean {
@@ -20,14 +34,36 @@ export function tavernPushActive(): boolean {
   );
 }
 
-function registerWorker(): void {
-  if ("serviceWorker" in navigator) {
-    void navigator.serviceWorker.register(SW_URL).catch(() => {});
-  }
+function urlBase64ToUint8Array(value: string): Uint8Array {
+  const padding = "=".repeat((4 - (value.length % 4)) % 4);
+  const base64 = (value + padding).replace(/-/g, "+").replace(/_/g, "/");
+  const raw = window.atob(base64);
+  const output = new Uint8Array(raw.length);
+  for (let index = 0; index < raw.length; index += 1) output[index] = raw.charCodeAt(index);
+  return output;
+}
+
+function registerWorker(): Promise<ServiceWorkerRegistration | null> {
+  if (!("serviceWorker" in navigator)) return Promise.resolve(null);
+  return navigator.serviceWorker.register(SW_URL).catch(() => null);
 }
 
 export function ensureTavernWorker(): void {
-  if (tavernPushActive()) registerWorker();
+  if (tavernPushActive()) void registerWorker();
+}
+
+async function subscribeOnServer(subscription: PushSubscription): Promise<boolean> {
+  const json = subscription.toJSON();
+  if (!json.endpoint || !json.keys?.p256dh || !json.keys.auth) return false;
+  const answer = await api("POST", "/api/tavern/push/subscribe", {
+    endpoint: json.endpoint,
+    keys: { p256dh: json.keys.p256dh, auth: json.keys.auth },
+  });
+  return answer.ok;
+}
+
+async function unsubscribeOnServer(endpoint: string): Promise<void> {
+  await api("DELETE", "/api/tavern/push/unsubscribe", { endpoint });
 }
 
 export async function enableTavernPush(): Promise<NotificationPermission> {
@@ -35,26 +71,51 @@ export async function enableTavernPush(): Promise<NotificationPermission> {
     tavernPushRepository.setEnabled(false);
     return "denied";
   }
+  if (!webPushConfigured()) {
+    tavernPushRepository.setEnabled(false);
+    return "denied";
+  }
   let permission = Notification.permission;
   if (permission === "default") permission = await Notification.requestPermission();
-  const granted = permission === "granted";
-  tavernPushRepository.setEnabled(granted);
-  if (granted) registerWorker();
-  return permission;
+  if (permission !== "granted") {
+    tavernPushRepository.setEnabled(false);
+    return permission;
+  }
+  const registration = await registerWorker();
+  if (!registration) {
+    tavernPushRepository.setEnabled(false);
+    return permission;
+  }
+  const existing = await registration.pushManager.getSubscription();
+  const subscription =
+    existing ??
+    (await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(vapidPublicKey()) as BufferSource,
+    }));
+  const saved = await subscribeOnServer(subscription);
+  tavernPushRepository.setEnabled(saved);
+  return saved ? permission : "denied";
 }
 
-export function disableTavernPush(): void {
+export async function disableTavernPush(): Promise<void> {
   tavernPushRepository.setEnabled(false);
+  if (!("serviceWorker" in navigator)) return;
+  const registration = await navigator.serviceWorker.getRegistration();
+  const subscription = await registration?.pushManager.getSubscription();
+  if (!subscription) return;
+  const endpoint = subscription.endpoint;
+  await unsubscribeOnServer(endpoint);
+  await subscription.unsubscribe();
 }
 
-export function notifyTavernMessage(
+export function notifyTavernMessageLocal(
   roomName: string,
   authorName: string,
   text: string,
   at: string,
 ): void {
-  if (!tavernPushActive()) return;
-
+  if (!tavernPushSupported() || Notification.permission !== "granted") return;
   const title = authorName + " · " + roomName;
   const base: NotificationOptions = {
     body: text + "\n" + formatDay(at),
@@ -62,12 +123,11 @@ export function notifyTavernMessage(
     tag: "tavern:" + roomName,
     requireInteraction: true,
   };
-
   if ("serviceWorker" in navigator) {
     void navigator.serviceWorker
       .getRegistration()
       .then((registration) => {
-        if (registration && registration.active) {
+        if (registration?.active) {
           const rich: NotificationOptionsWithActions = {
             ...base,
             data: { url: "/tavern" },
@@ -76,7 +136,7 @@ export function notifyTavernMessage(
           return registration.showNotification(title, rich);
         }
         plainNotice(title, base);
-        registerWorker();
+        void registerWorker();
       })
       .catch(() => plainNotice(title, base));
     return;
@@ -85,7 +145,7 @@ export function notifyTavernMessage(
 }
 
 export function testTavernPush(): void {
-  notifyTavernMessage(
+  notifyTavernMessageLocal(
     "Taverna",
     "Wizold",
     "Notificação de teste: se você está vendo isto, está funcionando.",

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import * as tavernController from "@/controllers/tavern.controller";
-import { saveTavernDiff } from "@/models/repositories/server/tavern.store";
+import { commitTavernWrite } from "@/app/api/_lib/tavern-commit";
 import { asText, withTavern } from "../../_lib/api";
 import { hashSecret } from "../../_lib/session";
 export async function POST(request: Request) {
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
       if (result.ok && result.roomId) {
         const newHashes = new Map<string, string>();
         if (password.trim().length > 0) newHashes.set(result.roomId, hashSecret(password.trim()));
-        await saveTavernDiff(context.client, state, result.state, context.tavern.hashes, newHashes);
+        await commitTavernWrite(context.client, state, result.state, context.tavern.hashes, newHashes);
       }
       return NextResponse.json({
         ok: result.ok,

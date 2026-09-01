@@ -25,6 +25,7 @@ function isPhaseKey(value: unknown): value is MoonPhaseKey {
 const REFRESH_MS = 10 * 60 * 1000;
 
 let snapshot: MoonState = computeMoonLocally();
+applyMoonState(snapshot);
 const listeners = new Set<() => void>();
 let timer: number | null = null;
 

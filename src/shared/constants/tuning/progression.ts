@@ -1,12 +1,7 @@
-import { numbersFromEnv } from "@/shared/utils/env";
+import { XP_CURVE, PROGRESSION_TUNING } from "@/shared/config/progression";
 
-export const PROGRESSION = {
-  yieldBase: 12,
-  yieldPerStep: 7,
-  forgeShare: 0.5,
-} as const;
+export const PROGRESSION = PROGRESSION_TUNING;
 
-const XP_CURVE = numbersFromEnv(process.env.NEXT_PUBLIC_XP_CURVE, [50 / 3, 1, -6, 17, -12]);
 const XP_SCALE = XP_CURVE[0];
 const XP_POLY = XP_CURVE.slice(1);
 

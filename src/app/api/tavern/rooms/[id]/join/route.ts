@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import * as tavernController from "@/controllers/tavern.controller";
-import { saveTavernDiff } from "@/models/repositories/server/tavern.store";
+import { commitTavernWrite } from "@/app/api/_lib/tavern-commit";
 import { asText, withTavernRoom } from "../../../../_lib/api";
 import { rateLimit, rateLimitShared } from "../../../../_lib/rate-limit";
 import { verifySecret } from "../../../../_lib/session";
@@ -34,7 +34,7 @@ export async function POST(
     }
     const result = tavernController.joinRoom(state, roomId, context.identity, "");
     if (result.ok) {
-      await saveTavernDiff(context.client, state, result.state, context.tavern.hashes);
+      await commitTavernWrite(context.client, state, result.state, context.tavern.hashes);
     }
     return NextResponse.json({
       ok: result.ok,

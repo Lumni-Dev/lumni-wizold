@@ -31,7 +31,7 @@ const { trainingSessionCost, trainingSessionsPerPoint } = require(
   join(BUILD, "models/rules/training.js"),
 );
 const { findCreature } = require(join(BUILD, "models/data/creatures.js"));
-const { referenceForge } = require(join(BUILD, "models/data/species.js"));
+const { referenceForge } = require(join(BUILD, "models/rules/reference.js"));
 const { petMaxEnergy } = require(join(BUILD, "models/rules/pet.js"));
 const { TERRITORIES } = require(join(BUILD, "models/data/territories.js"));
 const { EQUIPMENT_SLOTS } = require(join(BUILD, "models/entities/item.js"));

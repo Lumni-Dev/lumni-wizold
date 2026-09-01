@@ -1,7 +1,7 @@
 import { capBronze, formatBronze } from "@/shared/utils/format";
 import { isValidQuantity } from "@/shared/utils/quantity";
 import { findItem, lineageName, marketItems, servesLineage } from "@/models/data/items";
-import { huntPurse } from "@/models/data/species";
+import { huntPurse } from "@/models/rules/economy";
 import type { GameState } from "@/models/entities/game-state";
 import { type Item } from "@/models/entities/item";
 import { failure, success, type Result } from "@/models/entities/result";
