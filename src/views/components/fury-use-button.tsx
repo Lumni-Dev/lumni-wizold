@@ -38,6 +38,7 @@ export function FuryUseButton({ onClick }: { onClick: () => void }) {
     <FuryRingFrame
       as="button"
       type="button"
+      contentAlign="center"
       disabled={furyActive}
       aria-disabled={furyActive}
       onClick={() => {
@@ -46,11 +47,11 @@ export function FuryUseButton({ onClick }: { onClick: () => void }) {
         onClick();
       }}
       className={cn(
-        "inline-block rounded-md border-0 bg-transparent p-0 font-[inherit] text-left",
+        "inline-block rounded-md border-0 bg-transparent p-0 font-[inherit]",
         furyActive && "cursor-default",
       )}
       fillClassName={cn(
-        "flex h-8 items-center justify-center px-3 text-[11px] font-medium uppercase tracking-[0.16em]",
+        "h-8 px-3 text-[11px] font-medium uppercase tracking-[0.16em]",
         "transition-[filter] duration-150",
         furyActive
           ? "bg-surface-high text-ink"

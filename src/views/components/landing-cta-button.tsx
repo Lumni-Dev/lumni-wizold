@@ -21,9 +21,10 @@ export function LandingCtaButton({ href, label, className }: LandingCtaButtonPro
     >
       <FuryRingFrame
         className="rounded-md"
+        contentAlign="center"
         fillClassName={
-          "flex h-12 w-full items-center justify-center px-8 text-xs font-medium uppercase " +
-          "tracking-[0.16em] text-ember bg-surface/70 transition-colors hover:bg-surface-high/80"
+          "h-12 w-full px-8 text-xs font-medium uppercase tracking-[0.16em] text-ember " +
+          "bg-surface/70 transition-colors hover:bg-surface-high/80"
         }
       >
         {label}

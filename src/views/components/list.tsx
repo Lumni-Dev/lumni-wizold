@@ -86,12 +86,14 @@ export function RowText({
   description?: ReactNode;
 }) {
   return (
-    <div className="min-w-0 flex-1">
+    <div className="min-w-0 flex-1 space-y-1">
       {label ? (
         <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">{label}</p>
       ) : null}
       <p className="truncate text-sm text-ink">{title}</p>
-      {description ? <div className="text-[11px] text-ink-faint">{description}</div> : null}
+      {description ? (
+        <div className="text-[11px] leading-relaxed text-ink-faint">{description}</div>
+      ) : null}
     </div>
   );
 }

@@ -279,19 +279,7 @@ export function ForgeScreen() {
                   <ArtRowButton
                     key={ore.id}
                     art={fragment ? <ItemIcon item={fragment} /> : <IconFrame>--</IconFrame>}
-                    title={
-                      <span
-                        className={cn(
-                          isSelected
-                            ? "text-ember"
-                            : unlocked
-                              ? "text-ink-soft"
-                              : "text-ink-faint",
-                        )}
-                      >
-                        {ore.label}
-                      </span>
-                    }
+                    title={ore.label}
                     description={
                       unlocked
                         ? "+" +
@@ -319,11 +307,7 @@ export function ForgeScreen() {
                     pressed={isSelected}
                     disabled={!unlocked || activeOre !== null}
                     onClick={() => unlocked && setSelectedOre(ore.id)}
-                    className={cn(
-                      isSelected && "bg-surface-high",
-                      !isSelected && "hover:bg-surface-high/60",
-                      !unlocked && "opacity-60",
-                    )}
+                    className={cn(!unlocked && "opacity-60")}
                   />
                 );
               })}
@@ -508,11 +492,6 @@ export function ForgeScreen() {
                           pressed={isSelected}
                           disabled={activeItem !== null}
                           onClick={() => selectForge(key)}
-                          className={cn(
-                            isSelected && "bg-surface-high",
-                            !isSelected && "hover:bg-surface-high/60",
-                            isSelected && "[&_.truncate]:text-ember",
-                          )}
                         />
                       );
                     })}

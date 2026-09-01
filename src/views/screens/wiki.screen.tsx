@@ -123,7 +123,7 @@ export function WikiScreen() {
           <Panel title="Atributos" description="Cinco eixos, todos treináveis." padding="none">
             <List>
               {ATTRIBUTES.map((attribute) => (
-                <ListRow key={attribute.key} padding="art" align="start">
+                <ListRow key={attribute.key} padding="art">
                   <AttributeIcon attribute={attribute.key} />
                   <RowText title={attribute.name} description={attribute.effect} />
                 </ListRow>

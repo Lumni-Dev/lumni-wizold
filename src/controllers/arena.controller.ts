@@ -134,6 +134,7 @@ export function drawOpponent(
 }
 export interface ArenaHistoryLine {
   id: string;
+  rivalId: string;
   rivalName: string;
   mine: boolean;
   outcome: ArenaOutcome;
@@ -147,6 +148,7 @@ export function describeArenaHistory(
 ): ArenaHistoryLine[] {
   return entries.map((entry) => {
     const mine = entry.challengerId === characterId;
+    const rivalId = mine ? entry.rivalId : entry.challengerId;
     const outcome: ArenaOutcome = mine
       ? entry.outcome
       : entry.outcome === "victory"
@@ -157,6 +159,7 @@ export function describeArenaHistory(
 
     return {
       id: entry.id,
+      rivalId,
       rivalName: mine ? entry.rivalName : entry.challengerName,
       mine,
       outcome,

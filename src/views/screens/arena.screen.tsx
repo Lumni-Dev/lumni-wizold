@@ -167,6 +167,7 @@ export function ArenaScreen() {
     };
   }, [report]);
   const characterId = character?.id ?? "";
+  const rosterById = useMemo(() => new Map(roster.map((hunter) => [hunter.id, hunter])), [roster]);
   const pastDuels = useMemo(
     () => describeArenaHistory(duelHistory, characterId),
     [duelHistory, characterId],
@@ -557,7 +558,15 @@ export function ArenaScreen() {
           </p>
         ) : (
           <List>
-            {pastDuels.map((line) => (
+            {pastDuels.map((line) => {
+              const rival = rosterById.get(line.rivalId);
+              const lineage = rival ? (rival.gender === "male" ? "Lumni" : "Luna") : null;
+              const coins =
+                line.outcome === "draw" || line.spoils === 0
+                  ? "0 WCoins"
+                  : (line.outcome === "victory" ? "+" : "-") + formatBronze(line.spoils);
+
+              return (
               <ListRow key={line.id}>
                 <RowText
                   title={
@@ -569,18 +578,24 @@ export function ArenaScreen() {
                   }
                   description={(line.mine ? "Ataque seu" : "Ataque recebido") + " - " + formatDay(line.at)}
                 />
-                <span
-                  className={cn(
-                    "shrink-0 font-mono text-[11px]",
-                    line.outcome === "victory" ? "text-ink" : "text-ink-faint",
-                  )}
-                >
-                  {line.outcome === "draw" || line.spoils === 0
-                    ? "0 WCoins"
-                    : (line.outcome === "victory" ? "+" : "-") + formatBronze(line.spoils)}
+                <span className="flex shrink-0 items-center gap-2">
+                  {lineage ? (
+                    <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                      {lineage}
+                    </span>
+                  ) : null}
+                  <span
+                    className={cn(
+                      "font-mono text-[11px]",
+                      line.outcome === "victory" ? "text-ink" : "text-ink-faint",
+                    )}
+                  >
+                    {coins}
+                  </span>
                 </span>
               </ListRow>
-            ))}
+              );
+            })}
           </List>
         )}
       </Panel>
