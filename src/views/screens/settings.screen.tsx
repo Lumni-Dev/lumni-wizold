@@ -25,7 +25,7 @@ import { ConfirmDialog } from "../components/confirm-dialog";
 import { Field } from "../components/field";
 import { Modal } from "../components/modal";
 import { GenderIcon } from "../components/gender-icon";
-import { IconFrame } from "../components/icon-frame";
+import { IconArt, IconFrame } from "../components/icon-frame";
 import { List, ListRow, RowText } from "../components/list";
 import { Panel } from "../components/panel";
 import { Tag } from "../components/tag";
@@ -222,13 +222,7 @@ export function SettingsScreen() {
           <div className={cn("flex items-center gap-3 border-b border-edge p-4", ICON_FRAME_INSET)}>
             {accountPicture ? (
               <IconFrame size="medium" tone="strong">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={accountPicture}
-                  alt=""
-                  referrerPolicy="no-referrer"
-                  className="h-full w-full object-cover"
-                />
+                <IconArt source={accountPicture} padded={false} />
               </IconFrame>
             ) : (
               <GenderIcon gender={character.gender} size="medium" />

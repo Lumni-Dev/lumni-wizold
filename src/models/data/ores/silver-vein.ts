@@ -6,6 +6,6 @@ export const silverVein: Ore = {
   fragmentId: "silver-fragment",
   set: "silver",
   requiredLevel: 201,
-  minYield: 1,
-  maxYield: 3,
+  minYield: 3,
+  maxYield: 6,
 };

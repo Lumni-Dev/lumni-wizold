@@ -25,7 +25,6 @@ import {
   miningNeeded,
   miningRemaining,
   miningResetsInMs,
-  miningYieldBonus,
   rolloverMining,
 } from "@/models/rules/mining";
 import { addToInventory, countInInventory, removeFromInventory } from "./inventory.controller";
@@ -107,7 +106,7 @@ export function mine(
     );
   }
 
-  const yielded = intBetween(ore.minYield, ore.maxYield, random) * miningYieldBonus(rolled.level);
+  const yielded = intBetween(ore.minYield, ore.maxYield, random);
   const { mining: advanced, levelsGained } = applyMiningProgress(rolled, miningEffort(rolled.level));
   const mining: MiningState = {
     ...advanced,

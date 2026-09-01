@@ -1,5 +1,6 @@
 "use client";
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { artLoadedFromImg, isArtCached, markArtCached } from "@/shared/utils/art-cache";
 import { cn } from "@/shared/utils/class-names";
 import { CornerAccents } from "./corner-accents";
@@ -121,6 +122,7 @@ export function IconArt({
         src={source}
         alt=""
         loading="lazy"
+        referrerPolicy="no-referrer"
         onLoad={() => {
           markArtCached(source);
           setLoaded(true);
@@ -140,38 +142,44 @@ export function IconArt({
         <span className="item-glow pointer-events-none absolute -inset-1/2 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
       ) : null}
 
-      {preview ? (
-        <span
-          aria-hidden="true"
-          className="pointer-events-none fixed z-40"
-          style={{
-            left: preview.left,
-            top: preview.top,
-            width: PREVIEW_SIZE,
-            height: PREVIEW_SIZE,
-          }}
-        >
-          <span className="slot-well relative flex h-full w-full overflow-hidden rounded-lg border border-edge-strong bg-surface shadow-[0_28px_64px_-16px_rgba(0,0,0,0.98),0_10px_28px_-10px_rgba(0,0,0,0.85)]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={source}
-              alt=""
-              className={cn(
-                "h-full w-full drop-shadow-[0_2px_4px_rgba(0,0,0,0.55)]",
-                fit === "contain" ? "object-contain" : "object-cover",
-                inset ? "p-[16px]" : padded && "p-[14px]",
-              )}
-            />
-            {glow ? <span className="item-glow pointer-events-none absolute -inset-1/2" /> : null}
-            {badge ? (
-              <span className="absolute right-2 top-2 inline-flex h-5 items-center justify-center rounded border border-ember bg-ember px-1.5 font-mono text-[11px] font-bold tracking-normal text-base">
-                {badge}
+      {preview
+        ? createPortal(
+            <span
+              aria-hidden="true"
+              className="pointer-events-none fixed z-40"
+              style={{
+                left: preview.left,
+                top: preview.top,
+                width: PREVIEW_SIZE,
+                height: PREVIEW_SIZE,
+              }}
+            >
+              <span className="slot-well relative flex h-full w-full overflow-hidden rounded-lg border border-edge-strong bg-surface shadow-[0_28px_64px_-16px_rgba(0,0,0,0.98),0_10px_28px_-10px_rgba(0,0,0,0.85)]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={source}
+                  alt=""
+                  referrerPolicy="no-referrer"
+                  className={cn(
+                    "h-full w-full drop-shadow-[0_2px_4px_rgba(0,0,0,0.55)]",
+                    fit === "contain" ? "object-contain" : "object-cover",
+                    inset ? "p-[16px]" : padded && "p-[14px]",
+                  )}
+                />
+                {glow ? (
+                  <span className="item-glow pointer-events-none absolute -inset-1/2" />
+                ) : null}
+                {badge ? (
+                  <span className="absolute right-2 top-2 inline-flex h-5 items-center justify-center rounded border border-ember bg-ember px-1.5 font-mono text-[11px] font-bold tracking-normal text-base">
+                    {badge}
+                  </span>
+                ) : null}
               </span>
-            ) : null}
-          </span>
-          <CornerAccents />
-        </span>
-      ) : null}
+              <CornerAccents />
+            </span>,
+            document.body,
+          )
+        : null}
     </>
   );
 }

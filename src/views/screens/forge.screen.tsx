@@ -276,7 +276,7 @@ export function ForgeScreen() {
                           formatNumber(ore.minYield) +
                           " a " +
                           formatNumber(ore.maxYield) +
-                          " fragmentos por batida"
+                          " fragmentos por mineração"
                         : reason
                     }
                     trailing={

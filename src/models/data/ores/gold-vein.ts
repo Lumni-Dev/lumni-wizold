@@ -6,6 +6,6 @@ export const goldVein: Ore = {
   fragmentId: "gold-fragment",
   set: "gold",
   requiredLevel: 401,
-  minYield: 1,
-  maxYield: 2,
+  minYield: 6,
+  maxYield: 9,
 };

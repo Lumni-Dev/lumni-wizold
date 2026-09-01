@@ -89,7 +89,17 @@ function moonLines(): string[] {
 }
 
 function oreLines(): string[] {
-  return ORES.map((ore) => ore.label + ": mineração NV. " + ore.requiredLevel + ".");
+  return ORES.map(
+    (ore) =>
+      ore.label +
+      ": mineração NV. " +
+      ore.requiredLevel +
+      ", de " +
+      ore.minYield +
+      " a " +
+      ore.maxYield +
+      " por mineração.",
+  );
 }
 
 function boardLine(): string {
@@ -268,7 +278,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         " no 100 e " +
         miningNeeded(1000) +
         " no teto: a escada da mina é a mesma da experiência.",
-      "A cada 40 níveis de mineração cada golpe rende um múltiplo a mais de fragmentos, então a forja continua alimentada sem virar chuva de fragmento.",
+      "O que cada veia rende é fixo e está na lista acima: o nível de mineração abre veias mais fundas, nunca multiplica o punhado que sai da rocha.",
       "A forja só aceita peça desequipada, na mochila: tire do corpo para forjar. Cada peça come só o fragmento do conjunto dela.",
       "Preço do próximo nível: a mesma curva da experiência do personagem, em fragmentos; subir a peça para +N custa o que o nível N custa de experiência, então +" +
         5 +

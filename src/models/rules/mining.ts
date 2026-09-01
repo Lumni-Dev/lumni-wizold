@@ -45,10 +45,6 @@ export function miningExhausted(mining: MiningState, now: number): boolean {
   return miningRemaining(mining, now) <= 0;
 }
 
-export function miningYieldBonus(level: number): number {
-  return 1 + Math.floor(level / 40);
-}
-
 export interface MiningOutcome {
   mining: MiningState;
   levelsGained: number;

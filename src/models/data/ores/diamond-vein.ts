@@ -6,6 +6,6 @@ export const diamondVein: Ore = {
   fragmentId: "diamond-fragment",
   set: "diamond",
   requiredLevel: 601,
-  minYield: 1,
-  maxYield: 2,
+  minYield: 9,
+  maxYield: 12,
 };
