@@ -34,8 +34,8 @@ export function TavernAlertDock() {
           aria-label={"Mensagem na mesa " + alert.roomName}
           className="toast-in pointer-events-auto relative w-full"
         >
-          <div className="overflow-hidden rounded-lg border border-edge bg-surface/80 backdrop-blur shadow-[0_12px_32px_-12px_rgba(0,0,0,0.95)]">
-            <div className="flex items-center gap-2 border-b border-edge bg-surface-high/40 px-3 py-2">
+          <div className="overflow-hidden rounded-lg border border-edge bg-surface-high shadow-[0_12px_32px_-12px_rgba(0,0,0,0.95)]">
+            <div className="flex items-center gap-2 border-b border-edge bg-surface-high px-3 py-2">
               <NavIcon href="/tavern" className="shrink-0 text-ink-faint" />
               <Link
                 href="/tavern"

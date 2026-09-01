@@ -59,7 +59,7 @@ export function GenderSheetHeader({
       <div className="aspect-square w-full overflow-hidden">
         <ArtImage source={source} />
       </div>
-      <div className="absolute inset-x-0 bottom-0 border-t border-edge bg-surface-high/40 px-4 py-3 backdrop-blur">
+      <div className="absolute inset-x-0 bottom-0 border-t border-edge bg-surface-high px-4 py-3">
         {children}
       </div>
     </div>

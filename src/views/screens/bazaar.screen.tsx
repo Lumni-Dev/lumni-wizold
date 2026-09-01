@@ -22,6 +22,8 @@ import {
   formatReais,
   parseReais,
 } from "@/shared/utils/format";
+import { ICON_FRAME_INSET } from "@/shared/constants/ui";
+import { cn } from "@/shared/utils/class-names";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
 import {
   matchesCategoryAndSet,
@@ -351,7 +353,7 @@ export function BazaarScreen() {
         {flow?.kind === "announce" ? (
           announcing ? (
             <div className="space-y-3 p-4">
-              <div className="flex items-center gap-3">
+              <div className={cn("flex items-center gap-3", ICON_FRAME_INSET)}>
                 <ItemIcon item={announcing.item} />
                 <RowText
                   title={enhancedName(announcing.item.name, announcing.enhancement)}
@@ -463,7 +465,7 @@ export function BazaarScreen() {
       >
         {flow?.kind === "buy" && buying ? (
           <>
-            <div className="flex items-center gap-3 border-b border-edge p-4">
+            <div className={cn("flex items-center gap-3 border-b border-edge p-4", ICON_FRAME_INSET)}>
               <ItemIcon item={buying.item} />
               <RowText
                 title={enhancedName(buying.item.name, buying.listing.enhancement)}

@@ -71,7 +71,7 @@ export function Modal({
         )}
         onClick={(event) => event.stopPropagation()}
       >
-        <header className="flex items-center gap-3 border-b border-edge bg-surface-high/40 px-4 py-3">
+        <header className="flex items-center gap-3 border-b border-edge bg-surface-high px-4 py-3">
           <h2 className="heading truncate text-[11px] text-ink">{title}</h2>
           <div className="ml-auto flex shrink-0 items-center gap-2">
             {action ? (

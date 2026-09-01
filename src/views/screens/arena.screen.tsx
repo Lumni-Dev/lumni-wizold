@@ -18,6 +18,7 @@ import type { DerivedStats } from "@/models/rules/stats";
 import { canPetFight, isPetActive, petLevelOf, petMaxEnergy } from "@/models/rules/pet";
 import { playSound } from "@/controllers/sound";
 import { HUNT_TICK_MS } from "@/shared/constants/game";
+import { ICON_FRAME_INSET } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { formatDay, formatNumber, formatBronze } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
@@ -55,7 +56,7 @@ function Fighter({
 }) {
   const left = Math.max(0, Math.round(health));
   return (
-    <div className="flex items-center gap-3 p-4">
+    <div className={cn("flex items-center gap-3 p-4", ICON_FRAME_INSET)}>
       <GenderIcon gender={gender} size="large" />
       <div className="min-w-0 flex-1 space-y-2">
         <div className="min-w-0">

@@ -15,6 +15,8 @@ import { tavernPushRepository } from "@/models/repositories/tavern-push.reposito
 import { NAME_MAX_LENGTH, RENAME_COOLDOWN_DAYS } from "@/shared/constants/game";
 import { formatNumber, formatBronze, formatReais, formatDay } from "@/shared/utils/format";
 import { sanitizeName } from "@/shared/utils/text";
+import { ICON_FRAME_INSET } from "@/shared/constants/ui";
+import { cn } from "@/shared/utils/class-names";
 import { Button } from "../components/button";
 import { AiAuditNotice } from "../components/ai-audit-notice";
 import { Chip } from "../components/chip";
@@ -204,7 +206,7 @@ export function SettingsScreen() {
             </div>
           }
         >
-          <div className="flex items-center gap-3 border-b border-edge p-4">
+          <div className={cn("flex items-center gap-3 border-b border-edge p-4", ICON_FRAME_INSET)}>
             {accountPicture ? (
               <IconFrame size="medium" tone="strong">
                 {/* eslint-disable-next-line @next/next/no-img-element */}

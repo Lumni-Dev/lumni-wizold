@@ -2,6 +2,7 @@
 
 import { createContext, useContext, type ReactNode } from "react";
 import { cn } from "@/shared/utils/class-names";
+import { ICON_FRAME_INSET } from "@/shared/constants/ui";
 import { CornerAccents, MarkNested, useNested } from "./corner-accents";
 
 type CardTone = "default" | "highlighted" | "empty";
@@ -24,7 +25,7 @@ interface CardProps {
 const TONES: Record<CardTone, string> = {
   default: "border-edge bg-surface-high",
   highlighted: "border-edge-strong bg-surface-high",
-  empty: "border-dashed border-edge bg-transparent",
+  empty: "border-dashed border-edge bg-surface",
 };
 
 export function Card({
@@ -61,6 +62,7 @@ export function CardHeader({ children, className }: { children: ReactNode; class
     <div
       className={cn(
         "flex items-center gap-3 p-4",
+        ICON_FRAME_INSET,
         tone !== "empty" && "border-b border-edge",
         className,
       )}

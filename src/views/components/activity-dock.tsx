@@ -277,7 +277,7 @@ export function ActivityDock() {
     <aside aria-label="Atividade em andamento" className="pointer-events-auto relative w-full">
       <div
         className={cn(
-          "overflow-hidden rounded-lg border border-edge bg-surface/80 backdrop-blur shadow-[0_12px_32px_-12px_rgba(0,0,0,0.95)]",
+          "overflow-hidden rounded-lg border border-edge bg-surface-high shadow-[0_12px_32px_-12px_rgba(0,0,0,0.95)]",
           shaking && "card-shake",
         )}
       >

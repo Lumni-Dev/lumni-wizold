@@ -10,7 +10,7 @@ export function chipClass(active = false, className?: string): string {
     "text-[10px] uppercase tracking-[0.16em] transition-colors",
     active
       ? LOOSE_CONTROL_SURFACE_ACTIVE
-      : "border-edge bg-surface/70 backdrop-blur text-ink-soft " + LOOSE_CONTROL_SURFACE_HOVER,
+      : "border-edge bg-surface text-ink-soft " + LOOSE_CONTROL_SURFACE_HOVER,
     className,
   );
 }

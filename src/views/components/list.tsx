@@ -1,4 +1,5 @@
 import type { ReactNode, Ref } from "react";
+import { ICON_FRAME_INSET } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 
 type RowLayout = "row" | "column" | "split";
@@ -47,6 +48,7 @@ export function ListRow({
     <li
       className={cn(
         padding === "art" ? "p-4" : "px-4 py-3",
+        ICON_FRAME_INSET,
         layout === "row" ? ROW_LAYOUT[padding] : LAYOUTS[layout],
         className,
       )}

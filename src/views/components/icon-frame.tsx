@@ -48,6 +48,7 @@ export function IconFrame({
 }) {
   return (
     <span
+      data-icon-frame
       aria-hidden="true"
       className={cn("relative flex shrink-0", ICON_BOX[size], FRAME_ROOM[size], className)}
     >
