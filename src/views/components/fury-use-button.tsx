@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useGame } from "@/controllers/game.context";
-import { furyRemainingMs, isFullMoon } from "@/models/rules/moon";
+import { furyRemainingMs } from "@/models/rules/moon";
 import { Button } from "./button";
 import { FuryRingFrame } from "./fury-ring-frame";
 
@@ -15,7 +15,6 @@ export function FuryUseButton({ onClick }: { onClick: () => void }) {
   const { character, moon } = useGame();
   const [now, setNow] = useState(() => Date.now());
 
-  const fullMoon = isFullMoon(moon.phase.key);
   const remaining = character ? furyRemainingMs(character, moon.phase.key, now) : 0;
   const furyActive = remaining > 0;
 
@@ -33,10 +32,6 @@ export function FuryUseButton({ onClick }: { onClick: () => void }) {
     );
   }
 
-  const label = fullMoon
-    ? "Lua cheia"
-    : "Em fúria " + furyClock(remaining);
-
   return (
     <FuryRingFrame
       as="button"
@@ -45,12 +40,9 @@ export function FuryUseButton({ onClick }: { onClick: () => void }) {
       disabled
       aria-disabled
       className="inline-block cursor-default border-0 bg-transparent p-0 font-[inherit]"
-      fillClassName={
-        "h-8 px-3 text-[11px] font-medium uppercase tracking-[0.16em] " +
-        "bg-surface-high/50 backdrop-blur text-ink"
-      }
+      fillClassName="h-8"
     >
-      {label}
+      <span className="px-3 font-mono text-[11px] text-ink">{furyClock(remaining)}</span>
     </FuryRingFrame>
   );
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { preload } from "react-dom";
 import { useGame } from "@/controllers/game.context";
 import { LORE_CHAPTERS, LORE_COUPLE, LORE_PILLARS } from "@/models/data/lore";
 import { PREVIEW_SHOTS } from "@/models/data/preview";
@@ -13,8 +12,6 @@ import { GenderBanner } from "../components/gender-icon";
 import { PreviewGallery } from "../components/preview-gallery";
 import { LandingCtaButton } from "../components/landing-cta-button";
 import { Footer } from "../layout/footer";
-
-const INTRO_VIDEO = "/assets/ui/backvideo.mp4?v=3";
 
 function useNarration() {
   const audio = useRef<HTMLAudioElement | null>(null);
@@ -65,113 +62,39 @@ export function LandingScreen() {
   const { ready, character } = useGame();
   const hasRun = ready && character !== null;
   const narration = useNarration();
-  preload(INTRO_VIDEO, { as: "video" });
-
-  const [heroShown, setHeroShown] = useState(false);
-  const [intro, setIntro] = useState<"playing" | "leaving" | "done">("playing");
-  const introRef = useRef<HTMLVideoElement>(null);
-  const finishIntro = () => {
-    setHeroShown(true);
-    setIntro((current) => (current === "done" ? current : "leaving"));
-    window.setTimeout(() => setIntro("done"), 700);
-  };
-  useEffect(() => {
-    const video = introRef.current;
-    if (!video) return;
-    void video.play().catch(() => {
-      setHeroShown(true);
-      setIntro("done");
-    });
-  }, []);
-  useEffect(() => {
-    if (intro === "done") return;
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previous;
-    };
-  }, [intro]);
 
   return (
     <div className="flex min-h-screen flex-col">
       <header className="relative flex min-h-screen flex-col items-center justify-center px-4 text-center">
-        {intro !== "done" ? (
-          <video
-            ref={introRef}
-            src={INTRO_VIDEO}
-            autoPlay
-            muted
-            playsInline
-            preload="auto"
-            onTimeUpdate={(event) => {
-              const video = event.currentTarget;
-              if (video.duration && video.duration - video.currentTime <= 1.5) setHeroShown(true);
-            }}
-            onEnded={finishIntro}
-            onError={finishIntro}
-            style={{ filter: "sepia(0.7) hue-rotate(-10deg) saturate(1.4) brightness(0.85)" }}
-            className={cn(
-              "pointer-events-none absolute inset-0 h-full w-full object-cover transition-opacity duration-700",
-              intro === "leaving" ? "opacity-0" : "opacity-100",
-            )}
-          />
-        ) : null}
-        {intro !== "done" ? (
-          <div
-            className={cn(
-              "pointer-events-none absolute inset-0 bg-ember/15 mix-blend-overlay transition-opacity duration-700",
-              intro === "leaving" ? "opacity-0" : "opacity-100",
-            )}
-          />
-        ) : null}
-        {intro !== "done" ? (
-          <div
-            className={cn(
-              "pointer-events-none absolute inset-0 transition-opacity duration-700",
-              intro === "leaving" ? "opacity-0" : "opacity-100",
-            )}
-            style={{
-              background:
-                "radial-gradient(ellipse at center, transparent 38%, rgba(7, 5, 3, 0.88) 100%)",
-              boxShadow: "inset 0 0 18vmax rgba(7, 5, 3, 0.75)",
-            }}
-          />
-        ) : null}
+        <div className="relative z-10 flex flex-col items-center gap-8">
+          <div className="space-y-5">
+            <h1 className="absolute h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
+              {GAME_NAME}: {GAME_TAGLINE}
+            </h1>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/assets/ui/logo.webp?v=3"
+              alt={GAME_NAME}
+              className="landing-hero-shadow-logo mx-auto w-72 max-w-full md:w-96"
+            />
+            <p className="landing-hero-shadow-text text-[11px] uppercase leading-relaxed tracking-[0.24em] text-ink-faint">
+              {GAME_TAGLINE}
+            </p>
+          </div>
 
-        <div
-          className={cn(
-            "relative z-10 flex flex-col items-center gap-8 transition-opacity duration-1000",
-            heroShown ? "opacity-100" : "opacity-0",
-          )}
-        >
-        <div className="space-y-5">
-          <h1 className="absolute h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
-            {GAME_NAME}: {GAME_TAGLINE}
-          </h1>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/assets/ui/logo.webp?v=3"
-            alt={GAME_NAME}
-            className="landing-hero-shadow-logo mx-auto w-72 max-w-full md:w-96"
-          />
-          <p className="landing-hero-shadow-text text-[11px] uppercase leading-relaxed tracking-[0.24em] text-ink-faint">
-            {GAME_TAGLINE}
+          <p className="landing-hero-shadow-text mx-auto max-w-xl text-sm leading-7 text-ink-soft">
+            Dois se encontraram numa noite de lua cheia e desceram a serra sendo outra coisa. A
+            matilha que eles começaram ainda caça, e a lua que decide o preço de cada noite é a que
+            está no céu agora, lá fora.
           </p>
-        </div>
 
-        <p className="landing-hero-shadow-text mx-auto max-w-xl text-sm leading-7 text-ink-soft">
-          Dois se encontraram numa noite de lua cheia e desceram a serra sendo outra coisa. A
-          matilha que eles começaram ainda caça, e a lua que decide o preço de cada noite é a que
-          está no céu agora, lá fora.
-        </p>
-
-        <div className="flex flex-col items-center gap-4">
-          {hasRun ? (
-            <LandingCtaButton href="/character" label={"Continuar com " + character.name} />
-          ) : (
-            <LandingCtaButton href="/login" label="Jogar grátis" />
-          )}
-        </div>
+          <div className="flex flex-col items-center gap-4">
+            {hasRun ? (
+              <LandingCtaButton href="/character" label={"Continuar com " + character.name} />
+            ) : (
+              <LandingCtaButton href="/login" label="Jogar grátis" />
+            )}
+          </div>
         </div>
       </header>
 

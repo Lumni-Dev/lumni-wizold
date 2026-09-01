@@ -12,8 +12,14 @@ export const GLASS_SECTION_STRONG = "bg-surface-high/50 backdrop-blur";
 /** Fields, selects, chips and tags sit slightly denser for legibility. */
 export const GLASS_CONTROL = "bg-surface/70 backdrop-blur";
 
-/** Inner fill of the fury ring: hides the spinning border while staying translucent. */
-export const FURY_RING_FILL = "bg-surface/70 backdrop-blur";
+/** Inner face of the fury ring: solid fill that masks the spinning border. */
+export const FURY_RING_FILL = "bg-surface-high";
+
+/** Outer edge of the fury ring: same rounded-md as buttons and fields. */
+export const FURY_RING_RADIUS = "rounded-md";
+
+/** Inner face, inset by the 1px animated border. */
+export const FURY_RING_INNER_RADIUS = "rounded-[calc(var(--radius-md)-1px)]";
 
 export const GLASS_CONTROL_ACTIVE = "bg-surface-high/50 backdrop-blur";
 
