@@ -60,17 +60,17 @@ function startScrubPingPong(video: HTMLVideoElement) {
   return () => cancelAnimationFrame(frame);
 }
 
-function startNativePingPong(video: HTMLVideoElement, onFail: () => void) {
+function startNativePingPong(video: HTMLVideoElement, onPlayFail: () => void) {
   video.loop = false;
 
   const playForward = () => {
     video.playbackRate = PLAYBACK_RATE;
-    void video.play().catch(onFail);
+    void video.play().catch(onPlayFail);
   };
 
   const playBackward = () => {
     video.playbackRate = -PLAYBACK_RATE;
-    void video.play().catch(onFail);
+    void video.play().catch(onPlayFail);
   };
 
   const onTimeUpdate = () => {
@@ -112,13 +112,19 @@ export function LandingBackground() {
     const video = videoRef.current;
     if (!video) return;
 
-    const onFail = () => setFailed(true);
-    const stop =
-      supportsReversePlayback(video)
-        ? startNativePingPong(video, onFail)
-        : startScrubPingPong(video);
+    let stop = () => undefined;
+    const onPlayFail = () => {
+      stop();
+      stop = startScrubPingPong(video);
+    };
 
-    return stop;
+    void video.play().catch(onPlayFail);
+
+    stop = supportsReversePlayback(video)
+      ? startNativePingPong(video, onPlayFail)
+      : startScrubPingPong(video);
+
+    return () => stop();
   }, [failed, ready]);
 
   const showVideo = !failed;
@@ -140,6 +146,7 @@ export function LandingBackground() {
 
       <video
         ref={videoRef}
+        autoPlay
         muted
         playsInline
         preload="auto"
