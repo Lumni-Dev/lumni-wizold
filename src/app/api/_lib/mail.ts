@@ -1,4 +1,5 @@
 import { createTransport } from "nodemailer";
+import { SITE_EMAIL } from "@/shared/constants/site";
 
 const GAME_URL = "https://wizold.lumni.dev.br";
 const GAME_NAME = "WIZOLD";
@@ -83,9 +84,13 @@ function layout(
     INK_FAINT +
     ';">' +
     "A partida vive no servidor de Wizold e te espera em qualquer navegador.<br/>" +
-    'Suporte: <a href="mailto:wizold@lumni.dev.br" style="color:' +
+    'Suporte: <a href="mailto:' +
+    SITE_EMAIL +
+    '" style="color:' +
     INK_SOFT +
-    ';text-decoration:none;">wizold@lumni.dev.br</a>' +
+    ';text-decoration:none;">' +
+    SITE_EMAIL +
+    "</a>" +
     "</div>" +
     "</td></tr></table></div>"
   );

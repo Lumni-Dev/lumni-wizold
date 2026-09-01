@@ -194,7 +194,7 @@ export function InventoryScreen() {
                           <FuryUseButton onClick={() => consumeItem(item.id)} />
                         ) : (
                           <Button variant="primary" onClick={() => consumeItem(item.id)}>
-                            Usar
+                            {item.category === "pet" ? "Alimentar" : "Beber"}
                           </Button>
                         )
                       ) : null}

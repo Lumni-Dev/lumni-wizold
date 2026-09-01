@@ -12,16 +12,22 @@ import { ActionIcon } from "../components/app-icon";
 import { CornerAccents } from "../components/corner-accents";
 import { GenderBanner } from "../components/gender-icon";
 import { PreviewGallery } from "../components/preview-gallery";
+import { SpinBorder } from "../components/spin-border";
 import { Footer } from "../layout/footer";
+
+const PLAY_INNER =
+  "inline-flex h-12 w-full items-center justify-center border-0 px-8 text-xs font-medium uppercase tracking-[0.16em] text-base bg-ember shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)]";
 
 function PlayButton({ href, label }: { href: string; label: string }) {
   return (
-    <Link
+    <SpinBorder
+      as={Link}
       href={href}
-      className="inline-flex h-12 items-center justify-center rounded-md border border-ember bg-ember px-8 text-xs font-medium uppercase tracking-[0.16em] text-base shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)] transition-[filter] hover:brightness-110"
+      className="inline-block rounded-md transition-[filter] hover:brightness-110"
+      innerClassName={PLAY_INNER}
     >
       {label}
-    </Link>
+    </SpinBorder>
   );
 }
 

@@ -24,6 +24,7 @@ import {
   RENAME_HUNTS,
   STARTING_BRONZE,
 } from "@/shared/constants/game";
+import { SITE_EMAIL } from "@/shared/constants/site";
 import { ECONOMY } from "@/shared/config/economy";
 import { SPECIES_LABEL, SPECIES_ORDER } from "../entities/creature";
 import { TERRITORIES } from "./territories";
@@ -427,7 +428,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         ", pedido com nome completo, CPF e chave Pix.",
       "O saque desta versão é de demonstração: o pedido fica registrado com os dados informados e nada é transferido ainda.",
       "Comprar uma peça mais forjada que a sua eleva a sua ao nível dela: a forja pertence à peça.",
-      "Qualquer dúvida com um pagamento, escreva para o suporte: wizold@lumni.dev.br.",
+      "Qualquer dúvida com um pagamento, escreva para o suporte: " + SITE_EMAIL + ".",
     ],
   },
   {
@@ -435,16 +436,21 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     title: "Wizold Store",
     summary: "WCoins por dinheiro, para quem quer pular a espera.",
     lines: [
-      "Três pacotes, e cada um vale um número de caçadas da sua faixa, não um número solto de WCoins.",
+      "Três pacotes ancorados no conjunto da faixa: uma peça, quase o conjunto inteiro, ou o conjunto com folga de bigorna.",
       ...STORE_PACKS.map(
         (pack) =>
-          pack.name + ": " + pack.hunts + " caçadas por " + formatReais(pack.priceCents) + ".",
+          pack.name +
+          ": ~" +
+          Math.round(pack.setShare * 100) +
+          "% do conjunto da faixa por " +
+          formatReais(pack.priceCents) +
+          ".",
       ),
-      "Subir de faixa aumenta o que o mesmo pacote entrega, então comprar cedo nunca vira atalho: o que está à venda é tempo, sempre o mesmo tempo.",
+      "Subir de faixa aumenta o WCoins que o mesmo pacote entrega, então comprar cedo nunca vira atalho: o que está à venda é tempo proporcional ao custo da faixa.",
       "A loja não vende nível, atributo nem equipamento: experiência só a caça dá, e ponto de atributo só o treino dá.",
       "O pagamento abre no checkout do Stripe e os WCoins caem na conta assim que ele confirma.",
       "O histórico de compras fica na própria loja, cinco por página: valor, data e o status de cada pacote, de aguardando pagamento a aprovado, expirado ou devolvido.",
-      "Qualquer dúvida com um pagamento, escreva para o suporte: wizold@lumni.dev.br.",
+      "Qualquer dúvida com um pagamento, escreva para o suporte: " + SITE_EMAIL + ".",
     ],
   },
   {

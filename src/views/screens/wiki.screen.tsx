@@ -3,13 +3,7 @@
 import { marketPriceOf } from "@/controllers/market.controller";
 import { useGame } from "@/controllers/game.context";
 import { CREATURES } from "@/models/data/creatures";
-import {
-  EQUIPMENT_SETS,
-  pieceId,
-  pieceName,
-  piecePrice,
-  type SetDefinition,
-} from "@/models/data/equipment-sets";
+import { EQUIPMENT_SETS, pieceId, pieceName, piecePrice } from "@/models/data/equipment-sets";
 import { SLOT_ROLE } from "@/models/data/equipment/slots";
 import { EXERCISES } from "@/models/data/exercises";
 import { trainingEffort } from "@/models/rules/training";
@@ -24,19 +18,18 @@ import {
   ITEM_CATEGORIES,
   RARITY_LABEL,
   SLOT_LABEL,
-  type EquipmentSlot,
-  type Item,
   type ItemCategory,
 } from "@/models/entities/item";
 import { DANGER_LABEL } from "@/models/entities/territory";
 import { formatNumber, formatBronze } from "@/shared/utils/format";
 import { Tag } from "../components/tag";
+import { List, ListRow, RowText } from "../components/list";
 import { Panel } from "../components/panel";
 import { AttributeIcon } from "../components/attribute-icon";
 import { chipClass } from "../components/chip";
 import { CreatureIcon } from "../components/creature-icon";
 import { ItemIcon } from "../components/item-icon";
-import { IconFrame } from "../components/icon-frame";
+import { WikiMasonry, WikiMasonryItem } from "../components/wiki-masonry";
 import { PageHeader } from "../layout/page-header";
 import { summarizeEffect } from "../presenters/item.presenter";
 
@@ -51,65 +44,28 @@ const SECTIONS: readonly { id: string; label: string }[] = [
   { id: "catalog", label: "Catálogo" },
 ];
 
-const TILE =
-  "flex items-start gap-2 rounded-md border border-edge bg-surface-high/20 p-2";
-
-const TILE_GRID =
-  "grid grid-cols-2 gap-2 p-4 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5";
-
-const PANEL_GRID = "grid gap-4 sm:grid-cols-2 lg:grid-cols-3";
-
 function itemsOfCategory(category: ItemCategory) {
   return ITEMS.filter((item) => item.category === category);
 }
 
-function WikiItemTile({ item, level }: { item: Item; level: number }) {
-  const effects = summarizeEffect(item);
+const SET_GRID =
+  "grid w-full grid-cols-[4.5rem_minmax(0,1fr)_4.5rem] items-center gap-x-3 sm:grid-cols-[4.5rem_minmax(0,1fr)_minmax(0,7rem)_4.5rem]";
 
+const CATALOG_GRID =
+  "grid w-full grid-cols-[4.5rem_minmax(0,1fr)_4.5rem] items-center gap-x-3 sm:grid-cols-[4.5rem_minmax(0,1fr)_minmax(0,7rem)_4.5rem]";
+
+function SetTableHeader() {
   return (
-    <div className={TILE}>
-      <ItemIcon item={item} size="mini" />
-      <div className="min-w-0 flex-1 space-y-0.5">
-        <p className="text-xs leading-snug text-ink">{item.name}</p>
-        {effects.length > 0 ? (
-          <p className="text-[10px] leading-snug text-ink-soft">{effects.join(", ")}</p>
-        ) : item.description ? (
-          <p className="text-[10px] leading-snug text-ink-faint">{item.description}</p>
-        ) : null}
-        <p className="text-[10px] text-ink-faint">
-          {RARITY_LABEL[item.rarity]} · NV. {item.minLevel}+
-        </p>
-        <p className="font-mono text-[10px] text-ink-faint">
-          {item.inMarket ? formatBronze(marketPriceOf(item, level)) : "drop"}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function WikiSetTile({
-  definition,
-  slot,
-}: {
-  definition: SetDefinition;
-  slot: EquipmentSlot;
-}) {
-  const item = findItem(pieceId(definition.key, slot));
-  const effects = item ? summarizeEffect(item) : [];
-
-  return (
-    <div className={TILE}>
-      {item ? <ItemIcon item={item} size="mini" /> : <IconFrame size="mini">--</IconFrame>}
-      <div className="min-w-0 flex-1 space-y-0.5">
-        <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">{SLOT_LABEL[slot]}</p>
-        <p className="text-xs leading-snug text-ink">{pieceName(definition, slot)}</p>
-        {effects.length > 0 ? (
-          <p className="text-[10px] leading-snug text-ink-soft">{effects.join(", ")}</p>
-        ) : null}
-        <p className="font-mono text-[10px] text-ink-faint">
-          {formatBronze(piecePrice(definition, slot))}
-        </p>
-      </div>
+    <div
+      className={
+        SET_GRID +
+        " border-b border-edge px-4 py-2 text-[10px] uppercase tracking-[0.16em] text-ink-faint"
+      }
+    >
+      <span>Espaço</span>
+      <span>Peça</span>
+      <span className="hidden sm:block">Bônus</span>
+      <span className="text-right">Preço</span>
     </div>
   );
 }
@@ -119,13 +75,13 @@ export function WikiScreen() {
   const level = character?.level ?? 1;
 
   return (
-    <div className="space-y-6">
+    <>
       <PageHeader
         title="Wiki"
         description="Todas as regras, números e catálogos do jogo em um lugar só."
       />
 
-      <nav aria-label="Seções da wiki" className="flex flex-wrap gap-2">
+      <nav aria-label="Seções da wiki" className="mb-6 flex flex-wrap gap-2">
         {SECTIONS.map((section) => (
           <a key={section.id} href={"#" + section.id} className={chipClass()}>
             {section.label}
@@ -133,37 +89,34 @@ export function WikiScreen() {
         ))}
       </nav>
 
-      <div className={PANEL_GRID}>
+      <div className="space-y-6">
+        <WikiMasonry>
         {WIKI_TOPICS.map((topic) => (
-          <Panel
-            key={topic.id}
-            id={topic.id}
-            title={topic.title}
-            description={topic.summary}
-            className="scroll-mt-28"
-          >
-            <ul className="space-y-1.5 text-xs leading-relaxed text-ink-soft">
-              {topic.lines.map((line) => (
-                <li key={line}>{line}</li>
-              ))}
-            </ul>
-          </Panel>
+          <WikiMasonryItem key={topic.id} id={topic.id}>
+            <Panel title={topic.title} description={topic.summary}>
+              <ul className="space-y-2 text-xs leading-relaxed text-ink-soft">
+                {topic.lines.map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ul>
+            </Panel>
+          </WikiMasonryItem>
         ))}
-      </div>
+      </WikiMasonry>
 
       <div id="attributes" className="scroll-mt-28">
         <Panel title="Atributos" description="Cinco eixos, todos treináveis." padding="none">
-          <div className={TILE_GRID + " lg:grid-cols-5"}>
+          <List>
             {ATTRIBUTES.map((attribute) => (
-              <div key={attribute.key} className={TILE}>
-                <AttributeIcon attribute={attribute.key} size="mini" />
-                <div className="min-w-0 flex-1 space-y-0.5">
-                  <p className="text-xs text-ink">{attribute.name}</p>
-                  <p className="text-[10px] leading-snug text-ink-faint">{attribute.effect}</p>
+              <ListRow key={attribute.key} padding="art">
+                <AttributeIcon attribute={attribute.key} />
+                <div className="min-w-0 flex-1 space-y-1">
+                  <p className="text-sm text-ink">{attribute.name}</p>
+                  <p className="text-[11px] leading-relaxed text-ink-faint">{attribute.effect}</p>
                 </div>
-              </div>
+              </ListRow>
             ))}
-          </div>
+          </List>
         </Panel>
       </div>
 
@@ -173,41 +126,60 @@ export function WikiScreen() {
           description="Um item por espaço, sete no total."
           padding="none"
         >
-          <div className={TILE_GRID + " lg:grid-cols-4 xl:grid-cols-7"}>
+          <List>
             {EQUIPMENT_SLOTS.map((slot) => (
-              <div key={slot} className={TILE}>
-                <div className="min-w-0 flex-1 space-y-0.5">
-                  <p className="text-xs text-ink">{SLOT_LABEL[slot]}</p>
-                  <p className="text-[10px] leading-snug text-ink-faint">{SLOT_ROLE[slot]}</p>
+              <ListRow key={slot}>
+                <div className="min-w-0 flex-1">
+                  <RowText title={SLOT_LABEL[slot]} description={SLOT_ROLE[slot]} />
                 </div>
-              </div>
+              </ListRow>
             ))}
-          </div>
+          </List>
         </Panel>
       </div>
 
-      <div id="sets" className={"scroll-mt-28 " + PANEL_GRID}>
+      <WikiMasonry id="sets" className="scroll-mt-28">
         {EQUIPMENT_SETS.map((definition) => (
-          <Panel
-            key={definition.key}
-            title={"Conjunto " + definition.label}
-            description={definition.description}
-            action={
-              <div className="flex flex-wrap justify-end gap-2">
-                <Tag tone="neutral">NV. {definition.minLevel}+</Tag>
-                {definition.inMarket ? <Tag tone="faint">No mercado</Tag> : null}
-              </div>
-            }
-            padding="none"
-          >
-            <div className={TILE_GRID}>
-              {EQUIPMENT_SLOTS.map((slot) => (
-                <WikiSetTile key={slot} definition={definition} slot={slot} />
-              ))}
-            </div>
-          </Panel>
+          <WikiMasonryItem key={definition.key}>
+            <Panel
+              title={"Conjunto " + definition.label}
+              description={definition.description}
+              action={
+                <div className="flex flex-wrap justify-end gap-2">
+                  <Tag tone="neutral">NV. {definition.minLevel}+</Tag>
+                  {definition.inMarket ? <Tag tone="faint">No mercado</Tag> : null}
+                </div>
+              }
+              padding="none"
+            >
+              <SetTableHeader />
+              <List>
+                {EQUIPMENT_SLOTS.map((slot) => {
+                  const item = findItem(pieceId(definition.key, slot));
+                  return (
+                    <ListRow key={slot} padding="text" className="!py-2.5">
+                      <div className={SET_GRID}>
+                        <span className="truncate text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                          {SLOT_LABEL[slot]}
+                        </span>
+                        <span className="min-w-0 truncate text-sm text-ink">
+                          {pieceName(definition, slot)}
+                        </span>
+                        <span className="hidden min-w-0 truncate text-[11px] text-ink-soft sm:block">
+                          {item ? summarizeEffect(item).join(", ") : "—"}
+                        </span>
+                        <span className="truncate text-right font-mono text-[11px] text-ink-faint">
+                          {formatBronze(piecePrice(definition, slot))}
+                        </span>
+                      </div>
+                    </ListRow>
+                  );
+                })}
+              </List>
+            </Panel>
+          </WikiMasonryItem>
         ))}
-      </div>
+      </WikiMasonry>
 
       <div id="exercises" className="scroll-mt-28">
         <Panel
@@ -215,26 +187,24 @@ export function WikiScreen() {
           description="Um por atributo, do primeiro ao último nível."
           padding="none"
         >
-          <div className={TILE_GRID + " lg:grid-cols-5"}>
+          <List>
             {EXERCISES.map((exercise) => (
-              <div key={exercise.id} className={TILE}>
-                <div className="min-w-0 flex-1 space-y-0.5">
-                  <div className="flex items-baseline justify-between gap-2">
-                    <p className="text-xs text-ink">{exercise.name}</p>
-                    <p className="shrink-0 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                      {findAttribute(exercise.attribute)?.name ?? exercise.attribute}
-                    </p>
-                  </div>
-                  <p className="text-[10px] leading-snug text-ink-faint">{exercise.description}</p>
+              <ListRow key={exercise.id} layout="column">
+                <div className="flex items-baseline justify-between gap-2">
+                  <p className="text-sm text-ink">{exercise.name}</p>
+                  <p className="shrink-0 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                    {findAttribute(exercise.attribute)?.name ?? exercise.attribute}
+                  </p>
                 </div>
-              </div>
+                <p className="text-[11px] leading-relaxed text-ink-faint">{exercise.description}</p>
+              </ListRow>
             ))}
-          </div>
+          </List>
           <div className="space-y-2 border-t border-edge px-4 py-3">
             <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
               Rendimento da sessão
             </p>
-            <ul className="grid gap-1 sm:grid-cols-2 lg:grid-cols-3">
+            <ul className="space-y-1">
               {[1, 170, 340, 670, 1000].map((value) => (
                 <li key={value} className="font-mono text-[11px] text-ink-soft">
                   Atributo {formatNumber(value)}: +{formatNumber(trainingEffort(value).progress)}{" "}
@@ -252,116 +222,131 @@ export function WikiScreen() {
           description="Ordem natural de progressão da caça."
           padding="none"
         >
-          <div className="grid gap-2 p-4 lg:grid-cols-2">
+          <List>
             {TERRITORIES.map((territory) => (
-              <div key={territory.id} className={TILE}>
-                <div className="min-w-0 flex-1 space-y-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="text-xs text-ink">{territory.name}</p>
-                    <Tag tone="faint">{DANGER_LABEL[territory.danger]}</Tag>
-                    <Tag tone="neutral">
-                      NV. {formatNumber(territory.minLevel)} a {formatNumber(territory.maxLevel)}
-                    </Tag>
-                    <Tag tone="neutral">{SPECIES_LABEL[territory.species]}</Tag>
-                  </div>
-                  <p className="text-[10px] leading-snug text-ink-faint">{territory.description}</p>
-                  <p className="text-[10px] leading-snug text-ink-soft">
-                    {territory.creatures
-                      .map(
-                        (creatureId) =>
-                          CREATURES.find((creature) => creature.id === creatureId)?.name,
-                      )
-                      .filter(Boolean)
-                      .join(", ")}
-                  </p>
+              <ListRow key={territory.id} layout="column">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-sm text-ink">{territory.name}</p>
+                  <Tag tone="faint">{DANGER_LABEL[territory.danger]}</Tag>
+                  <Tag tone="neutral">
+                    NV. {formatNumber(territory.minLevel)} a {formatNumber(territory.maxLevel)}
+                  </Tag>
+                  <Tag tone="neutral">{SPECIES_LABEL[territory.species]}</Tag>
                 </div>
-              </div>
+                <p className="text-xs text-ink-faint">{territory.description}</p>
+                <p className="text-[11px] text-ink-soft">
+                  {territory.creatures
+                    .map(
+                      (creatureId) =>
+                        CREATURES.find((creature) => creature.id === creatureId)?.name,
+                    )
+                    .filter(Boolean)
+                    .join(", ")}
+                </p>
+              </ListRow>
             ))}
-          </div>
+          </List>
         </Panel>
       </div>
 
-      <div id="bestiary" className={"scroll-mt-28 " + PANEL_GRID}>
+      <WikiMasonry id="bestiary" className="scroll-mt-28">
         {SPECIES_ORDER.map((species) => {
           const members = CREATURES.filter((creature) => creature.species === species);
           const band = members.length > 0 ? members[0].description : "";
 
           return (
-            <Panel
-              key={species}
-              title={SPECIES_LABEL[species]}
-              description={band}
-              action={
-                members.length > 0 ? (
-                  <Tag tone="neutral">
-                    NV. {formatNumber(members[0].level)} a{" "}
-                    {formatNumber(members[members.length - 1].level)}
-                  </Tag>
-                ) : null
-              }
-              padding="none"
-            >
-              <div className={TILE_GRID + " md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2"}>
-                {members.map((creature) => (
-                  <div key={creature.id} className={TILE}>
-                    <CreatureIcon creature={creature} size="mini" />
-                    <div className="min-w-0 flex-1 space-y-0.5">
-                      <div className="flex items-baseline justify-between gap-2">
-                        <p className="truncate text-xs text-ink">{creature.name}</p>
-                        <span className="shrink-0 font-mono text-[10px] text-ink-faint">
-                          NV. {formatNumber(creature.level)}
-                        </span>
+            <WikiMasonryItem key={species}>
+              <Panel
+                title={SPECIES_LABEL[species]}
+                description={band}
+                action={
+                  members.length > 0 ? (
+                    <Tag tone="neutral">
+                      NV. {formatNumber(members[0].level)} a{" "}
+                      {formatNumber(members[members.length - 1].level)}
+                    </Tag>
+                  ) : null
+                }
+                padding="none"
+              >
+                <List>
+                  {members.map((creature) => (
+                    <ListRow key={creature.id} padding="art" className="items-start">
+                      <CreatureIcon creature={creature} />
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3">
+                          <p className="truncate text-sm text-ink">{creature.name}</p>
+                          <span className="shrink-0 font-mono text-[11px] text-ink-faint">
+                            NV. {formatNumber(creature.level)}
+                          </span>
+                        </div>
+                        <p className="font-mono text-[11px] leading-relaxed text-ink-soft">
+                          {formatNumber(creature.health)} vida · {formatNumber(creature.strength)}{" "}
+                          força · {formatNumber(creature.endurance)} resistência ·{" "}
+                          {formatNumber(creature.agility)} agilidade
+                        </p>
+                        <p className="font-mono text-[11px] text-ink-faint">
+                          +{formatNumber(creature.experience)} exp ·{" "}
+                          {formatNumber(creature.minBronze)} a {formatBronze(creature.maxBronze)}
+                        </p>
                       </div>
-                      <p className="text-[10px] leading-snug text-ink-soft">
-                        {formatNumber(creature.health)} vida · {formatNumber(creature.strength)} força
-                        · {formatNumber(creature.endurance)} resist ·{" "}
-                        {formatNumber(creature.agility)} agi
-                      </p>
-                      <p className="text-[10px] text-ink-faint">
-                        +{formatNumber(creature.experience)} exp ·{" "}
-                        {formatNumber(creature.minBronze)} a {formatBronze(creature.maxBronze)}
-                      </p>
-                    </div>
+                    </ListRow>
+                  ))}
+                </List>
+                {members.length > 0 ? (
+                  <div className="border-t border-edge px-4 py-3">
+                    <p className="text-[11px] text-ink-faint">
+                      Loot:{" "}
+                      {members[0].drops
+                        .map(
+                          (drop) =>
+                            (findItem(drop.itemId)?.name ?? drop.itemId) +
+                            " (" +
+                            Math.round(drop.chance * 100) +
+                            "%)",
+                        )
+                        .join(", ")}
+                    </p>
                   </div>
-                ))}
-              </div>
-              {members.length > 0 ? (
-                <div className="border-t border-edge px-4 py-3">
-                  <p className="text-[10px] leading-snug text-ink-faint">
-                    Loot:{" "}
-                    {members[0].drops
-                      .map(
-                        (drop) =>
-                          (findItem(drop.itemId)?.name ?? drop.itemId) +
-                          " (" +
-                          Math.round(drop.chance * 100) +
-                          "%)",
-                      )
-                      .join(", ")}
-                  </p>
-                </div>
-              ) : null}
-            </Panel>
+                ) : null}
+              </Panel>
+            </WikiMasonryItem>
           );
         })}
-      </div>
+      </WikiMasonry>
 
-      <div id="catalog" className={"scroll-mt-28 " + PANEL_GRID}>
+      <WikiMasonry id="catalog" className="scroll-mt-28">
         {ITEM_CATEGORIES.map((category) => (
-          <Panel
-            key={category}
-            title={CATEGORY_PLURAL[category]}
-            description={itemsOfCategory(category).length + " itens no catálogo."}
-            padding="none"
-          >
-            <div className={TILE_GRID}>
-              {itemsOfCategory(category).map((item) => (
-                <WikiItemTile key={item.id} item={item} level={level} />
-              ))}
-            </div>
-          </Panel>
+          <WikiMasonryItem key={category}>
+            <Panel
+              title={CATEGORY_PLURAL[category]}
+              description={itemsOfCategory(category).length + " itens no catálogo."}
+              padding="none"
+            >
+              <List>
+                {itemsOfCategory(category).map((item) => (
+                  <ListRow key={item.id} padding="text" className="!py-2.5">
+                    <div className={CATALOG_GRID}>
+                      <ItemIcon item={item} size="small" />
+                      <span className="min-w-0 truncate text-sm text-ink">{item.name}</span>
+                      <span className="hidden min-w-0 truncate text-[11px] text-ink-soft sm:block">
+                        {RARITY_LABEL[item.rarity]}, NV. {item.minLevel}+
+                        {summarizeEffect(item).length > 0
+                          ? " · " + summarizeEffect(item).join(", ")
+                          : ""}
+                      </span>
+                      <span className="truncate text-right font-mono text-[11px] text-ink-faint">
+                        {item.inMarket ? formatBronze(marketPriceOf(item, level)) : "drop"}
+                      </span>
+                    </div>
+                  </ListRow>
+                ))}
+              </List>
+            </Panel>
+          </WikiMasonryItem>
         ))}
+        </WikiMasonry>
       </div>
-    </div>
+    </>
   );
 }

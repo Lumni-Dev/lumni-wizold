@@ -12,53 +12,53 @@ export const PREVIEW_SHOTS: readonly PreviewShot[] = [
     label: "Personagem",
     title: "A ficha inteira, sem número escondido",
     text:
-      "Cada atributo mostra de onde veio cada ponto: treino, equipamento, mascote, lua e " +
-      "lobisomem em colunas separadas. Some com o dedo e você chega no total.",
-    image: "/assets/landing/character.webp?v=5",
-  },
-  {
-    key: "inventory",
-    label: "Inventário",
-    title: "Sete espaços e uma mochila honesta",
-    text:
-      "Capacete, colar, armadura, calças, botas, luvas e anel: uma peça por espaço, e o que a " +
-      "peça promete é exatamente o que a ficha soma. O que foi forjado carrega o +X na arte.",
-    image: "/assets/landing/inventory.webp?v=5",
+      "Atributos, forma, lobo e combate na mesma tela, com a origem de cada ponto separada: " +
+      "treino, equipamento, mascote, lua e fúria.",
+    image: "/assets/landing/character.png?v=6",
   },
   {
     key: "hunt",
     label: "Caça",
-    title: "Seis territórios, e só a fera sobe a trilha",
+    title: "Seis territórios, narrados ao vivo",
     text:
-      "A caçada roda em rodadas, narrada golpe a golpe, e a presa cresce junto com você dentro " +
-      "da faixa do território. Transforme-se antes: em pele humana o campo recusa.",
-    image: "/assets/landing/hunt.webp?v=5",
+      "A trilha enche, a presa responde e a luta desce linha a linha. Só a fera caça: " +
+      "em pele humana o campo recusa.",
+    image: "/assets/landing/hunt.png?v=6",
   },
   {
-    key: "pet",
-    label: "Mascote",
-    title: "Um lobo do seu lado, com ladder própria",
+    key: "training",
+    label: "Treino",
+    title: "Cinco exercícios, uma vida inteira",
     text:
-      "Adotado uma vez, para sempre: ele morde na caçada, empresta atributos enquanto acompanha " +
-      "e sobe os próprios níveis no pátio. A energia é o único fôlego dele; comida ou repouso devolvem.",
-    image: "/assets/landing/pet.webp?v=5",
-  },
-  {
-    key: "market",
-    label: "Mercado",
-    title: "Cinco conjuntos, sete peças cada",
-    text:
-      "Do bronze ao lunar, e uma peça só empresta atributo: o que o card promete é exatamente o " +
-      "que a ficha soma e o que a luta lê. O resto é forja, mina e paciência.",
-    image: "/assets/landing/market.webp?v=5",
+      "Cada atributo tem o seu pátio, a sessão cobra WCoins e o ganho acompanha o nível " +
+      "sem presente escondido na faixa.",
+    image: "/assets/landing/training.png?v=6",
   },
   {
     key: "forge",
     label: "Forja",
-    title: "A bigorna bate na peça que você já usa",
+    title: "Veia, fragmento e martelo",
     text:
-      "A mina abre os veios, o fragmento certo alimenta a marreta, e cada nível forjado soma " +
-      "ponto e porcentagem à peça. O nível pertence à peça: tirar do corpo não desfaz o trabalho.",
-    image: "/assets/landing/forge.webp?v=5",
+      "A mina abre os veios por faixa, a bigorna bate na peça que você já usa e cada +1 " +
+      "permanece na peça, não no slot.",
+    image: "/assets/landing/forge.png?v=6",
+  },
+  {
+    key: "arena",
+    label: "Arena",
+    title: "Fosso contra caçadores reais",
+    text:
+      "Adversário do ranking, prêmio em WCoins na bolsa dele e replay da luta na mesma " +
+      "cadência da caça.",
+    image: "/assets/landing/arena.png?v=6",
+  },
+  {
+    key: "tavern",
+    label: "Taverna",
+    title: "Mesas que não esperam refresh",
+    text:
+      "Salas abertas ou trancadas, mensagens ao vivo, convite de matilha e aviso quando " +
+      "a cadeira acende.",
+    image: "/assets/landing/tavern.png?v=6",
   },
 ];

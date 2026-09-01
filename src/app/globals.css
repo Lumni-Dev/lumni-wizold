@@ -283,13 +283,15 @@ button:not(:disabled) {
 
 .fury-spin-border {
   position: relative;
+  isolation: isolate;
   overflow: hidden;
   border-radius: 0.375rem;
   padding: 1px;
-  isolation: isolate;
+  border: 0;
 }
 
-.fury-spin-border-track {
+.fury-spin-border::before {
+  content: "";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -299,9 +301,9 @@ button:not(:disabled) {
   background: conic-gradient(
     from 0deg,
     var(--color-ember) 0deg,
-    color-mix(in oklab, var(--color-ember) 35%, transparent) 55deg,
-    transparent 110deg,
-    transparent 360deg
+    color-mix(in oklab, var(--color-ember) 45%, var(--color-edge)) 55deg,
+    var(--color-edge) 110deg,
+    var(--color-edge) 360deg
   );
   transform: translate(-50%, -50%);
   animation: fury-border-spin 2.4s linear infinite;
@@ -310,10 +312,8 @@ button:not(:disabled) {
 .fury-spin-border-inner {
   position: relative;
   z-index: 1;
-  display: flex;
-  align-items: stretch;
+  border: 0;
   border-radius: calc(0.375rem - 1px);
-  background: var(--color-surface);
 }
 
 .volume-slider {

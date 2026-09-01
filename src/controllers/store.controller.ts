@@ -2,7 +2,7 @@ import { capBronze, formatReais, formatBronze } from "@/shared/utils/format";
 import { findPack, STORE_PACKS, type StorePack } from "@/models/data/store-packs";
 import type { GameState } from "@/models/entities/game-state";
 import { failure, success, type Result } from "@/models/entities/result";
-import { packBronze, bronzePerReal } from "@/models/rules/store";
+import { packBronze, bronzePerReal, packHuntEquivalent } from "@/models/rules/store";
 import { addLog } from "./log.controller";
 import { updateCharacter } from "./character.controller";
 
@@ -10,6 +10,7 @@ export interface StoreOffer {
   pack: StorePack;
   bronze: number;
   perReal: number;
+  huntEquivalent: number;
 }
 
 export function listPacks(state: GameState): StoreOffer[] {
@@ -19,6 +20,7 @@ export function listPacks(state: GameState): StoreOffer[] {
     pack,
     bronze: packBronze(pack, level),
     perReal: bronzePerReal(pack, level),
+    huntEquivalent: packHuntEquivalent(pack, level),
   }));
 }
 
@@ -47,6 +49,7 @@ export function purchasePack(state: GameState, packId: string): Result<StoreOffe
     pack,
     bronze,
     perReal: bronzePerReal(pack, character.level),
+    huntEquivalent: packHuntEquivalent(pack, character.level),
   });
 }
 

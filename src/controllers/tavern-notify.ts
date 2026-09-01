@@ -71,42 +71,61 @@ export async function enableTavernPush(): Promise<NotificationPermission> {
     tavernPushRepository.setEnabled(false);
     return "denied";
   }
-  if (!webPushConfigured()) {
-    tavernPushRepository.setEnabled(false);
-    return "denied";
-  }
+
   let permission = Notification.permission;
   if (permission === "default") permission = await Notification.requestPermission();
   if (permission !== "granted") {
     tavernPushRepository.setEnabled(false);
     return permission;
   }
+
+  tavernPushRepository.setEnabled(true);
+
+  if (!webPushConfigured()) return permission;
+
   const registration = await registerWorker();
-  if (!registration) {
-    tavernPushRepository.setEnabled(false);
-    return permission;
+  if (!registration) return permission;
+
+  try {
+    const key = urlBase64ToUint8Array(vapidPublicKey()) as BufferSource;
+    let subscription = await registration.pushManager.getSubscription();
+    if (!subscription) {
+      subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: key,
+      });
+    }
+    const saved = await subscribeOnServer(subscription);
+    if (!saved) {
+      try {
+        await subscription.unsubscribe();
+      } catch {}
+      subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: key,
+      });
+      await subscribeOnServer(subscription);
+    }
+  } catch {
+    // O switch fica ligado: avisos locais e no painel seguem valendo.
   }
-  const existing = await registration.pushManager.getSubscription();
-  const subscription =
-    existing ??
-    (await registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(vapidPublicKey()) as BufferSource,
-    }));
-  const saved = await subscribeOnServer(subscription);
-  tavernPushRepository.setEnabled(saved);
-  return saved ? permission : "denied";
+
+  return permission;
 }
 
 export async function disableTavernPush(): Promise<void> {
   tavernPushRepository.setEnabled(false);
   if (!("serviceWorker" in navigator)) return;
-  const registration = await navigator.serviceWorker.getRegistration();
-  const subscription = await registration?.pushManager.getSubscription();
-  if (!subscription) return;
-  const endpoint = subscription.endpoint;
-  await unsubscribeOnServer(endpoint);
-  await subscription.unsubscribe();
+  try {
+    const registration = await navigator.serviceWorker.getRegistration();
+    const subscription = await registration?.pushManager.getSubscription();
+    if (!subscription) return;
+    const endpoint = subscription.endpoint;
+    await unsubscribeOnServer(endpoint);
+    await subscription.unsubscribe();
+  } catch {
+    // O switch já foi desligado neste aparelho.
+  }
 }
 
 export function notifyTavernMessageLocal(

@@ -30,7 +30,7 @@ export function FuryUseButton({ onClick }: { onClick: () => void }) {
       disabled={furyActive}
       onClick={onClick}
     >
-      {furyActive ? "Em fúria " + furyClock(furyRemaining) : "Usar"}
+      {furyActive ? "Em fúria " + furyClock(furyRemaining) : "Beber"}
     </Button>
   );
 }

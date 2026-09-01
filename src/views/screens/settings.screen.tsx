@@ -130,9 +130,9 @@ export function SettingsScreen() {
     tavernPushRepository.serverSnapshot,
   );
 
-  function choosePush(on: boolean) {
-    if (on) void enableTavernPush();
-    else disableTavernPush();
+  async function choosePush(on: boolean) {
+    if (on) await enableTavernPush();
+    else await disableTavernPush();
   }
 
   if (!character) return null;
@@ -164,6 +164,34 @@ export function SettingsScreen() {
           action={<Tag tone="neutral">Google</Tag>}
           padding="none"
         >
+          <List>
+            <ListRow>
+              <Button
+                variant="outline"
+                fullWidth
+                onClick={() =>
+                  logout().then(() => {
+                    router.push("/");
+                  })
+                }
+              >
+                Sair da conta
+              </Button>
+            </ListRow>
+            <ListRow>
+              <Button
+                variant="outline"
+                fullWidth
+                onClick={() =>
+                  logoutEverywhere().then(() => {
+                    router.push("/");
+                  })
+                }
+              >
+                Sair de todos os aparelhos
+              </Button>
+            </ListRow>
+          </List>
           <div className="flex items-center gap-3 border-b border-edge p-4">
             {accountPicture ? (
               <IconFrame size="medium" tone="strong">
@@ -185,77 +213,57 @@ export function SettingsScreen() {
               </p>
             </div>
           </div>
-          <div className="space-y-3 p-4">
-            <p className="text-xs leading-relaxed text-ink-faint">
-              A porta é a conta Google, e a partida vive no servidor: saia quando quiser, e o mesmo
-              botão de entrar devolve tudo como estava. Sair de todos os aparelhos derruba qualquer
-              sessão aberta em outro lugar na hora.
-            </p>
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant="outline"
-                onClick={() =>
-                  logout().then(() => {
-                    router.push("/");
-                  })
-                }
-              >
-                Sair da conta
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() =>
-                  logoutEverywhere().then(() => {
-                    router.push("/");
-                  })
-                }
-              >
-                Sair de todos os aparelhos
-              </Button>
-            </div>
-          </div>
+          <p className="p-4 text-xs leading-relaxed text-ink-faint">
+            A porta é a conta Google, e a partida vive no servidor: saia quando quiser, e o mesmo
+            botão de entrar devolve tudo como estava. Sair de todos os aparelhos derruba qualquer
+            sessão aberta em outro lugar na hora.
+          </p>
         </Panel>
 
         <Panel
           title="Verificação em duas etapas"
           description="Um código de oito dígitos no e-mail confirma cada entrada, além do Google."
+          padding="none"
         >
-          <div className="space-y-3">
-            <p className="text-xs leading-relaxed text-ink-faint">
-              Com a verificação ligada, depois do Google a porta só abre quando você digitar o
-              código que chega no e-mail da conta.
-            </p>
-            <div className="flex gap-2">
-              <Chip
-                active={twoFactorEnabled}
-                onClick={() => {
-                  if (twoFactorEnabled) return;
-                  void sendTwoFactorCode("enable").then((sent) => {
-                    if (sent) {
-                      setTwoFactorCode("");
-                      setTwoFactorSetup("enable");
-                    }
-                  });
-                }}
-              >
-                Ativado
-              </Chip>
-              <Chip
-                active={!twoFactorEnabled}
-                onClick={() => {
-                  if (!twoFactorEnabled) return;
-                  void sendTwoFactorCode("disable").then((sent) => {
-                    if (sent) {
-                      setTwoFactorCode("");
-                      setTwoFactorSetup("disable");
-                    }
-                  });
-                }}
-              >
-                Desativado
-              </Chip>
-            </div>
-          </div>
+          <List>
+            <ListRow layout="split">
+              <RowText title="Estado" description="Ligado ou desligado na conta." />
+              <div className="flex shrink-0 gap-2">
+                <Chip
+                  active={twoFactorEnabled}
+                  onClick={() => {
+                    if (twoFactorEnabled) return;
+                    void sendTwoFactorCode("enable").then((sent) => {
+                      if (sent) {
+                        setTwoFactorCode("");
+                        setTwoFactorSetup("enable");
+                      }
+                    });
+                  }}
+                >
+                  Ativado
+                </Chip>
+                <Chip
+                  active={!twoFactorEnabled}
+                  onClick={() => {
+                    if (!twoFactorEnabled) return;
+                    void sendTwoFactorCode("disable").then((sent) => {
+                      if (sent) {
+                        setTwoFactorCode("");
+                        setTwoFactorSetup("disable");
+                      }
+                    });
+                  }}
+                >
+                  Desativado
+                </Chip>
+              </div>
+            </ListRow>
+          </List>
+          <p className="p-4 text-xs leading-relaxed text-ink-faint">
+            Com a verificação ligada, depois do Google a porta só abre quando você digitar o código
+            que chega no e-mail da conta.
+          </p>
         </Panel>
 
         <Panel
@@ -297,89 +305,17 @@ export function SettingsScreen() {
             </Button>
           </form>
         </Panel>
-      </div>
 
-      <Panel
-        title="Automação"
-        description="O que a partida faz sozinha. Cada chave faz uma coisa só, e elas se ajudam: a caçada bebe, a poção acaba, o corpo descansa, a caçada volta. É um recurso VIP."
-        action={
-          vip ? (
-            <Tag tone="light">
-              {formatNumber(active)} de {AUTOMATIONS.length} ativadas
-            </Tag>
-          ) : (
-            <Tag tone="neutral">Requer VIP</Tag>
-          )
-        }
-        padding="none"
-        footer={
-          vip ? (
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <span className="text-[11px] text-ink-faint">
-                {character.vipCanceling
-                  ? "VIP ativo até " + formatDay(character.vipUntil ?? "") + ", sem renovar."
-                  : "Assinatura ativa, renova em " + formatDay(character.vipUntil ?? "") + "."}
-              </span>
-              {character.vipCanceling ? (
-                <Button variant="primary" onClick={() => reactivateVip()}>
-                  Reativar assinatura
-                </Button>
-              ) : (
-                <Button variant="outline" onClick={() => setCancelingVip(true)}>
-                  Cancelar assinatura
-                </Button>
-              )}
-            </div>
-          ) : (
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <span className="text-[11px] text-ink-faint">
-                A automação é um recurso VIP. Ative para ligar as chaves.
-              </span>
-              <Button variant="primary" onClick={() => buyVip()}>
-                Ativar VIP por {formatReais(VIP_PRICE_CENTS)}/mês
-              </Button>
-            </div>
-          )
-        }
-      >
-        <List>
-          {AUTOMATIONS.map((entry) => (
-            <ListRow key={entry.key} layout="split">
-              <RowText title={entry.label} description={entry.effect} />
-              <div
-                className={"flex shrink-0 gap-2" + (vip ? "" : " pointer-events-none opacity-50")}
-              >
-                <Chip
-                  active={state.automation[entry.key]}
-                  disabled={!vip}
-                  onClick={() => setAutomation(entry.key, true)}
-                >
-                  Ativado
-                </Chip>
-                <Chip
-                  active={!state.automation[entry.key]}
-                  disabled={!vip}
-                  onClick={() => setAutomation(entry.key, false)}
-                >
-                  Desativado
-                </Chip>
-              </div>
-            </ListRow>
-          ))}
-        </List>
-      </Panel>
-
-      <div className="grid items-start gap-6 lg:grid-cols-2">
         <Panel
           title="Taverna"
           description="Avisos no desktop das mensagens das suas mesas: nome da mesa, quem falou, quando e o quê, com um botão para responder direto na taverna. Com Web Push ativo, chegam mesmo com o jogo fechado; sem ele, só enquanto uma aba do Wizold está aberta fora da taverna."
         >
           <div className="space-y-3">
             <div className="flex gap-2">
-              <Chip active={pushOn} onClick={() => choosePush(true)} disabled={!tavernPushSupported()}>
+              <Chip active={pushOn} onClick={() => void choosePush(true)} disabled={!tavernPushSupported()}>
                 Ativado
               </Chip>
-              <Chip active={!pushOn} onClick={() => choosePush(false)}>
+              <Chip active={!pushOn} onClick={() => void choosePush(false)}>
                 Desativado
               </Chip>
             </div>
@@ -404,6 +340,119 @@ export function SettingsScreen() {
         </Panel>
 
         <Panel
+          className="lg:col-span-2"
+          title="Automação"
+          description="O que a partida faz sozinha. Cada chave faz uma coisa só, e elas se ajudam: a caçada bebe, a poção acaba, o corpo descansa, a caçada volta. É um recurso VIP."
+          action={
+            vip ? (
+              <Tag tone="light">
+                {formatNumber(active)} de {AUTOMATIONS.length} ativadas
+              </Tag>
+            ) : (
+              <Tag tone="neutral">Requer VIP</Tag>
+            )
+          }
+          padding="none"
+          footer={
+            vip ? (
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <span className="text-[11px] text-ink-faint">
+                  {character.vipCanceling
+                    ? "VIP ativo até " + formatDay(character.vipUntil ?? "") + ", sem renovar."
+                    : "Assinatura ativa, renova em " + formatDay(character.vipUntil ?? "") + "."}
+                </span>
+                {character.vipCanceling ? (
+                  <Button variant="primary" onClick={() => reactivateVip()}>
+                    Reativar assinatura
+                  </Button>
+                ) : (
+                  <Button variant="outline" onClick={() => setCancelingVip(true)}>
+                    Cancelar assinatura
+                  </Button>
+                )}
+              </div>
+            ) : (
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <span className="text-[11px] text-ink-faint">
+                  A automação é um recurso VIP. Ative para ligar as chaves.
+                </span>
+                <Button variant="primary" onClick={() => buyVip()}>
+                  Ativar VIP por {formatReais(VIP_PRICE_CENTS)}/mês
+                </Button>
+              </div>
+            )
+          }
+        >
+          <List>
+            {AUTOMATIONS.map((entry) => (
+              <ListRow key={entry.key} layout="split">
+                <RowText title={entry.label} description={entry.effect} />
+                <div
+                  className={"flex shrink-0 gap-2" + (vip ? "" : " pointer-events-none opacity-50")}
+                >
+                  <Chip
+                    active={state.automation[entry.key]}
+                    disabled={!vip}
+                    onClick={() => setAutomation(entry.key, true)}
+                  >
+                    Ativado
+                  </Chip>
+                  <Chip
+                    active={!state.automation[entry.key]}
+                    disabled={!vip}
+                    onClick={() => setAutomation(entry.key, false)}
+                  >
+                    Desativado
+                  </Chip>
+                </div>
+              </ListRow>
+            ))}
+          </List>
+        </Panel>
+
+        <Panel
+          title="Som"
+          description="Os efeitos do jogo: couro, moedas e o rugido da virada."
+          padding="none"
+        >
+          <List>
+            <ListRow layout="split">
+              <RowText title="Estado" description="Ligado ou desligado neste aparelho." />
+              <div className="flex shrink-0 gap-2">
+                <Chip active={sound} onClick={() => chooseSound(true)}>
+                  Ativado
+                </Chip>
+                <Chip active={!sound} onClick={() => chooseSound(false)}>
+                  Desativado
+                </Chip>
+              </div>
+            </ListRow>
+            {sound ? (
+              <ListRow layout="column">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">Volume</span>
+                  <span className="font-mono text-[11px] text-ink">{Math.round(volume * 100)}%</span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={Math.round(volume * 100)}
+                  aria-label="Volume do som"
+                  className="volume-slider w-full"
+                  onChange={(event) => {
+                    const next = Number(event.target.value) / 100;
+                    soundRepository.setVolume(next);
+                    if (next > 0) playSound("ui");
+                  }}
+                />
+              </ListRow>
+            ) : null}
+          </List>
+        </Panel>
+
+        <Panel
           title="Cache do jogo"
           description="O que este aparelho guarda para abrir mais rápido."
           footer={
@@ -424,68 +473,33 @@ export function SettingsScreen() {
             serve para quando alguma arte aparece errada ou desatualizada.
           </p>
         </Panel>
-      </div>
 
-      <Panel title="Som" description="Os efeitos do jogo: couro, moedas e o rugido da virada.">
-        <div className="space-y-3">
-          <div className="flex gap-2">
-            <Chip active={sound} onClick={() => chooseSound(true)}>
-              Ativado
-            </Chip>
-            <Chip active={!sound} onClick={() => chooseSound(false)}>
-              Desativado
-            </Chip>
-          </div>
-          {sound ? (
-            <div className="space-y-2 border-t border-edge pt-3">
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">Volume</span>
-                <span className="font-mono text-[11px] text-ink">{Math.round(volume * 100)}%</span>
-              </div>
-              <input
-                type="range"
-                min={0}
-                max={100}
-                step={1}
-                value={Math.round(volume * 100)}
-                aria-label="Volume do som"
-                className="volume-slider w-full"
-                onChange={(event) => {
-                  const next = Number(event.target.value) / 100;
-                  soundRepository.setVolume(next);
-                  if (next > 0) playSound("ui");
+        <Panel
+          title="Excluir conta"
+          description="Apaga a partida inteira do servidor. Não tem volta."
+          footer={
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <span className="text-[11px] text-ink-faint">
+                {character.name} - NV. {formatNumber(character.level)}
+              </span>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setDeleteCode("");
+                  setDeleting("ask");
                 }}
-              />
+              >
+                Excluir conta
+              </Button>
             </div>
-          ) : null}
-        </div>
-      </Panel>
-
-      <Panel
-        title="Excluir conta"
-        description="Apaga a partida inteira do servidor. Não tem volta."
-        footer={
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <span className="text-[11px] text-ink-faint">
-              {character.name} - NV. {formatNumber(character.level)}
-            </span>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setDeleteCode("");
-                setDeleting("ask");
-              }}
-            >
-              Excluir conta
-            </Button>
-          </div>
-        }
-      >
-        <p className="text-xs leading-relaxed text-ink-faint">
-          Personagem, inventário, forja, lobo, carteira e anúncios: tudo some de uma vez, e a
-          conta volta para a criação de personagem.
-        </p>
-      </Panel>
+          }
+        >
+          <p className="text-xs leading-relaxed text-ink-faint">
+            Personagem, inventário, forja, lobo, carteira e anúncios: tudo some de uma vez, e a
+            conta volta para a criação de personagem.
+          </p>
+        </Panel>
+      </div>
 
       <ConfirmDialog
         open={confirmingClear}

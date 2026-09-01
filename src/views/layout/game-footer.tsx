@@ -1,4 +1,5 @@
 import { GAME_NAME, GAME_TAGLINE } from "@/shared/constants/game";
+import { SITE_EMAIL } from "@/shared/constants/site";
 
 export function GameFooter() {
   return (
@@ -16,10 +17,10 @@ export function GameFooter() {
           <p className="text-[11px] text-ink-faint">
             Suporte:{" "}
             <a
-              href="mailto:wizold@lumni.dev.br"
+              href={"mailto:" + SITE_EMAIL}
               className="text-ink-soft transition-colors hover:text-ink"
             >
-              wizold@lumni.dev.br
+              {SITE_EMAIL}
             </a>
           </p>
         </div>

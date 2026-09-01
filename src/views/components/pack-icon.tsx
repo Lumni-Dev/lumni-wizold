@@ -19,7 +19,7 @@ export function PackIcon({
 
   return (
     <IconFrame size={size} tone={pack.highlight ? "strong" : "default"} className={className}>
-      {source ? <IconArt source={source} /> : formatNumber(pack.hunts)}
+      {source ? <IconArt source={source} /> : formatNumber(Math.round(pack.setShare * 100)) + "%"}
     </IconFrame>
   );
 }

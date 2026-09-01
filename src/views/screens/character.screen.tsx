@@ -196,7 +196,7 @@ export function CharacterScreen() {
                         x{formatNumber(quantity)}
                       </span>
                       <Button variant="primary" disabled={healthFull} onClick={() => consumeItem(item.id)}>
-                        Usar
+                        Beber
                       </Button>
                     </span>
                   </ListRow>

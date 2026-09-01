@@ -303,7 +303,7 @@ export function PetScreen() {
             {supplies.length === 0 ? (
               <div className="p-4">
                 <EmptyState
-                  title="Nada para dar"
+                  title="Nada para alimentar"
                   description="O alimento para mascote é vendido no mercado."
                 />
               </div>
@@ -321,7 +321,7 @@ export function PetScreen() {
                         x{formatNumber(quantity)}
                       </span>
                       <Button variant="primary" onClick={() => feedPet(item.id)}>
-                        Dar
+                        Alimentar
                       </Button>
                     </span>
                   </ListRow>

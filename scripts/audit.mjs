@@ -36,6 +36,7 @@ const storeRules = load("models/rules/store.js");
 const rankingRules = load("models/rules/ranking.js");
 const species = load("models/data/species.js");
 const sets = load("models/data/equipment-sets.js");
+const equipment = load("models/data/equipment/index.js");
 const items = load("models/data/items.js");
 const creaturesData = load("models/data/creatures.js");
 const territoriesData = load("models/data/territories.js");
@@ -426,15 +427,16 @@ sec("economia");
       );
     }
     for (const pack of packsData.STORE_PACKS) {
+      const set = equipment.setTotalPrice(equipment.setForLevel(level));
       ok(
-        "pacote " + pack.id + " NV " + level + " = bolsa x caçadas",
-        storeRules.packBronze(pack, level) === Math.round(purse * pack.hunts),
+        "pacote " + pack.id + " NV " + level + " = fração do conjunto",
+        storeRules.packBronze(pack, level) === Math.round(set * pack.setShare),
       );
     }
   }
   ok(
-    "três pacotes de 25/125/400 caçadas",
-    json(packsData.STORE_PACKS.map((pack) => pack.hunts)) === json([25, 125, 400]),
+    "três pacotes ancorados no conjunto",
+    json(packsData.STORE_PACKS.map((pack) => pack.setShare)) === json([1 / 7, 0.58, 1.5]),
   );
   ok(
     "preços dos pacotes",
