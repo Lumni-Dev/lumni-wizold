@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useGame } from "@/controllers/game.context";
-import { playClick } from "@/controllers/sound";
 import { furyRemainingMs, isFullMoon } from "@/models/rules/moon";
-import { cn } from "@/shared/utils/class-names";
+import { Button } from "./button";
 import { FuryRingFrame } from "./fury-ring-frame";
 
 function furyClock(ms: number): string {
@@ -19,8 +18,6 @@ export function FuryUseButton({ onClick }: { onClick: () => void }) {
   const fullMoon = isFullMoon(moon.phase.key);
   const remaining = character ? furyRemainingMs(character, moon.phase.key, now) : 0;
   const furyActive = remaining > 0;
-  const potionActive =
-    !!character?.furyUntil && Date.parse(character.furyUntil) > now;
 
   useEffect(() => {
     if (!furyActive) return undefined;
@@ -28,35 +25,30 @@ export function FuryUseButton({ onClick }: { onClick: () => void }) {
     return () => window.clearInterval(timer);
   }, [furyActive]);
 
+  if (!furyActive) {
+    return (
+      <Button variant="primary" onClick={onClick}>
+        Beber
+      </Button>
+    );
+  }
+
   const label = fullMoon
     ? "Lua cheia"
-    : potionActive
-      ? "Em fúria " + furyClock(remaining)
-      : "Beber";
+    : "Em fúria " + furyClock(remaining);
 
   return (
     <FuryRingFrame
       as="button"
       type="button"
       contentAlign="center"
-      disabled={furyActive}
-      aria-disabled={furyActive}
-      onClick={() => {
-        if (furyActive) return;
-        playClick();
-        onClick();
-      }}
-      className={cn(
-        "inline-block rounded-md border-0 bg-transparent p-0 font-[inherit]",
-        furyActive && "cursor-default",
-      )}
-      fillClassName={cn(
-        "h-8 px-3 text-[11px] font-medium uppercase tracking-[0.16em]",
-        "transition-[filter] duration-150",
-        furyActive
-          ? "bg-surface-high/50 text-ink"
-          : "bg-ember/90 text-base hover:brightness-110",
-      )}
+      disabled
+      aria-disabled
+      className="inline-block cursor-default border-0 bg-transparent p-0 font-[inherit]"
+      fillClassName={
+        "h-8 px-3 text-[11px] font-medium uppercase tracking-[0.16em] " +
+        "bg-surface-high/50 backdrop-blur text-ink"
+      }
     >
       {label}
     </FuryRingFrame>

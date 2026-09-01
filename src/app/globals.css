@@ -275,66 +275,43 @@ button:not(:disabled) {
   animation: toast-in 220ms ease-out;
 }
 
-@keyframes fury-ring-spin {
+@property --fury-ring-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes fury-ring-rotate {
   to {
-    transform: translate(-50%, -50%) rotate(360deg);
+    --fury-ring-angle: 360deg;
   }
 }
 
 .fury-ring-frame {
-  position: relative;
+  --fury-ring-border-size: 1px;
   display: block;
-  isolation: isolate;
-  overflow: hidden;
   border-radius: 0.375rem;
-}
-
-.fury-ring-frame__track {
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  border-radius: inherit;
-}
-
-.fury-ring-frame__track::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 400%;
-  height: 400%;
-  transform: translate(-50%, -50%);
-  background: conic-gradient(
-    from 0deg,
-    var(--color-ember) 0deg,
-    color-mix(in oklab, var(--color-ember) 42%, var(--color-edge)) 72deg,
-    var(--color-edge) 148deg,
-    var(--color-edge) 212deg,
-    color-mix(in oklab, var(--color-ember) 42%, var(--color-edge)) 288deg,
-    var(--color-ember) 360deg
-  );
-  animation: fury-ring-spin 2.4s linear infinite;
-}
-
-.fury-ring-frame__fill {
-  position: relative;
-  z-index: 1;
-  display: block;
-  margin: 1px;
-  border-radius: calc(0.375rem - 1px);
+  border: var(--fury-ring-border-size) solid transparent;
+  border-image: conic-gradient(
+      from var(--fury-ring-angle),
+      var(--color-ember) 0deg,
+      color-mix(in oklab, var(--color-ember) 42%, var(--color-edge)) 72deg,
+      var(--color-edge) 148deg,
+      var(--color-edge) 212deg,
+      color-mix(in oklab, var(--color-ember) 42%, var(--color-edge)) 288deg,
+      var(--color-ember) 360deg
+    )
+    1 stretch;
+  animation: fury-ring-rotate 2.4s linear infinite;
   overflow: hidden;
 }
 
 .fury-ring-frame__content {
-  position: relative;
-  z-index: 1;
   display: flex;
   align-items: center;
   width: 100%;
   min-height: 100%;
-  border-radius: inherit;
+  border-radius: calc(0.375rem - var(--fury-ring-border-size));
 }
 
 .fury-ring-frame__content--center {

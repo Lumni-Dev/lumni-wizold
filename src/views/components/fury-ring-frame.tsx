@@ -26,20 +26,17 @@ export function FuryRingFrame<T extends ElementType = "div">({
 
   return (
     <Tag className={cn("fury-ring-frame", className)} {...rest}>
-      <span className="fury-ring-frame__track" aria-hidden="true" />
-      <span className="fury-ring-frame__fill">
-        <span
-          className={cn(
-            "fury-ring-frame__content",
-            FURY_RING_FILL,
-            contentAlign === "start"
-              ? "fury-ring-frame__content--start"
-              : "fury-ring-frame__content--center",
-            fillClassName,
-          )}
-        >
-          {children}
-        </span>
+      <span
+        className={cn(
+          "fury-ring-frame__content",
+          FURY_RING_FILL,
+          contentAlign === "start"
+            ? "fury-ring-frame__content--start"
+            : "fury-ring-frame__content--center",
+          fillClassName,
+        )}
+      >
+        {children}
       </span>
     </Tag>
   );
