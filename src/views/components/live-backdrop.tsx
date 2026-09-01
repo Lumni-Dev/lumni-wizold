@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
+import { backgroundRepository } from "@/models/repositories/background.repository";
 
 const WALLPAPER = "/assets/ui/background.jpg?v=2";
 const VIDEO = "/assets/ui/landing-background.mp4?v=9";
@@ -13,9 +14,14 @@ const UNLOCK_EVENTS: Array<keyof DocumentEventMap> = [
   "mousemove",
 ];
 
-export function LiveBackdrop() {
+export function LiveBackdrop({ shade = "soft" }: { shade?: "soft" | "deep" }) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [failed, setFailed] = useState(false);
+  const darkness = useSyncExternalStore(
+    backgroundRepository.subscribe,
+    backgroundRepository.darkness,
+    backgroundRepository.serverDarknessSnapshot,
+  );
 
   useEffect(() => {
     const video = videoRef.current;
@@ -92,7 +98,17 @@ export function LiveBackdrop() {
         />
       )}
 
-      <div className="live-backdrop-shade absolute inset-0" />
+      <div
+        className={
+          (shade === "deep" ? "live-backdrop-shade-deep" : "live-backdrop-shade") +
+          " absolute inset-0"
+        }
+        style={
+          shade === "deep"
+            ? ({ "--shade-scale": String(darkness * 2) } as CSSProperties)
+            : undefined
+        }
+      />
     </div>
   );
 }

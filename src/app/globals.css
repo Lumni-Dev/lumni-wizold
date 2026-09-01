@@ -93,6 +93,19 @@
     );
   }
 
+  .live-backdrop-shade-deep {
+    --shade-scale: 1;
+    background-image: linear-gradient(
+      to bottom,
+      rgba(7, 5, 3, min(1, calc(0.55 * var(--shade-scale)))) 0%,
+      rgba(7, 5, 3, min(1, calc(0.64 * var(--shade-scale)))) 30%,
+      rgba(7, 5, 3, min(1, calc(0.76 * var(--shade-scale)))) 55%,
+      rgba(7, 5, 3, min(1, calc(0.88 * var(--shade-scale)))) 75%,
+      rgba(7, 5, 3, min(1, calc(0.96 * var(--shade-scale)))) 90%,
+      rgba(7, 5, 3, min(1, var(--shade-scale))) 100%
+    );
+  }
+
   input,
   textarea {
     -webkit-user-select: text;

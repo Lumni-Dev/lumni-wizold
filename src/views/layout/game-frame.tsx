@@ -43,7 +43,7 @@ export function GameFrame({ children }: { children: ReactNode }) {
 
   return (
     <>
-      {animatedBackground ? <LiveBackdrop /> : null}
+      {animatedBackground ? <LiveBackdrop shade="deep" /> : null}
       <div className="relative z-10 flex min-h-screen">
         <Sidebar tavernUnread={asideUnread} />
         <div className="flex min-h-screen w-full min-w-0 flex-col">

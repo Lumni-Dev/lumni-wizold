@@ -134,6 +134,12 @@ export function SettingsScreen() {
     backgroundRepository.serverSnapshot,
   );
 
+  const backdropDarkness = useSyncExternalStore(
+    backgroundRepository.subscribe,
+    backgroundRepository.darkness,
+    backgroundRepository.serverDarknessSnapshot,
+  );
+
   const pushOn = useSyncExternalStore(
     tavernPushRepository.subscribe,
     tavernPushRepository.enabled,
@@ -510,6 +516,34 @@ export function SettingsScreen() {
                 </Chip>
               </div>
             </ListRow>
+            {animatedBackground ? (
+              <ListRow layout="column">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                    Escuridão
+                  </span>
+                  <span className="font-mono text-[11px] text-ink">
+                    {Math.round(backdropDarkness * 100)}%
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={Math.round(backdropDarkness * 100)}
+                  aria-label="Escuridão do fundo animado"
+                  className="volume-slider w-full"
+                  onChange={(event) => {
+                    backgroundRepository.setDarkness(Number(event.target.value) / 100);
+                  }}
+                />
+                <p className="text-[11px] leading-relaxed text-ink-faint">
+                  A cortina na frente do vídeo: 0% mostra a noite crua, 50% é o tom de sempre e
+                  100% fecha tudo. O efeito aparece aqui atrás na hora.
+                </p>
+              </ListRow>
+            ) : null}
           </List>
         </Panel>
 
@@ -529,8 +563,8 @@ export function SettingsScreen() {
         >
           <p className="text-xs leading-relaxed text-ink-faint">
             O navegador guarda cópias das imagens do jogo e as preferências deste aparelho: som,
-            volume, animação de fundo, a data de nascimento lembrada na porta e o trabalho em
-            andamento. Limpar o cache
+            volume, animação e escuridão do fundo, a data de nascimento lembrada na porta e o
+            trabalho em andamento. Limpar o cache
             descarta essas cópias, baixa as imagens de novo do servidor e recarrega a página;
             serve para quando alguma arte aparece errada ou desatualizada.
           </p>
@@ -566,7 +600,7 @@ export function SettingsScreen() {
       <ConfirmDialog
         open={confirmingClear}
         title="Limpar cache"
-        description="As imagens serão baixadas de novo e as preferências deste aparelho (som, volume, animação de fundo, data de nascimento lembrada e trabalho em andamento) voltam ao padrão. A partida no servidor não é tocada."
+        description="As imagens serão baixadas de novo e as preferências deste aparelho (som, volume, animação e escuridão do fundo, data de nascimento lembrada e trabalho em andamento) voltam ao padrão. A partida no servidor não é tocada."
         detail="A página recarrega ao terminar."
         confirmLabel="Limpar"
         onCancel={() => setConfirmingClear(false)}
