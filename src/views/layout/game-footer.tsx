@@ -1,5 +1,6 @@
 import { GAME_NAME, GAME_TAGLINE } from "@/shared/constants/game";
 import { SITE_EMAIL } from "@/shared/constants/site";
+import { GAME_VERSION } from "@/shared/constants/version";
 
 export function GameFooter() {
   return (
@@ -23,6 +24,7 @@ export function GameFooter() {
               {SITE_EMAIL}
             </a>
           </p>
+          <p className="font-mono text-[11px] text-ink-faint">v{GAME_VERSION}</p>
         </div>
       </div>
     </footer>
