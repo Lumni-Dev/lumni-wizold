@@ -89,7 +89,7 @@ interface GameContextValue {
   unequipItem: (slot: EquipmentSlot) => Promise<void>;
   consumeItem: (itemId: string) => Promise<void>;
   buyItem: (itemId: string, quantity?: number) => Promise<void>;
-  sellItem: (itemId: string, quantity?: number) => Promise<void>;
+  sellItem: (itemId: string, quantity?: number, enhancement?: number) => Promise<void>;
   announceListing: (
     itemId: string,
     quantity: number,
@@ -644,8 +644,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
           playSound("buy"),
         );
       },
-      sellItem: async (itemId, quantity = 1) => {
-        await act("POST", "/api/market/sell", { itemId, quantity }, "Mercado", () =>
+      sellItem: async (itemId, quantity = 1, enhancement = 0) => {
+        await act("POST", "/api/market/sell", { itemId, quantity, enhancement }, "Mercado", () =>
           playSound("sell"),
         );
       },

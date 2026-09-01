@@ -56,9 +56,8 @@ import { MOON_PHASES, SYNODIC_MONTH_DAYS } from "../rules/moon";
 import { FURY_ATTRIBUTE_BONUS } from "@/shared/constants/game";
 import { miningNeeded } from "../rules/mining";
 import { criticalMultiplierOf } from "../rules/combat";
-import { huntPurse } from "../rules/economy";
 import { VIP_DAYS, VIP_PRICE_CENTS } from "../rules/vip";
-import { formatReais } from "@/shared/utils/format";
+import { formatBronze, formatReais } from "@/shared/utils/format";
 import { EQUIPMENT_SETS, piecePrice } from "./equipment-sets";
 import { EQUIPMENT_SLOTS } from "../entities/item";
 import { STORE_PACKS } from "./store-packs";
@@ -108,14 +107,10 @@ function bandLines(): string[] {
 
 function setCostRangeLine(): string {
   const parts = EQUIPMENT_SETS.map((definition) => {
-    const bronze = EQUIPMENT_SLOTS.reduce(
-      (sum, slot) => sum + piecePrice(definition, slot),
-      0,
-    );
-    const hunts = Math.round(bronze / huntPurse(definition.minLevel));
-    return definition.label + " (~" + hunts + " caçadas na faixa NV. " + definition.minLevel + ")";
+    const total = EQUIPMENT_SLOTS.length * piecePrice(definition);
+    return definition.label + " (" + formatBronze(total) + ", " + formatBronze(piecePrice(definition)) + " por peça)";
   });
-  return "Um conjunto completo custa cerca de: " + parts.join("; ") + ".";
+  return "Um conjunto completo custa: " + parts.join("; ") + ".";
 }
 
 function forgeMultiplierAt(level: number): string {
@@ -275,7 +270,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         " no teto: a escada da mina é a mesma da experiência.",
       "A cada 40 níveis de mineração cada golpe rende um múltiplo a mais de fragmentos, então a forja continua alimentada sem virar chuva de fragmento.",
       "A forja só aceita peça desequipada, na mochila: tire do corpo para forjar. Cada peça come só o fragmento do conjunto dela.",
-      "Preço do próximo nível: metade da curva da experiência em fragmentos, então +" +
+      "Preço do próximo nível: a mesma curva da experiência do personagem, em fragmentos; subir a peça para +N custa o que o nível N custa de experiência, então +" +
         5 +
         " custa " +
         enhancementCost(5) +

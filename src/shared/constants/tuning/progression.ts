@@ -20,5 +20,5 @@ export function levelYield(step: number): number {
 }
 
 export function forgeRequirement(step: number): number {
-  return Math.max(1, Math.round(levelRequirement(step) * PROGRESSION.forgeShare));
+  return levelRequirement(step);
 }

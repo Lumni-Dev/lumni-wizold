@@ -41,6 +41,7 @@ interface PendingDeal {
   item: Item;
   quantity: number;
   total: number;
+  enhancement: number;
 }
 
 const PAGE_SIZE = 9;
@@ -67,15 +68,25 @@ export function MarketScreen() {
   const sellables = useMemo(() => listSellables(state), [state]);
 
   useEffect(() => {
-    const sellId = new URLSearchParams(window.location.search).get("sell");
+    const params = new URLSearchParams(window.location.search);
+    const sellId = params.get("sell");
     if (!sellId) return;
+    const sellEnhancement = Math.max(0, Number(params.get("enh")) || 0);
     window.history.replaceState(null, "", "/market");
-    const slot = sellables.find((entry) => entry.item.id === sellId);
+    const slot = sellables.find(
+      (entry) => entry.item.id === sellId && entry.enhancement === sellEnhancement,
+    );
     if (!slot) return;
     /* eslint-disable react-hooks/set-state-in-effect */
     setTab("sell");
-    setSelling("1");
-    setDeal({ kind: "sell", item: slot.item, quantity: slot.quantity, total: 0 });
+    setSelling(String(slot.quantity));
+    setDeal({
+      kind: "sell",
+      item: slot.item,
+      quantity: slot.quantity,
+      total: 0,
+      enhancement: slot.enhancement,
+    });
     /* eslint-enable react-hooks/set-state-in-effect */
   }, [sellables]);
 
@@ -105,7 +116,9 @@ export function MarketScreen() {
     (EQUIPMENT_SLOTS as readonly string[]).includes(deal.item.category);
   const sellOwned =
     deal && deal.kind === "sell"
-      ? (sellables.find((entry) => entry.item.id === deal.item.id)?.quantity ?? 0)
+      ? (sellables.find(
+          (entry) => entry.item.id === deal.item.id && entry.enhancement === deal.enhancement,
+        )?.quantity ?? 0)
       : 0;
   const dealQuantity =
     deal && deal.kind === "buy"
@@ -189,7 +202,13 @@ export function MarketScreen() {
                           }
                           onClick={() => {
                             setBuying("1");
-                            setDeal({ kind: "buy", item, quantity: 1, total: priceOf(item) });
+                            setDeal({
+                              kind: "buy",
+                              item,
+                              quantity: 1,
+                              total: priceOf(item),
+                              enhancement: 0,
+                            });
                           }}
                           disabled={!ofLineage || !levelAllowed || !affordable || petless}
                         >
@@ -235,7 +254,7 @@ export function MarketScreen() {
             >
               <List>
                 {sellablesOnPage.map(({ item, quantity, enhancement }) => (
-                  <ListRow key={item.id} padding="art">
+                  <ListRow key={item.id + "-" + enhancement} padding="art">
                     <ItemIcon item={item} enhancement={enhancement} />
                     <RowText
                       title={enhancedName(item.name, enhancement)}
@@ -249,8 +268,8 @@ export function MarketScreen() {
                     <Button
                       variant="secondary"
                       onClick={() => {
-                        setSelling("1");
-                        setDeal({ kind: "sell", item, quantity, total: 0 });
+                        setSelling(String(quantity));
+                        setDeal({ kind: "sell", item, quantity, total: 0, enhancement });
                       }}
                     >
                       Vender
@@ -277,7 +296,7 @@ export function MarketScreen() {
         }
         detail={
           deal
-            ? deal.item.name +
+            ? enhancedName(deal.item.name, deal.enhancement) +
               (dealQuantity > 1 ? " x" + formatNumber(dealQuantity) : "") +
               " - " +
               formatBronze(dealTotal)
@@ -291,7 +310,7 @@ export function MarketScreen() {
           if (deal.kind === "buy") {
             buyItem(deal.item.id, dealQuantity);
           } else {
-            sellItem(deal.item.id, dealQuantity);
+            sellItem(deal.item.id, dealQuantity, deal.enhancement);
           }
 
           setDeal(null);

@@ -118,9 +118,6 @@ export function sellItem(
   if (isForgeMaterial(item)) {
     return failure(state, "Fragmentos não se vendem por bronze: só a forja os aceita.");
   }
-  if (enhancement > 0) {
-    return failure(state, item.name + " está forjado: peças forjadas só se vendem no bazar.");
-  }
   if (countInInventory(state.inventory, itemId, enhancement) < quantity) {
     return failure(state, "Você não tem essa quantidade de " + item.name + ".");
   }

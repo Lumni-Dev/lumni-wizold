@@ -6,7 +6,6 @@ export interface SlotBlueprint {
   feminine: boolean;
   flavor: string;
   attributes: Partial<Record<AttributeKey, number>>;
-  priceFactor: number;
 }
 
 export interface SetDefinition {
@@ -20,7 +19,6 @@ export interface SetDefinition {
   description: string;
   flavor: string;
   power: number;
-  priceBase: number;
 }
 
 export type { EquipmentSet, EquipmentSlot, Rarity };

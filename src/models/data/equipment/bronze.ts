@@ -12,6 +12,4 @@ export const bronzeSet: SetDefinition = {
   flavor:
     "Bronze bruto, martelado sem capricho nenhum. O ferreiro do vilarejo faz um por " +
     "tarde e nunca pergunta por que a encomenda vem sempre dois números maior.",
-  power: 20,
-  priceBase: 13,
-};
+  power: 20,};

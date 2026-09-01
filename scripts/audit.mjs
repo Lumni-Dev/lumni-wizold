@@ -444,15 +444,34 @@ sec("economia");
     "preços dos pacotes",
     json(packsData.STORE_PACKS.map((pack) => pack.priceCents)) === json([490, 1990, 4990]),
   );
-  const setTotal = (definition) =>
-    entItem.EQUIPMENT_SLOTS.reduce((total, slot) => total + sets.piecePrice(definition, slot), 0);
+  const FLAT_PIECE_PRICE = {
+    bronze: 20000,
+    silver: 25000,
+    gold: 35000,
+    diamond: 50000,
+    lunar: 100000,
+  };
+  for (const definition of sets.EQUIPMENT_SETS) {
+    ok(
+      "peça de " + definition.key + " custa " + FLAT_PIECE_PRICE[definition.key] + " fixo",
+      sets.piecePrice(definition) === FLAT_PIECE_PRICE[definition.key],
+    );
+    ok(
+      "conjunto " + definition.key + " vale sete peças",
+      sets.setTotalPrice(definition) ===
+        entItem.EQUIPMENT_SLOTS.length * FLAT_PIECE_PRICE[definition.key],
+    );
+  }
   ok(
-    "conjunto de bronze vale 400 caçadas na abertura",
-    setTotal(sets.EQUIPMENT_SETS[0]) === species.huntPurse(1) * 400,
+    "toda peça à venda carrega o preço fixo do seu conjunto",
+    sets.buildSetItems().every((item) => item.price === FLAT_PIECE_PRICE[item.set]),
   );
   let setsClimb = true;
   for (let index = 1; index < sets.EQUIPMENT_SETS.length; index += 1) {
-    if (setTotal(sets.EQUIPMENT_SETS[index]) <= setTotal(sets.EQUIPMENT_SETS[index - 1])) {
+    if (
+      sets.setTotalPrice(sets.EQUIPMENT_SETS[index]) <=
+      sets.setTotalPrice(sets.EQUIPMENT_SETS[index - 1])
+    ) {
       setsClimb = false;
     }
   }
@@ -1064,15 +1083,12 @@ sec("forja e mina");
 {
   let forgeCostOk = true;
   for (let level = 1; level <= 1000; level += 1) {
-    if (
-      forgeRules.enhancementCost(level) !==
-      Math.max(1, Math.round((50 * (level * level - 3 * level + 4)) / 2))
-    ) {
+    if (forgeRules.enhancementCost(level) !== progression.experienceForLevel(level)) {
       forgeCostOk = false;
       break;
     }
   }
-  ok("custo de forja segue metade da curva (2.050.000 no teto)", forgeCostOk);
+  ok("custo de forja é a própria curva da experiência (49.850.200 no teto)", forgeCostOk);
   const claw = items.findItem("lunar-claw");
   const forged = forgeRules.enhancedEffect(claw, 100);
   const base = claw.effect.attributes.strength;
@@ -1082,10 +1098,11 @@ sec("forja e mina");
   );
   ok("forja zero devolve o efeito puro", forgeRules.enhancedEffect(claw, 0) === claw.effect);
   const state = baseState({ level: 1 });
+  const fragmentStock = forgeRules.enhancementCost(5) + 100;
   state.inventory = [
     ...state.inventory,
     { itemId: "bronze-claw", quantity: 1, enhancement: 4 },
-    { itemId: "bronze-fragment", quantity: 500, enhancement: 0 },
+    { itemId: "bronze-fragment", quantity: fragmentStock, enhancement: 0 },
   ];
   const strikeFee = forgeRules.forgeBronzeCost(state.character.level, 4);
   const enhanced = forgeCtrl.enhance(state, "bronze-claw", 4, () => 0);
@@ -1102,7 +1119,7 @@ sec("forja e mina");
     "forja consome o fragmento do conjunto",
     enhanced.ok &&
       inventoryCtrl.countInInventory(enhanced.state.inventory, "bronze-fragment") ===
-        500 - forgeRules.enhancementCost(5),
+        fragmentStock - forgeRules.enhancementCost(5),
   );
   ok(
     "martelada cobra bronze",
@@ -1119,7 +1136,7 @@ sec("forja e mina");
     "martelada falha ainda consome fragmentos",
     missed.ok &&
       inventoryCtrl.countInInventory(missed.state.inventory, "bronze-fragment") ===
-        500 - forgeRules.enhancementCost(5),
+        fragmentStock - forgeRules.enhancementCost(5),
   );
   ok(
     "martelada falha também paga o ferreiro",
@@ -1518,6 +1535,27 @@ sec("inventário e mercado");
       sale.state.character.bronze ===
         state.character.bronze + Math.max(1, Math.round(fur.price * 0.5)) * 2,
   );
+  const forgedSale = marketCtrl.sellItem(
+    { ...state, inventory: [{ itemId: "bronze-claw", quantity: 1, enhancement: 3 }] },
+    "bronze-claw",
+    1,
+    3,
+  );
+  const claw = items.findItem("bronze-claw");
+  ok(
+    "peça forjada vende pelo preço normal, sem bônus de forja",
+    forgedSale.ok &&
+      forgedSale.state.character.bronze ===
+        state.character.bronze + Math.max(1, Math.round(claw.price * 0.5)) &&
+      forgedSale.state.inventory.length === 0,
+  );
+  const wrongCopy = marketCtrl.sellItem(
+    { ...state, inventory: [{ itemId: "bronze-claw", quantity: 1, enhancement: 3 }] },
+    "bronze-claw",
+    1,
+    0,
+  );
+  ok("vender a cópia que não existe é recusado", wrongCopy.ok === false);
   const dressed = inventoryCtrl.equipItem(bought.state, "bronze-claw");
   ok(
     "equipar tira da mochila",

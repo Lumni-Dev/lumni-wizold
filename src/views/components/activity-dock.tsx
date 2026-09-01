@@ -9,6 +9,7 @@ import { listTerritories, resolveHuntCreatureId } from "@/controllers/hunt.contr
 import { useGame } from "@/controllers/game.context";
 import { petTrainingView } from "@/controllers/pet.controller";
 import { listAttributeProgress, listExercises } from "@/controllers/training.controller";
+import { dockRepository } from "@/models/repositories/dock.repository";
 import { loadHuntSelection } from "@/models/repositories/hunt-selection.repository";
 import { canPetFight, petLevelOf, petMaxEnergy } from "@/models/rules/pet";
 import {
@@ -20,11 +21,13 @@ import {
 } from "@/shared/constants/game";
 import { GLASS_SECTION } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
-import { NavIcon } from "./app-icon";
+import { ActionIcon, NavIcon } from "./app-icon";
 import { Bar } from "./bar";
 import { Button } from "./button";
 import { CornerAccents } from "./corner-accents";
 import { List, ListRow } from "./list";
+import { RestSeconds } from "./rest-seconds";
+import { Tooltip } from "./tooltip";
 import { emphasizeDamage } from "../presenters/hunt.presenter";
 import { useShake } from "./use-shake";
 
@@ -37,6 +40,11 @@ export function ActivityDock() {
     activityRuntimeStore.serverSnapshot,
   );
   const dock = runtime.dock;
+  const minimized = useSyncExternalStore(
+    dockRepository.subscribe,
+    dockRepository.minimized,
+    dockRepository.serverSnapshot,
+  );
 
   const huntView = useMemo(() => {
     const huntRt = runtime.hunt;
@@ -205,7 +213,7 @@ export function ActivityDock() {
   const restView = useMemo(() => {
     if (activity?.kind !== "rest" || !character || !stats) return null;
     return {
-      healthLabel: "Vida (Recuperando-se...)",
+      beat: String(character.health),
       healthCurrent: character.health,
       healthMax: stats.maxHealth,
       glows: character.health < stats.maxHealth,
@@ -283,7 +291,12 @@ export function ActivityDock() {
           shaking && "card-shake",
         )}
       >
-        <div className="flex items-center gap-2 border-b border-edge px-3 py-2">
+        <div
+          className={cn(
+            "flex items-center gap-2 px-3 py-2",
+            !minimized && "border-b border-edge",
+          )}
+        >
           <NavIcon href={dock.href} className="shrink-0 text-ink-faint" />
           <Link
             href={dock.href}
@@ -291,187 +304,206 @@ export function ActivityDock() {
           >
             {dock.title}
           </Link>
+          <Tooltip label={minimized ? "Maximizar" : "Minimizar"}>
+            <button
+              type="button"
+              onClick={() => dockRepository.setMinimized(!minimized)}
+              aria-label={minimized ? "Maximizar atividade" : "Minimizar atividade"}
+              aria-expanded={!minimized}
+              className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-edge text-ink-faint transition-colors hover:border-edge-strong hover:text-ink"
+            >
+              <ActionIcon action={minimized ? "expand" : "collapse"} />
+            </button>
+          </Tooltip>
         </div>
 
-        <List>
-          {huntView ? (
-            <>
-              <ListRow layout="column">
-                <Bar
-                  label={huntView.preyLabel}
-                  current={huntView.preyCurrent}
-                  maximum={huntView.preyMax}
-                  tone="blood"
-                />
-              </ListRow>
-              <ListRow layout="column">
-                <Bar
-                  label={
-                    huntView.cooldown !== null
-                      ? "Parar em " + huntView.cooldown + "s"
-                      : huntView.huntLabel
-                  }
-                  current={huntView.huntCurrent}
-                  maximum={huntView.huntMax}
-                  tone="blood"
-                  glows={huntView.glows && huntView.cooldown === null}
-                  wraps
-                />
-              </ListRow>
-              {huntView.pet ? (
+        {minimized ? null : (
+          <>
+            <List>
+              {huntView ? (
+                <>
+                  <ListRow layout="column">
+                    <Bar
+                      label={huntView.preyLabel}
+                      current={huntView.preyCurrent}
+                      maximum={huntView.preyMax}
+                      tone="blood"
+                    />
+                  </ListRow>
+                  <ListRow layout="column">
+                    <Bar
+                      label={
+                        huntView.cooldown !== null
+                          ? "Parar em " + huntView.cooldown + "s"
+                          : huntView.huntLabel
+                      }
+                      current={huntView.huntCurrent}
+                      maximum={huntView.huntMax}
+                      tone="blood"
+                      glows={huntView.glows && huntView.cooldown === null}
+                      wraps
+                    />
+                  </ListRow>
+                  {huntView.pet ? (
+                    <ListRow layout="column">
+                      <Bar
+                        label={huntView.pet.label}
+                        current={huntView.pet.current}
+                        maximum={huntView.pet.maximum}
+                        tone="vigor"
+                      />
+                    </ListRow>
+                  ) : null}
+                  {huntView.line ? (
+                    <ListRow layout="column">
+                      <p
+                        className={cn(
+                          "truncate font-mono text-[11px]",
+                          huntView.line.critical ? "text-ember" : "text-ink-faint",
+                        )}
+                      >
+                        {emphasizeDamage(huntView.line.text).map((part, index) =>
+                          typeof part === "string" ? (
+                            part
+                          ) : (
+                            <strong
+                              key={index}
+                              className={cn("font-bold", !huntView.line?.critical && "text-ink")}
+                            >
+                              {part.damage}
+                            </strong>
+                          ),
+                        )}
+                      </p>
+                    </ListRow>
+                  ) : null}
+                </>
+              ) : null}
+
+              {trainView ? (
+                <>
+                  <ListRow layout="column">
+                    <Bar
+                      label={trainView.progressLabel}
+                      current={trainView.progressCurrent}
+                      maximum={trainView.progressMax}
+                      wraps
+                    />
+                  </ListRow>
+                  <ListRow layout="column">
+                    <Bar
+                      label={
+                        trainView.cooldown !== null
+                          ? "Parar em " + trainView.cooldown + "s"
+                          : trainView.sessionLabel
+                      }
+                      current={trainView.sessionCurrent}
+                      maximum={trainView.sessionMax}
+                      glows={trainView.glows && trainView.cooldown === null}
+                      wraps
+                    />
+                  </ListRow>
+                </>
+              ) : null}
+
+              {mineView ? (
+                <>
+                  <ListRow layout="column">
+                    <Bar
+                      label={mineView.dailyLabel}
+                      tone="tide"
+                      current={mineView.dailyCurrent}
+                      maximum={mineView.dailyMax}
+                    />
+                  </ListRow>
+                  <ListRow layout="column">
+                    <Bar
+                      label={
+                        mineView.cooldown !== null
+                          ? "Parar em " + mineView.cooldown + "s"
+                          : mineView.swingLabel
+                      }
+                      current={mineView.swingCurrent}
+                      maximum={mineView.swingMax}
+                      glows={mineView.glows && mineView.cooldown === null}
+                      wraps
+                    />
+                  </ListRow>
+                </>
+              ) : null}
+
+              {forgeView ? (
+                <>
+                  {forgeView.fragment ? (
+                    <ListRow layout="column">
+                      <Bar
+                        label={forgeView.fragment.label}
+                        tone="ember"
+                        current={forgeView.fragment.current}
+                        maximum={forgeView.fragment.maximum}
+                      />
+                    </ListRow>
+                  ) : null}
+                  <ListRow layout="column">
+                    <Bar
+                      label={
+                        forgeView.cooldown !== null
+                          ? "Parar em " + forgeView.cooldown + "s"
+                          : forgeView.strikeLabel
+                      }
+                      current={forgeView.strikeCurrent}
+                      maximum={forgeView.strikeMax}
+                      tone="ember"
+                      glows={forgeView.glows && forgeView.cooldown === null}
+                      wraps
+                    />
+                  </ListRow>
+                </>
+              ) : null}
+
+              {restView ? (
                 <ListRow layout="column">
                   <Bar
-                    label={huntView.pet.label}
-                    current={huntView.pet.current}
-                    maximum={huntView.pet.maximum}
-                    tone="vigor"
+                    label={
+                      <>
+                        Vida (Recuperando-se... <RestSeconds key={restView.beat} />)
+                      </>
+                    }
+                    current={restView.healthCurrent}
+                    maximum={restView.healthMax}
+                    tone="blood"
+                    glows={restView.glows}
                   />
                 </ListRow>
               ) : null}
-              {huntView.line ? (
-                <ListRow layout="column">
-                  <p
-                    className={cn(
-                      "truncate font-mono text-[11px]",
-                      huntView.line.critical ? "text-ember" : "text-ink-faint",
-                    )}
-                  >
-                    {emphasizeDamage(huntView.line.text).map((part, index) =>
-                      typeof part === "string" ? (
-                        part
-                      ) : (
-                        <strong
-                          key={index}
-                          className={cn("font-bold", !huntView.line?.critical && "text-ink")}
-                        >
-                          {part.damage}
-                        </strong>
-                      ),
-                    )}
-                  </p>
-                </ListRow>
-              ) : null}
-            </>
-          ) : null}
 
-          {trainView ? (
-            <>
-              <ListRow layout="column">
-                <Bar
-                  label={trainView.progressLabel}
-                  current={trainView.progressCurrent}
-                  maximum={trainView.progressMax}
-                  wraps
-                />
-              </ListRow>
-              <ListRow layout="column">
-                <Bar
-                  label={
-                    trainView.cooldown !== null
-                      ? "Parar em " + trainView.cooldown + "s"
-                      : trainView.sessionLabel
-                  }
-                  current={trainView.sessionCurrent}
-                  maximum={trainView.sessionMax}
-                  glows={trainView.glows && trainView.cooldown === null}
-                  wraps
-                />
-              </ListRow>
-            </>
-          ) : null}
-
-          {mineView ? (
-            <>
-              <ListRow layout="column">
-                <Bar
-                  label={mineView.dailyLabel}
-                  tone="tide"
-                  current={mineView.dailyCurrent}
-                  maximum={mineView.dailyMax}
-                />
-              </ListRow>
-              <ListRow layout="column">
-                <Bar
-                  label={
-                    mineView.cooldown !== null
-                      ? "Parar em " + mineView.cooldown + "s"
-                      : mineView.swingLabel
-                  }
-                  current={mineView.swingCurrent}
-                  maximum={mineView.swingMax}
-                  glows={mineView.glows && mineView.cooldown === null}
-                  wraps
-                />
-              </ListRow>
-            </>
-          ) : null}
-
-          {forgeView ? (
-            <>
-              {forgeView.fragment ? (
+              {!huntView && !trainView && !mineView && !forgeView && !restView ? (
                 <ListRow layout="column">
                   <Bar
-                    label={forgeView.fragment.label}
-                    tone="ember"
-                    current={forgeView.fragment.current}
-                    maximum={forgeView.fragment.maximum}
+                    label={dock.cooldown !== null ? "Parar em " + dock.cooldown + "s" : dock.detail}
+                    current={dock.beat}
+                    maximum={dock.max}
+                    tone={dock.tone}
+                    glows={dock.cooldown === null && dock.beat > 0}
+                    wraps
                   />
                 </ListRow>
               ) : null}
-              <ListRow layout="column">
-                <Bar
-                  label={
-                    forgeView.cooldown !== null
-                      ? "Parar em " + forgeView.cooldown + "s"
-                      : forgeView.strikeLabel
-                  }
-                  current={forgeView.strikeCurrent}
-                  maximum={forgeView.strikeMax}
-                  tone="ember"
-                  glows={forgeView.glows && forgeView.cooldown === null}
-                  wraps
-                />
-              </ListRow>
-            </>
-          ) : null}
+            </List>
 
-          {restView ? (
-            <ListRow layout="column">
-              <Bar
-                label={restView.healthLabel}
-                current={restView.healthCurrent}
-                maximum={restView.healthMax}
-                tone="blood"
-                glows={restView.glows}
-              />
-            </ListRow>
-          ) : null}
-
-          {!huntView && !trainView && !mineView && !forgeView && !restView ? (
-            <ListRow layout="column">
-              <Bar
-                label={dock.cooldown !== null ? "Parar em " + dock.cooldown + "s" : dock.detail}
-                current={dock.beat}
-                maximum={dock.max}
-                tone={dock.tone}
-                glows={dock.cooldown === null && dock.beat > 0}
-                wraps
-              />
-            </ListRow>
-          ) : null}
-        </List>
-
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-edge px-4 py-3">
-          <span className="min-w-0 flex-1 truncate text-[11px] text-ink-faint">{statusText}</span>
-          <Button
-            variant={dock.canStop ? "secondary" : "outline"}
-            disabled={!dock.canStop}
-            onClick={() => setActivity(null)}
-            aria-label={dock.canStop ? "Parar atividade" : runningLabel}
-          >
-            {stopLabel}
-          </Button>
-        </div>
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-edge px-4 py-3">
+              <span className="min-w-0 flex-1 truncate text-[11px] text-ink-faint">{statusText}</span>
+              <Button
+                variant={dock.canStop ? "secondary" : "outline"}
+                disabled={!dock.canStop}
+                onClick={() => setActivity(null)}
+                aria-label={dock.canStop ? "Parar atividade" : runningLabel}
+              >
+                {stopLabel}
+              </Button>
+            </div>
+          </>
+        )}
       </div>
       <CornerAccents />
     </aside>

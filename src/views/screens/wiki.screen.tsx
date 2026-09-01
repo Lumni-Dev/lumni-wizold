@@ -177,7 +177,7 @@ export function WikiScreen() {
                     }
                   />
                   <span className="shrink-0 font-mono text-[11px] text-ink-faint">
-                    {formatBronze(piecePrice(definition, slot))}
+                    {formatBronze(piecePrice(definition))}
                   </span>
                 </ListRow>
               );

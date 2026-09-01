@@ -169,9 +169,7 @@ export function InventoryScreen() {
                     ? "Requer NV. " + item.minLevel
                     : !sellable
                       ? "Forja ou bazar"
-                      : enhancement > 0
-                        ? "Forjado, vende só no bazar"
-                        : null
+                      : null
                 }
                 footer={
                   hasActions ? (
@@ -181,10 +179,14 @@ export function InventoryScreen() {
                           <Button
                             variant="outline"
                             onClick={() =>
-                              router.push(enhancement > 0 ? "/bazaar" : "/market?sell=" + item.id)
+                              router.push(
+                                "/market?sell=" +
+                                  item.id +
+                                  (enhancement > 0 ? "&enh=" + enhancement : ""),
+                              )
                             }
                           >
-                            {enhancement > 0 ? "Bazar" : "Vender"}
+                            Vender
                           </Button>
                         ) : null}
                       </div>
