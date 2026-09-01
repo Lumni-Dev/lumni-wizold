@@ -313,12 +313,14 @@ export function PetScreen() {
                       title={item.name}
                       description={"+" + formatNumber(petRationOf(item, pet)) + " de energia"}
                     />
-                    <span className="font-mono text-xs text-ink-soft">
-                      x{formatNumber(quantity)}
+                    <span className="flex shrink-0 items-center gap-3">
+                      <span className="font-mono text-xs text-ink-soft">
+                        x{formatNumber(quantity)}
+                      </span>
+                      <Button variant="primary" onClick={() => feedPet(item.id)}>
+                        Dar
+                      </Button>
                     </span>
-                    <Button variant="primary" onClick={() => feedPet(item.id)}>
-                      Dar
-                    </Button>
                   </ListRow>
                 ))}
               </List>

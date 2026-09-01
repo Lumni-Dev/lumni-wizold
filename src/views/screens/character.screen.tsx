@@ -205,12 +205,14 @@ export function CharacterScreen() {
                         "% da vida máxima"
                       }
                     />
-                    <span className="font-mono text-xs text-ink-soft">
-                      x{formatNumber(quantity)}
+                    <span className="flex shrink-0 items-center gap-3">
+                      <span className="font-mono text-xs text-ink-soft">
+                        x{formatNumber(quantity)}
+                      </span>
+                      <Button variant="primary" disabled={healthFull} onClick={() => consumeItem(item.id)}>
+                        Usar
+                      </Button>
                     </span>
-                    <Button variant="primary" disabled={healthFull} onClick={() => consumeItem(item.id)}>
-                      Usar
-                    </Button>
                   </ListRow>
                 ))}
               </List>
@@ -244,12 +246,14 @@ export function CharacterScreen() {
                         " min"
                       }
                     />
-                    <span className="font-mono text-xs text-ink-soft">
-                      x{formatNumber(quantity)}
+                    <span className="flex shrink-0 items-center gap-3">
+                      <span className="font-mono text-xs text-ink-soft">
+                        x{formatNumber(quantity)}
+                      </span>
+                      <Button variant="primary" disabled={furyActive} onClick={() => consumeItem(item.id)}>
+                        Usar
+                      </Button>
                     </span>
-                    <Button variant="primary" disabled={furyActive} onClick={() => consumeItem(item.id)}>
-                      Usar
-                    </Button>
                   </ListRow>
                 ))}
               </List>

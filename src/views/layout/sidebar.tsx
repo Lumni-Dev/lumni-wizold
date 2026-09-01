@@ -11,7 +11,7 @@ import {
   type NavigationItem,
 } from "@/shared/constants/navigation";
 import { cn } from "@/shared/utils/class-names";
-import { chipClass } from "../components/chip";
+import { chipClass, ChipFrame } from "../components/chip";
 import { MoonTracker } from "../components/moon-tracker";
 import { NavIcon } from "../components/app-icon";
 
@@ -70,7 +70,7 @@ export function Sidebar({ tavernUnread = 0 }: { tavernUnread?: number }) {
   const pathname = usePathname();
 
   return (
-    <aside className="sticky top-0 hidden h-screen w-56 shrink-0 flex-col border-r border-edge bg-charcoal/70 backdrop-blur lg:flex">
+    <aside className="sticky top-0 hidden h-screen w-56 shrink-0 flex-col border-r border-edge bg-surface/40 backdrop-blur lg:flex">
       <Brand />
 
       <nav className="flex-1 overflow-y-auto p-3" aria-label="Páginas do jogo">
@@ -109,19 +109,20 @@ export function MobileNavigation({ tavernUnread = 0 }: { tavernUnread?: number }
         const active = pathname === item.href;
         const badge = item.href === "/tavern" ? tavernUnread : 0;
         return (
-          <Link
-            key={item.href}
-            href={item.href}
-            aria-current={active ? "page" : undefined}
-            className={chipClass(active)}
-          >
-            {item.label}
-            {badge > 0 ? (
-              <span className="ml-1.5 inline-flex h-6 min-w-6 items-center justify-center rounded-md border border-ember bg-ember px-2 font-mono text-[10px] font-bold tracking-normal text-base">
-                {badge > 9 ? "9+" : badge}
-              </span>
-            ) : null}
-          </Link>
+          <ChipFrame key={item.href} active={active}>
+            <Link
+              href={item.href}
+              aria-current={active ? "page" : undefined}
+              className={chipClass(active)}
+            >
+              {item.label}
+              {badge > 0 ? (
+                <span className="ml-1.5 inline-flex h-6 min-w-6 items-center justify-center rounded-md border border-ember bg-ember px-2 font-mono text-[10px] font-bold tracking-normal text-base">
+                  {badge > 9 ? "9+" : badge}
+                </span>
+              ) : null}
+            </Link>
+          </ChipFrame>
         );
       })}
     </nav>

@@ -1,6 +1,7 @@
-import type { ButtonHTMLAttributes, MouseEvent } from "react";
+import type { ButtonHTMLAttributes, MouseEvent, ReactNode } from "react";
 import { playClick } from "@/controllers/sound";
 import { cn } from "@/shared/utils/class-names";
+import { CornerAccents } from "./corner-accents";
 
 export function chipClass(active = false, className?: string): string {
   return cn(
@@ -13,17 +14,38 @@ export function chipClass(active = false, className?: string): string {
   );
 }
 
+export function ChipFrame({
+  active = false,
+  className,
+  children,
+}: {
+  active?: boolean;
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <span className={cn("relative inline-flex", className)}>
+      {children}
+      {active ? <CornerAccents scale="icon" inside /> : null}
+    </span>
+  );
+}
+
 interface ChipProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   active?: boolean;
 }
 
-export function Chip({ active = false, className, onClick, ...rest }: ChipProps) {
+export function Chip({ active = false, className, onClick, children, ...rest }: ChipProps) {
   const press = (event: MouseEvent<HTMLButtonElement>) => {
     playClick();
     onClick?.(event);
   };
 
   return (
-    <button type="button" className={chipClass(active, className)} onClick={press} {...rest} />
+    <ChipFrame active={active}>
+      <button type="button" className={chipClass(active, className)} onClick={press} {...rest}>
+        {children}
+      </button>
+    </ChipFrame>
   );
 }

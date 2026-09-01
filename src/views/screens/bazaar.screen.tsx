@@ -194,6 +194,11 @@ export function BazaarScreen() {
           title="Anúncios"
           description="O quadro inteiro: os seus primeiro, depois os dos outros caçadores."
           padding="none"
+          footer={
+            pages > 1 ? (
+              <Pagination page={currentPage} pages={pages} onChange={setPage} />
+            ) : undefined
+          }
         >
           <List>
             {onPage.map((entry) => (
@@ -222,36 +227,36 @@ export function BazaarScreen() {
                     </>
                   }
                 />
-                {entry.available > 1 ? (
-                  <span className="font-mono text-xs text-ink-soft">
-                    x{formatNumber(entry.available)}
-                  </span>
-                ) : null}
-                {entry.mine ? (
-                  <Button variant="outline" onClick={() => setCancelling(entry.listing.id)}>
-                    Remover
-                  </Button>
-                ) : (
-                  <Button
-                    variant="primary"
-                    onClick={() =>
-                      setFlow({
-                        kind: "buy",
-                        listingId: entry.listing.id,
-                        quantity: "1",
-                      })
-                    }
-                  >
-                    Comprar {formatReais(entry.listing.priceCents)}
-                  </Button>
-                )}
+                <span className="flex shrink-0 items-center gap-3">
+                  {entry.available > 1 ? (
+                    <span className="font-mono text-xs text-ink-soft">
+                      x{formatNumber(entry.available)}
+                    </span>
+                  ) : null}
+                  {entry.mine ? (
+                    <Button variant="outline" onClick={() => setCancelling(entry.listing.id)}>
+                      Remover
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="primary"
+                      onClick={() =>
+                        setFlow({
+                          kind: "buy",
+                          listingId: entry.listing.id,
+                          quantity: "1",
+                        })
+                      }
+                    >
+                      Comprar {formatReais(entry.listing.priceCents)}
+                    </Button>
+                  )}
+                </span>
               </ListRow>
             ))}
           </List>
         </Panel>
       )}
-
-      <Pagination page={currentPage} pages={pages} onChange={setPage} />
 
       <Modal
         open={flow?.kind === "announce"}
