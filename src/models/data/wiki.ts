@@ -392,7 +392,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "Cada mesa guarda as últimas " +
         MAX_ROOM_MESSAGES +
         " falas: o que veio antes a noite leva.",
-      "A taverna não aceita links: fala que carrega endereço volta recusada.",
+      "Links de Wizold, Lumni, Twitch, YouTube, Instagram, Facebook, WhatsApp, TikTok e X passam; qualquer outro endereço é recusado.",
       "Nomes de caçador, mesa e mensagens passam por moderação: o que fere as regras é recusado na hora ou censurado depois do envio.",
       "Cada fala cabe em " +
         MESSAGE_MAX_LENGTH +

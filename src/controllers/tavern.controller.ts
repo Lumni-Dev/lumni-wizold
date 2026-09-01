@@ -362,7 +362,7 @@ export function sendMessage(
   const clean = text.trim().slice(0, MESSAGE_MAX_LENGTH);
   if (clean.length === 0) return fail(state, "Escreva alguma coisa antes de enviar.");
   if (containsLink(clean)) {
-    return fail(state, "A taverna não aceita links: conversa se leva em palavras.");
+    return fail(state, "Esse link não é permitido na taverna.");
   }
 
   const lastOwn = [...room.messages]

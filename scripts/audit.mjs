@@ -2017,6 +2017,31 @@ sec("taverna");
     tavernCtrl.sendMessage(tavern, opened.roomId, me, "acessa exemplo.com agora").ok === false,
   );
   ok(
+    "link do wizold passa",
+    tavernCtrl.sendMessage(tavern, opened.roomId, me, "joga em https://wizold.lumni.dev.br").ok ===
+      true,
+  );
+  ok(
+    "link da lumni passa",
+    tavernCtrl.sendMessage(tavern, opened.roomId, me, "politica em lumni.dev.br/privacy").ok === true,
+  );
+  ok(
+    "wizold.com.br passa",
+    tavernCtrl.sendMessage(tavern, opened.roomId, me, "https://wizold.com.br em breve").ok === true,
+  );
+  ok(
+    "youtube passa",
+    tavernCtrl.sendMessage(tavern, opened.roomId, me, "live em youtube.com/watch?v=abc").ok === true,
+  );
+  ok(
+    "twitch passa",
+    tavernCtrl.sendMessage(tavern, opened.roomId, me, "www.twitch.tv/canal").ok === true,
+  );
+  ok(
+    "site aleatório ainda recusa",
+    tavernCtrl.sendMessage(tavern, opened.roomId, me, "spam em https://malicioso.net/x").ok === false,
+  );
+  ok(
     "fala com pontuação passa",
     tavernCtrl.sendMessage(tavern, opened.roomId, me, "Boa noite, matilha. Tudo bem?").ok === true,
   );

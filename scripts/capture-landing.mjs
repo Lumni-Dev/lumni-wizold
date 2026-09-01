@@ -8,6 +8,8 @@ import { fileURLToPath } from "node:url";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
 const BASE = process.env.SMOKE_BASE ?? "http://localhost:3000";
+// Prefer production captures (no Next.js dev badge): npm run build && PORT=3001 npm run start
+// then SMOKE_BASE=http://localhost:3001 node scripts/capture-landing.mjs
 const OUT = join(ROOT, "public", "assets", "landing");
 const EMAIL = "landing@wizold.test";
 
@@ -79,9 +81,24 @@ await context.addCookies([
 
 const page = await context.newPage();
 
+async function stripDevChrome(page) {
+  await page.evaluate(() => {
+    const selectors = [
+      "nextjs-portal",
+      "#devtools-indicator",
+      "[data-nextjs-toast]",
+      "[data-nextjs-dev-tools-button]",
+    ];
+    for (const selector of selectors) {
+      document.querySelectorAll(selector).forEach((node) => node.remove());
+    }
+  });
+}
+
 for (const shot of SHOTS) {
   await page.goto(BASE + shot.path, { waitUntil: "networkidle" });
   await page.waitForTimeout(800);
+  await stripDevChrome(page);
   const target = join(OUT, shot.key + ".webp");
   await page.screenshot({ path: target, type: "webp", fullPage: false });
   console.log("saved", target);

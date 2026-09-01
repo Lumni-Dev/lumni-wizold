@@ -10,6 +10,7 @@ import { ActionIcon } from "../components/app-icon";
 import { CornerAccents } from "../components/corner-accents";
 import { GenderBanner } from "../components/gender-icon";
 import { PreviewGallery } from "../components/preview-gallery";
+import { LandingBackground } from "../components/landing-background";
 import { LandingCtaButton } from "../components/landing-cta-button";
 import { Footer } from "../layout/footer";
 
@@ -63,8 +64,14 @@ export function LandingScreen() {
   const hasRun = ready && character !== null;
   const narration = useNarration();
 
+  useEffect(() => {
+    document.body.classList.add("landing-page");
+    return () => document.body.classList.remove("landing-page");
+  }, []);
+
   return (
     <div className="flex min-h-screen flex-col">
+      <LandingBackground />
       <header className="relative flex min-h-screen flex-col items-center justify-center px-4 text-center">
         <div className="relative z-10 flex flex-col items-center gap-8">
           <div className="space-y-5">
