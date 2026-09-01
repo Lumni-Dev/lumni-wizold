@@ -1800,13 +1800,13 @@ sec("automação");
   const floor = stats.deriveStats(low.character, low.equipment, null).maxHealth;
   low.character.health = Math.max(1, Math.floor(floor * 0.1));
   ok(
-    "ferido bebe sozinho ao zerar, sem chave",
-    automationCtrl.nextAutomationStep(low, null)?.kind === "potion",
+    "ferido no chão não bebe sem a chave de poção",
+    automationCtrl.nextAutomationStep(low, null) === null,
   );
   const bareFloor = { ...low, inventory: [] };
   ok(
-    "ferido sem poção deita sozinho, sem chave",
-    automationCtrl.nextAutomationStep(bareFloor, null)?.kind === "rest",
+    "ferido no chão não repousa sem a chave de descanso",
+    automationCtrl.nextAutomationStep(bareFloor, null) === null,
   );
   const withPotion = { ...low, automation: { ...low.automation, potion: true } };
   const step = automationCtrl.nextAutomationStep(withPotion, null);
@@ -1859,8 +1859,16 @@ sec("automação");
   );
   const restKeyOnly = { ...petState, automation: { ...petState.automation, petRest: true } };
   ok(
-    "com repouso automático, ração vence a casinha",
-    automationCtrl.nextAutomationStep(restKeyOnly, null)?.kind === "feed",
+    "repouso do lobo não alimenta sem a chave de comida",
+    automationCtrl.nextAutomationStep(restKeyOnly, null) === null,
+  );
+  const restFeed = {
+    ...petState,
+    automation: { ...petState.automation, petRest: true, petFeed: true },
+  };
+  ok(
+    "com comida automática, ração vence a casinha",
+    automationCtrl.nextAutomationStep(restFeed, null)?.kind === "feed",
   );
   const paused = baseState({ level: 10, form: "werewolf" });
   const idle = { kind: "hunt", id: "village-field", paused: true };
@@ -1920,7 +1928,7 @@ sec("automação");
   const floorTurn = {
     ...low,
     character: { ...low.character, rage: 100 },
-    automation: { ...low.automation, transform: true },
+    automation: { ...low.automation, transform: true, potion: true },
   };
   ok(
     "no chão a fúria espera, recupera antes",

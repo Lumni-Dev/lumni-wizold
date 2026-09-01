@@ -607,6 +607,7 @@ export async function insertNewGame(
      on conflict (character_id) do update set cents = $2`,
     [character.id, state.wallet.cents],
   );
+  await saveAutomation(client, character.id, state);
   await saveGame(client, character.id, initialState(), state);
   await recordWalletMovement(client, character.id, state.wallet.cents, "starting_balance", null);
 }

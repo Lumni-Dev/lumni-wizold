@@ -78,9 +78,11 @@ export function nextAutomationStep(
   const resting = activity?.kind === "rest";
 
   if (character.health <= floor && character.health < stats.maxHealth) {
-    const flask = smallestPotion(state, "health");
-    if (flask) return { kind: "potion", itemId: flask };
-    if (!resting) return { kind: "rest" };
+    if (on.potion) {
+      const flask = smallestPotion(state, "health");
+      if (flask) return { kind: "potion", itemId: flask };
+    }
+    if (on.rest && !resting) return { kind: "rest" };
   }
 
   const pet = state.pet;
@@ -88,7 +90,7 @@ export function nextAutomationStep(
     const spent = petShortOfBreath(pet);
     const ration = smallestRation(state);
 
-    if (spent && (on.petFeed || on.petRest) && ration) return { kind: "feed", itemId: ration };
+    if (spent && on.petFeed && ration) return { kind: "feed", itemId: ration };
     if (spent && on.petRest && !ration && isPetActive(pet)) return { kind: "kennel", active: false };
     if (on.petRest && !isPetActive(pet) && isPetWhole(pet)) {
       return { kind: "kennel", active: true };

@@ -495,9 +495,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     lines: [
       "Só quem tem VIP liga e desliga os interruptores nas configurações.",
       AUTOMATIONS.map((entry) => entry.label + ": " + entry.effect).join(" "),
-      "Com VIP ativo, no chão de vida (" +
-        Math.round(MIN_HEALTH_RATIO_TO_ACT * 100) +
-        "%) bebe poção se houver, senão repousa; trabalho pausado por falta de recurso retoma quando der. Na lua cheia a fúria automática não bebe poção: o céu já mantém o Modo Fúria.",
+      "Nada liga sozinho: cada interruptor precisa estar ativado nas configurações. Trabalho pausado por falta de recurso retoma quando a chave daquele job estiver ligada. Na lua cheia a fúria automática não bebe poção: o céu já mantém o Modo Fúria.",
     ],
   },
   {
