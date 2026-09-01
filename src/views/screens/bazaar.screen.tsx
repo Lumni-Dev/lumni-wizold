@@ -32,7 +32,7 @@ import {
 } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
 import { Button } from "../components/button";
-import { Chip } from "../components/chip";
+import { FilterRow, FilterSelect } from "../components/filter-select";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { EmptyState } from "../components/empty-state";
 import { Field } from "../components/field";
@@ -228,39 +228,26 @@ export function BazaarScreen() {
         />
       ) : (
         <>
-          <div className="space-y-2">
-            <div className="flex flex-wrap gap-2">
-              {BAZAAR_CATEGORY_FILTERS.map((option) => (
-                <Chip
-                  key={option.key}
-                  active={category === option.key}
-                  onClick={() => {
-                    setCategory(option.key);
-                    setPage(1);
-                  }}
-                >
-                  {option.label}
-                </Chip>
-              ))}
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="mr-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                Conjunto
-              </span>
-              {BAZAAR_SET_FILTERS.map((option) => (
-                <Chip
-                  key={option.key}
-                  active={set === option.key}
-                  onClick={() => {
-                    setSet(option.key);
-                    setPage(1);
-                  }}
-                >
-                  {option.label}
-                </Chip>
-              ))}
-            </div>
-          </div>
+          <FilterRow>
+            <FilterSelect
+              label="Categoria"
+              value={category}
+              options={BAZAAR_CATEGORY_FILTERS}
+              onChange={(value) => {
+                setCategory(value);
+                setPage(1);
+              }}
+            />
+            <FilterSelect
+              label="Conjunto"
+              value={set}
+              options={BAZAAR_SET_FILTERS}
+              onChange={(value) => {
+                setSet(value);
+                setPage(1);
+              }}
+            />
+          </FilterRow>
 
           {filteredBoard.length === 0 ? (
             <EmptyState

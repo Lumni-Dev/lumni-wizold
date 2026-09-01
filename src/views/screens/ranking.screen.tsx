@@ -12,6 +12,7 @@ import { cn } from "@/shared/utils/class-names";
 import { formatNumber } from "@/shared/utils/format";
 import { sanitizeName } from "@/shared/utils/text";
 import { Chip } from "../components/chip";
+import { FilterRow, FilterSelect } from "../components/filter-select";
 import { CopyNick } from "../components/copy-nick";
 import { Field } from "../components/field";
 import { List, ListRow } from "../components/list";
@@ -76,32 +77,24 @@ export function RankingScreen() {
         }
       />
 
-      <div className="flex flex-wrap gap-2">
-        {RANKING_BOARDS.map((board) => (
-          <Chip
-            key={board.key}
-            active={board.key === view.board.key}
-            onClick={() => openBoard(board.key)}
-          >
-            {board.label}
-          </Chip>
-        ))}
-      </div>
-
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="mr-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-          Personagem
-        </span>
-        <Chip active={gender === "all"} onClick={() => cutGender("all")}>
-          Todos
-        </Chip>
-        <Chip active={gender === "male"} onClick={() => cutGender("male")}>
-          Lumni
-        </Chip>
-        <Chip active={gender === "female"} onClick={() => cutGender("female")}>
-          Luna
-        </Chip>
-      </div>
+      <FilterRow>
+        <FilterSelect
+          label="Quadro"
+          value={view.board.key}
+          options={RANKING_BOARDS.map((board) => ({ key: board.key, label: board.label }))}
+          onChange={openBoard}
+        />
+        <FilterSelect
+          label="Personagem"
+          value={gender}
+          options={[
+            { key: "all", label: "Todos" },
+            { key: "male", label: "Lumni" },
+            { key: "female", label: "Luna" },
+          ]}
+          onChange={cutGender}
+        />
+      </FilterRow>
 
       <Field
         compact

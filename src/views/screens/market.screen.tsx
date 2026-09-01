@@ -21,8 +21,8 @@ import { lineageName } from "@/models/data/items";
 import { formatNumber, formatBronze } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
 import { Button } from "../components/button";
-import { cn } from "@/shared/utils/class-names";
 import { Chip } from "../components/chip";
+import { FilterRow, FilterSelect } from "../components/filter-select";
 import { Pagination } from "../components/pagination";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { Field } from "../components/field";
@@ -109,43 +109,19 @@ function MarketFilters({
   const isPet = category === "pet";
 
   return (
-    <div className="space-y-2">
-      <div className="flex flex-wrap gap-2">
-        {CATEGORY_FILTERS.map((option) => (
-          <Chip
-            key={option.key}
-            active={category === option.key}
-            onClick={() => setCategory(option.key)}
-          >
-            {option.label}
-          </Chip>
-        ))}
-      </div>
-      <div className={cn("flex flex-wrap items-center gap-2", isPet && "hidden")}>
-        <span className="mr-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-          {isPotion ? "Tamanho" : "Conjunto"}
-        </span>
-        {isPotion
-          ? SIZE_FILTERS.map((option) => (
-              <Chip
-                key={option.key}
-                active={size === option.key}
-                onClick={() => setSize(option.key)}
-              >
-                {option.label}
-              </Chip>
-            ))
-          : SET_FILTERS.map((option) => (
-              <Chip
-                key={option.key}
-                active={set === option.key}
-                onClick={() => setSet(option.key)}
-              >
-                {option.label}
-              </Chip>
-            ))}
-      </div>
-    </div>
+    <FilterRow>
+      <FilterSelect
+        label="Categoria"
+        value={category}
+        options={CATEGORY_FILTERS}
+        onChange={setCategory}
+      />
+      {isPet ? null : isPotion ? (
+        <FilterSelect label="Tamanho" value={size} options={SIZE_FILTERS} onChange={setSize} />
+      ) : (
+        <FilterSelect label="Conjunto" value={set} options={SET_FILTERS} onChange={setSet} />
+      )}
+    </FilterRow>
   );
 }
 

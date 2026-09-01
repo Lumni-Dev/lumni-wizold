@@ -17,7 +17,7 @@ import {
 import { enhancedName } from "@/models/rules/forge";
 import { FORGE_TICKS, MAX_ENHANCEMENT, MINING_RESET_HOUR, MINING_TICKS } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
-import { Chip } from "../components/chip";
+import { FilterRow, FilterSelect } from "../components/filter-select";
 import { formatBronze, formatNumber } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf, pageOfPosition } from "@/shared/utils/pagination";
 import { Bar } from "../components/bar";
@@ -72,50 +72,6 @@ function RadioMark({ selected }: { selected: boolean }) {
     >
       {selected ? <span className="h-2 w-2 rounded-full bg-ember" /> : null}
     </span>
-  );
-}
-
-function ForgeCategoryFilters({
-  category,
-  onChange,
-}: {
-  category: CategoryFilter;
-  onChange: (value: CategoryFilter) => void;
-}) {
-  return (
-    <div className="flex flex-wrap items-center gap-2">
-      <span className="mr-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">Categoria</span>
-      {FORGE_CATEGORY_FILTERS.map((option) => (
-        <Chip
-          key={option.key}
-          active={category === option.key}
-          onClick={() => onChange(option.key)}
-        >
-          {option.label}
-        </Chip>
-      ))}
-    </div>
-  );
-}
-
-function ForgeSetFilters({
-  set,
-  onChange,
-}: {
-  set: SetFilter;
-  onChange: (value: SetFilter) => void;
-}) {
-  return (
-    <div className="flex flex-wrap items-center gap-2">
-      <span className="mr-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-        Disponíveis
-      </span>
-      {FORGE_SET_FILTERS.map((option) => (
-        <Chip key={option.key} active={set === option.key} onClick={() => onChange(option.key)}>
-          {option.label}
-        </Chip>
-      ))}
-    </div>
   );
 }
 
@@ -483,8 +439,20 @@ export function ForgeScreen() {
         </Panel>
 
         <div className="space-y-3">
-          <ForgeCategoryFilters category={category} onChange={pickCategory} />
-          <ForgeSetFilters set={set} onChange={pickSet} />
+          <FilterRow>
+            <FilterSelect
+              label="Categoria"
+              value={category}
+              options={FORGE_CATEGORY_FILTERS}
+              onChange={pickCategory}
+            />
+            <FilterSelect
+              label="Conjunto"
+              value={set}
+              options={FORGE_SET_FILTERS}
+              onChange={pickSet}
+            />
+          </FilterRow>
 
           {slots.length === 0 ? (
             <EmptyState

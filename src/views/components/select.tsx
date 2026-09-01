@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useId, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
+import { playClick } from "@/controllers/sound";
 import { cn } from "@/shared/utils/class-names";
 export interface SelectOption {
   value: string;
@@ -14,6 +15,7 @@ interface SelectProps {
   onChange: (value: string) => void;
   compact?: boolean;
   disabled?: boolean;
+  className?: string;
   "aria-label"?: string;
 }
 const TYPE_RESET_MS = 800;
@@ -25,6 +27,7 @@ export function Select({
   onChange,
   compact = false,
   disabled = false,
+  className,
   "aria-label": ariaLabel,
 }: SelectProps) {
   const [open, setOpen] = useState(false);
@@ -55,7 +58,11 @@ export function Select({
   };
   const pick = (index: number) => {
     const option = options[index];
-    if (!option) return;
+    if (!option || option.value === value) {
+      setOpen(false);
+      return;
+    }
+    playClick();
     onChange(option.value);
     setOpen(false);
   };
@@ -111,7 +118,7 @@ export function Select({
     }
   };
   return (
-    <div className="block space-y-2">
+    <div className={cn("block space-y-2", className)}>
       {label ? (
         <span className="block text-[10px] uppercase tracking-[0.16em] text-ink-faint">
           {label}

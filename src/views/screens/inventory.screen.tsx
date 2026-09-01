@@ -19,7 +19,7 @@ import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
 import { summarizeEffect } from "../presenters/item.presenter";
 import { Button } from "../components/button";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
-import { Chip } from "../components/chip";
+import { FilterSelect } from "../components/filter-select";
 import { Pagination } from "../components/pagination";
 import { IconFrame } from "../components/icon-frame";
 import { ItemCard } from "../components/item-card";
@@ -141,20 +141,15 @@ export function InventoryScreen() {
         </div>
       </Panel>
 
-      <div className="flex flex-wrap gap-2">
-        {FILTERS.map((option) => (
-          <Chip
-            key={option.key}
-            active={filter === option.key}
-            onClick={() => {
-              setFilter(option.key);
-              setPage(1);
-            }}
-          >
-            {option.label}
-          </Chip>
-        ))}
-      </div>
+      <FilterSelect
+        label="Categoria"
+        value={filter}
+        options={FILTERS}
+        onChange={(value) => {
+          setFilter(value);
+          setPage(1);
+        }}
+      />
 
       {visible.length === 0 ? (
         <EmptyState
