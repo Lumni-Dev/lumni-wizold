@@ -10,14 +10,20 @@ import {
   isEquippable,
   SLOT_LABEL,
 } from "@/models/entities/item";
-import { inventoryCategoryFilterOptions, type CategoryFilter } from "../presenters/item-filter.presenter";
+import {
+  inventoryCategoryFilterOptions,
+  matchesMarketItemFilter,
+  type CategoryFilter,
+  type SetFilter,
+  type SizeFilter,
+} from "../presenters/item-filter.presenter";
 import { isForgeMaterial } from "@/models/rules/bazaar";
 import { formatNumber } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
 import { summarizeEffect } from "../presenters/item.presenter";
 import { Button } from "../components/button";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
-import { FilterRow, FilterSelect } from "../components/filter-select";
+import { ItemFilterRow } from "../components/item-filter-row";
 import { Pagination } from "../components/pagination";
 import { IconFrame } from "../components/icon-frame";
 import { ItemCard } from "../components/item-card";
@@ -35,6 +41,8 @@ export function InventoryScreen() {
   const router = useRouter();
   const { state, character, equipItem, unequipItem, consumeItem } = useGame();
   const [filter, setFilter] = useState<CategoryFilter>("all");
+  const [set, setSet] = useState<SetFilter>("all");
+  const [size, setSize] = useState<SizeFilter>("all");
   const [page, setPage] = useState(1);
   const [now, setNow] = useState(() => Date.now());
   const [equipLock, setEquipLock] = useState<Record<string, number>>({});
@@ -49,7 +57,7 @@ export function InventoryScreen() {
   }
 
   const slots = useMemo(() => detailInventory(state), [state]);
-  const visible = filter === "all" ? slots : slots.filter((slot) => slot.item.category === filter);
+  const visible = slots.filter((slot) => matchesMarketItemFilter(slot.item, filter, set, size));
 
   const currentPage = clampPage(page, visible.length, PAGE_SIZE);
   const pages = pageCount(visible.length, PAGE_SIZE);
@@ -128,16 +136,24 @@ export function InventoryScreen() {
         </div>
       </Panel>
 
-      <FilterRow className="sm:max-w-xs">
-        <FilterSelect
-            accent
-          label="Categoria"
-          value={filter}
-          options={inventoryCategoryFilterOptions()}
-          onChange={setFilter}
-          onPageReset={() => setPage(1)}
-        />
-      </FilterRow>
+      <ItemFilterRow
+        category={filter}
+        set={set}
+        size={size}
+        onCategoryChange={(value) => {
+          setFilter(value);
+          setPage(1);
+        }}
+        onSetChange={(value) => {
+          setSet(value);
+          setPage(1);
+        }}
+        onSizeChange={(value) => {
+          setSize(value);
+          setPage(1);
+        }}
+        includeMaterial
+      />
 
       {visible.length === 0 ? (
         <EmptyState

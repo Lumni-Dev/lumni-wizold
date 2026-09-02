@@ -18,6 +18,7 @@ import { formatNumber } from "@/shared/utils/format";
 import { backgroundRepository } from "@/models/repositories/background.repository";
 import { ArtImage } from "../components/art-image";
 import { ArtVideo } from "../components/art-video";
+import { ChipTabs } from "../components/chip-tabs";
 import { CreatureIcon } from "../components/creature-icon";
 import {
   loadHuntSelection,
@@ -173,10 +174,25 @@ export function HuntScreen() {
   const [reportLines, setReportLines] = useState<NarrationLine[]>([]);
   const [session, setSession] = useState<HuntSession>(EMPTY_SESSION);
   const [preyJolt, setPreyJolt] = useState(0);
+  const [area, setArea] = useState("all");
   const [lapJolt, setLapJolt] = useState(0);
   const shaking = useShake(preyJolt + lapJolt);
   const lastReportRef = useRef<HuntReport | null>(null);
   const territories = useMemo(() => listTerritories(state), [state]);
+  const areaTabs = useMemo(
+    () => [
+      { key: "all", label: "Todas" },
+      ...territories.map(({ territory }) => ({ key: territory.id, label: territory.name })),
+    ],
+    [territories],
+  );
+  const shownAreas =
+    area === "all"
+      ? territories
+      : territories.filter(
+          ({ territory }) =>
+            territory.id === area || territory.id === activeId || territory.id === waitingId,
+        );
   const xpBonus = moon.phase.experienceBonus;
   const animatedArt = useSyncExternalStore(
     backgroundRepository.subscribe,
@@ -246,8 +262,10 @@ export function HuntScreen() {
         }
       />
 
+      <ChipTabs tabs={areaTabs} value={area} onChange={setArea} />
+
       <div className="space-y-6">
-        {territories.map(({ territory, creatures, prey, unlocked, hasHealth, reason }) => {
+        {shownAreas.map(({ territory, creatures, prey, unlocked, hasHealth, reason }) => {
           const ready = unlocked && hasHealth;
           const available = ready;
           const active = activeId === territory.id;
