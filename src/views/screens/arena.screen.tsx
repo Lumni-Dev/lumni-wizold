@@ -467,8 +467,8 @@ export function ArenaScreen() {
                     />
                   </CardHeader>
 
-                  <CardBody>
-                    <div className="overflow-hidden rounded-md border border-edge">
+                  <CardBody className="p-0">
+                    <div className="divide-y divide-edge">
                       <div className="grid grid-cols-5 divide-x divide-edge">
                         {ATTRIBUTES.map((attribute) => (
                           <div
@@ -482,7 +482,7 @@ export function ArenaScreen() {
                           </div>
                         ))}
                       </div>
-                      <div className="grid grid-cols-3 divide-x divide-edge border-t border-edge">
+                      <div className="grid grid-cols-3 divide-x divide-edge">
                         {[
                           { label: "Vida", value: formatNumber(rival.maxHealth) },
                           { label: "Esquiva", value: rival.dodge + "%" },
