@@ -10,6 +10,7 @@ import { ActionIcon } from "../components/app-icon";
 import { Button } from "../components/button";
 import { CornerAccents } from "../components/corner-accents";
 import { GenderBanner } from "../components/gender-icon";
+import { CreatureCarousel } from "../components/creature-carousel";
 import { PreviewGallery } from "../components/preview-gallery";
 import { LiveBackdrop } from "../components/live-backdrop";
 import { LandingCtaButton } from "../components/landing-cta-button";
@@ -155,6 +156,18 @@ export function LandingScreen() {
             </div>
           </div>
           <CornerAccents />
+        </section>
+
+        <section className="space-y-6">
+          <div className="space-y-1 text-center">
+            <h2 className="heading text-[11px] text-ink">O que espera lá fora</h2>
+            <p className="text-xs text-ink-faint">
+              Cem criaturas divididas em dez áreas, da primeira presa do campo ao que mora no
+              abismo.
+            </p>
+          </div>
+
+          <CreatureCarousel />
         </section>
 
         <section className="space-y-6">
