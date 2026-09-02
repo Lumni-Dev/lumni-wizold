@@ -10,6 +10,7 @@ import { MAX_ROOM_MEMBERS, MESSAGE_MAX_LENGTH } from "@/models/entities/tavern";
 import { CONTROL_HEIGHT } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { formatTime } from "@/shared/utils/format";
+import { splitChatLinks } from "@/shared/utils/text";
 import { ActionIcon } from "./app-icon";
 import { AiAuditNotice } from "./ai-audit-notice";
 import { Button } from "./button";
@@ -43,6 +44,28 @@ function authorPresence(
 ): PresenceStatus | undefined {
   if (authorId === identityId) return "active";
   return presence[authorId];
+}
+
+function ChatText({ text }: { text: string }) {
+  return (
+    <>
+      {splitChatLinks(text).map((part, index) =>
+        part.kind === "link" ? (
+          <a
+            key={index}
+            href={part.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="break-words underline underline-offset-2 transition-colors hover:text-highlight"
+          >
+            {part.value}
+          </a>
+        ) : (
+          <span key={index}>{part.value}</span>
+        ),
+      )}
+    </>
+  );
 }
 
 function ChatNick({
@@ -152,7 +175,7 @@ export function TavernRoomChatMessages({
     <List ref={messagesRef} className={className}>
       {activeRoom.messages.map((message, index) => (
         <ListRow key={message.id} className={cn(index % 2 === 1 && "bg-charcoal")}>
-          <p className="min-w-0 flex-1 text-xs leading-relaxed">
+          <p className="min-w-0 flex-1 break-words text-xs leading-relaxed">
             {message.authorId === "system" ? (
               <span className="mr-2 inline-flex items-center gap-2">
                 <span className="font-mono text-[10px] text-ink-faint">{formatTime(message.at)}</span>
@@ -170,7 +193,7 @@ export function TavernRoomChatMessages({
             <span
               className={cn(message.authorId === "system" ? "text-ink-faint" : "text-ink-soft")}
             >
-              {message.text}
+              <ChatText text={message.text} />
             </span>
           </p>
         </ListRow>
