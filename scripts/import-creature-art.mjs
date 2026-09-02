@@ -15,6 +15,8 @@ const ALIASES = {
   "urso-paro-jovem": "urso-pardo-jovem",
   "bode-eselvagem": "bode-selvagem",
   mercenaio: "mercenario",
+  "fnix-menor": "fenix-menor",
+  sucubu: "sucubo",
 };
 
 function normalize(value) {
