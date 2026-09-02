@@ -9,7 +9,7 @@ import {
   resolveHuntCreatureId,
   type HuntReport,
 } from "@/controllers/hunt.controller";
-import { useActivityLock } from "@/controllers/use-activity-lock";
+import { ACTIVITY_WAIT_LABEL, useActivityLock } from "@/controllers/use-activity-lock";
 import { areaVoice, useNarration } from "@/controllers/use-narration";
 import { usePageActivity } from "@/controllers/use-page-activity";
 import { emphasizeDamage, narrationOf, type NarrationLine } from "../presenters/hunt.presenter";
@@ -155,6 +155,7 @@ export function HuntScreen() {
   const { state, character, pet, moon, activity, setActivity } = useGame();
   usePageActivity(["hunt"]);
   const { locked } = useActivityLock();
+  const waitLabel = locked ? ACTIVITY_WAIT_LABEL : "";
   const narration = useNarration();
   const runtime = useSyncExternalStore(
     activityRuntimeStore.subscribe,
@@ -424,7 +425,11 @@ export function HuntScreen() {
                       onClick={() => toggleHunt(territory.id, available)}
                       disabled={active ? !opting : !available || locked}
                     >
-                      {opting ? "Parar (" + cooldown + ")" : active ? "Caçando..." : "Caçar"}
+                      {opting
+                        ? "Parar (" + cooldown + ")"
+                        : active
+                          ? "Caçando..."
+                          : waitLabel || "Caçar"}
                     </Button>
                   </div>
                 </div>

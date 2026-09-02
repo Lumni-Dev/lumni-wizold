@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { activityRuntimeStore } from "@/controllers/activity-runtime";
 import { useGame } from "@/controllers/game.context";
 import { listForge, listMining } from "@/controllers/forge.controller";
-import { useActivityLock } from "@/controllers/use-activity-lock";
+import { ACTIVITY_WAIT_LABEL, useActivityLock } from "@/controllers/use-activity-lock";
 import { usePageActivity } from "@/controllers/use-page-activity";
 import type { Activity } from "@/models/entities/activity";
 import {
@@ -60,6 +60,7 @@ export function ForgeScreen() {
   const { state, character, activity, setActivity } = useGame();
   usePageActivity(["mine", "forge"]);
   const { locked } = useActivityLock();
+  const waitLabel = locked ? ACTIVITY_WAIT_LABEL : "";
   const runtime = useSyncExternalStore(
     activityRuntimeStore.subscribe,
     activityRuntimeStore.snapshot,
@@ -280,7 +281,7 @@ export function ForgeScreen() {
                       ? "Parar (" + cooldown + ")"
                       : activeOre
                         ? "Minerando..."
-                        : "Minerar"}
+                        : waitLabel || "Minerar"}
                   </Button>
                 </div>
               </ListRow>
@@ -420,7 +421,7 @@ export function ForgeScreen() {
                           ? "Parar (" + cooldown + ")"
                           : forgeActive
                             ? "Forjando..."
-                            : "Forjar"}
+                            : waitLabel || "Forjar"}
                       </Button>
                     </div>
                   </ListRow>

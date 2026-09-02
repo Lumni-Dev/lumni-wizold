@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { api } from "@/controllers/api.client";
-import { useActivityLock } from "@/controllers/use-activity-lock";
+import { ACTIVITY_WAIT_LABEL, useActivityLock } from "@/controllers/use-activity-lock";
 import { useGame } from "@/controllers/game.context";
 import {
   describeArenaHistory,
@@ -125,6 +125,7 @@ export function ArenaScreen() {
   const { state, character, stats, pet, moon, drawOpponent, challengeArena, sufferBlow, landArena } =
     useGame();
   const { locked } = useActivityLock();
+  const waitLabel = locked ? ACTIVITY_WAIT_LABEL : "";
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [roster, setRoster] = useState<Hunter[]>([]);
@@ -336,7 +337,7 @@ export function ArenaScreen() {
                   disabled={!view.canFight || busy || locked}
                   onClick={challengeDrawn}
                 >
-                  {busy ? "No fosso..." : "Buscar adversário"}
+                  {busy ? "No fosso..." : waitLabel || "Buscar adversário"}
                 </Button>
               </Tooltip>
             </BodyGate>
@@ -524,7 +525,11 @@ export function ArenaScreen() {
                           disabled={!inBand || resting || !view.canFight || busy || locked}
                           onClick={() => challenge(hunter, rival)}
                         >
-                          {!inBand ? "Fora da faixa" : resting ? "Descansando" : "Desafiar"}
+                          {!inBand
+                            ? "Fora da faixa"
+                            : resting
+                              ? "Descansando"
+                              : waitLabel || "Desafiar"}
                         </Button>
                       </Tooltip>
                     </BodyGate>

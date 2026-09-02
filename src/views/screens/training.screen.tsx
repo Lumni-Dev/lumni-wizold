@@ -9,7 +9,7 @@ import {
   listExercises,
   trainingSummaryLine,
 } from "@/controllers/training.controller";
-import { useActivityLock } from "@/controllers/use-activity-lock";
+import { ACTIVITY_WAIT_LABEL, useActivityLock } from "@/controllers/use-activity-lock";
 import { usePageActivity } from "@/controllers/use-page-activity";
 import {
   MAX_ATTRIBUTE_VALUE,
@@ -33,6 +33,7 @@ export function TrainingScreen() {
   const { state, character, stats, activity, setActivity } = useGame();
   usePageActivity(["train"]);
   const { locked } = useActivityLock();
+  const waitLabel = locked ? ACTIVITY_WAIT_LABEL : "";
   const runtime = useSyncExternalStore(
     activityRuntimeStore.subscribe,
     activityRuntimeStore.snapshot,
@@ -161,7 +162,11 @@ export function TrainingScreen() {
                     onClick={() => toggleTraining(exercise.id, ready)}
                     disabled={active ? !opting : !ready || locked}
                   >
-                    {opting ? "Parar (" + cooldown + ")" : active ? "Treinando..." : "Treinar"}
+                    {opting
+                      ? "Parar (" + cooldown + ")"
+                      : active
+                        ? "Treinando..."
+                        : waitLabel || "Treinar"}
                   </Button>
                 </CardFooter>
               </Card>
@@ -238,7 +243,7 @@ export function TrainingScreen() {
                     ? "Parar (" + cooldown + ")"
                     : petActive
                       ? "Treinando..."
-                      : "Treinar"}
+                      : waitLabel || "Treinar"}
                 </Button>
               </CardFooter>
             </Card>

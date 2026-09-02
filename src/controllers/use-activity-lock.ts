@@ -13,6 +13,8 @@ const LABEL: Record<string, string> = {
   rest: "Recuperação em andamento",
 };
 
+export const ACTIVITY_WAIT_LABEL = "Aguarde...";
+
 export function useActivityLock(): { locked: boolean; reason: string } {
   const { activity } = useGame();
   const runtime = useSyncExternalStore(
