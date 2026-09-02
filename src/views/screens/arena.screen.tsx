@@ -25,6 +25,7 @@ import { formatDay, formatNumber, formatBronze } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
 import { emphasizeDamage, narrationOf, type NarrationLine } from "../presenters/hunt.presenter";
 import { Bar } from "../components/bar";
+import { AttributeIcon } from "../components/attribute-icon";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
 import { BodyGate } from "../components/body-gate";
 import { Button } from "../components/button";
@@ -439,7 +440,7 @@ export function ArenaScreen() {
           }
         >
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            {onPage.map(({ hunter, stats: rival, inBand, cooldownLeft, spoils }) => {
+            {onPage.map(({ hunter, stats: rival, inBand, cooldownLeft }) => {
               const resting = cooldownLeft > 0;
               return (
                 <Card key={hunter.id} height="fill">
@@ -463,46 +464,31 @@ export function ArenaScreen() {
                   </CardHeader>
 
                   <CardBody>
-                    <p className="text-[11px] text-ink-faint">
-                      {formatNumber(hunter.arena)} duelos ganhos - bolsa de{" "}
-                      {formatNumber(spoils.min)} a {formatNumber(spoils.max)}
-                      {resting ? " - descansa " + formatCooldown(cooldownLeft) : ""}
-                    </p>
-
-                    <div className="space-y-1">
-                      <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                        Atributos
-                      </p>
-                      <div className="grid grid-cols-5 divide-x divide-edge overflow-hidden rounded-md border border-edge">
+                    <div className="overflow-hidden rounded-md border border-edge">
+                      <div className="grid grid-cols-5 divide-x divide-edge">
                         {ATTRIBUTES.map((attribute) => (
-                          <div key={attribute.key} className="px-2 py-1 text-center">
-                            <p className="truncate text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                              {attribute.code}
-                            </p>
+                          <div
+                            key={attribute.key}
+                            className="flex flex-col items-center gap-1 px-1 py-2"
+                          >
+                            <AttributeIcon attribute={attribute.key} size="mini" />
                             <p className="font-mono text-[11px] text-ink">
                               {formatNumber(rival.totalAttributes[attribute.key])}
                             </p>
                           </div>
                         ))}
                       </div>
-                    </div>
-
-                    <div className="space-y-1">
-                      <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                        Combate
-                      </p>
-                      <div className="grid grid-cols-3 divide-x divide-edge overflow-hidden rounded-md border border-edge">
+                      <div className="grid grid-cols-3 divide-x divide-edge border-t border-edge">
                         {[
                           { label: "Vida", value: formatNumber(rival.maxHealth) },
                           { label: "Esquiva", value: rival.dodge + "%" },
                           { label: "Crítico", value: rival.critical + "%" },
                         ].map((cell) => (
-                          <div key={cell.label} className="px-2 py-1 text-center">
-                            <p className="truncate text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                              {cell.label}
-                            </p>
-                            <p className="font-mono text-[11px] text-ink">{cell.value}</p>
-                          </div>
+                          <Tooltip key={cell.label} label={cell.label}>
+                            <div className="px-2 py-2 text-center">
+                              <p className="font-mono text-[11px] text-ink">{cell.value}</p>
+                            </div>
+                          </Tooltip>
                         ))}
                       </div>
                     </div>

@@ -42,10 +42,13 @@ export const tavernChatStore = {
     return () => listeners.delete(listener);
   },
 
-  openRoom(roomId: string): void {
-    const position = defaultPosition();
+  openRoom(roomId: string): string | null {
+    const previous =
+      state.open && state.roomId !== null && state.roomId !== roomId ? state.roomId : null;
+    const position = state.open ? { x: state.x, y: state.y } : defaultPosition();
     state = { roomId, open: true, x: position.x, y: position.y };
     notify();
+    return previous;
   },
 
   closeWindow(): void {

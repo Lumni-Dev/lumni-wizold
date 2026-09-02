@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import {
   useCallback,
   useEffect,
@@ -12,7 +11,7 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from "react";
 import { tavernChatStore } from "@/controllers/tavern-chat.store";
-import { isInPack } from "@/controllers/pack.controller";
+import { useIsDesktop } from "@/controllers/use-is-desktop";
 import { playSound } from "@/controllers/sound";
 import { dismissTavernNotices } from "@/controllers/tavern-notify";
 import { useGame } from "@/controllers/game.context";
@@ -24,40 +23,16 @@ import {
   tavernSentRepository,
   type TavernSentMap,
 } from "@/models/repositories/tavern-sent.repository";
-import {
-  MAX_ROOM_MEMBERS,
-  MESSAGE_COOLDOWN_MS,
-  MESSAGE_MAX_LENGTH,
-} from "@/models/entities/tavern";
-import { CONTROL_HEIGHT } from "@/shared/constants/ui";
-import { cn } from "@/shared/utils/class-names";
-import { formatTime } from "@/shared/utils/format";
+import { MESSAGE_COOLDOWN_MS } from "@/models/entities/tavern";
 import { ActionIcon } from "./app-icon";
-import { AiAuditNotice } from "./ai-audit-notice";
-import { Button } from "./button";
 import { CornerAccents } from "./corner-accents";
-import { Field } from "./field";
-import { List, ListRow } from "./list";
-import { Tag } from "./tag";
-import { Tooltip } from "./tooltip";
+import {
+  TavernRoomChatComposer,
+  TavernRoomChatMembers,
+  TavernRoomChatMessages,
+  tavernRoomChatAction,
+} from "./tavern-room-chat";
 import { Move } from "lucide-react";
-
-function MemberName({
-  href,
-  name,
-  className,
-}: {
-  href: string | null;
-  name: string;
-  className?: string;
-}) {
-  if (!href) return <span className={className}>{name}</span>;
-  return (
-    <Link href={href} className={cn("transition-colors hover:text-highlight", className)}>
-      {name}
-    </Link>
-  );
-}
 
 function clampPosition(x: number, y: number, width: number, height: number) {
   const maxX = Math.max(16, window.innerWidth - width - 16);
@@ -69,6 +44,7 @@ function clampPosition(x: number, y: number, width: number, height: number) {
 }
 
 export function TavernChatWindow() {
+  const isDesktop = useIsDesktop();
   const chat = useSyncExternalStore(
     tavernChatStore.subscribe,
     tavernChatStore.snapshot,
@@ -189,8 +165,19 @@ export function TavernChatWindow() {
   }, [chat.open, closeChat]);
 
   useEffect(() => {
-    if (chat.open && chat.roomId && !activeRoom) tavernChatStore.closeWindow();
-  }, [chat.open, chat.roomId, activeRoom]);
+    if (!chat.open || !chat.roomId) return;
+    setDraft("");
+    setEmojiOpen(false);
+    setInvitingMemberId(null);
+    setSentBeat(0);
+    setCooldownLeft(0);
+  }, [chat.roomId, chat.open]);
+
+  useEffect(() => {
+    if (!chat.open || !chat.roomId) return;
+    const entry = rooms.find((summary) => summary.room.id === chat.roomId);
+    if (!entry?.isMember) tavernChatStore.closeWindow();
+  }, [chat.open, chat.roomId, rooms]);
 
   useEffect(() => {
     if (!chat.open) return;
@@ -206,7 +193,7 @@ export function TavernChatWindow() {
     return () => window.removeEventListener("resize", clamp);
   }, [chat.open, chat.x, chat.y]);
 
-  if (!chat.open || !chat.roomId || !activeRoom || !identity) return null;
+  if (!isDesktop || !chat.open || !chat.roomId || !activeRoom || !identity) return null;
 
   const profileHref = (memberId: string): string | null =>
     memberId === identity.id ? "/character" : "/ranking/" + memberId;
@@ -266,7 +253,7 @@ export function TavernChatWindow() {
   return (
     <div
       ref={shellRef}
-      className="pointer-events-auto fixed z-60 flex w-[min(32rem,calc(100vw-2rem))] flex-col items-center"
+      className="pointer-events-auto fixed z-60 hidden w-[min(32rem,calc(100vw-2rem))] flex-col items-center lg:flex"
       style={{ left: chat.x, top: chat.y }}
     >
       <div className="relative w-full">
@@ -275,164 +262,56 @@ export function TavernChatWindow() {
           aria-label={activeRoom.name}
           className="flex max-h-[min(32rem,calc(100svh-6rem))] w-full flex-col overflow-hidden rounded-lg border border-edge-strong bg-surface shadow-[0_24px_60px_-20px_rgba(0,0,0,0.95)]"
         >
-        <header className="flex items-center gap-3 border-b border-edge bg-surface-high px-4 py-3">
-          <h2 className="heading min-w-0 flex-1 truncate text-[11px] text-ink">{activeRoom.name}</h2>
-          <span className="shrink-0 font-mono text-[11px] text-ink-faint">
-            {activeRoom.members.length} de {activeRoom.privateFor ? 2 : MAX_ROOM_MEMBERS}
-          </span>
-          <kbd className="hidden h-6 select-none items-center rounded-md border border-edge px-1.5 font-mono text-[10px] tracking-[0.1em] text-ink-faint sm:inline-flex">
-            ESC
-          </kbd>
-          <button
-            type="button"
-            onClick={closeChat}
-            aria-label={"Fechar chat de " + activeRoom.name}
-            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-edge text-ink-faint transition-colors hover:border-edge-strong hover:text-ink"
-          >
-            <span aria-hidden="true" className="text-sm leading-none">
-              ×
+          <header className="flex items-center gap-3 border-b border-edge bg-surface-high px-4 py-3">
+            <h2 className="heading min-w-0 flex-1 truncate text-[11px] text-ink">{activeRoom.name}</h2>
+            <span className="shrink-0 font-mono text-[11px] text-ink-faint">
+              {tavernRoomChatAction(activeRoom)}
             </span>
-          </button>
-        </header>
+            <kbd className="hidden h-6 select-none items-center rounded-md border border-edge px-1.5 font-mono text-[10px] tracking-[0.1em] text-ink-faint sm:inline-flex">
+              ESC
+            </kbd>
+            <button
+              type="button"
+              onClick={closeChat}
+              aria-label={"Fechar chat de " + activeRoom.name}
+              className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-edge text-ink-faint transition-colors hover:border-edge-strong hover:text-ink"
+            >
+              <span aria-hidden="true" className="text-sm leading-none">
+                ×
+              </span>
+            </button>
+          </header>
 
-        <div className="border-b border-edge px-4 py-3">
-          <p className="mb-2 text-[10px] uppercase tracking-[0.16em] text-ink-faint">Na mesa</p>
-          <ul className="flex flex-nowrap items-center gap-2 overflow-x-auto pb-1">
-            {activeRoom.members.map((member) => {
-              const yourself = member.id === identity.id;
-              const kept = isInPack(state, member.id);
+          <TavernRoomChatMembers
+            activeRoom={activeRoom}
+            identityId={identity.id}
+            state={state}
+            profileHref={profileHref}
+            invitingMemberId={invitingMemberId}
+            onInviteMember={inviteMember}
+          />
 
-              return (
-                <li key={member.id} className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-                  <Tag tone={yourself ? "neutral" : "faint"} className="gap-2">
-                    <MemberName href={profileHref(member.id)} name={member.name} />
-                    {kept && !yourself ? <span className="text-ink-faint">- na matilha</span> : null}
-                  </Tag>
-                  {!yourself && !kept ? (
-                    <Tooltip label={"Convidar " + member.name + " para a matilha"}>
-                      <Button
-                        icon
-                        variant="secondary"
-                        busy={invitingMemberId === member.id}
-                        disabled={invitingMemberId !== null && invitingMemberId !== member.id}
-                        aria-label={"Convidar " + member.name + " para a matilha"}
-                        onClick={() => inviteMember(member)}
-                      >
-                        <ActionIcon action="keep" />
-                      </Button>
-                    </Tooltip>
-                  ) : null}
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+          <TavernRoomChatMessages
+            activeRoom={activeRoom}
+            identityId={identity.id}
+            profileHref={profileHref}
+            messagesRef={messagesRef}
+            className="min-h-0 flex-1 overflow-y-auto"
+          />
 
-        <List ref={messagesRef} className="min-h-0 flex-1 overflow-y-auto">
-          {activeRoom.messages.map((message, index) => (
-            <ListRow key={message.id} className={cn(index % 2 === 1 && "bg-charcoal")}>
-              <span className="font-mono text-[10px] text-ink-faint">{formatTime(message.at)}</span>
-              <p className="min-w-0 flex-1 text-xs leading-relaxed">
-                {message.authorId === "system" ? (
-                  <span className="mr-2 text-ink-faint">{message.authorName}:</span>
-                ) : (
-                  <>
-                    <MemberName
-                      href={profileHref(message.authorId)}
-                      name={message.authorName}
-                      className={cn(message.authorId === identity.id ? "text-ink" : "text-ink-soft")}
-                    />
-                    <span className="mr-2 text-ink-faint">:</span>
-                  </>
-                )}
-                <span
-                  className={cn(message.authorId === "system" ? "text-ink-faint" : "text-ink-soft")}
-                >
-                  {message.text}
-                </span>
-              </p>
-            </ListRow>
-          ))}
-        </List>
-
-        <div className="border-t border-edge p-4">
-          <form onSubmit={submitMessage} className="space-y-2">
-            <AiAuditNotice />
-            <div className="flex items-center gap-2">
-              <div className="relative min-w-0 flex-1">
-                <Field
-                  aria-label="Mensagem"
-                  placeholder="Diga alguma coisa"
-                  maxLength={MESSAGE_MAX_LENGTH}
-                  autoComplete="off"
-                  value={draft}
-                  onChange={(event) => setDraft(event.target.value)}
-                  className="pr-14"
-                />
-                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 font-mono text-[10px] text-ink-faint">
-                  {draft.length}/{MESSAGE_MAX_LENGTH}
-                </span>
-              </div>
-              <div className="relative shrink-0" ref={emojiRef}>
-                {emojiOpen ? (
-                  <div
-                    className="fixed z-[61] grid grid-cols-4 gap-1 rounded-md border border-edge-strong bg-surface p-2 shadow-[0_18px_40px_-12px_rgba(0,0,0,0.9)]"
-                    style={
-                      emojiRect
-                        ? {
-                            bottom: window.innerHeight - emojiRect.top + 8,
-                            right: window.innerWidth - emojiRect.right,
-                          }
-                        : undefined
-                    }
-                  >
-                    {["😂", "❤️", "👍", "😮", "😢", "🔥", "🎉", "🍺", "🐺", "🌕", "🌙", "⭐", "🍻", "⚔️", "🏆", "💀"].map(
-                      (emoji) => (
-                        <button
-                          key={emoji}
-                          type="button"
-                          aria-label={"Inserir " + emoji}
-                          onClick={() =>
-                            setDraft((current) =>
-                              current.length + emoji.length <= MESSAGE_MAX_LENGTH
-                                ? current + emoji
-                                : current,
-                            )
-                          }
-                          className={
-                            "grid " + CONTROL_HEIGHT + " w-8 place-items-center rounded-md text-lg hover:bg-surface-high"
-                          }
-                        >
-                          {emoji}
-                        </button>
-                      ),
-                    )}
-                  </div>
-                ) : null}
-                <Button
-                  type="button"
-                  icon
-                  variant="outline"
-                  aria-label="Emojis"
-                  aria-expanded={emojiOpen}
-                  onClick={() => {
-                    if (!emojiOpen) setEmojiRect(emojiRef.current?.getBoundingClientRect() ?? null);
-                    setEmojiOpen((open) => !open);
-                  }}
-                >
-                  <ActionIcon action="smile" />
-                </Button>
-              </div>
-              <Button
-                type="submit"
-                variant="primary"
-                disabled={draft.trim().length === 0 || cooldownLeft > 0}
-              >
-                {cooldownLeft > 0 ? Math.ceil(cooldownLeft / 1000) : "Falar"}
-              </Button>
-            </div>
-          </form>
-        </div>
+          <div className="border-t border-edge p-4">
+            <TavernRoomChatComposer
+              draft={draft}
+              onDraftChange={setDraft}
+              emojiOpen={emojiOpen}
+              onEmojiOpenChange={setEmojiOpen}
+              emojiRef={emojiRef}
+              emojiRect={emojiRect}
+              onEmojiRectChange={setEmojiRect}
+              cooldownLeft={cooldownLeft}
+              onSubmit={submitMessage}
+            />
+          </div>
         </section>
         <CornerAccents />
       </div>

@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { tavernChatStore } from "@/controllers/tavern-chat.store";
+import { useIsDesktop } from "@/controllers/use-is-desktop";
 import { useGame } from "@/controllers/game.context";
 import { isInPack, listPack } from "@/controllers/pack.controller";
 import { usePackPresence } from "@/controllers/use-pack-presence";
@@ -15,7 +17,12 @@ import {
   type TavernReadMap,
 } from "@/models/repositories/tavern-read.repository";
 import {
+  tavernSentRepository,
+  type TavernSentMap,
+} from "@/models/repositories/tavern-sent.repository";
+import {
   MAX_ROOM_MEMBERS,
+  MESSAGE_COOLDOWN_MS,
   OPEN_ROOM_MIN_LEVEL,
   ROOM_NAME_MAX_LENGTH,
 } from "@/models/entities/tavern";
@@ -29,6 +36,7 @@ import { Button } from "../components/button";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { Field } from "../components/field";
+import { Modal } from "../components/modal";
 import { Tag } from "../components/tag";
 import { List, ListRow } from "../components/list";
 import { Pagination } from "../components/pagination";
@@ -38,6 +46,12 @@ import { FilteredEmptyState } from "../components/filtered-empty-state";
 import { Tooltip } from "../components/tooltip";
 import { PageHeader } from "../layout/page-header";
 import { PRESENCE_LABELS, PresenceDot } from "../components/presence-dot";
+import {
+  TavernRoomChatComposer,
+  TavernRoomChatMembers,
+  TavernRoomChatMessages,
+  tavernRoomChatAction,
+} from "../components/tavern-room-chat";
 
 const PAGE_SIZE = 6;
 
@@ -59,10 +73,13 @@ function MemberName({
 }
 
 export function TavernScreen() {
+  const pathname = usePathname();
+  const isDesktop = useIsDesktop();
   const {
     state,
     character,
     notify,
+    invite,
     inviteByNick,
     acceptInvite,
     declineInvite,
@@ -85,16 +102,31 @@ export function TavernScreen() {
   const [inviting, setInviting] = useState(false);
   const [removing, setRemoving] = useState<PackMate | null>(null);
   const [invites, setInvites] = useState<PackInvite[]>([]);
+  const [mobileRoomId, setMobileRoomId] = useState<string | null>(null);
+  const [draft, setDraft] = useState("");
+  const [emojiOpen, setEmojiOpen] = useState(false);
+  const [emojiRect, setEmojiRect] = useState<DOMRect | null>(null);
+  const [invitingMemberId, setInvitingMemberId] = useState<string | null>(null);
+  const [cooldownLeft, setCooldownLeft] = useState(0);
+  const [sentBeat, setSentBeat] = useState(0);
+
+  const emojiRef = useRef<HTMLDivElement>(null);
+  const messagesRef = useRef<HTMLUListElement>(null);
+  const sentMapRef = useRef<TavernSentMap>({});
+  const wasDesktopRef = useRef(isDesktop);
 
   const {
     identity,
     rooms,
+    activeRoom,
     createRoom,
     joinRoom,
     leaveRoom,
     closeRoom,
     openDirect,
-  } = useTavern(null);
+    sendMessage,
+    announceAway,
+  } = useTavern(isDesktop ? null : mobileRoomId);
   const [closingRoomId, setClosingRoomId] = useState<string | null>(null);
 
   const fetchInvitesRef = useRef(fetchInvites);
@@ -184,11 +216,109 @@ export function TavernScreen() {
     dismissTavernNotices();
   }, []);
 
-  const openRoomId = chat.open ? chat.roomId : null;
+  useEffect(() => {
+    if (!emojiOpen) return;
+    const onDown = (event: MouseEvent) => {
+      if (emojiRef.current && !emojiRef.current.contains(event.target as Node)) {
+        setEmojiOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, [emojiOpen]);
+
+  useEffect(() => {
+    sentMapRef.current = tavernSentRepository.load();
+  }, []);
+
+  const mobileLastMessageId = activeRoom?.messages[activeRoom.messages.length - 1]?.id ?? null;
+
+  useEffect(() => {
+    if (isDesktop) return;
+    const list = messagesRef.current;
+    if (list) list.scrollTop = list.scrollHeight;
+  }, [isDesktop, mobileLastMessageId]);
+
+  const lastMineAt = useMemo(() => {
+    if (!activeRoom) return null;
+    for (let index = activeRoom.messages.length - 1; index >= 0; index -= 1) {
+      if (activeRoom.messages[index].authorId === selfId) return activeRoom.messages[index].at;
+    }
+    return null;
+  }, [activeRoom, selfId]);
+
+  useEffect(() => {
+    if (isDesktop || !mobileRoomId) return;
+    const compute = () => {
+      const marker = sentMapRef.current[mobileRoomId];
+      const left =
+        marker !== undefined
+          ? MESSAGE_COOLDOWN_MS - (Date.now() - marker)
+          : lastMineAt
+            ? MESSAGE_COOLDOWN_MS - (Date.now() - Date.parse(lastMineAt))
+            : 0;
+      return Math.max(0, Math.min(MESSAGE_COOLDOWN_MS, left));
+    };
+    const tick = () => {
+      const left = compute();
+      setCooldownLeft(left);
+      if (left <= 0) window.clearInterval(interval);
+    };
+    const first = window.setTimeout(tick, 0);
+    const interval = window.setInterval(tick, 500);
+    return () => {
+      window.clearTimeout(first);
+      window.clearInterval(interval);
+    };
+  }, [isDesktop, lastMineAt, mobileRoomId, sentBeat]);
+
+  const lastMessageAt = activeRoom?.messages[activeRoom.messages.length - 1]?.at ?? null;
+  useEffect(() => {
+    if (isDesktop || !mobileRoomId || !lastMessageAt) return;
+    const timer = window.setTimeout(() => markRoomRead(mobileRoomId), 0);
+    return () => window.clearTimeout(timer);
+  }, [isDesktop, mobileRoomId, lastMessageAt, markRoomRead]);
+
+  useEffect(() => {
+    if (isDesktop || !mobileRoomId) return;
+    const entry = rooms.find((summary) => summary.room.id === mobileRoomId);
+    if (!entry?.isMember) setMobileRoomId(null);
+  }, [isDesktop, mobileRoomId, rooms]);
+
+  useEffect(() => {
+    if (wasDesktopRef.current && !isDesktop) {
+      if (chat.open && chat.roomId) {
+        tavernChatStore.closeWindow();
+        if (pathname.startsWith("/tavern")) setMobileRoomId(chat.roomId);
+      }
+    }
+    if (!wasDesktopRef.current && isDesktop && mobileRoomId) {
+      tavernChatStore.openRoom(mobileRoomId);
+      setMobileRoomId(null);
+    }
+    wasDesktopRef.current = isDesktop;
+  }, [isDesktop, chat.open, chat.roomId, mobileRoomId, pathname]);
+
+  useEffect(() => {
+    if (!mobileRoomId) return;
+    setDraft("");
+    setEmojiOpen(false);
+    setInvitingMemberId(null);
+    setSentBeat(0);
+    setCooldownLeft(0);
+  }, [mobileRoomId]);
+
+  const openRoomId = isDesktop
+    ? chat.open
+      ? chat.roomId
+      : null
+    : activeRoom
+      ? mobileRoomId
+      : null;
 
   useEffect(() => {
     setReadMap(tavernReadRepository.load());
-  }, [rooms, chat.open, chat.roomId]);
+  }, [rooms, chat.open, chat.roomId, mobileRoomId]);
 
   const filteredRooms = useMemo(() => {
     const query = roomSearch.trim().toLowerCase();
@@ -216,14 +346,31 @@ export function TavernScreen() {
   const pages = pageCount(filteredRooms.length, PAGE_SIZE);
   const roomsOnPage = pageOf(filteredRooms, currentPage, PAGE_SIZE);
 
+  function showChatRoom(roomId: string) {
+    if (isDesktop) {
+      const previous = tavernChatStore.openRoom(roomId);
+      if (previous) {
+        markRoomRead(previous);
+        void announceAway(previous);
+      }
+    } else {
+      const previous = mobileRoomId && mobileRoomId !== roomId ? mobileRoomId : null;
+      if (previous) {
+        markRoomRead(previous);
+        void announceAway(previous);
+      }
+      setMobileRoomId(roomId);
+    }
+    markRoomRead(roomId);
+  }
+
   async function open(roomId: string, password: string) {
     const result = await joinRoom(roomId, password);
     if (!result) return;
     notify(result.message, result.ok, "Taverna");
     if (result.ok) {
       playSound("door");
-      tavernChatStore.openRoom(roomId);
-      markRoomRead(roomId);
+      showChatRoom(roomId);
       setJoinPasswords((current) => ({ ...current, [roomId]: "" }));
     }
   }
@@ -236,7 +383,11 @@ export function TavernScreen() {
     if (result.ok) {
       playSound("door");
       markRoomRead(roomId);
-      if (tavernChatStore.isOpenFor(roomId)) tavernChatStore.closeWindow();
+      if (isDesktop) {
+        if (tavernChatStore.isOpenFor(roomId)) tavernChatStore.closeWindow();
+      } else if (mobileRoomId === roomId) {
+        setMobileRoomId(null);
+      }
     }
   }
 
@@ -283,8 +434,44 @@ export function TavernScreen() {
     notify(result.message, result.ok, "Taverna");
     if (result.ok && result.roomId) {
       playSound("door");
-      tavernChatStore.openRoom(result.roomId);
-      markRoomRead(result.roomId);
+      showChatRoom(result.roomId);
+    }
+  }
+
+  function closeMobileChat() {
+    if (!activeRoom) {
+      setMobileRoomId(null);
+      return;
+    }
+    playSound("door");
+    markRoomRead(activeRoom.id);
+    void announceAway(activeRoom.id);
+    setMobileRoomId(null);
+    setDraft("");
+    setEmojiOpen(false);
+  }
+
+  async function submitMessage(event: FormEvent) {
+    event.preventDefault();
+    if (!mobileRoomId) return;
+    const result = await sendMessage(mobileRoomId, draft);
+    if (!result) return;
+    if (result.ok) {
+      sentMapRef.current = { ...sentMapRef.current, [mobileRoomId]: Date.now() };
+      tavernSentRepository.save(sentMapRef.current);
+      setSentBeat((count) => count + 1);
+      playSound("chat");
+      setDraft("");
+    } else notify(result.message, false, "Taverna");
+  }
+
+  async function inviteMember(member: { id: string; name: string }) {
+    if (invitingMemberId) return;
+    setInvitingMemberId(member.id);
+    try {
+      await invite(member);
+    } finally {
+      setInvitingMemberId(null);
     }
   }
 
@@ -661,6 +848,51 @@ export function TavernScreen() {
         </div>
       </div>
 
+      {!isDesktop ? (
+        <Modal
+          open={Boolean(activeRoom)}
+          title={activeRoom ? activeRoom.name : ""}
+          action={activeRoom ? tavernRoomChatAction(activeRoom) : null}
+          onClose={closeMobileChat}
+          className="max-w-lg"
+          footer={
+            activeRoom ? (
+              <TavernRoomChatComposer
+                draft={draft}
+                onDraftChange={setDraft}
+                emojiOpen={emojiOpen}
+                onEmojiOpenChange={setEmojiOpen}
+                emojiRef={emojiRef}
+                emojiRect={emojiRect}
+                onEmojiRectChange={setEmojiRect}
+                cooldownLeft={cooldownLeft}
+                onSubmit={submitMessage}
+              />
+            ) : null
+          }
+        >
+          {activeRoom && identity ? (
+            <>
+              <TavernRoomChatMembers
+                activeRoom={activeRoom}
+                identityId={identity.id}
+                state={state}
+                profileHref={profileHref}
+                invitingMemberId={invitingMemberId}
+                onInviteMember={inviteMember}
+              />
+              <TavernRoomChatMessages
+                activeRoom={activeRoom}
+                identityId={identity.id}
+                profileHref={profileHref}
+                messagesRef={messagesRef}
+                className="h-[min(20rem,45svh)] overflow-y-auto"
+              />
+            </>
+          ) : null}
+        </Modal>
+      ) : null}
+
       <ConfirmDialog
         open={closingRoomId !== null}
         title={closingRoom?.isPrivate ? "Fechar mesa reservada" : "Fechar mesa"}
@@ -679,7 +911,11 @@ export function TavernScreen() {
           if (result) notify(result.message, result.ok, "Taverna");
           if (result?.ok) {
             playSound("door");
-            if (tavernChatStore.isOpenFor(roomId)) tavernChatStore.closeWindow();
+            if (isDesktop) {
+              if (tavernChatStore.isOpenFor(roomId)) tavernChatStore.closeWindow();
+            } else if (mobileRoomId === roomId) {
+              setMobileRoomId(null);
+            }
           }
           setClosingRoomId(null);
         }}
