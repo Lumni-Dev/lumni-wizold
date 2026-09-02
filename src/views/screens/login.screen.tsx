@@ -211,7 +211,7 @@ export function LoginScreen() {
               <img
                 src="/assets/ui/logo.webp?v=3"
                 alt={GAME_NAME}
-                className="landing-hero-shadow-logo h-[4rem] w-auto shrink-0"
+                className="landing-hero-shadow-logo h-[4.5rem] w-auto shrink-0"
               />
             </Link>
           </header>
