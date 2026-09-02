@@ -47,9 +47,9 @@ export const ATTRIBUTES: readonly AttributeDefinition[] = [
     key: "willpower",
     name: "Vontade",
     code: "VON",
-    description: "Disciplina e foco. Sobe pelo treino e pelo colar.",
+    description: "Quanto tempo você segura a fera. Estica a duração da poção de fúria.",
     effect:
-      "Entra na ficha como os demais atributos: treino, equipamento e mascote somam aqui. Modo Fúria (poção ou lua cheia) dá +10 em todos enquanto durar, Vontade incluída.",
+      "A poção de fúria dura o tempo do frasco multiplicado por 1 mais Vontade dividido por Vontade mais 250, rumo ao dobro: um frasco médio de 5 min passa de 6,4 min com 100 de Vontade e de 8,4 min com 550. A conta usa a Vontade da ficha inteira, então colar e anel também esticam o frasco. A fúria da lua cheia não muda, ela dura o que o céu manda.",
   },
 ] as const;
 

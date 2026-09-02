@@ -71,7 +71,7 @@ export const POTIONS: readonly Item[] = [
     name: "Poção de Fúria " + SIZE_LABEL[tier.size],
     description:
       "Não devolve nada ao corpo: acende a fera por dentro. Enquanto dura, +10 em cada " +
-      "atributo, e o quanto dura depende do tamanho do frasco.",
+      "atributo, e o quanto dura depende do tamanho do frasco e da sua Vontade.",
     category: "potion" as const,
     rarity: tier.rarity,
     price: tier.price,

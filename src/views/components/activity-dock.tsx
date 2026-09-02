@@ -15,7 +15,6 @@ import { canPetFight, petLevelOf, petMaxEnergy } from "@/models/rules/pet";
 import {
   FORGE_TICKS,
   MAX_ENHANCEMENT,
-  MINING_TICKS,
   PET_EXERCISE_ID,
 } from "@/shared/constants/game";
 import { GLASS_SECTION } from "@/shared/constants/ui";
@@ -169,7 +168,7 @@ export function ActivityDock() {
       dailyMax: mining.dailyLimit,
       swingLabel: "Minerando...",
       swingCurrent: mineRt.beat,
-      swingMax: MINING_TICKS,
+      swingMax: mineRt.max,
       glows: true,
       status: opting
         ? "Segue sozinho..."

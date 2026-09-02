@@ -5,4 +5,6 @@ export const FURY = {
     medium: 5,
     large: 7.5,
   },
+  willpowerMaxBonus: 1,
+  willpowerScale: 250,
 };

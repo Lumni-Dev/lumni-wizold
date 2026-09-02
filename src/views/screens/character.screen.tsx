@@ -6,6 +6,7 @@ import { useGame } from "@/controllers/game.context";
 import { detailInventory } from "@/controllers/inventory.controller";
 import { profileOf } from "@/controllers/ranking.controller";
 import { criticalMultiplierOf } from "@/models/rules/combat";
+import { furyDurationMinutes, furyWillpowerBonus } from "@/models/rules/moon";
 import { findItem } from "@/models/data/items";
 import { EQUIPMENT_SLOTS } from "@/models/entities/item";
 import { findGender } from "@/models/entities/character";
@@ -60,6 +61,7 @@ export function CharacterScreen() {
 
   const strength = stats.totalAttributes.strength;
   const endurance = stats.totalAttributes.endurance;
+  const willpower = stats.totalAttributes.willpower;
 
   const genderDefinition = findGender(character.gender);
   const healthFull = character.health >= stats.maxHealth;
@@ -228,7 +230,9 @@ export function CharacterScreen() {
                       "+" +
                       formatNumber(FURY.attributeBonus) +
                       " em cada atributo por " +
-                      formatNumber(item.effect.furyMinutes ?? 0) +
+                      String(
+                        furyDurationMinutes(item.effect.furyMinutes ?? 0, willpower),
+                      ).replace(".", ",") +
                       " min"
                     }
                     action={<FuryUseButton onClick={() => consumeItem(item.id)} />}
@@ -244,6 +248,10 @@ export function CharacterScreen() {
               <DataRow label="Defesa (Resistência)" value={formatNumber(endurance)} />
               <DataRow label="Esquiva (Agilidade)" value={stats.dodge + "%"} />
               <DataRow label="Crítico (Instinto)" value={stats.critical + "%"} />
+              <DataRow
+                label="Fúria do frasco (Vontade)"
+                value={"+" + Math.round(furyWillpowerBonus(willpower) * 100) + "%"}
+              />
               <DataRow label="Vida máxima" value={formatNumber(stats.maxHealth)} />
               <DataRow
                 label="Dano do crítico"

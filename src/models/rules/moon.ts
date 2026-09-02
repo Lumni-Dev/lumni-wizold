@@ -1,3 +1,5 @@
+import { FURY_WILLPOWER_MAX_BONUS, FURY_WILLPOWER_SCALE } from "@/shared/constants/game";
+
 export type MoonPhaseKey = "new" | "waxing" | "full" | "waning";
 
 export interface MoonPhase {
@@ -127,6 +129,19 @@ export function fullMoonRemainingMs(now = Date.now()): number {
   }
 
   return halfWindow * 2 * DAY_MS;
+}
+
+export function furyWillpowerBonus(willpower: number): number {
+  const value = Math.max(0, willpower);
+  return (FURY_WILLPOWER_MAX_BONUS * value) / (value + FURY_WILLPOWER_SCALE);
+}
+
+export function furyDurationMs(minutes: number, willpower: number): number {
+  return Math.round(minutes * 60_000 * (1 + furyWillpowerBonus(willpower)));
+}
+
+export function furyDurationMinutes(minutes: number, willpower: number): number {
+  return Math.round(furyDurationMs(minutes, willpower) / 6_000) / 10;
 }
 
 export function potionFuryRemainingMs(character: FuryCarrier, now = Date.now()): number {

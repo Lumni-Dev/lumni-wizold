@@ -10,6 +10,7 @@ import type { GameState } from "@/models/entities/game-state";
 import { findItem } from "@/models/data/items";
 import { TERRITORIES } from "@/models/data/territories";
 import { forgeDurationMs } from "@/models/rules/forge";
+import { miningSwingTicks } from "@/models/rules/mining";
 import { trainingSessionTicks } from "@/models/rules/training";
 import {
   CYCLE_OPTOUT_SECS,
@@ -17,7 +18,6 @@ import {
   HUNT_TICK_MS,
   MAX_ENHANCEMENT,
   MINING_TICK_MS,
-  MINING_TICKS,
   PET_EXERCISE_ID,
   TRAINING_TICK_MS,
 } from "@/shared/constants/game";
@@ -420,30 +420,25 @@ export function ActivityEngine() {
     let barTimer = 0;
     let coolTimer = 0;
     let beat = 0;
+    let ticks = miningSwingTicks();
 
     const push = (cooldown: number | null) => {
       const name = findItem(activeOre)?.name ?? "Mina";
       patchActivityRuntime({
-        mine: { id: activeOre, beat, max: MINING_TICKS, cooldown },
-        dock: dockOf(
-          "mine",
-          "Minerando · " + name,
-          "Golpe da picareta",
-          beat,
-          MINING_TICKS,
-          cooldown,
-        ),
+        mine: { id: activeOre, beat, max: ticks, cooldown },
+        dock: dockOf("mine", "Minerando · " + name, "Golpe da picareta", beat, ticks, cooldown),
       });
     };
 
     const startBar = () => {
       beat = 0;
+      ticks = miningSwingTicks();
       push(null);
       barTimer = window.setInterval(() => {
         beat += 1;
         playSound("mine");
         push(null);
-        if (beat < MINING_TICKS) return;
+        if (beat < ticks) return;
         window.clearInterval(barTimer);
         barTimer = 0;
         void mineRef.current(activeOre).then((mined) => {

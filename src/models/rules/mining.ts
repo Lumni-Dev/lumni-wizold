@@ -1,5 +1,11 @@
-import { MINING_DAILY_MININGS, MINING_RESET_HOUR_UTC } from "@/shared/constants/game";
+import {
+  MINING_DAILY_MININGS,
+  MINING_RESET_HOUR_UTC,
+  MINING_TICKS_MAX,
+  MINING_TICKS_MIN,
+} from "@/shared/constants/game";
 import { levelRequirement, levelYield } from "@/shared/constants/tuning";
+import { defaultRandom, intBetween, type Random } from "@/shared/utils/random";
 import { type MiningState } from "../entities/mining";
 import { MINING_MAX_LEVEL } from "../data/ores";
 
@@ -11,6 +17,10 @@ export function miningNeeded(level: number): number {
 
 export function miningEffort(level: number): number {
   return levelYield(level);
+}
+
+export function miningSwingTicks(random: Random = defaultRandom): number {
+  return intBetween(MINING_TICKS_MIN, MINING_TICKS_MAX, random);
 }
 
 export function miningPeriodStart(now: number): number {

@@ -32,7 +32,9 @@ export function summarizeEffect(item: Item, enhancement = 0): string[] {
   if (effect.healthRatio) lines.push(percent(effect.healthRatio) + " da vida");
   if (effect.furyMinutes)
     lines.push(
-      "+10 em todos os atributos por " + String(effect.furyMinutes).replace(".", ",") + " min",
+      "+10 em todos os atributos por " +
+        String(effect.furyMinutes).replace(".", ",") +
+        " min, esticado pela Vontade",
     );
 
   for (const definition of ATTRIBUTES) {

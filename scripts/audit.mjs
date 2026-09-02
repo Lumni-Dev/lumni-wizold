@@ -412,33 +412,50 @@ sec("bandas e presas");
     }
   }
 }
-sec("ritmo do treino");
+sec("ritmo dos ciclos");
 {
-  const drawn = new Set();
-  for (let seed = 1; seed <= 400; seed += 1) {
-    drawn.add(training.trainingSessionTicks(seededRandom(seed)));
+  const cycles = [
+    {
+      name: "treino",
+      draw: (random) => training.trainingSessionTicks(random),
+      min: CONST.TRAINING_TICKS_MIN,
+      max: CONST.TRAINING_TICKS_MAX,
+    },
+    {
+      name: "mina",
+      draw: (random) => miningRules.miningSwingTicks(random),
+      min: CONST.MINING_TICKS_MIN,
+      max: CONST.MINING_TICKS_MAX,
+    },
+  ];
+
+  for (const cycle of cycles) {
+    const drawn = new Set();
+    for (let seed = 1; seed <= 400; seed += 1) {
+      drawn.add(cycle.draw(seededRandom(seed)));
+    }
+    ok(
+      cycle.name + " sorteia dentro da faixa",
+      [...drawn].every(
+        (ticks) => Number.isInteger(ticks) && ticks >= cycle.min && ticks <= cycle.max,
+      ),
+      [...drawn].sort((a, b) => a - b).join(","),
+    );
+    ok(
+      cycle.name + " alcança as duas pontas",
+      drawn.has(cycle.min) && drawn.has(cycle.max),
+    );
+    ok(cycle.name + " tem faixa 3 a 7", cycle.min === 3 && cycle.max === 7);
+    ok(
+      cycle.name + " mantém a média dos 5 passos antigos",
+      (cycle.min + cycle.max) / 2 === 5,
+    );
   }
+
   ok(
-    "sessão sorteia dentro da faixa",
-    [...drawn].every(
-      (ticks) =>
-        Number.isInteger(ticks) &&
-        ticks >= CONST.TRAINING_TICKS_MIN &&
-        ticks <= CONST.TRAINING_TICKS_MAX,
-    ),
-    [...drawn].sort((a, b) => a - b).join(","),
-  );
-  ok(
-    "sorteio alcança as duas pontas",
-    drawn.has(CONST.TRAINING_TICKS_MIN) && drawn.has(CONST.TRAINING_TICKS_MAX),
-  );
-  ok(
-    "faixa do treino é 3 a 7",
-    CONST.TRAINING_TICKS_MIN === 3 && CONST.TRAINING_TICKS_MAX === 7,
-  );
-  ok(
-    "média da faixa segue os 5 passos antigos",
-    (CONST.TRAINING_TICKS_MIN + CONST.TRAINING_TICKS_MAX) / 2 === 5,
+    "ciclo da mina anuncia a faixa em segundos",
+    CONST.MINING_CYCLE_MIN_MS === CONST.MINING_TICK_MS * (CONST.MINING_TICKS_MIN + 1) &&
+      CONST.MINING_CYCLE_MAX_MS === CONST.MINING_TICK_MS * (CONST.MINING_TICKS_MAX + 1),
   );
 }
 sec("economia");
@@ -1461,6 +1478,54 @@ sec("lua");
   ok("crescente paga 5%", moon.withMoonBonus(100) === 105);
   ok("crescente não é lua cheia", !moon.isFullMoon());
   setMoon("new");
+}
+sec("vontade estica a fúria");
+{
+  ok("sem Vontade o frasco vale o rótulo", moon.furyDurationMs(5, 0) === 5 * 60_000);
+  ok("Vontade negativa não encurta", moon.furyDurationMs(5, -50) === 5 * 60_000);
+
+  let previous = moon.furyDurationMs(5, 0);
+  let strictly = true;
+  for (let willpower = 1; willpower <= 1200; willpower += 1) {
+    const current = moon.furyDurationMs(5, willpower);
+    if (current < previous) strictly = false;
+    previous = current;
+  }
+  ok("cada ponto de Vontade nunca encurta o frasco", strictly);
+
+  ok(
+    "a curva não passa do dobro",
+    moon.furyDurationMs(5, 10_000_000) < 2 * 5 * 60_000 &&
+      moon.furyWillpowerBonus(10_000_000) < CONST.FURY_WILLPOWER_MAX_BONUS,
+  );
+  ok(
+    "a curva segue a família de esquiva e crítico",
+    Math.abs(
+      moon.furyWillpowerBonus(250) -
+        CONST.FURY_WILLPOWER_MAX_BONUS / 2,
+    ) < 1e-9,
+  );
+  ok("100 de Vontade rende 6,4 min no frasco médio", moon.furyDurationMinutes(5, 100) === 6.4);
+  ok("550 de Vontade rende 8,4 min no frasco médio", moon.furyDurationMinutes(5, 550) === 8.4);
+
+  const plain = baseState({ level: 10 });
+  const bag = {
+    ...plain,
+    character: { ...plain.character, attributes: { ...plain.character.attributes, willpower: 250 } },
+    equipment: {},
+    inventory: [{ itemId: "rage-potion-medium", quantity: 1, enhancement: 0 }],
+  };
+  const drunk = inventoryCtrl.consumeItem(bag, "rage-potion-medium");
+  ok("beber a poção grava o prazo esticado", drunk.ok === true, drunk.message);
+  if (drunk.ok) {
+    const left = Date.parse(drunk.state.character.furyUntil) - Date.now();
+    ok(
+      "prazo gravado bate com a regra",
+      Math.abs(left - moon.furyDurationMs(5, 250)) < 2_000,
+      String(left) + " vs " + moon.furyDurationMs(5, 250),
+    );
+    ok("o prazo esticado passa do rótulo", left > 5 * 60_000);
+  }
 }
 sec("inventário e mercado");
 {

@@ -14,7 +14,12 @@ import {
   type SetFilter,
 } from "../presenters/item-filter.presenter";
 import { enhancedName } from "@/models/rules/forge";
-import { FORGE_TICKS, MAX_ENHANCEMENT, MINING_RESET_HOUR, MINING_TICKS } from "@/shared/constants/game";
+import {
+  FORGE_TICKS,
+  MAX_ENHANCEMENT,
+  MINING_RESET_HOUR,
+  MINING_TICKS_MAX,
+} from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
 import { FilterRow, FilterSelect } from "../components/filter-select";
 import { FilteredEmptyState } from "../components/filtered-empty-state";
@@ -68,8 +73,8 @@ export function ForgeScreen() {
   const forgeRt = runtime.forge;
   const swing =
     mineRt && activeOre === mineRt.id
-      ? { id: mineRt.id, beat: mineRt.beat }
-      : { id: activeOre ?? "", beat: 0 };
+      ? { id: mineRt.id, beat: mineRt.beat, max: mineRt.max }
+      : { id: activeOre ?? "", beat: 0, max: MINING_TICKS_MAX };
   const strike =
     forgeRt && activeItem === forgeRt.id
       ? { id: forgeRt.id, beat: forgeRt.beat }
@@ -225,7 +230,7 @@ export function ForgeScreen() {
                 <Bar
                   label={activeOre ? "Minerando..." : "Minerar"}
                   current={swing.id === activeOre ? swing.beat : 0}
-                  maximum={MINING_TICKS}
+                  maximum={swing.id === activeOre ? swing.max : MINING_TICKS_MAX}
                   glows={activeOre !== null}
                   wraps
                 />

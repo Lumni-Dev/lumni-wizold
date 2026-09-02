@@ -4,8 +4,11 @@ import {
   FORGE_BRONZE_RATIO,
   FORGE_SUCCESS_RATIO,
   MAX_ENHANCEMENT,
-  MINING_CYCLE_MS,
+  MINING_CYCLE_MAX_MS,
+  MINING_CYCLE_MIN_MS,
   MINING_DAILY_MININGS,
+  MINING_TICKS_MAX,
+  MINING_TICKS_MIN,
   MIN_HEALTH_RATIO_TO_ACT,
   PET_BASE_BONUS,
   PET_BASE_ENERGY,
@@ -232,6 +235,9 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     summary: "Resolvido em rodadas, sem entrada do jogador durante a luta.",
     lines: [
       "Cinco números e só: Força, Agilidade, Resistência, Instinto e Vontade. Dano = Força² ÷ (Força + Resistência do alvo), com 10% de variação na Força.",
+      "A Vontade não entra na conta da luta: ela estica a poção de fúria, e a fúria é que soma +" +
+        FURY_ATTRIBUTE_BONUS +
+        " em todos os atributos enquanto dura. Quanto mais Vontade, mais tempo cada frasco rende.",
       "Quem tem mais Agilidade começa. Esquiva e crítico sobem a vida toda sem teto: 35% e 45% no horizonte.",
       "Crítico multiplica por " +
         criticalMultiplierOf().toFixed(2).replace(".", ",") +
@@ -244,7 +250,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     summary: "Sete espaços, cinco conjuntos, um item por espaço.",
     lines: [
       "Espaços: gorro, colar, casaco, calças, botas, luvas e anel. " + setRequirementsLine(),
-      "Toda peça dá atributo e nada além: luvas/anel = Força; casaco/calças/gorro = Resistência; botas = Agilidade; colar = Instinto e Vontade.",
+      "Toda peça dá atributo e nada além: luvas/anel = Força e Vontade; casaco/calças/gorro = Resistência; botas = Agilidade; colar = Instinto e Vontade. A Vontade do colar e do anel estica a poção de fúria.",
       "Casaco tem corte de linhagem (Lumni/Luna). Mercado vende uma peça de cada; o que já está na mochila ou no corpo não se compra de novo.",
       "Nenhum equipamento cai na caça. Peça forjada na mochila carrega o +X; desequipe para forjar, equipe de novo para usar.",
     ],
@@ -266,8 +272,15 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     summary: "A bigorna não faz peça nova: melhora a que está na mochila, fora do corpo.",
     lines: [
       "A mina rende a cada " +
-        (MINING_CYCLE_MS / 1000).toFixed(1).replace(".", ",") +
-        " segundos: um clique vale um rendimento, e com a mineração automática ligada ela repete até você mandar parar.",
+        MINING_CYCLE_MIN_MS / 1000 +
+        " a " +
+        MINING_CYCLE_MAX_MS / 1000 +
+        " segundos, porque cada golpe sorteia de " +
+        MINING_TICKS_MIN +
+        " a " +
+        MINING_TICKS_MAX +
+        " passadas: um clique vale um rendimento, e com a mineração automática ligada ela repete até você mandar parar.",
+      "O sorteio das passadas é só ritmo: o punhado que a veia entrega, o progresso de mineração e a mineração descontada da cota são os mesmos, golpe curto ou longo.",
       "A picareta tem cota: " +
         MINING_DAILY_MININGS +
         " minerações por dia, contando a colheita e não cada batida. A cota zera às 06:00 de São Paulo, o mesmo horário para todo mundo.",

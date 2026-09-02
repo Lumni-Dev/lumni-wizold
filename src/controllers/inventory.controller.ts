@@ -8,7 +8,7 @@ import {
   type InventorySlot,
 } from "@/models/entities/item";
 import { failure, success, type Result } from "@/models/entities/result";
-import { isFullMoon } from "@/models/rules/moon";
+import { furyDurationMinutes, furyDurationMs, isFullMoon } from "@/models/rules/moon";
 import { rollHealthPotionHeal } from "@/models/rules/potion";
 import { deriveStats } from "@/models/rules/stats";
 import { defaultRandom, type Random } from "@/shared/utils/random";
@@ -201,7 +201,9 @@ export function consumeItem(
     if (character.furyUntil && Date.now() < Date.parse(character.furyUntil)) {
       return failure(state, "Você já está em fúria: espere ela passar para beber de novo.");
     }
-    const until = new Date(Date.now() + furyMinutes * 60_000).toISOString();
+    const willpower = deriveStats(character, state.equipment, state.pet).totalAttributes.willpower;
+    const lasting = furyDurationMinutes(furyMinutes, willpower);
+    const until = new Date(Date.now() + furyDurationMs(furyMinutes, willpower)).toISOString();
     const consumed: GameState = {
       ...state,
       inventory: removeFromInventory(state.inventory, itemId, 1),
@@ -210,7 +212,7 @@ export function consumeItem(
     const message =
       item.name +
       " consumida: +10 em todos os atributos por " +
-      String(furyMinutes).replace(".", ",") +
+      String(lasting).replace(".", ",") +
       " min.";
     return success(addLog(next, "inventory", message), message);
   }
