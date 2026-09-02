@@ -307,6 +307,9 @@ try {
         hunter.arenaLosses,
       ],
     );
+    await client.query("insert into wallets (character_id, cents) values ($1, 1000)", [
+      characterId,
+    ]);
     for (const slot of SLOTS) {
       const piece = hunter.worn[slot];
       if (!piece) continue;

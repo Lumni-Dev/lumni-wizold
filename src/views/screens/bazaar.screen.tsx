@@ -278,6 +278,7 @@ export function BazaarScreen() {
                           >
                             {entry.mine ? "Seu anúncio" : "por " + entry.listing.sellerName}
                           </Link>
+                          {entry.listing.sellerHouse ? ", anúncio da casa" : null}
                           {entry.mine
                             ? " - " +
                               formatReais(entry.listing.priceCents) +
@@ -489,7 +490,16 @@ export function BazaarScreen() {
               <ItemIcon item={buying.item} />
               <RowText
                 title={enhancedName(buying.item.name, buying.listing.enhancement)}
-                description={"por " + buying.listing.sellerName}
+                description={
+                  <>
+                    {"por " + buying.listing.sellerName}
+                    {buying.listing.sellerHouse ? (
+                      <span className="block">
+                        Anúncio da casa: quem vende é o próprio Wizold, não outro jogador.
+                      </span>
+                    ) : null}
+                  </>
+                }
               />
             </div>
 

@@ -11,6 +11,7 @@ function asListing(row: Record<string, unknown>): BazaarListing {
     quantity: Number(row.quantity),
     priceCents: Number(row.price_cents),
     announcedAt: new Date(String(row.announced_at)).toISOString(),
+    sellerHouse: row.seller_house === true,
   };
 }
 
@@ -20,7 +21,7 @@ export async function loadOthersListings(
 ): Promise<BazaarListing[]> {
   const found = await client.query(
     `select l.id, l.seller_id, l.item_id, l.enhancement, l.quantity, l.price_cents,
-            l.announced_at, c.name as seller_name
+            l.announced_at, c.name as seller_name, c.is_npc as seller_house
        from bazaar_listings l
        join characters c on c.id = l.seller_id
       where l.status = 'active' and l.seller_id <> $1
@@ -36,7 +37,7 @@ export async function lockListing(
 ): Promise<BazaarListing | null> {
   const found = await client.query(
     `select l.id, l.seller_id, l.item_id, l.enhancement, l.quantity, l.price_cents,
-            l.announced_at, c.name as seller_name
+            l.announced_at, c.name as seller_name, c.is_npc as seller_house
        from bazaar_listings l
        join characters c on c.id = l.seller_id
       where l.id = $1 and l.status = 'active'

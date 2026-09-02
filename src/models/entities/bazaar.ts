@@ -9,6 +9,7 @@ export interface BazaarListing {
   quantity: number;
   priceCents: number;
   announcedAt?: string;
+  sellerHouse?: boolean;
 }
 
 export const BAZAAR_LISTING_DAYS = BAZAAR.listingDays;
