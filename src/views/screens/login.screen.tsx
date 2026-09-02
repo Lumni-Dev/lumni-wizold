@@ -240,58 +240,41 @@ export function LoginScreen() {
                     Enviamos um código de oito dígitos para o e-mail da conta. Ele vale por 10
                     minutos.
                   </p>
-                <Field
-                  label="Código"
-                  numeric
-                  maxLength={8}
-                  value={twoFactorCode}
-                  autoComplete="one-time-code"
-                  onChange={(event) => setTwoFactorCode(event.target.value.slice(0, 8))}
-                />
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    variant="primary"
-                    size="medium"
-                    fullWidth
-                    busy={verifying}
-                    disabled={!/^\d{8}$/.test(twoFactorCode)}
-                    onClick={() => {
-                      void (async () => {
-                        setVerifying(true);
-                        try {
-                          const opened = await verifyTwoFactor(twoFactorCode);
-                          if (!opened) return;
-                          saveBirth(birthRef.current);
-                          playSound("door");
-                          router.push(opened.hasCharacter ? "/character" : "/create");
-                        } finally {
-                          setVerifying(false);
-                        }
-                      })();
-                    }}
-                  >
-                    Confirmar
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="medium"
-                    fullWidth
-                    onClick={() => resendTwoFactor()}
-                  >
-                    Reenviar código
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="medium"
-                    fullWidth
-                    onClick={() => {
-                      setTwoFactor(null);
-                      setTwoFactorCode("");
-                    }}
-                  >
-                    Voltar
-                  </Button>
-                </div>
+                  <Field
+                    label="Código"
+                    numeric
+                    maxLength={8}
+                    value={twoFactorCode}
+                    autoComplete="one-time-code"
+                    onChange={(event) => setTwoFactorCode(event.target.value.slice(0, 8))}
+                  />
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button
+                      variant="primary"
+                      fullWidth
+                      busy={verifying}
+                      disabled={!/^\d{8}$/.test(twoFactorCode)}
+                      onClick={() => {
+                        void (async () => {
+                          setVerifying(true);
+                          try {
+                            const opened = await verifyTwoFactor(twoFactorCode);
+                            if (!opened) return;
+                            saveBirth(birthRef.current);
+                            playSound("door");
+                            router.push(opened.hasCharacter ? "/character" : "/create");
+                          } finally {
+                            setVerifying(false);
+                          }
+                        })();
+                      }}
+                    >
+                      Confirmar
+                    </Button>
+                    <Button variant="outline" fullWidth onClick={() => resendTwoFactor()}>
+                      Reenviar código
+                    </Button>
+                  </div>
               </>
             ) : (
               <>
