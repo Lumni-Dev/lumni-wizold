@@ -26,7 +26,7 @@ export function GameCorner() {
   return (
     <div
       aria-label="Avisos e atividade"
-      className="pointer-events-none fixed bottom-6 right-6 z-60 flex w-[min(22rem,calc(100vw-3rem))] flex-col items-end gap-2"
+      className="pointer-events-none fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom))] right-6 z-60 flex max-h-[calc(100svh-4rem)] w-[min(22rem,calc(100vw-3rem))] flex-col items-end gap-2 overflow-y-auto overscroll-contain"
     >
       {notices.map((line) => (
         <div key={line.id} className="toast-in pointer-events-auto relative w-full">

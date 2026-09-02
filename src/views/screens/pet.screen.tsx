@@ -21,6 +21,7 @@ import {
   NAME_MAX_LENGTH,
   PET_MAX_LEVEL,
   PET_MIN_LEVEL,
+  PET_RENAME_PRICE,
   REST_TICK_MS,
 } from "@/shared/constants/game";
 import { formatNumber, formatBronze } from "@/shared/utils/format";
@@ -53,7 +54,7 @@ function Kennel({ bronze, level }: { bronze: number; level: number }) {
 
   return (
     <>
-      <div className="grid items-start gap-6 sm:grid-cols-2">
+      <div className="grid grid-cols-1 items-start gap-6 sm:grid-cols-2">
         {PETS.map((definition) => {
           const chosen = definition.key === gender;
 
@@ -125,11 +126,14 @@ function Kennel({ bronze, level }: { bronze: number; level: number }) {
           <Button
             type="submit"
             variant="primary"
-            size="medium"
             fullWidth
             disabled={!oldEnough || !affordable || name.trim().length === 0}
           >
-            Adotar por {formatBronze(price)}
+            {!oldEnough
+              ? "Exige NV " + PET_MIN_LEVEL
+              : affordable
+                ? "Adotar por " + formatBronze(price)
+                : "Faltam " + formatBronze(price - bronze)}
           </Button>
         </form>
       </Panel>
@@ -201,7 +205,7 @@ export function PetScreen() {
         description="Acompanhando, ele entra na luta como um turno de ataque, os atributos dele contam como seus, e cada caçada ao seu lado rende experiência para ele."
       />
 
-      <div className="grid items-start gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
         <Panel title="Companheiro" padding="none" className="lg:col-span-1">
           <PetSheetHeader gender={pet.gender}>
             <div className="min-w-0">
@@ -324,7 +328,9 @@ export function PetScreen() {
 
           <Panel
             title="Nome do companheiro"
-            description="A troca custa WCoins na hora: quanto mais fundo na partida, mais caro o novo nome."
+            description={
+              "A troca custa " + formatBronze(PET_RENAME_PRICE) + " WCoins na hora."
+            }
           >
             <form
               onSubmit={(event) => {

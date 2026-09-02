@@ -5,8 +5,11 @@ import type { GameState } from "@/models/entities/game-state";
 import { failure, success, type Result } from "@/models/entities/result";
 import type { Exercise } from "@/models/entities/exercise";
 import { applyTrainingProgress, progressNeeded } from "@/models/rules/progression";
-import { trainingSessionCost, trainingEffort, type TrainingEffort } from "@/models/rules/training";
-import { formatBronze } from "@/shared/utils/format";
+import {
+  trainingEffort,
+  trainingSessionsPerPoint,
+  type TrainingEffort,
+} from "@/models/rules/training";
 import { syncCharacter } from "./character.controller";
 import { addLog } from "./log.controller";
 
@@ -35,18 +38,34 @@ export function listExercises(state: GameState): AvailableExercise[] {
     const value = character?.attributes[exercise.attribute] ?? 1;
     const effort = trainingEffort(value);
     const maxed = character !== null && value >= MAX_ATTRIBUTE_VALUE;
-    const cost = trainingSessionCost(character?.level ?? 1, value);
-    const affordable = character !== null && character.bronze >= cost;
+    const affordable = character !== null && !maxed;
 
     return {
       exercise,
       effort,
-      cost,
+      cost: 0,
       affordable,
       maxed,
-      reason: maxed ? "Atributo no teto" : !affordable ? "WCoins insuficientes" : null,
+      reason: maxed ? "Atributo no teto" : null,
     };
   });
+}
+
+export function trainingSummaryLine(
+  attributeName: string,
+  value: number,
+  effort: TrainingEffort,
+): string {
+  const sessions = trainingSessionsPerPoint(value);
+  return (
+    "Treina " +
+    attributeName +
+    ": cada ponto completo soma +1. Agora +" +
+    effort.progress +
+    " de progresso por sessão; faltam cerca de " +
+    sessions +
+    " sessões para o próximo ponto. Gratuito."
+  );
 }
 
 export function listAttributeProgress(state: GameState): AttributeProgress[] {
@@ -92,20 +111,8 @@ export function train(state: GameState, exerciseId: string): Result<TrainingRepo
     );
   }
 
-  const cost = trainingSessionCost(character.level, character.attributes[exercise.attribute]);
-  if (character.bronze < cost) {
-    return failure(
-      state,
-      "Cada treino é pago na hora: custa " +
-        formatBronze(cost) +
-        " e faltam " +
-        formatBronze(cost - character.bronze) +
-        ".",
-    );
-  }
-
   const { character: trained, pointsGained } = applyTrainingProgress(
-    { ...character, bronze: character.bronze - cost },
+    character,
     exercise.attribute,
     effort.progress,
   );

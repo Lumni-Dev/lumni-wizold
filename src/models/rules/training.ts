@@ -1,6 +1,5 @@
 import { ECONOMY } from "@/shared/config/economy";
 import { levelYield } from "@/shared/constants/tuning";
-import { huntPurse } from "./economy";
 import { progressNeeded } from "./progression";
 
 export interface TrainingEffort {
@@ -17,8 +16,8 @@ export function trainingSessionsPerPoint(value: number): number {
   return Math.max(1, Math.ceil(progressNeeded(value) / trainingEffort(value).progress));
 }
 
-export function trainingSessionCost(level: number, _value: number): number {
-  return Math.max(1, Math.round(huntPurse(level) * TRAINING_SESSION_HUNTS));
+export function trainingSessionCost(_level: number, _value: number): number {
+  return 0;
 }
 
 export function trainingPointCost(level: number, value: number): number {

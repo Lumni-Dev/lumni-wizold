@@ -25,7 +25,7 @@ export function ChipFrame({
   children: ReactNode;
 }) {
   return (
-    <span className={cn("relative inline-flex", className)}>
+    <span className={cn("relative inline-flex shrink-0", className)}>
       {children}
       {active ? <CornerAccents scale="icon" inside /> : null}
     </span>

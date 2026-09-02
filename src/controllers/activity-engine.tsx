@@ -83,7 +83,13 @@ function pausedDock(state: GameState, activity: Activity): ActivityDockView {
     rest: "O corpo descansa.",
   };
   const prefix = name ? name + " · " : "";
-  return dockOf(activity.kind, prefix + titles[activity.kind], details[activity.kind], 0, 1, null, true);
+  const trainDetail =
+    activity.kind === "train" && activity.id === PET_EXERCISE_ID
+      ? "Esperando WCoins para continuar"
+      : activity.kind === "train"
+        ? "Esperando para continuar"
+        : details[activity.kind];
+  return dockOf(activity.kind, prefix + titles[activity.kind], trainDetail, 0, 1, null, true);
 }
 
 export function ActivityEngine() {

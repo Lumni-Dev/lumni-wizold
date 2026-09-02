@@ -76,13 +76,13 @@ export function Bar({
       <div className="flex items-baseline justify-between gap-2">
         <span
           className={cn(
-            "text-[10px] uppercase tracking-[0.16em]",
+            "min-w-0 truncate text-[10px] uppercase tracking-[0.16em]",
             prominent ? "text-ink" : "text-ink-faint",
           )}
         >
           {label}
         </span>
-        <span className="font-mono text-[11px] text-ink-soft">
+        <span className="shrink-0 font-mono text-[11px] text-ink-soft">
           {formatNumber(current)}
           <span className="text-ink-faint">/{formatNumber(maximum)}</span>
         </span>

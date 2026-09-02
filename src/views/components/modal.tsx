@@ -65,7 +65,7 @@ export function Modal({
         aria-modal="true"
         aria-label={title}
         className={cn(
-          "flex max-h-[calc(100vh-2rem)] w-full max-w-md flex-col overflow-hidden rounded-lg",
+          "flex max-h-[calc(100svh-2rem)] w-full max-w-md flex-col overflow-hidden rounded-lg",
           "border border-edge-strong bg-surface shadow-[0_24px_60px_-20px_rgba(0,0,0,0.95)]",
           className,
         )}

@@ -108,7 +108,7 @@ export function LandingScreen() {
       <main className="relative z-10 mx-auto w-full max-w-5xl space-y-16 px-4 py-16 md:px-8 md:py-24">
         <section className="relative">
           <div className="overflow-hidden rounded-lg border border-edge bg-surface/80">
-            <div className="grid border-b border-edge sm:grid-cols-2">
+            <div className="grid grid-cols-1 border-b border-edge sm:grid-cols-2">
               {(["male", "female"] as const).map((key) => (
                 <div
                   key={key}
@@ -127,7 +127,7 @@ export function LandingScreen() {
               ))}
             </div>
 
-            <div className="grid sm:grid-cols-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2">
               {LORE_CHAPTERS.map((chapter, index) => (
                 <article
                   key={chapter.title}
@@ -175,7 +175,7 @@ export function LandingScreen() {
             </p>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {LORE_PILLARS.map((pillar) => (
               <article
                 key={pillar.title}

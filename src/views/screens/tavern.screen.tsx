@@ -403,7 +403,7 @@ export function TavernScreen() {
         </p>
       </Panel>
 
-      <div className="grid items-start gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
         <div className="space-y-6">
           <Panel
             title="Escolher mesa"
@@ -616,7 +616,7 @@ export function TavernScreen() {
                 <FilteredEmptyState description="Nenhuma mesa combina com esse nome." />
               ) : (
                 <>
-                  <div className="grid gap-6 sm:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     {roomsOnPage.map(({ room, locked, full, memberCount, isMember, isPrivate }) => {
                       const unread = unreadByRoom.get(room.id) ?? 0;
 
@@ -872,7 +872,7 @@ export function TavernScreen() {
               })}
             </div>
 
-            <List ref={messagesRef} className="h-80 overflow-y-auto">
+            <List ref={messagesRef} className="h-[min(20rem,45svh)] overflow-y-auto">
               {activeRoom.messages.map((message, index) => (
                 <ListRow
                   key={message.id}

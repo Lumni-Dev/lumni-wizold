@@ -18,9 +18,11 @@ export function SupplyRow({
   action: ReactNode;
 }) {
   return (
-    <li className={cn("flex items-center gap-3 p-4", ICON_FRAME_INSET)}>
+    <li className={cn("flex flex-wrap items-center gap-3 p-4", ICON_FRAME_INSET)}>
       <ItemIcon item={item} />
-      <RowText title={item.name} description={description} />
+      <div className="flex min-w-[8rem] flex-1">
+        <RowText title={item.name} description={description} />
+      </div>
       <span className="ml-auto flex shrink-0 items-center gap-3">
         <span className="font-mono text-xs text-ink-soft">x{formatNumber(quantity)}</span>
         {action}

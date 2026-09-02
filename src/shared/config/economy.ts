@@ -1,8 +1,8 @@
 export const ECONOMY = {
   vipPriceCents: 990,
   startingBronze: 200,
-  /** Hunter rename at the character's current band. */
-  renameHunts: 90,
+  /** Hunter rename; flat bronze, not scaled by level. */
+  renamePriceBronze: 100_000,
   /** Each yard session, in hunts of the character's current band. */
   trainingSessionHunts: 0.4,
 } as const;

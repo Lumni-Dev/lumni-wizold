@@ -100,7 +100,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
         }
       />
 
-      <div className="grid items-start gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-1">
           <Panel title="Ficha" padding="none">
             <GenderSheetHeader gender={hunter.gender}>

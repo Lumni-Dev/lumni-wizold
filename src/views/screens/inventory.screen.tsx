@@ -73,7 +73,7 @@ export function InventoryScreen() {
         title="Equipado"
         description="Sete espaços: capacete, colar, armadura, calças, botas, luvas e anel."
       >
-        <div className="grid auto-rows-fr gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-1 auto-rows-fr gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {EQUIPMENT_SLOTS.map((slot) => {
             const piece = state.equipment[slot];
             const item = piece ? findItem(piece.itemId) : undefined;
@@ -150,7 +150,7 @@ export function InventoryScreen() {
           }
         />
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {onPage.map(({ item, quantity, enhancement }) => {
             const levelTooLow = character.level < item.minLevel;
             const consumable = item.category === "potion" || item.category === "pet";

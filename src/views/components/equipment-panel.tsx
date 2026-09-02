@@ -20,7 +20,7 @@ export function EquipmentPanel({ gear, forge }: { gear: GearSlot[]; forge: numbe
         "Os sete espaços, do elmo ao anel, somando +" + formatNumber(forge) + " de forja."
       }
     >
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {gear.map(({ slot, item, level }) => (
           <div
             key={slot}

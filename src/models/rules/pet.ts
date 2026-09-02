@@ -15,12 +15,12 @@ import type { Pet } from "../entities/pet";
 import { ECONOMY } from "@/shared/config/economy";
 import { huntPurse } from "./economy";
 
-export function petPrice(level: number): number {
-  return Math.max(1, Math.round(huntPurse(level) * PET_TUNING.adoptionHunts));
+export function petPrice(_level: number): number {
+  return PET_TUNING.priceBronze;
 }
 
-export function petRenamePrice(level: number): number {
-  return Math.max(1, Math.round(huntPurse(level) * PET_TUNING.renameHunts));
+export function petRenamePrice(_level: number): number {
+  return PET_TUNING.renamePriceBronze;
 }
 
 export function isPetAwake(pet: Pet | null | undefined): pet is Pet {

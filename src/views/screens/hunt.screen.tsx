@@ -87,7 +87,7 @@ function CombatReport({ report, lines }: { report: HuntReport; lines: NarrationL
       action={<Tag tone={combat.victory ? "light" : "neutral"}>{outcome}</Tag>}
       padding="none"
     >
-      <div className="grid items-start border-b border-edge sm:grid-cols-2 sm:divide-x sm:divide-edge">
+      <div className="grid grid-cols-1 items-start border-b border-edge sm:grid-cols-2 sm:divide-x sm:divide-edge">
         <List>
           <DataRow label="Experiência" value={"+" + formatNumber(report.experience)} />
           <DataRow label="WCoins" value={"+" + formatNumber(report.bronze)} />
@@ -281,7 +281,7 @@ export function HuntScreen() {
               tone={active ? "highlighted" : "default"}
               className={cn(!available && !active && "opacity-70", active && shaking && "card-shake")}
             >
-              <div className="grid md:grid-cols-2 md:divide-x md:divide-edge">
+              <div className="grid grid-cols-1 md:grid-cols-2 md:divide-x md:divide-edge">
                 <div className="flex flex-col divide-y divide-edge">
                   {art.territories[territory.id] ? (
                     <div className="aspect-video w-full overflow-hidden">
@@ -459,7 +459,7 @@ export function HuntScreen() {
           }
           padding="none"
         >
-          <div className="grid divide-y divide-edge sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+          <div className="grid grid-cols-1 divide-y divide-edge sm:grid-cols-2 sm:divide-x sm:divide-y-0">
             <List>
               <DataRow label="Caçadas" value={formatNumber(session.hunts)} />
               <DataRow label="Vitórias" value={formatNumber(session.wins)} />

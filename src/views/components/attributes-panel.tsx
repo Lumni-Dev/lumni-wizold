@@ -48,7 +48,7 @@ export function AttributesPanel({
                 <AttributeIcon attribute={definition.key} size="medium" />
                 <RowText title={definition.name} description={definition.description} />
               </div>
-              <div className="grid w-full grid-cols-4 divide-x divide-y divide-edge overflow-hidden rounded-md border border-edge sm:grid-cols-7 sm:divide-y-0">
+              <div className="grid w-full grid-cols-3 divide-x divide-y divide-edge overflow-hidden rounded-md border border-edge sm:grid-cols-7 sm:divide-y-0">
                 {cells.map((cell) => (
                   <div
                     key={cell.label}

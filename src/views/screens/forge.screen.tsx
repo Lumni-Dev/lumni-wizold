@@ -193,7 +193,7 @@ export function ForgeScreen() {
       />
 
       <div className="space-y-6">
-        <div className="grid items-start gap-6 lg:grid-cols-2">
+        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
           <Panel
             title="Mina"
             description="Escolha o veio e a picareta bate nele. Cada veio pede um nível de mineração, e só o pique abre o próximo."

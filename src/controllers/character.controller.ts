@@ -11,9 +11,8 @@ import { initialState, type GameState } from "@/models/entities/game-state";
 import type { Character, Gender } from "@/models/entities/character";
 import { failure, success, type Result } from "@/models/entities/result";
 import { createRun } from "@/models/factories/character.factory";
-import { huntPurse } from "@/models/rules/economy";
-import { clampVitals, deriveStats } from "@/models/rules/stats";
 import { applyExperience } from "@/models/rules/progression";
+import { clampVitals, deriveStats } from "@/models/rules/stats";
 import { withMoonBonus } from "@/models/rules/moon";
 import { addLog } from "./log.controller";
 
@@ -57,8 +56,8 @@ export function startRun(name: string, gender: Gender): Result {
   return success(createRun(capitalizeName(name), gender), "Personagem criado. A caçada aguarda.");
 }
 
-export function renameCost(level: number): number {
-  return Math.max(1, Math.round(huntPurse(level) * ECONOMY.renameHunts));
+export function renameCost(_level: number): number {
+  return ECONOMY.renamePriceBronze;
 }
 
 export function renameDaysLeft(character: Character): number {

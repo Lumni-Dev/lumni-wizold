@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useRef } from "react";
 import { playSound } from "@/controllers/sound";
 import { GAME_TAGLINE } from "@/shared/constants/game";
 import {
@@ -107,11 +108,18 @@ export function Sidebar({ tavernUnread = 0 }: { tavernUnread?: number }) {
 export function MobileNavigation({ tavernUnread = 0 }: { tavernUnread?: number }) {
   const pathname = usePathname();
   const links = [...NAVIGATION, STORE_LINK, SETTINGS_LINK];
+  const trackRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const active = trackRef.current?.querySelector('[aria-current="page"]');
+    active?.scrollIntoView({ block: "nearest", inline: "center" });
+  }, [pathname]);
 
   return (
     <nav
+      ref={trackRef}
       aria-label="Páginas do jogo"
-      className="flex h-[74px] items-center gap-2 overflow-x-auto border-b border-edge bg-surface/40 px-3 backdrop-blur lg:hidden"
+      className="flex h-14 items-center gap-2 overflow-x-auto border-b border-edge bg-surface/40 px-3 backdrop-blur lg:hidden"
     >
       {links.map((item) => {
         const active = pathname === item.href;

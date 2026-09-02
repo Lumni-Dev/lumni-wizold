@@ -4,7 +4,11 @@ import { useMemo, useSyncExternalStore } from "react";
 import { activityRuntimeStore } from "@/controllers/activity-runtime";
 import { useGame } from "@/controllers/game.context";
 import { petTrainingView } from "@/controllers/pet.controller";
-import { listAttributeProgress, listExercises } from "@/controllers/training.controller";
+import {
+  listAttributeProgress,
+  listExercises,
+  trainingSummaryLine,
+} from "@/controllers/training.controller";
 import { usePageActivity } from "@/controllers/use-page-activity";
 import { MAX_ATTRIBUTE_VALUE, PET_EXERCISE_ID, PET_MAX_LEVEL, TRAINING_TICKS } from "@/shared/constants/game";
 import { formatNumber, formatBronze } from "@/shared/utils/format";
@@ -58,7 +62,7 @@ export function TrainingScreen() {
     <>
       <PageHeader
         title="Treinamento"
-        description="Um exercício por atributo, cada barra cheia vira um ponto permanente. Não dá para parar no meio de uma sessão, mas entre uma e outra sobram três segundos para você mandar parar."
+        description="Treino gratuito para sempre: um exercício por atributo, cada barra cheia vira +1 permanente. Não dá para parar no meio de uma sessão, mas entre uma e outra sobram três segundos para você mandar parar."
       />
 
       <Panel
@@ -71,8 +75,8 @@ export function TrainingScreen() {
           "."
         }
       >
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          {exercises.map(({ exercise, effort, cost, affordable, maxed, reason }) => {
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {exercises.map(({ exercise, effort, affordable, maxed, reason }) => {
             const row = progress.find((entry) => entry.key === exercise.attribute);
             const ready = !maxed && affordable;
             const active = activeExercise === exercise.id;
@@ -85,13 +89,15 @@ export function TrainingScreen() {
                 interactive={active || ready}
                 tone={active ? "highlighted" : "default"}
               >
-                <CardHeader>
+                <CardHeader className="flex-wrap">
                   <TrainingIcon attribute={exercise.attribute} size="medium" />
-                  <RowText
-                    title={row?.name ?? exercise.name}
-                    label={exercise.name}
-                  />
-                  <span className="shrink-0 self-center font-mono text-sm text-ink">
+                  <div className="flex min-w-[7rem] flex-1">
+                    <RowText
+                      title={row?.name ?? exercise.name}
+                      label={exercise.name}
+                    />
+                  </div>
+                  <span className="ml-auto shrink-0 self-center font-mono text-sm text-ink">
                     NV. {formatNumber(row?.value ?? 0)}
                     <span className="text-ink-faint">
                       {" / " + formatNumber(MAX_ATTRIBUTE_VALUE)}
@@ -103,13 +109,10 @@ export function TrainingScreen() {
                 </CardHeader>
 
                 <CardBody>
-                  <p className="text-xs leading-relaxed text-ink-soft">{row?.effect}</p>
+                  <p className="text-xs leading-relaxed text-ink-soft">
+                    {trainingSummaryLine(row?.name ?? exercise.name, row?.value ?? 0, effort)}
+                  </p>
                   <p className="text-xs leading-relaxed text-ink-faint">{exercise.description}</p>
-
-                  <div className="flex flex-wrap gap-2">
-                    <Tag>+{effort.progress} de progresso por treinamento</Tag>
-                    <Tag>Treino por {formatBronze(cost)}</Tag>
-                  </div>
                 </CardBody>
 
                 {row ? (
@@ -137,7 +140,7 @@ export function TrainingScreen() {
                           ? "Treinando sem parar..."
                           : "Treinando..."
                       : waitingExercise === exercise.id
-                        ? "Esperando WCoins para continuar"
+                        ? "Esperando para continuar"
                         : reason}
                   </span>
                   <BodyGate open={ready && !active} reason="Vida baixa demais para treinar.">
@@ -160,10 +163,12 @@ export function TrainingScreen() {
               interactive={petActive || petReady}
               tone={petActive ? "highlighted" : "default"}
             >
-              <CardHeader>
+              <CardHeader className="flex-wrap">
                 <PetIcon gender={petTraining.pet.gender} size="medium" />
-                <RowText title="Mascote" label="Treino do mascote" />
-                <span className="shrink-0 self-center font-mono text-sm text-ink">
+                <div className="flex min-w-[7rem] flex-1">
+                  <RowText title="Mascote" label="Treino do mascote" />
+                </div>
+                <span className="ml-auto shrink-0 self-center font-mono text-sm text-ink">
                   NV. {formatNumber(petTraining.level)}
                   <span className="text-ink-faint">{" / " + formatNumber(PET_MAX_LEVEL)}</span>
                   {petTraining.level >= PET_MAX_LEVEL ? (

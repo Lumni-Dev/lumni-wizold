@@ -418,9 +418,8 @@ sec("economia");
     const purse = species.huntPurse(level);
     const trainedValue = Math.max(1, Math.round(level * 0.55));
     ok(
-      "sessão de treino custa a fatia da bolsa NV " + level,
-      training.trainingSessionCost(level, trainedValue) ===
-        Math.max(1, Math.round(purse * training.TRAINING_SESSION_HUNTS)),
+      "sessão de treino é gratuita NV " + level,
+      training.trainingSessionCost(level, trainedValue) === 0,
     );
     if (trainedValue > 1) {
       ok(
@@ -485,17 +484,14 @@ sec("economia");
       sessions === Math.ceil(progression.experienceForLevel(value) / (12 + 7 * value)),
       sessions,
     );
-    const perPoint = training.trainingPointCost(level, value) / species.huntPurse(level);
     ok(
-      "ponto sobe com as sessões NV " + level,
-      perPoint >= training.trainingSessionsPerPoint(value) * training.TRAINING_SESSION_HUNTS * 0.9,
-      perPoint.toFixed(2),
+      "ponto de treino não custa bronze NV " + level,
+      training.trainingPointCost(level, value) === 0,
     );
   }
-  ok(
-    "renomear segue a bolsa da caçada",
-    characterCtrl.renameCost(500) === Math.round(species.huntPurse(500) * CONST.RENAME_HUNTS),
-  );
+  ok("renomear personagem custa fixo", characterCtrl.renameCost(500) === CONST.RENAME_PRICE);
+  ok("adoção do mascote custa fixo", petRules.petPrice(500) === CONST.PET_PRICE);
+  ok("renomear mascote custa fixo", petRules.petRenamePrice(500) === CONST.PET_RENAME_PRICE);
 }
 sec("progressão");
 {
@@ -911,7 +907,7 @@ sec("treinamento");
 {
   const state = baseState({ level: 100 });
   const broke = { ...state, character: { ...state.character, bronze: 0 } };
-  ok("sem bronze não treina", trainingCtrl.train(broke, "trunk-punches").ok === false);
+  ok("sem bronze ainda treina", trainingCtrl.train(broke, "trunk-punches").ok === true);
   ok("exercício desconhecido recusa", trainingCtrl.train(state, "nada").ok === false);
   const maxed = {
     ...state,
@@ -924,20 +920,18 @@ sec("treinamento");
   const session = trainingCtrl.train(state, "trunk-punches");
   ok("sessão válida treina", session.ok === true);
   if (session.ok) {
-    const cost = training.trainingSessionCost(100, state.character.attributes.strength);
     ok(
-      "cada sessão cobra na hora",
-      session.state.character.bronze === state.character.bronze - cost,
+      "sessão não cobra bronze",
+      session.state.character.bronze === state.character.bronze,
     );
     const gained =
       session.state.character.trainingProgress.strength > 0 ||
       session.state.character.attributes.strength > state.character.attributes.strength;
     ok("sessão rende progresso", gained);
     const second = trainingCtrl.train(session.state, "trunk-punches");
-    const secondCost = training.trainingSessionCost(100, session.state.character.attributes.strength);
     ok(
-      "a sessão seguinte cobra de novo",
-      second.ok && second.state.character.bronze === session.state.character.bronze - secondCost,
+      "a sessão seguinte também é grátis",
+      second.ok && second.state.character.bronze === session.state.character.bronze,
     );
   }
   ok(
@@ -1068,10 +1062,10 @@ sec("mascote");
     "Neve",
   );
   ok(
-    "adoção cobra a bolsa da caçada",
+    "adoção cobra preço fixo",
     adopt.ok &&
       adopt.state.character.bronze ===
-        baseState({ level: adoptLevel }).character.bronze - petRules.petPrice(adoptLevel),
+        baseState({ level: adoptLevel }).character.bronze - CONST.PET_PRICE,
   );
   ok("segunda adoção recusa", petCtrl.adoptPet(adopt.state, "male", "Outro").ok === false);
   const released = petCtrl.releasePet(adopt.state);

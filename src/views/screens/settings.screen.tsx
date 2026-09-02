@@ -13,7 +13,7 @@ import { disableTavernPush, enableTavernPush, testTavernPush, webPushConfigured,
 import { backgroundRepository } from "@/models/repositories/background.repository";
 import { soundRepository } from "@/models/repositories/sound.repository";
 import { tavernPushRepository } from "@/models/repositories/tavern-push.repository";
-import { NAME_MAX_LENGTH, RENAME_COOLDOWN_DAYS } from "@/shared/constants/game";
+import { NAME_MAX_LENGTH, RENAME_COOLDOWN_DAYS, RENAME_PRICE } from "@/shared/constants/game";
 import { formatNumber, formatBronze, formatReais, formatDay } from "@/shared/utils/format";
 import { sanitizeName } from "@/shared/utils/text";
 import { ICON_FRAME_INSET } from "@/shared/constants/ui";
@@ -293,7 +293,9 @@ export function SettingsScreen() {
           description={
             "O nome pode mudar uma vez a cada " +
             RENAME_COOLDOWN_DAYS +
-            " dias, e a troca custa WCoins: quanto mais fundo na partida, mais caro o novo nome."
+            " dias, e a troca custa " +
+            formatBronze(RENAME_PRICE) +
+            " WCoins."
           }
         >
           <form onSubmit={submitRename} className="space-y-3">

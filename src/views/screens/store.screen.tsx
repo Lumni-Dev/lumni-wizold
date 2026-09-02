@@ -121,7 +121,7 @@ export function StoreScreen() {
         </p>
       </Panel>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {offers.map(({ pack, bronze, perReal, huntEquivalent }) => (
           <Card
             key={pack.id}

@@ -18,14 +18,13 @@ import {
   REST_TICK_MS,
   REST_HEALTH_RATIO,
   PET_MIN_LEVEL,
-  PET_ADOPTION_HUNTS,
-  PET_RENAME_HUNTS,
+  PET_PRICE,
+  PET_RENAME_PRICE,
   RENAME_COOLDOWN_DAYS,
-  RENAME_HUNTS,
+  RENAME_PRICE,
   STARTING_BRONZE,
 } from "@/shared/constants/game";
 import { SITE_EMAIL } from "@/shared/constants/site";
-import { ECONOMY } from "@/shared/config/economy";
 import { SPECIES_LABEL, SPECIES_ORDER } from "../entities/creature";
 import { TERRITORIES } from "./territories";
 import { MAX_PACK } from "../entities/pack";
@@ -217,9 +216,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         " no 100. A curva sobe mais rápido do que a presa paga: cerca de 5 caçadas no começo e 585 no teto.",
       "O teto é nível 1000 para personagem e atributo. Subir de nível não dá poder de graça: abre território, conjunto e veia; a força vem do treino e do que você veste. Nível não restaura vida.",
       "Atributo só sobe no treino, pela mesma curva da experiência: barato no começo, caríssimo perto do teto; um ponto pede poucas sessões no começo e centenas no fim.",
-      "Cada sessão de treino cobra " +
-        ECONOMY.trainingSessionHunts.toString().replace(".", ",") +
-        " caçada da bolsa do seu nível; quanto mais alto o atributo, mais sessões cada ponto exige. Equipamento soma por cima do teto treinado.",
+      "Treino é gratuito: cada exercício sobe um atributo (+1 Força, +1 Resistência, +1 Agilidade, +1 Instinto ou +1 Vontade por ponto). O progresso por sessão segue o valor atual daquele atributo. Equipamento soma por cima do teto treinado.",
     ],
   },
   {
@@ -310,16 +307,16 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     lines: [
       "A adoção exige NV " +
         PET_MIN_LEVEL +
-        " e custa cerca de " +
-        PET_ADOPTION_HUNTS +
-        " caçadas do seu nível; soltar não paga. O lobo nasce com +" +
+        " e custa " +
+        formatBronze(PET_PRICE) +
+        "; soltar não paga. O lobo nasce com +" +
         PET_BASE_BONUS +
         " de Força, Agilidade e Instinto, +1 de cada por nível até " +
         PET_MAX_LEVEL +
         ".",
-      "Rename custa cerca de " +
-        PET_RENAME_HUNTS +
-        " caçadas do seu nível. Só o pátio ensina o lobo; caçada ao lado não sobe nível dele.",
+      "Renomear no canil custa " +
+        formatBronze(PET_RENAME_PRICE) +
+        ". Só o pátio ensina o lobo; caçada ao lado não sobe nível dele.",
       "Energia é o único vital: começa em " +
         PET_BASE_ENERGY +
         ", +" +
@@ -505,11 +502,15 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     lines: [
       "A partida começa com " +
         STARTING_BRONZE +
-        " WCoins. A caçada é a unidade de preço: treino, poção, arena e rename (" +
-        RENAME_HUNTS +
-        " caçadas do seu nível, a cada " +
+        " WCoins. Renomear o personagem custa " +
+        formatBronze(RENAME_PRICE) +
+        " a cada " +
         RENAME_COOLDOWN_DAYS +
-        " dias) seguem a bolsa da faixa.",
+        " dias; adoção do lobo " +
+        formatBronze(PET_PRICE) +
+        " e renomear o lobo " +
+        formatBronze(PET_RENAME_PRICE) +
+        ". Poção, arena e treino do mascote seguem a bolsa da faixa.",
       setCostRangeLine() +
         " Subir de nível dentro de uma faixa não enche o bolso: quem muda o tamanho da bolsa é abrir a faixa seguinte.",
       "O mercado vende pelo preço de tabela e recompra pela metade. Materiais só servem para venda; nenhum equipamento cai na caça.",

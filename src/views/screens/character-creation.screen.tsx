@@ -95,7 +95,7 @@ export function CharacterCreationScreen() {
 
           <fieldset className="space-y-2">
             <legend className="heading text-[11px] text-ink">Linhagem</legend>
-            <div className="grid items-start gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 items-start gap-3 sm:grid-cols-2">
               {GENDERS.map((definition) => {
                 const chosen = gender === definition.key;
                 return (

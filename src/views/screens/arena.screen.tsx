@@ -80,7 +80,7 @@ function DuelReport({ report }: { report: ArenaResolution }) {
       action={<Tag tone="neutral">{outcome}</Tag>}
       padding="none"
     >
-      <div className="grid items-start border-b border-edge sm:grid-cols-2 sm:divide-x sm:divide-edge">
+      <div className="grid grid-cols-1 items-start border-b border-edge sm:grid-cols-2 sm:divide-x sm:divide-edge">
         <List>
           <DataRow
             label={report.spoils < 0 ? "WCoins perdidas" : "WCoins tomadas"}
@@ -361,7 +361,7 @@ export function ArenaScreen() {
           padding="none"
           className={cn(shaking && "card-shake")}
         >
-          <div className="grid divide-y divide-edge border-b border-edge sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+          <div className="grid grid-cols-1 divide-y divide-edge border-b border-edge sm:grid-cols-2 sm:divide-x sm:divide-y-0">
             <Fighter
               gender={character.gender}
               name={character.name}
@@ -436,7 +436,7 @@ export function ArenaScreen() {
             ) : undefined
           }
         >
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {onPage.map(({ hunter, stats: rival, inBand, cooldownLeft, spoils }) => {
               const resting = cooldownLeft > 0;
               return (

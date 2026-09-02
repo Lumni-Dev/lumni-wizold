@@ -14,8 +14,8 @@ export function ResourceBar() {
 
   return (
     <header className="border-b border-edge bg-surface/40 backdrop-blur">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 p-4 md:px-8 lg:h-[74px] lg:flex-row lg:items-center">
-        <div className="grid flex-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-4 py-3 md:px-8 md:py-4 lg:h-[74px] lg:flex-row lg:items-center">
+        <div className="grid grid-cols-1 flex-1 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           <Bar
             label={
               resting ? (
