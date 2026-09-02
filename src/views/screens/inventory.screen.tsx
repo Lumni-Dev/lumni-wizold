@@ -116,11 +116,9 @@ export function InventoryScreen() {
                   </CardBody>
                 ) : null}
 
-                <CardFooter>
-                  <span className="text-[11px] text-ink-faint">
-                    {item ? "Equipado" : "Espaço livre"}
-                  </span>
-                  {item ? (
+                {item ? (
+                  <CardFooter>
+                    <span className="text-[11px] text-ink-faint">Equipado</span>
                     <Button
                       variant="primary"
                       onClick={() => unequipItem(slot)}
@@ -128,8 +126,8 @@ export function InventoryScreen() {
                     >
                       {lockSecs > 0 ? "Tirar (" + lockSecs + ")" : "Tirar"}
                     </Button>
-                  ) : null}
-                </CardFooter>
+                  </CardFooter>
+                ) : null}
               </Card>
             );
           })}
@@ -173,7 +171,8 @@ export function InventoryScreen() {
             const levelTooLow = character.level < item.minLevel;
             const consumable = item.category === "potion" || item.category === "pet";
             const sellable = !isForgeMaterial(item);
-            const hasActions = isEquippable(item) || consumable || sellable;
+            const fragment = !sellable;
+            const hasActions = isEquippable(item) || consumable || sellable || fragment;
 
             return (
               <ItemCard
@@ -183,11 +182,7 @@ export function InventoryScreen() {
                 enhancement={enhancement}
                 fromBazaar={state.bazaarFinds.includes(item.id)}
                 note={
-                  levelTooLow
-                    ? "Requer NV. " + item.minLevel
-                    : !sellable
-                      ? "Forja ou bazar"
-                      : null
+                  levelTooLow ? "Requer NV. " + item.minLevel : null
                 }
                 footer={
                   hasActions ? (
@@ -209,6 +204,16 @@ export function InventoryScreen() {
                         ) : null}
                       </div>
                       <div className="flex flex-wrap justify-end gap-2">
+                        {fragment ? (
+                          <>
+                            <Button variant="outline" onClick={() => router.push("/bazaar")}>
+                              Bazar
+                            </Button>
+                            <Button variant="primary" onClick={() => router.push("/forge")}>
+                              Forjar
+                            </Button>
+                          </>
+                        ) : null}
                         {isEquippable(item) ? (
                           <Button
                             variant="primary"
