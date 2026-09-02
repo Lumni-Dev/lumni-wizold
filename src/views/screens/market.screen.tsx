@@ -10,6 +10,7 @@ import {
 import { lineageName } from "@/models/data/items";
 import { formatNumber, formatBronze } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
+import { normalizeText } from "@/shared/utils/text";
 import {
   matchesMarketItemFilter,
   type CategoryFilter,
@@ -60,6 +61,7 @@ export function MarketScreen() {
   const [page, setPage] = useState(1);
   const [buying, setBuying] = useState("1");
   const [selling, setSelling] = useState("1");
+  const [search, setSearch] = useState("");
 
   const offers = useMemo(() => listOffers(state), [state]);
   const sellables = useMemo(() => listSellables(state), [state]);
@@ -87,11 +89,13 @@ export function MarketScreen() {
     /* eslint-enable react-hooks/set-state-in-effect */
   }, [sellables]);
 
-  const visibleOffers = offers.filter((offer) =>
-    matchesMarketItemFilter(offer.item, category, set, size),
+  const wanted = normalizeText(search);
+  const named = (name: string) => wanted === "" || normalizeText(name).includes(wanted);
+  const visibleOffers = offers.filter(
+    (offer) => matchesMarketItemFilter(offer.item, category, set, size) && named(offer.item.name),
   );
-  const visibleSellables = sellables.filter(({ item }) =>
-    matchesMarketItemFilter(item, category, set, size),
+  const visibleSellables = sellables.filter(
+    ({ item }) => matchesMarketItemFilter(item, category, set, size) && named(item.name),
   );
 
   const list = tab === "buy" ? visibleOffers : visibleSellables;
@@ -147,6 +151,11 @@ export function MarketScreen() {
     setPage(1);
   }
 
+  function pickSearch(value: string) {
+    setSearch(value);
+    setPage(1);
+  }
+
   return (
     <>
       <PageHeader
@@ -173,6 +182,8 @@ export function MarketScreen() {
             onCategoryChange={pickCategory}
             onSetChange={pickSet}
             onSizeChange={pickSize}
+            search={search}
+            onSearchChange={pickSearch}
           />
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
@@ -240,6 +251,8 @@ export function MarketScreen() {
             onCategoryChange={pickCategory}
             onSetChange={pickSet}
             onSizeChange={pickSize}
+            search={search}
+            onSearchChange={pickSearch}
             includeMaterial
           />
 

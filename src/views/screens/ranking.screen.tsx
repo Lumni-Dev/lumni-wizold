@@ -94,9 +94,10 @@ export function RankingScreen() {
           options={genderFilterOptions()}
           onChange={cutGender}
         />
+        <div className="min-w-0 flex-1 basis-40 sm:min-w-[12rem]">
+          <HunterSearchField accent label="Busca" value={search} onChange={find} />
+        </div>
       </FilterRow>
-
-      <HunterSearchField accent value={search} onChange={find} />
 
       <Panel
         title={view.board.label}

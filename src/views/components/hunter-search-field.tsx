@@ -9,6 +9,7 @@ interface HunterSearchFieldProps {
   onChange: (value: string) => void;
   className?: string;
   accent?: boolean;
+  label?: string;
 }
 
 export function HunterSearchField({
@@ -16,11 +17,13 @@ export function HunterSearchField({
   onChange,
   className,
   accent,
+  label,
 }: HunterSearchFieldProps) {
   return (
     <Field
       loose
       accent={accent}
+      label={label}
       className={className}
       aria-label="Buscar caçador pelo nome"
       placeholder="Buscar caçador pelo nome"

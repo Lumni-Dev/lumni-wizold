@@ -8,6 +8,7 @@ import {
   type SetFilter,
   type SizeFilter,
 } from "../presenters/item-filter.presenter";
+import { Field } from "./field";
 import { FilterRow, FilterSelect } from "./filter-select";
 
 interface ItemFilterRowProps {
@@ -18,6 +19,9 @@ interface ItemFilterRowProps {
   onSetChange: (value: SetFilter) => void;
   onSizeChange: (value: SizeFilter) => void;
   includeMaterial?: boolean;
+  search?: string;
+  onSearchChange?: (value: string) => void;
+  searchLabel?: string;
 }
 
 export function ItemFilterRow({
@@ -28,6 +32,9 @@ export function ItemFilterRow({
   onSetChange,
   onSizeChange,
   includeMaterial = false,
+  search,
+  onSearchChange,
+  searchLabel = "Buscar item pelo nome",
 }: ItemFilterRowProps) {
   const isPotion = category === "potion";
   const isPet = category === "pet" || category === "material";
@@ -58,6 +65,19 @@ export function ItemFilterRow({
           onChange={onSetChange}
         />
       )}
+      {onSearchChange ? (
+        <div className="min-w-0 flex-1 basis-40 sm:min-w-[12rem]">
+          <Field
+            accent
+            label="Busca"
+            aria-label={searchLabel}
+            placeholder="Nome do item"
+            value={search ?? ""}
+            autoComplete="off"
+            onChange={(event) => onSearchChange(event.target.value)}
+          />
+        </div>
+      ) : null}
     </FilterRow>
   );
 }

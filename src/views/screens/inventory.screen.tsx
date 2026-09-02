@@ -20,6 +20,7 @@ import {
 import { isForgeMaterial } from "@/models/rules/bazaar";
 import { formatNumber } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
+import { normalizeText } from "@/shared/utils/text";
 import { summarizeEffect } from "../presenters/item.presenter";
 import { Button } from "../components/button";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
@@ -43,6 +44,7 @@ export function InventoryScreen() {
   const [filter, setFilter] = useState<CategoryFilter>("all");
   const [set, setSet] = useState<SetFilter>("all");
   const [size, setSize] = useState<SizeFilter>("all");
+  const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [now, setNow] = useState(() => Date.now());
   const [equipLock, setEquipLock] = useState<Record<string, number>>({});
@@ -57,7 +59,12 @@ export function InventoryScreen() {
   }
 
   const slots = useMemo(() => detailInventory(state), [state]);
-  const visible = slots.filter((slot) => matchesMarketItemFilter(slot.item, filter, set, size));
+  const wanted = normalizeText(search);
+  const visible = slots.filter(
+    (slot) =>
+      matchesMarketItemFilter(slot.item, filter, set, size) &&
+      (wanted === "" || normalizeText(slot.item.name).includes(wanted)),
+  );
 
   const currentPage = clampPage(page, visible.length, PAGE_SIZE);
   const pages = pageCount(visible.length, PAGE_SIZE);
@@ -148,6 +155,11 @@ export function InventoryScreen() {
         }}
         onSizeChange={(value) => {
           setSize(value);
+          setPage(1);
+        }}
+        search={search}
+        onSearchChange={(value) => {
+          setSearch(value);
           setPage(1);
         }}
         includeMaterial

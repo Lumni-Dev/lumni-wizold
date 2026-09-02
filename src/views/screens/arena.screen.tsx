@@ -460,7 +460,6 @@ export function ArenaScreen() {
                         formatNumber(hunter.level)
                       }
                     />
-                    {hunter.npc ? <Tag tone="faint">NPC</Tag> : null}
                   </CardHeader>
 
                   <CardBody>

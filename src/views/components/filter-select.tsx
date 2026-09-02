@@ -53,5 +53,5 @@ export function FilterSelect<T extends string>({
 }
 
 export function FilterRow({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cn("flex flex-wrap items-end gap-3", className)}>{children}</div>;
+  return <div className={cn("flex flex-wrap items-end gap-6", className)}>{children}</div>;
 }
