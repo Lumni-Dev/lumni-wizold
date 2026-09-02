@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useGame } from "@/controllers/game.context";
 import { playSound } from "@/controllers/sound";
 import { loadBirth, saveBirth } from "@/models/repositories/birth.repository";
-import { GAME_NAME, GAME_TAGLINE, MIN_AGE } from "@/shared/constants/game";
+import { GAME_NAME, MIN_AGE } from "@/shared/constants/game";
 import { ageOf, EMPTY_BIRTH, isRealBirth } from "@/shared/utils/birth";
 import { cn } from "@/shared/utils/class-names";
 import { Button } from "../components/button";
@@ -194,7 +194,7 @@ export function LoginScreen() {
   return (
     <main className="flex min-h-screen items-center justify-center p-4 md:p-8">
       <div className="w-full max-w-md space-y-6">
-        <header className="space-y-2 text-center">
+        <header className="text-center">
           <Link
             href="/"
             className="mx-auto block w-fit transition-opacity hover:opacity-90"
@@ -203,10 +203,9 @@ export function LoginScreen() {
             <img
               src="/assets/ui/logo.webp?v=3"
               alt={GAME_NAME}
-              className="h-[3.375rem] w-auto shrink-0"
+              className="h-[4rem] w-auto shrink-0"
             />
           </Link>
-          <p className="text-[11px] uppercase tracking-[0.24em] text-ink-faint">{GAME_TAGLINE}</p>
         </header>
 
         <div className="relative rounded-lg border border-edge bg-surface/80">
