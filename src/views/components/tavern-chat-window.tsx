@@ -269,16 +269,20 @@ export function TavernChatWindow() {
       className="pointer-events-auto fixed z-60 flex w-[min(32rem,calc(100vw-2rem))] flex-col items-center"
       style={{ left: chat.x, top: chat.y }}
     >
-      <section
-        role="dialog"
-        aria-label={activeRoom.name}
-        className="flex max-h-[min(32rem,calc(100svh-6rem))] w-full flex-col overflow-hidden rounded-lg border border-edge-strong bg-surface shadow-[0_24px_60px_-20px_rgba(0,0,0,0.95)]"
-      >
+      <div className="relative w-full">
+        <section
+          role="dialog"
+          aria-label={activeRoom.name}
+          className="flex max-h-[min(32rem,calc(100svh-6rem))] w-full flex-col overflow-hidden rounded-lg border border-edge-strong bg-surface shadow-[0_24px_60px_-20px_rgba(0,0,0,0.95)]"
+        >
         <header className="flex items-center gap-3 border-b border-edge bg-surface-high px-4 py-3">
           <h2 className="heading min-w-0 flex-1 truncate text-[11px] text-ink">{activeRoom.name}</h2>
           <span className="shrink-0 font-mono text-[11px] text-ink-faint">
             {activeRoom.members.length} de {activeRoom.privateFor ? 2 : MAX_ROOM_MEMBERS}
           </span>
+          <kbd className="hidden h-6 select-none items-center rounded-md border border-edge px-1.5 font-mono text-[10px] tracking-[0.1em] text-ink-faint sm:inline-flex">
+            ESC
+          </kbd>
           <button
             type="button"
             onClick={closeChat}
@@ -291,34 +295,37 @@ export function TavernChatWindow() {
           </button>
         </header>
 
-        <div className="flex items-center gap-2 overflow-x-auto border-b border-edge px-4 py-3">
-          {activeRoom.members.map((member) => {
-            const yourself = member.id === identity.id;
-            const kept = isInPack(state, member.id);
+        <div className="border-b border-edge px-4 py-3">
+          <p className="mb-2 text-[10px] uppercase tracking-[0.16em] text-ink-faint">Na mesa</p>
+          <ul className="flex flex-nowrap items-center gap-2 overflow-x-auto pb-1">
+            {activeRoom.members.map((member) => {
+              const yourself = member.id === identity.id;
+              const kept = isInPack(state, member.id);
 
-            return (
-              <span key={member.id} className="flex shrink-0 items-center gap-1">
-                <Tag tone={yourself ? "neutral" : "faint"} className="gap-2">
-                  <MemberName href={profileHref(member.id)} name={member.name} />
-                  {kept && !yourself ? <span className="text-ink-faint">- na matilha</span> : null}
-                </Tag>
-                {!yourself && !kept ? (
-                  <Tooltip label={"Convidar " + member.name + " para a matilha"}>
-                    <Button
-                      icon
-                      variant="secondary"
-                      busy={invitingMemberId === member.id}
-                      disabled={invitingMemberId !== null && invitingMemberId !== member.id}
-                      aria-label={"Convidar " + member.name + " para a matilha"}
-                      onClick={() => inviteMember(member)}
-                    >
-                      <ActionIcon action="keep" />
-                    </Button>
-                  </Tooltip>
-                ) : null}
-              </span>
-            );
-          })}
+              return (
+                <li key={member.id} className="flex shrink-0 items-center gap-1 whitespace-nowrap">
+                  <Tag tone={yourself ? "neutral" : "faint"} className="gap-2">
+                    <MemberName href={profileHref(member.id)} name={member.name} />
+                    {kept && !yourself ? <span className="text-ink-faint">- na matilha</span> : null}
+                  </Tag>
+                  {!yourself && !kept ? (
+                    <Tooltip label={"Convidar " + member.name + " para a matilha"}>
+                      <Button
+                        icon
+                        variant="secondary"
+                        busy={invitingMemberId === member.id}
+                        disabled={invitingMemberId !== null && invitingMemberId !== member.id}
+                        aria-label={"Convidar " + member.name + " para a matilha"}
+                        onClick={() => inviteMember(member)}
+                      >
+                        <ActionIcon action="keep" />
+                      </Button>
+                    </Tooltip>
+                  ) : null}
+                </li>
+              );
+            })}
+          </ul>
         </div>
 
         <List ref={messagesRef} className="min-h-0 flex-1 overflow-y-auto">
@@ -426,7 +433,9 @@ export function TavernChatWindow() {
             </div>
           </form>
         </div>
-      </section>
+        </section>
+        <CornerAccents />
+      </div>
 
       <button
         type="button"
@@ -436,8 +445,6 @@ export function TavernChatWindow() {
       >
         <Move className="h-4 w-4" aria-hidden="true" />
       </button>
-
-      <CornerAccents />
     </div>
   );
 }
