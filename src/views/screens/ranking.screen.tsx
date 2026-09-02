@@ -146,6 +146,11 @@ export function RankingScreen() {
                 >
                   {entry.hunter.name}
                 </Link>
+                {entry.hunter.npc ? (
+                  <Tag tone="faint" className="shrink-0">
+                    NPC
+                  </Tag>
+                ) : null}
                 <span className="hidden shrink-0 text-[10px] uppercase tracking-[0.16em] text-ink-faint sm:block">
                   {entry.hunter.gender === "male" ? "Lumni" : "Luna"}
                 </span>

@@ -59,6 +59,7 @@ export async function loadHunters(client: PoolClient): Promise<Hunter[]> {
       mining: Number(row.mining_level),
       pet: petBy.get(row.id) ?? null,
       equipment,
+      npc: row.is_npc === true,
     };
   });
 }

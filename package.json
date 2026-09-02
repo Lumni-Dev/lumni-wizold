@@ -13,6 +13,8 @@
     "migrate": "node scripts/migrate.mjs",
     "migrate:status": "node scripts/migrate.mjs status",
     "smoke": "node scripts/smoke.mjs",
+    "seed:hunters": "node scripts/seed-hunters.mjs",
+    "remove:hunters": "node scripts/remove-hunters.mjs",
     "load": "node scripts/load.mjs",
     "prepare": "node scripts/prepare.mjs"
   },

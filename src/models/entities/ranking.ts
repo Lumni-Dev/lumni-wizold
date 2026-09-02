@@ -27,6 +27,7 @@ export interface Hunter {
   mining: number;
   pet: HunterPet | null;
   equipment: Equipment;
+  npc: boolean;
 }
 
 export type RankingKey =

@@ -93,6 +93,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
                 Convidar para matilha
               </Button>
             )}
+            {hunter.npc ? <Tag tone="faint">NPC da Ordem</Tag> : null}
             <Tag tone={isPlayer ? "light" : "neutral"}>
               Melhor em {best.label} - {formatNumber(best.position)}º
             </Tag>
