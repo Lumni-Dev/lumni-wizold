@@ -46,11 +46,13 @@ function authorPresence(
 }
 
 function ChatNick({
+  at,
   href,
   name,
   className,
   status,
 }: {
+  at: string;
   href: string | null;
   name: string;
   className?: string;
@@ -58,6 +60,7 @@ function ChatNick({
 }) {
   return (
     <span className="mr-2 inline-flex items-center gap-2">
+      <span className="font-mono text-[10px] text-ink-faint">{formatTime(at)}</span>
       {status ? (
         <Tooltip label={PRESENCE_LABELS[status]}>
           <PresenceDot size="small" status={status} />
@@ -149,12 +152,15 @@ export function TavernRoomChatMessages({
     <List ref={messagesRef} className={className}>
       {activeRoom.messages.map((message, index) => (
         <ListRow key={message.id} className={cn(index % 2 === 1 && "bg-charcoal")}>
-          <span className="font-mono text-[10px] text-ink-faint">{formatTime(message.at)}</span>
           <p className="min-w-0 flex-1 text-xs leading-relaxed">
             {message.authorId === "system" ? (
-              <span className="mr-2 text-ink-faint">{message.authorName}:</span>
+              <span className="mr-2 inline-flex items-center gap-2">
+                <span className="font-mono text-[10px] text-ink-faint">{formatTime(message.at)}</span>
+                <span className="text-ink-faint">{message.authorName}:</span>
+              </span>
             ) : (
               <ChatNick
+                at={message.at}
                 href={profileHref(message.authorId)}
                 name={message.authorName}
                 className={cn(message.authorId === identityId ? "text-ink" : "text-ink-soft")}
