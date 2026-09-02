@@ -32,7 +32,7 @@ import {
   type SetFilter,
 } from "../presenters/item-filter.presenter";
 import { Button } from "../components/button";
-import { FilterRow, FilterSelect } from "../components/filter-select";
+import { FILTER_COLUMN, FilterRow, FilterSelect } from "../components/filter-select";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { EmptyState } from "../components/empty-state";
 import { FilteredEmptyState } from "../components/filtered-empty-state";
@@ -235,7 +235,7 @@ export function BazaarScreen() {
               onChange={setSet}
               onPageReset={() => setPage(1)}
             />
-            <div className="min-w-0 flex-1 basis-40 sm:min-w-[12rem]">
+            <div className={FILTER_COLUMN}>
               <Field
                 accent
                 label="Busca"

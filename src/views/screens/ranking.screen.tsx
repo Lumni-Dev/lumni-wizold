@@ -14,7 +14,7 @@ import {
 import { formatNumber } from "@/shared/utils/format";
 import { cn } from "@/shared/utils/class-names";
 import { Chip } from "../components/chip";
-import { FilterRow, FilterSelect } from "../components/filter-select";
+import { FILTER_COLUMN, FilterRow, FilterSelect } from "../components/filter-select";
 import { HunterSearchField } from "../components/hunter-search-field";
 import { CopyNick } from "../components/copy-nick";
 import { List, ListRow } from "../components/list";
@@ -94,7 +94,7 @@ export function RankingScreen() {
           options={genderFilterOptions()}
           onChange={cutGender}
         />
-        <div className="min-w-0 flex-1 basis-40 sm:min-w-[12rem]">
+        <div className={FILTER_COLUMN}>
           <HunterSearchField accent label="Busca" value={search} onChange={find} />
         </div>
       </FilterRow>

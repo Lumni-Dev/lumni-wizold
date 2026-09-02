@@ -9,7 +9,7 @@ import {
   type SizeFilter,
 } from "../presenters/item-filter.presenter";
 import { Field } from "./field";
-import { FilterRow, FilterSelect } from "./filter-select";
+import { FILTER_COLUMN, FilterRow, FilterSelect } from "./filter-select";
 
 interface ItemFilterRowProps {
   category: CategoryFilter;
@@ -66,7 +66,7 @@ export function ItemFilterRow({
         />
       )}
       {onSearchChange ? (
-        <div className="min-w-0 flex-1 basis-40 sm:min-w-[12rem]">
+        <div className={FILTER_COLUMN}>
           <Field
             accent
             label="Busca"

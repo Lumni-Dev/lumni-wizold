@@ -23,7 +23,7 @@ import {
 } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
 import { Field } from "../components/field";
-import { FilterRow, FilterSelect } from "../components/filter-select";
+import { FILTER_COLUMN, FilterRow, FilterSelect } from "../components/filter-select";
 import { FilteredEmptyState } from "../components/filtered-empty-state";
 import { formatBronze, formatNumber } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf, pageOfPosition } from "@/shared/utils/pagination";
@@ -443,7 +443,7 @@ export function ForgeScreen() {
                 options={setFilterOptions()}
                 onChange={pickSet}
               />
-              <div className="min-w-0 flex-1 basis-40 sm:min-w-[12rem]">
+              <div className={FILTER_COLUMN}>
                 <Field
                   accent
                   label="Busca"

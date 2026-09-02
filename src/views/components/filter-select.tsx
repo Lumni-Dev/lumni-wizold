@@ -4,6 +4,8 @@ import type { ReactNode } from "react";
 import { cn } from "@/shared/utils/class-names";
 import { Select, type SelectOption } from "./select";
 
+export const FILTER_COLUMN = "min-w-0 flex-1 basis-40 sm:basis-0 sm:min-w-[10rem]";
+
 export function toSelectOptions<T extends string>(
   items: readonly { key: T; label: string }[],
 ): SelectOption[] {
@@ -39,7 +41,7 @@ export function FilterSelect<T extends string>({
   return (
     <Select
       compact
-      className={cn("min-w-0 flex-1 basis-40 sm:basis-auto sm:min-w-[10rem]", className)}
+      className={cn(FILTER_COLUMN, className)}
       label={label}
       placeholder={options[0]?.label ?? label}
       value={value}
