@@ -45,6 +45,7 @@ import {
   announceIdle,
   dropMirror,
   listenToTabs,
+  shareNotice,
   shareState,
   watchMirror,
   yieldsTo,
@@ -70,7 +71,13 @@ interface GameContextValue {
   moon: MoonState;
   notices: Notice[];
   dismissNotice: (id: number) => void;
-  notify: (text: string, ok: boolean, source: string, dot?: PresenceStatus) => void;
+  notify: (
+    text: string,
+    ok: boolean,
+    source: string,
+    dot?: PresenceStatus,
+    local?: boolean,
+  ) => void;
   enter: (
     credential: string,
     birth: BirthDate,
@@ -175,14 +182,21 @@ export function GameProvider({ children }: { children: ReactNode }) {
     moonRepository.serverSnapshot,
   );
   const NOTICE_STACK = 4;
-  const announce = useCallback(
-    (text: string, ok: boolean, source: string, dot?: PresenceStatus) => {
+  const pushNotice = useCallback(
+    (text: string, ok: boolean, source: string, dot: PresenceStatus | undefined, sound: boolean) => {
       noticeCounter.current += 1;
       const line = { id: noticeCounter.current, text, ok, source, dot };
       setNotices((current) => [...current, line].slice(-NOTICE_STACK));
-      if (!ok) playSound("denied");
+      if (!ok && sound) playSound("denied");
     },
     [],
+  );
+  const announce = useCallback(
+    (text: string, ok: boolean, source: string, dot?: PresenceStatus, local = false) => {
+      pushNotice(text, ok, source, dot, true);
+      if (!local) shareNotice(text, ok, source);
+    },
+    [pushNotice],
   );
   const dismissNotice = useCallback((id: number) => {
     setNotices((current) => current.filter((line) => line.id !== id));
@@ -385,12 +399,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
         if (activityRef.current) return;
         applyState(incoming, ++mintRef.current, false);
       },
+      onNotice: (notice) => pushNotice(notice.text, notice.ok, notice.source, undefined, false),
       onHello: () => {
         const mine = activityRef.current;
         if (mine) announceBeat(claimedAtRef.current, mine, activityRuntimeStore.snapshot());
       },
     });
-  }, [applyState, setActivity]);
+  }, [applyState, pushNotice, setActivity]);
   const petResting =
     state.pet !== null &&
     state.pet.active === false &&
@@ -438,6 +453,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     const beat = async () => {
       if (busy) return;
       if (inFlightRef.current > 0 || heldHuntRef.current || heldArenaRef.current) return;
+      if (activityMirrorStore.snapshot() !== null) return;
       if (!isVip(stateRef.current.character, Date.now())) return;
       busy = true;
       try {

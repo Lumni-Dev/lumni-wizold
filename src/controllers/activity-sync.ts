@@ -32,7 +32,8 @@ type Message =
   | { kind: "idle"; tab: string }
   | { kind: "stop"; tab: string; target: string }
   | { kind: "state"; tab: string; state: GameState }
-  | { kind: "hello"; tab: string };
+  | { kind: "hello"; tab: string }
+  | { kind: "notice"; tab: string; text: string; ok: boolean; source: string };
 
 export interface TabHandlers {
   onBeat: (claim: ActivityClaim) => void;
@@ -40,6 +41,7 @@ export interface TabHandlers {
   onStop: () => void;
   onState: (state: GameState) => void;
   onHello: () => void;
+  onNotice: (notice: { text: string; ok: boolean; source: string }) => void;
 }
 
 let id = "";
@@ -101,6 +103,10 @@ export function askToStop(target: string): void {
   post({ kind: "stop", tab: tabId(), target });
 }
 
+export function shareNotice(text: string, ok: boolean, source: string): void {
+  post({ kind: "notice", tab: tabId(), text, ok, source });
+}
+
 export function shareState(state: GameState): void {
   post({ kind: "state", tab: tabId(), state });
 }
@@ -132,6 +138,12 @@ export function listenToTabs(handlers: TabHandlers): () => void {
     }
     if (message.kind === "state") {
       handlers.onState(message.state);
+      return;
+    }
+    if (message.kind === "notice") {
+      if (typeof message.text === "string" && message.text) {
+        handlers.onNotice({ text: message.text, ok: message.ok, source: message.source });
+      }
       return;
     }
     if (message.kind === "hello") handlers.onHello();

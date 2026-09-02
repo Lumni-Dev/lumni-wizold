@@ -46,7 +46,7 @@ export function usePackAlert(watching: boolean) {
           const was = before[id];
           if (was === undefined || was === "active") continue;
           const name = namesRef.current[id];
-          if (name) notifyRef.current(name + " está online.", true, "Matilha", "active");
+          if (name) notifyRef.current(name + " está online.", true, "Matilha", "active", true);
         }
       }
       seenRef.current = now;
