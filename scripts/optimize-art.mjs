@@ -19,7 +19,7 @@ const FOLDERS = [
 ];
 
 const SOURCE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg"]);
-const MAX_WIDTH = {
+const MAX_SIZE = {
   inventory: 512,
   store: 512,
   creatures: 512,
@@ -30,7 +30,7 @@ const MAX_WIDTH = {
   pet: 400,
 };
 
-const DEFAULT_WIDTH = 512;
+const DEFAULT_SIZE = 512;
 const QUALITY = 80;
 
 const force = process.argv.includes("--force");
@@ -70,7 +70,7 @@ let after = 0;
 let written = 0;
 
 for (const folder of folders) {
-  const width = MAX_WIDTH[folder] ?? DEFAULT_WIDTH;
+  const width = MAX_SIZE[folder] ?? DEFAULT_SIZE;
 
   for (const source of collect(join(ASSETS, folder))) {
     const target = source.replace(/\.(png|jpe?g)$/i, ".webp");
@@ -85,7 +85,7 @@ for (const folder of folders) {
         "-i",
         source,
         "-vf",
-        "scale='min(" + width + ",iw)':-2:flags=lanczos",
+        "scale=w=" + width + ":h=" + width + ":force_original_aspect_ratio=decrease:flags=lanczos",
         "-c:v",
         "libwebp",
         "-pix_fmt",
