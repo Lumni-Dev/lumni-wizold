@@ -271,7 +271,6 @@ export function BazaarScreen() {
                         >
                           {entry.mine ? "Seu anúncio" : "por " + entry.listing.sellerName}
                         </Link>
-                        {entry.listing.sellerHouse ? ", anúncio da casa" : null}
                         {entry.mine
                           ? " - " +
                             formatReais(entry.listing.priceCents) +
