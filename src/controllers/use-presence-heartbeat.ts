@@ -1,19 +1,23 @@
 "use client";
 
-import { useEffect } from "react";
-import { api } from "./api.client";
+import { useEffect, useRef } from "react";
+import type { ActivityKind } from "@/models/entities/activity";
 import { PRESENCE_HEARTBEAT_MS } from "@/models/rules/presence";
+import { api } from "./api.client";
 
 function currentStatus(): "active" | "away" {
   return document.visibilityState === "visible" ? "active" : "away";
 }
 
-export function usePresenceHeartbeat(enabled: boolean) {
+export function usePresenceHeartbeat(enabled: boolean, doing: ActivityKind | null) {
+  const doingRef = useRef(doing);
+  doingRef.current = doing;
+
   useEffect(() => {
     if (!enabled) return;
 
     const ping = (status: "active" | "away") => {
-      void api("PATCH", "/api/presence", { status });
+      void api("PATCH", "/api/presence", { status, activity: doingRef.current });
     };
 
     const sync = () => {

@@ -5,6 +5,7 @@ import { type FormEvent, type RefObject, useSyncExternalStore } from "react";
 import { playSoundPreview } from "@/controllers/sound";
 import { tavernPingRepository } from "@/models/repositories/tavern-ping.repository";
 import { isInPack } from "@/controllers/pack.controller";
+import { describeDoing, doingFor, type HunterDoing, type ActivityKind } from "@/models/entities/activity";
 import type { GameState } from "@/models/entities/game-state";
 import type { PresenceStatus } from "@/models/entities/presence";
 import type { TavernRoom } from "@/models/entities/tavern";
@@ -80,12 +81,14 @@ function ChatNick({
   name,
   className,
   status,
+  doing,
 }: {
   at: string;
   href: string | null;
   name: string;
   className?: string;
   status?: PresenceStatus;
+  doing: HunterDoing;
 }) {
   return (
     <span className="mr-2 inline-flex items-center gap-2">
@@ -95,7 +98,9 @@ function ChatNick({
           <PresenceDot size="small" status={status} />
         </Tooltip>
       ) : null}
-      <MemberName href={href} name={name} className={className} />
+      <Tooltip label={describeDoing(name, doing)}>
+        <MemberName href={href} name={name} className={className} />
+      </Tooltip>
       <span className="text-ink-faint">:</span>
     </span>
   );
@@ -106,6 +111,8 @@ export function TavernRoomChatMembers({
   identityId,
   state,
   presence,
+  doing,
+  mine,
   profileHref,
   invitingMemberId,
   onInviteMember,
@@ -114,6 +121,8 @@ export function TavernRoomChatMembers({
   identityId: string;
   state: GameState;
   presence: Record<string, PresenceStatus>;
+  doing: Record<string, HunterDoing>;
+  mine: ActivityKind | null;
   profileHref: (memberId: string) => string | null;
   invitingMemberId: string | null;
   onInviteMember: (member: { id: string; name: string }) => void;
@@ -128,6 +137,7 @@ export function TavernRoomChatMembers({
           const yourself = member.id === identityId;
           const kept = isInPack(state, member.id);
           const status = authorPresence(member.id, identityId, presence);
+          const job = doingFor(member.id, identityId, mine, doing);
 
           return (
             <li key={member.id} className="flex shrink-0 items-center gap-1 whitespace-nowrap">
@@ -137,11 +147,13 @@ export function TavernRoomChatMembers({
                     <PresenceDot size="small" status={status} />
                   </Tooltip>
                 ) : null}
-                <MemberName
-                  href={profileHref(member.id)}
-                  name={member.name}
-                  className={nickColorClass(member.nickColor)}
-                />
+                <Tooltip label={describeDoing(member.name, job)}>
+                  <MemberName
+                    href={profileHref(member.id)}
+                    name={member.name}
+                    className={nickColorClass(member.nickColor)}
+                  />
+                </Tooltip>
                 {kept && !yourself ? <span className="text-ink-faint">- na matilha</span> : null}
               </Tag>
               {!yourself && !kept ? (
@@ -170,6 +182,8 @@ export function TavernRoomChatMessages({
   activeRoom,
   identityId,
   presence,
+  doing,
+  mine,
   profileHref,
   messagesRef,
   className,
@@ -177,6 +191,8 @@ export function TavernRoomChatMessages({
   activeRoom: TavernRoom;
   identityId: string;
   presence: Record<string, PresenceStatus>;
+  doing: Record<string, HunterDoing>;
+  mine: ActivityKind | null;
   profileHref: (memberId: string) => string | null;
   messagesRef: RefObject<HTMLUListElement | null>;
   className?: string;
@@ -198,6 +214,7 @@ export function TavernRoomChatMessages({
                 name={message.authorName}
                 className={nickColorClass(nickColorOf(activeRoom, message.authorId))}
                 status={authorPresence(message.authorId, identityId, presence)}
+                doing={doingFor(message.authorId, identityId, mine, doing)}
               />
             )}
             <span
@@ -241,7 +258,6 @@ export function TavernRoomChatComposer({
   onEmojiRectChange,
   cooldownLeft,
   onSubmit,
-  showPing = false,
 }: {
   draft: string;
   onDraftChange: (value: string) => void;
@@ -252,7 +268,6 @@ export function TavernRoomChatComposer({
   onEmojiRectChange: (rect: DOMRect | null) => void;
   cooldownLeft: number;
   onSubmit: (event: FormEvent) => void;
-  showPing?: boolean;
 }) {
   const pingOn = useSyncExternalStore(
     tavernPingRepository.subscribe,
@@ -262,26 +277,23 @@ export function TavernRoomChatComposer({
 
   return (
     <form onSubmit={onSubmit} className="space-y-2">
-      <AiAuditNotice />
       <div className="flex items-center gap-2">
-        {showPing ? (
-          <Tooltip label={pingOn ? "Mutar notificação" : "Ativar notificação"}>
-            <Button
-              type="button"
-              icon
-              variant="outline"
-              aria-label={pingOn ? "Mutar notificação da mesa" : "Ativar notificação da mesa"}
-              aria-pressed={pingOn}
-              onClick={() => {
-                const next = !pingOn;
-                tavernPingRepository.setEnabled(next);
-                if (next) playSoundPreview("ping");
-              }}
-            >
-              <ActionIcon action={pingOn ? "sound" : "mute"} />
-            </Button>
-          </Tooltip>
-        ) : null}
+        <Tooltip label={pingOn ? "Mutar notificação" : "Ativar notificação"}>
+          <Button
+            type="button"
+            icon
+            variant="outline"
+            aria-label={pingOn ? "Mutar notificação da mesa" : "Ativar notificação da mesa"}
+            aria-pressed={pingOn}
+            onClick={() => {
+              const next = !pingOn;
+              tavernPingRepository.setEnabled(next);
+              if (next) playSoundPreview("ping");
+            }}
+          >
+            <ActionIcon action={pingOn ? "sound" : "mute"} />
+          </Button>
+        </Tooltip>
         <div className="relative min-w-0 flex-1">
           <Field
             aria-label="Mensagem"
@@ -346,6 +358,7 @@ export function TavernRoomChatComposer({
           {cooldownLeft > 0 ? Math.ceil(cooldownLeft / 1000) : "Falar"}
         </Button>
       </div>
+      <AiAuditNotice />
     </form>
   );
 }

@@ -6,6 +6,10 @@ export function sanitizeName(value: string, maximum: number): string {
   return capitalize(value.replace(/[^\p{L}\p{M}\p{N}]/gu, "").slice(0, maximum));
 }
 
+export function sanitizeRoomSearch(value: string, maximum: number): string {
+  return value.replace(/[^\p{L}\p{M}\p{N}#]/gu, "").slice(0, maximum);
+}
+
 export function normalizeText(value: string): string {
   return value
     .toLowerCase()

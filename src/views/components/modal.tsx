@@ -7,6 +7,7 @@ import { cn } from "@/shared/utils/class-names";
 export function Modal({
   open,
   title,
+  leading,
   onClose,
   action,
   footer,
@@ -16,6 +17,7 @@ export function Modal({
 }: {
   open: boolean;
   title: string;
+  leading?: ReactNode;
   onClose: () => void;
   action?: ReactNode;
   footer?: ReactNode;
@@ -72,7 +74,14 @@ export function Modal({
         onClick={(event) => event.stopPropagation()}
       >
         <header className="flex items-center gap-3 border-b border-edge bg-surface-high px-4 py-3">
-          <h2 className="heading truncate text-[11px] text-ink">{title}</h2>
+          {leading ? (
+            <div className="flex min-w-0 flex-1 items-center gap-2">
+              {leading}
+              <h2 className="heading min-w-0 flex-1 truncate text-[11px] text-ink">{title}</h2>
+            </div>
+          ) : (
+            <h2 className="heading truncate text-[11px] text-ink">{title}</h2>
+          )}
           <div className="ml-auto flex shrink-0 items-center gap-2">
             {action ? (
               <span className="inline-flex h-6 items-center justify-center rounded-md border border-edge px-2 font-mono text-[11px] text-ink-faint">

@@ -7,4 +7,4 @@ export const MODERATION_REFUSAL =
 export const MODERATION_UNAVAILABLE =
   "A auditoria de IA está indisponível. Tente de novo em instantes.";
 
-export const CHAT_CENSORED_TEXT = "Conteúdo impróprio removido.";
+export const CHAT_CENSORED_TEXT = "Conteúdo impróprio.";

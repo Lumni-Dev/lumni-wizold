@@ -243,7 +243,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     preloadSounds();
   }, []);
-  usePresenceHeartbeat(authenticated && state.character !== null);
+  usePresenceHeartbeat(authenticated && state.character !== null, activity?.kind ?? null);
   const lineage = state.character?.gender ?? "male";
   useEffect(() => {
     setVoiceProfile(lineage);
@@ -280,6 +280,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       setActivityState(next);
       if (!mine) return;
       activityRepository.save(next);
+      void api("PUT", "/api/activity", { kind: next?.kind ?? null });
       if (next) {
         dropMirror();
         claimedAtRef.current = Date.now();

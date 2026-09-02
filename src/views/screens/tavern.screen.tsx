@@ -7,9 +7,11 @@ import { useIsDesktop } from "@/controllers/use-is-desktop";
 import { useGame } from "@/controllers/game.context";
 import { isInPack, listPack } from "@/controllers/pack.controller";
 import { usePackPresence } from "@/controllers/use-pack-presence";
+import { useTavernDoing } from "@/controllers/use-tavern-doing";
 import { playSound } from "@/controllers/sound";
 import { dismissTavernNotices } from "@/controllers/tavern-notify";
 import { useTavern } from "@/controllers/use-tavern";
+import { describeDoing, doingFor } from "@/models/entities/activity";
 import { MAX_PACK, type PackInvite, type PackMate } from "@/models/entities/pack";
 import type { PresenceStatus } from "@/models/entities/presence";
 import {
@@ -26,18 +28,21 @@ import {
   OPEN_ROOM_MIN_LEVEL,
   ROOM_NAME_MAX_LENGTH,
   canOpenUnlockedRoom,
-  isPrivateTable,
+  roomMatchesSearch,
+  roomTitle,
 } from "@/models/entities/tavern";
 import { isVip } from "@/models/rules/vip";
 import { nickColorClass } from "@/models/rules/tavern-nicks";
 import { NAME_MAX_LENGTH } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
-import { sanitizeName } from "@/shared/utils/text";
+import { sanitizeName, sanitizeRoomSearch } from "@/shared/utils/text";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
 import { ActionIcon } from "../components/app-icon";
 import { AiAuditNotice } from "../components/ai-audit-notice";
 import { Button } from "../components/button";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
+import { Chip } from "../components/chip";
+import { TavernRoomNumber } from "../components/tavern-room-number";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { Field } from "../components/field";
 import { Modal } from "../components/modal";
@@ -91,6 +96,7 @@ export function TavernScreen() {
     declineInvite,
     fetchInvites,
     removeFromPack,
+    activity,
   } = useGame();
 
   const chat = useSyncExternalStore(
@@ -100,6 +106,7 @@ export function TavernScreen() {
   );
   const [roomName, setRoomName] = useState("");
   const [roomPassword, setRoomPassword] = useState("");
+  const [hideName, setHideName] = useState(false);
   const [creatingRoom, setCreatingRoom] = useState(false);
   const [joinPasswords, setJoinPasswords] = useState<Record<string, string>>({});
   const [page, setPage] = useState(1);
@@ -311,14 +318,14 @@ export function TavernScreen() {
   }, [rooms, chat.open, chat.roomId]);
 
   const filteredRooms = useMemo(() => {
-    const query = roomSearch.trim().toLowerCase();
-    if (!query) return rooms;
-    return rooms.filter(({ room }) => room.name.toLowerCase().includes(query));
+    return rooms.filter(({ room, isMember }) => roomMatchesSearch(room, isMember, roomSearch));
   }, [rooms, roomSearch]);
 
   const pack = useMemo(() => listPack(state), [state]);
   const packIds = useMemo(() => pack.map((mate) => mate.id), [pack]);
   const packPresence = usePackPresence(packIds, Boolean(character));
+  const tavernDoing = useTavernDoing(Boolean(character));
+  const mineDoing = activity?.kind ?? null;
   const chatPresence = useMemo(() => {
     const next: Record<string, PresenceStatus> = {};
     for (const id of packIds) next[id] = packPresence[id] ?? "offline";
@@ -383,12 +390,13 @@ export function TavernScreen() {
     if (creatingRoom) return;
     setCreatingRoom(true);
     try {
-      const result = await createRoom(roomName, roomPassword);
+      const result = await createRoom(roomName, roomPassword, hideName);
       if (!result) return;
       if (!result.ok) notify(result.message, false, "Taverna");
       if (result.ok) {
         setRoomName("");
         setRoomPassword("");
+        setHideName(false);
       }
     } finally {
       setCreatingRoom(false);
@@ -525,6 +533,18 @@ export function TavernScreen() {
                 disabled={Boolean(ownRoom)}
                 onChange={(event) => setRoomPassword(event.target.value)}
               />
+              <Chip
+                active={hideName}
+                disabled={Boolean(ownRoom)}
+                onClick={() => setHideName((current) => !current)}
+              >
+                Mesa reservada
+              </Chip>
+              {hideName ? (
+                <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                  De fora só aparece o número
+                </p>
+              ) : null}
               <Tooltip
                 block
                 label={
@@ -549,7 +569,7 @@ export function TavernScreen() {
                     (roomPassword.trim().length === 0 && !mayOpenUnlocked)
                   }
                 >
-                  {ownRoom ? "Sua mesa: " + ownRoom.room.name : "Escolher mesa"}
+                  {ownRoom ? "Sua mesa: " + roomTitle(ownRoom.room, true) : "Escolher mesa"}
                 </Button>
               </Tooltip>
             </form>
@@ -646,7 +666,14 @@ export function TavernScreen() {
                         <PresenceDot status={packPresence[mate.id] ?? "offline"} />
                       </Tooltip>
                       <p className="min-w-0 flex-1 truncate text-sm text-ink">
-                        <MemberName href={profileHref(mate.id)} name={mate.name} />
+                        <Tooltip
+                          label={describeDoing(
+                            mate.name,
+                            doingFor(mate.id, identity.id, mineDoing, tavernDoing),
+                          )}
+                        >
+                          <MemberName href={profileHref(mate.id)} name={mate.name} />
+                        </Tooltip>
                       </p>
                     </div>
 
@@ -687,19 +714,19 @@ export function TavernScreen() {
             <>
               <Field
                 accent
-                aria-label="Buscar mesa pelo nome"
-                placeholder="Buscar mesa pelo nome"
+                aria-label="Buscar mesa pelo nome ou número"
+                placeholder="Buscar mesa pelo nome ou #"
                 value={roomSearch}
                 maxLength={ROOM_NAME_MAX_LENGTH}
                 autoComplete="off"
                 onChange={(event) => {
-                  setRoomSearch(sanitizeName(event.target.value, ROOM_NAME_MAX_LENGTH));
+                  setRoomSearch(sanitizeRoomSearch(event.target.value, ROOM_NAME_MAX_LENGTH));
                   setPage(1);
                 }}
               />
 
               {filteredRooms.length === 0 ? (
-                <FilteredEmptyState description="Nenhuma mesa combina com esse nome." />
+                <FilteredEmptyState description="Nenhuma mesa combina com essa busca." />
               ) : (
                 <>
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -716,8 +743,15 @@ export function TavernScreen() {
                 >
                   <CardHeader>
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center justify-between gap-2">
-                        <h3 className="truncate text-sm text-ink">{room.name}</h3>
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex min-w-0 items-center gap-2">
+                          <TavernRoomNumber number={room.number} className="text-sm" />
+                          {isMember || !room.nameHidden ? (
+                            <h3 className="min-w-0 truncate text-sm text-ink">{room.name}</h3>
+                          ) : (
+                            <h3 className="min-w-0 truncate text-sm text-ink-faint">Reservada</h3>
+                          )}
+                        </div>
                         <div className="flex shrink-0 items-center gap-2">
                           {unread > 0 ? (
                             <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-md border border-ember bg-ember px-2 font-mono text-[10px] font-bold tracking-normal text-base">
@@ -731,6 +765,7 @@ export function TavernScreen() {
                               {room.ownerId === identity.id ? (
                                 <Tag tone="neutral">Sua mesa</Tag>
                               ) : null}
+                              {room.nameHidden ? <Tag tone="neutral">Reservada</Tag> : null}
                               <Tag tone={locked ? "neutral" : "faint"}>
                                 {locked ? "Com senha" : "Aberta"}
                               </Tag>
@@ -750,11 +785,18 @@ export function TavernScreen() {
                     <ul className="flex grow items-center gap-3 overflow-x-auto pb-1">
                       {room.members.map((member) => (
                         <li key={member.id} className="shrink-0 whitespace-nowrap text-xs">
-                          <MemberName
-                            href={profileHref(member.id)}
-                            name={member.name}
-                            className={nickColorClass(member.nickColor)}
-                          />
+                          <Tooltip
+                            label={describeDoing(
+                              member.name,
+                              doingFor(member.id, identity.id, mineDoing, tavernDoing),
+                            )}
+                          >
+                            <MemberName
+                              href={profileHref(member.id)}
+                              name={member.name}
+                              className={nickColorClass(member.nickColor)}
+                            />
+                          </Tooltip>
                           {!isPrivate && member.id === room.ownerId ? (
                             <span className="ml-1 text-ink-faint">(dono)</span>
                           ) : null}
@@ -766,7 +808,7 @@ export function TavernScreen() {
                       <Field
                         type="password"
                         maxLength={60}
-                        aria-label={"Senha da mesa " + room.name}
+                        aria-label={"Senha da mesa " + roomTitle(room, isMember)}
                         placeholder="senha da mesa"
                         value={joinPasswords[room.id] ?? ""}
                         onChange={(event) =>
@@ -840,6 +882,11 @@ export function TavernScreen() {
         <Modal
           open={Boolean(activeRoom)}
           title={activeRoom ? activeRoom.name : ""}
+          leading={
+            activeRoom ? (
+              <TavernRoomNumber number={activeRoom.number} className="text-[11px]" />
+            ) : null
+          }
           action={activeRoom ? tavernRoomChatAction(activeRoom) : null}
           onClose={closeMobileChat}
           className="max-w-lg"
@@ -855,7 +902,6 @@ export function TavernScreen() {
                 onEmojiRectChange={setEmojiRect}
                 cooldownLeft={cooldownLeft}
                 onSubmit={submitMessage}
-                showPing={isPrivateTable(activeRoom)}
               />
             ) : null
           }
@@ -867,6 +913,8 @@ export function TavernScreen() {
                 identityId={identity.id}
                 state={state}
                 presence={chatPresence}
+                doing={tavernDoing}
+                mine={mineDoing}
                 profileHref={profileHref}
                 invitingMemberId={invitingMemberId}
                 onInviteMember={inviteMember}
@@ -875,6 +923,8 @@ export function TavernScreen() {
                 activeRoom={activeRoom}
                 identityId={identity.id}
                 presence={chatPresence}
+                doing={tavernDoing}
+                mine={mineDoing}
                 profileHref={profileHref}
                 messagesRef={messagesRef}
                 className="h-[min(20rem,45svh)] overflow-y-auto"
@@ -892,7 +942,7 @@ export function TavernScreen() {
             ? "A mesa some para vocês dois e as mensagens se perdem. Chamar de novo abre outra, vazia."
             : "A mesa sai do quadro para todo mundo e a conversa se perde. Abrir outra depois é de graça."
         }
-        detail={closingRoom?.room.name}
+        detail={closingRoom ? roomTitle(closingRoom.room, true) : undefined}
         confirmLabel="Fechar"
         onCancel={() => setClosingRoomId(null)}
         onConfirm={async () => {

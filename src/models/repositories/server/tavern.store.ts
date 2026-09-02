@@ -8,6 +8,50 @@ import {
 } from "../../entities/tavern";
 import { nickColorCapacity, paintMembers } from "../../rules/tavern-nicks";
 
+function roomNumberOf(value: unknown): number {
+  const number = Number(value);
+  return Number.isFinite(number) && number >= 1 ? number : 0;
+}
+
+function roomFromRow(
+  row: {
+    id: string;
+    name: string;
+    number?: unknown;
+    name_hidden?: unknown;
+    password_hash: string | null;
+    owner_id: string;
+    created_at: Date;
+    private_for?: string[] | null;
+  },
+  members: TavernMember[],
+  messages: TavernRoom["messages"],
+): TavernRoom {
+  return {
+    id: row.id,
+    name: row.name,
+    number: roomNumberOf(row.number),
+    nameHidden: row.name_hidden === true,
+    password: row.password_hash ? "" : null,
+    ownerId: row.owner_id,
+    createdAt: new Date(row.created_at).toISOString(),
+    privateFor: row.private_for ?? undefined,
+    members,
+    messages,
+  };
+}
+
+function assignMissingNumbers(rooms: TavernRoom[]): TavernRoom[] {
+  const taken = new Set(rooms.map((room) => room.number).filter((value) => value >= 1));
+  let next = 1;
+  return rooms.map((room) => {
+    if (room.number >= 1) return room;
+    while (taken.has(next)) next += 1;
+    taken.add(next);
+    return { ...room, number: next };
+  });
+}
+
 function membersOf(
   rows: { member_id: string; member_name: string; joined_at: Date; last_seen: Date; nick_color?: number }[],
   privateFor?: string[],
@@ -66,24 +110,19 @@ export async function loadRoomState(
   if (row.password_hash) hashes.set(row.id, row.password_hash);
   const state: TavernState = {
     version: TAVERN_VERSION,
-    rooms: [
-      {
-        id: row.id,
-        name: row.name,
-        password: row.password_hash ? "" : null,
-        ownerId: row.owner_id,
-        createdAt: new Date(row.created_at).toISOString(),
-        privateFor: row.private_for ?? undefined,
-        members: membersOf(members.rows, row.private_for ?? undefined),
-        messages: messages.rows.map((message) => ({
+    rooms: assignMissingNumbers([
+      roomFromRow(
+        row,
+        membersOf(members.rows, row.private_for ?? undefined),
+        messages.rows.map((message) => ({
           id: message.id,
           authorId: message.author_id,
           authorName: message.author_name,
           text: message.body,
           at: new Date(message.sent_at).toISOString(),
         })),
-      },
-    ],
+      ),
+    ]),
   };
   return { state, hashes };
 }
@@ -102,25 +141,22 @@ export async function loadTavern(client: PoolClient): Promise<LoadedTavern> {
   ): T[] => rows.filter((row) => row.room_id === roomId);
   const state: TavernState = {
     version: TAVERN_VERSION,
-    rooms: rooms.rows.map((row): TavernRoom => {
-      if (row.password_hash) hashes.set(row.id, row.password_hash);
-      return {
-        id: row.id,
-        name: row.name,
-        password: row.password_hash ? "" : null,
-        ownerId: row.owner_id,
-        createdAt: new Date(row.created_at).toISOString(),
-        privateFor: row.private_for ?? undefined,
-        members: membersOf(byRoom(row.id, members.rows), row.private_for ?? undefined),
-        messages: byRoom(row.id, messages.rows).map((message) => ({
-          id: message.id,
-          authorId: message.author_id,
-          authorName: message.author_name,
-          text: message.body,
-          at: new Date(message.sent_at).toISOString(),
-        })),
-      };
-    }),
+    rooms: assignMissingNumbers(
+      rooms.rows.map((row): TavernRoom => {
+        if (row.password_hash) hashes.set(row.id, row.password_hash);
+        return roomFromRow(
+          row,
+          membersOf(byRoom(row.id, members.rows), row.private_for ?? undefined),
+          byRoom(row.id, messages.rows).map((message) => ({
+            id: message.id,
+            authorId: message.author_id,
+            authorName: message.author_name,
+            text: message.body,
+            at: new Date(message.sent_at).toISOString(),
+          })),
+        );
+      }),
+    ),
   };
   return { state, hashes };
 }
@@ -130,10 +166,19 @@ async function saveRoom(
   passwordHash: string | null,
 ): Promise<void> {
   await client.query(
-    `insert into tavern_rooms (id, name, password_hash, owner_id, private_for, created_at)
-     values ($1, $2, $3, $4, $5, $6)
-     on conflict (id) do update set name = $2`,
-    [room.id, room.name, passwordHash, room.ownerId, room.privateFor ?? null, room.createdAt],
+    `insert into tavern_rooms (id, name, password_hash, owner_id, private_for, created_at, number, name_hidden)
+     values ($1, $2, $3, $4, $5, $6, $7, $8)
+     on conflict (id) do update set name = $2, number = $7, name_hidden = $8`,
+    [
+      room.id,
+      room.name,
+      passwordHash,
+      room.ownerId,
+      room.privateFor ?? null,
+      room.createdAt,
+      room.number,
+      room.nameHidden,
+    ],
   );
   await client.query("delete from tavern_members where room_id = $1", [room.id]);
   for (const member of room.members) {

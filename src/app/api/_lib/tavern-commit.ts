@@ -1,6 +1,7 @@
 import type { PoolClient } from "pg";
 import type { TavernState } from "@/models/entities/tavern";
-import { saveTavernDiff } from "@/models/repositories/server/tavern.store";
+import { withTransaction } from "@/models/repositories/server/database";
+import { loadRoomState, saveTavernDiff } from "@/models/repositories/server/tavern.store";
 import {
   deletePushSubscriptionByEndpoint,
   listPushSubscriptionsForUsers,
@@ -25,13 +26,18 @@ export async function commitTavernWrite(
   after: TavernState,
   hashes: Map<string, string>,
   newHashes?: Map<string, string>,
-  push?: TavernMessagePush,
 ): Promise<number> {
   await saveTavernDiff(client, before, after, hashes, newHashes);
   const revision = await bumpTavernRevision(client);
   publishTavernRevision(revision);
-  if (push) await notifyTavernMessagePush(client, after, push);
   return revision;
+}
+
+export async function deliverTavernMessagePush(push: TavernMessagePush): Promise<void> {
+  await withTransaction(async (client) => {
+    const loaded = await loadRoomState(client, push.roomId, false);
+    await notifyTavernMessagePush(client, loaded.state, push);
+  });
 }
 
 async function notifyTavernMessagePush(

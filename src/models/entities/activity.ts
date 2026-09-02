@@ -8,7 +8,45 @@ export interface Activity {
   paused?: boolean;
 }
 
-const KINDS: readonly string[] = ["hunt", "train", "mine", "forge", "rest"];
+export const ACTIVITY_KINDS: readonly ActivityKind[] = ["hunt", "train", "mine", "forge", "rest"];
+const KINDS: readonly string[] = ACTIVITY_KINDS;
+
+export type HunterDoing = ActivityKind | "idle";
+
+export const ACTIVITY_STALE_MS = 60000;
+
+export const DOING_VERBS: Record<HunterDoing, string> = {
+  hunt: "caçando",
+  train: "treinando",
+  mine: "minerando",
+  forge: "forjando",
+  rest: "repousando",
+  idle: "parado",
+};
+
+export function isActivityKind(value: string): value is ActivityKind {
+  return KINDS.includes(value);
+}
+
+export function resolveDoing(kind: string | null, at: string | null, now = Date.now()): HunterDoing {
+  if (!kind || !at || !isActivityKind(kind)) return "idle";
+  if (now - Date.parse(at) > ACTIVITY_STALE_MS) return "idle";
+  return kind;
+}
+
+export function describeDoing(name: string, doing: HunterDoing): string {
+  return name + " está " + DOING_VERBS[doing];
+}
+
+export function doingFor(
+  id: string,
+  selfId: string,
+  mine: ActivityKind | null,
+  map: Record<string, HunterDoing>,
+): HunterDoing {
+  if (id === selfId) return mine ?? "idle";
+  return map[id] ?? "idle";
+}
 
 function isResume(data: unknown): data is { kind: ActivityKind; id?: string; enhancement?: number } {
   if (typeof data !== "object" || data === null) return false;

@@ -3,6 +3,7 @@ import { containsLink } from "@/shared/utils/text";
 import {
   isPrivateTable,
   isRoomFull,
+  nextRoomNumber,
   MAX_ROOM_MEMBERS,
   MAX_ROOM_MESSAGES,
   MESSAGE_COOLDOWN_MS,
@@ -79,6 +80,7 @@ export function listRooms(state: TavernState, identity: TavernIdentity | null): 
         identity !== null && room.members.some((member) => member.id === identity.id);
       const safeRoom: TavernRoom = {
         ...room,
+        name: isMember || !room.nameHidden ? room.name : "",
         password: null,
         messages: isMember ? room.messages : [],
       };
@@ -93,7 +95,7 @@ export function listRooms(state: TavernState, identity: TavernIdentity | null): 
     })
     .sort((a, b) =>
       a.isPrivate === b.isPrivate
-        ? a.room.name.localeCompare(b.room.name, "pt-BR")
+        ? a.room.number - b.room.number
         : Number(b.isPrivate) - Number(a.isPrivate),
     );
 }
@@ -103,6 +105,7 @@ export function createRoom(
   identity: TavernIdentity,
   name: string,
   password: string,
+  hideName = false,
 ): TavernResult {
   const problem = validateRoomName(name);
   if (problem) return fail(state, problem);
@@ -131,6 +134,8 @@ export function createRoom(
   const room: TavernRoom = {
     id: generateId("room"),
     name: cleanName,
+    number: nextRoomNumber(state.rooms),
+    nameHidden: hideName,
     password: password.trim().length > 0 ? password.trim() : null,
     ownerId: identity.id,
     createdAt: now,
@@ -300,6 +305,8 @@ export function openDirect(
   const room: TavernRoom = {
     id: generateId("room"),
     name: tableName,
+    number: nextRoomNumber(state.rooms),
+    nameHidden: false,
     password: null,
     ownerId: identity.id,
     createdAt: now,
@@ -420,11 +427,11 @@ export function touchMember(
   });
 }
 
-/** Newest other-person line in a reserved table the viewer sits at, or empty. */
-export function latestPrivateChatAt(rooms: RoomSummary[], selfId: string): string {
+/** Newest other-person line in a table the viewer sits at, or empty. */
+export function latestSeatedChatAt(rooms: RoomSummary[], selfId: string): string {
   let latest = "";
-  for (const { room, isMember, isPrivate } of rooms) {
-    if (!isMember || !isPrivate) continue;
+  for (const { room, isMember } of rooms) {
+    if (!isMember) continue;
     for (const message of room.messages) {
       if (message.authorId === "system" || message.authorId === selfId) continue;
       if (message.at > latest) latest = message.at;

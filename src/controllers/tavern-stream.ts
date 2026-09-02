@@ -74,3 +74,11 @@ export function subscribeTavernBoard(listener: BoardListener): () => void {
 export function tavernBoardSnapshot(): TavernBoardPayload | null {
   return lastBoard;
 }
+
+export function applyLocalBoard(board: TavernBoardPayload): void {
+  notify(board);
+}
+
+export async function refreshTavernBoard(): Promise<void> {
+  await fallbackPoll();
+}

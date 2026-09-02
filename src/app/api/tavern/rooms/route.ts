@@ -15,11 +15,13 @@ export async function POST(request: Request) {
         return NextResponse.json({ ok: false, message: blocked, data: null });
       }
       const password = asText(body.password, 60);
+      const hideName = body.hideName === true;
       const result = tavernController.createRoom(
         state,
         context.identity,
         name,
         password,
+        hideName,
       );
       if (result.ok && result.roomId) {
         const newHashes = new Map<string, string>();

@@ -17,6 +17,7 @@ import { dismissTavernNotices } from "@/controllers/tavern-notify";
 import { useGame } from "@/controllers/game.context";
 import { listPack } from "@/controllers/pack.controller";
 import { usePackPresence } from "@/controllers/use-pack-presence";
+import { useTavernDoing } from "@/controllers/use-tavern-doing";
 import { useTavern } from "@/controllers/use-tavern";
 import type { PresenceStatus } from "@/models/entities/presence";
 import {
@@ -26,8 +27,9 @@ import {
   tavernSentRepository,
   type TavernSentMap,
 } from "@/models/repositories/tavern-sent.repository";
-import { MESSAGE_COOLDOWN_MS, isPrivateTable } from "@/models/entities/tavern";
+import { MESSAGE_COOLDOWN_MS, roomTitle } from "@/models/entities/tavern";
 import { CornerAccents } from "./corner-accents";
+import { TavernRoomNumber } from "./tavern-room-number";
 import {
   TavernRoomChatComposer,
   TavernRoomChatMembers,
@@ -51,12 +53,14 @@ export function TavernChatWindow() {
     tavernChatStore.snapshot,
     tavernChatStore.serverSnapshot,
   );
-  const { state, character, notify, invite } = useGame();
+  const { state, character, notify, invite, activity } = useGame();
   const { identity, rooms, ready, activeRoom, sendMessage, announceAway } = useTavern(
     chat.open ? chat.roomId : null,
   );
   const packIds = useMemo(() => listPack(state).map((mate) => mate.id), [state]);
   const packPresence = usePackPresence(packIds, Boolean(character) && chat.open);
+  const tavernDoing = useTavernDoing(Boolean(character) && chat.open);
+  const mineDoing = activity?.kind ?? null;
   const chatPresence = useMemo(() => {
     const next: Record<string, PresenceStatus> = {};
     for (const id of packIds) next[id] = packPresence[id] ?? "offline";
@@ -270,14 +274,19 @@ export function TavernChatWindow() {
       <div className="relative w-full">
         <section
           role="dialog"
-          aria-label={activeRoom.name}
+          aria-label={roomTitle(activeRoom, true)}
           className="flex max-h-[min(32rem,calc(100svh-6rem))] w-full flex-col overflow-hidden rounded-lg border border-edge-strong bg-surface shadow-[0_24px_60px_-20px_rgba(0,0,0,0.95)]"
         >
           <header
             className="flex cursor-grab items-center gap-3 select-none border-b border-edge bg-surface-high px-4 py-3 active:cursor-grabbing"
             onPointerDown={startDrag}
           >
-            <h2 className="heading min-w-0 flex-1 truncate text-[11px] text-ink">{activeRoom.name}</h2>
+            <div className="flex min-w-0 flex-1 items-center gap-2">
+              <TavernRoomNumber number={activeRoom.number} className="text-[11px]" />
+              <h2 className="heading min-w-0 flex-1 truncate text-[11px] text-ink">
+                {activeRoom.name}
+              </h2>
+            </div>
             <span className="shrink-0 font-mono text-[11px] text-ink-faint">
               {tavernRoomChatAction(activeRoom)}
             </span>
@@ -287,7 +296,7 @@ export function TavernChatWindow() {
             <button
               type="button"
               onClick={closeChat}
-              aria-label={"Fechar chat de " + activeRoom.name}
+              aria-label={"Fechar chat de " + roomTitle(activeRoom, true)}
               className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-edge text-ink-faint transition-colors hover:border-edge-strong hover:text-ink"
             >
               <span aria-hidden="true" className="text-sm leading-none">
@@ -301,6 +310,8 @@ export function TavernChatWindow() {
             identityId={identity.id}
             state={state}
             presence={chatPresence}
+            doing={tavernDoing}
+            mine={mineDoing}
             profileHref={profileHref}
             invitingMemberId={invitingMemberId}
             onInviteMember={inviteMember}
@@ -310,6 +321,8 @@ export function TavernChatWindow() {
             activeRoom={activeRoom}
             identityId={identity.id}
             presence={chatPresence}
+            doing={tavernDoing}
+            mine={mineDoing}
             profileHref={profileHref}
             messagesRef={messagesRef}
             className="min-h-0 flex-1 overflow-y-auto"
@@ -326,7 +339,6 @@ export function TavernChatWindow() {
               onEmojiRectChange={setEmojiRect}
               cooldownLeft={cooldownLeft}
               onSubmit={submitMessage}
-              showPing={isPrivateTable(activeRoom)}
             />
           </div>
         </section>

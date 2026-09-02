@@ -33,12 +33,49 @@ export interface TavernMessage {
 export interface TavernRoom {
   id: string;
   name: string;
+  number: number;
+  nameHidden: boolean;
   password: string | null;
   ownerId: string;
   createdAt: string;
   members: TavernMember[];
   messages: TavernMessage[];
   privateFor?: string[];
+}
+
+export function nextRoomNumber(rooms: readonly Pick<TavernRoom, "number">[]): number {
+  const taken = new Set(
+    rooms.map((room) => room.number).filter((value) => Number.isFinite(value) && value >= 1),
+  );
+  let number = 1;
+  while (taken.has(number)) number += 1;
+  return number;
+}
+
+export function roomNumberLabel(number: number): string {
+  return "#" + number;
+}
+
+export function roomTitle(
+  room: Pick<TavernRoom, "name" | "number" | "nameHidden">,
+  inside: boolean,
+): string {
+  const mark = roomNumberLabel(room.number);
+  if (!inside && room.nameHidden) return mark;
+  return room.name ? mark + " " + room.name : mark;
+}
+
+export function roomMatchesSearch(
+  room: Pick<TavernRoom, "name" | "number" | "nameHidden">,
+  inside: boolean,
+  raw: string,
+): boolean {
+  const query = raw.trim().toLowerCase();
+  if (!query) return true;
+  const digits = query.startsWith("#") ? query.slice(1) : query;
+  if (/^\d+$/.test(digits) && room.number === Number(digits)) return true;
+  if (!inside && room.nameHidden) return false;
+  return room.name.toLowerCase().includes(query);
 }
 export function isPrivateTable(room: TavernRoom): boolean {
   return Array.isArray(room.privateFor);

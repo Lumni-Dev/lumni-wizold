@@ -20,7 +20,9 @@ const require = createRequire(import.meta.url);
 const load = (path) => require(join(SIM, path));
 const CONST = load("shared/constants/game.js");
 const { seededRandom } = load("shared/utils/random.js");
-const { sanitizeName, normalizeText } = load("shared/utils/text.js");
+const { sanitizeName, sanitizeRoomSearch, normalizeText, splitChatLinks } = load(
+  "shared/utils/text.js",
+);
 const { clamp, formatBronze, parseReais } = load("shared/utils/format.js");
 const stats = load("models/rules/stats.js");
 const combat = load("models/rules/combat.js");
@@ -45,6 +47,7 @@ const exercisesData = load("models/data/exercises.js");
 const entItem = load("models/entities/item.js");
 const oresData = load("models/data/ores/index.js");
 const entTavern = load("models/entities/tavern.js");
+const entActivity = load("models/entities/activity.js");
 const entRanking = load("models/entities/ranking.js");
 const entBazaar = load("models/entities/bazaar.js");
 const factory = load("models/factories/character.factory.js");
@@ -2081,12 +2084,19 @@ sec("taverna");
     tavernCtrl.createRoom(entTavern.emptyTavern(), lowbie, "Ninho", "").ok === false,
   );
   ok(
+    "VIP abaixo do NV abre mesa sem senha",
+    tavernCtrl.createRoom(entTavern.emptyTavern(), { ...lowbie, vip: true }, "Ninho", "").ok ===
+      true,
+  );
+  ok(
     "com senha o novato abre em qualquer nível",
     tavernCtrl.createRoom(entTavern.emptyTavern(), lowbie, "Ninho", "chave").ok === true,
   );
   const opened = tavernCtrl.createRoom(tavern, me, "Fogueira", "");
   ok("mesa abre", opened.ok === true);
   tavern = opened.state;
+  ok("mesa ganha o #1", tavernCtrl.findRoom(tavern, opened.roomId).number === 1);
+  ok("nome começa visível", tavernCtrl.findRoom(tavern, opened.roomId).nameHidden === false);
   ok("dona já está sentada", tavernCtrl.findRoom(tavern, opened.roomId).members.length === 1);
   ok(
     "mesa sem senha exige o NV mínimo para entrar",
@@ -2201,6 +2211,31 @@ sec("taverna");
     "site aleatório ainda recusa",
     tavernCtrl.sendMessage(tavern, opened.roomId, me, "spam em https://malicioso.net/x").ok === false,
   );
+  {
+    const youtube = splitChatLinks("live em youtube.com/watch?v=abc agora");
+    const twitch = splitChatLinks("www.twitch.tv/canal.");
+    const site = splitChatLinks("joga em https://wizold.lumni.dev.br");
+    const blocked = splitChatLinks("spam em https://malicioso.net/x");
+    ok(
+      "youtube permitido vira href",
+      youtube.some((part) => part.kind === "link" && part.href === "https://youtube.com/watch?v=abc"),
+    );
+    ok(
+      "www ganha https e pontuação fica fora",
+      twitch.some((part) => part.kind === "link" && part.href === "https://www.twitch.tv/canal") &&
+        twitch.some((part) => part.kind === "text" && part.value === "."),
+    );
+    ok(
+      "https do wizold fica no href",
+      site.some(
+        (part) => part.kind === "link" && part.href === "https://wizold.lumni.dev.br",
+      ),
+    );
+    ok(
+      "site recusado não vira link",
+      blocked.every((part) => part.kind === "text"),
+    );
+  }
   ok(
     "fala com pontuação passa",
     tavernCtrl.sendMessage(tavern, opened.roomId, me, "Boa noite, matilha. Tudo bem?").ok === true,
@@ -2242,6 +2277,54 @@ sec("taverna");
       tavernCtrl.findRoom(forged.state, locked.roomId).messages.length === 2,
     );
   }
+  {
+    const hide = tavernCtrl.createRoom(entTavern.emptyTavern(), me, "Secreta", "", true);
+    ok("mesa oculta abre", hide.ok === true);
+    const pair = tavernCtrl.createRoom(hide.state, other, "Clara", "");
+    ok(
+      "segunda mesa é #2",
+      pair.ok && tavernCtrl.findRoom(pair.state, pair.roomId).number === 2,
+    );
+    const listed = tavernCtrl
+      .listRooms(hide.state, other)
+      .find((summary) => summary.room.id === hide.roomId);
+    ok(
+      "de fora o nome some",
+      Boolean(listed) &&
+        listed.room.name === "" &&
+        listed.room.nameHidden === true &&
+        listed.room.number === 1,
+    );
+    ok(
+      "de fora a busca pelo nome falha",
+      listed && entTavern.roomMatchesSearch(listed.room, false, "secreta") === false,
+    );
+    ok(
+      "de fora a busca pelo número acha",
+      listed &&
+        entTavern.roomMatchesSearch(listed.room, false, "#1") &&
+        entTavern.roomMatchesSearch(listed.room, false, "1"),
+    );
+    const inside = tavernCtrl
+      .listRooms(hide.state, me)
+      .find((summary) => summary.room.id === hide.roomId);
+    ok("de dentro o nome fica", Boolean(inside) && inside.room.name === "Secreta");
+    ok(
+      "de dentro a busca pelo nome acha",
+      inside && entTavern.roomMatchesSearch(inside.room, true, "secre"),
+    );
+    const closed = tavernCtrl.closeRoom(hide.state, hide.roomId, me);
+    const again = tavernCtrl.createRoom(closed.state, me, "Nova", "");
+    ok(
+      "número volta depois de fechar",
+      again.ok && tavernCtrl.findRoom(again.state, again.roomId).number === 1,
+    );
+    ok("busca aceita o #", sanitizeRoomSearch("#17", 40) === "#17");
+    ok(
+      "número reusa o furo",
+      entTavern.nextRoomNumber([{ number: 1 }, { number: 3 }]) === 2,
+    );
+  }
   const direct = tavernCtrl.openDirect(tavern, me, other);
   ok("mesa reservada abre", direct.ok === true);
   tavern = direct.state;
@@ -2259,6 +2342,89 @@ sec("taverna");
   );
   const reopened = tavernCtrl.openDirect(tavern, me, other);
   ok("reabrir acha a mesma mesa", reopened.ok && reopened.roomId === direct.roomId);
+  {
+    const nicks = load("models/rules/tavern-nicks.js");
+    ok("primeiro assento pega a cor 0", nicks.claimNickColor([], 20) === 0);
+    ok(
+      "o próximo pega a primeira livre",
+      nicks.claimNickColor([{ nickColor: 0 }, { nickColor: 2 }], 20) === 1,
+    );
+    ok("mesa de dois só oferece 0 e 1", nicks.claimNickColor([{ nickColor: 0 }], 2) === 1);
+    const fire = tavernCtrl.findRoom(tavern, opened.roomId);
+    const fireTones = new Set(fire.members.map((member) => member.nickColor));
+    ok(
+      "cada assento da mesa aberta tem cor distinta",
+      fire.members.length === fireTones.size && fireTones.size >= 19,
+    );
+    const reservedSeats = tavernCtrl.findRoom(tavern, direct.roomId).members;
+    ok(
+      "mesa de dois pinta sem repetir",
+      reservedSeats.length >= 1 &&
+        reservedSeats.every((member) => member.nickColor === 0 || member.nickColor === 1) &&
+        new Set(reservedSeats.map((member) => member.nickColor)).size === reservedSeats.length,
+    );
+  }
+  {
+    const at = "2026-09-02T20:00:00.000Z";
+    const reserved = {
+      room: {
+        id: "dm",
+        name: "Privada",
+        password: null,
+        ownerId: "a",
+        createdAt: at,
+        privateFor: ["a", "b"],
+        members: [],
+        messages: [
+          { id: "1", authorId: "system", authorName: "Taverna", text: "x", at },
+          { id: "2", authorId: "b", authorName: "B", text: "oi", at },
+        ],
+      },
+      locked: false,
+      full: false,
+      memberCount: 2,
+      isMember: true,
+      isPrivate: true,
+    };
+    const open = {
+      ...reserved,
+      isPrivate: false,
+      room: { ...reserved.room, id: "open", privateFor: undefined },
+    };
+    ok(
+      "ping lê a fala do outro na reservada",
+      tavernCtrl.latestSeatedChatAt([reserved], "a") === at,
+    );
+    ok("ping ignora a própria fala", tavernCtrl.latestSeatedChatAt([reserved], "b") === "");
+    ok("ping lê a fala na mesa aberta", tavernCtrl.latestSeatedChatAt([open], "a") === at);
+    ok(
+      "ping ignora quem não senta",
+      tavernCtrl.latestSeatedChatAt([{ ...reserved, isMember: false }], "a") === "",
+    );
+  }
+  {
+    const fresh = new Date().toISOString();
+    const stale = new Date(Date.now() - entActivity.ACTIVITY_STALE_MS - 1000).toISOString();
+    ok("caça viva", entActivity.resolveDoing("hunt", fresh) === "hunt");
+    ok("atividade velha vira parado", entActivity.resolveDoing("hunt", stale) === "idle");
+    ok("sem atividade é parado", entActivity.resolveDoing(null, null) === "idle");
+    ok(
+      "frase da caça",
+      entActivity.describeDoing("Luna", "hunt") === "Luna está caçando",
+    );
+    ok(
+      "frase parado",
+      entActivity.describeDoing("Lumni", "idle") === "Lumni está parado",
+    );
+    ok(
+      "a própria caça vale na hora",
+      entActivity.doingFor("eu", "eu", "hunt", {}) === "hunt",
+    );
+    ok(
+      "o outro lê o quadro",
+      entActivity.doingFor("ela", "eu", "hunt", { ela: "mine" }) === "mine",
+    );
+  }
   const stale = {
     ...tavern,
     rooms: tavern.rooms.map((room) => ({

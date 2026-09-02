@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { tavernPingRepository } from "@/models/repositories/tavern-ping.repository";
 import { playSound } from "./sound";
-import { latestPrivateChatAt } from "./tavern.controller";
+import { latestSeatedChatAt } from "./tavern.controller";
 import { subscribeTavernBoard } from "./tavern-stream";
 import { useGame } from "./game.context";
 
@@ -17,7 +17,7 @@ export function usePrivateChatPing() {
     heardRef.current = null;
     if (!enabled) return;
     return subscribeTavernBoard((board) => {
-      const latest = latestPrivateChatAt(board.rooms, selfId);
+      const latest = latestSeatedChatAt(board.rooms, selfId);
       if (!latest) return;
       if (heardRef.current === null) {
         heardRef.current = latest;
