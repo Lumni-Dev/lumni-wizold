@@ -321,7 +321,6 @@ button:not(:disabled) {
 
 @utility creature-drift {
   animation: creature-drift var(--drift-seconds, 160s) linear infinite;
-  will-change: transform;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -7,7 +7,7 @@ import type { Creature } from "@/models/entities/creature";
 import { CreatureIcon } from "./creature-icon";
 
 const SECONDS_PER_CREATURE = 1.6;
-const SWELL = 0.45;
+const RESTING = 0.7;
 const REACH_IN_ITEMS = 2.5;
 
 export function CreatureCarousel() {
@@ -39,12 +39,15 @@ export function CreatureCarousel() {
     if (pitch <= 0) return undefined;
 
     const reach = pitch * REACH_IN_ITEMS;
+    const resting = "scale(" + String(RESTING) + ")";
     let frame = 0;
     let swollen: HTMLElement[] = [];
 
+    for (const item of items) item.style.transform = resting;
+
     const clear = () => {
       for (const item of swollen) {
-        item.style.transform = "";
+        item.style.transform = resting;
         item.style.zIndex = "";
       }
       swollen = [];
@@ -64,7 +67,8 @@ export function CreatureCarousel() {
         const centre = start + index * pitch + half;
         const closeness = Math.max(0, 1 - Math.abs(centre - middle) / reach);
         if (closeness <= 0) continue;
-        items[index].style.transform = "scale(" + String(1 + SWELL * closeness * closeness) + ")";
+        const scale = RESTING + (1 - RESTING) * closeness * closeness;
+        items[index].style.transform = "scale(" + String(scale) + ")";
         items[index].style.zIndex = "1";
         swollen.push(items[index]);
       }
@@ -75,7 +79,10 @@ export function CreatureCarousel() {
     frame = window.requestAnimationFrame(tick);
     return () => {
       window.cancelAnimationFrame(frame);
-      clear();
+      for (const item of items) {
+        item.style.transform = "";
+        item.style.zIndex = "";
+      }
     };
   }, [roster.length]);
 
