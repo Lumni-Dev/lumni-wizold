@@ -105,7 +105,7 @@ export function LiveBackdrop({ shade = "soft" }: { shade?: "soft" | "deep" }) {
         }
         style={
           shade === "deep"
-            ? ({ "--shade-scale": String(darkness * 2) } as CSSProperties)
+            ? ({ "--shade-scale": String(darkness) } as CSSProperties)
             : undefined
         }
       />
