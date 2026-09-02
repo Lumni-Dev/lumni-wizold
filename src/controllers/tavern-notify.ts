@@ -163,6 +163,23 @@ export function notifyTavernMessageLocal(
   plainNotice(title, base);
 }
 
+export function dismissTavernNotices(roomName?: string): void {
+  if (!tavernPushSupported() || Notification.permission !== "granted") return;
+  if (!("serviceWorker" in navigator)) return;
+  const wanted = roomName ? "tavern:" + roomName : null;
+  void navigator.serviceWorker
+    .getRegistration()
+    .then((registration) => registration?.getNotifications() ?? [])
+    .then((notices) => {
+      for (const notice of notices) {
+        if (!notice.tag.startsWith("tavern:")) continue;
+        if (wanted && notice.tag !== wanted) continue;
+        notice.close();
+      }
+    })
+    .catch(() => {});
+}
+
 export function testTavernPush(): void {
   notifyTavernMessageLocal(
     "Taverna",

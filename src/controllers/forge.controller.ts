@@ -107,7 +107,8 @@ export function mine(
   }
 
   const yielded = intBetween(ore.minYield, ore.maxYield, random);
-  const { mining: advanced, levelsGained } = applyMiningProgress(rolled, miningEffort(rolled.level));
+  const effort = miningEffort(rolled.level);
+  const { mining: advanced, levelsGained } = applyMiningProgress(rolled, effort);
   const mining: MiningState = {
     ...advanced,
     windowStart: rolled.windowStart ?? new Date(now).toISOString(),
@@ -121,15 +122,16 @@ export function mine(
   };
 
   const fragment = findItem(ore.fragmentId);
+  const atCeiling = rolled.level >= MINING_MAX_LEVEL;
+  const haul =
+    yielded +
+    " de " +
+    (fragment?.name ?? "fragmento") +
+    (atCeiling ? "" : " e " + effort + " de experiência de mineração");
   const message =
     levelsGained > 0
-      ? yielded +
-        " de " +
-        (fragment?.name ?? "fragmento") +
-        ". A mineração subiu para " +
-        mining.level +
-        "."
-      : yielded + " de " + (fragment?.name ?? "fragmento") + " sai da rocha.";
+      ? haul + ". A mineração subiu para " + mining.level + "."
+      : haul + (atCeiling ? " sai da rocha." : " saem da rocha.");
 
   return success(addLog(next, "system", message), message, { levelsGained });
 }

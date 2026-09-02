@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { tavernPushRepository } from "@/models/repositories/tavern-push.repository";
 import { tavernReadRepository } from "@/models/repositories/tavern-read.repository";
-import { pushTavernAlert } from "./tavern-alert.store";
+import { clearTavernAlerts, pushTavernAlert } from "./tavern-alert.store";
 import { useGame } from "./game.context";
 import { ensureTavernWorker, notifyTavernMessageLocal, tavernPushActive } from "./tavern-notify";
 import { subscribeTavernBoard } from "./tavern-stream";
@@ -14,7 +14,8 @@ const ALERT_FLASH_MS = 1500;
 function unreadFromBoard(rooms: RoomSummary[], selfId: string): number {
   const readMap = tavernReadRepository.load();
   let total = 0;
-  for (const { room } of rooms) {
+  for (const { room, isMember } of rooms) {
+    if (!isMember) continue;
     const lastRead = readMap[room.id] ?? "";
     for (const message of room.messages) {
       if (message.authorId === "system" || message.authorId === selfId) continue;
@@ -29,7 +30,7 @@ function freshMessages(
   selfId: string,
   since: string | null,
 ): { roomName: string; authorName: string; text: string; at: string }[] {
-  if (!since) return [];
+  if (since === null) return [];
   const readMap = tavernReadRepository.load();
   const found: { roomName: string; authorName: string; text: string; at: string }[] = [];
   for (const { room, isMember } of rooms) {
@@ -57,9 +58,13 @@ export function useTavernAlert(watching: boolean) {
   const notifiedRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!enabled) return;
+    notifiedRef.current = null;
+    if (!enabled) {
+      clearTavernAlerts();
+      return;
+    }
     ensureTavernWorker();
-    return subscribeTavernBoard((board) => {
+    const stop = subscribeTavernBoard((board) => {
       setUnread(unreadFromBoard(board.rooms, selfId));
       const alertsOn = tavernPushRepository.enabled();
       const hidden = document.hidden;
@@ -86,6 +91,10 @@ export function useTavernAlert(watching: boolean) {
       }
       notifiedRef.current = latest;
     });
+    return () => {
+      notifiedRef.current = null;
+      stop();
+    };
   }, [enabled, selfId]);
 
   const baseRef = useRef<string | null>(null);

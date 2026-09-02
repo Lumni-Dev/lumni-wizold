@@ -6,6 +6,7 @@ import { useGame } from "@/controllers/game.context";
 import { isInPack, listPack } from "@/controllers/pack.controller";
 import { usePackPresence } from "@/controllers/use-pack-presence";
 import { playSound } from "@/controllers/sound";
+import { dismissTavernNotices } from "@/controllers/tavern-notify";
 import { useTavern } from "@/controllers/use-tavern";
 import { MAX_PACK, type PackInvite, type PackMate } from "@/models/entities/pack";
 import {
@@ -238,23 +239,36 @@ export function TavernScreen() {
       window.clearInterval(interval);
     };
   }, [lastMineAt, activeRoomId, sentBeat]);
+  const markRoomRead = useCallback((roomId: string) => {
+    const summary = roomsRef.current.find((entry) => entry.room.id === roomId);
+    if (summary) dismissTavernNotices(summary.room.name);
+    const lastAt = summary?.room.messages[summary.room.messages.length - 1]?.at;
+    if (!lastAt) return;
+    const next = tavernReadRepository.mark(
+      roomId,
+      lastAt,
+      roomsRef.current.map((entry) => entry.room.id),
+    );
+    if (next) setReadMap(next);
+  }, []);
+
   const lastMessageAt = activeRoom?.messages[activeRoom.messages.length - 1]?.at ?? null;
   useEffect(() => {
     if (!openRoomId || !lastMessageAt) return;
     const timer = window.setTimeout(() => {
-      setReadMap((current) => {
-        if ((current[openRoomId] ?? "") >= lastMessageAt) return current;
-        const alive = new Set(roomsRef.current.map((summary) => summary.room.id));
-        const next: TavernReadMap = {};
-        for (const [roomId, at] of Object.entries({ ...current, [openRoomId]: lastMessageAt })) {
-          if (alive.has(roomId)) next[roomId] = at;
-        }
-        tavernReadRepository.save(next);
-        return next;
-      });
+      const next = tavernReadRepository.mark(
+        openRoomId,
+        lastMessageAt,
+        roomsRef.current.map((summary) => summary.room.id),
+      );
+      if (next) setReadMap(next);
     }, 0);
     return () => window.clearTimeout(timer);
   }, [openRoomId, lastMessageAt]);
+
+  useEffect(() => {
+    dismissTavernNotices();
+  }, []);
 
   const filteredRooms = useMemo(() => {
     const query = roomSearch.trim().toLowerCase();
@@ -289,6 +303,7 @@ export function TavernScreen() {
     if (result.ok) {
       playSound("door");
       setActiveRoomId(roomId);
+      markRoomRead(roomId);
       setJoinPasswords((current) => ({ ...current, [roomId]: "" }));
     }
   }
@@ -300,6 +315,7 @@ export function TavernScreen() {
     notify(result.message, result.ok, "Taverna");
     if (result.ok) {
       playSound("door");
+      markRoomRead(roomId);
       if (activeRoomId === roomId) setActiveRoomId(null);
     }
   }
@@ -372,6 +388,7 @@ export function TavernScreen() {
     if (result.ok && result.roomId) {
       playSound("door");
       setActiveRoomId(result.roomId);
+      markRoomRead(result.roomId);
     }
   }
 
@@ -758,6 +775,7 @@ export function TavernScreen() {
         onClose={() => {
           if (activeRoom) {
             playSound("door");
+            markRoomRead(activeRoom.id);
             void announceAway(activeRoom.id);
           }
           setActiveRoomId(null);
