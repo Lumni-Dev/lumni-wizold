@@ -1,4 +1,4 @@
 export const RECOVERY = {
-  tickSeconds: 15,
+  tickSeconds: 10,
   healthPerTick: 0.05,
 };
