@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { api } from "@/controllers/api.client";
+import { useActivityLock } from "@/controllers/use-activity-lock";
 import { useGame } from "@/controllers/game.context";
 import {
   describeArenaHistory,
@@ -122,6 +123,7 @@ function DuelReport({ report }: { report: ArenaResolution }) {
 export function ArenaScreen() {
   const { state, character, stats, pet, moon, drawOpponent, challengeArena, sufferBlow, landArena } =
     useGame();
+  const { locked } = useActivityLock();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [roster, setRoster] = useState<Hunter[]>([]);
@@ -326,7 +328,7 @@ export function ArenaScreen() {
               <Tooltip label={view.reason}>
                 <Button
                   variant="primary"
-                  disabled={!view.canFight || busy}
+                  disabled={!view.canFight || busy || locked}
                   onClick={challengeDrawn}
                 >
                   {busy ? "No fosso..." : "Buscar adversário"}
@@ -528,7 +530,7 @@ export function ArenaScreen() {
                       >
                         <Button
                           variant={inBand && !resting ? "primary" : "outline"}
-                          disabled={!inBand || resting || !view.canFight || busy}
+                          disabled={!inBand || resting || !view.canFight || busy || locked}
                           onClick={() => challenge(hunter, rival)}
                         >
                           {!inBand ? "Fora da faixa" : resting ? "Descansando" : "Desafiar"}

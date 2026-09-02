@@ -9,6 +9,7 @@ import {
   listExercises,
   trainingSummaryLine,
 } from "@/controllers/training.controller";
+import { useActivityLock } from "@/controllers/use-activity-lock";
 import { usePageActivity } from "@/controllers/use-page-activity";
 import {
   MAX_ATTRIBUTE_VALUE,
@@ -31,6 +32,7 @@ import { PageHeader } from "../layout/page-header";
 export function TrainingScreen() {
   const { state, character, stats, activity, setActivity } = useGame();
   usePageActivity(["train"]);
+  const { locked } = useActivityLock();
   const runtime = useSyncExternalStore(
     activityRuntimeStore.subscribe,
     activityRuntimeStore.snapshot,
@@ -157,7 +159,7 @@ export function TrainingScreen() {
                   <Button
                     variant={active ? "secondary" : ready ? "primary" : "outline"}
                     onClick={() => toggleTraining(exercise.id, ready)}
-                    disabled={active ? !opting : !ready}
+                    disabled={active ? !opting : !ready || locked}
                   >
                     {opting ? "Parar (" + cooldown + ")" : active ? "Treinando..." : "Treinar"}
                   </Button>
@@ -230,7 +232,7 @@ export function TrainingScreen() {
                 <Button
                   variant={petActive ? "secondary" : petReady ? "primary" : "outline"}
                   onClick={() => toggleTraining(PET_EXERCISE_ID, petReady)}
-                  disabled={petActive ? cooldown === null : !petReady}
+                  disabled={petActive ? cooldown === null : !petReady || locked}
                 >
                   {petActive && cooldown !== null
                     ? "Parar (" + cooldown + ")"

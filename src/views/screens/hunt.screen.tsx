@@ -9,6 +9,7 @@ import {
   resolveHuntCreatureId,
   type HuntReport,
 } from "@/controllers/hunt.controller";
+import { useActivityLock } from "@/controllers/use-activity-lock";
 import { usePageActivity } from "@/controllers/use-page-activity";
 import { emphasizeDamage, narrationOf, type NarrationLine } from "../presenters/hunt.presenter";
 import { DANGER_LABEL } from "@/models/entities/territory";
@@ -151,6 +152,7 @@ function CombatReport({ report, lines }: { report: HuntReport; lines: NarrationL
 export function HuntScreen() {
   const { state, character, pet, moon, activity, setActivity } = useGame();
   usePageActivity(["hunt"]);
+  const { locked } = useActivityLock();
   const runtime = useSyncExternalStore(
     activityRuntimeStore.subscribe,
     activityRuntimeStore.snapshot,
@@ -389,7 +391,7 @@ export function HuntScreen() {
                     <Button
                       variant={active ? "secondary" : available ? "primary" : "outline"}
                       onClick={() => toggleHunt(territory.id, available)}
-                      disabled={active ? !opting : !available}
+                      disabled={active ? !opting : !available || locked}
                     >
                       {opting ? "Parar (" + cooldown + ")" : active ? "Caçando..." : "Caçar"}
                     </Button>

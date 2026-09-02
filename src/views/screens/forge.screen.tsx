@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { activityRuntimeStore } from "@/controllers/activity-runtime";
 import { useGame } from "@/controllers/game.context";
 import { listForge, listMining } from "@/controllers/forge.controller";
+import { useActivityLock } from "@/controllers/use-activity-lock";
 import { usePageActivity } from "@/controllers/use-page-activity";
 import type { Activity } from "@/models/entities/activity";
 import {
@@ -58,6 +59,7 @@ const FORGE_PAGE_SIZE = 5;
 export function ForgeScreen() {
   const { state, character, activity, setActivity } = useGame();
   usePageActivity(["mine", "forge"]);
+  const { locked } = useActivityLock();
   const runtime = useSyncExternalStore(
     activityRuntimeStore.subscribe,
     activityRuntimeStore.snapshot,
@@ -268,7 +270,9 @@ export function ForgeScreen() {
                   </span>
                   <Button
                     variant={activeOre ? "secondary" : selectedAvailable ? "primary" : "outline"}
-                    disabled={activeOre ? !mineOpting : !selectedAvailable || activeItem !== null}
+                    disabled={
+                      activeOre ? !mineOpting : !selectedAvailable || activeItem !== null || locked
+                    }
                     onClick={() => toggleMining(effectiveOre, selectedAvailable)}
                     aria-label={activeOre ? "Parar de minerar" : "Minerar o veio escolhido"}
                   >
@@ -407,7 +411,7 @@ export function ForgeScreen() {
                           forgeActive ? "secondary" : forgeEntry.canForge ? "primary" : "outline"
                         }
                         disabled={
-                          forgeActive ? !forgeOpting : !forgeEntry.canForge || activeOre !== null
+                          forgeActive ? !forgeOpting : !forgeEntry.canForge || activeOre !== null || locked
                         }
                         onClick={() => toggleForge()}
                         aria-label={forgeActive ? "Parar de forjar" : "Forjar a peça escolhida"}
