@@ -21,6 +21,7 @@ import { List, ListRow } from "../components/list";
 import { EmptyState } from "../components/empty-state";
 import { Pagination } from "../components/pagination";
 import { Panel } from "../components/panel";
+import { Spinner } from "../components/spinner";
 import { Tag } from "../components/tag";
 import { PageHeader } from "../layout/page-header";
 
@@ -31,11 +32,14 @@ export function RankingScreen() {
   const [search, setSearch] = useState("");
   const [gender, setGender] = useState<Gender | "all">("all");
   const [roster, setRoster] = useState<Hunter[]>([]);
+  const [rosterLoading, setRosterLoading] = useState(true);
 
   useEffect(() => {
     let alive = true;
     void api<{ hunters: Hunter[] }>("GET", "/api/roster").then((answer) => {
-      if (alive && answer.ok && answer.data) setRoster(answer.data.hunters);
+      if (!alive) return;
+      if (answer.ok && answer.data) setRoster(answer.data.hunters);
+      setRosterLoading(false);
     });
     return () => {
       alive = false;
@@ -120,7 +124,15 @@ export function RankingScreen() {
           ) : undefined
         }
       >
-        {view.entries.length === 0 ? (
+        {rosterLoading ? (
+          <div
+            role="status"
+            className="flex flex-col items-center justify-center gap-3 px-4 py-12"
+          >
+            <Spinner size="medium" />
+            <p className="heading text-[11px] text-ink-faint">Carregando...</p>
+          </div>
+        ) : view.entries.length === 0 ? (
           <div className="p-4">
             <EmptyState
               title="Ninguém com esse nome"
