@@ -325,7 +325,11 @@ export function ArenaScreen() {
             <span className="text-[11px] text-ink-faint">
               {view.reason ?? "Escolha um adversário da sua faixa ou busque um ao acaso."}
             </span>
-            <BodyGate open={!busy && view.charges.left > 0} reason="Com pouca vida, recupere-se antes do fosso.">
+            <BodyGate
+              open={!busy && view.charges.left > 0}
+              requireFull
+              reason="Recupere-se antes do fosso."
+            >
               <Tooltip label={view.reason}>
                 <Button
                   variant="primary"
@@ -497,7 +501,8 @@ export function ArenaScreen() {
                   <CardFooter>
                     <BodyGate
                       open={inBand && !resting && !busy && view.charges.left > 0}
-                      reason="Só a fera desce ao fosso."
+                      requireFull
+                      reason="Recupere-se antes do fosso."
                     >
                       <Tooltip
                         label={

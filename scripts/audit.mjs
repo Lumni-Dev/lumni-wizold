@@ -689,6 +689,14 @@ sec("arena");
     "vida no chão é recusada",
     arenaCtrl.resolveArena(bleeding, pit, rival.id, random).ok === false,
   );
+  const wounded = {
+    ...inBand,
+    character: { ...inBand.character, health: inBand.character.health - 1 },
+  };
+  ok(
+    "vida incompleta é recusada",
+    arenaCtrl.resolveArena(wounded, pit, rival.id, random).ok === false,
+  );
   const duel = arenaCtrl.resolveArena(inBand, pit, rival.id, seededRandom(7));
   ok("duelo válido resolve", duel.ok === true);
   if (duel.ok) {

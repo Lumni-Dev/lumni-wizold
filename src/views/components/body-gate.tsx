@@ -8,17 +8,21 @@ import { RecoveryButton } from "./recovery-button";
 export function BodyGate({
   open,
   reason,
+  requireFull = false,
   children,
 }: {
   open: boolean;
   reason: string;
+  requireFull?: boolean;
   children: ReactNode;
 }) {
   const { character, stats, activity, setActivity, rest } = useGame();
   if (!character || !stats || !open) return <>{children}</>;
 
-  const lowHealth = character.health <= stats.maxHealth * MIN_HEALTH_RATIO_TO_ACT;
-  if (!lowHealth) return <>{children}</>;
+  const blocked = requireFull
+    ? character.health < stats.maxHealth
+    : character.health <= stats.maxHealth * MIN_HEALTH_RATIO_TO_ACT;
+  if (!blocked) return <>{children}</>;
 
   return (
     <RecoveryButton
@@ -26,7 +30,7 @@ export function BodyGate({
       beat={String(character.health)}
       recoveringLabel="Recuperando-se..."
       label="Recuperar-se"
-      tooltip={"Vida baixa demais. " + reason}
+      tooltip={requireFull ? reason : "Vida baixa demais. " + reason}
       onClick={activity?.kind === "rest" ? () => setActivity(null) : rest}
     />
   );

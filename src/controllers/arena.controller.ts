@@ -1,4 +1,3 @@
-import { MIN_HEALTH_RATIO_TO_ACT } from "@/shared/constants/game";
 import { capBronze, formatCooldown, formatNumber, formatBronze } from "@/shared/utils/format";
 import { defaultRandom, pickOne, type Random } from "@/shared/utils/random";
 import { normalizeText } from "@/shared/utils/text";
@@ -74,7 +73,7 @@ export function listArena(
   }
   const band = arenaBand(character.level);
   const stats = deriveStats(character, state.equipment, state.pet);
-  const healthy = character.health > stats.maxHealth * MIN_HEALTH_RATIO_TO_ACT;
+  const healthy = character.health >= stats.maxHealth;
   const charges = arenaCharges(state.arenaDuels, now);
   const ready = healthy && charges.left > 0;
   const pit = roster.filter((hunter) => hunter.id !== character.id);
@@ -104,7 +103,7 @@ export function listArena(
     ready,
     canFight: ready,
     reason: !healthy
-      ? "Vida baixa demais para subir na arena. Recupere-se ou use uma poção."
+      ? "Recupere-se antes do fosso: a arena só abre com o corpo inteiro."
       : charges.left === 0
         ? "Os ataques do dia acabaram: o próximo volta em " +
           formatCooldown(charges.returnsIn) +
@@ -223,8 +222,8 @@ export function resolveArena(
     );
   }
   const stats = deriveStats(character, state.equipment, state.pet);
-  if (character.health <= stats.maxHealth * MIN_HEALTH_RATIO_TO_ACT) {
-    return failure(state, "Vida baixa demais para subir na arena. Recupere-se ou use uma poção.");
+  if (character.health < stats.maxHealth) {
+    return failure(state, "Recupere-se antes do fosso: a arena só abre com o corpo inteiro.");
   }
   const foe = arenaCombatant(hunter);
   const ally = canPetFight(state.pet) ? state.pet : null;
