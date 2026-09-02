@@ -2,26 +2,17 @@ import { capBronze, formatReais, formatBronze } from "@/shared/utils/format";
 import { findPack, STORE_PACKS, type StorePack } from "@/models/data/store-packs";
 import type { GameState } from "@/models/entities/game-state";
 import { failure, success, type Result } from "@/models/entities/result";
-import { packBronze, bronzePerReal, packHuntEquivalent } from "@/models/rules/store";
+import { packBronze } from "@/models/rules/store";
 import { addLog } from "./log.controller";
 import { updateCharacter } from "./character.controller";
 
 export interface StoreOffer {
   pack: StorePack;
   bronze: number;
-  perReal: number;
-  huntEquivalent: number;
 }
 
-export function listPacks(state: GameState): StoreOffer[] {
-  const level = state.character?.level ?? 1;
-
-  return STORE_PACKS.map((pack) => ({
-    pack,
-    bronze: packBronze(pack, level),
-    perReal: bronzePerReal(pack, level),
-    huntEquivalent: packHuntEquivalent(pack, level),
-  }));
+export function listPacks(_state: GameState): StoreOffer[] {
+  return STORE_PACKS.map((pack) => ({ pack, bronze: packBronze(pack) }));
 }
 
 export function purchasePack(state: GameState, packId: string): Result<StoreOffer> {
@@ -31,7 +22,7 @@ export function purchasePack(state: GameState, packId: string): Result<StoreOffe
   const pack = findPack(packId);
   if (!pack) return failure(state, "Esse pacote não existe mais.");
 
-  const bronze = packBronze(pack, character.level);
+  const bronze = packBronze(pack);
   const next = updateCharacter(state, (current) => ({
     ...current,
     bronze: capBronze(current.bronze + bronze),
@@ -45,12 +36,7 @@ export function purchasePack(state: GameState, packId: string): Result<StoreOffe
     formatReais(pack.priceCents) +
     ".";
 
-  return success(addLog(next, "character", message), message, {
-    pack,
-    bronze,
-    perReal: bronzePerReal(pack, character.level),
-    huntEquivalent: packHuntEquivalent(pack, character.level),
-  });
+  return success(addLog(next, "character", message), message, { pack, bronze });
 }
 
 export function applyVipSubscription(

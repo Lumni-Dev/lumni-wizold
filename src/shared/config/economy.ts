@@ -9,10 +9,8 @@ export const ECONOMY = {
 
 /** WCoins store packs scale with the current band set, not a flat hunt count. */
 export const STORE = {
-  /** About one market piece of the band set. */
-  onePieceShare: 1 / 7,
-  /** Most of a band set; enough to pivot mid-band without stopping training. */
-  midSetShare: 0.58,
-  /** Full band set plus forge headroom. */
-  fullSetShare: 1.5,
+  /** Flat WCoins each pouch hands over, the same at every level. */
+  onePouch: 20_000,
+  twoPouches: 80_000,
+  threePouches: 200_000,
 } as const;

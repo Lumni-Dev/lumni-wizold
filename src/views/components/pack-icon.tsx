@@ -2,7 +2,7 @@
 
 import { useArt } from "@/controllers/art.context";
 import type { StorePack } from "@/models/data/store-packs";
-import { formatNumber } from "@/shared/utils/format";
+import { formatBronze } from "@/shared/utils/format";
 import { IconArt, IconFrame, type IconSize } from "./icon-frame";
 
 export function PackIcon({
@@ -19,7 +19,7 @@ export function PackIcon({
 
   return (
     <IconFrame size={size} tone={pack.highlight ? "strong" : "default"} className={className}>
-      {source ? <IconArt source={source} /> : formatNumber(Math.round(pack.setShare * 100)) + "%"}
+      {source ? <IconArt source={source} /> : formatBronze(pack.bronze)}
     </IconFrame>
   );
 }

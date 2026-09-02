@@ -122,7 +122,7 @@ export function StoreScreen() {
       </Panel>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {offers.map(({ pack, bronze, perReal, huntEquivalent }) => (
+        {offers.map(({ pack, bronze }) => (
           <Card
             key={pack.id}
             height="fill"
@@ -139,9 +139,7 @@ export function StoreScreen() {
             </CardBody>
 
             <List className="border-t border-edge">
-              <DataRow label="Caçadas da sua faixa" value={formatNumber(huntEquivalent)} />
               <DataRow label="Você recebe" value={formatBronze(bronze)} />
-              <DataRow label="Por real" value={formatBronze(perReal)} />
               <DataRow label="Preço" value={formatReais(pack.priceCents)} />
             </List>
 

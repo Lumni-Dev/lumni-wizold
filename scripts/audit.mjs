@@ -37,7 +37,6 @@ const storeRules = load("models/rules/store.js");
 const rankingRules = load("models/rules/ranking.js");
 const species = load("models/data/species.js");
 const sets = load("models/data/equipment-sets.js");
-const equipment = load("models/data/equipment/index.js");
 const items = load("models/data/items.js");
 const creaturesData = load("models/data/creatures.js");
 const territoriesData = load("models/data/territories.js");
@@ -475,16 +474,15 @@ sec("economia");
       );
     }
     for (const pack of packsData.STORE_PACKS) {
-      const set = equipment.setTotalPrice(equipment.setForLevel(level));
       ok(
-        "pacote " + pack.id + " NV " + level + " = fração do conjunto",
-        storeRules.packBronze(pack, level) === Math.round(set * pack.setShare),
+        "pacote " + pack.id + " NV " + level + " entrega o mesmo em qualquer nível",
+        storeRules.packBronze(pack) === pack.bronze,
       );
     }
   }
   ok(
-    "três pacotes ancorados no conjunto",
-    json(packsData.STORE_PACKS.map((pack) => pack.setShare)) === json([1 / 7, 0.58, 1.5]),
+    "três pacotes de valor fixo",
+    json(packsData.STORE_PACKS.map((pack) => pack.bronze)) === json([20000, 80000, 200000]),
   );
   ok(
     "preços dos pacotes",
@@ -1704,7 +1702,7 @@ sec("inventário e mercado");
     "pacote credita a bolsa da loja",
     store.ok &&
       store.state.character.bronze ===
-        state.character.bronze + storeRules.packBronze(packsData.STORE_PACKS[1], 1),
+        state.character.bronze + storeRules.packBronze(packsData.STORE_PACKS[1]),
   );
 }
 sec("nomes");

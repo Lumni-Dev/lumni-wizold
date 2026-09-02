@@ -472,17 +472,11 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     title: "Wizold Store",
     summary: "WCoins por dinheiro, para quem quer pular a espera.",
     lines: [
-      "Três pacotes ancorados no conjunto da faixa: uma peça, quase o conjunto inteiro, ou o conjunto com folga de bigorna.",
+      "Três pacotes de WCoins, com a mesma quantia em qualquer nível.",
       ...STORE_PACKS.map(
         (pack) =>
-          pack.name +
-          ": ~" +
-          Math.round(pack.setShare * 100) +
-          "% do conjunto da faixa por " +
-          formatReais(pack.priceCents) +
-          ".",
+          pack.name + ": " + formatBronze(pack.bronze) + " por " + formatReais(pack.priceCents) + ".",
       ),
-      "Subir de faixa aumenta o WCoins que o mesmo pacote entrega, então comprar cedo nunca vira atalho: o que está à venda é tempo proporcional ao custo da faixa.",
       "A loja não vende nível, atributo nem equipamento: experiência só a caça dá, e ponto de atributo só o treino dá.",
       "O pagamento abre no checkout do Stripe e os WCoins caem na conta assim que ele confirma.",
       "O histórico de compras fica na própria loja, cinco por página: valor, data e o status de cada pacote, de aguardando pagamento a aprovado, expirado ou devolvido.",
