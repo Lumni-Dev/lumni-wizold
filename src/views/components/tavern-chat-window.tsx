@@ -54,7 +54,7 @@ export function TavernChatWindow() {
     tavernChatStore.serverSnapshot,
   );
   const { state, character, notify, invite } = useGame();
-  const { identity, rooms, activeRoom, sendMessage, announceAway } = useTavern(
+  const { identity, rooms, ready, activeRoom, sendMessage, announceAway } = useTavern(
     chat.open ? chat.roomId : null,
   );
   const packIds = useMemo(() => listPack(state).map((mate) => mate.id), [state]);
@@ -184,10 +184,10 @@ export function TavernChatWindow() {
   }, [chat.roomId, chat.open]);
 
   useEffect(() => {
-    if (!chat.open || !chat.roomId) return;
+    if (!ready || !chat.open || !chat.roomId) return;
     const entry = rooms.find((summary) => summary.room.id === chat.roomId);
     if (!entry?.isMember) tavernChatStore.closeWindow();
-  }, [chat.open, chat.roomId, rooms]);
+  }, [ready, chat.open, chat.roomId, rooms]);
 
   useEffect(() => {
     if (!chat.open) return;
@@ -231,7 +231,10 @@ export function TavernChatWindow() {
     }
   }
 
-  function startDrag(event: ReactPointerEvent<HTMLButtonElement>) {
+  function startDrag(event: ReactPointerEvent<HTMLElement>) {
+    if (event.button !== 0) return;
+    const origin = event.target;
+    if (origin instanceof Element && origin.closest("button")) return;
     event.preventDefault();
     const shell = shellRef.current;
     if (!shell) return;
@@ -272,7 +275,10 @@ export function TavernChatWindow() {
           aria-label={activeRoom.name}
           className="flex max-h-[min(32rem,calc(100svh-6rem))] w-full flex-col overflow-hidden rounded-lg border border-edge-strong bg-surface shadow-[0_24px_60px_-20px_rgba(0,0,0,0.95)]"
         >
-          <header className="flex items-center gap-3 border-b border-edge bg-surface-high px-4 py-3">
+          <header
+            className="flex cursor-grab items-center gap-3 select-none border-b border-edge bg-surface-high px-4 py-3 active:cursor-grabbing"
+            onPointerDown={startDrag}
+          >
             <h2 className="heading min-w-0 flex-1 truncate text-[11px] text-ink">{activeRoom.name}</h2>
             <span className="shrink-0 font-mono text-[11px] text-ink-faint">
               {tavernRoomChatAction(activeRoom)}

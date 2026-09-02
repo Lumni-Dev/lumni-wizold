@@ -22,6 +22,7 @@ interface TavernBoard {
 export function useTavern(activeRoomId: string | null) {
   const { character, authenticated } = useGame();
   const [board, setBoard] = useState<TavernBoard>({ identity: null, rooms: [] });
+  const [ready, setReady] = useState(false);
   const boardRef = useRef(board);
   useEffect(() => {
     boardRef.current = board;
@@ -29,9 +30,14 @@ export function useTavern(activeRoomId: string | null) {
   const enabled = authenticated && character !== null;
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled) {
+      setBoard({ identity: null, rooms: [] });
+      setReady(false);
+      return;
+    }
     return subscribeTavernBoard((payload) => {
       setBoard({ identity: payload.identity, rooms: payload.rooms });
+      setReady(true);
     });
   }, [enabled]);
 
@@ -81,6 +87,7 @@ export function useTavern(activeRoomId: string | null) {
   return {
     identity,
     rooms,
+    ready,
     activeRoom,
     atTables,
     refresh: async () => {

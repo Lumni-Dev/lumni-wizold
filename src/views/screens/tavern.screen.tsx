@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { tavernChatStore } from "@/controllers/tavern-chat.store";
 import { useIsDesktop } from "@/controllers/use-is-desktop";
@@ -74,7 +73,6 @@ function MemberName({
 }
 
 export function TavernScreen() {
-  const pathname = usePathname();
   const isDesktop = useIsDesktop();
   const {
     state,
@@ -103,7 +101,6 @@ export function TavernScreen() {
   const [inviting, setInviting] = useState(false);
   const [removing, setRemoving] = useState<PackMate | null>(null);
   const [invites, setInvites] = useState<PackInvite[]>([]);
-  const [mobileRoomId, setMobileRoomId] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [emojiRect, setEmojiRect] = useState<DOMRect | null>(null);
@@ -114,11 +111,17 @@ export function TavernScreen() {
   const emojiRef = useRef<HTMLDivElement>(null);
   const messagesRef = useRef<HTMLUListElement>(null);
   const sentMapRef = useRef<TavernSentMap>({});
-  const wasDesktopRef = useRef(isDesktop);
+  const openRoomId = chat.open ? chat.roomId : null;
+  const [layoutReady, setLayoutReady] = useState(false);
+  useEffect(() => {
+    setLayoutReady(true);
+  }, []);
+  const mobileChat = layoutReady && !isDesktop;
 
   const {
     identity,
     rooms,
+    ready,
     activeRoom,
     createRoom,
     joinRoom,
@@ -127,7 +130,7 @@ export function TavernScreen() {
     openDirect,
     sendMessage,
     announceAway,
-  } = useTavern(isDesktop ? null : mobileRoomId);
+  } = useTavern(mobileChat ? openRoomId : null);
   const [closingRoomId, setClosingRoomId] = useState<string | null>(null);
 
   const fetchInvitesRef = useRef(fetchInvites);
@@ -235,10 +238,10 @@ export function TavernScreen() {
   const mobileLastMessageId = activeRoom?.messages[activeRoom.messages.length - 1]?.id ?? null;
 
   useEffect(() => {
-    if (isDesktop) return;
+    if (!mobileChat) return;
     const list = messagesRef.current;
     if (list) list.scrollTop = list.scrollHeight;
-  }, [isDesktop, mobileLastMessageId]);
+  }, [mobileChat, mobileLastMessageId]);
 
   const lastMineAt = useMemo(() => {
     if (!activeRoom) return null;
@@ -249,9 +252,9 @@ export function TavernScreen() {
   }, [activeRoom, selfId]);
 
   useEffect(() => {
-    if (isDesktop || !mobileRoomId) return;
+    if (!mobileChat || !openRoomId) return;
     const compute = () => {
-      const marker = sentMapRef.current[mobileRoomId];
+      const marker = sentMapRef.current[openRoomId];
       const left =
         marker !== undefined
           ? MESSAGE_COOLDOWN_MS - (Date.now() - marker)
@@ -271,55 +274,33 @@ export function TavernScreen() {
       window.clearTimeout(first);
       window.clearInterval(interval);
     };
-  }, [isDesktop, lastMineAt, mobileRoomId, sentBeat]);
+  }, [mobileChat, lastMineAt, openRoomId, sentBeat]);
 
   const lastMessageAt = activeRoom?.messages[activeRoom.messages.length - 1]?.at ?? null;
   useEffect(() => {
-    if (isDesktop || !mobileRoomId || !lastMessageAt) return;
-    const timer = window.setTimeout(() => markRoomRead(mobileRoomId), 0);
+    if (!mobileChat || !openRoomId || !lastMessageAt) return;
+    const timer = window.setTimeout(() => markRoomRead(openRoomId), 0);
     return () => window.clearTimeout(timer);
-  }, [isDesktop, mobileRoomId, lastMessageAt, markRoomRead]);
+  }, [mobileChat, openRoomId, lastMessageAt, markRoomRead]);
 
   useEffect(() => {
-    if (isDesktop || !mobileRoomId) return;
-    const entry = rooms.find((summary) => summary.room.id === mobileRoomId);
-    if (!entry?.isMember) setMobileRoomId(null);
-  }, [isDesktop, mobileRoomId, rooms]);
+    if (!ready || !mobileChat || !openRoomId) return;
+    const entry = rooms.find((summary) => summary.room.id === openRoomId);
+    if (!entry?.isMember) tavernChatStore.closeWindow();
+  }, [ready, mobileChat, openRoomId, rooms]);
 
   useEffect(() => {
-    if (wasDesktopRef.current && !isDesktop) {
-      if (chat.open && chat.roomId) {
-        tavernChatStore.closeWindow();
-        if (pathname.startsWith("/tavern")) setMobileRoomId(chat.roomId);
-      }
-    }
-    if (!wasDesktopRef.current && isDesktop && mobileRoomId) {
-      tavernChatStore.openRoom(mobileRoomId);
-      setMobileRoomId(null);
-    }
-    wasDesktopRef.current = isDesktop;
-  }, [isDesktop, chat.open, chat.roomId, mobileRoomId, pathname]);
-
-  useEffect(() => {
-    if (!mobileRoomId) return;
+    if (!mobileChat || !openRoomId) return;
     setDraft("");
     setEmojiOpen(false);
     setInvitingMemberId(null);
     setSentBeat(0);
     setCooldownLeft(0);
-  }, [mobileRoomId]);
-
-  const openRoomId = isDesktop
-    ? chat.open
-      ? chat.roomId
-      : null
-    : activeRoom
-      ? mobileRoomId
-      : null;
+  }, [mobileChat, openRoomId]);
 
   useEffect(() => {
     setReadMap(tavernReadRepository.load());
-  }, [rooms, chat.open, chat.roomId, mobileRoomId]);
+  }, [rooms, chat.open, chat.roomId]);
 
   const filteredRooms = useMemo(() => {
     const query = roomSearch.trim().toLowerCase();
@@ -353,19 +334,10 @@ export function TavernScreen() {
   const roomsOnPage = pageOf(filteredRooms, currentPage, PAGE_SIZE);
 
   function showChatRoom(roomId: string) {
-    if (isDesktop) {
-      const previous = tavernChatStore.openRoom(roomId);
-      if (previous) {
-        markRoomRead(previous);
-        void announceAway(previous);
-      }
-    } else {
-      const previous = mobileRoomId && mobileRoomId !== roomId ? mobileRoomId : null;
-      if (previous) {
-        markRoomRead(previous);
-        void announceAway(previous);
-      }
-      setMobileRoomId(roomId);
+    const previous = tavernChatStore.openRoom(roomId);
+    if (previous) {
+      markRoomRead(previous);
+      void announceAway(previous);
     }
     markRoomRead(roomId);
   }
@@ -389,11 +361,7 @@ export function TavernScreen() {
     if (result.ok) {
       playSound("door");
       markRoomRead(roomId);
-      if (isDesktop) {
-        if (tavernChatStore.isOpenFor(roomId)) tavernChatStore.closeWindow();
-      } else if (mobileRoomId === roomId) {
-        setMobileRoomId(null);
-      }
+      if (tavernChatStore.isOpenFor(roomId)) tavernChatStore.closeWindow();
     }
   }
 
@@ -446,24 +414,24 @@ export function TavernScreen() {
 
   function closeMobileChat() {
     if (!activeRoom) {
-      setMobileRoomId(null);
+      tavernChatStore.closeWindow();
       return;
     }
     playSound("door");
     markRoomRead(activeRoom.id);
     void announceAway(activeRoom.id);
-    setMobileRoomId(null);
+    tavernChatStore.closeWindow();
     setDraft("");
     setEmojiOpen(false);
   }
 
   async function submitMessage(event: FormEvent) {
     event.preventDefault();
-    if (!mobileRoomId) return;
-    const result = await sendMessage(mobileRoomId, draft);
+    if (!openRoomId) return;
+    const result = await sendMessage(openRoomId, draft);
     if (!result) return;
     if (result.ok) {
-      sentMapRef.current = { ...sentMapRef.current, [mobileRoomId]: Date.now() };
+      sentMapRef.current = { ...sentMapRef.current, [openRoomId]: Date.now() };
       tavernSentRepository.save(sentMapRef.current);
       setSentBeat((count) => count + 1);
       playSound("chat");
@@ -854,7 +822,7 @@ export function TavernScreen() {
         </div>
       </div>
 
-      {!isDesktop ? (
+      {mobileChat ? (
         <Modal
           open={Boolean(activeRoom)}
           title={activeRoom ? activeRoom.name : ""}
@@ -919,11 +887,7 @@ export function TavernScreen() {
           if (result) notify(result.message, result.ok, "Taverna");
           if (result?.ok) {
             playSound("door");
-            if (isDesktop) {
-              if (tavernChatStore.isOpenFor(roomId)) tavernChatStore.closeWindow();
-            } else if (mobileRoomId === roomId) {
-              setMobileRoomId(null);
-            }
+            if (tavernChatStore.isOpenFor(roomId)) tavernChatStore.closeWindow();
           }
           setClosingRoomId(null);
         }}

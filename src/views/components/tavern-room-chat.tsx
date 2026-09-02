@@ -57,7 +57,7 @@ function ChatNick({
   status?: PresenceStatus;
 }) {
   return (
-    <span className="mr-2 inline-flex items-center gap-1">
+    <span className="mr-2 inline-flex items-center gap-2">
       {status ? (
         <Tooltip label={PRESENCE_LABELS[status]}>
           <PresenceDot size="small" status={status} />
@@ -88,8 +88,10 @@ export function TavernRoomChatMembers({
 }) {
   return (
     <div className="border-b border-edge px-4 py-3">
-      <p className="mb-2 text-[10px] uppercase tracking-[0.16em] text-ink-faint">Na mesa</p>
-      <ul className="flex flex-nowrap items-center gap-2 overflow-x-auto pb-1">
+      <ul
+        aria-label="Na mesa"
+        className="flex flex-nowrap items-center gap-2 overflow-x-auto pb-1"
+      >
         {activeRoom.members.map((member) => {
           const yourself = member.id === identityId;
           const kept = isInPack(state, member.id);
