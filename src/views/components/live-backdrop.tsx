@@ -76,14 +76,13 @@ export function LiveBackdrop({ shade = "soft" }: { shade?: "soft" | "deep" }) {
       aria-hidden
       className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
     >
-      {failed ? (
-        /* eslint-disable-next-line @next/next/no-img-element */
-        <img
-          src={WALLPAPER}
-          alt=""
-          className="live-backdrop-media absolute inset-0 h-full w-full object-cover object-top"
-        />
-      ) : (
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={WALLPAPER}
+        alt=""
+        className="live-backdrop-media absolute inset-0 h-full w-full object-cover object-top"
+      />
+      {!failed ? (
         <video
           ref={videoRef}
           src={VIDEO}
@@ -96,7 +95,7 @@ export function LiveBackdrop({ shade = "soft" }: { shade?: "soft" | "deep" }) {
           onError={() => setFailed(true)}
           className="live-backdrop-media absolute inset-0 h-full w-full object-cover object-top"
         />
-      )}
+      ) : null}
 
       <div
         className={
