@@ -40,6 +40,44 @@ const economy = require(join(BUILD, "models/rules/economy.js"));
 const stats = require(join(BUILD, "models/rules/stats.js"));
 const game = require(join(BUILD, "shared/constants/game.js"));
 const progression = require(join(BUILD, "models/rules/progression.js"));
+const tuning = require(join(BUILD, "shared/constants/tuning/index.js"));
+const items = require(join(BUILD, "models/data/items.js"));
+const creatures = require(join(BUILD, "models/data/creatures.js"));
+const territories = require(join(BUILD, "models/data/territories.js"));
+const forgeRules = require(join(BUILD, "models/rules/forge.js"));
+
+function preyAt(level) {
+  const area =
+    territories.TERRITORIES.find((one) => level >= one.minLevel && level <= one.maxLevel) ??
+    territories.TERRITORIES[territories.TERRITORIES.length - 1];
+  const pool = area.creatures
+    .map((id) => creatures.findCreature(id))
+    .filter(Boolean)
+    .sort((left, right) => left.level - right.level);
+  const reached = pool.filter((one) => one.level <= level);
+  return reached[reached.length - 1] ?? pool[0];
+}
+
+function perHunt(level) {
+  const prey = preyAt(level);
+  if (!prey) return economy.huntPurse(level);
+  const coin = (prey.minBronze + prey.maxBronze) / 2;
+  const loot = (prey.drops ?? []).reduce((total, drop) => {
+    const item = items.findItem(drop.itemId);
+    if (!item) return total;
+    const amount = ((drop.minimum ?? 1) + (drop.maximum ?? 1)) / 2;
+    return total + drop.chance * amount * Math.max(1, Math.round(item.price * 0.5));
+  }, 0);
+  return coin + loot;
+}
+
+function earnedBy(level) {
+  let total = 0;
+  for (let step = 1; step < level; step += 1) {
+    total += (tuning.levelRequirement(step) / tuning.levelYield(step)) * perHunt(step);
+  }
+  return total;
+}
 
 function huntsToReach(level) {
   let total = 0;
@@ -149,26 +187,45 @@ function build(name, level, index) {
     willpower: spread(),
   };
 
-  const worn = {};
-  const favourite = Math.round(level * (0.06 + random() * 0.2));
-  for (const slot of SLOTS) {
-    worn[slot] = {
-      itemId: sets.pieceId(set.key, slot),
-      enhancement: Math.max(
-        0,
-        Math.min(game.MAX_ENHANCEMENT, Math.round(favourite * (0.25 + random() * 0.95))),
-      ),
-    };
-  }
-
   const climbed = huntsToReach(level);
   const hunts = Math.max(1, Math.round(climbed * (0.94 + random() * 0.22)));
   const losses = Math.round(hunts * (0.03 + random() * 0.05));
-  const earned = hunts * economy.huntPurse(level) * 0.6;
-  const bronze = Math.max(
-    game.STARTING_BRONZE ?? 200,
-    Math.round(earned * (0.05 + random() * 0.3)),
-  );
+
+  let purse = earnedBy(level) + (game.STARTING_BRONZE ?? 200);
+  purse *= 0.62 + random() * 0.3;
+
+  const worn = {};
+  for (const slot of SLOTS) worn[slot] = null;
+  const price = sets.piecePrice(set);
+  const order = ["claw", "armor", "helmet", "pants", "boots", "necklace", "ring"];
+  for (const slot of order) {
+    if (!SLOTS.includes(slot)) continue;
+    if (purse < price) continue;
+    purse -= price;
+    worn[slot] = { itemId: sets.pieceId(set.key, slot), enhancement: 0 };
+  }
+
+  const dressed = SLOTS.filter((slot) => worn[slot] !== null);
+  if (dressed.length > 0) {
+    let anvil = purse * (0.15 + random() * 0.45);
+    let shards = hunts * (0.4 + random() * 0.5);
+    let slot = 0;
+    while (slot < dressed.length * 200) {
+      const piece = worn[dressed[slot % dressed.length]];
+      if (piece.enhancement >= game.MAX_ENHANCEMENT) break;
+      const strike = forgeRules.forgeBronzeCost(level, piece.enhancement) / 0.75;
+      const shard = tuning.forgeRequirement(piece.enhancement + 1) / 0.75;
+      if (strike > anvil || shard > shards) break;
+      anvil -= strike;
+      purse -= strike;
+      shards -= shard;
+      piece.enhancement += 1;
+      slot += 1;
+    }
+  }
+
+  purse -= purse * (0.1 + random() * 0.35);
+  const bronze = Math.max(game.STARTING_BRONZE ?? 200, Math.round(purse));
 
   const derived = stats.deriveStatsOf({ level, attributes, gender, form: "human" }, worn, null);
 
@@ -252,6 +309,7 @@ try {
     );
     for (const slot of SLOTS) {
       const piece = hunter.worn[slot];
+      if (!piece) continue;
       await client.query(
         "insert into equipped_items (character_id, slot, item_id, enhancement) values ($1,$2,$3,$4)",
         [characterId, slot, piece.itemId, piece.enhancement],
