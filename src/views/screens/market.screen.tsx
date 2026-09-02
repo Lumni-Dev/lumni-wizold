@@ -24,9 +24,6 @@ import { ConfirmDialog } from "../components/confirm-dialog";
 import { QuantityField } from "../components/quantity-field";
 import { enhancedName } from "@/models/rules/forge";
 import { ItemCard } from "../components/item-card";
-import { List, ListRow, RowText } from "../components/list";
-import { ItemIcon } from "../components/item-icon";
-import { Panel } from "../components/panel";
 import { EmptyState } from "../components/empty-state";
 import { FilteredEmptyState } from "../components/filtered-empty-state";
 import { PageHeader } from "../layout/page-header";
@@ -163,6 +160,7 @@ export function MarketScreen() {
         onChange={(next) => {
           setTab(next);
           setPage(1);
+          if (next === "buy" && category === "material") setCategory("all");
         }}
       />
 
@@ -242,42 +240,37 @@ export function MarketScreen() {
             onCategoryChange={pickCategory}
             onSetChange={pickSet}
             onSizeChange={pickSize}
+            includeMaterial
           />
 
           {visibleSellables.length === 0 ? (
             <FilteredEmptyState description="Nenhum item do inventário combina com a categoria escolhida." />
           ) : (
-            <Panel
-              title="Sua oferta"
-              description="A recompra é feita pela metade do preço de tabela."
-              padding="none"
-            >
-              <List>
-                {sellablesOnPage.map(({ item, quantity, enhancement }) => (
-                  <ListRow key={item.id + "-" + enhancement} padding="art">
-                    <ItemIcon item={item} enhancement={enhancement} />
-                    <RowText
-                      title={enhancedName(item.name, enhancement)}
-                      label={
-                        formatNumber(quantity) +
-                        " em estoque · " +
-                        formatBronze(sellOf(item)) +
-                        " cada"
-                      }
-                    />
-                    <Button
-                      variant="secondary"
-                      onClick={() => {
-                        setSelling(String(quantity));
-                        setDeal({ kind: "sell", item, quantity, total: 0, enhancement });
-                      }}
-                    >
-                      Vender
-                    </Button>
-                  </ListRow>
-                ))}
-              </List>
-            </Panel>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+              {sellablesOnPage.map(({ item, quantity, enhancement }) => (
+                <ItemCard
+                  key={item.id + "-" + enhancement}
+                  item={item}
+                  quantity={quantity}
+                  enhancement={enhancement}
+                  note="A recompra paga metade do preço de tabela."
+                  footer={
+                    <div className="w-full">
+                      <Button
+                        fullWidth
+                        variant="primary"
+                        onClick={() => {
+                          setSelling(String(quantity));
+                          setDeal({ kind: "sell", item, quantity, total: 0, enhancement });
+                        }}
+                      >
+                        {"Vender por " + formatBronze(sellOf(item))}
+                      </Button>
+                    </div>
+                  }
+                />
+              ))}
+            </div>
           )}
 
           <Pagination page={currentPage} pages={pages} onChange={setPage} />

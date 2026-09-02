@@ -33,10 +33,14 @@ export function inventoryCategoryFilterOptions(): FilterOption<CategoryFilter>[]
   ];
 }
 
-export function marketCategoryFilterOptions(): FilterOption<CategoryFilter>[] {
+export function marketCategoryFilterOptions(opts?: {
+  includeMaterial?: boolean;
+}): FilterOption<CategoryFilter>[] {
   return [
     { key: "all", label: "Tudo" },
-    ...ITEM_CATEGORIES.filter((category) => category !== "material").map((category) => ({
+    ...ITEM_CATEGORIES.filter(
+      (category) => opts?.includeMaterial === true || category !== "material",
+    ).map((category) => ({
       key: category,
       label: CATEGORY_PLURAL[category],
     })),

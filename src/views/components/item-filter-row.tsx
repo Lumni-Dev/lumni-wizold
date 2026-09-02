@@ -17,6 +17,7 @@ interface ItemFilterRowProps {
   onCategoryChange: (value: CategoryFilter) => void;
   onSetChange: (value: SetFilter) => void;
   onSizeChange: (value: SizeFilter) => void;
+  includeMaterial?: boolean;
 }
 
 export function ItemFilterRow({
@@ -26,16 +27,17 @@ export function ItemFilterRow({
   onCategoryChange,
   onSetChange,
   onSizeChange,
+  includeMaterial = false,
 }: ItemFilterRowProps) {
   const isPotion = category === "potion";
-  const isPet = category === "pet";
+  const isPet = category === "pet" || category === "material";
 
   return (
     <FilterRow>
       <FilterSelect
         label="Categoria"
         value={category}
-        options={marketCategoryFilterOptions()}
+        options={marketCategoryFilterOptions({ includeMaterial })}
         onChange={onCategoryChange}
       />
       {isPet ? null : isPotion ? (
