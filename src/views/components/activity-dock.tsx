@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { activityRuntimeStore } from "@/controllers/activity-runtime";
+import { activityMirrorStore, askToStop } from "@/controllers/activity-sync";
 import { findForgePiece, listMining } from "@/controllers/forge.controller";
 import { listTerritories, resolveHuntCreatureId } from "@/controllers/hunt.controller";
 import { useGame } from "@/controllers/game.context";
@@ -37,7 +38,18 @@ export function ActivityDock() {
     activityRuntimeStore.snapshot,
     activityRuntimeStore.serverSnapshot,
   );
-  const dock = runtime.dock;
+  const mirror = useSyncExternalStore(
+    activityMirrorStore.subscribe,
+    activityMirrorStore.snapshot,
+    activityMirrorStore.serverSnapshot,
+  );
+  const running = activity ?? mirror?.activity ?? null;
+  const dock = activity ? runtime.dock : (mirror?.dock ?? null);
+  const owner = mirror?.tab ?? null;
+  const stop = useCallback(() => {
+    if (activity) setActivity(null);
+    else if (owner) askToStop(owner);
+  }, [activity, owner, setActivity]);
   const minimized = useSyncExternalStore(
     dockRepository.subscribe,
     dockRepository.minimized,
@@ -219,7 +231,7 @@ export function ActivityDock() {
     };
   }, [activity, character, stats]);
 
-  const dockVisible = Boolean(activity && dock && pathname !== dock.href);
+  const dockVisible = Boolean(running && dock && pathname !== dock.href);
   const [jolt, setJolt] = useState(0);
   const shaking = useShake(jolt);
 
@@ -240,19 +252,19 @@ export function ActivityDock() {
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
       if (document.querySelector('[role="dialog"][aria-modal="true"]')) return;
-      if (!dock.canStop && activity?.kind !== "rest" && !activity?.paused) return;
+      if (!dock.canStop && running?.kind !== "rest" && !running?.paused) return;
       event.preventDefault();
-      setActivity(null);
+      stop();
     };
 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [activity, dock, dockVisible, setActivity]);
+  }, [dock, dockVisible, running, stop]);
 
-  if (!activity || !dock) return null;
+  if (!running || !dock) return null;
   if (pathname === dock.href) return null;
 
-  const paused = activity.paused === true;
+  const paused = running.paused === true;
 
   const statusText = paused
     ? dock.detail
@@ -504,7 +516,7 @@ export function ActivityDock() {
               <Button
                 variant={dock.canStop ? "secondary" : "outline"}
                 disabled={!dock.canStop}
-                onClick={() => setActivity(null)}
+                onClick={stop}
                 aria-label={dock.canStop ? "Parar atividade" : runningLabel}
               >
                 {stopLabel}

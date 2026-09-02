@@ -35,6 +35,20 @@ import type { ArenaResolution } from "./arena.controller";
 import type { TrainingReport } from "./training.controller";
 import * as automationController from "./automation.controller";
 import { ActivityEngine } from "./activity-engine";
+import { activityRuntimeStore } from "./activity-runtime";
+import {
+  HANDSHAKE_MS,
+  OWNER_BEAT_MS,
+  activityMirrorStore,
+  announceBeat,
+  announceHello,
+  announceIdle,
+  dropMirror,
+  listenToTabs,
+  shareState,
+  watchMirror,
+  yieldsTo,
+} from "./activity-sync";
 import { api, type ApiAnswer } from "./api.client";
 import { usePresenceHeartbeat } from "./use-presence-heartbeat";
 import { playSound, preloadSounds, setVoiceProfile } from "./sound";
@@ -225,26 +239,40 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [state, activity]);
   const mintRef = useRef(0);
   const appliedRef = useRef(0);
+  const claimedAtRef = useRef(0);
   const heldHuntRef = useRef<HeldLanding | null>(null);
   const heldArenaRef = useRef<HeldLanding | null>(null);
   const inFlightRef = useRef(0);
-  const applyState = useCallback((next: GameState, seq: number) => {
+  const applyState = useCallback((next: GameState, seq: number, share = true) => {
     if (seq <= appliedRef.current) return;
     appliedRef.current = seq;
     setState(next);
+    if (share) shareState(next);
   }, []);
-  const setActivity = useCallback((next: Activity | null) => {
-    const prev = activityRef.current;
-    if (prev?.kind === "hunt" && (next?.kind !== "hunt" || next.id !== prev.id)) {
-      const held = heldHuntRef.current;
-      if (held) {
-        heldHuntRef.current = null;
-        applyState(held.state, held.seq);
+  const setActivity = useCallback(
+    (next: Activity | null, mine = true) => {
+      const prev = activityRef.current;
+      if (prev?.kind === "hunt" && (next?.kind !== "hunt" || next.id !== prev.id)) {
+        const held = heldHuntRef.current;
+        if (held) {
+          heldHuntRef.current = null;
+          applyState(held.state, held.seq);
+        }
       }
-    }
-    activityRepository.save(next);
-    setActivityState(next);
-  }, [applyState]);
+      activityRef.current = next;
+      setActivityState(next);
+      if (!mine) return;
+      activityRepository.save(next);
+      if (next) {
+        dropMirror();
+        claimedAtRef.current = Date.now();
+        announceBeat(claimedAtRef.current, next, activityRuntimeStore.snapshot().dock);
+      } else {
+        announceIdle();
+      }
+    },
+    [applyState],
+  );
   const request = useCallback(
     async <T,>(
       method: "GET" | "POST" | "PATCH" | "PUT" | "DELETE",
@@ -316,10 +344,53 @@ export function GameProvider({ children }: { children: ReactNode }) {
     })();
   }, [hydrated, request]);
   useEffect(() => {
-    if (!ready) return;
-    const saved = activityRepository.load();
-    if (saved && stateRef.current.character) setActivityState(saved);
+    if (!ready) return undefined;
+    announceHello();
+    const timer = window.setTimeout(() => {
+      if (activityMirrorStore.snapshot()) return;
+      const saved = activityRepository.load();
+      if (!saved || !stateRef.current.character) return;
+      claimedAtRef.current = 0;
+      activityRef.current = saved;
+      setActivityState(saved);
+    }, HANDSHAKE_MS);
+    return () => window.clearTimeout(timer);
   }, [ready]);
+  useEffect(() => {
+    if (!activity) return undefined;
+    const send = () =>
+      announceBeat(claimedAtRef.current, activity, activityRuntimeStore.snapshot().dock);
+    send();
+    const leave = () => announceIdle();
+    const unsubscribe = activityRuntimeStore.subscribe(send);
+    const timer = window.setInterval(send, OWNER_BEAT_MS);
+    window.addEventListener("pagehide", leave);
+    return () => {
+      unsubscribe();
+      window.clearInterval(timer);
+      window.removeEventListener("pagehide", leave);
+    };
+  }, [activity]);
+  useEffect(() => {
+    return listenToTabs({
+      onBeat: (claim) => {
+        const mine = activityRef.current;
+        if (mine && !yieldsTo(claimedAtRef.current, claim.since, claim.tab)) return;
+        if (mine) setActivity(null, false);
+        watchMirror(claim);
+      },
+      onIdle: (tab) => dropMirror(tab),
+      onStop: () => setActivity(null),
+      onState: (incoming) => {
+        if (activityRef.current) return;
+        applyState(incoming, ++mintRef.current, false);
+      },
+      onHello: () => {
+        const mine = activityRef.current;
+        if (mine) announceBeat(claimedAtRef.current, mine, activityRuntimeStore.snapshot().dock);
+      },
+    });
+  }, [applyState, setActivity]);
   const petResting =
     state.pet !== null &&
     state.pet.active === false &&
