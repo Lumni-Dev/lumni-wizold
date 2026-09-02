@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
+import { tavernChatStore } from "@/controllers/tavern-chat.store";
 import { useGame } from "@/controllers/game.context";
 import { isInPack, listPack } from "@/controllers/pack.controller";
 import { usePackPresence } from "@/controllers/use-pack-presence";
@@ -14,20 +15,12 @@ import {
   type TavernReadMap,
 } from "@/models/repositories/tavern-read.repository";
 import {
-  tavernSentRepository,
-  type TavernSentMap,
-} from "@/models/repositories/tavern-sent.repository";
-import {
   MAX_ROOM_MEMBERS,
-  MESSAGE_COOLDOWN_MS,
-  MESSAGE_MAX_LENGTH,
   OPEN_ROOM_MIN_LEVEL,
   ROOM_NAME_MAX_LENGTH,
 } from "@/models/entities/tavern";
 import { NAME_MAX_LENGTH } from "@/shared/constants/game";
-import { CONTROL_HEIGHT } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
-import { formatTime } from "@/shared/utils/format";
 import { sanitizeName } from "@/shared/utils/text";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
 import { ActionIcon } from "../components/app-icon";
@@ -39,7 +32,6 @@ import { Field } from "../components/field";
 import { Tag } from "../components/tag";
 import { List, ListRow } from "../components/list";
 import { Pagination } from "../components/pagination";
-import { Modal } from "../components/modal";
 import { Panel } from "../components/panel";
 import { EmptyState } from "../components/empty-state";
 import { FilteredEmptyState } from "../components/filtered-empty-state";
@@ -71,7 +63,6 @@ export function TavernScreen() {
     state,
     character,
     notify,
-    invite,
     inviteByNick,
     acceptInvite,
     declineInvite,
@@ -79,47 +70,31 @@ export function TavernScreen() {
     removeFromPack,
   } = useGame();
 
-  const [activeRoomId, setActiveRoomId] = useState<string | null>(null);
+  const chat = useSyncExternalStore(
+    tavernChatStore.subscribe,
+    tavernChatStore.snapshot,
+    tavernChatStore.serverSnapshot,
+  );
   const [roomName, setRoomName] = useState("");
   const [roomPassword, setRoomPassword] = useState("");
   const [creatingRoom, setCreatingRoom] = useState(false);
   const [joinPasswords, setJoinPasswords] = useState<Record<string, string>>({});
-  const [draft, setDraft] = useState("");
-  const [emojiOpen, setEmojiOpen] = useState(false);
-  const [emojiRect, setEmojiRect] = useState<DOMRect | null>(null);
-  const emojiRef = useRef<HTMLDivElement>(null);
   const [page, setPage] = useState(1);
   const [roomSearch, setRoomSearch] = useState("");
   const [nick, setNick] = useState("");
   const [inviting, setInviting] = useState(false);
-  const [invitingMemberId, setInvitingMemberId] = useState<string | null>(null);
   const [removing, setRemoving] = useState<PackMate | null>(null);
   const [invites, setInvites] = useState<PackInvite[]>([]);
-
-  useEffect(() => {
-    if (!emojiOpen) return;
-    const onDown = (event: MouseEvent) => {
-      if (emojiRef.current && !emojiRef.current.contains(event.target as Node)) {
-        setEmojiOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", onDown);
-    return () => document.removeEventListener("mousedown", onDown);
-  }, [emojiOpen]);
 
   const {
     identity,
     rooms,
-    activeRoom,
-
     createRoom,
     joinRoom,
     leaveRoom,
     closeRoom,
     openDirect,
-    sendMessage,
-    announceAway,
-  } = useTavern(activeRoomId);
+  } = useTavern(null);
   const [closingRoomId, setClosingRoomId] = useState<string | null>(null);
 
   const fetchInvitesRef = useRef(fetchInvites);
@@ -136,17 +111,6 @@ export function TavernScreen() {
     const timer = window.setInterval(refreshInvites, 10000);
     return () => window.clearInterval(timer);
   }, [refreshInvites]);
-
-  const messagesRef = useRef<HTMLUListElement>(null);
-
-  const lastMessageId = activeRoom?.messages[activeRoom.messages.length - 1]?.id ?? null;
-
-  useEffect(() => {
-    const list = messagesRef.current;
-    if (list) list.scrollTop = list.scrollHeight;
-  }, [lastMessageId]);
-
-  const openRoomId = activeRoom ? activeRoomId : null;
 
   const [readMap, setReadMap] = useState<TavernReadMap>(() => tavernReadRepository.load());
   const roomsRef = useRef(rooms);
@@ -203,42 +167,6 @@ export function TavernScreen() {
     }
   }, [rooms, selfId]);
 
-  const lastMineAt = useMemo(() => {
-    if (!activeRoom) return null;
-    for (let index = activeRoom.messages.length - 1; index >= 0; index -= 1) {
-      if (activeRoom.messages[index].authorId === selfId) return activeRoom.messages[index].at;
-    }
-    return null;
-  }, [activeRoom, selfId]);
-  const [cooldownLeft, setCooldownLeft] = useState(0);
-  const [sentBeat, setSentBeat] = useState(0);
-  const sentMapRef = useRef<TavernSentMap>({});
-  useEffect(() => {
-    sentMapRef.current = tavernSentRepository.load();
-  }, []);
-  useEffect(() => {
-    const compute = () => {
-      const marker = activeRoomId ? sentMapRef.current[activeRoomId] : undefined;
-      const left =
-        marker !== undefined
-          ? MESSAGE_COOLDOWN_MS - (Date.now() - marker)
-          : lastMineAt
-            ? MESSAGE_COOLDOWN_MS - (Date.now() - Date.parse(lastMineAt))
-            : 0;
-      return Math.max(0, Math.min(MESSAGE_COOLDOWN_MS, left));
-    };
-    const tick = () => {
-      const left = compute();
-      setCooldownLeft(left);
-      if (left <= 0) window.clearInterval(interval);
-    };
-    const first = window.setTimeout(tick, 0);
-    const interval = window.setInterval(tick, 500);
-    return () => {
-      window.clearTimeout(first);
-      window.clearInterval(interval);
-    };
-  }, [lastMineAt, activeRoomId, sentBeat]);
   const markRoomRead = useCallback((roomId: string) => {
     const summary = roomsRef.current.find((entry) => entry.room.id === roomId);
     if (summary) dismissTavernNotices(summary.room.name);
@@ -252,23 +180,15 @@ export function TavernScreen() {
     if (next) setReadMap(next);
   }, []);
 
-  const lastMessageAt = activeRoom?.messages[activeRoom.messages.length - 1]?.at ?? null;
-  useEffect(() => {
-    if (!openRoomId || !lastMessageAt) return;
-    const timer = window.setTimeout(() => {
-      const next = tavernReadRepository.mark(
-        openRoomId,
-        lastMessageAt,
-        roomsRef.current.map((summary) => summary.room.id),
-      );
-      if (next) setReadMap(next);
-    }, 0);
-    return () => window.clearTimeout(timer);
-  }, [openRoomId, lastMessageAt]);
-
   useEffect(() => {
     dismissTavernNotices();
   }, []);
+
+  const openRoomId = chat.open ? chat.roomId : null;
+
+  useEffect(() => {
+    setReadMap(tavernReadRepository.load());
+  }, [rooms, chat.open, chat.roomId]);
 
   const filteredRooms = useMemo(() => {
     const query = roomSearch.trim().toLowerCase();
@@ -302,7 +222,7 @@ export function TavernScreen() {
     notify(result.message, result.ok, "Taverna");
     if (result.ok) {
       playSound("door");
-      setActiveRoomId(roomId);
+      tavernChatStore.openRoom(roomId);
       markRoomRead(roomId);
       setJoinPasswords((current) => ({ ...current, [roomId]: "" }));
     }
@@ -316,7 +236,7 @@ export function TavernScreen() {
     if (result.ok) {
       playSound("door");
       markRoomRead(roomId);
-      if (activeRoomId === roomId) setActiveRoomId(null);
+      if (tavernChatStore.isOpenFor(roomId)) tavernChatStore.closeWindow();
     }
   }
 
@@ -337,20 +257,6 @@ export function TavernScreen() {
     }
   }
 
-  async function submitMessage(event: FormEvent) {
-    event.preventDefault();
-    if (!activeRoomId) return;
-    const result = await sendMessage(activeRoomId, draft);
-    if (!result) return;
-    if (result.ok) {
-      sentMapRef.current = { ...sentMapRef.current, [activeRoomId]: Date.now() };
-      tavernSentRepository.save(sentMapRef.current);
-      setSentBeat((count) => count + 1);
-      playSound("chat");
-      setDraft("");
-    } else notify(result.message, false, "Taverna");
-  }
-
   async function submitNick(event: FormEvent) {
     event.preventDefault();
     if (inviting || nick.trim().length === 0 || pack.length >= MAX_PACK) return;
@@ -359,16 +265,6 @@ export function TavernScreen() {
       if (await inviteByNick(nick)) setNick("");
     } finally {
       setInviting(false);
-    }
-  }
-
-  async function inviteMember(member: { id: string; name: string }) {
-    if (invitingMemberId) return;
-    setInvitingMemberId(member.id);
-    try {
-      await invite(member);
-    } finally {
-      setInvitingMemberId(null);
     }
   }
 
@@ -387,7 +283,7 @@ export function TavernScreen() {
     notify(result.message, result.ok, "Taverna");
     if (result.ok && result.roomId) {
       playSound("door");
-      setActiveRoomId(result.roomId);
+      tavernChatStore.openRoom(result.roomId);
       markRoomRead(result.roomId);
     }
   }
@@ -765,171 +661,6 @@ export function TavernScreen() {
         </div>
       </div>
 
-      <Modal
-        open={Boolean(activeRoom)}
-        title={activeRoom ? activeRoom.name : ""}
-        action={
-          activeRoom
-            ? activeRoom.members.length + " de " + (activeRoom.privateFor ? 2 : MAX_ROOM_MEMBERS)
-            : null
-        }
-        onClose={() => {
-          if (activeRoom) {
-            playSound("door");
-            markRoomRead(activeRoom.id);
-            void announceAway(activeRoom.id);
-          }
-          setActiveRoomId(null);
-        }}
-        className="max-w-lg"
-        footer={
-          <form onSubmit={submitMessage} className="space-y-2">
-            <AiAuditNotice />
-            <div className="flex items-center gap-2">
-            <div className="relative min-w-0 flex-1">
-              <Field
-                aria-label="Mensagem"
-                placeholder="Diga alguma coisa"
-                maxLength={MESSAGE_MAX_LENGTH}
-                autoComplete="off"
-                value={draft}
-                onChange={(event) => setDraft(event.target.value)}
-                className="pr-14"
-              />
-              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 font-mono text-[10px] text-ink-faint">
-                {draft.length}/{MESSAGE_MAX_LENGTH}
-              </span>
-            </div>
-            <div className="relative shrink-0" ref={emojiRef}>
-              {emojiOpen ? (
-                <div
-                  className="fixed z-[55] grid grid-cols-4 gap-1 rounded-md border border-edge-strong bg-surface p-2 shadow-[0_18px_40px_-12px_rgba(0,0,0,0.9)]"
-                  style={
-                    emojiRect
-                      ? {
-                          bottom: window.innerHeight - emojiRect.top + 8,
-                          right: window.innerWidth - emojiRect.right,
-                        }
-                      : undefined
-                  }
-                >
-                  {["😂", "❤️", "👍", "😮", "😢", "🔥", "🎉", "🍺", "🐺", "🌕", "🌙", "⭐", "🍻", "⚔️", "🏆", "💀"].map((emoji) => (
-                    <button
-                      key={emoji}
-                      type="button"
-                      aria-label={"Inserir " + emoji}
-                      onClick={() =>
-                        setDraft((current) =>
-                          current.length + emoji.length <= MESSAGE_MAX_LENGTH
-                            ? current + emoji
-                            : current,
-                        )
-                      }
-                      className={"grid " + CONTROL_HEIGHT + " w-8 place-items-center rounded-md text-lg hover:bg-surface-high"}
-                    >
-                      {emoji}
-                    </button>
-                  ))}
-                </div>
-              ) : null}
-              <Button
-                type="button"
-                icon
-                variant="outline"
-                aria-label="Emojis"
-                aria-expanded={emojiOpen}
-                onClick={() => {
-                  if (!emojiOpen) setEmojiRect(emojiRef.current?.getBoundingClientRect() ?? null);
-                  setEmojiOpen((open) => !open);
-                }}
-              >
-                <ActionIcon action="smile" />
-              </Button>
-            </div>
-            <Button
-              type="submit"
-              variant="primary"
-              disabled={draft.trim().length === 0 || cooldownLeft > 0}
-            >
-              {cooldownLeft > 0 ? Math.ceil(cooldownLeft / 1000) : "Falar"}
-            </Button>
-            </div>
-          </form>
-        }
-      >
-        {activeRoom ? (
-          <>
-            <div className="flex items-center gap-2 overflow-x-auto border-b border-edge px-4 py-3">
-              {activeRoom.members.map((member) => {
-                const yourself = member.id === identity.id;
-                const kept = isInPack(state, member.id);
-
-                return (
-                  <span key={member.id} className="flex shrink-0 items-center gap-1">
-                    <Tag tone={yourself ? "neutral" : "faint"} className="gap-2">
-                      <MemberName href={profileHref(member.id)} name={member.name} />
-                      {kept && !yourself ? (
-                        <span className="text-ink-faint">- na matilha</span>
-                      ) : null}
-                    </Tag>
-                    {!yourself && !kept ? (
-                      <Tooltip label={"Convidar " + member.name + " para a matilha"}>
-                        <Button
-                          icon
-                          variant="secondary"
-                          busy={invitingMemberId === member.id}
-                          disabled={invitingMemberId !== null && invitingMemberId !== member.id}
-                          aria-label={"Convidar " + member.name + " para a matilha"}
-                          onClick={() => inviteMember(member)}
-                        >
-                          <ActionIcon action="keep" />
-                        </Button>
-                      </Tooltip>
-                    ) : null}
-                  </span>
-                );
-              })}
-            </div>
-
-            <List ref={messagesRef} className="h-[min(20rem,45svh)] overflow-y-auto">
-              {activeRoom.messages.map((message, index) => (
-                <ListRow
-                  key={message.id}
-                  className={cn(index % 2 === 1 && "bg-charcoal")}
-                >
-                  <span className="font-mono text-[10px] text-ink-faint">
-                    {formatTime(message.at)}
-                  </span>
-                  <p className="min-w-0 flex-1 text-xs leading-relaxed">
-                    {message.authorId === "system" ? (
-                      <span className="mr-2 text-ink-faint">{message.authorName}:</span>
-                    ) : (
-                      <>
-                        <MemberName
-                          href={profileHref(message.authorId)}
-                          name={message.authorName}
-                          className={cn(
-                            message.authorId === identity.id ? "text-ink" : "text-ink-soft",
-                          )}
-                        />
-                        <span className="mr-2 text-ink-faint">:</span>
-                      </>
-                    )}
-                    <span
-                      className={cn(
-                        message.authorId === "system" ? "text-ink-faint" : "text-ink-soft",
-                      )}
-                    >
-                      {message.text}
-                    </span>
-                  </p>
-                </ListRow>
-              ))}
-            </List>
-          </>
-        ) : null}
-      </Modal>
-
       <ConfirmDialog
         open={closingRoomId !== null}
         title={closingRoom?.isPrivate ? "Fechar mesa reservada" : "Fechar mesa"}
@@ -948,7 +679,7 @@ export function TavernScreen() {
           if (result) notify(result.message, result.ok, "Taverna");
           if (result?.ok) {
             playSound("door");
-            if (activeRoomId === roomId) setActiveRoomId(null);
+            if (tavernChatStore.isOpenFor(roomId)) tavernChatStore.closeWindow();
           }
           setClosingRoomId(null);
         }}

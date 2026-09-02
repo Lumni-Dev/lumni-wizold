@@ -11,6 +11,7 @@ import { GameMusic } from "../components/game-music";
 import { Spinner } from "../components/spinner";
 import { GameFooter } from "./game-footer";
 import { GameCorner } from "./game-corner";
+import { TavernChatWindow } from "../components/tavern-chat-window";
 import { MoonTracker } from "../components/moon-tracker";
 import { MobileNavigation, Sidebar } from "./sidebar";
 import { ResourceBar } from "./resource-bar";
@@ -63,6 +64,7 @@ export function GameFrame({ children }: { children: ReactNode }) {
         </div>
       </div>
       <GameCorner />
+      <TavernChatWindow />
     </>
   );
 }
