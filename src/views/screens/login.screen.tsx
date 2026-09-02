@@ -205,8 +205,15 @@ export function LoginScreen() {
           <header className="text-center">
             <Link
               href="/"
-              className="mx-auto block w-fit transition-opacity hover:opacity-90"
+              className="mx-auto flex w-fit flex-col items-center gap-4 transition-opacity hover:opacity-90"
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/icon.png"
+                alt=""
+                aria-hidden
+                className="landing-hero-shadow-logo h-14 w-14 shrink-0 rounded-md"
+              />
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/assets/ui/logo.webp?v=3"
