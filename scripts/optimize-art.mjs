@@ -27,7 +27,7 @@ const MAX_WIDTH = {
   attributes: 1254,
   training: 1254,
   genders: 1254,
-  pet: 1254,
+  pet: 768,
 };
 
 const DEFAULT_WIDTH = 512;
