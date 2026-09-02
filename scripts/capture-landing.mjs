@@ -17,10 +17,18 @@ const SHOTS = [
   { key: "character", path: "/character" },
   { key: "hunt", path: "/hunt" },
   { key: "training", path: "/training" },
+  { key: "market", path: "/market" },
   { key: "forge", path: "/forge" },
   { key: "arena", path: "/arena" },
   { key: "tavern", path: "/tavern" },
 ];
+
+const ONLY = process.argv[2];
+const shots = ONLY ? SHOTS.filter((shot) => shot.key === ONLY) : SHOTS;
+if (ONLY && shots.length === 0) {
+  console.error("unknown shot:", ONLY);
+  process.exit(1);
+}
 
 for (const line of readFileSync(join(ROOT, ".env.local"), "utf8").split(/\r?\n/)) {
   const match = line.match(/^([A-Z0-9_]+)\s*=\s*"?(.*?)"?\s*$/);
@@ -95,9 +103,9 @@ async function stripDevChrome(page) {
   });
 }
 
-for (const shot of SHOTS) {
-  await page.goto(BASE + shot.path, { waitUntil: "networkidle" });
-  await page.waitForTimeout(800);
+for (const shot of shots) {
+  await page.goto(BASE + shot.path, { waitUntil: "load", timeout: 60_000 });
+  await page.waitForTimeout(1500);
   await stripDevChrome(page);
   const target = join(OUT, shot.key + ".webp");
   await page.screenshot({ path: target, type: "webp", fullPage: false });

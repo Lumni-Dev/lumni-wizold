@@ -163,7 +163,7 @@ export function LandingScreen() {
           <div className="space-y-1 text-center">
             <h2 className="heading text-[11px] text-ink">Por dentro do jogo</h2>
             <p className="text-xs text-ink-faint">
-              Seis telas da mesma noite, do jeito que elas aparecem no navegador.
+              Sete telas da mesma noite, do jeito que elas aparecem no navegador.
             </p>
           </div>
 

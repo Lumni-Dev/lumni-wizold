@@ -197,9 +197,18 @@ export function LoginScreen() {
         <header className="space-y-2 text-center">
           <Link
             href="/"
-            className="font-logo text-lg uppercase tracking-[0.22em] text-highlight transition-colors hover:text-ink"
+            className="inline-flex items-center justify-center gap-2 transition-colors hover:text-ink"
           >
-            {GAME_NAME}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/assets/ui/logo.webp?v=3"
+              alt=""
+              aria-hidden
+              className="h-[1.125rem] w-auto shrink-0"
+            />
+            <span className="font-logo text-lg uppercase tracking-[0.22em] text-highlight">
+              {GAME_NAME}
+            </span>
           </Link>
           <p className="text-[11px] uppercase tracking-[0.24em] text-ink-faint">{GAME_TAGLINE}</p>
         </header>

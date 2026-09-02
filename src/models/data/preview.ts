@@ -35,6 +35,15 @@ export const PREVIEW_SHOTS: readonly PreviewShot[] = [
     image: "/assets/landing/training.webp?v=9",
   },
   {
+    key: "market",
+    label: "Mercado",
+    title: "Balcão de peças e poções",
+    text:
+      "Cinco sets sobem faixa a faixa, poções cobradas em caçadas da sua noite e uma cópia " +
+      "de cada peça: o que já está na mochila ou no corpo o balcão recusa.",
+    image: "/assets/landing/market.webp?v=1",
+  },
+  {
     key: "forge",
     label: "Forja",
     title: "Veia, fragmento e martelo",
