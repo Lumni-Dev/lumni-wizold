@@ -11,6 +11,7 @@ import { useGame } from "@/controllers/game.context";
 import { playSoundPreview } from "@/controllers/sound";
 import { disableTavernPush, enableTavernPush, testTavernPush, webPushConfigured, tavernPushSupported } from "@/controllers/tavern-notify";
 import { backgroundRepository } from "@/models/repositories/background.repository";
+import { musicRepository } from "@/models/repositories/music.repository";
 import { soundRepository } from "@/models/repositories/sound.repository";
 import { tavernPushRepository } from "@/models/repositories/tavern-push.repository";
 import { NAME_MAX_LENGTH, RENAME_COOLDOWN_DAYS, RENAME_PRICE } from "@/shared/constants/game";
@@ -151,6 +152,21 @@ export function SettingsScreen() {
     else await disableTavernPush();
   }
 
+  const music = useSyncExternalStore(
+    musicRepository.subscribe,
+    musicRepository.enabled,
+    musicRepository.serverSnapshot,
+  );
+  const musicVolume = useSyncExternalStore(
+    musicRepository.subscribe,
+    musicRepository.volume,
+    musicRepository.serverVolumeSnapshot,
+  );
+
+  function chooseMusic(on: boolean) {
+    musicRepository.setEnabled(on);
+    if (on && musicRepository.volume() <= 0) musicRepository.setVolume(0.35);
+  }
   const volumeDragging = useRef(false);
 
   function finishVolumeAdjust() {
@@ -496,6 +512,54 @@ export function SettingsScreen() {
         </Panel>
 
         <Panel
+          title="Trilha"
+          description="A música que toca por baixo do jogo. Não toca na porta de entrada."
+          padding="none"
+        >
+          <List>
+            <ListRow layout="split">
+              <RowText title="Estado" description="Ligada ou desligada neste aparelho." />
+              <div className="flex shrink-0 gap-2">
+                <Chip active={music} onClick={() => chooseMusic(true)}>
+                  Ativada
+                </Chip>
+                <Chip active={!music} onClick={() => chooseMusic(false)}>
+                  Desativada
+                </Chip>
+              </div>
+            </ListRow>
+            {music ? (
+              <ListRow layout="column">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                    Volume
+                  </span>
+                  <span className="font-mono text-[11px] text-ink">
+                    {Math.round(musicVolume * 100)}%
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={Math.round(musicVolume * 100)}
+                  aria-label="Volume da trilha"
+                  className="volume-slider w-full"
+                  onChange={(event) => {
+                    musicRepository.setVolume(Number(event.target.value) / 100);
+                  }}
+                />
+                <p className="text-[11px] leading-relaxed text-ink-faint">
+                  A trilha corre por baixo dos efeitos, então ela começa em 35% para não abafar o
+                  couro, as moedas e o rugido da virada. O volume vale na hora.
+                </p>
+              </ListRow>
+            ) : null}
+          </List>
+        </Panel>
+
+        <Panel
           title="Animação de fundo"
           description="A noite viva atrás do jogo, a mesma da porta de entrada. Desligada, fica a imagem parada."
           padding="none"
@@ -559,7 +623,7 @@ export function SettingsScreen() {
         >
           <p className="text-xs leading-relaxed text-ink-faint">
             O navegador guarda cópias das imagens do jogo e as preferências deste aparelho: som,
-            volume, animação e escuridão do fundo, a data de nascimento lembrada na porta e o
+            volume, trilha, animação e escuridão do fundo, a data de nascimento lembrada na porta e o
             trabalho em andamento. Limpar o cache
             descarta essas cópias, baixa as imagens de novo do servidor e recarrega a página;
             serve para quando alguma arte aparece errada ou desatualizada.
@@ -596,7 +660,7 @@ export function SettingsScreen() {
       <ConfirmDialog
         open={confirmingClear}
         title="Limpar cache"
-        description="As imagens serão baixadas de novo e as preferências deste aparelho (som, volume, animação e escuridão do fundo, data de nascimento lembrada e trabalho em andamento) voltam ao padrão. A partida no servidor não é tocada."
+        description="As imagens serão baixadas de novo e as preferências deste aparelho (som, volume, trilha, animação e escuridão do fundo, data de nascimento lembrada e trabalho em andamento) voltam ao padrão. A partida no servidor não é tocada."
         detail="A página recarrega ao terminar."
         confirmLabel="Limpar"
         onCancel={() => setConfirmingClear(false)}

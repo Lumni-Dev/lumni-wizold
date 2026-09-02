@@ -7,6 +7,7 @@ import { usePackAlert } from "@/controllers/use-pack-alert";
 import { useTavernAlert } from "@/controllers/use-tavern-alert";
 import { backgroundRepository } from "@/models/repositories/background.repository";
 import { LiveBackdrop } from "../components/live-backdrop";
+import { GameMusic } from "../components/game-music";
 import { Spinner } from "../components/spinner";
 import { GameFooter } from "./game-footer";
 import { GameCorner } from "./game-corner";
@@ -46,6 +47,7 @@ export function GameFrame({ children }: { children: ReactNode }) {
   return (
     <>
       {animatedBackground ? <LiveBackdrop shade="deep" /> : null}
+      <GameMusic />
       <div className="relative z-10 flex min-h-screen">
         <Sidebar tavernUnread={asideUnread} />
         <div className="flex min-h-screen w-full min-w-0 flex-col">
