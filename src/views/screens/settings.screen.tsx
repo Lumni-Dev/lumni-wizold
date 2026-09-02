@@ -165,7 +165,7 @@ export function SettingsScreen() {
 
   function chooseMusic(on: boolean) {
     musicRepository.setEnabled(on);
-    if (on && musicRepository.volume() <= 0) musicRepository.setVolume(0.35);
+    if (on && musicRepository.volume() <= 0) musicRepository.setVolume(musicRepository.defaultVolume());
   }
   const volumeDragging = useRef(false);
 
@@ -551,8 +551,9 @@ export function SettingsScreen() {
                   }}
                 />
                 <p className="text-[11px] leading-relaxed text-ink-faint">
-                  A trilha corre por baixo dos efeitos, então ela começa em 35% para não abafar o
-                  couro, as moedas e o rugido da virada. O volume vale na hora.
+                  A trilha começa em 75% e corre por baixo dos efeitos, que ficam por cima dela
+                  para o couro, as moedas e o rugido da virada continuarem se ouvindo. O volume
+                  vale na hora.
                 </p>
               </ListRow>
             ) : null}

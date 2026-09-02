@@ -1,6 +1,6 @@
 const ENABLED_KEY = "lumni-wizold:music";
 const VOLUME_KEY = "lumni-wizold:music:volume";
-const DEFAULT_VOLUME = 0.35;
+const DEFAULT_VOLUME = 0.75;
 
 const listeners = new Set<() => void>();
 
@@ -14,6 +14,10 @@ function notify(): void {
 }
 
 export const musicRepository = {
+  defaultVolume(): number {
+    return DEFAULT_VOLUME;
+  },
+
   enabled(): boolean {
     if (typeof window === "undefined") return true;
     try {
