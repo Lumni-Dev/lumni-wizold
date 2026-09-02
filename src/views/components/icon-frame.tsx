@@ -46,7 +46,7 @@ export function IconFrame({
   size?: IconSize;
   tone?: FrameTone;
   className?: string;
-  children: ReactNode;
+  children?: ReactNode;
 }) {
   return (
     <span

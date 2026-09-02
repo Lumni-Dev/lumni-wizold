@@ -29,7 +29,7 @@ export function EquipmentPanel({ gear, forge }: { gear: GearSlot[]; forge: numbe
               ICON_FRAME_INSET,
             )}
           >
-            {item ? <ItemIcon item={item} enhancement={level} /> : <IconFrame tone="empty">--</IconFrame>}
+            {item ? <ItemIcon item={item} enhancement={level} /> : <IconFrame tone="empty" />}
             <div className="min-w-0">
               <p className="truncate text-sm text-ink">{item ? item.name : "Nada equipado"}</p>
               <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
