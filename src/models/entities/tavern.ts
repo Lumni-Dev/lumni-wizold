@@ -12,6 +12,11 @@ export interface TavernIdentity {
   id: string;
   name: string;
   level?: number;
+  vip?: boolean;
+}
+
+export function canOpenUnlockedRoom(identity: TavernIdentity): boolean {
+  return Boolean(identity.vip) || (identity.level ?? 1) >= OPEN_ROOM_MIN_LEVEL;
 }
 export interface TavernMember extends TavernIdentity {
   joinedAt: string;

@@ -25,8 +25,10 @@ import {
   MESSAGE_COOLDOWN_MS,
   OPEN_ROOM_MIN_LEVEL,
   ROOM_NAME_MAX_LENGTH,
+  canOpenUnlockedRoom,
   isPrivateTable,
 } from "@/models/entities/tavern";
+import { isVip } from "@/models/rules/vip";
 import { nickColorClass } from "@/models/rules/tavern-nicks";
 import { NAME_MAX_LENGTH } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
@@ -325,6 +327,11 @@ export function TavernScreen() {
 
   if (!character || !identity) return null;
 
+  const mayOpenUnlocked = canOpenUnlockedRoom({
+    ...identity,
+    vip: identity.vip ?? isVip(character, Date.now()),
+  });
+
   const ownRoom =
     rooms.find(({ room, isPrivate }) => !isPrivate && room.ownerId === identity.id) ?? null;
 
@@ -492,7 +499,7 @@ export function TavernScreen() {
                 ? "Você já tem uma mesa aberta: feche a sua para abrir outra."
                 : "Sem senha, NV " +
                   OPEN_ROOM_MIN_LEVEL +
-                  "+ abre e entra. Com senha, qualquer nível."
+                  "+ ou VIP. Com senha, qualquer nível."
             }
           >
             <form onSubmit={submitRoom} className="space-y-3">
@@ -523,11 +530,10 @@ export function TavernScreen() {
                 label={
                   ownRoom
                     ? "Feche a sua mesa antes de abrir outra"
-                    : roomPassword.trim().length === 0 &&
-                        (character?.level ?? 1) < OPEN_ROOM_MIN_LEVEL
+                    : roomPassword.trim().length === 0 && !mayOpenUnlocked
                       ? "Mesa sem senha é só a partir do NV " +
                         OPEN_ROOM_MIN_LEVEL +
-                        ". Ponha uma senha para abrir em qualquer nível."
+                        ", ou com VIP. Ponha uma senha para abrir em qualquer nível."
                       : ""
                 }
               >
@@ -540,8 +546,7 @@ export function TavernScreen() {
                     creatingRoom ||
                     Boolean(ownRoom) ||
                     roomName.trim().length === 0 ||
-                    (roomPassword.trim().length === 0 &&
-                      (character?.level ?? 1) < OPEN_ROOM_MIN_LEVEL)
+                    (roomPassword.trim().length === 0 && !mayOpenUnlocked)
                   }
                 >
                   {ownRoom ? "Sua mesa: " + ownRoom.room.name : "Escolher mesa"}

@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { TavernIdentity } from "@/models/entities/tavern";
+import { isVip } from "@/models/rules/vip";
 import { api } from "./api.client";
 import { useGame } from "./game.context";
 import { subscribeTavernBoard } from "./tavern-stream";
@@ -65,7 +66,16 @@ export function useTavern(activeRoomId: string | null) {
   );
 
   const identity = useMemo<TavernIdentity | null>(
-    () => board.identity ?? (character ? { id: character.id, name: character.name } : null),
+    () =>
+      board.identity ??
+      (character
+        ? {
+            id: character.id,
+            name: character.name,
+            level: character.level,
+            vip: isVip(character, Date.now()),
+          }
+        : null),
     [board.identity, character],
   );
   const rooms = board.rooms;

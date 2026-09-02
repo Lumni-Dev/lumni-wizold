@@ -1,6 +1,7 @@
 import type { PoolClient } from "pg";
 import * as tavernController from "@/controllers/tavern.controller";
 import type { TavernIdentity } from "@/models/entities/tavern";
+import { isVip } from "@/models/rules/vip";
 import { loadTavern, pruneStale } from "@/models/repositories/server/tavern.store";
 import type { RoomSummary } from "@/controllers/tavern.controller";
 
@@ -11,11 +12,21 @@ export interface TavernBoardPayload {
 }
 
 async function tavernIdentity(client: PoolClient, userId: string): Promise<TavernIdentity | null> {
-  const found = await client.query("select id, name, level from characters where user_id = $1", [
-    userId,
-  ]);
+  const found = await client.query(
+    "select id, name, level, vip_until from characters where user_id = $1",
+    [userId],
+  );
   const row = found.rows[0];
-  return row ? { id: row.id, name: row.name, level: Number(row.level) } : null;
+  if (!row) return null;
+  return {
+    id: row.id,
+    name: row.name,
+    level: Number(row.level),
+    vip: isVip(
+      { vipUntil: row.vip_until ? new Date(row.vip_until).toISOString() : undefined },
+      Date.now(),
+    ),
+  };
 }
 
 export async function readTavernRevision(client: PoolClient): Promise<number> {

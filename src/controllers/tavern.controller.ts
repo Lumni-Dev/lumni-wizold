@@ -9,6 +9,7 @@ import {
   MESSAGE_MAX_LENGTH,
   MEMBER_TIMEOUT_MS,
   OPEN_ROOM_MIN_LEVEL,
+  canOpenUnlockedRoom,
   validateRoomName,
   type TavernIdentity,
   type TavernResult,
@@ -107,12 +108,12 @@ export function createRoom(
   if (problem) return fail(state, problem);
 
   const open = password.trim().length === 0;
-  if (open && (identity.level ?? 1) < OPEN_ROOM_MIN_LEVEL) {
+  if (open && !canOpenUnlockedRoom(identity)) {
     return fail(
       state,
       "Abrir mesa sem senha é só a partir do NV " +
         OPEN_ROOM_MIN_LEVEL +
-        ". Ponha uma senha para abrir em qualquer nível.",
+        ", ou com VIP. Ponha uma senha para abrir em qualquer nível.",
     );
   }
 

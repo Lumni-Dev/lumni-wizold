@@ -3,6 +3,7 @@ import type { PoolClient } from "pg";
 import type { GameState } from "@/models/entities/game-state";
 import type { Result } from "@/models/entities/result";
 import type { TavernIdentity, TavernState } from "@/models/entities/tavern";
+import { isVip } from "@/models/rules/vip";
 import { syncCharacter } from "@/controllers/character.controller";
 import { withTransaction } from "@/models/repositories/server/database";
 import { loadGame, saveGame, type LoadedGame } from "@/models/repositories/server/game.store";
@@ -143,11 +144,21 @@ type TavernAction = (
   context: TavernContext,
 ) => Promise<NextResponse>;
 async function tavernIdentity(client: PoolClient, userId: string): Promise<TavernIdentity | null> {
-  const found = await client.query("select id, name, level from characters where user_id = $1", [
-    userId,
-  ]);
+  const found = await client.query(
+    "select id, name, level, vip_until from characters where user_id = $1",
+    [userId],
+  );
   const row = found.rows[0];
-  return row ? { id: row.id, name: row.name, level: Number(row.level) } : null;
+  if (!row) return null;
+  return {
+    id: row.id,
+    name: row.name,
+    level: Number(row.level),
+    vip: isVip(
+      { vipUntil: row.vip_until ? new Date(row.vip_until).toISOString() : undefined },
+      Date.now(),
+    ),
+  };
 }
 async function guardTavern(request: Request): Promise<SessionClaims | NextResponse> {
   const refused = refuseAbuse(request);
