@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { type FormEvent, type RefObject } from "react";
+import { type FormEvent, type RefObject, useSyncExternalStore } from "react";
+import { playSoundPreview } from "@/controllers/sound";
+import { tavernPingRepository } from "@/models/repositories/tavern-ping.repository";
 import { isInPack } from "@/controllers/pack.controller";
 import type { GameState } from "@/models/entities/game-state";
 import type { PresenceStatus } from "@/models/entities/presence";
@@ -231,6 +233,7 @@ export function TavernRoomChatComposer({
   onEmojiRectChange,
   cooldownLeft,
   onSubmit,
+  showPing = false,
 }: {
   draft: string;
   onDraftChange: (value: string) => void;
@@ -241,11 +244,36 @@ export function TavernRoomChatComposer({
   onEmojiRectChange: (rect: DOMRect | null) => void;
   cooldownLeft: number;
   onSubmit: (event: FormEvent) => void;
+  showPing?: boolean;
 }) {
+  const pingOn = useSyncExternalStore(
+    tavernPingRepository.subscribe,
+    tavernPingRepository.enabled,
+    tavernPingRepository.serverSnapshot,
+  );
+
   return (
     <form onSubmit={onSubmit} className="space-y-2">
       <AiAuditNotice />
       <div className="flex items-center gap-2">
+        {showPing ? (
+          <Tooltip label={pingOn ? "Mutar notificação" : "Ativar notificação"}>
+            <Button
+              type="button"
+              icon
+              variant="outline"
+              aria-label={pingOn ? "Mutar notificação da mesa" : "Ativar notificação da mesa"}
+              aria-pressed={pingOn}
+              onClick={() => {
+                const next = !pingOn;
+                tavernPingRepository.setEnabled(next);
+                if (next) playSoundPreview("ping");
+              }}
+            >
+              <ActionIcon action={pingOn ? "sound" : "mute"} />
+            </Button>
+          </Tooltip>
+        ) : null}
         <div className="relative min-w-0 flex-1">
           <Field
             aria-label="Mensagem"

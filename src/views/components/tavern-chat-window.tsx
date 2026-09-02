@@ -26,7 +26,7 @@ import {
   tavernSentRepository,
   type TavernSentMap,
 } from "@/models/repositories/tavern-sent.repository";
-import { MESSAGE_COOLDOWN_MS } from "@/models/entities/tavern";
+import { MESSAGE_COOLDOWN_MS, isPrivateTable } from "@/models/entities/tavern";
 import { CornerAccents } from "./corner-accents";
 import {
   TavernRoomChatComposer,
@@ -326,6 +326,7 @@ export function TavernChatWindow() {
               onEmojiRectChange={setEmojiRect}
               cooldownLeft={cooldownLeft}
               onSubmit={submitMessage}
+              showPing={isPrivateTable(activeRoom)}
             />
           </div>
         </section>

@@ -37,9 +37,10 @@ const SOURCES = {
   beast: "/assets/sounds/wolf/beast.mp3",
   door: "/assets/sounds/tavern/door.mp3",
   chat: "/assets/sounds/tavern/chat.mp3",
+  ping: "/assets/sounds/tavern/ping.mp3",
 } as const;
 export type GameSound = keyof typeof SOURCES;
-const VERSION = "?v=20";
+const VERSION = "?v=21";
 const VOICED: readonly GameSound[] = ["hit", "crit", "hurt"];
 const LINEAGE_VOICED: readonly GameSound[] = ["rest"];
 const PREVIEW_FLOOR = 0.4;

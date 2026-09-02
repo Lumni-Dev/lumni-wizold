@@ -417,3 +417,16 @@ export function touchMember(
     ),
   });
 }
+
+/** Newest other-person line in a reserved table the viewer sits at, or empty. */
+export function latestPrivateChatAt(rooms: RoomSummary[], selfId: string): string {
+  let latest = "";
+  for (const { room, isMember, isPrivate } of rooms) {
+    if (!isMember || !isPrivate) continue;
+    for (const message of room.messages) {
+      if (message.authorId === "system" || message.authorId === selfId) continue;
+      if (message.at > latest) latest = message.at;
+    }
+  }
+  return latest;
+}

@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
 import { useGame } from "@/controllers/game.context";
 import { usePackAlert } from "@/controllers/use-pack-alert";
+import { usePrivateChatPing } from "@/controllers/use-private-chat-ping";
 import { useTavernAlert } from "@/controllers/use-tavern-alert";
 import { backgroundRepository } from "@/models/repositories/background.repository";
 import { LiveBackdrop } from "../components/live-backdrop";
@@ -36,6 +37,7 @@ export function GameFrame({ children }: { children: ReactNode }) {
   const asideUnread = inTavern ? 0 : tavernUnread;
   const tutorialOpen = !tutorial || reviewTutorial;
   usePackAlert(!inTavern);
+  usePrivateChatPing();
   const animatedBackground = useSyncExternalStore(
     backgroundRepository.subscribe,
     backgroundRepository.enabled,

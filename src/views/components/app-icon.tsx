@@ -34,6 +34,8 @@ import {
   UserPlus,
   Users,
   Venus,
+  Volume2,
+  VolumeX,
   type LucideIcon,
 } from "lucide-react";
 import type { Gender } from "@/models/entities/character";
@@ -91,6 +93,8 @@ const ACTION_ICONS = {
   copy: Copy,
   check: Check,
   smile: Smile,
+  sound: Volume2,
+  mute: VolumeX,
 } as const;
 
 export type AppAction = keyof typeof ACTION_ICONS;

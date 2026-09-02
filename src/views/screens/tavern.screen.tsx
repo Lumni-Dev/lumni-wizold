@@ -25,6 +25,7 @@ import {
   MESSAGE_COOLDOWN_MS,
   OPEN_ROOM_MIN_LEVEL,
   ROOM_NAME_MAX_LENGTH,
+  isPrivateTable,
 } from "@/models/entities/tavern";
 import { NAME_MAX_LENGTH } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
@@ -186,7 +187,8 @@ export function TavernScreen() {
   const heardRef = useRef<string | null>(null);
   useEffect(() => {
     let latest = "";
-    for (const { room } of rooms) {
+    for (const { room, isPrivate } of rooms) {
+      if (isPrivate) continue;
       for (const message of room.messages) {
         if (message.authorId === "system" || message.authorId === selfId) continue;
         if (message.at > latest) latest = message.at;
@@ -844,6 +846,7 @@ export function TavernScreen() {
                 onEmojiRectChange={setEmojiRect}
                 cooldownLeft={cooldownLeft}
                 onSubmit={submitMessage}
+                showPing={isPrivateTable(activeRoom)}
               />
             ) : null
           }

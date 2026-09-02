@@ -210,6 +210,7 @@ const FOLDERS = {
   "pet-eat": "wolf",
   door: "tavern",
   chat: "tavern",
+  ping: "tavern",
 };
 
 const RECIPES = {
@@ -601,6 +602,22 @@ const RECIPES = {
     },
   },
 
+  ping: {
+    peak: 0.28,
+    format: "mp3",
+    forge() {
+      const out = make(0.58);
+      mix(out, bell(0.48, 784, { partials: [1, 2.01, 2.99], decays: [0.92, 0.42, 0.2] }), {
+        gain: 0.8,
+      });
+      mix(out, bell(0.4, 988, { partials: [1, 2.005], decays: [0.72, 0.28] }), {
+        at: 0.1,
+        gain: 0.5,
+      });
+      return room(out, { time: 0.045, feedback: 0.2, mix: 0.16 });
+    },
+  },
+
   growl: {
     peak: 0.72,
     forge() {
@@ -747,26 +764,19 @@ function main() {
     const samples = finish(recipe.forge(), recipe.peak);
     const source = join(TMP, name + ".wav");
     const folder = FOLDERS[name] ?? "";
-    const target = join(OUT, folder, name + ".ogg");
+    const format = recipe.format === "mp3" ? "mp3" : "ogg";
+    const target = join(OUT, folder, name + "." + format);
     mkdirSync(join(OUT, folder), { recursive: true });
     writeFileSync(source, wav(samples));
 
+    const codec =
+      format === "mp3"
+        ? ["-c:a", "libmp3lame", "-q:a", "4"]
+        : ["-c:a", "libvorbis", "-q:a", "6"];
+
     execFileSync(
       "ffmpeg",
-      [
-        "-y",
-        "-loglevel",
-        "error",
-        "-i",
-        source,
-        "-c:a",
-        "libvorbis",
-        "-q:a",
-        "6",
-        "-ac",
-        "1",
-        target,
-      ],
+      ["-y", "-loglevel", "error", "-i", source, ...codec, "-ac", "1", target],
       { stdio: ["ignore", "ignore", "inherit"] },
     );
 
