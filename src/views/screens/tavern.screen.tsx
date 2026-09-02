@@ -804,7 +804,7 @@ export function TavernScreen() {
                           disabled={full && !isMember}
                           onClick={() => open(room.id, joinPasswords[room.id] ?? "")}
                         >
-                          {openRoomId === room.id ? "Aberta" : "Sentar"}
+                          {openRoomId === room.id ? "Se sentou" : "Sentar"}
                         </Button>
                       </Tooltip>
                     </div>
