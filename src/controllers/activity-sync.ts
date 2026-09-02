@@ -2,7 +2,11 @@
 
 import type { Activity } from "@/models/entities/activity";
 import type { GameState } from "@/models/entities/game-state";
-import type { ActivityDockView } from "./activity-runtime";
+import {
+  clearActivityRuntime,
+  publishActivityRuntime,
+  type ActivityRuntimeSnapshot,
+} from "./activity-runtime";
 
 const CHANNEL_NAME = "lumni-wizold:activity";
 
@@ -14,7 +18,7 @@ export interface ActivityClaim {
   tab: string;
   since: number;
   activity: Activity;
-  dock: ActivityDockView | null;
+  runtime: ActivityRuntimeSnapshot;
 }
 
 type Message =
@@ -23,7 +27,7 @@ type Message =
       tab: string;
       since: number;
       activity: Activity;
-      dock: ActivityDockView | null;
+      runtime: ActivityRuntimeSnapshot;
     }
   | { kind: "idle"; tab: string }
   | { kind: "stop"; tab: string; target: string }
@@ -80,9 +84,9 @@ export function yieldsTo(mine: number, theirs: number, theirTab: string): boolea
 export function announceBeat(
   since: number,
   activity: Activity,
-  dock: ActivityDockView | null,
+  runtime: ActivityRuntimeSnapshot,
 ): void {
-  post({ kind: "beat", tab: tabId(), since, activity, dock });
+  post({ kind: "beat", tab: tabId(), since, activity, runtime });
 }
 
 export function announceIdle(): void {
@@ -114,7 +118,7 @@ export function listenToTabs(handlers: TabHandlers): () => void {
         tab: message.tab,
         since: message.since,
         activity: message.activity,
-        dock: message.dock,
+        runtime: message.runtime,
       });
       return;
     }
@@ -146,7 +150,9 @@ function emitMirror(): void {
 }
 
 export function watchMirror(claim: ActivityClaim): void {
+  if (!claim.runtime || typeof claim.runtime !== "object") return;
   mirror = claim;
+  publishActivityRuntime(claim.runtime);
   if (typeof window !== "undefined") {
     window.clearTimeout(fade);
     fade = window.setTimeout(() => dropMirror(), OWNER_SILENCE_MS);
@@ -158,6 +164,7 @@ export function dropMirror(tab?: string): void {
   if (mirror === null) return;
   if (tab !== undefined && mirror.tab !== tab) return;
   mirror = null;
+  clearActivityRuntime();
   if (typeof window !== "undefined") window.clearTimeout(fade);
   emitMirror();
 }

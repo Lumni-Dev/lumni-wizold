@@ -44,7 +44,7 @@ export function ActivityDock() {
     activityMirrorStore.serverSnapshot,
   );
   const running = activity ?? mirror?.activity ?? null;
-  const dock = activity ? runtime.dock : (mirror?.dock ?? null);
+  const dock = runtime.dock;
   const owner = mirror?.tab ?? null;
   const stop = useCallback(() => {
     if (activity) setActivity(null);
@@ -58,7 +58,7 @@ export function ActivityDock() {
 
   const huntView = useMemo(() => {
     const huntRt = runtime.hunt;
-    if (!huntRt || activity?.kind !== "hunt" || activity.paused) return null;
+    if (!huntRt || running?.kind !== "hunt" || running.paused) return null;
     const territory = listTerritories(state).find((row) => row.territory.id === huntRt.territoryId);
     if (!territory) return null;
 
@@ -117,11 +117,11 @@ export function ActivityDock() {
           }
         : null,
     };
-  }, [activity, pet, runtime.hunt, state]);
+  }, [pet, running, runtime.hunt, state]);
 
   const trainView = useMemo(() => {
     const trainRt = runtime.train;
-    if (!trainRt || activity?.kind !== "train" || activity.paused) return null;
+    if (!trainRt || running?.kind !== "train" || running.paused) return null;
     const cooldown = trainRt.cooldown;
     const opting = cooldown !== null;
     const petActive = trainRt.id === PET_EXERCISE_ID;
@@ -165,11 +165,11 @@ export function ActivityDock() {
           : "Treinando...",
       cooldown,
     };
-  }, [activity, runtime.train, state]);
+  }, [running, runtime.train, state]);
 
   const mineView = useMemo(() => {
     const mineRt = runtime.mine;
-    if (!mineRt || activity?.kind !== "mine" || activity.paused) return null;
+    if (!mineRt || running?.kind !== "mine" || running.paused) return null;
     const mining = listMining(state);
     const cooldown = mineRt.cooldown;
     const opting = cooldown !== null;
@@ -189,11 +189,11 @@ export function ActivityDock() {
           : "Minerando...",
       cooldown,
     };
-  }, [activity, runtime.mine, state]);
+  }, [running, runtime.mine, state]);
 
   const forgeView = useMemo(() => {
     const forgeRt = runtime.forge;
-    if (!forgeRt || activity?.kind !== "forge" || activity.paused) return null;
+    if (!forgeRt || running?.kind !== "forge" || running.paused) return null;
     const forgeEntry = findForgePiece(state, forgeRt.id, forgeRt.level);
     const cooldown = forgeRt.cooldown;
     const opting = cooldown !== null;
@@ -218,10 +218,10 @@ export function ActivityDock() {
           : "Forjando...",
       cooldown,
     };
-  }, [activity, runtime.forge, state]);
+  }, [running, runtime.forge, state]);
 
   const restView = useMemo(() => {
-    if (activity?.kind !== "rest" || !character || !stats) return null;
+    if (running?.kind !== "rest" || !character || !stats) return null;
     return {
       beat: String(character.health),
       healthCurrent: character.health,
@@ -229,22 +229,23 @@ export function ActivityDock() {
       glows: character.health < stats.maxHealth,
       status: "O corpo descansa.",
     };
-  }, [activity, character, stats]);
+  }, [running, character, stats]);
 
-  const dockVisible = Boolean(running && dock && pathname !== dock.href);
+  const onOwnPage = activity !== null && pathname === dock?.href;
+  const dockVisible = Boolean(running && dock && !onOwnPage);
   const [jolt, setJolt] = useState(0);
   const shaking = useShake(jolt);
 
   useEffect(() => {
     const huntRt = runtime.hunt;
-    if (!huntRt || activity?.kind !== "hunt" || activity.paused || huntRt.beat <= 0) return;
+    if (!huntRt || running?.kind !== "hunt" || running.paused || huntRt.beat <= 0) return;
     const line = huntRt.script[Math.min(huntRt.beat, huntRt.script.length) - 1];
     if (line?.critical) {
       /* eslint-disable react-hooks/set-state-in-effect */
       setJolt((count) => count + 1);
       /* eslint-enable react-hooks/set-state-in-effect */
     }
-  }, [activity, runtime.hunt]);
+  }, [running, runtime.hunt]);
 
   useEffect(() => {
     if (!dockVisible || !dock) return undefined;
@@ -262,7 +263,7 @@ export function ActivityDock() {
   }, [dock, dockVisible, running, stop]);
 
   if (!running || !dock) return null;
-  if (pathname === dock.href) return null;
+  if (onOwnPage) return null;
 
   const paused = running.paused === true;
 

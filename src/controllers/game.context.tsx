@@ -266,7 +266,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       if (next) {
         dropMirror();
         claimedAtRef.current = Date.now();
-        announceBeat(claimedAtRef.current, next, activityRuntimeStore.snapshot().dock);
+        announceBeat(claimedAtRef.current, next, activityRuntimeStore.snapshot());
       } else {
         announceIdle();
       }
@@ -359,7 +359,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!activity) return undefined;
     const send = () =>
-      announceBeat(claimedAtRef.current, activity, activityRuntimeStore.snapshot().dock);
+      announceBeat(claimedAtRef.current, activity, activityRuntimeStore.snapshot());
     send();
     const leave = () => announceIdle();
     const unsubscribe = activityRuntimeStore.subscribe(send);
@@ -387,7 +387,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       },
       onHello: () => {
         const mine = activityRef.current;
-        if (mine) announceBeat(claimedAtRef.current, mine, activityRuntimeStore.snapshot().dock);
+        if (mine) announceBeat(claimedAtRef.current, mine, activityRuntimeStore.snapshot());
       },
     });
   }, [applyState, setActivity]);

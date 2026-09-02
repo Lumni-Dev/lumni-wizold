@@ -5,6 +5,7 @@ import { findForgePiece } from "@/controllers/forge.controller";
 import { listTerritories, resolveHuntCreatureId } from "@/controllers/hunt.controller";
 import { listExercises } from "@/controllers/training.controller";
 import { loadHuntSelection } from "@/models/repositories/hunt-selection.repository";
+import { progressRepository } from "@/models/repositories/progress.repository";
 import type { Activity } from "@/models/entities/activity";
 import type { GameState } from "@/models/entities/game-state";
 import { findItem } from "@/models/data/items";
@@ -32,6 +33,12 @@ import {
   patchActivityRuntime,
   type ActivityDockView,
 } from "./activity-runtime";
+import { activityMirrorStore } from "./activity-sync";
+
+function idleRuntime(patch: Parameters<typeof patchActivityRuntime>[0]): void {
+  if (activityMirrorStore.snapshot()) return;
+  patchActivityRuntime(patch);
+}
 
 function territoryName(id: string): string {
   return TERRITORIES.find((entry) => entry.id === id)?.name ?? "Caçada";
@@ -138,7 +145,7 @@ export function ActivityEngine() {
       activity?.kind === "hunt" && !paused && activity.id ? activity.id : null;
 
     if (!activeHunt) {
-      patchActivityRuntime({ hunt: null });
+      idleRuntime({ hunt: null });
       return;
     }
 
@@ -308,7 +315,7 @@ export function ActivityEngine() {
       activity?.kind === "train" && !paused && activity.id ? activity.id : null;
 
     if (!activeExercise) {
-      patchActivityRuntime({ train: null });
+      idleRuntime({ train: null });
       return;
     }
 
@@ -320,6 +327,8 @@ export function ActivityEngine() {
     let alive = true;
     let barTimer = 0;
     let coolTimer = 0;
+    const bank = "train:" + activeExercise;
+    let carry = progressRepository.get(bank, trainingSessionTicks());
     let beat = 0;
     let ticks = trainingSessionTicks();
     let resumable = true;
@@ -337,6 +346,7 @@ export function ActivityEngine() {
           ? "Treino do lobo"
           : (exercises.find((row) => row.exercise.id === activeExercise)?.exercise.name ??
             "Treino");
+      progressRepository.set(bank, beat);
       patchActivityRuntime({
         train: { id: activeExercise, beat, max: ticks, cooldown },
         dock: dockOf("train", label, "Sessão em andamento", beat, ticks, cooldown),
@@ -344,8 +354,9 @@ export function ActivityEngine() {
     };
 
     const startBar = () => {
-      beat = 0;
       ticks = trainingSessionTicks();
+      beat = Math.min(carry, Math.max(0, ticks - 1));
+      carry = 0;
       push(null);
       barTimer = window.setInterval(() => {
         beat += 1;
@@ -366,6 +377,7 @@ export function ActivityEngine() {
             }
           }
           beat = 0;
+          progressRepository.clear(bank);
           if (!landed) {
             setActivityRef.current(
               autoRef.current.train && resumable
@@ -412,18 +424,21 @@ export function ActivityEngine() {
     const activeOre = activity?.kind === "mine" && !paused && activity.id ? activity.id : null;
 
     if (!activeOre) {
-      patchActivityRuntime({ mine: null });
+      idleRuntime({ mine: null });
       return;
     }
 
     let alive = true;
     let barTimer = 0;
     let coolTimer = 0;
+    const bank = "mine:" + activeOre;
+    let carry = progressRepository.get(bank, miningSwingTicks());
     let beat = 0;
     let ticks = miningSwingTicks();
 
     const push = (cooldown: number | null) => {
       const name = findItem(activeOre)?.name ?? "Mina";
+      progressRepository.set(bank, beat);
       patchActivityRuntime({
         mine: { id: activeOre, beat, max: ticks, cooldown },
         dock: dockOf("mine", "Minerando · " + name, "Golpe da picareta", beat, ticks, cooldown),
@@ -431,8 +446,9 @@ export function ActivityEngine() {
     };
 
     const startBar = () => {
-      beat = 0;
       ticks = miningSwingTicks();
+      beat = Math.min(carry, Math.max(0, ticks - 1));
+      carry = 0;
       push(null);
       barTimer = window.setInterval(() => {
         beat += 1;
@@ -444,6 +460,7 @@ export function ActivityEngine() {
         void mineRef.current(activeOre).then((mined) => {
           if (!alive) return;
           beat = 0;
+          progressRepository.clear(bank);
           if (!mined) {
             setActivityRef.current(
               autoRef.current.mine ? { kind: "mine", id: activeOre, paused: true } : null,
@@ -490,19 +507,22 @@ export function ActivityEngine() {
     const startLevel = activity?.kind === "forge" ? (activity.enhancement ?? 0) : 0;
 
     if (!activeItem) {
-      patchActivityRuntime({ forge: null });
+      idleRuntime({ forge: null });
       return;
     }
 
     let alive = true;
     let barTimer = 0;
     let coolTimer = 0;
+    const bank = "forge:" + activeItem;
+    let carry = progressRepository.get(bank, FORGE_TICKS);
     let beat = 0;
     let level = startLevel;
 
     const push = (cooldown: number | null) => {
       const slot = findForgePiece(stateRef.current, activeItem, level);
       const name = slot?.item.name ?? activeItem;
+      progressRepository.set(bank, beat);
       patchActivityRuntime({
         forge: { id: activeItem, beat, max: FORGE_TICKS, cooldown, level },
         dock: dockOf(
@@ -518,7 +538,8 @@ export function ActivityEngine() {
 
     const startBar = () => {
       const tickMs = forgeDurationMs(level) / FORGE_TICKS;
-      beat = 0;
+      beat = Math.min(carry, Math.max(0, FORGE_TICKS - 1));
+      carry = 0;
       push(null);
       barTimer = window.setInterval(() => {
         beat += 1;
@@ -537,6 +558,7 @@ export function ActivityEngine() {
             if (landed.raised) level += 1;
           }
           beat = 0;
+          progressRepository.clear(bank);
           if (!landed) {
             setActivityRef.current(
               autoRef.current.forge
@@ -580,7 +602,7 @@ export function ActivityEngine() {
   useEffect(() => {
     if (!ready) return;
     if (!activity) {
-      clearActivityRuntime();
+      if (!activityMirrorStore.snapshot()) clearActivityRuntime();
       return;
     }
     if (activity.kind === "rest") {
