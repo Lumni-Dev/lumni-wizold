@@ -27,7 +27,6 @@ import {
   type TavernSentMap,
 } from "@/models/repositories/tavern-sent.repository";
 import { MESSAGE_COOLDOWN_MS } from "@/models/entities/tavern";
-import { ActionIcon } from "./app-icon";
 import { CornerAccents } from "./corner-accents";
 import {
   TavernRoomChatComposer,
@@ -35,7 +34,6 @@ import {
   TavernRoomChatMessages,
   tavernRoomChatAction,
 } from "./tavern-room-chat";
-import { Move } from "lucide-react";
 
 function clampPosition(x: number, y: number, width: number, height: number) {
   const maxX = Math.max(16, window.innerWidth - width - 16);
@@ -266,7 +264,7 @@ export function TavernChatWindow() {
   return (
     <div
       ref={shellRef}
-      className="pointer-events-auto fixed z-60 hidden w-[min(32rem,calc(100vw-2rem))] flex-col items-center lg:flex"
+      className="pointer-events-auto fixed z-60 hidden w-[min(32rem,calc(100vw-2rem))] lg:block"
       style={{ left: chat.x, top: chat.y }}
     >
       <div className="relative w-full">
@@ -333,15 +331,6 @@ export function TavernChatWindow() {
         </section>
         <CornerAccents />
       </div>
-
-      <button
-        type="button"
-        aria-label="Mover janela do chat"
-        onPointerDown={startDrag}
-        className="mt-2 flex h-8 w-8 cursor-grab items-center justify-center rounded-full border border-edge-strong bg-surface-high text-ink-faint shadow-[0_8px_24px_-8px_rgba(0,0,0,0.9)] transition-colors hover:border-edge-strong hover:bg-surface-top hover:text-ink active:cursor-grabbing"
-      >
-        <Move className="h-4 w-4" aria-hidden="true" />
-      </button>
     </div>
   );
 }
