@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import type { Item } from "@/models/entities/item";
-import { enhancedName } from "@/models/rules/forge";
 import { itemSubtitle, summarizeEffect } from "../presenters/item.presenter";
 import { Card, CardBody, CardFooter, CardHeader } from "./card";
 import { ItemIcon } from "./item-icon";
@@ -12,7 +11,7 @@ interface ItemCardProps {
   quantity?: number;
   enhancement?: number;
   footer?: ReactNode;
-  note?: string | null;
+  note?: ReactNode;
   highlighted?: boolean;
   fromBazaar?: boolean;
 }
@@ -32,7 +31,7 @@ export function ItemCard({
     <Card tone={highlighted ? "highlighted" : "default"} height="fill" interactive>
       <CardHeader>
         <ItemIcon item={item} enhancement={enhancement} />
-        <RowText title={enhancedName(item.name, enhancement)} description={itemSubtitle(item)} />
+        <RowText title={item.name} description={itemSubtitle(item)} />
         {quantity && quantity > 1 ? (
           <span className="shrink-0 font-mono text-xs text-ink-soft">x{quantity}</span>
         ) : null}

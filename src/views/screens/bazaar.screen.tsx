@@ -14,7 +14,6 @@ import {
   sellerNet,
 } from "@/models/rules/bazaar";
 import { listingExpiresAt, type BazaarListing } from "@/models/entities/bazaar";
-import { enhancedName } from "@/models/rules/forge";
 import {
   formatBronze,
   formatNumber,
@@ -39,6 +38,7 @@ import { EmptyState } from "../components/empty-state";
 import { FilteredEmptyState } from "../components/filtered-empty-state";
 import { Field } from "../components/field";
 import { QuantityField } from "../components/quantity-field";
+import { ItemCard } from "../components/item-card";
 import { ItemIcon } from "../components/item-icon";
 import { List, ListRow, RowText } from "../components/list";
 import { Modal } from "../components/modal";
@@ -254,73 +254,63 @@ export function BazaarScreen() {
           {filteredBoard.length === 0 ? (
             <FilteredEmptyState description="Nenhum anúncio combina com a categoria escolhida." />
           ) : (
-            <Panel
-              title="Anúncios"
-              description="O quadro inteiro: os seus primeiro, depois os dos outros caçadores."
-              padding="none"
-              footer={
-                pages > 1 ? (
-                  <Pagination page={currentPage} pages={pages} onChange={setPage} />
-                ) : undefined
-              }
-            >
-              <List>
+            <>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                 {onPage.map((entry) => (
-                  <ListRow key={entry.listing.id} padding="art">
-                    <ItemIcon item={entry.item} />
-                    <RowText
-                      title={enhancedName(entry.item.name, entry.listing.enhancement)}
-                      description={
-                        <>
-                          <Link
-                            href={entry.mine ? "/character" : "/ranking/" + entry.listing.sellerId}
-                            className="transition-colors hover:text-highlight"
-                          >
-                            {entry.mine ? "Seu anúncio" : "por " + entry.listing.sellerName}
-                          </Link>
-                          {entry.listing.sellerHouse ? ", anúncio da casa" : null}
-                          {entry.mine
-                            ? " - " +
-                              formatReais(entry.listing.priceCents) +
-                              (entry.available > 1 ? " cada" : "")
-                            : null}
-                          <span className="block">
-                            {entry.expired
-                              ? "Vencido: remova para recolher as peças."
-                              : expiryLine(entry.listing, now)}
-                          </span>
-                        </>
-                      }
-                    />
-                    <span className="flex shrink-0 items-center gap-3 self-center">
-                      {entry.available > 1 ? (
-                        <span className="font-mono text-xs text-ink-soft">
-                          x{formatNumber(entry.available)}
+                  <ItemCard
+                    key={entry.listing.id}
+                    item={entry.item}
+                    enhancement={entry.listing.enhancement}
+                    quantity={entry.available}
+                    highlighted={entry.mine}
+                    note={
+                      <>
+                        <Link
+                          href={entry.mine ? "/character" : "/ranking/" + entry.listing.sellerId}
+                          className="transition-colors hover:text-highlight"
+                        >
+                          {entry.mine ? "Seu anúncio" : "por " + entry.listing.sellerName}
+                        </Link>
+                        {entry.listing.sellerHouse ? ", anúncio da casa" : null}
+                        {entry.mine
+                          ? " - " +
+                            formatReais(entry.listing.priceCents) +
+                            (entry.available > 1 ? " cada" : "")
+                          : null}
+                        <span className="block">
+                          {entry.expired
+                            ? "Vencido: remova para recolher as peças."
+                            : expiryLine(entry.listing, now)}
                         </span>
-                      ) : null}
-                      {entry.mine ? (
-                        <Button variant="outline" onClick={() => setCancelling(entry.listing.id)}>
-                          Remover
-                        </Button>
-                      ) : (
+                      </>
+                    }
+                    footer={
+                      <div className="w-full">
                         <Button
-                          variant="primary"
+                          fullWidth
+                          variant={entry.mine ? "outline" : "primary"}
                           onClick={() =>
-                            setFlow({
-                              kind: "buy",
-                              listingId: entry.listing.id,
-                              quantity: "1",
-                            })
+                            entry.mine
+                              ? setCancelling(entry.listing.id)
+                              : setFlow({
+                                  kind: "buy",
+                                  listingId: entry.listing.id,
+                                  quantity: "1",
+                                })
                           }
                         >
-                          Comprar {formatReais(entry.listing.priceCents)}
+                          {entry.mine
+                            ? "Remover"
+                            : "Comprar por " + formatReais(entry.listing.priceCents)}
                         </Button>
-                      )}
-                    </span>
-                  </ListRow>
+                      </div>
+                    }
+                  />
                 ))}
-              </List>
-            </Panel>
+              </div>
+
+              <Pagination page={currentPage} pages={pages} onChange={setPage} />
+            </>
           )}
         </>
       )}
@@ -375,9 +365,9 @@ export function BazaarScreen() {
           announcing ? (
             <div className="space-y-3 p-4">
               <div className={cn("flex items-center gap-3", ICON_FRAME_INSET)}>
-                <ItemIcon item={announcing.item} />
+                <ItemIcon item={announcing.item} enhancement={announcing.enhancement} />
                 <RowText
-                  title={enhancedName(announcing.item.name, announcing.enhancement)}
+                  title={announcing.item.name}
                   description={"Você tem " + formatNumber(announcing.quantity) + "."}
                 />
               </div>
@@ -433,9 +423,9 @@ export function BazaarScreen() {
             <List>
               {sellable.map((entry) => (
                 <ListRow key={entry.item.id + "@" + entry.enhancement} padding="art">
-                  <ItemIcon item={entry.item} />
+                  <ItemIcon item={entry.item} enhancement={entry.enhancement} />
                   <RowText
-                    title={enhancedName(entry.item.name, entry.enhancement)}
+                    title={entry.item.name}
                     description={
                       "x" +
                       formatNumber(entry.quantity) +
@@ -487,9 +477,9 @@ export function BazaarScreen() {
         {flow?.kind === "buy" && buying ? (
           <>
             <div className={cn("flex items-center gap-3 border-b border-edge p-4", ICON_FRAME_INSET)}>
-              <ItemIcon item={buying.item} />
+              <ItemIcon item={buying.item} enhancement={buying.listing.enhancement} />
               <RowText
-                title={enhancedName(buying.item.name, buying.listing.enhancement)}
+                title={buying.item.name}
                 description={
                   <>
                     {"por " + buying.listing.sellerName}
