@@ -144,6 +144,10 @@ export function furyDurationMinutes(minutes: number, willpower: number): number 
   return Math.round(furyDurationMs(minutes, willpower) / 6_000) / 10;
 }
 
+export function furyWillpowerExtraMs(minutes: number, willpower: number): number {
+  return Math.max(0, furyDurationMs(minutes, willpower) - Math.round(minutes * 60_000));
+}
+
 export function potionFuryRemainingMs(character: FuryCarrier, now = Date.now()): number {
   return character.furyUntil ? Math.max(0, Date.parse(character.furyUntil) - now) : 0;
 }
