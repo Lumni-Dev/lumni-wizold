@@ -4,6 +4,7 @@ import Link from "next/link";
 import { type FormEvent, type RefObject } from "react";
 import { isInPack } from "@/controllers/pack.controller";
 import type { GameState } from "@/models/entities/game-state";
+import type { PresenceStatus } from "@/models/entities/presence";
 import type { TavernRoom } from "@/models/entities/tavern";
 import { MAX_ROOM_MEMBERS, MESSAGE_MAX_LENGTH } from "@/models/entities/tavern";
 import { CONTROL_HEIGHT } from "@/shared/constants/ui";
@@ -14,6 +15,7 @@ import { AiAuditNotice } from "./ai-audit-notice";
 import { Button } from "./button";
 import { Field } from "./field";
 import { List, ListRow } from "./list";
+import { PRESENCE_LABELS, PresenceDot } from "./presence-dot";
 import { Tag } from "./tag";
 import { Tooltip } from "./tooltip";
 
@@ -34,10 +36,44 @@ function MemberName({
   );
 }
 
+function authorPresence(
+  authorId: string,
+  identityId: string,
+  presence: Record<string, PresenceStatus>,
+): PresenceStatus | undefined {
+  if (authorId === identityId) return "active";
+  return presence[authorId];
+}
+
+function ChatNick({
+  href,
+  name,
+  className,
+  status,
+}: {
+  href: string | null;
+  name: string;
+  className?: string;
+  status?: PresenceStatus;
+}) {
+  return (
+    <span className="mr-2 inline-flex items-center gap-1">
+      {status ? (
+        <Tooltip label={PRESENCE_LABELS[status]}>
+          <PresenceDot size="small" status={status} />
+        </Tooltip>
+      ) : null}
+      <MemberName href={href} name={name} className={className} />
+      <span className="text-ink-faint">:</span>
+    </span>
+  );
+}
+
 export function TavernRoomChatMembers({
   activeRoom,
   identityId,
   state,
+  presence,
   profileHref,
   invitingMemberId,
   onInviteMember,
@@ -45,6 +81,7 @@ export function TavernRoomChatMembers({
   activeRoom: TavernRoom;
   identityId: string;
   state: GameState;
+  presence: Record<string, PresenceStatus>;
   profileHref: (memberId: string) => string | null;
   invitingMemberId: string | null;
   onInviteMember: (member: { id: string; name: string }) => void;
@@ -56,10 +93,16 @@ export function TavernRoomChatMembers({
         {activeRoom.members.map((member) => {
           const yourself = member.id === identityId;
           const kept = isInPack(state, member.id);
+          const status = authorPresence(member.id, identityId, presence);
 
           return (
             <li key={member.id} className="flex shrink-0 items-center gap-1 whitespace-nowrap">
               <Tag tone={yourself ? "neutral" : "faint"} className="gap-2">
+                {status ? (
+                  <Tooltip label={PRESENCE_LABELS[status]}>
+                    <PresenceDot size="small" status={status} />
+                  </Tooltip>
+                ) : null}
                 <MemberName href={profileHref(member.id)} name={member.name} />
                 {kept && !yourself ? <span className="text-ink-faint">- na matilha</span> : null}
               </Tag>
@@ -88,12 +131,14 @@ export function TavernRoomChatMembers({
 export function TavernRoomChatMessages({
   activeRoom,
   identityId,
+  presence,
   profileHref,
   messagesRef,
   className,
 }: {
   activeRoom: TavernRoom;
   identityId: string;
+  presence: Record<string, PresenceStatus>;
   profileHref: (memberId: string) => string | null;
   messagesRef: RefObject<HTMLUListElement | null>;
   className?: string;
@@ -107,14 +152,12 @@ export function TavernRoomChatMessages({
             {message.authorId === "system" ? (
               <span className="mr-2 text-ink-faint">{message.authorName}:</span>
             ) : (
-              <>
-                <MemberName
-                  href={profileHref(message.authorId)}
-                  name={message.authorName}
-                  className={cn(message.authorId === identityId ? "text-ink" : "text-ink-soft")}
-                />
-                <span className="mr-2 text-ink-faint">:</span>
-              </>
+              <ChatNick
+                href={profileHref(message.authorId)}
+                name={message.authorName}
+                className={cn(message.authorId === identityId ? "text-ink" : "text-ink-soft")}
+                status={authorPresence(message.authorId, identityId, presence)}
+              />
             )}
             <span
               className={cn(message.authorId === "system" ? "text-ink-faint" : "text-ink-soft")}

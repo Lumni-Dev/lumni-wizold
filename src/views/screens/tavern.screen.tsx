@@ -12,6 +12,7 @@ import { playSound } from "@/controllers/sound";
 import { dismissTavernNotices } from "@/controllers/tavern-notify";
 import { useTavern } from "@/controllers/use-tavern";
 import { MAX_PACK, type PackInvite, type PackMate } from "@/models/entities/pack";
+import type { PresenceStatus } from "@/models/entities/presence";
 import {
   tavernReadRepository,
   type TavernReadMap,
@@ -329,6 +330,11 @@ export function TavernScreen() {
   const pack = useMemo(() => listPack(state), [state]);
   const packIds = useMemo(() => pack.map((mate) => mate.id), [pack]);
   const packPresence = usePackPresence(packIds, Boolean(character));
+  const chatPresence = useMemo(() => {
+    const next: Record<string, PresenceStatus> = {};
+    for (const id of packIds) next[id] = packPresence[id] ?? "offline";
+    return next;
+  }, [packIds, packPresence]);
 
   if (!character || !identity) return null;
 
@@ -877,6 +883,7 @@ export function TavernScreen() {
                 activeRoom={activeRoom}
                 identityId={identity.id}
                 state={state}
+                presence={chatPresence}
                 profileHref={profileHref}
                 invitingMemberId={invitingMemberId}
                 onInviteMember={inviteMember}
@@ -884,6 +891,7 @@ export function TavernScreen() {
               <TavernRoomChatMessages
                 activeRoom={activeRoom}
                 identityId={identity.id}
+                presence={chatPresence}
                 profileHref={profileHref}
                 messagesRef={messagesRef}
                 className="h-[min(20rem,45svh)] overflow-y-auto"

@@ -15,7 +15,10 @@ import { useIsDesktop } from "@/controllers/use-is-desktop";
 import { playSound } from "@/controllers/sound";
 import { dismissTavernNotices } from "@/controllers/tavern-notify";
 import { useGame } from "@/controllers/game.context";
+import { listPack } from "@/controllers/pack.controller";
+import { usePackPresence } from "@/controllers/use-pack-presence";
 import { useTavern } from "@/controllers/use-tavern";
+import type { PresenceStatus } from "@/models/entities/presence";
 import {
   tavernReadRepository,
 } from "@/models/repositories/tavern-read.repository";
@@ -50,10 +53,17 @@ export function TavernChatWindow() {
     tavernChatStore.snapshot,
     tavernChatStore.serverSnapshot,
   );
-  const { state, notify, invite } = useGame();
+  const { state, character, notify, invite } = useGame();
   const { identity, rooms, activeRoom, sendMessage, announceAway } = useTavern(
     chat.open ? chat.roomId : null,
   );
+  const packIds = useMemo(() => listPack(state).map((mate) => mate.id), [state]);
+  const packPresence = usePackPresence(packIds, Boolean(character) && chat.open);
+  const chatPresence = useMemo(() => {
+    const next: Record<string, PresenceStatus> = {};
+    for (const id of packIds) next[id] = packPresence[id] ?? "offline";
+    return next;
+  }, [packIds, packPresence]);
 
   const [draft, setDraft] = useState("");
   const [emojiOpen, setEmojiOpen] = useState(false);
@@ -286,6 +296,7 @@ export function TavernChatWindow() {
             activeRoom={activeRoom}
             identityId={identity.id}
             state={state}
+            presence={chatPresence}
             profileHref={profileHref}
             invitingMemberId={invitingMemberId}
             onInviteMember={inviteMember}
@@ -294,6 +305,7 @@ export function TavernChatWindow() {
           <TavernRoomChatMessages
             activeRoom={activeRoom}
             identityId={identity.id}
+            presence={chatPresence}
             profileHref={profileHref}
             messagesRef={messagesRef}
             className="min-h-0 flex-1 overflow-y-auto"
