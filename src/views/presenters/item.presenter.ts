@@ -1,6 +1,7 @@
 import { ATTRIBUTES } from "@/models/entities/attribute";
 import { CATEGORY_LABEL, type Item } from "@/models/entities/item";
 import { enhancedEffect } from "@/models/rules/forge";
+import { FURY_ATTRIBUTE_BONUS } from "@/shared/constants/game";
 
 export function itemInitials(name: string): string {
   const words = name.split(" ").filter((word) => word.length > 2);
@@ -30,12 +31,10 @@ export function summarizeEffect(item: Item, enhancement = 0): string[] {
   }
   if (effect.petEnergyRatio) lines.push(percent(effect.petEnergyRatio) + " da energia do mascote");
   if (effect.healthRatio) lines.push(percent(effect.healthRatio) + " da vida");
-  if (effect.furyMinutes)
-    lines.push(
-      "+10 em todos os atributos por " +
-        String(effect.furyMinutes).replace(".", ",") +
-        " min, esticado pela Vontade",
-    );
+  if (effect.furyMinutes) {
+    lines.push("+" + FURY_ATTRIBUTE_BONUS + " em todos os atributos");
+    lines.push(String(effect.furyMinutes).replace(".", ",") + " min de duração");
+  }
 
   for (const definition of ATTRIBUTES) {
     const value = effect.attributes?.[definition.key];
