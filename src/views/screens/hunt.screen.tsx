@@ -215,6 +215,29 @@ export function HuntScreen() {
     () => normalizeHuntSelection(state, selection),
     [state, selection],
   );
+  const scrollDataRef = useRef({ territories, effectiveSelection });
+  useEffect(() => {
+    scrollDataRef.current = { territories, effectiveSelection };
+  });
+
+  useEffect(() => {
+    if (!activeId) return;
+    const { territories: rows, effectiveSelection: chosen } = scrollDataRef.current;
+    const row = rows.find((entry) => entry.territory.id === activeId);
+    if (!row) return;
+    const wanted = resolveHuntCreatureId(row.creatures, chosen[activeId]);
+    const index = row.creatures.findIndex((creature) => creature.id === wanted);
+    if (index < 0) return;
+    const list = document.querySelector<HTMLElement>(
+      '[data-hunt-list="' + activeId + '"] ul',
+    );
+    const target = list?.children[index];
+    if (!list || !(target instanceof HTMLElement)) return;
+    const listTop = list.getBoundingClientRect().top;
+    const rect = target.getBoundingClientRect();
+    const centred = rect.top - listTop - (list.clientHeight - rect.height) / 2;
+    list.scrollTo({ top: list.scrollTop + centred, behavior: "smooth" });
+  }, [activeId]);
 
   useEffect(() => {
     if (!huntRt || !activeId || huntRt.territoryId !== activeId || huntRt.beat <= 0) return;
@@ -404,7 +427,7 @@ export function HuntScreen() {
                       Criaturas da área
                     </p>
                   </div>
-                  <div className="relative md:flex-1 md:min-h-0">
+                  <div data-hunt-list={territory.id} className="relative md:flex-1 md:min-h-0">
                     <List className="max-h-[560px] overflow-y-auto border-t border-edge md:absolute md:inset-0 md:max-h-none">
                       {creatures.map((creature) => {
                         const isSelected = creature.id === selectedId;
