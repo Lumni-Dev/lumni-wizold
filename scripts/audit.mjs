@@ -954,6 +954,8 @@ sec("treinamento");
   const state = baseState({ level: 100 });
   const broke = { ...state, character: { ...state.character, bronze: 0 } };
   ok("sem bronze ainda treina", trainingCtrl.train(broke, "trunk-punches").ok === true);
+  const wounded = { ...state, character: { ...state.character, health: 1 } };
+  ok("no chão ainda treina", trainingCtrl.train(wounded, "trunk-punches").ok === true);
   ok("exercício desconhecido recusa", trainingCtrl.train(state, "nada").ok === false);
   const maxed = {
     ...state,
@@ -1905,6 +1907,10 @@ sec("automação");
     automation: { ...low.automation, potion: true, rest: true },
   };
   ok("sem poção, deita", automationCtrl.nextAutomationStep(noFlask, null)?.kind === "rest");
+  ok(
+    "treinando, o chão não interrompe",
+    automationCtrl.nextAutomationStep(noFlask, { kind: "train", id: "trunk-punches" }) === null,
+  );
   const petState = baseState({ level: 10 });
   petState.pet = {
     id: "p",

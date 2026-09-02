@@ -76,8 +76,9 @@ export function nextAutomationStep(
   const stats = deriveStats(character, state.equipment, state.pet);
   const floor = stats.maxHealth * MIN_HEALTH_RATIO_TO_ACT;
   const resting = activity?.kind === "rest";
+  const training = activity?.kind === "train";
 
-  if (character.health <= floor && character.health < stats.maxHealth) {
+  if (!training && character.health <= floor && character.health < stats.maxHealth) {
     if (on.potion) {
       const flask = smallestPotion(state, "health");
       if (flask) return { kind: "potion", itemId: flask };

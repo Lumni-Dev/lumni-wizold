@@ -19,7 +19,6 @@ import {
 } from "@/shared/constants/game";
 import { formatNumber, formatBronze } from "@/shared/utils/format";
 import { Bar } from "../components/bar";
-import { BodyGate } from "../components/body-gate";
 import { Button } from "../components/button";
 import { Tag } from "../components/tag";
 import { PetIcon } from "../components/pet-icon";
@@ -155,15 +154,13 @@ export function TrainingScreen() {
                         ? "Esperando para continuar"
                         : reason}
                   </span>
-                  <BodyGate open={ready && !active} reason="Vida baixa demais para treinar.">
-                    <Button
-                      variant={active ? "secondary" : ready ? "primary" : "outline"}
-                      onClick={() => toggleTraining(exercise.id, ready)}
-                      disabled={active ? !opting : !ready}
-                    >
-                      {opting ? "Parar (" + cooldown + ")" : active ? "Treinando..." : "Treinar"}
-                    </Button>
-                  </BodyGate>
+                  <Button
+                    variant={active ? "secondary" : ready ? "primary" : "outline"}
+                    onClick={() => toggleTraining(exercise.id, ready)}
+                    disabled={active ? !opting : !ready}
+                  >
+                    {opting ? "Parar (" + cooldown + ")" : active ? "Treinando..." : "Treinar"}
+                  </Button>
                 </CardFooter>
               </Card>
             );
@@ -230,19 +227,17 @@ export function TrainingScreen() {
                         : "Treinando..."
                     : petTraining.reason}
                 </span>
-                <BodyGate open={petReady && !petActive} reason="Vida baixa demais para treinar.">
-                  <Button
-                    variant={petActive ? "secondary" : petReady ? "primary" : "outline"}
-                    onClick={() => toggleTraining(PET_EXERCISE_ID, petReady)}
-                    disabled={petActive ? cooldown === null : !petReady}
-                  >
-                    {petActive && cooldown !== null
-                      ? "Parar (" + cooldown + ")"
-                      : petActive
-                        ? "Treinando..."
-                        : "Treinar"}
-                  </Button>
-                </BodyGate>
+                <Button
+                  variant={petActive ? "secondary" : petReady ? "primary" : "outline"}
+                  onClick={() => toggleTraining(PET_EXERCISE_ID, petReady)}
+                  disabled={petActive ? cooldown === null : !petReady}
+                >
+                  {petActive && cooldown !== null
+                    ? "Parar (" + cooldown + ")"
+                    : petActive
+                      ? "Treinando..."
+                      : "Treinar"}
+                </Button>
               </CardFooter>
             </Card>
           ) : null}
