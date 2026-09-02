@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import type { PreviewShot } from "@/models/data/preview";
+import { GLASS_SECTION } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { ActionIcon } from "./app-icon";
 import { Chip } from "./chip";
@@ -48,7 +49,7 @@ export function PreviewGallery({ shots }: { shots: readonly PreviewShot[] }) {
     setIndex((current) => (current + amount + shots.length) % shots.length);
   return (
     <div
-      className="relative rounded-lg border border-edge bg-surface/80"
+      className={cn("relative rounded-lg border border-edge", GLASS_SECTION)}
       onMouseEnter={() => setHeld(true)}
       onMouseLeave={() => setHeld(false)}
       onFocus={() => setHeld(true)}

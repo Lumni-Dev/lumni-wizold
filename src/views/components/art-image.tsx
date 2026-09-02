@@ -4,15 +4,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { artLoadedFromImg, isArtCached, markArtCached } from "@/shared/utils/art-cache";
 import { cn } from "@/shared/utils/class-names";
 
-export function ArtImage({
-  source,
-  fit = "cover",
-  className,
-}: {
-  source: string;
-  fit?: "cover" | "contain";
-  className?: string;
-}) {
+export function ArtImage({ source, className }: { source: string; className?: string }) {
   const imgRef = useRef<HTMLImageElement>(null);
   const [loaded, setLoaded] = useState(() => isArtCached(source));
 
@@ -38,8 +30,7 @@ export function ArtImage({
           setLoaded(true);
         }}
         className={cn(
-          "h-full w-full transition-opacity duration-300",
-          fit === "contain" ? "object-contain" : "object-cover",
+          "h-full w-full object-cover transition-opacity duration-300",
           loaded ? "opacity-100" : "opacity-0",
         )}
       />

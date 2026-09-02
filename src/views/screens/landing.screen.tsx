@@ -5,6 +5,7 @@ import { useGame } from "@/controllers/game.context";
 import { LORE_CHAPTERS, LORE_COMPANIONS, LORE_COUPLE, LORE_PILLARS } from "@/models/data/lore";
 import { PREVIEW_SHOTS } from "@/models/data/preview";
 import { GAME_NAME, GAME_TAGLINE } from "@/shared/constants/game";
+import { GLASS_SECTION } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { ActionIcon } from "../components/app-icon";
 import { Button } from "../components/button";
@@ -110,7 +111,7 @@ export function LandingScreen() {
 
       <main className="relative z-10 mx-auto w-full max-w-5xl space-y-16 px-4 py-16 md:px-8 md:py-24">
         <section className="relative">
-          <div className="overflow-hidden rounded-lg border border-edge bg-surface/80">
+          <div className={cn("overflow-hidden rounded-lg border border-edge", GLASS_SECTION)}>
             <div className="grid grid-cols-1 border-b border-edge sm:grid-cols-2">
               {(["male", "female"] as const).map((key) => (
                 <div
@@ -171,17 +172,19 @@ export function LandingScreen() {
             {LORE_COMPANIONS.map((companion) => (
               <article
                 key={companion.gender}
-                className="space-y-4 rounded-lg border border-edge bg-surface/80 p-6 md:p-8"
+                className={cn("overflow-hidden rounded-lg border border-edge", GLASS_SECTION)}
               >
-                <div className="mx-auto aspect-square w-full max-w-[220px] overflow-hidden rounded-md border border-edge">
+                <div className="aspect-square w-full overflow-hidden border-b border-edge">
                   <PetPortrait gender={companion.gender} />
                 </div>
-                <h3 className="heading text-[11px] text-ink">{companion.title}</h3>
-                <p className="text-xs leading-relaxed text-ink-soft">{companion.text}</p>
-                <NarrationButton
-                  playing={narration.current === companion.voice}
-                  onClick={() => narration.toggle(companion.voice)}
-                />
+                <div className="space-y-3 p-6 md:p-8">
+                  <h3 className="heading text-[11px] text-ink">{companion.title}</h3>
+                  <p className="text-xs leading-relaxed text-ink-soft">{companion.text}</p>
+                  <NarrationButton
+                    playing={narration.current === companion.voice}
+                    onClick={() => narration.toggle(companion.voice)}
+                  />
+                </div>
               </article>
             ))}
           </div>
