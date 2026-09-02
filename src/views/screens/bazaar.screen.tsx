@@ -513,8 +513,8 @@ export function BazaarScreen() {
         description="As cópias voltam para a mochila e o lugar na fila de venda se perde."
         confirmLabel="Remover"
         onCancel={() => setCancelling(null)}
-        onConfirm={() => {
-          if (cancelling) cancelListing(cancelling);
+        onConfirm={async () => {
+          if (cancelling) await cancelListing(cancelling);
           setCancelling(null);
         }}
       />

@@ -304,13 +304,13 @@ export function MarketScreen() {
         }
         confirmLabel={deal?.kind === "sell" ? "Vender" : "Pagar " + formatBronze(dealTotal)}
         onCancel={() => setDeal(null)}
-        onConfirm={() => {
+        onConfirm={async () => {
           if (!deal) return;
 
           if (deal.kind === "buy") {
-            buyItem(deal.item.id, dealQuantity);
+            await buyItem(deal.item.id, dealQuantity);
           } else {
-            sellItem(deal.item.id, dealQuantity, deal.enhancement);
+            await sellItem(deal.item.id, dealQuantity, deal.enhancement);
           }
 
           setDeal(null);

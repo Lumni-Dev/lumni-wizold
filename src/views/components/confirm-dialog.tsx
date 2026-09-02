@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { Button } from "./button";
 import { Modal } from "./modal";
 
@@ -22,20 +22,30 @@ export function ConfirmDialog({
   detail?: ReactNode;
   confirmLabel?: string;
   cancelLabel?: string;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<unknown>;
   onCancel: () => void;
 }) {
+  const [pending, setPending] = useState(false);
+
+  const confirm = () => {
+    const outcome = onConfirm();
+    if (!(outcome instanceof Promise)) return outcome;
+    setPending(true);
+    return outcome.finally(() => setPending(false));
+  };
+
   return (
     <Modal
       open={open}
       title={title}
+      dismissible={!pending}
       onClose={onCancel}
       footer={
         <div className="flex items-center justify-end gap-2">
-          <Button variant="ghost" onClick={onCancel}>
+          <Button variant="ghost" disabled={pending} onClick={onCancel}>
             {cancelLabel}
           </Button>
-          <Button variant="primary" autoFocus onClick={onConfirm}>
+          <Button variant="primary" autoFocus onClick={confirm}>
             {confirmLabel}
           </Button>
         </div>

@@ -259,7 +259,7 @@ export function LoginScreen() {
                     variant="outline"
                     size="medium"
                     fullWidth
-                    onClick={() => void resendTwoFactor()}
+                    onClick={() => resendTwoFactor()}
                   >
                     Reenviar código
                   </Button>

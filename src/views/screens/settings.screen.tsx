@@ -274,8 +274,8 @@ export function SettingsScreen() {
                 <Chip
                   active={twoFactorEnabled}
                   onClick={() => {
-                    if (twoFactorEnabled) return;
-                    void sendTwoFactorCode("enable").then((sent) => {
+                    if (twoFactorEnabled) return undefined;
+                    return sendTwoFactorCode("enable").then((sent) => {
                       if (sent) {
                         setTwoFactorCode("");
                         setTwoFactorSetup("enable");
@@ -288,8 +288,8 @@ export function SettingsScreen() {
                 <Chip
                   active={!twoFactorEnabled}
                   onClick={() => {
-                    if (!twoFactorEnabled) return;
-                    void sendTwoFactorCode("disable").then((sent) => {
+                    if (!twoFactorEnabled) return undefined;
+                    return sendTwoFactorCode("disable").then((sent) => {
                       if (sent) {
                         setTwoFactorCode("");
                         setTwoFactorSetup("disable");
@@ -355,10 +355,10 @@ export function SettingsScreen() {
             <ListRow layout="split">
               <RowText title="Estado" description="Avisos de mesa neste aparelho." />
               <div className="flex shrink-0 gap-2">
-                <Chip active={pushOn} onClick={() => void choosePush(true)} disabled={!tavernPushSupported()}>
+                <Chip active={pushOn} onClick={() => choosePush(true)} disabled={!tavernPushSupported()}>
                   Ativado
                 </Chip>
-                <Chip active={!pushOn} onClick={() => void choosePush(false)}>
+                <Chip active={!pushOn} onClick={() => choosePush(false)}>
                   Desativado
                 </Chip>
               </div>
@@ -665,9 +665,9 @@ export function SettingsScreen() {
         detail="A página recarrega ao terminar."
         confirmLabel="Limpar"
         onCancel={() => setConfirmingClear(false)}
-        onConfirm={() => {
+        onConfirm={async () => {
+          await clearGameCache();
           setConfirmingClear(false);
-          void clearGameCache();
         }}
       />
 
@@ -677,9 +677,9 @@ export function SettingsScreen() {
         description="A cobrança mensal para de renovar. O VIP continua ativo até o fim do período já pago, e dá para reativar antes disso."
         confirmLabel="Cancelar assinatura"
         onCancel={() => setCancelingVip(false)}
-        onConfirm={() => {
+        onConfirm={async () => {
+          await cancelVip();
           setCancelingVip(false);
-          void cancelVip();
         }}
       />
 
@@ -716,7 +716,7 @@ export function SettingsScreen() {
               disabled={!/^\d{8}$/.test(twoFactorCode)}
               onClick={() => {
                 const action = twoFactorSetup === "enable" ? enableTwoFactor : disableTwoFactor;
-                void action(twoFactorCode).then((ok) => {
+                return action(twoFactorCode).then((ok) => {
                   if (!ok) return;
                   setTwoFactorEnabled(twoFactorSetup === "enable");
                   setTwoFactorSetup(null);

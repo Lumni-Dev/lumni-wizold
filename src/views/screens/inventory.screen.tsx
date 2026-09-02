@@ -43,8 +43,9 @@ export function InventoryScreen() {
     return () => window.clearInterval(timer);
   }, []);
   function handleEquip(itemId: string, slot: string, enhancement: number) {
-    equipItem(itemId, enhancement);
+    const done = equipItem(itemId, enhancement);
     setEquipLock((prev) => ({ ...prev, [slot]: Date.now() + 3000 }));
+    return done;
   }
 
   const slots = useMemo(() => detailInventory(state), [state]);

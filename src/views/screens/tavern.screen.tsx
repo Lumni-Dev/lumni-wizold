@@ -940,17 +940,16 @@ export function TavernScreen() {
         detail={closingRoom?.room.name}
         confirmLabel="Fechar"
         onCancel={() => setClosingRoomId(null)}
-        onConfirm={() => {
+        onConfirm={async () => {
           const roomId = closingRoomId;
-          setClosingRoomId(null);
           if (!roomId) return;
-          return closeRoom(roomId).then((result) => {
-            if (result) notify(result.message, result.ok, "Taverna");
-            if (result?.ok) {
-              playSound("door");
-              if (activeRoomId === roomId) setActiveRoomId(null);
-            }
-          });
+          const result = await closeRoom(roomId);
+          if (result) notify(result.message, result.ok, "Taverna");
+          if (result?.ok) {
+            playSound("door");
+            if (activeRoomId === roomId) setActiveRoomId(null);
+          }
+          setClosingRoomId(null);
         }}
       />
 
@@ -961,8 +960,8 @@ export function TavernScreen() {
         detail={removing?.name}
         confirmLabel="Sair"
         onCancel={() => setRemoving(null)}
-        onConfirm={() => {
-          if (removing) removeFromPack(removing.id);
+        onConfirm={async () => {
+          if (removing) await removeFromPack(removing.id);
           setRemoving(null);
         }}
       />

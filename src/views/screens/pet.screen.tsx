@@ -156,8 +156,8 @@ function Kennel({ bronze, level }: { bronze: number; level: number }) {
         detail={findPet(gender).label + " - " + name.trim() + " - " + formatBronze(price)}
         confirmLabel="Adotar"
         onCancel={() => setConfirming(false)}
-        onConfirm={() => {
-          adoptPet(gender, name);
+        onConfirm={async () => {
+          await adoptPet(gender, name);
           setName("");
           setConfirming(false);
         }}
@@ -415,8 +415,8 @@ export function PetScreen() {
         }
         confirmLabel="Soltar"
         onCancel={() => setConfirmingRelease(false)}
-        onConfirm={() => {
-          releasePet();
+        onConfirm={async () => {
+          await releasePet();
           setConfirmingRelease(false);
         }}
       />
