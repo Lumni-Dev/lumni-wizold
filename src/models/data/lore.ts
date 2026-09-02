@@ -102,6 +102,21 @@ export const LORE_COMPANIONS: readonly LoreCompanion[] = [
   },
 ];
 
+export const WELCOME_VOICE = "/assets/voice/welcome.mp3?v=1";
+
+export const WELCOME_PARAGRAPHS = [
+  "Você cruzou a porta. Este é o seu lugar na noite.",
+  "Na ficha você vê o corpo, a fúria e o que a Vontade segura. Na caça, só a fera sai: junte a fúria, vire, e volte antes do relógio acabar. O pátio treina o que o nível não dá. A mina e a forja pagam o metal. O mercado e o bazar trocam o que você carrega. O fosso mede iguais. A taverna é mesa e matilha.",
+  "Antes de tudo, abra as Configurações. Lá você liga ou corta o som e a trilha, e escolhe o volume da música. Lá você decide se o fundo vive em vídeo ou fica parado, e o quão fechado fica o véu da tela. Lá a Taverna pode avisar no aparelho quando a mesa fala. E lá estão as chaves da automação: caçar, treinar, minerar, forjar, beber e cuidar do lobo sem você ficar em cima de cada volta.",
+  "Nada liga sozinho. Cada chave é sua. Quando a noite estiver do seu jeito, a porta já não precisa de guia.",
+] as const;
+
+export const WELCOME_CHAPTER: LoreChapter = {
+  title: "Bem-vindo",
+  text: WELCOME_PARAGRAPHS.join(" "),
+  voice: WELCOME_VOICE,
+};
+
 export const LORE_PILLARS: readonly LorePillar[] = [
   {
     title: "Caçar",

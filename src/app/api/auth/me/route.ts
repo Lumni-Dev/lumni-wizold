@@ -13,7 +13,7 @@ export async function GET() {
     return await withTransaction(async (client) => {
       if (!(await sessionIsLive(client, claims))) return bad("Sessão encerrada.", 401);
       const found = await client.query(
-        "select email, picture, two_factor_enabled from users where id = $1",
+        "select email, picture, two_factor_enabled, tutorial from users where id = $1",
         [userId],
       );
       const loaded = await loadGame(client, userId, false);
@@ -25,6 +25,7 @@ export async function GET() {
           email: found.rows[0]?.email ?? null,
           picture: found.rows[0]?.picture ?? null,
           twoFactorEnabled: found.rows[0]?.two_factor_enabled === true,
+          tutorial: found.rows[0]?.tutorial === true,
           hasCharacter: loaded !== null,
         },
       });

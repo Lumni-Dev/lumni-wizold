@@ -9,6 +9,7 @@ import {
   NAVIGATION,
   SETTINGS_LINK,
   STORE_LINK,
+  TUTORIAL_LINK,
   type NavigationItem,
 } from "@/shared/constants/navigation";
 import { cn } from "@/shared/utils/class-names";
@@ -74,7 +75,43 @@ function NavLink({
   );
 }
 
-export function Sidebar({ tavernUnread = 0 }: { tavernUnread?: number }) {
+function TutorialButton({ active, onClick }: { active: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        playSound("ui");
+        onClick();
+      }}
+      aria-pressed={active}
+      className={cn(
+        "relative flex w-full " + CONTROL_HEIGHT + " items-center rounded-md border transition-colors",
+        active
+          ? "border-edge-strong bg-surface-high text-ink"
+          : "border-edge text-ink-soft hover:border-edge-strong hover:bg-surface/70 hover:text-ink",
+      )}
+    >
+      <span
+        className={"flex " + CONTROL_HEIGHT + " w-8 shrink-0 items-center justify-center border-r border-edge"}
+      >
+        <NavIcon href="tutorial" />
+      </span>
+      <span className="min-w-0 truncate px-3 text-[10px] uppercase tracking-[0.16em]">
+        {TUTORIAL_LINK.label}
+      </span>
+    </button>
+  );
+}
+
+export function Sidebar({
+  tavernUnread = 0,
+  tutorialOpen = false,
+  onOpenTutorial,
+}: {
+  tavernUnread?: number;
+  tutorialOpen?: boolean;
+  onOpenTutorial: () => void;
+}) {
   const pathname = usePathname();
 
   return (
@@ -92,6 +129,9 @@ export function Sidebar({ tavernUnread = 0 }: { tavernUnread?: number }) {
               />
             </li>
           ))}
+          <li>
+            <TutorialButton active={tutorialOpen} onClick={onOpenTutorial} />
+          </li>
         </ul>
       </nav>
 
@@ -105,7 +145,15 @@ export function Sidebar({ tavernUnread = 0 }: { tavernUnread?: number }) {
   );
 }
 
-export function MobileNavigation({ tavernUnread = 0 }: { tavernUnread?: number }) {
+export function MobileNavigation({
+  tavernUnread = 0,
+  tutorialOpen = false,
+  onOpenTutorial,
+}: {
+  tavernUnread?: number;
+  tutorialOpen?: boolean;
+  onOpenTutorial: () => void;
+}) {
   const pathname = usePathname();
   const links = [...NAVIGATION, STORE_LINK, SETTINGS_LINK];
   const trackRef = useRef<HTMLElement>(null);
@@ -124,8 +172,8 @@ export function MobileNavigation({ tavernUnread = 0 }: { tavernUnread?: number }
       {links.map((item) => {
         const active = pathname === item.href;
         const badge = item.href === "/tavern" ? tavernUnread : 0;
-        return (
-          <ChipFrame key={item.href} active={active}>
+        const chip = (
+          <ChipFrame active={active}>
             <Link
               href={item.href}
               aria-current={active ? "page" : undefined}
@@ -139,6 +187,31 @@ export function MobileNavigation({ tavernUnread = 0 }: { tavernUnread?: number }
               ) : null}
             </Link>
           </ChipFrame>
+        );
+        if (item.href !== "/wiki") {
+          return (
+            <span key={item.href} className="shrink-0">
+              {chip}
+            </span>
+          );
+        }
+        return (
+          <span key={item.href} className="contents">
+            {chip}
+            <ChipFrame active={tutorialOpen}>
+              <button
+                type="button"
+                aria-pressed={tutorialOpen}
+                onClick={() => {
+                  playSound("ui");
+                  onOpenTutorial();
+                }}
+                className={chipClass(tutorialOpen)}
+              >
+                {TUTORIAL_LINK.label}
+              </button>
+            </ChipFrame>
+          </span>
         );
       })}
     </nav>

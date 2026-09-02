@@ -45,6 +45,14 @@ for (const match of lore.matchAll(block)) {
   chapters.push({ name: match[2], text });
 }
 
+const welcomeBlock = lore.match(/export const WELCOME_PARAGRAPHS = \[([\s\S]*?)\] as const/);
+if (welcomeBlock) {
+  const text = Array.from(welcomeBlock[1].matchAll(/"((?:[^"\\]|\\.)*)"/g))
+    .map((piece) => piece[1])
+    .join(" ");
+  if (text) chapters.push({ name: "welcome", text });
+}
+
 const AREAS = join(ROOT, "src", "models", "data", "areas");
 for (const entry of readdirSync(AREAS)) {
   if (!entry.endsWith(".ts") || entry === "index.ts" || entry === "types.ts") continue;

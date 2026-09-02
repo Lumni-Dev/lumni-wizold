@@ -94,7 +94,12 @@ export async function POST(request: Request) {
         return NextResponse.json({
           ok: true,
           message: "Código enviado para o seu e-mail.",
-          data: { userId: user.id, hasCharacter: loaded !== null, needsTwoFactor: true },
+          data: {
+            userId: user.id,
+            hasCharacter: loaded !== null,
+            needsTwoFactor: true,
+            tutorial: user.tutorial,
+          },
         });
       }
 
@@ -115,7 +120,7 @@ export async function POST(request: Request) {
       return NextResponse.json({
         ok: true,
         message: existing ? "Bem-vindo de volta." : "Conta criada. A caçada aguarda.",
-        data: { userId: user.id, hasCharacter: loaded !== null },
+        data: { userId: user.id, hasCharacter: loaded !== null, tutorial: user.tutorial },
       });
     });
   } catch (error) {

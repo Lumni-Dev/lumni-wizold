@@ -7,6 +7,7 @@ export interface ApiAnswer<T> {
   data: T | null;
   state: GameState | null;
   version: string | null;
+  tutorial: boolean | null;
 }
 export async function api<T = unknown>(
   method: "GET" | "POST" | "PATCH" | "PUT" | "DELETE",
@@ -28,6 +29,7 @@ export async function api<T = unknown>(
       data?: T;
       state?: GameState;
       version?: string;
+      tutorial?: boolean;
     } | null = null;
     try {
       payload = await response.json();
@@ -43,6 +45,7 @@ export async function api<T = unknown>(
       data: payload?.data ?? null,
       state: payload?.state ?? null,
       version: payload?.version ?? null,
+      tutorial: typeof payload?.tutorial === "boolean" ? payload.tutorial : null,
     };
   } catch {
     return {
@@ -52,6 +55,7 @@ export async function api<T = unknown>(
       data: null,
       state: null,
       version: null,
+      tutorial: null,
     };
   }
 }

@@ -54,3 +54,9 @@ export const SETTINGS_LINK: NavigationItem = {
   code: "CF",
   description: "Conta, nome e partida",
 };
+
+export const TUTORIAL_LINK = {
+  label: "Como jogar",
+  code: "TJ",
+  description: "A primeira noite, de novo",
+};

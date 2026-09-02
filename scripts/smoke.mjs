@@ -102,8 +102,21 @@ const clashUpper = await call("POST", "/api/characters", { name: "FUMACA", gende
 check("nome repetido ignora maiúsculas", clashUpper.payload?.ok === false, clashUpper.payload?.message);
 await client.query("delete from users where id = $1", [rivalId]);
 cookie = mine;
-const state1 = (await call("POST", "/api/state")).payload?.data;
+const state1Answer = await call("POST", "/api/state");
+const state1 = state1Answer.payload?.data;
 check("nasce com 200 de bronze", state1?.character?.bronze === 200);
+check("tutorial começa aberto", state1Answer.payload?.tutorial === false);
+const meTutorial = await call("GET", "/api/auth/me");
+check("me traz o tutorial aberto", meTutorial.payload?.data?.tutorial === false);
+const started = await call("POST", "/api/tutorial");
+check(
+  "começar jogo marca o tutorial",
+  started.payload?.ok === true && started.payload?.tutorial === true,
+);
+const meDone = await call("GET", "/api/auth/me");
+check("tutorial fica marcado", meDone.payload?.data?.tutorial === true);
+const startedAgain = await call("POST", "/api/tutorial");
+check("marcar de novo não reabre", startedAgain.payload?.tutorial === true);
 check("carteira nasce com R$ 10", state1?.wallet?.cents === 1000);
 check("dez poções na mochila", state1?.inventory?.[0]?.quantity === 10);
 const stockFury = await call("POST", "/api/market/buy", {

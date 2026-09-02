@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useSyncExternalStore, type ReactNode } from "react";
+import { useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
 import { useGame } from "@/controllers/game.context";
 import { usePackAlert } from "@/controllers/use-pack-alert";
 import { useTavernAlert } from "@/controllers/use-tavern-alert";
@@ -9,6 +9,7 @@ import { backgroundRepository } from "@/models/repositories/background.repositor
 import { LiveBackdrop } from "../components/live-backdrop";
 import { GameMusic } from "../components/game-music";
 import { Spinner } from "../components/spinner";
+import { WelcomeTutorial } from "../components/welcome-tutorial";
 import { GameFooter } from "./game-footer";
 import { GameCorner } from "./game-corner";
 import { TavernChatWindow } from "../components/tavern-chat-window";
@@ -26,12 +27,14 @@ function Loading() {
 }
 
 export function GameFrame({ children }: { children: ReactNode }) {
-  const { ready, character } = useGame();
+  const { ready, character, tutorial } = useGame();
+  const [reviewTutorial, setReviewTutorial] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const inTavern = pathname.startsWith("/tavern");
   const tavernUnread = useTavernAlert(!inTavern);
   const asideUnread = inTavern ? 0 : tavernUnread;
+  const tutorialOpen = !tutorial || reviewTutorial;
   usePackAlert(!inTavern);
   const animatedBackground = useSyncExternalStore(
     backgroundRepository.subscribe,
@@ -50,12 +53,20 @@ export function GameFrame({ children }: { children: ReactNode }) {
       {animatedBackground ? <LiveBackdrop shade="deep" /> : null}
       <GameMusic />
       <div className="relative z-10 flex min-h-screen">
-        <Sidebar tavernUnread={asideUnread} />
+        <Sidebar
+          tavernUnread={asideUnread}
+          tutorialOpen={tutorialOpen}
+          onOpenTutorial={() => setReviewTutorial(true)}
+        />
         <div className="flex min-h-screen w-full min-w-0 flex-col">
           <div className="sticky top-0 z-20">
             <ResourceBar />
           </div>
-          <MobileNavigation tavernUnread={asideUnread} />
+          <MobileNavigation
+            tavernUnread={asideUnread}
+            tutorialOpen={tutorialOpen}
+            onOpenTutorial={() => setReviewTutorial(true)}
+          />
           <div className="border-b border-edge px-3 py-2 lg:hidden">
             <MoonTracker />
           </div>
@@ -65,6 +76,11 @@ export function GameFrame({ children }: { children: ReactNode }) {
       </div>
       <GameCorner />
       <TavernChatWindow />
+      <WelcomeTutorial
+        open={tutorialOpen}
+        persist={!tutorial}
+        onFinished={() => setReviewTutorial(false)}
+      />
     </>
   );
 }

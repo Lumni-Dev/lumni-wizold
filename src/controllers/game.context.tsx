@@ -146,6 +146,8 @@ interface GameContextValue {
   feedPet: (itemId: string) => Promise<void>;
   setPetActive: (active: boolean) => Promise<void>;
   refresh: () => Promise<void>;
+  tutorial: boolean;
+  completeTutorial: () => Promise<boolean>;
   updateAvailable: boolean;
   updateVersion: string | null;
   applyUpdate: () => void;
@@ -170,6 +172,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<GameState>(initialState());
   const [booted, setBooted] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
+  const [tutorial, setTutorial] = useState(true);
   const [notices, setNotices] = useState<Notice[]>([]);
   const [activity, setActivityState] = useState<Activity | null>(null);
   const [updateAvailable, setUpdateAvailable] = useState(false);
@@ -306,8 +309,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
         const answer = await api<T>(method, path, body);
         if (answer.status === 401) {
           setAuthenticated(false);
+          setTutorial(true);
           return answer;
         }
+        if (typeof answer.tutorial === "boolean") setTutorial(answer.tutorial);
         if (answer.state) {
           const seq = ++mintRef.current;
           if (defer === "hunt" && answer.ok) {
@@ -550,6 +555,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         const answer = await api<{
           hasCharacter: boolean;
           needsTwoFactor?: boolean;
+          tutorial?: boolean;
         }>("POST", "/api/auth/enter", {
           credential,
           birth,
@@ -558,6 +564,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
           announce(answer.message, false, "Conta");
           return null;
         }
+        if (typeof answer.data?.tutorial === "boolean") setTutorial(answer.data.tutorial);
         if (answer.data?.needsTwoFactor) {
           announce(answer.message, true, "Conta");
           return {
@@ -622,6 +629,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         applyState(initialState(), ++mintRef.current);
         setActivity(null);
         setAuthenticated(false);
+        setTutorial(true);
       },
       logoutEverywhere: async () => {
         await api("POST", "/api/auth/logout-all");
@@ -630,6 +638,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         applyState(initialState(), ++mintRef.current);
         setActivity(null);
         setAuthenticated(false);
+        setTutorial(true);
       },
       deleteRun: async (code) => {
         const answer = await api("DELETE", "/api/characters", { code });
@@ -638,6 +647,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
           applyState(initialState(), ++mintRef.current);
           setActivity(null);
           setAuthenticated(false);
+          setTutorial(true);
         }
         return answer.ok;
       },
@@ -929,6 +939,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
       refresh: async () => {
         await request("POST", "/api/state");
       },
+      tutorial,
+      completeTutorial: async () => {
+        const answer = await request("POST", "/api/tutorial");
+        if (answer.ok) setTutorial(true);
+        return answer.ok;
+      },
       updateAvailable,
       updateVersion,
       applyUpdate,
@@ -937,6 +953,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     state,
     ready,
     authenticated,
+    tutorial,
     notices,
     activity,
     moon,

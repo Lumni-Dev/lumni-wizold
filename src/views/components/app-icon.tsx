@@ -5,6 +5,7 @@ import {
   Bell,
   BookOpen,
   Check,
+  CircleHelp,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -51,6 +52,7 @@ const NAV_ICONS: Record<string, LucideIcon> = {
   "/tavern": Beer,
   "/ranking": Trophy,
   "/wiki": BookOpen,
+  tutorial: CircleHelp,
   "/store": ShoppingBag,
   "/settings": Settings,
 };

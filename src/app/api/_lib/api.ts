@@ -6,6 +6,7 @@ import type { TavernIdentity, TavernState } from "@/models/entities/tavern";
 import { syncCharacter } from "@/controllers/character.controller";
 import { withTransaction } from "@/models/repositories/server/database";
 import { loadGame, saveGame, type LoadedGame } from "@/models/repositories/server/game.store";
+import { isTutorialDone } from "@/models/repositories/server/user.store";
 import {
   loadRoomState,
   loadTavern,
@@ -122,7 +123,8 @@ export async function withGame<T>(request: Request, action: GameAction<T>): Prom
         await saveGame(client, loaded.characterId, loaded.state, result.state);
         await recordClientVersion(client, userId, request.headers.get("x-game-version"));
       }
-      return reply(result);
+      const tutorial = await isTutorialDone(client, userId);
+      return reply(result, { tutorial });
     });
   } catch (error) {
     console.error("[api]", request.method, new URL(request.url).pathname, error);
