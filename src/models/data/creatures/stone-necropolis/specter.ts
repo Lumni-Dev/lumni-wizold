@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const specter: Creature = {
   id: "specter",
   name: "Espectro",
-  image: "/assets/creatures/stone-necropolis/specter.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 621,

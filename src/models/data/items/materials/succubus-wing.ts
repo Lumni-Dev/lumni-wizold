@@ -9,7 +9,6 @@ export const succubusWing: Item = {
   category: "material",
   rarity: "epic",
   price: 750,
-  image: "/assets/inventory/materials/succubus-wing.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

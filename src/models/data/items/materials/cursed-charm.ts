@@ -9,7 +9,6 @@ export const cursedCharm: Item = {
   category: "material",
   rarity: "rare",
   price: 200,
-  image: "/assets/inventory/materials/cursed-charm.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

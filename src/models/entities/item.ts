@@ -30,7 +30,6 @@ export interface Item {
   category: ItemCategory;
   rarity: Rarity;
   price: number;
-  image?: string;
   huntCost?: number;
   minLevel: number;
   stackable: boolean;

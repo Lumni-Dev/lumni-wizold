@@ -9,7 +9,6 @@ export const thickHide: Item = {
   category: "material",
   rarity: "common",
   price: 10,
-  image: "/assets/inventory/materials/thick-hide.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

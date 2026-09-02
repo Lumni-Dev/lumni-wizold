@@ -9,7 +9,6 @@ export const lavaCore: Item = {
   category: "material",
   rarity: "epic",
   price: 750,
-  image: "/assets/inventory/materials/lava-core.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

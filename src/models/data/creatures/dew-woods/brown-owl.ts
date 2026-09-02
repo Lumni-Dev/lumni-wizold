@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const brownOwl: Creature = {
   id: "brown-owl",
   name: "Coruja Parda",
-  image: "/assets/creatures/dew-woods/brown-owl.png",
   description: "Pequenos, rápidos e em número maior do que parece. O primeiro sangue de qualquer lobisomem.",
   species: "rabbit",
   level: 111,

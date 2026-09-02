@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const hungryCrow: Creature = {
   id: "hungry-crow",
   name: "Corvo Faminto",
-  image: "/assets/creatures/village-field/hungry-crow.png",
   description: "Fogem bem e chutam melhor. Alimentam uma matilha inteira por semanas.",
   species: "deer",
   level: 41,

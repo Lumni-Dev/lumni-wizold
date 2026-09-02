@@ -9,7 +9,6 @@ export const ghoulClaw: Item = {
   category: "material",
   rarity: "rare",
   price: 200,
-  image: "/assets/inventory/materials/ghoul-claw.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

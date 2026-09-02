@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const necromancer: Creature = {
   id: "necromancer",
   name: "Necromante",
-  image: "/assets/creatures/stone-necropolis/necromancer.png",
   description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
   species: "human",
   level: 661,

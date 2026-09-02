@@ -9,7 +9,6 @@ export const mosquitoWing: Item = {
   category: "material",
   rarity: "common",
   price: 10,
-  image: "/assets/inventory/materials/mosquito-wing.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

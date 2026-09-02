@@ -9,7 +9,6 @@ export const spectralAntler: Item = {
   category: "material",
   rarity: "epic",
   price: 750,
-  image: "/assets/inventory/materials/spectral-antler.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

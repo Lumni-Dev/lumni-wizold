@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const skeletonWarrior: Creature = {
   id: "skeleton-warrior",
   name: "Esqueleto Guerreiro",
-  image: "/assets/creatures/stone-necropolis/skeleton-warrior.png",
   description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
   species: "human",
   level: 601,

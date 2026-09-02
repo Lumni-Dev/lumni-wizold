@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const lesserGriffin: Creature = {
   id: "lesser-griffin",
   name: "Grifo Menor",
-  image: "/assets/creatures/mist-ridge/lesser-griffin.png",
   description: "Nada aqui é gentil. O chifre atravessa antes de você ouvir o galope.",
   species: "unicorn",
   level: 291,

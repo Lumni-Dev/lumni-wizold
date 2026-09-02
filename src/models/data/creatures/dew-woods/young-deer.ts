@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const youngDeer: Creature = {
   id: "young-deer",
   name: "Veado Jovem",
-  image: "/assets/creatures/dew-woods/young-deer.png",
   description: "Fogem bem e chutam melhor. Alimentam uma matilha inteira por semanas.",
   species: "deer",
   level: 101,

@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const banshee: Creature = {
   id: "banshee",
   name: "Banshee",
-  image: "/assets/creatures/stone-necropolis/banshee.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 651,

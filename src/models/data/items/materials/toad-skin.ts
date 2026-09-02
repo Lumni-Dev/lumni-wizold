@@ -9,7 +9,6 @@ export const toadSkin: Item = {
   category: "material",
   rarity: "uncommon",
   price: 50,
-  image: "/assets/inventory/materials/toad-skin.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

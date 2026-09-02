@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const bloodSorceress: Creature = {
   id: "blood-sorceress",
   name: "Feiticeira de Sangue",
-  image: "/assets/creatures/scarlet-castle/blood-sorceress.png",
   description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
   species: "human",
   level: 841,

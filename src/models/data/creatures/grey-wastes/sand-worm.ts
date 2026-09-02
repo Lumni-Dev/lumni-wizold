@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const sandWorm: Creature = {
   id: "sand-worm",
   name: "Verme das Areias",
-  image: "/assets/creatures/grey-wastes/sand-worm.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 541,

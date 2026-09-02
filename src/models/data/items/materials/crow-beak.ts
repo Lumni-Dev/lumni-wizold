@@ -9,7 +9,6 @@ export const crowBeak: Item = {
   category: "material",
   rarity: "common",
   price: 10,
-  image: "/assets/inventory/materials/crow-beak.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

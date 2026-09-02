@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const wildRaider: Creature = {
   id: "wild-raider",
   name: "Saqueador Selvagem",
-  image: "/assets/creatures/grey-wastes/wild-raider.png",
   description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
   species: "human",
   level: 551,

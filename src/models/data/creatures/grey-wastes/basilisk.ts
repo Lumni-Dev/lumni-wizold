@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const basilisk: Creature = {
   id: "basilisk",
   name: "Basilisco",
-  image: "/assets/creatures/grey-wastes/basilisk.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 581,

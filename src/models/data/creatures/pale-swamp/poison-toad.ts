@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const poisonToad: Creature = {
   id: "poison-toad",
   name: "Sapo Venenoso",
-  image: "/assets/creatures/pale-swamp/poison-toad.png",
   description: "Pequenos, rápidos e em número maior do que parece. O primeiro sangue de qualquer lobisomem.",
   species: "rabbit",
   level: 301,

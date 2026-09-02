@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const lesserPhoenix: Creature = {
   id: "lesser-phoenix",
   name: "Fênix Menor",
-  image: "/assets/creatures/white-clearing/lesser-phoenix.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 921,

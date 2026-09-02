@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const scarletCount: Creature = {
   id: "scarlet-count",
   name: "Conde Escarlate",
-  image: "/assets/creatures/scarlet-castle/scarlet-count.png",
   description: "Nada aqui é gentil. O chifre atravessa antes de você ouvir o galope.",
   species: "unicorn",
   level: 881,

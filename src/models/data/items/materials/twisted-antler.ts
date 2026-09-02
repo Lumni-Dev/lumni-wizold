@@ -9,7 +9,6 @@ export const twistedAntler: Item = {
   category: "material",
   rarity: "uncommon",
   price: 50,
-  image: "/assets/inventory/materials/twisted-antler.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

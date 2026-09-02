@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const ridgePuma: Creature = {
   id: "ridge-puma",
   name: "Puma da Serra",
-  image: "/assets/creatures/mist-ridge/ridge-puma.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 231,

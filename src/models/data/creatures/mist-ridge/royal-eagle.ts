@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const royalEagle: Creature = {
   id: "royal-eagle",
   name: "Águia Real",
-  image: "/assets/creatures/mist-ridge/royal-eagle.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 211,

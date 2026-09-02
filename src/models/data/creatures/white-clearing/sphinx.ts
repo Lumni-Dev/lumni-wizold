@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const sphinx: Creature = {
   id: "sphinx",
   name: "Esfinge",
-  image: "/assets/creatures/white-clearing/sphinx.png",
   description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
   species: "human",
   level: 951,

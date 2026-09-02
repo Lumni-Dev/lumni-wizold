@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const fallenSeraph: Creature = {
   id: "fallen-seraph",
   name: "Serafim Caído",
-  image: "/assets/creatures/white-clearing/fallen-seraph.png",
   description: "Nada aqui é gentil. O chifre atravessa antes de você ouvir o galope.",
   species: "unicorn",
   level: 971,

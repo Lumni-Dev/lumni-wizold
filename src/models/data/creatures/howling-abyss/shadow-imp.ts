@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const shadowImp: Creature = {
   id: "shadow-imp",
   name: "Imp das Sombras",
-  image: "/assets/creatures/howling-abyss/shadow-imp.png",
   description: "Pequenos, rápidos e em número maior do que parece. O primeiro sangue de qualquer lobisomem.",
   species: "rabbit",
   level: 701,

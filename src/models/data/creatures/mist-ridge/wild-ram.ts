@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const wildRam: Creature = {
   id: "wild-ram",
   name: "Bode Selvagem",
-  image: "/assets/creatures/mist-ridge/wild-ram.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 241,

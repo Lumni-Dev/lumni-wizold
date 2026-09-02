@@ -9,7 +9,6 @@ export const basiliskFang: Item = {
   category: "material",
   rarity: "epic",
   price: 750,
-  image: "/assets/inventory/materials/basilisk-fang.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

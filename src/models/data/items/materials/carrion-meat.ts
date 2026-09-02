@@ -9,7 +9,6 @@ export const carrionMeat: Item = {
   category: "material",
   rarity: "common",
   price: 10,
-  image: "/assets/inventory/materials/carrion-meat.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

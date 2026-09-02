@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const reaper: Creature = {
   id: "reaper",
   name: "Ceifador",
-  image: "/assets/creatures/howling-abyss/reaper.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 771,

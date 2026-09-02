@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const huntingHound: Creature = {
   id: "hunting-hound",
   name: "Cão de Caça",
-  image: "/assets/creatures/hunter-road/hunting-hound.png",
   description: "Fogem bem e chutam melhor. Alimentam uma matilha inteira por semanas.",
   species: "deer",
   level: 441,

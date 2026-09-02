@@ -9,7 +9,6 @@ export const poultryMeat: Item = {
   category: "material",
   rarity: "common",
   price: 10,
-  image: "/assets/inventory/materials/poultry-meat.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

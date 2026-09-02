@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const lesserGorgon: Creature = {
   id: "lesser-gorgon",
   name: "Górgona Menor",
-  image: "/assets/creatures/grey-wastes/lesser-gorgon.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 561,

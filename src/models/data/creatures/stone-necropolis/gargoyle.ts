@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const gargoyle: Creature = {
   id: "gargoyle",
   name: "Gárgula",
-  image: "/assets/creatures/stone-necropolis/gargoyle.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 671,

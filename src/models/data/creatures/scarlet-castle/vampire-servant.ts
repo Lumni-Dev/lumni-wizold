@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const vampireServant: Creature = {
   id: "vampire-servant",
   name: "Servo Vampiro",
-  image: "/assets/creatures/scarlet-castle/vampire-servant.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 801,

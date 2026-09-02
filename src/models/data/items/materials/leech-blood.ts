@@ -9,7 +9,6 @@ export const leechBlood: Item = {
   category: "material",
   rarity: "uncommon",
   price: 50,
-  image: "/assets/inventory/materials/leech-blood.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

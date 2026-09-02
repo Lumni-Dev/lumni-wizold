@@ -9,7 +9,6 @@ export const rivalPelt: Item = {
   category: "material",
   rarity: "epic",
   price: 750,
-  image: "/assets/inventory/materials/rival-pelt.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

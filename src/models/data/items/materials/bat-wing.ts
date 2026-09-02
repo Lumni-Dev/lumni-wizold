@@ -9,7 +9,6 @@ export const batWing: Item = {
   category: "material",
   rarity: "uncommon",
   price: 50,
-  image: "/assets/inventory/materials/bat-wing.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

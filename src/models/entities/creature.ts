@@ -28,7 +28,6 @@ export interface CreatureDrop {
 export interface Creature {
   id: string;
   name: string;
-  image?: string;
   description: string;
   species: SpeciesKey;
   level: number;

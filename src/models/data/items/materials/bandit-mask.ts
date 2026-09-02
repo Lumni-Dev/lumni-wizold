@@ -9,7 +9,6 @@ export const banditMask: Item = {
   category: "material",
   rarity: "rare",
   price: 200,
-  image: "/assets/inventory/materials/bandit-mask.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

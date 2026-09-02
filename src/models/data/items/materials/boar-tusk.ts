@@ -9,7 +9,6 @@ export const boarTusk: Item = {
   category: "material",
   rarity: "uncommon",
   price: 50,
-  image: "/assets/inventory/materials/boar-tusk.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const slopeOgre: Creature = {
   id: "slope-ogre",
   name: "Ogro da Encosta",
-  image: "/assets/creatures/mist-ridge/slope-ogre.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 281,

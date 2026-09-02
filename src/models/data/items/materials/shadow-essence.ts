@@ -9,7 +9,6 @@ export const shadowEssence: Item = {
   category: "material",
   rarity: "rare",
   price: 200,
-  image: "/assets/inventory/materials/shadow-essence.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

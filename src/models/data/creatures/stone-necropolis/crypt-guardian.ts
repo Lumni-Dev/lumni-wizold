@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const cryptGuardian: Creature = {
   id: "crypt-guardian",
   name: "Guardião da Cripta",
-  image: "/assets/creatures/stone-necropolis/crypt-guardian.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 691,

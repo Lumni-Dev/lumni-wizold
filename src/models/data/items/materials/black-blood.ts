@@ -9,7 +9,6 @@ export const blackBlood: Item = {
   category: "material",
   rarity: "legendary",
   price: 2800,
-  image: "/assets/inventory/materials/black-blood.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

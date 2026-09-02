@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const giantSpider: Creature = {
   id: "giant-spider",
   name: "Aranha Gigante",
-  image: "/assets/creatures/dew-woods/giant-spider.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 181,

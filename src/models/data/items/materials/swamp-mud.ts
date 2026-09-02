@@ -9,7 +9,6 @@ export const swampMud: Item = {
   category: "material",
   rarity: "uncommon",
   price: 50,
-  image: "/assets/inventory/materials/swamp-mud.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

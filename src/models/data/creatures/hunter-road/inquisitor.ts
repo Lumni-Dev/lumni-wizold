@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const inquisitor: Creature = {
   id: "inquisitor",
   name: "Inquisidor",
-  image: "/assets/creatures/hunter-road/inquisitor.png",
   description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
   species: "human",
   level: 471,

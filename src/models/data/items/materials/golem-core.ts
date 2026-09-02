@@ -9,7 +9,6 @@ export const golemCore: Item = {
   category: "material",
   rarity: "epic",
   price: 750,
-  image: "/assets/inventory/materials/golem-core.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

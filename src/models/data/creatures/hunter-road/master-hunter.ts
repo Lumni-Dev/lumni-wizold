@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const masterHunter: Creature = {
   id: "master-hunter",
   name: "Mestre Caçador",
-  image: "/assets/creatures/hunter-road/master-hunter.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 491,

@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const pegasus: Creature = {
   id: "pegasus",
   name: "Pégaso",
-  image: "/assets/creatures/white-clearing/pegasus.png",
   description: "Nada aqui é gentil. O chifre atravessa antes de você ouvir o galope.",
   species: "unicorn",
   level: 941,

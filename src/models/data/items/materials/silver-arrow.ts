@@ -9,7 +9,6 @@ export const silverArrow: Item = {
   category: "material",
   rarity: "rare",
   price: 200,
-  image: "/assets/inventory/materials/silver-arrow.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const woodBoar: Creature = {
   id: "wood-boar",
   name: "Javali da Mata",
-  image: "/assets/creatures/dew-woods/wood-boar.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 131,

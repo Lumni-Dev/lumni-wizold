@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const forestLynx: Creature = {
   id: "forest-lynx",
   name: "Lince do Mato",
-  image: "/assets/creatures/village-field/forest-lynx.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 91,

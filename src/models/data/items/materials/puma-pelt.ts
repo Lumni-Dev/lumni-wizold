@@ -9,7 +9,6 @@ export const pumaPelt: Item = {
   category: "material",
   rarity: "rare",
   price: 200,
-  image: "/assets/inventory/materials/puma-pelt.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const youngHydra: Creature = {
   id: "young-hydra",
   name: "Hidra Jovem",
-  image: "/assets/creatures/pale-swamp/young-hydra.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 381,

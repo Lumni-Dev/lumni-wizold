@@ -9,7 +9,6 @@ export const eagleFeather: Item = {
   category: "material",
   rarity: "rare",
   price: 200,
-  image: "/assets/inventory/materials/eagle-feather.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

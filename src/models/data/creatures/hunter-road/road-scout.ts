@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const roadScout: Creature = {
   id: "road-scout",
   name: "Batedor da Estrada",
-  image: "/assets/creatures/hunter-road/road-scout.png",
   description: "Fogem bem e chutam melhor. Alimentam uma matilha inteira por semanas.",
   species: "deer",
   level: 411,

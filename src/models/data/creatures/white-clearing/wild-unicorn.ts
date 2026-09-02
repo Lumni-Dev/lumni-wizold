@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const wildUnicorn: Creature = {
   id: "wild-unicorn",
   name: "Unicórnio Selvagem",
-  image: "/assets/creatures/white-clearing/wild-unicorn.png",
   description: "Nada aqui é gentil. O chifre atravessa antes de você ouvir o galope.",
   species: "unicorn",
   level: 901,

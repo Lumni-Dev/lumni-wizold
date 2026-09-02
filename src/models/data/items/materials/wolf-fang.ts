@@ -9,7 +9,6 @@ export const wolfFang: Item = {
   category: "material",
   rarity: "uncommon",
   price: 50,
-  image: "/assets/inventory/materials/wolf-fang.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

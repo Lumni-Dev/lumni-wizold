@@ -9,7 +9,6 @@ export const hellhoundFang: Item = {
   category: "material",
   rarity: "epic",
   price: 750,
-  image: "/assets/inventory/materials/hellhound-fang.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

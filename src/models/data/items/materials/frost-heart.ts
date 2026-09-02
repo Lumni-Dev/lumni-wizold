@@ -9,7 +9,6 @@ export const frostHeart: Item = {
   category: "material",
   rarity: "epic",
   price: 750,
-  image: "/assets/inventory/materials/frost-heart.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

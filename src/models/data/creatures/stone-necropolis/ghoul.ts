@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const ghoul: Creature = {
   id: "ghoul",
   name: "Carniçal",
-  image: "/assets/creatures/stone-necropolis/ghoul.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 631,

@@ -9,7 +9,6 @@ export const serpentScale: Item = {
   category: "material",
   rarity: "uncommon",
   price: 50,
-  image: "/assets/inventory/materials/serpent-scale.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

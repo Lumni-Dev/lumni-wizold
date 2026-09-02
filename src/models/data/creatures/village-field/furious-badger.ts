@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const furiousBadger: Creature = {
   id: "furious-badger",
   name: "Texugo Furioso",
-  image: "/assets/creatures/village-field/furious-badger.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 81,

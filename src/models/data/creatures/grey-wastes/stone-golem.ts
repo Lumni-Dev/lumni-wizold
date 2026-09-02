@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const stoneGolem: Creature = {
   id: "stone-golem",
   name: "Golem de Pedra",
-  image: "/assets/creatures/grey-wastes/stone-golem.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 571,

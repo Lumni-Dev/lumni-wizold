@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const barnRat: Creature = {
   id: "barn-rat",
   name: "Rato de Celeiro",
-  image: "/assets/creatures/village-field/barn-rat.png",
   description: "Pequenos, rápidos e em número maior do que parece. O primeiro sangue de qualquer lobisomem.",
   species: "rabbit",
   level: 11,

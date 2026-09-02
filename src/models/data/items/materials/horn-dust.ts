@@ -9,7 +9,6 @@ export const hornDust: Item = {
   category: "material",
   rarity: "legendary",
   price: 2800,
-  image: "/assets/inventory/materials/horn-dust.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

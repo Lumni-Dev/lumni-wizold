@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const nightQueen: Creature = {
   id: "night-queen",
   name: "Rainha da Noite",
-  image: "/assets/creatures/scarlet-castle/night-queen.png",
   description: "Nada aqui é gentil. O chifre atravessa antes de você ouvir o galope.",
   species: "unicorn",
   level: 891,

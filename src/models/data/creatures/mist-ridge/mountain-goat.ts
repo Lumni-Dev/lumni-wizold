@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const mountainGoat: Creature = {
   id: "mountain-goat",
   name: "Cabra Montesa",
-  image: "/assets/creatures/mist-ridge/mountain-goat.png",
   description: "Fogem bem e chutam melhor. Alimentam uma matilha inteira por semanas.",
   species: "deer",
   level: 201,

@@ -9,7 +9,6 @@ export const snakeSkin: Item = {
   category: "material",
   rarity: "common",
   price: 10,
-  image: "/assets/inventory/materials/snake-skin.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

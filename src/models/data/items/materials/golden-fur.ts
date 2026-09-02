@@ -9,7 +9,6 @@ export const goldenFur: Item = {
   category: "material",
   rarity: "epic",
   price: 750,
-  image: "/assets/inventory/materials/golden-fur.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

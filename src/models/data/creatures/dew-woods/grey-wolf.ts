@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const greyWolf: Creature = {
   id: "grey-wolf",
   name: "Lobo Cinzento",
-  image: "/assets/creatures/dew-woods/grey-wolf.png",
   description: "Fogem bem e chutam melhor. Alimentam uma matilha inteira por semanas.",
   species: "deer",
   level: 121,

@@ -9,7 +9,6 @@ export const gorgonEye: Item = {
   category: "material",
   rarity: "epic",
   price: 750,
-  image: "/assets/inventory/materials/gorgon-eye.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

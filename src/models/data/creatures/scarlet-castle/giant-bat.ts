@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const giantBat: Creature = {
   id: "giant-bat",
   name: "Morcego Gigante",
-  image: "/assets/creatures/scarlet-castle/giant-bat.png",
   description: "Pequenos, rápidos e em número maior do que parece. O primeiro sangue de qualquer lobisomem.",
   species: "rabbit",
   level: 811,

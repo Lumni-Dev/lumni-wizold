@@ -9,7 +9,6 @@ export const silverMane: Item = {
   category: "material",
   rarity: "legendary",
   price: 2800,
-  image: "/assets/inventory/materials/silver-mane.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

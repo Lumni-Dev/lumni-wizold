@@ -9,7 +9,6 @@ export const bloodGrimoire: Item = {
   category: "material",
   rarity: "epic",
   price: 750,
-  image: "/assets/inventory/materials/blood-grimoire.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

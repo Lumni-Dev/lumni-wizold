@@ -9,7 +9,6 @@ export const paleBlood: Item = {
   category: "material",
   rarity: "rare",
   price: 200,
-  image: "/assets/inventory/materials/pale-blood.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

@@ -9,7 +9,6 @@ export const dragonHeart: Item = {
   category: "material",
   rarity: "legendary",
   price: 2800,
-  image: "/assets/inventory/materials/dragon-heart.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

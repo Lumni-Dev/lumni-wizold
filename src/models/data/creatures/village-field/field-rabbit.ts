@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const fieldRabbit: Creature = {
   id: "field-rabbit",
   name: "Coelho do Campo",
-  image: "/assets/creatures/village-field/field-rabbit.png",
   description: "Pequenos, rápidos e em número maior do que parece. O primeiro sangue de qualquer lobisomem.",
   species: "rabbit",
   level: 1,

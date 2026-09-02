@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const succubus: Creature = {
   id: "succubus",
   name: "Súcubo",
-  image: "/assets/creatures/howling-abyss/succubus.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 751,

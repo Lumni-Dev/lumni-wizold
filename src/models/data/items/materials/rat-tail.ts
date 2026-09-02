@@ -9,7 +9,6 @@ export const ratTail: Item = {
   category: "material",
   rarity: "common",
   price: 10,
-  image: "/assets/inventory/materials/rat-tail.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

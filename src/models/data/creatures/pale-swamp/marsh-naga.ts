@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const marshNaga: Creature = {
   id: "marsh-naga",
   name: "Naga do Charco",
-  image: "/assets/creatures/pale-swamp/marsh-naga.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 371,

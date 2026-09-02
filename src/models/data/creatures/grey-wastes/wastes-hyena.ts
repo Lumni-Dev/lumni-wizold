@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const wastesHyena: Creature = {
   id: "wastes-hyena",
   name: "Hiena do Ermo",
-  image: "/assets/creatures/grey-wastes/wastes-hyena.png",
   description: "Fogem bem e chutam melhor. Alimentam uma matilha inteira por semanas.",
   species: "deer",
   level: 511,

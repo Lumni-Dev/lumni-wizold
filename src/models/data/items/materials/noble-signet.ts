@@ -9,7 +9,6 @@ export const nobleSignet: Item = {
   category: "material",
   rarity: "epic",
   price: 750,
-  image: "/assets/inventory/materials/noble-signet.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

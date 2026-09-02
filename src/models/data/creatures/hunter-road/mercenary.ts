@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const mercenary: Creature = {
   id: "mercenary",
   name: "Mercenário",
-  image: "/assets/creatures/hunter-road/mercenary.png",
   description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
   species: "human",
   level: 421,

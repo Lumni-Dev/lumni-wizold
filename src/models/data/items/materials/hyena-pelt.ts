@@ -9,7 +9,6 @@ export const hyenaPelt: Item = {
   category: "material",
   rarity: "uncommon",
   price: 50,
-  image: "/assets/inventory/materials/hyena-pelt.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

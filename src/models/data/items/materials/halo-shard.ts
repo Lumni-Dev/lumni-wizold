@@ -9,7 +9,6 @@ export const haloShard: Item = {
   category: "material",
   rarity: "legendary",
   price: 2800,
-  image: "/assets/inventory/materials/halo-shard.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

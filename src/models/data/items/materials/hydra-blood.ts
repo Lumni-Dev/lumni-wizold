@@ -9,7 +9,6 @@ export const hydraBlood: Item = {
   category: "material",
   rarity: "epic",
   price: 750,
-  image: "/assets/inventory/materials/hydra-blood.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

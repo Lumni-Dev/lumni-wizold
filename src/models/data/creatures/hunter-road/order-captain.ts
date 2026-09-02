@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const orderCaptain: Creature = {
   id: "order-captain",
   name: "Capitão da Ordem",
-  image: "/assets/creatures/hunter-road/order-captain.png",
   description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
   species: "human",
   level: 481,

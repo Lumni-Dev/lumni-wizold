@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const wildcat: Creature = {
   id: "wildcat",
   name: "Gato Selvagem",
-  image: "/assets/creatures/dew-woods/wildcat.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 161,

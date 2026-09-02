@@ -9,7 +9,6 @@ export const badgerClaw: Item = {
   category: "material",
   rarity: "common",
   price: 10,
-  image: "/assets/inventory/materials/badger-claw.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

@@ -9,7 +9,6 @@ export const gnawedBone: Item = {
   category: "material",
   rarity: "common",
   price: 10,
-  image: "/assets/inventory/materials/gnawed-bone.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

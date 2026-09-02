@@ -9,7 +9,6 @@ export const bearPelt: Item = {
   category: "material",
   rarity: "uncommon",
   price: 50,
-  image: "/assets/inventory/materials/bear-pelt.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

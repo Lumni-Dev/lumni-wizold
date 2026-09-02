@@ -9,7 +9,6 @@ export const lizardScale: Item = {
   category: "material",
   rarity: "rare",
   price: 200,
-  image: "/assets/inventory/materials/lizard-scale.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

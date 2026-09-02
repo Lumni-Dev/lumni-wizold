@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useArt } from "@/controllers/art.context";
 import type { Creature } from "@/models/entities/creature";
-import { assetUrl } from "@/shared/constants/assets";
 import { IconArt, IconFrame, type IconSize } from "./icon-frame";
 
 function creatureInitials(name: string): string {
@@ -20,7 +19,7 @@ export function CreatureIcon({
   size?: IconSize;
 }) {
   const art = useArt();
-  const source = art.creatures[creature.id] ?? (creature.image ? assetUrl(creature.image) : undefined);
+  const source = art.creatures[creature.id];
   const [broken, setBroken] = useState(false);
 
   return (

@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const starvingJackal: Creature = {
   id: "starving-jackal",
   name: "Chacal Faminto",
-  image: "/assets/creatures/grey-wastes/starving-jackal.png",
   description: "Fogem bem e chutam melhor. Alimentam uma matilha inteira por semanas.",
   species: "deer",
   level: 531,

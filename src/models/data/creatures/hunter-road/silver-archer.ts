@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const silverArcher: Creature = {
   id: "silver-archer",
   name: "Arqueiro de Prata",
-  image: "/assets/creatures/hunter-road/silver-archer.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 431,

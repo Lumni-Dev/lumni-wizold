@@ -9,7 +9,6 @@ export const goatHorn: Item = {
   category: "material",
   rarity: "uncommon",
   price: 50,
-  image: "/assets/inventory/materials/goat-horn.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

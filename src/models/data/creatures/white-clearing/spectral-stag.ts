@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const spectralStag: Creature = {
   id: "spectral-stag",
   name: "Cervo Espectral",
-  image: "/assets/creatures/white-clearing/spectral-stag.png",
   description: "Fogem bem e chutam melhor. Alimentam uma matilha inteira por semanas.",
   species: "deer",
   level: 911,

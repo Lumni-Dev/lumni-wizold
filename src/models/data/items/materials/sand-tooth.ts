@@ -9,7 +9,6 @@ export const sandTooth: Item = {
   category: "material",
   rarity: "rare",
   price: 200,
-  image: "/assets/inventory/materials/sand-tooth.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

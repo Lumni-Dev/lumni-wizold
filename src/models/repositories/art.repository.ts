@@ -1,4 +1,5 @@
-import { readFile, readdir } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { readFile, readdir, stat } from "node:fs/promises";
 import { join, parse } from "node:path";
 import { EMPTY_ART, type ArtManifest } from "../entities/art";
 import { ATTRIBUTES } from "../entities/attribute";
@@ -8,7 +9,6 @@ import { ITEMS } from "../data/items";
 import { STORE_PACKS } from "../data/store-packs";
 import { TERRITORIES } from "../data/territories";
 import { CREATURES } from "../data/creatures";
-import { ART_VERSION } from "@/shared/constants/assets";
 
 const ITEM_ROOT = "inventory";
 const HUNT_ROOT = "hunt";
@@ -21,6 +21,8 @@ const CREATURE_ROOT = "creatures";
 
 const IMAGE_EXTENSIONS = new Set([".png", ".webp", ".gif", ".jpg", ".jpeg", ".svg", ".avif"]);
 const VIDEO_EXTENSIONS = new Set([".mp4", ".webm"]);
+
+const FORMAT_ORDER = [".avif", ".webp", ".svg", ".png", ".jpg", ".jpeg", ".gif", ".mp4", ".webm"];
 
 const ASSETS_ROOT = join(process.cwd(), "public", "assets");
 const MANIFEST_PATH = join(process.cwd(), "public", "art-manifest.json");
@@ -62,10 +64,61 @@ const SLOT_ALIASES: Record<string, string> = {
   ring: "ring",
 };
 
+interface RawFile {
+  name: string;
+  folder: string;
+  path: string;
+  ext: string;
+}
+
 interface FoundFile {
   name: string;
   folder: string;
   url: string;
+}
+
+const fingerprints = new Map<string, string>();
+
+function formatRank(ext: string): number {
+  const index = FORMAT_ORDER.indexOf(ext.toLowerCase());
+  return index === -1 ? FORMAT_ORDER.length : index;
+}
+
+async function fingerprint(path: string): Promise<string> {
+  const absolute = join(ASSETS_ROOT, path);
+  const info = await stat(absolute);
+  const key = path + ":" + info.size + ":" + info.mtimeMs;
+
+  const known = fingerprints.get(key);
+  if (known) return known;
+
+  const digest = createHash("sha1")
+    .update(await readFile(absolute))
+    .digest("hex")
+    .slice(0, 8);
+
+  fingerprints.set(key, digest);
+  return digest;
+}
+
+async function resolve(files: RawFile[]): Promise<FoundFile[]> {
+  const best = new Map<string, RawFile>();
+
+  for (const file of files) {
+    const key = file.path.slice(0, file.path.length - file.ext.length);
+    const current = best.get(key);
+    if (!current || formatRank(file.ext) < formatRank(current.ext)) best.set(key, file);
+  }
+
+  const chosen = [...best.values()].sort((a, b) => a.path.localeCompare(b.path));
+
+  return Promise.all(
+    chosen.map(async (file) => ({
+      name: file.name,
+      folder: file.folder,
+      url: "/assets/" + file.path + "?v=" + (await fingerprint(file.path)),
+    })),
+  );
 }
 
 function normalize(value: string): string {
@@ -95,7 +148,7 @@ function equipmentIdFrom(name: string, folder: string): string | null {
 async function walk(
   relative: string,
   extensions: Set<string> = IMAGE_EXTENSIONS,
-): Promise<FoundFile[]> {
+): Promise<RawFile[]> {
   let entries;
   try {
     entries = await readdir(join(ASSETS_ROOT, relative), { withFileTypes: true });
@@ -103,7 +156,7 @@ async function walk(
     return [];
   }
 
-  const found: FoundFile[] = [];
+  const found: RawFile[] = [];
 
   for (const entry of entries) {
     const path = relative + "/" + entry.name;
@@ -120,7 +173,8 @@ async function walk(
     found.push({
       name,
       folder: parts[parts.length - 1] ?? "",
-      url: "/assets/" + path + ART_VERSION,
+      path,
+      ext,
     });
   }
 
@@ -254,16 +308,29 @@ export async function scanArtManifestFromDisk(): Promise<ArtManifest> {
     walk(STORE_ROOT),
   ]);
 
+  const [items, hunt, huntVideos, attributes, training, creatures, pets, genders, packs] =
+    await Promise.all([
+      resolve(itemFiles),
+      resolve(huntFiles),
+      resolve(huntVideoFiles),
+      resolve(attributeFiles),
+      resolve(trainingFiles),
+      resolve(creatureFiles),
+      resolve(petFiles),
+      resolve(genderFiles),
+      resolve(packFiles),
+    ]);
+
   return {
-    items: collectItems(itemFiles),
-    attributes: collectAttributes(attributeFiles),
-    training: collectAttributes(trainingFiles),
-    territories: collectTerritories(huntFiles),
-    territoryVideos: collectTerritories(huntVideoFiles),
-    creatures: collectCreatures(creatureFiles),
-    pets: collectPets(petFiles),
-    genders: collectGenders(genderFiles),
-    packs: collectPacks(packFiles),
+    items: collectItems(items),
+    attributes: collectAttributes(attributes),
+    training: collectAttributes(training),
+    territories: collectTerritories(hunt),
+    territoryVideos: collectTerritories(huntVideos),
+    creatures: collectCreatures(creatures),
+    pets: collectPets(pets),
+    genders: collectGenders(genders),
+    packs: collectPacks(packs),
   };
 }
 

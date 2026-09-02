@@ -9,7 +9,6 @@ export const moltenRock: Item = {
   category: "material",
   rarity: "rare",
   price: 200,
-  image: "/assets/inventory/materials/molten-rock.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

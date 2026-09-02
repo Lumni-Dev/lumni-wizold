@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const rivalWerewolf: Creature = {
   id: "rival-werewolf",
   name: "Lobisomem Rival",
-  image: "/assets/creatures/scarlet-castle/rival-werewolf.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 851,

@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const twistedAntlerStag: Creature = {
   id: "twisted-antler-stag",
   name: "Cervo de Chifre Torto",
-  image: "/assets/creatures/dew-woods/twisted-antler-stag.png",
   description: "Fogem bem e chutam melhor. Alimentam uma matilha inteira por semanas.",
   species: "deer",
   level: 171,

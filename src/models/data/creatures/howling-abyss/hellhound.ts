@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const hellhound: Creature = {
   id: "hellhound",
   name: "Cão do Inferno",
-  image: "/assets/creatures/howling-abyss/hellhound.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 711,

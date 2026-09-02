@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const snowWolf: Creature = {
   id: "snow-wolf",
   name: "Lobo da Neve",
-  image: "/assets/creatures/mist-ridge/snow-wolf.png",
   description: "Fogem bem e chutam melhor. Alimentam uma matilha inteira por semanas.",
   species: "deer",
   level: 271,

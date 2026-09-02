@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const wildHen: Creature = {
   id: "wild-hen",
   name: "Galinha do Mato",
-  image: "/assets/creatures/village-field/wild-hen.png",
   description: "Pequenos, rápidos e em número maior do que parece. O primeiro sangue de qualquer lobisomem.",
   species: "rabbit",
   level: 21,

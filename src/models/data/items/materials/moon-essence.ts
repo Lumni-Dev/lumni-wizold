@@ -9,7 +9,6 @@ export const moonEssence: Item = {
   category: "material",
   rarity: "legendary",
   price: 2800,
-  image: "/assets/inventory/materials/moon-essence.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

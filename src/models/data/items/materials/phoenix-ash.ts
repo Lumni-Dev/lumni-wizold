@@ -9,7 +9,6 @@ export const phoenixAsh: Item = {
   category: "material",
   rarity: "legendary",
   price: 2800,
-  image: "/assets/inventory/materials/phoenix-ash.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

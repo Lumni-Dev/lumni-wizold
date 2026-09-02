@@ -9,7 +9,6 @@ export const wastesCrown: Item = {
   category: "material",
   rarity: "epic",
   price: 750,
-  image: "/assets/inventory/materials/wastes-crown.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

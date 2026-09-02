@@ -9,7 +9,6 @@ export const soulShard: Item = {
   category: "material",
   rarity: "epic",
   price: 750,
-  image: "/assets/inventory/materials/soul-shard.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

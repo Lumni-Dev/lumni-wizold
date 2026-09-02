@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const swampSerpent: Creature = {
   id: "swamp-serpent",
   name: "Serpente do Pântano",
-  image: "/assets/creatures/pale-swamp/swamp-serpent.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 331,

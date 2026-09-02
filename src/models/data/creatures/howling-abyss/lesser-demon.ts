@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const lesserDemon: Creature = {
   id: "lesser-demon",
   name: "Demônio Menor",
-  image: "/assets/creatures/howling-abyss/lesser-demon.png",
   description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
   species: "human",
   level: 721,

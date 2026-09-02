@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const nightNoble: Creature = {
   id: "night-noble",
   name: "Nobre da Noite",
-  image: "/assets/creatures/scarlet-castle/night-noble.png",
   description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
   species: "vampire",
   level: 821,

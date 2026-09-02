@@ -9,7 +9,6 @@ export const shadowSilk: Item = {
   category: "material",
   rarity: "rare",
   price: 200,
-  image: "/assets/inventory/materials/shadow-silk.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

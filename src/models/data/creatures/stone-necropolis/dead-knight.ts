@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const deadKnight: Creature = {
   id: "dead-knight",
   name: "Cavaleiro Morto",
-  image: "/assets/creatures/stone-necropolis/dead-knight.png",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 641,

@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const wildDog: Creature = {
   id: "wild-dog",
   name: "Cão Selvagem",
-  image: "/assets/creatures/village-field/wild-dog.png",
   description: "Fogem bem e chutam melhor. Alimentam uma matilha inteira por semanas.",
   species: "deer",
   level: 51,

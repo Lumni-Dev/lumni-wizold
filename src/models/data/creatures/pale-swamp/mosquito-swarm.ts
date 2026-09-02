@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const mosquitoSwarm: Creature = {
   id: "mosquito-swarm",
   name: "Enxame de Mosquitos",
-  image: "/assets/creatures/pale-swamp/mosquito-swarm.png",
   description: "Pequenos, rápidos e em número maior do que parece. O primeiro sangue de qualquer lobisomem.",
   species: "rabbit",
   level: 351,

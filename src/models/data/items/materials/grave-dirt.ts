@@ -9,7 +9,6 @@ export const graveDirt: Item = {
   category: "material",
   rarity: "common",
   price: 10,
-  image: "/assets/inventory/materials/grave-dirt.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

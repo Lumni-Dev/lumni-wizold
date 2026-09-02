@@ -9,7 +9,6 @@ export const witchHair: Item = {
   category: "material",
   rarity: "rare",
   price: 200,
-  image: "/assets/inventory/materials/witch-hair.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

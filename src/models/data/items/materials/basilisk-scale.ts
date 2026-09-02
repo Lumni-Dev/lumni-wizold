@@ -9,7 +9,6 @@ export const basiliskScale: Item = {
   category: "material",
   rarity: "epic",
   price: 750,
-  image: "/assets/inventory/materials/basilisk-scale.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

@@ -9,7 +9,6 @@ export const deerHide: Item = {
   category: "material",
   rarity: "common",
   price: 10,
-  image: "/assets/inventory/materials/deer-hide.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

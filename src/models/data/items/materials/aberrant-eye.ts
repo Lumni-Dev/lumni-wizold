@@ -9,7 +9,6 @@ export const aberrantEye: Item = {
   category: "material",
   rarity: "epic",
   price: 750,
-  image: "/assets/inventory/materials/aberrant-eye.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,

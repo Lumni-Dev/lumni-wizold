@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const wastesLord: Creature = {
   id: "wastes-lord",
   name: "Senhor do Ermo",
-  image: "/assets/creatures/grey-wastes/wastes-lord.png",
   description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
   species: "human",
   level: 591,

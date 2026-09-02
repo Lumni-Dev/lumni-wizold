@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const moonAvatar: Creature = {
   id: "moon-avatar",
   name: "Avatar da Lua",
-  image: "/assets/creatures/white-clearing/moon-avatar.png",
   description: "Nada aqui é gentil. O chifre atravessa antes de você ouvir o galope.",
   species: "unicorn",
   level: 991,

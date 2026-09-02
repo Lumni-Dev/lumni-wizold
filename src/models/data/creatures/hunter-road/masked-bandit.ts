@@ -4,7 +4,6 @@ import type { Creature } from "../types";
 export const maskedBandit: Creature = {
   id: "masked-bandit",
   name: "Bandido Mascarado",
-  image: "/assets/creatures/hunter-road/masked-bandit.png",
   description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
   species: "human",
   level: 451,

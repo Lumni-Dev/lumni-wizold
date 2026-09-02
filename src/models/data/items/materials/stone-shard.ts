@@ -9,7 +9,6 @@ export const stoneShard: Item = {
   category: "material",
   rarity: "uncommon",
   price: 50,
-  image: "/assets/inventory/materials/stone-shard.png",
   minLevel: 1,
   stackable: true,
   inMarket: false,
