@@ -694,6 +694,7 @@ export function TavernScreen() {
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     {roomsOnPage.map(({ room, locked, full, memberCount, isMember, isPrivate }) => {
                       const unread = unreadByRoom.get(room.id) ?? 0;
+                      const seatedHere = openRoomId === room.id;
 
                       return (
                 <Card
@@ -794,17 +795,19 @@ export function TavernScreen() {
                       ) : null}
                       <Tooltip
                         label={
-                          full && !isMember
-                            ? "A mesa está cheia: " + MAX_ROOM_MEMBERS + " pessoas"
-                            : ""
+                          seatedHere
+                            ? "Você já está sentado nesta mesa"
+                            : full && !isMember
+                              ? "A mesa está cheia: " + MAX_ROOM_MEMBERS + " pessoas"
+                              : ""
                         }
                       >
                         <Button
-                          variant={openRoomId === room.id ? "secondary" : "primary"}
-                          disabled={full && !isMember}
+                          variant={seatedHere ? "secondary" : "primary"}
+                          disabled={seatedHere || (full && !isMember)}
                           onClick={() => open(room.id, joinPasswords[room.id] ?? "")}
                         >
-                          {openRoomId === room.id ? "Se sentou" : "Sentar"}
+                          {seatedHere ? "Se sentou" : "Sentar"}
                         </Button>
                       </Tooltip>
                     </div>
