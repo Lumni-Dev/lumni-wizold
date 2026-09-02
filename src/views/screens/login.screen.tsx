@@ -6,11 +6,13 @@ import { useGame } from "@/controllers/game.context";
 import { playSound } from "@/controllers/sound";
 import { loadBirth, saveBirth } from "@/models/repositories/birth.repository";
 import { GAME_NAME, MIN_AGE } from "@/shared/constants/game";
+import { GLASS_SECTION } from "@/shared/constants/ui";
 import { ageOf, EMPTY_BIRTH, isRealBirth } from "@/shared/utils/birth";
 import { cn } from "@/shared/utils/class-names";
 import { Button } from "../components/button";
 import { CornerAccents } from "../components/corner-accents";
 import { Field } from "../components/field";
+import { LiveBackdrop } from "../components/live-backdrop";
 import { Select, type SelectOption } from "../components/select";
 
 function GoogleMark() {
@@ -118,6 +120,10 @@ export function LoginScreen() {
     setBirth(next);
   }
   useEffect(() => {
+    document.body.classList.add("landing-page");
+    return () => document.body.classList.remove("landing-page");
+  }, []);
+  useEffect(() => {
     if (ready && character) router.replace("/character");
   }, [ready, character, router]);
   useEffect(() => {
@@ -192,41 +198,48 @@ export function LoginScreen() {
     };
   }, [oldEnough, enter, router]);
   return (
-    <main className="flex min-h-screen items-center justify-center p-4 md:p-8">
-      <div className="w-full max-w-md space-y-6">
-        <header className="text-center">
-          <Link
-            href="/"
-            className="mx-auto block w-fit transition-opacity hover:opacity-90"
+    <div className="relative flex min-h-screen flex-col">
+      <LiveBackdrop />
+      <main className="relative z-10 flex min-h-screen items-center justify-center p-4 md:p-8">
+        <div className="w-full max-w-md space-y-6">
+          <header className="text-center">
+            <Link
+              href="/"
+              className="mx-auto block w-fit transition-opacity hover:opacity-90"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/assets/ui/logo.webp?v=3"
+                alt={GAME_NAME}
+                className="landing-hero-shadow-logo h-[4rem] w-auto shrink-0"
+              />
+            </Link>
+          </header>
+
+          <div
+            className={cn(
+              "landing-hero-shadow-button relative overflow-hidden rounded-lg border border-edge",
+              GLASS_SECTION,
+            )}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/assets/ui/logo.webp?v=3"
-              alt={GAME_NAME}
-              className="h-[4rem] w-auto shrink-0"
-            />
-          </Link>
-        </header>
+            <div className="border-b border-edge px-4 py-3">
+              <h1 className="landing-hero-shadow-text heading text-[11px] text-ink">
+                {twoFactor ? "Verificação" : "Entrar"}
+              </h1>
+              <p className="landing-hero-shadow-text mt-1 text-xs text-ink-faint">
+                {twoFactor
+                  ? "Confirme o código enviado ao seu e-mail."
+                  : "A noite não cobra nada para começar."}
+              </p>
+            </div>
 
-        <div className="relative rounded-lg border border-edge bg-surface/80">
-          <div className="border-b border-edge px-4 py-3">
-            <h1 className="heading text-[11px] text-ink">
-              {twoFactor ? "Verificação" : "Entrar"}
-            </h1>
-            <p className="mt-1 text-xs text-ink-faint">
-              {twoFactor
-                ? "Confirme o código enviado ao seu e-mail."
-                : "A noite não cobra nada para começar."}
-            </p>
-          </div>
-
-          <div className="space-y-4 p-4">
-            {twoFactor ? (
-              <>
-                <p className="text-xs leading-relaxed text-ink-faint">
-                  Enviamos um código de oito dígitos para o e-mail da conta. Ele vale por 10
-                  minutos.
-                </p>
+            <div className="space-y-4 p-4">
+              {twoFactor ? (
+                <>
+                  <p className="landing-hero-shadow-text text-xs leading-relaxed text-ink-faint">
+                    Enviamos um código de oito dígitos para o e-mail da conta. Ele vale por 10
+                    minutos.
+                  </p>
                 <Field
                   label="Código"
                   numeric
@@ -282,10 +295,10 @@ export function LoginScreen() {
               </>
             ) : (
               <>
-            <div className="space-y-2">
-              <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                Data de nascimento
-              </p>
+                <div className="space-y-2">
+                  <p className="landing-hero-shadow-text text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                    Data de nascimento
+                  </p>
               <div className="grid grid-cols-3 gap-2">
                 <Select
                   compact
@@ -312,63 +325,64 @@ export function LoginScreen() {
                   onChange={(year) => setBirthPart({ year })}
                 />
               </div>
-              <p className="text-[11px] leading-relaxed text-ink-faint">
-                {complete && !oldEnough
-                  ? "A caçada é para maiores de " + MIN_AGE + " anos."
-                  : "O jogo é para maiores de " +
-                    MIN_AGE +
-                    " anos: tem sangue na caça, duelo entre jogadores, mesa de conversa aberta e compra com dinheiro de verdade."}
-              </p>
-            </div>
+                  <p className="landing-hero-shadow-text text-[11px] leading-relaxed text-ink-faint">
+                    {complete && !oldEnough
+                      ? "A caçada é para maiores de " + MIN_AGE + " anos."
+                      : "O jogo é para maiores de " +
+                        MIN_AGE +
+                        " anos: tem sangue na caça, duelo entre jogadores, mesa de conversa aberta e compra com dinheiro de verdade."}
+                  </p>
+                </div>
 
-            {oldEnough && GOOGLE_CLIENT_ID ? (
-              <div className="group relative">
-                <Button
-                  variant="primary"
-                  size="medium"
-                  fullWidth
-                  busy={entering}
-                  aria-hidden
-                  tabIndex={-1}
-                  className="pointer-events-none group-hover:brightness-110"
-                >
-                  <GoogleMark />
-                  Entrar com Google
-                </Button>
-                <div
-                  ref={buttonHost}
-                  className={cn(
-                    "absolute inset-0 flex items-center justify-center overflow-hidden opacity-0",
-                    entering && "pointer-events-none",
-                  )}
-                />
-              </div>
-            ) : (
-              <Button variant="primary" size="medium" fullWidth disabled>
-                <GoogleMark />
-                Entrar com Google
-              </Button>
-            )}
+                {oldEnough && GOOGLE_CLIENT_ID ? (
+                  <div className="group relative">
+                    <Button
+                      variant="primary"
+                      size="medium"
+                      fullWidth
+                      busy={entering}
+                      aria-hidden
+                      tabIndex={-1}
+                      className="landing-hero-shadow-button pointer-events-none group-hover:brightness-110"
+                    >
+                      <GoogleMark />
+                      Entrar com Google
+                    </Button>
+                    <div
+                      ref={buttonHost}
+                      className={cn(
+                        "absolute inset-0 flex items-center justify-center overflow-hidden opacity-0",
+                        entering && "pointer-events-none",
+                      )}
+                    />
+                  </div>
+                ) : (
+                  <Button variant="primary" size="medium" fullWidth disabled>
+                    <GoogleMark />
+                    Entrar com Google
+                  </Button>
+                )}
 
-            <p className="text-xs leading-relaxed text-ink-faint">
-              A porta é a conta Google: nada de senha nova para lembrar. Na primeira entrada a data
-              de nascimento fica guardada, e nas seguintes basta o botão.
-            </p>
+                <p className="landing-hero-shadow-text text-xs leading-relaxed text-ink-faint">
+                  A porta é a conta Google: nada de senha nova para lembrar. Na primeira entrada a
+                  data de nascimento fica guardada, e nas seguintes basta o botão.
+                </p>
               </>
             )}
+            </div>
+            <CornerAccents inside />
           </div>
-          <CornerAccents inside />
-        </div>
 
-        <div className="flex items-center justify-center">
-          <Link
-            href="/"
-            className="text-[11px] uppercase tracking-[0.16em] text-ink-faint transition-colors hover:text-ink"
-          >
-            Voltar para a lenda
-          </Link>
+          <div className="flex items-center justify-center">
+            <Link
+              href="/"
+              className="landing-hero-shadow-text text-[11px] uppercase tracking-[0.16em] text-ink-faint transition-colors hover:text-ink"
+            >
+              Voltar para a lenda
+            </Link>
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }
