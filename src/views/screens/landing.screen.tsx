@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useGame } from "@/controllers/game.context";
-import { LORE_CHAPTERS, LORE_COUPLE, LORE_PILLARS } from "@/models/data/lore";
+import { LORE_CHAPTERS, LORE_COMPANIONS, LORE_COUPLE, LORE_PILLARS } from "@/models/data/lore";
 import { PREVIEW_SHOTS } from "@/models/data/preview";
 import { GAME_NAME, GAME_TAGLINE } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
@@ -11,6 +11,7 @@ import { Button } from "../components/button";
 import { CornerAccents } from "../components/corner-accents";
 import { GenderBanner } from "../components/gender-icon";
 import { CreatureCarousel } from "../components/creature-carousel";
+import { PetPortrait } from "../components/pet-icon";
 import { PreviewGallery } from "../components/preview-gallery";
 import { LiveBackdrop } from "../components/live-backdrop";
 import { LandingCtaButton } from "../components/landing-cta-button";
@@ -156,6 +157,34 @@ export function LandingScreen() {
             </div>
           </div>
           <CornerAccents />
+        </section>
+
+        <section className="space-y-6">
+          <div className="space-y-1 text-center">
+            <h2 className="heading text-[11px] text-ink">O lobo que anda junto</h2>
+            <p className="text-xs text-ink-faint">
+              Ninguém caça sozinho. Duas linhagens chegaram à matilha, cada uma do seu jeito.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            {LORE_COMPANIONS.map((companion) => (
+              <article
+                key={companion.gender}
+                className="space-y-4 rounded-lg border border-edge bg-surface/80 p-6 md:p-8"
+              >
+                <div className="mx-auto aspect-square w-full max-w-[220px] overflow-hidden rounded-md border border-edge">
+                  <PetPortrait gender={companion.gender} />
+                </div>
+                <h3 className="heading text-[11px] text-ink">{companion.title}</h3>
+                <p className="text-xs leading-relaxed text-ink-soft">{companion.text}</p>
+                <NarrationButton
+                  playing={narration.current === companion.voice}
+                  onClick={() => narration.toggle(companion.voice)}
+                />
+              </article>
+            ))}
+          </div>
         </section>
 
         <section className="space-y-6">

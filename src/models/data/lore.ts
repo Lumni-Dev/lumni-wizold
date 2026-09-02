@@ -4,6 +4,13 @@ export interface LoreChapter {
   voice: string;
 }
 
+export interface LoreCompanion {
+  gender: "male" | "female";
+  title: string;
+  text: string;
+  voice: string;
+}
+
 export interface LorePillar {
   title: string;
   text: string;
@@ -60,6 +67,35 @@ export const LORE_CHAPTERS: readonly LoreChapter[] = [
       "hoje enche a taverna começou ali, no alto do campo, com dois que só queriam conversar. A " +
       "lua ainda sobe. Ainda cobra. E ninguém, em noite nenhuma, caça sozinho.",
     voice: "/assets/voice/pack.mp3?v=3",
+  },
+];
+
+export const LORE_COMPANIONS: readonly LoreCompanion[] = [
+  {
+    gender: "male",
+    title: "O que fica na frente",
+    text:
+      "O primeiro veio sozinho, sem coleira e sem dono, e sentou na entrada do cercado como " +
+      "quem espera há muito tempo. Peito largo, passo pesado, olhos que não desviavam. Naquela " +
+      "noite a fera desceu ao campo e ele foi junto, sem rosnar e sem recuar: pôs o corpo entre " +
+      "o caçador e a criatura, e levou a primeira investida no lugar do ombro que devia " +
+      "levá-la. Amanheceu sujo, respirando fundo, vivo. Desde então a matilha entende o " +
+      "acordo. Ele não persegue o rastro nem escolhe a presa. Ele fica na frente, e ficar na " +
+      "frente já é a parte mais difícil da noite.",
+    voice: "/assets/voice/guardian.mp3?v=1",
+  },
+  {
+    gender: "female",
+    title: "A que acha o rastro",
+    text:
+      "A outra ninguém viu chegar, e é justamente esse o ponto. Magra, silenciosa, sempre três " +
+      "passos adiante, achava o rastro antes de o caçador saber que havia rastro. Farejava o " +
+      "vento, parava, esperava a fera alcançá-la, e seguia de novo. Contam que numa noite de " +
+      "lua nova, quando nem Lumni enxergava a trilha, foi ela quem abriu caminho no escuro e " +
+      "trouxe a matilha inteira de volta ao campo. Não briga por espaço e não pede nada. Anda " +
+      "na frente porque é de lá que se vê primeiro, e volta sempre, porque escolheu de quem " +
+      "quer estar perto.",
+    voice: "/assets/voice/tracker.mp3?v=1",
   },
 ];
 
