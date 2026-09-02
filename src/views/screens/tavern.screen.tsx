@@ -27,6 +27,7 @@ import {
   ROOM_NAME_MAX_LENGTH,
   isPrivateTable,
 } from "@/models/entities/tavern";
+import { nickColorClass } from "@/models/rules/tavern-nicks";
 import { NAME_MAX_LENGTH } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
 import { sanitizeName } from "@/shared/utils/text";
@@ -67,7 +68,10 @@ function MemberName({
 }) {
   if (!href) return <span className={className}>{name}</span>;
   return (
-    <Link href={href} className={cn("transition-colors hover:text-highlight", className)}>
+    <Link
+      href={href}
+      className={cn("underline-offset-2 transition-colors hover:underline", className)}
+    >
       {name}
     </Link>
   );
@@ -744,7 +748,7 @@ export function TavernScreen() {
                           <MemberName
                             href={profileHref(member.id)}
                             name={member.name}
-                            className="text-ink-soft"
+                            className={nickColorClass(member.nickColor)}
                           />
                           {!isPrivate && member.id === room.ownerId ? (
                             <span className="ml-1 text-ink-faint">(dono)</span>

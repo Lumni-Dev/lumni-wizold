@@ -411,10 +411,11 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         " pessoas, com ou sem senha, e você mantém uma por vez. Mesa aberta sem senha exige NV " +
         OPEN_ROOM_MIN_LEVEL +
         "; com senha, qualquer nível.",
+      "Cada nome na mesa ganha uma cor só sua. Quem chega pega a primeira livre; quem sai devolve a cor. Mesa reservada usa duas.",
       "Cada mesa guarda as últimas " +
         MAX_ROOM_MESSAGES +
         " falas: o que veio antes a noite leva.",
-      "Links de Wizold, Lumni, Twitch, YouTube, Instagram, Facebook, WhatsApp, TikTok e X passam; qualquer outro endereço é recusado.",
+      "Links de Wizold, Lumni, Twitch, YouTube, Instagram, Facebook, WhatsApp, TikTok e X passam e abrem numa aba nova; qualquer outro endereço é recusado.",
       "Nomes de caçador, mesa e mensagens passam por moderação: o que fere as regras é recusado na hora ou censurado depois do envio.",
       "Cada fala cabe em " +
         MESSAGE_MAX_LENGTH +
@@ -429,6 +430,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "Quem recebe vê o convite em Convites na taverna e aceita ou recusa; aceitar coloca os dois na matilha um do outro.",
       "Sair da matilha é mútuo: remover um nome apaga os dois lados.",
       "Chamar alguém da matilha abre uma mesa reservada para vocês dois, que só vocês veem.",
+      "Nessa mesa de dois, uma fala nova do outro toca um aviso suave. O botão de som à esquerda do campo muta ou liga de novo; ligar toca o aviso para você ouvir.",
       "Quem está numa mesa agora responde primeiro à busca por nick; depois responde o quadro do ranking.",
       "A mesa reservada nunca é varrida: a mensagem espera até que o outro nome apareça.",
       "Excluir um nome não custa nada e guardar de novo também não; a mesa reservada continua até alguém fechá-la.",
@@ -495,7 +497,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         " dias a cada cobrança confirmada.",
       "Libera todos os interruptores de automação nas configurações: caçada, treino, mina, forja, descanso, fúria, poção e mascote.",
       "Sem VIP, cada clique faz um ciclo só; com VIP, a partida repete o trabalho sozinha enquanto houver recurso.",
-      "Cancelar a assinatura mantém o VIP até o fim do período já pago; reativar antes do vencimento evita ficar sem o recurso.",
+      "Cancele na Wizold Store: a cobrança para de renovar no Stripe e o VIP vale até o fim do período já pago; reative antes do vencimento para não perder o recurso.",
       "O pagamento abre no checkout do Stripe; a confirmação liga o VIP na hora.",
     ],
   },

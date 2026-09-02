@@ -9,6 +9,7 @@ import type { GameState } from "@/models/entities/game-state";
 import type { PresenceStatus } from "@/models/entities/presence";
 import type { TavernRoom } from "@/models/entities/tavern";
 import { MAX_ROOM_MEMBERS, MESSAGE_MAX_LENGTH } from "@/models/entities/tavern";
+import { nickColorClass, nickColorOf } from "@/models/rules/tavern-nicks";
 import { CONTROL_HEIGHT } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { formatTime } from "@/shared/utils/format";
@@ -33,7 +34,10 @@ function MemberName({
 }) {
   if (!href) return <span className={className}>{name}</span>;
   return (
-    <Link href={href} className={cn("transition-colors hover:text-highlight", className)}>
+    <Link
+      href={href}
+      className={cn("underline-offset-2 transition-colors hover:underline", className)}
+    >
       {name}
     </Link>
   );
@@ -133,7 +137,11 @@ export function TavernRoomChatMembers({
                     <PresenceDot size="small" status={status} />
                   </Tooltip>
                 ) : null}
-                <MemberName href={profileHref(member.id)} name={member.name} />
+                <MemberName
+                  href={profileHref(member.id)}
+                  name={member.name}
+                  className={nickColorClass(member.nickColor)}
+                />
                 {kept && !yourself ? <span className="text-ink-faint">- na matilha</span> : null}
               </Tag>
               {!yourself && !kept ? (
@@ -188,7 +196,7 @@ export function TavernRoomChatMessages({
                 at={message.at}
                 href={profileHref(message.authorId)}
                 name={message.authorName}
-                className={cn(message.authorId === identityId ? "text-ink" : "text-ink-soft")}
+                className={nickColorClass(nickColorOf(activeRoom, message.authorId))}
                 status={authorPresence(message.authorId, identityId, presence)}
               />
             )}

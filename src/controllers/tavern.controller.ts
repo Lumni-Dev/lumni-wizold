@@ -15,6 +15,7 @@ import {
   type TavernRoom,
   type TavernState,
 } from "@/models/entities/tavern";
+import { nickColorCapacity, seatMember } from "@/models/rules/tavern-nicks";
 
 function fail(state: TavernState, message: string): TavernResult {
   return { ok: false, message, state };
@@ -132,7 +133,7 @@ export function createRoom(
     password: password.trim().length > 0 ? password.trim() : null,
     ownerId: identity.id,
     createdAt: now,
-    members: [{ id: identity.id, name: identity.name, joinedAt: now, lastSeen: now }],
+    members: [seatMember(identity, now, [], nickColorCapacity({}))],
     messages: [
       {
         id: generateId("msg"),
@@ -181,7 +182,7 @@ export function joinRoom(
     ? room.members.map((member) =>
         member.id === identity.id ? { ...member, name: identity.name, lastSeen: now } : member,
       )
-    : [...room.members, { id: identity.id, name: identity.name, joinedAt: now, lastSeen: now }];
+    : [...room.members, seatMember(identity, now, room.members, nickColorCapacity(room))];
 
   const messages = [
     ...room.messages,
@@ -285,7 +286,7 @@ export function openDirect(
         )
       : [
           ...existing.members,
-          { id: identity.id, name: identity.name, joinedAt: now, lastSeen: now },
+          seatMember(identity, now, existing.members, nickColorCapacity(existing)),
         ];
 
     return done(
@@ -301,7 +302,7 @@ export function openDirect(
     password: null,
     ownerId: identity.id,
     createdAt: now,
-    members: [{ id: identity.id, name: identity.name, joinedAt: now, lastSeen: now }],
+    members: [seatMember(identity, now, [], nickColorCapacity({ privateFor: [identity.id, other.id] }))],
     privateFor: [identity.id, other.id],
     messages: [
       {

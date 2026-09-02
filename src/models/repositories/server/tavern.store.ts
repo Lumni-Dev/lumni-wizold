@@ -1,10 +1,28 @@
 import type { PoolClient } from "pg";
 import {
   MEMBER_TIMEOUT_MS,
+  type TavernMember,
   type TavernRoom,
   type TavernState,
   TAVERN_VERSION,
 } from "../../entities/tavern";
+import { nickColorCapacity, paintMembers } from "../../rules/tavern-nicks";
+
+function membersOf(
+  rows: { member_id: string; member_name: string; joined_at: Date; last_seen: Date; nick_color?: number }[],
+  privateFor?: string[],
+): TavernMember[] {
+  return paintMembers(
+    rows.map((member) => ({
+      id: member.member_id,
+      name: member.member_name,
+      joinedAt: new Date(member.joined_at).toISOString(),
+      lastSeen: new Date(member.last_seen).toISOString(),
+      nickColor: member.nick_color,
+    })),
+    nickColorCapacity({ privateFor }),
+  );
+}
 const TAVERN_LOCK = 0x77697a01;
 export async function lockTavern(client: PoolClient): Promise<void> {
   await client.query("select pg_advisory_xact_lock($1)", [TAVERN_LOCK]);
@@ -56,12 +74,7 @@ export async function loadRoomState(
         ownerId: row.owner_id,
         createdAt: new Date(row.created_at).toISOString(),
         privateFor: row.private_for ?? undefined,
-        members: members.rows.map((member) => ({
-          id: member.member_id,
-          name: member.member_name,
-          joinedAt: new Date(member.joined_at).toISOString(),
-          lastSeen: new Date(member.last_seen).toISOString(),
-        })),
+        members: membersOf(members.rows, row.private_for ?? undefined),
         messages: messages.rows.map((message) => ({
           id: message.id,
           authorId: message.author_id,
@@ -98,12 +111,7 @@ export async function loadTavern(client: PoolClient): Promise<LoadedTavern> {
         ownerId: row.owner_id,
         createdAt: new Date(row.created_at).toISOString(),
         privateFor: row.private_for ?? undefined,
-        members: byRoom(row.id, members.rows).map((member) => ({
-          id: member.member_id,
-          name: member.member_name,
-          joinedAt: new Date(member.joined_at).toISOString(),
-          lastSeen: new Date(member.last_seen).toISOString(),
-        })),
+        members: membersOf(byRoom(row.id, members.rows), row.private_for ?? undefined),
         messages: byRoom(row.id, messages.rows).map((message) => ({
           id: message.id,
           authorId: message.author_id,
@@ -130,9 +138,9 @@ async function saveRoom(
   await client.query("delete from tavern_members where room_id = $1", [room.id]);
   for (const member of room.members) {
     await client.query(
-      `insert into tavern_members (room_id, member_id, member_name, joined_at, last_seen)
-       values ($1, $2, $3, $4, $5)`,
-      [room.id, member.id, member.name, member.joinedAt, member.lastSeen],
+      `insert into tavern_members (room_id, member_id, member_name, joined_at, last_seen, nick_color)
+       values ($1, $2, $3, $4, $5, $6)`,
+      [room.id, member.id, member.name, member.joinedAt, member.lastSeen, member.nickColor],
     );
   }
   await client.query("delete from tavern_messages where room_id = $1", [room.id]);

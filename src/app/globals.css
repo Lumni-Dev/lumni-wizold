@@ -20,6 +20,27 @@
   --color-vigor: #32a864;
   --color-tide: #3080c9;
 
+  --color-nick-0: #e0a24a;
+  --color-nick-1: #5aa6e0;
+  --color-nick-2: #4ecf7a;
+  --color-nick-3: #b07ae0;
+  --color-nick-4: #e04a6a;
+  --color-nick-5: #f0e9e2;
+  --color-nick-6: #3ec8c8;
+  --color-nick-7: #e07a4a;
+  --color-nick-8: #c9a0e8;
+  --color-nick-9: #9ad14a;
+  --color-nick-10: #8aa4c8;
+  --color-nick-11: #f0b48a;
+  --color-nick-12: #6ed4b0;
+  --color-nick-13: #e88ab4;
+  --color-nick-14: #f0c44a;
+  --color-nick-15: #7ec8f0;
+  --color-nick-16: #7ab86a;
+  --color-nick-17: #d478c8;
+  --color-nick-18: #d4c4a0;
+  --color-nick-19: #a8d4d4;
+
   --font-sans: var(--font-sans-stack), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono-stack), ui-monospace, "SFMono-Regular", monospace;
   

@@ -16,6 +16,7 @@ export interface TavernIdentity {
 export interface TavernMember extends TavernIdentity {
   joinedAt: string;
   lastSeen: string;
+  nickColor: number;
 }
 export interface TavernMessage {
   id: string;
