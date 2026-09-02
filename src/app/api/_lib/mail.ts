@@ -45,6 +45,24 @@ function layout(
     )
     .join("");
   return (
+    '<!DOCTYPE html><html lang="pt-BR"><head>' +
+    '<meta charset="utf-8" />' +
+    '<meta name="viewport" content="width=device-width,initial-scale=1" />' +
+    '<meta name="color-scheme" content="dark" />' +
+    '<meta name="supported-color-schemes" content="dark" />' +
+    "</head>" +
+    '<body style="margin:0;padding:0;width:100%;background-color:' +
+    BASE +
+    ';">' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="' +
+    BASE +
+    '" style="background-color:' +
+    BASE +
+    ';width:100%;"><tr><td align="center" bgcolor="' +
+    BASE +
+    '" style="background-color:' +
+    BASE +
+    ';">' +
     '<div style="margin:0;padding:32px 16px;background-color:' +
     BASE +
     ';font-family:Arial,Helvetica,sans-serif;">' +
@@ -92,7 +110,8 @@ function layout(
     SITE_EMAIL +
     "</a>" +
     "</div>" +
-    "</td></tr></table></div>"
+    "</td></tr></table></div>" +
+    "</td></tr></table></body></html>"
   );
 }
 
