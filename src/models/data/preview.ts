@@ -41,7 +41,7 @@ export const PREVIEW_SHOTS: readonly PreviewShot[] = [
     text:
       "Cinco sets sobem faixa a faixa, poções cobradas em caçadas da sua noite e uma cópia " +
       "de cada peça: o que já está na mochila ou no corpo o balcão recusa.",
-    image: "/assets/landing/market.webp?v=1",
+    image: "/assets/landing/market.webp?v=3",
   },
   {
     key: "forge",
