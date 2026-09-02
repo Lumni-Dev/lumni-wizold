@@ -2,6 +2,7 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { artLoadedFromImg, isArtCached, markArtCached } from "@/shared/utils/art-cache";
+import { GLASS_SECTION } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { CornerAccents } from "./corner-accents";
 export type IconSize = "mini" | "small" | "medium" | "large" | "huge";
@@ -31,11 +32,12 @@ const ICON_TEXT: Record<IconSize, string> = {
   large: "text-xl",
   huge: "text-2xl",
 };
-type FrameTone = "default" | "strong" | "empty";
+export type FrameTone = "default" | "strong" | "empty" | "glass";
 const TONES: Record<FrameTone, string> = {
   default: "slot-well border-edge text-ink-faint",
   strong: "slot-well-strong border-edge-strong text-ink-soft",
   empty: "border-edge bg-surface-high text-ink-faint",
+  glass: "border-edge " + GLASS_SECTION + " text-ink-faint",
 };
 export function IconFrame({
   size = "medium",
@@ -76,6 +78,7 @@ export function IconArt({
   badge,
   inset,
   fit = "cover",
+  zoom = true,
   onFail,
 }: {
   source: string;
@@ -84,6 +87,7 @@ export function IconArt({
   badge?: string;
   inset?: string;
   fit?: "cover" | "contain";
+  zoom?: boolean;
   onFail?: () => void;
 }) {
   const imgRef = useRef<HTMLImageElement>(null);
@@ -129,14 +133,15 @@ export function IconArt({
         }}
         onError={() => onFail?.()}
         className={cn(
-          "h-full w-full cursor-zoom-in drop-shadow-[0_2px_4px_rgba(0,0,0,0.55)] transition-opacity duration-300",
+          "h-full w-full drop-shadow-[0_2px_4px_rgba(0,0,0,0.55)] transition-opacity duration-300",
           fit === "contain" ? "object-contain" : "object-cover",
           loaded ? "opacity-100" : "opacity-0",
+          zoom && "cursor-zoom-in",
           inset ?? (padded && ICON_PAD),
         )}
-        onMouseEnter={place}
-        onMouseMove={place}
-        onMouseLeave={() => setPreview(null)}
+        onMouseEnter={zoom ? place : undefined}
+        onMouseMove={zoom ? place : undefined}
+        onMouseLeave={zoom ? () => setPreview(null) : undefined}
       />
       {glow ? (
         <span className="item-glow pointer-events-none absolute -inset-1/2 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />

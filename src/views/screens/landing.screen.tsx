@@ -1,67 +1,24 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { useGame } from "@/controllers/game.context";
 import { LORE_CHAPTERS, LORE_COMPANIONS, LORE_COUPLE, LORE_PILLARS } from "@/models/data/lore";
 import { PREVIEW_SHOTS } from "@/models/data/preview";
 import { GAME_NAME, GAME_TAGLINE } from "@/shared/constants/game";
-import { GLASS_SECTION } from "@/shared/constants/ui";
+import { GLASS_SECTION, GLASS_SECTION_STRONG } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
-import { ActionIcon } from "../components/app-icon";
-import { Button } from "../components/button";
 import { CornerAccents } from "../components/corner-accents";
 import { GenderBanner } from "../components/gender-icon";
 import { CreatureCarousel } from "../components/creature-carousel";
 import { ArtImage } from "../components/art-image";
 import { PreviewGallery } from "../components/preview-gallery";
 import { LiveBackdrop } from "../components/live-backdrop";
+import { useNarration } from "@/controllers/use-narration";
 import { LandingCtaButton } from "../components/landing-cta-button";
 import { Footer } from "../layout/footer";
-
-function useNarration() {
-  const audio = useRef<HTMLAudioElement | null>(null);
-  const [current, setCurrent] = useState<string | null>(null);
-
-  useEffect(() => {
-    return () => {
-      audio.current?.pause();
-      audio.current = null;
-    };
-  }, []);
-
-  function toggle(source: string) {
-    if (audio.current && current === source) {
-      audio.current.pause();
-      setCurrent(null);
-      return;
-    }
-
-    audio.current?.pause();
-    const element = new Audio(source);
-    element.addEventListener("ended", () => setCurrent(null));
-    audio.current = element;
-    void element.play().catch(() => setCurrent(null));
-    setCurrent(source);
-  }
-
-  return { current, toggle };
-}
+import { NarrationButton } from "../components/narration-button";
 
 const CHAPTER_NUMBERS = ["I", "II", "III", "IV"];
-
-function NarrationButton({ playing, onClick }: { playing: boolean; onClick: () => void }) {
-  return (
-    <Button
-      variant="ghost"
-      className="shrink-0"
-      onClick={onClick}
-      aria-label={playing ? "Parar a narração" : "Ouvir este capítulo"}
-    >
-      <ActionIcon action={playing ? "pause" : "play"} />
-      {playing ? "Parar" : "Ouvir"}
-    </Button>
-  );
-}
 
 export function LandingScreen() {
   const { ready, character } = useGame();
@@ -225,7 +182,7 @@ export function LandingScreen() {
             {LORE_PILLARS.map((pillar) => (
               <article
                 key={pillar.title}
-                className="relative rounded-lg border border-edge bg-surface-high/50 p-4"
+                className={cn("relative rounded-lg border border-edge p-4", GLASS_SECTION_STRONG)}
               >
                 <h3 className="heading text-[11px] text-ink">{pillar.title}</h3>
                 <p className="mt-2 text-xs leading-relaxed text-ink-soft">{pillar.text}</p>

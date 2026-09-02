@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -43,6 +43,15 @@ for (const match of lore.matchAll(block)) {
     .map((piece) => piece[1])
     .join("");
   chapters.push({ name: match[2], text });
+}
+
+const AREAS = join(ROOT, "src", "models", "data", "areas");
+for (const entry of readdirSync(AREAS)) {
+  if (!entry.endsWith(".ts") || entry === "index.ts" || entry === "types.ts") continue;
+  const source = readFileSync(join(AREAS, entry), "utf8");
+  const id = source.match(/id:\s*"([^"]+)"/)?.[1];
+  const description = source.match(/description:\s*"((?:[^"\\]|\\.)*)"/)?.[1];
+  if (id && description) chapters.push({ name: "area-" + id, text: description });
 }
 
 if (chapters.length === 0) {

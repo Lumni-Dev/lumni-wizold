@@ -10,6 +10,7 @@ import {
   type HuntReport,
 } from "@/controllers/hunt.controller";
 import { useActivityLock } from "@/controllers/use-activity-lock";
+import { areaVoice, useNarration } from "@/controllers/use-narration";
 import { usePageActivity } from "@/controllers/use-page-activity";
 import { emphasizeDamage, narrationOf, type NarrationLine } from "../presenters/hunt.presenter";
 import { DANGER_LABEL } from "@/models/entities/territory";
@@ -20,6 +21,7 @@ import { backgroundRepository } from "@/models/repositories/background.repositor
 import { ArtImage } from "../components/art-image";
 import { ArtVideo } from "../components/art-video";
 import { ChipTabs } from "../components/chip-tabs";
+import { NarrationButton } from "../components/narration-button";
 import { CreatureIcon } from "../components/creature-icon";
 import {
   loadHuntSelection,
@@ -153,6 +155,7 @@ export function HuntScreen() {
   const { state, character, pet, moon, activity, setActivity } = useGame();
   usePageActivity(["hunt"]);
   const { locked } = useActivityLock();
+  const narration = useNarration();
   const runtime = useSyncExternalStore(
     activityRuntimeStore.subscribe,
     activityRuntimeStore.snapshot,
@@ -344,10 +347,15 @@ export function HuntScreen() {
                       {DANGER_LABEL[territory.danger]}
                     </p>
                   </div>
-                  <div className="px-4 py-3">
+                  <div className="space-y-3 px-4 py-3">
                     <p className="text-xs leading-relaxed text-ink-faint">
                       {territory.description}
                     </p>
+                    <NarrationButton
+                      playing={narration.current === areaVoice(territory.id)}
+                      onClick={() => narration.toggle(areaVoice(territory.id))}
+                      label={"Ouvir sobre " + territory.name}
+                    />
                   </div>
                   {shownFoe ? (
                     <div className="px-4 py-3">
