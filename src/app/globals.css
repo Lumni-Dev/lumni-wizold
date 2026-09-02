@@ -299,6 +299,26 @@ button:not(:disabled) {
   animation: card-shake 450ms cubic-bezier(0.36, 0.07, 0.19, 0.97);
 }
 
+@keyframes creature-drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@utility creature-drift {
+  animation: creature-drift var(--drift-seconds, 160s) linear infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .creature-drift {
+    animation: none;
+  }
+}
+
 @keyframes toast-in {
   from {
     opacity: 0;
