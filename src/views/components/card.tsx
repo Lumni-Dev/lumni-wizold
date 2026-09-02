@@ -88,7 +88,7 @@ export function CardArt({ children, className }: { children: ReactNode; classNam
   return (
     <div
       className={cn(
-        "flex w-1/3 shrink-0 items-center justify-center overflow-hidden",
+        "flex w-2/5 shrink-0 items-center justify-center overflow-hidden",
         tone !== "empty" && "border-r border-edge",
         className,
       )}
