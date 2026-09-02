@@ -24,6 +24,7 @@ import {
 import { ICON_FRAME_INSET } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
+import { normalizeText } from "@/shared/utils/text";
 import {
   matchesCategoryAndSet,
   setFilterOptions,
@@ -95,6 +96,7 @@ export function BazaarScreen() {
   const [page, setPage] = useState(1);
   const [category, setCategory] = useState<CategoryFilter>("all");
   const [set, setSet] = useState<SetFilter>("all");
+  const [search, setSearch] = useState("");
   const [flow, setFlow] = useState<Flow | null>(null);
   const [cancelling, setCancelling] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
@@ -120,11 +122,14 @@ export function BazaarScreen() {
   }, [ownListings]);
   const sellable = useMemo(() => listSellable(state), [state]);
 
-  const filteredBoard = useMemo(
-    () =>
-      board.filter((entry) => matchesCategoryAndSet(entry.item, category, set)),
-    [board, category, set],
-  );
+  const filteredBoard = useMemo(() => {
+    const wanted = normalizeText(search);
+    return board.filter(
+      (entry) =>
+        matchesCategoryAndSet(entry.item, category, set) &&
+        (wanted === "" || normalizeText(entry.item.name).includes(wanted)),
+    );
+  }, [board, category, set, search]);
 
   if (!character) return null;
 
@@ -228,6 +233,19 @@ export function BazaarScreen() {
               onChange={setSet}
               onPageReset={() => setPage(1)}
             />
+            <div className="min-w-0 flex-1 basis-40 sm:min-w-[12rem]">
+              <Field
+                label="Busca"
+                aria-label="Buscar anúncio pelo nome da peça"
+                placeholder="Nome da peça"
+                value={search}
+                autoComplete="off"
+                onChange={(event) => {
+                  setSearch(event.target.value);
+                  setPage(1);
+                }}
+              />
+            </div>
           </FilterRow>
 
           {filteredBoard.length === 0 ? (

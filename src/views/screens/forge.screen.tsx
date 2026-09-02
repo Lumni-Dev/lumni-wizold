@@ -21,10 +21,12 @@ import {
   MINING_TICKS_MAX,
 } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
+import { Field } from "../components/field";
 import { FilterRow, FilterSelect } from "../components/filter-select";
 import { FilteredEmptyState } from "../components/filtered-empty-state";
 import { formatBronze, formatNumber } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf, pageOfPosition } from "@/shared/utils/pagination";
+import { normalizeText } from "@/shared/utils/text";
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
 import { ConfirmDialog } from "../components/confirm-dialog";
@@ -106,12 +108,17 @@ export function ForgeScreen() {
   const [forgePage, setForgePage] = useState(1);
   const [category, setCategory] = useState<CategoryFilter>("all");
   const [set, setSet] = useState<SetFilter>("all");
+  const [search, setSearch] = useState("");
   const forgeShake = useShake(strike.beat);
 
-  const filteredSlots = useMemo(
-    () => slots.filter((row) => matchesCategoryAndSet(row.item, category, set)),
-    [slots, category, set],
-  );
+  const filteredSlots = useMemo(() => {
+    const wanted = normalizeText(search);
+    return slots.filter(
+      (row) =>
+        matchesCategoryAndSet(row.item, category, set) &&
+        (wanted === "" || normalizeText(row.item.name).includes(wanted)),
+    );
+  }, [slots, category, set, search]);
 
   function selectForge(key: string) {
     setSelectedForge(key);
@@ -178,6 +185,11 @@ export function ForgeScreen() {
     }
     if (!forgeEntry.canForge || activeOre !== null) return;
     setConfirmingKey(pieceKey(forgeEntry.item.id, forgeEntry.level));
+  }
+
+  function pickSearch(value: string) {
+    setSearch(value);
+    setForgePage(1);
   }
 
   function pickCategory(value: CategoryFilter) {
@@ -425,6 +437,16 @@ export function ForgeScreen() {
                 options={setFilterOptions()}
                 onChange={pickSet}
               />
+              <div className="min-w-0 flex-1 basis-40 sm:min-w-[12rem]">
+                <Field
+                  label="Busca"
+                  aria-label="Buscar peça pelo nome"
+                  placeholder="Nome da peça"
+                  value={search}
+                  autoComplete="off"
+                  onChange={(event) => pickSearch(event.target.value)}
+                />
+              </div>
             </FilterRow>
 
             <Panel
