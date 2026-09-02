@@ -7,6 +7,7 @@ import { PREVIEW_SHOTS } from "@/models/data/preview";
 import { GAME_NAME, GAME_TAGLINE } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
 import { ActionIcon } from "../components/app-icon";
+import { Button } from "../components/button";
 import { CornerAccents } from "../components/corner-accents";
 import { GenderBanner } from "../components/gender-icon";
 import { PreviewGallery } from "../components/preview-gallery";
@@ -47,15 +48,15 @@ const CHAPTER_NUMBERS = ["I", "II", "III", "IV"];
 
 function NarrationButton({ playing, onClick }: { playing: boolean; onClick: () => void }) {
   return (
-    <button
-      type="button"
+    <Button
+      variant="ghost"
+      className="shrink-0"
       onClick={onClick}
       aria-label={playing ? "Parar a narração" : "Ouvir este capítulo"}
-      className="inline-flex h-6 shrink-0 items-center gap-2 rounded-md border border-edge px-2 text-[10px] uppercase tracking-[0.16em] text-ink-faint transition-colors hover:border-edge-strong hover:text-ink"
     >
-      <ActionIcon action={playing ? "pause" : "play"} className="h-3 w-3" />
+      <ActionIcon action={playing ? "pause" : "play"} />
       {playing ? "Parar" : "Ouvir"}
-    </button>
+    </Button>
   );
 }
 
