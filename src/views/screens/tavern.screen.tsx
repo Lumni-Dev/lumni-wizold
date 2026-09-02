@@ -618,6 +618,7 @@ export function TavernScreen() {
           ) : (
             <>
               <Field
+                accent
                 aria-label="Buscar mesa pelo nome"
                 placeholder="Buscar mesa pelo nome"
                 value={roomSearch}

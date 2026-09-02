@@ -35,6 +35,7 @@ export function ItemFilterRow({
   return (
     <FilterRow>
       <FilterSelect
+        accent
         label="Categoria"
         value={category}
         options={marketCategoryFilterOptions({ includeMaterial })}
@@ -42,6 +43,7 @@ export function ItemFilterRow({
       />
       {isPet ? null : isPotion ? (
         <FilterSelect
+        accent
           label="Tamanho"
           value={size}
           options={potionSizeFilterOptions()}
@@ -49,6 +51,7 @@ export function ItemFilterRow({
         />
       ) : (
         <FilterSelect
+        accent
           label="Conjunto"
           value={set}
           options={setFilterOptions({ marketOnly: true })}

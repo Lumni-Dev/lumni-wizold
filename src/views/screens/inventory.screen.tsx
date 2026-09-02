@@ -130,6 +130,7 @@ export function InventoryScreen() {
 
       <FilterRow className="sm:max-w-xs">
         <FilterSelect
+            accent
           label="Categoria"
           value={filter}
           options={inventoryCategoryFilterOptions()}

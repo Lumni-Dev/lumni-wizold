@@ -18,6 +18,7 @@ interface FilterSelectProps<T extends string> {
   onPageReset?: () => void;
   className?: string;
   disabled?: boolean;
+  accent?: boolean;
 }
 
 export function FilterSelect<T extends string>({
@@ -28,6 +29,7 @@ export function FilterSelect<T extends string>({
   onPageReset,
   className,
   disabled,
+  accent,
 }: FilterSelectProps<T>) {
   const pick = (next: T) => {
     onChange(next);
@@ -44,6 +46,7 @@ export function FilterSelect<T extends string>({
       options={toSelectOptions(options)}
       onChange={(next) => pick(next as T)}
       disabled={disabled}
+      accent={accent}
       aria-label={label}
     />
   );

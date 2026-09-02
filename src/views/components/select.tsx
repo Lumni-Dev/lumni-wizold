@@ -27,6 +27,7 @@ interface SelectProps {
   options: readonly SelectOption[];
   onChange: (value: string) => void;
   compact?: boolean;
+  accent?: boolean;
   disabled?: boolean;
   className?: string;
   "aria-label"?: string;
@@ -39,6 +40,7 @@ export function Select({
   options,
   onChange,
   compact = false,
+  accent = false,
   disabled = false,
   className,
   "aria-label": ariaLabel,
@@ -140,7 +142,7 @@ export function Select({
 
       <div ref={rootRef} className="relative">
         {compact ? (
-          <ChipFrame active={open} className="w-full min-w-0">
+          <ChipFrame active={open || accent} className="w-full min-w-0">
             <button
               type="button"
               role="combobox"

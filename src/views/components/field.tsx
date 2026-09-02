@@ -1,12 +1,14 @@
 import type { InputHTMLAttributes } from "react";
 import { CONTROL_HEIGHT, LOOSE_CONTROL_SURFACE } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
+import { CornerAccents } from "./corner-accents";
 
 interface FieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   hint?: string;
   numeric?: boolean;
   loose?: boolean;
+  accent?: boolean;
 }
 
 export function Field({
@@ -14,6 +16,7 @@ export function Field({
   hint,
   numeric = false,
   loose: _loose,
+  accent = false,
   className,
   onChange,
   ...rest
@@ -25,21 +28,24 @@ export function Field({
           {label}
         </span>
       ) : null}
-      <input
-        className={cn(
-          CONTROL_HEIGHT + " w-full rounded-md px-3 text-xs text-ink",
-          LOOSE_CONTROL_SURFACE +
-            " placeholder:text-ink-faint focus:border-edge-strong focus:outline-none",
-          className,
-        )}
-        {...rest}
-        type={numeric ? "text" : rest.type}
-        inputMode={numeric ? "numeric" : rest.inputMode}
-        onChange={(event) => {
-          if (numeric) event.target.value = event.target.value.replace(/\D/g, "");
-          onChange?.(event);
-        }}
-      />
+      <span className="relative block">
+        <input
+          className={cn(
+            CONTROL_HEIGHT + " w-full rounded-md px-3 text-xs text-ink",
+            LOOSE_CONTROL_SURFACE +
+              " placeholder:text-ink-faint focus:border-edge-strong focus:outline-none",
+            className,
+          )}
+          {...rest}
+          type={numeric ? "text" : rest.type}
+          inputMode={numeric ? "numeric" : rest.inputMode}
+          onChange={(event) => {
+            if (numeric) event.target.value = event.target.value.replace(/\D/g, "");
+            onChange?.(event);
+          }}
+        />
+        {accent ? <CornerAccents scale="icon" inside /> : null}
+      </span>
       {hint ? <span className="block text-[10px] text-ink-faint">{hint}</span> : null}
     </label>
   );

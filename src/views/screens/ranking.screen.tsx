@@ -81,12 +81,14 @@ export function RankingScreen() {
 
       <FilterRow>
         <FilterSelect
+          accent
           label="Quadro"
           value={view.board.key}
           options={rankingBoardFilterOptions()}
           onChange={openBoard}
         />
         <FilterSelect
+          accent
           label="Personagem"
           value={gender}
           options={genderFilterOptions()}
@@ -94,7 +96,7 @@ export function RankingScreen() {
         />
       </FilterRow>
 
-      <HunterSearchField value={search} onChange={find} />
+      <HunterSearchField accent value={search} onChange={find} />
 
       <Panel
         title={view.board.label}
