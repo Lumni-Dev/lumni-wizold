@@ -22,6 +22,7 @@ import { cn } from "@/shared/utils/class-names";
 import { Button } from "../components/button";
 import { AiAuditNotice } from "../components/ai-audit-notice";
 import { Chip } from "../components/chip";
+import { ChipTabs } from "../components/chip-tabs";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { Field } from "../components/field";
 import { Modal } from "../components/modal";
@@ -31,6 +32,20 @@ import { List, ListRow, RowText } from "../components/list";
 import { Panel } from "../components/panel";
 import { Tag } from "../components/tag";
 import { PageHeader } from "../layout/page-header";
+
+const SECTIONS: readonly { key: string; label: string }[] = [
+  { key: "all", label: "Tudo" },
+  { key: "conta", label: "Conta" },
+  { key: "2fa", label: "Duas etapas" },
+  { key: "nome", label: "Nome" },
+  { key: "taverna", label: "Taverna" },
+  { key: "automacao", label: "Automação" },
+  { key: "som", label: "Som" },
+  { key: "trilha", label: "Trilha" },
+  { key: "fundo", label: "Fundo" },
+  { key: "cache", label: "Cache" },
+  { key: "excluir", label: "Excluir conta" },
+];
 
 export function SettingsScreen() {
   const {
@@ -167,6 +182,12 @@ export function SettingsScreen() {
     musicRepository.setEnabled(on);
     if (on && musicRepository.volume() <= 0) musicRepository.setVolume(musicRepository.defaultVolume());
   }
+  const [section, setSection] = useState("all");
+
+  function shows(key: string): boolean {
+    return section === "all" || section === key;
+  }
+
   const volumeDragging = useRef(false);
 
   function finishVolumeAdjust() {
@@ -204,458 +225,480 @@ export function SettingsScreen() {
         description="A conta, o nome que a matilha conhece e a própria partida."
       />
 
+      <ChipTabs tabs={SECTIONS} value={section} onChange={setSection} />
+
       <div className="space-y-6">
-        <Panel
-          title="Conta"
-          description="Com quem esta partida está assinada."
-          action={<Tag tone="neutral">Google</Tag>}
-          padding="none"
-          footer={
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant="outline"
-                onClick={() =>
-                  logout().then(() => {
-                    router.push("/");
-                  })
-                }
-              >
-                Sair da conta
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() =>
-                  logoutEverywhere().then(() => {
-                    router.push("/");
-                  })
-                }
-              >
-                Sair de todos os aparelhos
-              </Button>
+        {shows("conta") ? (
+          <Panel
+            title="Conta"
+            description="Com quem esta partida está assinada."
+            action={<Tag tone="neutral">Google</Tag>}
+            padding="none"
+            footer={
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    logout().then(() => {
+                      router.push("/");
+                    })
+                  }
+                >
+                  Sair da conta
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    logoutEverywhere().then(() => {
+                      router.push("/");
+                    })
+                  }
+                >
+                  Sair de todos os aparelhos
+                </Button>
+              </div>
+            }
+          >
+            <div className={cn("flex items-center gap-3 border-b border-edge p-4", ICON_FRAME_INSET)}>
+              {accountPicture ? (
+                <IconFrame size="medium" tone="strong">
+                  <IconArt source={accountPicture} padded={false} />
+                </IconFrame>
+              ) : (
+                <GenderIcon gender={character.gender} size="medium" />
+              )}
+              <div className="min-w-0">
+                <p className="truncate text-sm text-ink">Conectado com Google</p>
+                <p className="truncate font-mono text-[11px] text-ink-faint">
+                  {accountEmail ?? "carregando..."}
+                </p>
+              </div>
             </div>
-          }
-        >
-          <div className={cn("flex items-center gap-3 border-b border-edge p-4", ICON_FRAME_INSET)}>
-            {accountPicture ? (
-              <IconFrame size="medium" tone="strong">
-                <IconArt source={accountPicture} padded={false} />
-              </IconFrame>
-            ) : (
-              <GenderIcon gender={character.gender} size="medium" />
-            )}
-            <div className="min-w-0">
-              <p className="truncate text-sm text-ink">Conectado com Google</p>
-              <p className="truncate font-mono text-[11px] text-ink-faint">
-                {accountEmail ?? "carregando..."}
-              </p>
-            </div>
-          </div>
-          <p className="p-4 text-xs leading-relaxed text-ink-faint">
-            A porta é a conta Google, e a partida vive no servidor: saia quando quiser, e o mesmo
-            botão de entrar devolve tudo como estava. Sair de todos os aparelhos derruba qualquer
-            sessão aberta em outro lugar na hora.
-          </p>
-        </Panel>
-
-        <Panel
-          title="Verificação em duas etapas"
-          padding="none"
-          footer={
-            <p className="text-xs leading-relaxed text-ink-faint">
-              Um código de oito dígitos no e-mail confirma cada entrada, além do Google. Com a
-              verificação ligada, a porta só abre depois que você digitar esse código.
+            <p className="p-4 text-xs leading-relaxed text-ink-faint">
+              A porta é a conta Google, e a partida vive no servidor: saia quando quiser, e o mesmo
+              botão de entrar devolve tudo como estava. Sair de todos os aparelhos derruba qualquer
+              sessão aberta em outro lugar na hora.
             </p>
-          }
-        >
-          <List>
-            <ListRow layout="split">
-              <RowText title="Estado" description="Ligado ou desligado na conta." />
-              <div className="flex shrink-0 gap-2">
-                <Chip
-                  active={twoFactorEnabled}
-                  onClick={() => {
-                    if (twoFactorEnabled) return undefined;
-                    return sendTwoFactorCode("enable").then((sent) => {
-                      if (sent) {
-                        setTwoFactorCode("");
-                        setTwoFactorSetup("enable");
-                      }
-                    });
-                  }}
-                >
-                  Ativado
-                </Chip>
-                <Chip
-                  active={!twoFactorEnabled}
-                  onClick={() => {
-                    if (!twoFactorEnabled) return undefined;
-                    return sendTwoFactorCode("disable").then((sent) => {
-                      if (sent) {
-                        setTwoFactorCode("");
-                        setTwoFactorSetup("disable");
-                      }
-                    });
-                  }}
-                >
-                  Desativado
-                </Chip>
-              </div>
-            </ListRow>
-          </List>
-        </Panel>
+          </Panel>
+        ) : null}
 
-        <Panel
-          title="Nome do personagem"
-          description={
-            "O nome pode mudar uma vez a cada " +
-            RENAME_COOLDOWN_DAYS +
-            " dias, e a troca custa " +
-            formatBronze(RENAME_PRICE) +
-            " WCoins."
-          }
-        >
-          <form onSubmit={submitRename} className="space-y-3">
-            <Field label="Nome atual" value={character.name} disabled className="font-mono" />
-            <Field
-              label="Novo nome"
-              value={newName}
-              maxLength={NAME_MAX_LENGTH}
-              placeholder="Como a matilha vai te chamar"
-              autoComplete="off"
-              disabled={!canRename}
-              hint={
-                canRename
-                  ? "O próximo ajuste só em " + RENAME_COOLDOWN_DAYS + " dias."
-                  : "Pode trocar de novo em " +
-                    formatNumber(daysLeft) +
-                    (daysLeft > 1 ? " dias." : " dia.")
-              }
-              onChange={(event) => setNewName(sanitizeName(event.target.value, NAME_MAX_LENGTH))}
-            />
-            <AiAuditNotice />
-            <Button
-              type="submit"
-              variant="primary"
-              fullWidth
-              disabled={!canRename || !affordable || newName.trim().length === 0}
-            >
-              {affordable
-                ? "Alterar por " + formatBronze(cost)
-                : "Faltam " + formatBronze(cost - character.bronze)}
-            </Button>
-          </form>
-        </Panel>
-
-        <Panel
-          title="Taverna"
-          description="Avisos no desktop das mensagens das suas mesas: nome da mesa, quem falou, quando e o quê, com um botão para responder direto na taverna. Com Web Push ativo, chegam mesmo com o jogo fechado; sem ele, só enquanto uma aba do Wizold está aberta fora da taverna."
-          padding="none"
-        >
-          <List>
-            <ListRow layout="split">
-              <RowText title="Estado" description="Avisos de mesa neste aparelho." />
-              <div className="flex shrink-0 gap-2">
-                <Chip active={pushOn} onClick={() => choosePush(true)} disabled={!tavernPushSupported()}>
-                  Ativado
-                </Chip>
-                <Chip active={!pushOn} onClick={() => choosePush(false)}>
-                  Desativado
-                </Chip>
-              </div>
-            </ListRow>
-            {!webPushConfigured() ? (
-              <ListRow layout="column">
-                <p className="text-[11px] leading-relaxed text-ink-faint">
-                  Web Push ainda não está configurado neste ambiente; avisos locais continuam
-                  funcionando com o jogo aberto.
-                </p>
-              </ListRow>
-            ) : null}
-            {pushOn ? (
-              <ListRow layout="column">
-                <Button variant="secondary" onClick={testTavernPush}>
-                  Testar notificação
-                </Button>
-                <p className="text-[11px] leading-relaxed text-ink-faint">
-                  Não apareceu? O navegador ou o Windows pode estar silenciando: confira o Foco
-                  assistido e as notificações do Chrome nas configurações do sistema.
-                </p>
-              </ListRow>
-            ) : null}
-          </List>
-        </Panel>
-
-        <Panel
-          title="Automação"
-          description="O que a partida faz sozinha. Cada chave faz uma coisa só, e elas se ajudam: a caçada bebe, a poção acaba, o corpo descansa, a caçada volta. É um recurso VIP."
-          action={
-            vip ? (
-              <Tag tone="light">
-                {formatNumber(active)} de {AUTOMATIONS.length} ativadas
-              </Tag>
-            ) : (
-              <Tag tone="neutral">Requer VIP</Tag>
-            )
-          }
-          padding="none"
-          footer={
-            vip ? (
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <span className="text-[11px] text-ink-faint">
-                  {character.vipCanceling
-                    ? "VIP ativo até " + formatDay(character.vipUntil ?? "") + ", sem renovar."
-                    : "Assinatura ativa, renova em " + formatDay(character.vipUntil ?? "") + "."}
-                </span>
-                {character.vipCanceling ? (
-                  <Button variant="primary" onClick={() => reactivateVip()}>
-                    Reativar assinatura
-                  </Button>
-                ) : (
-                  <Button variant="outline" onClick={() => setCancelingVip(true)}>
-                    Cancelar assinatura
-                  </Button>
-                )}
-              </div>
-            ) : (
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <span className="text-[11px] text-ink-faint">
-                  A automação é um recurso VIP. Ative para ligar as chaves.
-                </span>
-                <Button variant="primary" onClick={() => buyVip()}>
-                  Ativar VIP por {formatReais(VIP_PRICE_CENTS)}/mês
-                </Button>
-              </div>
-            )
-          }
-        >
-          <List>
-            {AUTOMATIONS.map((entry) => (
-              <ListRow key={entry.key} layout="split">
-                <RowText title={entry.label} description={entry.effect} />
-                <div
-                  className={"flex shrink-0 gap-2" + (vip ? "" : " pointer-events-none opacity-50")}
-                >
+        {shows("2fa") ? (
+          <Panel
+            title="Verificação em duas etapas"
+            padding="none"
+            footer={
+              <p className="text-xs leading-relaxed text-ink-faint">
+                Um código de oito dígitos no e-mail confirma cada entrada, além do Google. Com a
+                verificação ligada, a porta só abre depois que você digitar esse código.
+              </p>
+            }
+          >
+            <List>
+              <ListRow layout="split">
+                <RowText title="Estado" description="Ligado ou desligado na conta." />
+                <div className="flex shrink-0 gap-2">
                   <Chip
-                    active={state.automation[entry.key]}
-                    disabled={!vip}
-                    onClick={() => setAutomation(entry.key, true)}
+                    active={twoFactorEnabled}
+                    onClick={() => {
+                      if (twoFactorEnabled) return undefined;
+                      return sendTwoFactorCode("enable").then((sent) => {
+                        if (sent) {
+                          setTwoFactorCode("");
+                          setTwoFactorSetup("enable");
+                        }
+                      });
+                    }}
                   >
                     Ativado
                   </Chip>
                   <Chip
-                    active={!state.automation[entry.key]}
-                    disabled={!vip}
-                    onClick={() => setAutomation(entry.key, false)}
+                    active={!twoFactorEnabled}
+                    onClick={() => {
+                      if (!twoFactorEnabled) return undefined;
+                      return sendTwoFactorCode("disable").then((sent) => {
+                        if (sent) {
+                          setTwoFactorCode("");
+                          setTwoFactorSetup("disable");
+                        }
+                      });
+                    }}
                   >
                     Desativado
                   </Chip>
                 </div>
               </ListRow>
-            ))}
-          </List>
-        </Panel>
+            </List>
+          </Panel>
+        ) : null}
 
-        <Panel
-          title="Som"
-          description="Os efeitos do jogo: couro, moedas e o rugido da virada."
-          padding="none"
-        >
-          <List>
-            <ListRow layout="split">
-              <RowText title="Estado" description="Ligado ou desligado neste aparelho." />
-              <div className="flex shrink-0 gap-2">
-                <Chip active={sound} onClick={() => chooseSound(true)}>
-                  Ativado
-                </Chip>
-                <Chip active={!sound} onClick={() => chooseSound(false)}>
-                  Desativado
-                </Chip>
-              </div>
-            </ListRow>
-            {sound ? (
-              <ListRow layout="column">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">Volume</span>
-                  <span className="font-mono text-[11px] text-ink">{Math.round(volume * 100)}%</span>
-                </div>
-                <input
-                  type="range"
-                  min={0}
-                  max={100}
-                  step={1}
-                  value={Math.round(volume * 100)}
-                  aria-label="Volume do som"
-                  className="volume-slider w-full"
-                  onPointerDown={(event) => {
-                    volumeDragging.current = true;
-                    event.currentTarget.setPointerCapture(event.pointerId);
-                  }}
-                  onChange={(event) => {
-                    soundRepository.setVolume(Number(event.target.value) / 100);
-                  }}
-                  onPointerUp={(event) => {
-                    releaseVolumePointer(event);
-                    finishVolumeAdjust();
-                  }}
-                  onPointerCancel={(event) => {
-                    releaseVolumePointer(event);
-                    volumeDragging.current = false;
-                  }}
-                  onKeyDown={() => {
-                    volumeDragging.current = true;
-                  }}
-                  onKeyUp={finishVolumeAdjust}
-                />
-              </ListRow>
-            ) : null}
-          </List>
-        </Panel>
-
-        <Panel
-          title="Trilha"
-          description="A música que toca por baixo do jogo. Não toca na porta de entrada."
-          padding="none"
-        >
-          <List>
-            <ListRow layout="split">
-              <RowText title="Estado" description="Ligada ou desligada neste aparelho." />
-              <div className="flex shrink-0 gap-2">
-                <Chip active={music} onClick={() => chooseMusic(true)}>
-                  Ativada
-                </Chip>
-                <Chip active={!music} onClick={() => chooseMusic(false)}>
-                  Desativada
-                </Chip>
-              </div>
-            </ListRow>
-            {music ? (
-              <ListRow layout="column">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                    Volume
-                  </span>
-                  <span className="font-mono text-[11px] text-ink">
-                    {Math.round(musicVolume * 100)}%
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min={0}
-                  max={100}
-                  step={1}
-                  value={Math.round(musicVolume * 100)}
-                  aria-label="Volume da trilha"
-                  className="volume-slider w-full"
-                  onChange={(event) => {
-                    musicRepository.setVolume(Number(event.target.value) / 100);
-                  }}
-                />
-                <p className="text-[11px] leading-relaxed text-ink-faint">
-                  A trilha começa em 75% e corre por baixo dos efeitos, que ficam por cima dela
-                  para o couro, as moedas e o rugido da virada continuarem se ouvindo. O volume
-                  vale na hora.
-                </p>
-              </ListRow>
-            ) : null}
-          </List>
-        </Panel>
-
-        <Panel
-          title="Animação de fundo"
-          description="A noite viva atrás do jogo, a mesma da porta de entrada. Desligada, fica a imagem parada."
-          padding="none"
-        >
-          <List>
-            <ListRow layout="split">
-              <RowText title="Estado" description="Ligada ou desligada neste aparelho." />
-              <div className="flex shrink-0 gap-2">
-                <Chip active={animatedBackground} onClick={() => backgroundRepository.setEnabled(true)}>
-                  Ativado
-                </Chip>
-                <Chip active={!animatedBackground} onClick={() => backgroundRepository.setEnabled(false)}>
-                  Desativado
-                </Chip>
-              </div>
-            </ListRow>
-            {animatedBackground ? (
-              <ListRow layout="column">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                    Escuridão
-                  </span>
-                  <span className="font-mono text-[11px] text-ink">
-                    {Math.round(backdropDarkness * 100)}%
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min={0}
-                  max={100}
-                  step={1}
-                  value={Math.round(backdropDarkness * 100)}
-                  aria-label="Escuridão do fundo animado"
-                  className="volume-slider w-full"
-                  onChange={(event) => {
-                    backgroundRepository.setDarkness(Number(event.target.value) / 100);
-                  }}
-                />
-                <p className="text-[11px] leading-relaxed text-ink-faint">
-                  A cortina na frente do vídeo: 0% mostra a noite crua, 50% deixa o vídeo respirar
-                  atrás do jogo e 100% fecha o pé da tela. O efeito aparece aqui atrás na hora.
-                </p>
-              </ListRow>
-            ) : null}
-          </List>
-        </Panel>
-
-        <Panel
-          title="Cache do jogo"
-          description="O que este aparelho guarda para abrir mais rápido."
-          footer={
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <span className="text-[11px] text-ink-faint">
-                {clearing ? "Limpando e recarregando..." : "A partida no servidor não muda"}
-              </span>
-              <Button variant="outline" busy={clearing} onClick={() => setConfirmingClear(true)}>
-                Limpar cache
-              </Button>
-            </div>
-          }
-        >
-          <p className="text-xs leading-relaxed text-ink-faint">
-            O navegador guarda cópias das imagens do jogo e as preferências deste aparelho: som,
-            volume, trilha, animação e escuridão do fundo, a data de nascimento lembrada na porta e o
-            trabalho em andamento. Limpar o cache
-            descarta essas cópias, baixa as imagens de novo do servidor e recarrega a página;
-            serve para quando alguma arte aparece errada ou desatualizada.
-          </p>
-        </Panel>
-
-        <Panel
-          title="Excluir conta"
-          description="Apaga a partida inteira do servidor. Não tem volta."
-          footer={
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <span className="text-[11px] text-ink-faint">
-                {character.name} - NV. {formatNumber(character.level)}
-              </span>
+        {shows("nome") ? (
+          <Panel
+            title="Nome do personagem"
+            description={
+              "O nome pode mudar uma vez a cada " +
+              RENAME_COOLDOWN_DAYS +
+              " dias, e a troca custa " +
+              formatBronze(RENAME_PRICE) +
+              " WCoins."
+            }
+          >
+            <form onSubmit={submitRename} className="space-y-3">
+              <Field label="Nome atual" value={character.name} disabled className="font-mono" />
+              <Field
+                label="Novo nome"
+                value={newName}
+                maxLength={NAME_MAX_LENGTH}
+                placeholder="Como a matilha vai te chamar"
+                autoComplete="off"
+                disabled={!canRename}
+                hint={
+                  canRename
+                    ? "O próximo ajuste só em " + RENAME_COOLDOWN_DAYS + " dias."
+                    : "Pode trocar de novo em " +
+                      formatNumber(daysLeft) +
+                      (daysLeft > 1 ? " dias." : " dia.")
+                }
+                onChange={(event) => setNewName(sanitizeName(event.target.value, NAME_MAX_LENGTH))}
+              />
+              <AiAuditNotice />
               <Button
-                variant="outline"
-                onClick={() => {
-                  setDeleteCode("");
-                  setDeleting("ask");
-                }}
+                type="submit"
+                variant="primary"
+                fullWidth
+                disabled={!canRename || !affordable || newName.trim().length === 0}
               >
-                Excluir conta
+                {affordable
+                  ? "Alterar por " + formatBronze(cost)
+                  : "Faltam " + formatBronze(cost - character.bronze)}
               </Button>
-            </div>
-          }
-        >
-          <p className="text-xs leading-relaxed text-ink-faint">
-            Personagem, inventário, forja, lobo, carteira e anúncios: tudo some de uma vez, e a
-            conta volta para a criação de personagem.
-          </p>
-        </Panel>
+            </form>
+          </Panel>
+        ) : null}
+
+        {shows("taverna") ? (
+          <Panel
+            title="Taverna"
+            description="Avisos no desktop das mensagens das suas mesas: nome da mesa, quem falou, quando e o quê, com um botão para responder direto na taverna. Com Web Push ativo, chegam mesmo com o jogo fechado; sem ele, só enquanto uma aba do Wizold está aberta fora da taverna."
+            padding="none"
+          >
+            <List>
+              <ListRow layout="split">
+                <RowText title="Estado" description="Avisos de mesa neste aparelho." />
+                <div className="flex shrink-0 gap-2">
+                  <Chip active={pushOn} onClick={() => choosePush(true)} disabled={!tavernPushSupported()}>
+                    Ativado
+                  </Chip>
+                  <Chip active={!pushOn} onClick={() => choosePush(false)}>
+                    Desativado
+                  </Chip>
+                </div>
+              </ListRow>
+              {!webPushConfigured() ? (
+                <ListRow layout="column">
+                  <p className="text-[11px] leading-relaxed text-ink-faint">
+                    Web Push ainda não está configurado neste ambiente; avisos locais continuam
+                    funcionando com o jogo aberto.
+                  </p>
+                </ListRow>
+              ) : null}
+              {pushOn ? (
+                <ListRow layout="column">
+                  <Button variant="secondary" onClick={testTavernPush}>
+                    Testar notificação
+                  </Button>
+                  <p className="text-[11px] leading-relaxed text-ink-faint">
+                    Não apareceu? O navegador ou o Windows pode estar silenciando: confira o Foco
+                    assistido e as notificações do Chrome nas configurações do sistema.
+                  </p>
+                </ListRow>
+              ) : null}
+            </List>
+          </Panel>
+        ) : null}
+
+        {shows("automacao") ? (
+          <Panel
+            title="Automação"
+            description="O que a partida faz sozinha. Cada chave faz uma coisa só, e elas se ajudam: a caçada bebe, a poção acaba, o corpo descansa, a caçada volta. É um recurso VIP."
+            action={
+              vip ? (
+                <Tag tone="light">
+                  {formatNumber(active)} de {AUTOMATIONS.length} ativadas
+                </Tag>
+              ) : (
+                <Tag tone="neutral">Requer VIP</Tag>
+              )
+            }
+            padding="none"
+            footer={
+              vip ? (
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <span className="text-[11px] text-ink-faint">
+                    {character.vipCanceling
+                      ? "VIP ativo até " + formatDay(character.vipUntil ?? "") + ", sem renovar."
+                      : "Assinatura ativa, renova em " + formatDay(character.vipUntil ?? "") + "."}
+                  </span>
+                  {character.vipCanceling ? (
+                    <Button variant="primary" onClick={() => reactivateVip()}>
+                      Reativar assinatura
+                    </Button>
+                  ) : (
+                    <Button variant="outline" onClick={() => setCancelingVip(true)}>
+                      Cancelar assinatura
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <span className="text-[11px] text-ink-faint">
+                    A automação é um recurso VIP. Ative para ligar as chaves.
+                  </span>
+                  <Button variant="primary" onClick={() => buyVip()}>
+                    Ativar VIP por {formatReais(VIP_PRICE_CENTS)}/mês
+                  </Button>
+                </div>
+              )
+            }
+          >
+            <List>
+              {AUTOMATIONS.map((entry) => (
+                <ListRow key={entry.key} layout="split">
+                  <RowText title={entry.label} description={entry.effect} />
+                  <div
+                    className={"flex shrink-0 gap-2" + (vip ? "" : " pointer-events-none opacity-50")}
+                  >
+                    <Chip
+                      active={state.automation[entry.key]}
+                      disabled={!vip}
+                      onClick={() => setAutomation(entry.key, true)}
+                    >
+                      Ativado
+                    </Chip>
+                    <Chip
+                      active={!state.automation[entry.key]}
+                      disabled={!vip}
+                      onClick={() => setAutomation(entry.key, false)}
+                    >
+                      Desativado
+                    </Chip>
+                  </div>
+                </ListRow>
+              ))}
+            </List>
+          </Panel>
+        ) : null}
+
+        {shows("som") ? (
+          <Panel
+            title="Som"
+            description="Os efeitos do jogo: couro, moedas e o rugido da virada."
+            padding="none"
+          >
+            <List>
+              <ListRow layout="split">
+                <RowText title="Estado" description="Ligado ou desligado neste aparelho." />
+                <div className="flex shrink-0 gap-2">
+                  <Chip active={sound} onClick={() => chooseSound(true)}>
+                    Ativado
+                  </Chip>
+                  <Chip active={!sound} onClick={() => chooseSound(false)}>
+                    Desativado
+                  </Chip>
+                </div>
+              </ListRow>
+              {sound ? (
+                <ListRow layout="column">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">Volume</span>
+                    <span className="font-mono text-[11px] text-ink">{Math.round(volume * 100)}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    step={1}
+                    value={Math.round(volume * 100)}
+                    aria-label="Volume do som"
+                    className="volume-slider w-full"
+                    onPointerDown={(event) => {
+                      volumeDragging.current = true;
+                      event.currentTarget.setPointerCapture(event.pointerId);
+                    }}
+                    onChange={(event) => {
+                      soundRepository.setVolume(Number(event.target.value) / 100);
+                    }}
+                    onPointerUp={(event) => {
+                      releaseVolumePointer(event);
+                      finishVolumeAdjust();
+                    }}
+                    onPointerCancel={(event) => {
+                      releaseVolumePointer(event);
+                      volumeDragging.current = false;
+                    }}
+                    onKeyDown={() => {
+                      volumeDragging.current = true;
+                    }}
+                    onKeyUp={finishVolumeAdjust}
+                  />
+                </ListRow>
+              ) : null}
+            </List>
+          </Panel>
+        ) : null}
+
+        {shows("trilha") ? (
+          <Panel
+            title="Trilha"
+            description="A música que toca por baixo do jogo. Não toca na porta de entrada."
+            padding="none"
+          >
+            <List>
+              <ListRow layout="split">
+                <RowText title="Estado" description="Ligada ou desligada neste aparelho." />
+                <div className="flex shrink-0 gap-2">
+                  <Chip active={music} onClick={() => chooseMusic(true)}>
+                    Ativada
+                  </Chip>
+                  <Chip active={!music} onClick={() => chooseMusic(false)}>
+                    Desativada
+                  </Chip>
+                </div>
+              </ListRow>
+              {music ? (
+                <ListRow layout="column">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                      Volume
+                    </span>
+                    <span className="font-mono text-[11px] text-ink">
+                      {Math.round(musicVolume * 100)}%
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    step={1}
+                    value={Math.round(musicVolume * 100)}
+                    aria-label="Volume da trilha"
+                    className="volume-slider w-full"
+                    onChange={(event) => {
+                      musicRepository.setVolume(Number(event.target.value) / 100);
+                    }}
+                  />
+                  <p className="text-[11px] leading-relaxed text-ink-faint">
+                    A trilha começa em 75% e corre por baixo dos efeitos, que ficam por cima dela
+                    para o couro, as moedas e o rugido da virada continuarem se ouvindo. O volume
+                    vale na hora.
+                  </p>
+                </ListRow>
+              ) : null}
+            </List>
+          </Panel>
+        ) : null}
+
+        {shows("fundo") ? (
+          <Panel
+            title="Animação de fundo"
+            description="A noite viva atrás do jogo, a mesma da porta de entrada. Desligada, fica a imagem parada."
+            padding="none"
+          >
+            <List>
+              <ListRow layout="split">
+                <RowText title="Estado" description="Ligada ou desligada neste aparelho." />
+                <div className="flex shrink-0 gap-2">
+                  <Chip active={animatedBackground} onClick={() => backgroundRepository.setEnabled(true)}>
+                    Ativado
+                  </Chip>
+                  <Chip active={!animatedBackground} onClick={() => backgroundRepository.setEnabled(false)}>
+                    Desativado
+                  </Chip>
+                </div>
+              </ListRow>
+              {animatedBackground ? (
+                <ListRow layout="column">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                      Escuridão
+                    </span>
+                    <span className="font-mono text-[11px] text-ink">
+                      {Math.round(backdropDarkness * 100)}%
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    step={1}
+                    value={Math.round(backdropDarkness * 100)}
+                    aria-label="Escuridão do fundo animado"
+                    className="volume-slider w-full"
+                    onChange={(event) => {
+                      backgroundRepository.setDarkness(Number(event.target.value) / 100);
+                    }}
+                  />
+                  <p className="text-[11px] leading-relaxed text-ink-faint">
+                    A cortina na frente do vídeo: 0% mostra a noite crua, 50% deixa o vídeo respirar
+                    atrás do jogo e 100% fecha o pé da tela. O efeito aparece aqui atrás na hora.
+                  </p>
+                </ListRow>
+              ) : null}
+            </List>
+          </Panel>
+        ) : null}
+
+        {shows("cache") ? (
+          <Panel
+            title="Cache do jogo"
+            description="O que este aparelho guarda para abrir mais rápido."
+            footer={
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <span className="text-[11px] text-ink-faint">
+                  {clearing ? "Limpando e recarregando..." : "A partida no servidor não muda"}
+                </span>
+                <Button variant="outline" busy={clearing} onClick={() => setConfirmingClear(true)}>
+                  Limpar cache
+                </Button>
+              </div>
+            }
+          >
+            <p className="text-xs leading-relaxed text-ink-faint">
+              O navegador guarda cópias das imagens do jogo e as preferências deste aparelho: som,
+              volume, trilha, animação e escuridão do fundo, a data de nascimento lembrada na porta e o
+              trabalho em andamento. Limpar o cache
+              descarta essas cópias, baixa as imagens de novo do servidor e recarrega a página;
+              serve para quando alguma arte aparece errada ou desatualizada.
+            </p>
+          </Panel>
+        ) : null}
+
+        {shows("excluir") ? (
+          <Panel
+            title="Excluir conta"
+            description="Apaga a partida inteira do servidor. Não tem volta."
+            footer={
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <span className="text-[11px] text-ink-faint">
+                  {character.name} - NV. {formatNumber(character.level)}
+                </span>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setDeleteCode("");
+                    setDeleting("ask");
+                  }}
+                >
+                  Excluir conta
+                </Button>
+              </div>
+            }
+          >
+            <p className="text-xs leading-relaxed text-ink-faint">
+              Personagem, inventário, forja, lobo, carteira e anúncios: tudo some de uma vez, e a
+              conta volta para a criação de personagem.
+            </p>
+          </Panel>
+        ) : null}
       </div>
 
       <ConfirmDialog

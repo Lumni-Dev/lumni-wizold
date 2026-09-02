@@ -430,12 +430,14 @@ export function ForgeScreen() {
 
             <FilterRow>
               <FilterSelect
+              accent
                 label="Espaço"
                 value={category}
                 options={slotCategoryFilterOptions()}
                 onChange={pickCategory}
               />
               <FilterSelect
+              accent
                 label="Conjunto"
                 value={set}
                 options={setFilterOptions()}
@@ -443,6 +445,7 @@ export function ForgeScreen() {
               />
               <div className="min-w-0 flex-1 basis-40 sm:min-w-[12rem]">
                 <Field
+                  accent
                   label="Busca"
                   aria-label="Buscar peça pelo nome"
                   placeholder="Nome da peça"

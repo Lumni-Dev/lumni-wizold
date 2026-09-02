@@ -220,6 +220,7 @@ export function BazaarScreen() {
         <>
           <FilterRow>
             <FilterSelect
+              accent
               label="Categoria"
               value={category}
               options={slotCategoryFilterOptions({ includeMaterial: true })}
@@ -227,6 +228,7 @@ export function BazaarScreen() {
               onPageReset={() => setPage(1)}
             />
             <FilterSelect
+              accent
               label="Conjunto"
               value={set}
               options={setFilterOptions()}
@@ -235,6 +237,7 @@ export function BazaarScreen() {
             />
             <div className="min-w-0 flex-1 basis-40 sm:min-w-[12rem]">
               <Field
+                accent
                 label="Busca"
                 aria-label="Buscar anúncio pelo nome da peça"
                 placeholder="Nome da peça"

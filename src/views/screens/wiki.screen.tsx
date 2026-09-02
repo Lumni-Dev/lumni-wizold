@@ -1,7 +1,9 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { marketPriceOf } from "@/controllers/market.controller";
 import { useGame } from "@/controllers/game.context";
+import { normalizeText } from "@/shared/utils/text";
 import { CREATURES } from "@/models/data/creatures";
 import { EQUIPMENT_SETS, pieceId, pieceName, piecePrice } from "@/models/data/equipment-sets";
 import { SLOT_ROLE } from "@/models/data/equipment/slots";
@@ -27,9 +29,10 @@ import { DANGER_LABEL } from "@/models/entities/territory";
 import { formatNumber, formatBronze } from "@/shared/utils/format";
 import { Tag } from "../components/tag";
 import { List, ListRow, RowText } from "../components/list";
+import { Field } from "../components/field";
+import { ChipTabs } from "../components/chip-tabs";
 import { Panel } from "../components/panel";
 import { AttributeIcon } from "../components/attribute-icon";
-import { chipClass } from "../components/chip";
 import { CreatureIcon } from "../components/creature-icon";
 import { ItemIcon } from "../components/item-icon";
 import { WikiMasonry, WikiMasonryItem } from "../components/wiki-masonry";
@@ -37,17 +40,18 @@ import { WikiPaginatedPanel } from "../components/wiki-paginated-panel";
 import { PageHeader } from "../layout/page-header";
 import { summarizeEffect } from "../presenters/item.presenter";
 
-const SECTIONS: readonly { id: string; label: string }[] = [
-  ...WIKI_TOPICS.map((topic) => ({ id: topic.id, label: topic.title })),
-  { id: "attributes", label: "Atributos" },
-  { id: "slots", label: "Espaços" },
-  { id: "exercises", label: "Exercícios" },
-  { id: "territories", label: "Territórios" },
-  { id: "equipamentos", label: "Equipamentos" },
-  { id: "bestiary", label: "Bestiário" },
-  { id: "fragmentos", label: "Fragmentos" },
-  { id: "itens", label: "Itens" },
-  { id: "pocoes", label: "Poções" },
+const SECTION_TABS: readonly { key: string; label: string }[] = [
+  { key: "all", label: "Tudo" },
+  ...WIKI_TOPICS.map((topic) => ({ key: topic.id, label: topic.title })),
+  { key: "attributes", label: "Atributos" },
+  { key: "slots", label: "Espaços" },
+  { key: "exercises", label: "Exercícios" },
+  { key: "territories", label: "Territórios" },
+  { key: "equipamentos", label: "Equipamentos" },
+  { key: "bestiary", label: "Bestiário" },
+  { key: "fragmentos", label: "Fragmentos" },
+  { key: "itens", label: "Itens" },
+  { key: "pocoes", label: "Poções" },
 ];
 
 interface WikiEquipmentEntry {
@@ -88,6 +92,60 @@ function wikiItemDescription(item: Item): string {
 export function WikiScreen() {
   const { character } = useGame();
   const level = character?.level ?? 1;
+  const [section, setSection] = useState("loop");
+  const [search, setSearch] = useState("");
+
+  const wanted = normalizeText(search);
+  const searching = wanted !== "";
+
+  const equipment = useMemo(
+    () =>
+      wanted === ""
+        ? WIKI_EQUIPMENT
+        : WIKI_EQUIPMENT.filter((entry) =>
+            normalizeText(pieceName(entry.definition, entry.slot)).includes(wanted),
+          ),
+    [wanted],
+  );
+  const creatures = useMemo(
+    () =>
+      wanted === ""
+        ? WIKI_CREATURES
+        : WIKI_CREATURES.filter((creature) => normalizeText(creature.name).includes(wanted)),
+    [wanted],
+  );
+  const fragments = useMemo(
+    () =>
+      wanted === ""
+        ? WIKI_FRAGMENTS
+        : WIKI_FRAGMENTS.filter((item) => normalizeText(item.name).includes(wanted)),
+    [wanted],
+  );
+  const items = useMemo(
+    () =>
+      wanted === "" ? WIKI_ITEMS : WIKI_ITEMS.filter((item) => normalizeText(item.name).includes(wanted)),
+    [wanted],
+  );
+  const potions = useMemo(
+    () =>
+      wanted === ""
+        ? WIKI_POTIONS
+        : WIKI_POTIONS.filter((item) => normalizeText(item.name).includes(wanted)),
+    [wanted],
+  );
+
+  function hits(text: string): boolean {
+    return normalizeText(text).includes(wanted);
+  }
+
+  function topicHit(topic: (typeof WIKI_TOPICS)[number]): boolean {
+    return hits(topic.title + " " + topic.summary + " " + topic.lines.join(" "));
+  }
+
+  function shows(id: string, matched = false): boolean {
+    if (searching) return matched;
+    return section === "all" || section === id;
+  }
 
   const equipmentCount = WIKI_EQUIPMENT.length;
 
@@ -98,16 +156,22 @@ export function WikiScreen() {
         description="Todas as regras, números e catálogos do jogo em um lugar só."
       />
 
-      <nav aria-label="Seções da wiki" className="mb-6 flex flex-wrap gap-2">
-        {SECTIONS.map((section) => (
-          <a key={section.id} href={"#" + section.id} className={chipClass()}>
-            {section.label}
-          </a>
-        ))}
-      </nav>
+      <div className="mb-6 space-y-3">
+        <div className="sm:max-w-xs">
+          <Field
+            accent
+            aria-label="Buscar na wiki"
+            placeholder="Buscar peça, criatura ou item"
+            value={search}
+            autoComplete="off"
+            onChange={(event) => setSearch(event.target.value)}
+          />
+        </div>
+        <ChipTabs tabs={SECTION_TABS} value={section} onChange={setSection} />
+      </div>
 
       <WikiMasonry>
-        {WIKI_TOPICS.map((topic) => (
+        {WIKI_TOPICS.filter((topic) => shows(topic.id, topicHit(topic))).map((topic) => (
           <WikiMasonryItem key={topic.id} id={topic.id}>
             <Panel title={topic.title} description={topic.summary}>
               <ul className="space-y-2 text-xs leading-relaxed text-ink-soft">
@@ -119,237 +183,255 @@ export function WikiScreen() {
           </WikiMasonryItem>
         ))}
 
-        <WikiMasonryItem id="attributes">
-          <Panel title="Atributos" description="Cinco eixos, todos treináveis." padding="none">
-            <List>
-              {ATTRIBUTES.map((attribute) => (
-                <ListRow key={attribute.key} padding="art">
-                  <AttributeIcon attribute={attribute.key} />
-                  <RowText title={attribute.name} description={attribute.effect} />
-                </ListRow>
-              ))}
-            </List>
-          </Panel>
-        </WikiMasonryItem>
+        {shows("attributes", hits("Atributos")) ? (
+          <WikiMasonryItem id="attributes">
+            <Panel title="Atributos" description="Cinco eixos, todos treináveis." padding="none">
+              <List>
+                {ATTRIBUTES.map((attribute) => (
+                  <ListRow key={attribute.key} padding="art">
+                    <AttributeIcon attribute={attribute.key} />
+                    <RowText title={attribute.name} description={attribute.effect} />
+                  </ListRow>
+                ))}
+              </List>
+            </Panel>
+          </WikiMasonryItem>
+        ) : null}
 
-        <WikiMasonryItem id="slots">
-          <Panel
-            title="Espaços de equipamento"
-            description="Um item por espaço, sete no total."
-            padding="none"
+        {shows("slots", hits("Espaços")) ? (
+          <WikiMasonryItem id="slots">
+            <Panel
+              title="Espaços de equipamento"
+              description="Um item por espaço, sete no total."
+              padding="none"
+            >
+              <List>
+                {EQUIPMENT_SLOTS.map((slot) => (
+                  <ListRow key={slot}>
+                    <RowText title={SLOT_LABEL[slot]} description={SLOT_ROLE[slot]} />
+                  </ListRow>
+                ))}
+              </List>
+            </Panel>
+          </WikiMasonryItem>
+        ) : null}
+
+        {shows("equipamentos", equipment.length > 0) ? (
+          <WikiPaginatedPanel
+            id="equipamentos"
+            title="Equipamentos"
+            description={
+              equipmentCount +
+              " peças em cinco conjuntos, do bronze ao lunar. Cada linha traz a peça, o bônus e o preço no mercado."
+            }
+            items={equipment}
           >
-            <List>
-              {EQUIPMENT_SLOTS.map((slot) => (
-                <ListRow key={slot}>
-                  <RowText title={SLOT_LABEL[slot]} description={SLOT_ROLE[slot]} />
-                </ListRow>
-              ))}
-            </List>
-          </Panel>
-        </WikiMasonryItem>
+            {(pageItems) =>
+              pageItems.map(({ id, definition, slot }) => {
+                const item = findItem(id);
+                if (!item) return null;
+                const bonuses = summarizeEffect(item).join(", ");
+                return (
+                  <ListRow key={id} padding="art">
+                    <ItemIcon item={item} />
+                    <RowText
+                      title={
+                        <>
+                          {pieceName(definition, slot)}
+                          <span className="text-ink-faint"> · {definition.label}</span>
+                        </>
+                      }
+                      description={
+                        SLOT_LABEL[slot] + (bonuses ? " · " + bonuses : "")
+                      }
+                    />
+                    <span className="shrink-0 font-mono text-[11px] text-ink-faint">
+                      {formatBronze(piecePrice(definition))}
+                    </span>
+                  </ListRow>
+                );
+              })
+            }
+          </WikiPaginatedPanel>
+        ) : null}
 
-        <WikiPaginatedPanel
-          id="equipamentos"
-          title="Equipamentos"
-          description={
-            equipmentCount +
-            " peças em cinco conjuntos, do bronze ao lunar. Cada linha traz a peça, o bônus e o preço no mercado."
-          }
-          items={WIKI_EQUIPMENT}
-        >
-          {(pageItems) =>
-            pageItems.map(({ id, definition, slot }) => {
-              const item = findItem(id);
-              if (!item) return null;
-              const bonuses = summarizeEffect(item).join(", ");
-              return (
-                <ListRow key={id} padding="art">
-                  <ItemIcon item={item} />
+        {shows("exercises", hits("Exercícios")) ? (
+          <WikiMasonryItem id="exercises">
+            <Panel
+              title="Exercícios"
+              description="Um por atributo, do primeiro ao último nível."
+              padding="none"
+            >
+              <List>
+                {EXERCISES.map((exercise) => (
+                  <ListRow key={exercise.id} layout="column">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <p className="text-sm text-ink">{exercise.name}</p>
+                      <p className="shrink-0 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                        {findAttribute(exercise.attribute)?.name ?? exercise.attribute}
+                      </p>
+                    </div>
+                    <p className="text-[11px] leading-relaxed text-ink-faint">{exercise.description}</p>
+                  </ListRow>
+                ))}
+              </List>
+              <div className="space-y-2 border-t border-edge px-4 py-3">
+                <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                  Rendimento da sessão
+                </p>
+                <ul className="space-y-1">
+                  {[1, 170, 340, 670, 1000].map((value) => (
+                    <li key={value} className="font-mono text-[11px] text-ink-soft">
+                      Atributo {formatNumber(value)}: +{formatNumber(trainingEffort(value).progress)}{" "}
+                      progresso por sessão
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </Panel>
+          </WikiMasonryItem>
+        ) : null}
+
+        {shows("territories", hits("Territórios")) ? (
+          <WikiMasonryItem id="territories">
+            <Panel
+              title="Territórios"
+              description="Ordem natural de progressão da caça."
+              padding="none"
+            >
+              <List>
+                {TERRITORIES.map((territory) => (
+                  <ListRow key={territory.id} layout="column">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-sm text-ink">{territory.name}</p>
+                      <Tag tone="faint">{DANGER_LABEL[territory.danger]}</Tag>
+                      <Tag tone="neutral">
+                        NV. {formatNumber(territory.minLevel)} a {formatNumber(territory.maxLevel)}
+                      </Tag>
+                      <Tag tone="neutral">{SPECIES_LABEL[territory.species]}</Tag>
+                    </div>
+                    <p className="text-xs text-ink-faint">{territory.description}</p>
+                    <p className="text-[11px] text-ink-soft">
+                      {territory.creatures
+                        .map(
+                          (creatureId) =>
+                            CREATURES.find((creature) => creature.id === creatureId)?.name,
+                        )
+                        .filter(Boolean)
+                        .join(", ")}
+                    </p>
+                  </ListRow>
+                ))}
+              </List>
+            </Panel>
+          </WikiMasonryItem>
+        ) : null}
+
+        {shows("bestiary", creatures.length > 0) ? (
+          <WikiPaginatedPanel
+            id="bestiary"
+            title="Bestiário"
+            description={
+              WIKI_CREATURES.length +
+              " criaturas em seis espécies, ordenadas por nível. Números fixos por variant."
+            }
+            items={creatures}
+          >
+            {(pageItems) =>
+              pageItems.map((creature) => (
+                <ListRow key={creature.id} padding="art">
+                  <CreatureIcon creature={creature} />
                   <RowText
-                    title={
-                      <>
-                        {pieceName(definition, slot)}
-                        <span className="text-ink-faint"> · {definition.label}</span>
-                      </>
-                    }
+                    title={creature.name}
+                    label={SPECIES_LABEL[creature.species]}
                     description={
-                      SLOT_LABEL[slot] + (bonuses ? " · " + bonuses : "")
+                      <>
+                        <p className="font-mono leading-relaxed text-ink-soft">
+                          {formatNumber(creature.health)} vida · {formatNumber(creature.strength)} força ·{" "}
+                          {formatNumber(creature.endurance)} resistência ·{" "}
+                          {formatNumber(creature.agility)} agilidade
+                        </p>
+                        <p className="font-mono">
+                          +{formatNumber(creature.experience)} exp · {formatNumber(creature.minBronze)} a{" "}
+                          {formatBronze(creature.maxBronze)}
+                        </p>
+                      </>
                     }
                   />
                   <span className="shrink-0 font-mono text-[11px] text-ink-faint">
-                    {formatBronze(piecePrice(definition))}
+                    NV. {formatNumber(creature.level)}
                   </span>
                 </ListRow>
-              );
-            })
-          }
-        </WikiPaginatedPanel>
+              ))
+            }
+          </WikiPaginatedPanel>
+        ) : null}
 
-        <WikiMasonryItem id="exercises">
-          <Panel
-            title="Exercícios"
-            description="Um por atributo, do primeiro ao último nível."
-            padding="none"
+        {shows("fragmentos", fragments.length > 0) ? (
+          <WikiPaginatedPanel
+            id="fragmentos"
+            title="Fragmentos"
+            description={
+              WIKI_FRAGMENTS.length +
+              " lascas da mina, uma por conjunto. Só alimentam a forja; não caem na caça nem entram no mercado."
+            }
+            items={fragments}
           >
-            <List>
-              {EXERCISES.map((exercise) => (
-                <ListRow key={exercise.id} layout="column">
-                  <div className="flex items-baseline justify-between gap-2">
-                    <p className="text-sm text-ink">{exercise.name}</p>
-                    <p className="shrink-0 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                      {findAttribute(exercise.attribute)?.name ?? exercise.attribute}
-                    </p>
-                  </div>
-                  <p className="text-[11px] leading-relaxed text-ink-faint">{exercise.description}</p>
+            {(pageItems) =>
+              pageItems.map((item) => (
+                <ListRow key={item.id} padding="art">
+                  <ItemIcon item={item} />
+                  <RowText title={item.name} description={wikiItemDescription(item)} />
+                  <span className="shrink-0 font-mono text-[11px] text-ink-faint">mina</span>
                 </ListRow>
-              ))}
-            </List>
-            <div className="space-y-2 border-t border-edge px-4 py-3">
-              <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                Rendimento da sessão
-              </p>
-              <ul className="space-y-1">
-                {[1, 170, 340, 670, 1000].map((value) => (
-                  <li key={value} className="font-mono text-[11px] text-ink-soft">
-                    Atributo {formatNumber(value)}: +{formatNumber(trainingEffort(value).progress)}{" "}
-                    progresso por sessão
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </Panel>
-        </WikiMasonryItem>
+              ))
+            }
+          </WikiPaginatedPanel>
+        ) : null}
 
-        <WikiMasonryItem id="territories">
-          <Panel
-            title="Territórios"
-            description="Ordem natural de progressão da caça."
-            padding="none"
+        {shows("itens", items.length > 0) ? (
+          <WikiPaginatedPanel
+            id="itens"
+            title="Itens"
+            description={
+              WIKI_ITEMS.length + " materiais de caça e suprimentos de mascote no catálogo."
+            }
+            items={items}
           >
-            <List>
-              {TERRITORIES.map((territory) => (
-                <ListRow key={territory.id} layout="column">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="text-sm text-ink">{territory.name}</p>
-                    <Tag tone="faint">{DANGER_LABEL[territory.danger]}</Tag>
-                    <Tag tone="neutral">
-                      NV. {formatNumber(territory.minLevel)} a {formatNumber(territory.maxLevel)}
-                    </Tag>
-                    <Tag tone="neutral">{SPECIES_LABEL[territory.species]}</Tag>
-                  </div>
-                  <p className="text-xs text-ink-faint">{territory.description}</p>
-                  <p className="text-[11px] text-ink-soft">
-                    {territory.creatures
-                      .map(
-                        (creatureId) =>
-                          CREATURES.find((creature) => creature.id === creatureId)?.name,
-                      )
-                      .filter(Boolean)
-                      .join(", ")}
-                  </p>
+            {(pageItems) =>
+              pageItems.map((item) => (
+                <ListRow key={item.id} padding="art">
+                  <ItemIcon item={item} />
+                  <RowText title={item.name} description={wikiItemDescription(item)} />
+                  <span className="shrink-0 font-mono text-[11px] text-ink-faint">
+                    {item.inMarket ? formatBronze(marketPriceOf(item, level)) : "drop"}
+                  </span>
                 </ListRow>
-              ))}
-            </List>
-          </Panel>
-        </WikiMasonryItem>
+              ))
+            }
+          </WikiPaginatedPanel>
+        ) : null}
 
-        <WikiPaginatedPanel
-          id="bestiary"
-          title="Bestiário"
-          description={
-            WIKI_CREATURES.length +
-            " criaturas em seis espécies, ordenadas por nível. Números fixos por variant."
-          }
-          items={WIKI_CREATURES}
-        >
-          {(pageItems) =>
-            pageItems.map((creature) => (
-              <ListRow key={creature.id} padding="art">
-                <CreatureIcon creature={creature} />
-                <RowText
-                  title={creature.name}
-                  label={SPECIES_LABEL[creature.species]}
-                  description={
-                    <>
-                      <p className="font-mono leading-relaxed text-ink-soft">
-                        {formatNumber(creature.health)} vida · {formatNumber(creature.strength)} força ·{" "}
-                        {formatNumber(creature.endurance)} resistência ·{" "}
-                        {formatNumber(creature.agility)} agilidade
-                      </p>
-                      <p className="font-mono">
-                        +{formatNumber(creature.experience)} exp · {formatNumber(creature.minBronze)} a{" "}
-                        {formatBronze(creature.maxBronze)}
-                      </p>
-                    </>
-                  }
-                />
-                <span className="shrink-0 font-mono text-[11px] text-ink-faint">
-                  NV. {formatNumber(creature.level)}
-                </span>
-              </ListRow>
-            ))
-          }
-        </WikiPaginatedPanel>
-
-        <WikiPaginatedPanel
-          id="fragmentos"
-          title="Fragmentos"
-          description={
-            WIKI_FRAGMENTS.length +
-            " lascas da mina, uma por conjunto. Só alimentam a forja; não caem na caça nem entram no mercado."
-          }
-          items={WIKI_FRAGMENTS}
-        >
-          {(pageItems) =>
-            pageItems.map((item) => (
-              <ListRow key={item.id} padding="art">
-                <ItemIcon item={item} />
-                <RowText title={item.name} description={wikiItemDescription(item)} />
-                <span className="shrink-0 font-mono text-[11px] text-ink-faint">mina</span>
-              </ListRow>
-            ))
-          }
-        </WikiPaginatedPanel>
-
-        <WikiPaginatedPanel
-          id="itens"
-          title="Itens"
-          description={
-            WIKI_ITEMS.length + " materiais de caça e suprimentos de mascote no catálogo."
-          }
-          items={WIKI_ITEMS}
-        >
-          {(pageItems) =>
-            pageItems.map((item) => (
-              <ListRow key={item.id} padding="art">
-                <ItemIcon item={item} />
-                <RowText title={item.name} description={wikiItemDescription(item)} />
-                <span className="shrink-0 font-mono text-[11px] text-ink-faint">
-                  {item.inMarket ? formatBronze(marketPriceOf(item, level)) : "drop"}
-                </span>
-              </ListRow>
-            ))
-          }
-        </WikiPaginatedPanel>
-
-        <WikiPaginatedPanel
-          id="pocoes"
-          title="Poções"
-          description={WIKI_POTIONS.length + " poções de vida e fúria vendidas no mercado."}
-          items={WIKI_POTIONS}
-        >
-          {(pageItems) =>
-            pageItems.map((item) => (
-              <ListRow key={item.id} padding="art">
-                <ItemIcon item={item} />
-                <RowText title={item.name} description={wikiItemDescription(item)} />
-                <span className="shrink-0 font-mono text-[11px] text-ink-faint">
-                  {formatBronze(marketPriceOf(item, level))}
-                </span>
-              </ListRow>
-            ))
-          }
-        </WikiPaginatedPanel>
+        {shows("pocoes", potions.length > 0) ? (
+          <WikiPaginatedPanel
+            id="pocoes"
+            title="Poções"
+            description={WIKI_POTIONS.length + " poções de vida e fúria vendidas no mercado."}
+            items={potions}
+          >
+            {(pageItems) =>
+              pageItems.map((item) => (
+                <ListRow key={item.id} padding="art">
+                  <ItemIcon item={item} />
+                  <RowText title={item.name} description={wikiItemDescription(item)} />
+                  <span className="shrink-0 font-mono text-[11px] text-ink-faint">
+                    {formatBronze(marketPriceOf(item, level))}
+                  </span>
+                </ListRow>
+              ))
+            }
+          </WikiPaginatedPanel>
+        ) : null}
       </WikiMasonry>
     </>
   );
