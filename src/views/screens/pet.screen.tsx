@@ -29,11 +29,11 @@ import { sanitizeName } from "@/shared/utils/text";
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
 import { AiAuditNotice } from "../components/ai-audit-notice";
-import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
+import { Card, CardArt, CardBody, CardFooter, CardHeader, CardStack } from "../components/card";
 import { RowText } from "../components/list";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { Field } from "../components/field";
-import { PetSheetHeader, PetIcon } from "../components/pet-icon";
+import { PetSheetHeader, PetPortrait } from "../components/pet-icon";
 import { List, ListRow } from "../components/list";
 import { SupplyRow } from "../components/supply-row";
 import { Panel } from "../components/panel";
@@ -62,29 +62,35 @@ function Kennel({ bronze, level }: { bronze: number; level: number }) {
             <Card
               key={definition.key}
               height="fill"
+              layout="row"
               tone={chosen ? "highlighted" : "default"}
               interactive={!chosen}
             >
-              <CardHeader>
-                <PetIcon gender={definition.key} size="medium" />
-                <RowText title={definition.label} label={definition.title} />
-              </CardHeader>
+              <CardArt>
+                <PetPortrait gender={definition.key} />
+              </CardArt>
 
-              <CardBody>
-                <p className="text-xs leading-relaxed text-ink-faint">{definition.description}</p>
-              </CardBody>
+              <CardStack>
+                <CardHeader>
+                  <RowText title={definition.label} label={definition.title} />
+                </CardHeader>
 
-              <CardFooter>
-                <span className="text-[11px] text-ink-faint">
-                  {chosen ? "Escolhido" : "Disponível no canil"}
-                </span>
-                <Button
-                  variant={chosen ? "secondary" : "outline"}
-                  onClick={() => setGender(definition.key)}
-                >
-                  {chosen ? "Escolhido" : "Escolher"}
-                </Button>
-              </CardFooter>
+                <CardBody>
+                  <p className="text-xs leading-relaxed text-ink-faint">{definition.description}</p>
+                </CardBody>
+
+                <CardFooter>
+                  <span className="text-[11px] text-ink-faint">
+                    {chosen ? "Escolhido" : "Disponível no canil"}
+                  </span>
+                  <Button
+                    variant={chosen ? "secondary" : "outline"}
+                    onClick={() => setGender(definition.key)}
+                  >
+                    {chosen ? "Escolhido" : "Escolher"}
+                  </Button>
+                </CardFooter>
+              </CardStack>
             </Card>
           );
         })}

@@ -412,6 +412,35 @@ sec("bandas e presas");
     }
   }
 }
+sec("ritmo do treino");
+{
+  const drawn = new Set();
+  for (let seed = 1; seed <= 400; seed += 1) {
+    drawn.add(training.trainingSessionTicks(seededRandom(seed)));
+  }
+  ok(
+    "sessão sorteia dentro da faixa",
+    [...drawn].every(
+      (ticks) =>
+        Number.isInteger(ticks) &&
+        ticks >= CONST.TRAINING_TICKS_MIN &&
+        ticks <= CONST.TRAINING_TICKS_MAX,
+    ),
+    [...drawn].sort((a, b) => a - b).join(","),
+  );
+  ok(
+    "sorteio alcança as duas pontas",
+    drawn.has(CONST.TRAINING_TICKS_MIN) && drawn.has(CONST.TRAINING_TICKS_MAX),
+  );
+  ok(
+    "faixa do treino é 3 a 7",
+    CONST.TRAINING_TICKS_MIN === 3 && CONST.TRAINING_TICKS_MAX === 7,
+  );
+  ok(
+    "média da faixa segue os 5 passos antigos",
+    (CONST.TRAINING_TICKS_MIN + CONST.TRAINING_TICKS_MAX) / 2 === 5,
+  );
+}
 sec("economia");
 {
   for (const level of [1, 100, 340, 670, 1000]) {

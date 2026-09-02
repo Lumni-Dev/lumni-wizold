@@ -10,6 +10,7 @@ import type { GameState } from "@/models/entities/game-state";
 import { findItem } from "@/models/data/items";
 import { TERRITORIES } from "@/models/data/territories";
 import { forgeDurationMs } from "@/models/rules/forge";
+import { trainingSessionTicks } from "@/models/rules/training";
 import {
   CYCLE_OPTOUT_SECS,
   FORGE_TICKS,
@@ -19,7 +20,6 @@ import {
   MINING_TICKS,
   PET_EXERCISE_ID,
   TRAINING_TICK_MS,
-  TRAINING_TICKS,
 } from "@/shared/constants/game";
 import { formatNumber } from "@/shared/utils/format";
 import { narrationOf } from "@/views/presenters/hunt.presenter";
@@ -321,6 +321,7 @@ export function ActivityEngine() {
     let barTimer = 0;
     let coolTimer = 0;
     let beat = 0;
+    let ticks = trainingSessionTicks();
     let resumable = true;
 
     const push = (cooldown: number | null) => {
@@ -337,18 +338,19 @@ export function ActivityEngine() {
           : (exercises.find((row) => row.exercise.id === activeExercise)?.exercise.name ??
             "Treino");
       patchActivityRuntime({
-        train: { id: activeExercise, beat, max: TRAINING_TICKS, cooldown },
-        dock: dockOf("train", label, "Sessão em andamento", beat, TRAINING_TICKS, cooldown),
+        train: { id: activeExercise, beat, max: ticks, cooldown },
+        dock: dockOf("train", label, "Sessão em andamento", beat, ticks, cooldown),
       });
     };
 
     const startBar = () => {
       beat = 0;
+      ticks = trainingSessionTicks();
       push(null);
       barTimer = window.setInterval(() => {
         beat += 1;
         push(null);
-        if (beat < TRAINING_TICKS) {
+        if (beat < ticks) {
           const effort = activeExercise === PET_EXERCISE_ID ? "growl" : activeExercise;
           if (isGameSound(effort)) playSound(effort);
           return;

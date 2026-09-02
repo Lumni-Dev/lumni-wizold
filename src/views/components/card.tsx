@@ -7,6 +7,7 @@ import { CornerAccents, MarkNested, useNested } from "./corner-accents";
 
 type CardTone = "default" | "highlighted" | "empty";
 type CardHeight = "content" | "fill";
+type CardLayout = "column" | "row";
 
 const CardToneContext = createContext<CardTone>("default");
 
@@ -18,6 +19,7 @@ interface CardProps {
   children: ReactNode;
   tone?: CardTone;
   height?: CardHeight;
+  layout?: CardLayout;
   interactive?: boolean;
   className?: string;
 }
@@ -32,6 +34,7 @@ export function Card({
   children,
   tone = "default",
   height = "content",
+  layout = "column",
   interactive = false,
   className,
 }: CardProps) {
@@ -41,7 +44,8 @@ export function Card({
     <div className={cn("relative", height === "fill" ? "h-full" : "h-fit", className)}>
       <article
         className={cn(
-          "group flex h-full flex-col overflow-hidden rounded-lg border transition-colors",
+          "group flex h-full overflow-hidden rounded-lg border transition-colors",
+          layout === "row" ? "flex-row" : "flex-col",
           TONES[tone],
           interactive && tone === "default" && "hover:border-edge-strong",
         )}
@@ -76,6 +80,26 @@ export function CardHeader({
       {children}
     </div>
   );
+}
+
+export function CardArt({ children, className }: { children: ReactNode; className?: string }) {
+  const tone = useCardTone();
+
+  return (
+    <div
+      className={cn(
+        "flex w-1/3 shrink-0 items-center justify-center overflow-hidden",
+        tone !== "empty" && "border-r border-edge",
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+
+export function CardStack({ children, className }: { children: ReactNode; className?: string }) {
+  return <div className={cn("flex min-w-0 flex-1 flex-col", className)}>{children}</div>;
 }
 
 export function CardBody({

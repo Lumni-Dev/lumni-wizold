@@ -17,7 +17,6 @@ import {
   MAX_ENHANCEMENT,
   MINING_TICKS,
   PET_EXERCISE_ID,
-  TRAINING_TICKS,
 } from "@/shared/constants/game";
 import { GLASS_SECTION } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
@@ -124,7 +123,7 @@ export function ActivityDock() {
         progressMax: petTraining.needed,
         sessionLabel: "Mascote - Treinamento",
         sessionCurrent: trainRt.beat,
-        sessionMax: TRAINING_TICKS,
+        sessionMax: trainRt.max,
         glows: true,
         status: opting
           ? "Segue sozinho..."
@@ -146,7 +145,7 @@ export function ActivityDock() {
       progressMax: row?.needed ?? 1,
       sessionLabel: "Treinamento",
       sessionCurrent: trainRt.beat,
-      sessionMax: TRAINING_TICKS,
+      sessionMax: trainRt.max,
       glows: true,
       status: opting
         ? "Segue sozinho..."

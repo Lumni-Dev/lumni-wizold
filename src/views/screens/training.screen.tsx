@@ -10,7 +10,13 @@ import {
   trainingSummaryLine,
 } from "@/controllers/training.controller";
 import { usePageActivity } from "@/controllers/use-page-activity";
-import { MAX_ATTRIBUTE_VALUE, PET_EXERCISE_ID, PET_MAX_LEVEL, TRAINING_TICKS } from "@/shared/constants/game";
+import {
+  MAX_ATTRIBUTE_VALUE,
+  PET_EXERCISE_ID,
+  PET_MAX_LEVEL,
+  TRAINING_TICKS_MAX,
+  TRAINING_TICKS_MIN,
+} from "@/shared/constants/game";
 import { formatNumber, formatBronze } from "@/shared/utils/format";
 import { Bar } from "../components/bar";
 import { BodyGate } from "../components/body-gate";
@@ -37,8 +43,8 @@ export function TrainingScreen() {
   const waitingExercise = activity?.kind === "train" && paused ? (activity.id ?? null) : null;
   const session =
     trainRt && activeExercise === trainRt.id
-      ? { id: trainRt.id, beat: trainRt.beat }
-      : { id: activeExercise ?? "", beat: 0 };
+      ? { id: trainRt.id, beat: trainRt.beat, max: trainRt.max }
+      : { id: activeExercise ?? "", beat: 0, max: TRAINING_TICKS_MAX };
   const cooldown = trainRt && activeExercise === trainRt.id ? trainRt.cooldown : null;
 
   const exercises = useMemo(() => listExercises(state), [state]);
@@ -62,7 +68,13 @@ export function TrainingScreen() {
     <>
       <PageHeader
         title="Treinamento"
-        description="Treino gratuito para sempre: um exercício por atributo, cada barra cheia vira +1 permanente. Não dá para parar no meio de uma sessão, mas entre uma e outra sobram três segundos para você mandar parar."
+        description={
+          "Treino gratuito para sempre: um exercício por atributo, cada barra cheia vira +1 permanente. Cada sessão sorteia de " +
+          TRAINING_TICKS_MIN +
+          " a " +
+          TRAINING_TICKS_MAX +
+          " passos, então uma sai rápida e a seguinte cobra paciência. Não dá para parar no meio de uma sessão, mas entre uma e outra sobram três segundos para você mandar parar."
+        }
       />
 
       <Panel
@@ -125,7 +137,7 @@ export function TrainingScreen() {
                   <Bar
                     label="Treinamento"
                     current={session.id === exercise.id ? session.beat : 0}
-                    maximum={TRAINING_TICKS}
+                    maximum={session.id === exercise.id ? session.max : TRAINING_TICKS_MAX}
                     glows={active}
                     wraps
                   />
@@ -202,7 +214,7 @@ export function TrainingScreen() {
                 <Bar
                   label="Treinamento"
                   current={session.id === PET_EXERCISE_ID ? session.beat : 0}
-                  maximum={TRAINING_TICKS}
+                  maximum={session.id === PET_EXERCISE_ID ? session.max : TRAINING_TICKS_MAX}
                   glows={petActive}
                   wraps
                 />

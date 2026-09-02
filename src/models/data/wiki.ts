@@ -23,6 +23,8 @@ import {
   RENAME_COOLDOWN_DAYS,
   RENAME_PRICE,
   STARTING_BRONZE,
+  TRAINING_TICKS_MAX,
+  TRAINING_TICKS_MIN,
 } from "@/shared/constants/game";
 import { SITE_EMAIL } from "@/shared/constants/site";
 import { SPECIES_LABEL, SPECIES_ORDER } from "../entities/creature";
@@ -217,6 +219,11 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "O teto é nível 1000 para personagem e atributo. Subir de nível não dá poder de graça: abre território, conjunto e veia; a força vem do treino e do que você veste. Nível não restaura vida.",
       "Atributo só sobe no treino, pela mesma curva da experiência: barato no começo, caríssimo perto do teto; um ponto pede poucas sessões no começo e centenas no fim.",
       "Treino é gratuito: cada exercício sobe um atributo (+1 Força, +1 Resistência, +1 Agilidade, +1 Instinto ou +1 Vontade por ponto). O progresso por sessão segue o valor atual daquele atributo. Equipamento soma por cima do teto treinado.",
+      "Cada sessão sorteia de " +
+        TRAINING_TICKS_MIN +
+        " a " +
+        TRAINING_TICKS_MAX +
+        " passos, e o sorteio é só ritmo: o progresso que a sessão paga é o mesmo, curta ou longa.",
     ],
   },
   {

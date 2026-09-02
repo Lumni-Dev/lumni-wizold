@@ -8,17 +8,13 @@ import { cn } from "@/shared/utils/class-names";
 import { ArtImage } from "./art-image";
 import { IconArt, IconFrame, type IconSize } from "./icon-frame";
 
-export function PetBanner({ gender }: { gender: PetGender }) {
+export function PetPortrait({ gender }: { gender: PetGender }) {
   const art = useArt();
   const source = art.pets[gender];
 
-  if (!source) return null;
+  if (!source) return <PetIcon gender={gender} size="large" />;
 
-  return (
-    <div className="aspect-square w-full overflow-hidden border-b border-edge">
-      <ArtImage source={source} />
-    </div>
-  );
+  return <ArtImage source={source} />;
 }
 
 export function PetSheetHeader({
