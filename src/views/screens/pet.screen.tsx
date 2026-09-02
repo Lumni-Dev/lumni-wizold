@@ -81,7 +81,7 @@ function Kennel({ bronze, level }: { bronze: number; level: number }) {
 
                 <CardFooter>
                   <span className="text-[11px] text-ink-faint">
-                    {chosen ? "Escolhido" : "Disponível no canil"}
+                    {chosen ? "Escolhido" : "Disponível"}
                   </span>
                   <Button
                     variant={chosen ? "secondary" : "outline"}
