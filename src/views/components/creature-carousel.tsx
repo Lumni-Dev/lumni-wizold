@@ -34,6 +34,7 @@ export function CreatureCarousel() {
             key={String(position) + "-" + creature.id}
             creature={creature}
             size="huge"
+            inset="p-3"
           />
         ))}
       </div>

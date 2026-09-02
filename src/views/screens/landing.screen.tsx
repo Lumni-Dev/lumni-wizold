@@ -12,7 +12,7 @@ import { Button } from "../components/button";
 import { CornerAccents } from "../components/corner-accents";
 import { GenderBanner } from "../components/gender-icon";
 import { CreatureCarousel } from "../components/creature-carousel";
-import { PetPortrait } from "../components/pet-icon";
+import { ArtImage } from "../components/art-image";
 import { PreviewGallery } from "../components/preview-gallery";
 import { LiveBackdrop } from "../components/live-backdrop";
 import { LandingCtaButton } from "../components/landing-cta-button";
@@ -162,6 +162,18 @@ export function LandingScreen() {
 
         <section className="space-y-6">
           <div className="space-y-1 text-center">
+            <h2 className="heading text-[11px] text-ink">O que espera lá fora</h2>
+            <p className="text-xs text-ink-faint">
+              Cem criaturas divididas em dez áreas, da primeira presa do campo ao que mora no
+              abismo.
+            </p>
+          </div>
+
+          <CreatureCarousel />
+        </section>
+
+        <section className="space-y-6">
+          <div className="space-y-1 text-center">
             <h2 className="heading text-[11px] text-ink">O lobo que anda junto</h2>
             <p className="text-xs text-ink-faint">
               Ninguém caça sozinho. Duas linhagens chegaram à matilha, cada uma do seu jeito.
@@ -175,7 +187,7 @@ export function LandingScreen() {
                 className={cn("overflow-hidden rounded-lg border border-edge", GLASS_SECTION)}
               >
                 <div className="aspect-square w-full overflow-hidden border-b border-edge">
-                  <PetPortrait gender={companion.gender} />
+                  <ArtImage source={companion.art} />
                 </div>
                 <div className="space-y-3 p-6 md:p-8">
                   <h3 className="heading text-[11px] text-ink">{companion.title}</h3>
@@ -188,18 +200,6 @@ export function LandingScreen() {
               </article>
             ))}
           </div>
-        </section>
-
-        <section className="space-y-6">
-          <div className="space-y-1 text-center">
-            <h2 className="heading text-[11px] text-ink">O que espera lá fora</h2>
-            <p className="text-xs text-ink-faint">
-              Cem criaturas divididas em dez áreas, da primeira presa do campo ao que mora no
-              abismo.
-            </p>
-          </div>
-
-          <CreatureCarousel />
         </section>
 
         <section className="space-y-6">

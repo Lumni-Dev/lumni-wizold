@@ -14,9 +14,11 @@ function creatureInitials(name: string): string {
 export function CreatureIcon({
   creature,
   size = "medium",
+  inset,
 }: {
   creature: Creature;
   size?: IconSize;
+  inset?: string;
 }) {
   const art = useArt();
   const source = art.creatures[creature.id];
@@ -25,7 +27,7 @@ export function CreatureIcon({
   return (
     <IconFrame size={size} className={source && !broken ? undefined : "tracking-widest"}>
       {source && !broken ? (
-        <IconArt source={source} fit="contain" glow onFail={() => setBroken(true)} />
+        <IconArt source={source} fit="contain" inset={inset} glow onFail={() => setBroken(true)} />
       ) : (
         creatureInitials(creature.name)
       )}
