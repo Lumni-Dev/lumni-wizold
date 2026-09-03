@@ -15,8 +15,7 @@ export async function PATCH(request: Request) {
     await touchPresence(client, identity.id, status);
     if ("activity" in body) {
       const kind = asText(body.activity, 16);
-      if (!kind) await updateActivity(client, identity.id, null);
-      else if (isActivityKind(kind)) await updateActivity(client, identity.id, { kind });
+      if (kind && isActivityKind(kind)) await updateActivity(client, identity.id, { kind });
     }
     return NextResponse.json({ ok: true, message: "", data: null });
   });

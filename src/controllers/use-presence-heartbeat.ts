@@ -17,7 +17,10 @@ export function usePresenceHeartbeat(enabled: boolean, doing: ActivityKind | nul
     if (!enabled) return;
 
     const ping = (status: "active" | "away") => {
-      void api("PATCH", "/api/presence", { status, activity: doingRef.current });
+      void api("PATCH", "/api/presence", {
+        status,
+        ...(doingRef.current ? { activity: doingRef.current } : {}),
+      });
     };
 
     const sync = () => {
