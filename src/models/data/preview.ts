@@ -68,6 +68,6 @@ export const PREVIEW_SHOTS: readonly PreviewShot[] = [
     text:
       "Duas mesas por linha, caneca em cada card e paginação quando o salão passa de oito. " +
       "Salas abertas ou trancadas, mensagens ao vivo, convite de matilha e aviso quando a cadeira acende.",
-    image: "/assets/landing/tavern.webp?v=12",
+    image: "/assets/landing/tavern.webp?v=13",
   },
 ];
