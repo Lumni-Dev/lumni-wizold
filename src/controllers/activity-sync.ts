@@ -8,8 +8,11 @@ import { activityMirrorStore } from "./activity-mirror.store";
 import { activityRuntimeStore } from "./activity-runtime";
 
 export const HANDSHAKE_MS = 500;
+export const RECLAIM_MS = 200;
 export const OWNER_SILENCE_MS = 20000;
 const OWNER_HEARTBEAT_MS = 4000;
+const PUBLISH_DEBOUNCE_MS = 400;
+const STATE_PUBLISH_MS = 300;
 const CHANNEL_NAME = "lumni-wizold:activity";
 const TAB_KEY = "lumni-wizold:tab-id";
 
@@ -63,8 +66,14 @@ let handshaking = false;
 let handlers: Handlers | null = null;
 let silenceTimer = 0;
 let publishTimer = 0;
+let statePublishTimer = 0;
+let pendingState: GameState | null = null;
 let heartbeatTimer = 0;
 let localActivity: Activity | null = null;
+
+function compactRuntime(runtime: ActivityRuntimeSnapshot): ActivityRuntimeSnapshot {
+  return { ...runtime, lastHuntReport: null };
+}
 const roleListeners = new Set<() => void>();
 
 function supported(): boolean {
@@ -131,9 +140,9 @@ function schedulePublish(): void {
       tabId,
       at: Date.now(),
       activity: localActivity,
-      runtime: activityRuntimeStore.snapshot(),
+      runtime: compactRuntime(activityRuntimeStore.snapshot()),
     });
-  }, 40);
+  }, PUBLISH_DEBOUNCE_MS);
 }
 
 function yieldOwner(): void {
@@ -154,7 +163,7 @@ function handleMessage(raw: MessageEvent<SyncMessage>): void {
           tabId,
           at: Date.now(),
           activity: localActivity,
-          runtime: activityRuntimeStore.snapshot(),
+          runtime: compactRuntime(activityRuntimeStore.snapshot()),
         });
       }
       break;
@@ -227,7 +236,7 @@ export const activitySync = {
         tabId,
         at: Date.now(),
         activity: localActivity,
-        runtime: activityRuntimeStore.snapshot(),
+        runtime: compactRuntime(activityRuntimeStore.snapshot()),
       });
     }, OWNER_HEARTBEAT_MS);
 
@@ -236,6 +245,7 @@ export const activitySync = {
       window.clearInterval(silenceTimer);
       window.clearInterval(heartbeatTimer);
       window.clearTimeout(publishTimer);
+      window.clearTimeout(statePublishTimer);
       channel?.removeEventListener("message", handleMessage);
       channel?.close();
       channel = null;
@@ -334,7 +344,19 @@ export const activitySync = {
 
   publishState(state: GameState): void {
     if (!supported() || role !== "owner" || !handlers?.shouldParticipate()) return;
-    post({ type: "state", tabId, state });
+    pendingState = state;
+    window.clearTimeout(statePublishTimer);
+    statePublishTimer = window.setTimeout(() => {
+      if (pendingState) post({ type: "state", tabId, state: pendingState });
+      pendingState = null;
+    }, STATE_PUBLISH_MS);
+  },
+
+  flushState(): void {
+    if (!pendingState) return;
+    window.clearTimeout(statePublishTimer);
+    post({ type: "state", tabId, state: pendingState });
+    pendingState = null;
   },
 
   requestStop(): void {
@@ -366,7 +388,7 @@ export const activitySync = {
     localActivity = serverActivity;
     activityMirrorStore.clear();
     post({ type: "claim", tabId, at: claim.at, activity: serverActivity });
-    await new Promise((resolve) => window.setTimeout(resolve, HANDSHAKE_MS));
+    await new Promise((resolve) => window.setTimeout(resolve, RECLAIM_MS));
     handshaking = false;
     if (remoteClaim && ownClaim && !beatsClaim(ownClaim, remoteClaim)) {
       yieldOwner();

@@ -5,9 +5,8 @@ import type { Result } from "@/models/entities/result";
 import type { TavernIdentity, TavernState } from "@/models/entities/tavern";
 import { isVip } from "@/models/rules/vip";
 import { syncCharacter } from "@/controllers/character.controller";
-import { withTransaction } from "@/models/repositories/server/database";
-import { loadGame, readActivity, saveGame, type LoadedGame } from "@/models/repositories/server/game.store";
-import { isTutorialDone } from "@/models/repositories/server/user.store";
+import { withTransaction, withReadOnly } from "@/models/repositories/server/database";
+import { loadGame, saveGame, type LoadedGame } from "@/models/repositories/server/game.store";
 import {
   loadRoomState,
   loadTavern,
@@ -15,17 +14,51 @@ import {
   pruneStale,
   type LoadedTavern,
 } from "@/models/repositories/server/tavern.store";
+import { loadTavernCached } from "./tavern-snapshot-cache";
 import { originAllowed } from "./cors";
 import { syncServerMoon } from "./moon";
 import { rateLimit } from "./rate-limit";
 import { sessionClaims, type SessionClaims } from "./session";
 
 export async function sessionIsLive(client: PoolClient, claims: SessionClaims): Promise<boolean> {
-  const found = await client.query("select session_epoch from users where id = $1", [
+  const gate = await sessionGate(client, claims);
+  return gate.live;
+}
+
+async function sessionGate(
+  client: PoolClient,
+  claims: SessionClaims,
+): Promise<{ live: boolean; tutorial: boolean }> {
+  const found = await client.query("select session_epoch, tutorial from users where id = $1", [
     claims.userId,
   ]);
   const row = found.rows[0];
-  return Boolean(row) && Number(row.session_epoch) === claims.epoch;
+  if (!row) return { live: false, tutorial: false };
+  return {
+    live: Number(row.session_epoch) === claims.epoch,
+    tutorial: row.tutorial === true,
+  };
+}
+
+export async function withSessionRead(
+  request: Request,
+  action: (client: PoolClient, userId: string) => Promise<NextResponse>,
+): Promise<NextResponse> {
+  const refused = refuseAbuse(request);
+  if (refused) return refused;
+  const claims = await sessionClaims();
+  if (!claims) return bad("Entre para jogar.", 401);
+  const gate = rateLimit("read:" + claims.userId, 60, 10000);
+  if (!gate.allowed) return tooMany(gate.retryAfterMs);
+  try {
+    return await withReadOnly(async (client) => {
+      if (!(await sessionIsLive(client, claims))) return bad("Sessão encerrada.", 401);
+      return action(client, claims.userId);
+    });
+  } catch (error) {
+    console.error("[api]", request.method, new URL(request.url).pathname, error);
+    return bad("O servidor tropeçou. Tente de novo.", 500);
+  }
 }
 export interface ApiContext {
   client: PoolClient;
@@ -124,9 +157,8 @@ export async function withGame<T>(request: Request, action: GameAction<T>): Prom
         await saveGame(client, loaded.characterId, loaded.state, result.state);
         await recordClientVersion(client, userId, request.headers.get("x-game-version"));
       }
-      const tutorial = await isTutorialDone(client, userId);
-      const { activity } = await readActivity(client, loaded.characterId);
-      return reply(result, { tutorial, activity });
+      const { tutorial } = await sessionGate(client, claims);
+      return reply(result, { tutorial, activity: loaded.activity });
     });
   } catch (error) {
     console.error("[api]", request.method, new URL(request.url).pathname, error);
@@ -185,9 +217,11 @@ export async function withTavern(
       if (!(await sessionIsLive(client, guarded))) return bad("Sessão encerrada.", 401);
       const identity = await tavernIdentity(client, guarded.userId);
       if (!identity) return bad("Nenhum personagem ativo.", 404);
-      if (options.write) await lockTavern(client);
-      await pruneStale(client);
-      const tavern = await loadTavern(client);
+      if (options.write) {
+        await lockTavern(client);
+        await pruneStale(client);
+      }
+      const tavern = options.write ? await loadTavern(client) : await loadTavernCached(client);
       return action(tavern.state, body, { client, userId: guarded.userId, identity, tavern });
     });
   } catch (error) {

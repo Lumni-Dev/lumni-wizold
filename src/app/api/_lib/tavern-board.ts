@@ -2,10 +2,11 @@ import type { PoolClient } from "pg";
 import * as tavernController from "@/controllers/tavern.controller";
 import type { TavernIdentity } from "@/models/entities/tavern";
 import { isVip } from "@/models/rules/vip";
-import { loadTavern, pruneStale } from "@/models/repositories/server/tavern.store";
 import { loadTavernUser } from "@/models/repositories/server/tavern-user.store";
+import { maybePruneStale } from "@/models/repositories/server/tavern.store";
 import type { TavernUserState } from "@/models/entities/tavern";
 import type { RoomSummary } from "@/controllers/tavern.controller";
+import { invalidateTavernStructureCache, loadTavernCached } from "./tavern-snapshot-cache";
 
 export interface TavernBoardPayload {
   identity: TavernIdentity;
@@ -41,6 +42,8 @@ export async function bumpTavernRevision(client: PoolClient): Promise<number> {
   const found = await client.query(
     "update tavern_signal set revision = revision + 1 where id = 1 returning revision",
   );
+  const { invalidateTavernStructureCache } = await import("./tavern-snapshot-cache");
+  invalidateTavernStructureCache();
   return Number(found.rows[0]?.revision ?? 0);
 }
 
@@ -48,12 +51,14 @@ export async function buildTavernBoard(
   client: PoolClient,
   userId: string,
 ): Promise<TavernBoardPayload | null> {
-  await pruneStale(client);
+  if (await maybePruneStale(client)) invalidateTavernStructureCache();
   const identity = await tavernIdentity(client, userId);
   if (!identity) return null;
-  const tavern = await loadTavern(client);
-  const revision = await readTavernRevision(client);
-  const user = await loadTavernUser(client, identity.id);
+  const [tavern, revision, user] = await Promise.all([
+    loadTavernCached(client),
+    readTavernRevision(client),
+    loadTavernUser(client, identity.id),
+  ]);
   return {
     identity,
     rooms: tavernController.listRooms(tavern.state, identity),

@@ -305,6 +305,42 @@ export function GameProvider({ children }: { children: ReactNode }) {
     [adoptState],
   );
   const setActivityRef = useRef<(next: Activity | null, fromServer?: boolean) => void>(() => undefined);
+  const progressFlushRef = useRef<number | null>(null);
+  const pendingProgressRef = useRef<{ beat: number; cooldownUntil?: string | null } | null>(null);
+  const flushProgress = useCallback(() => {
+    if (progressFlushRef.current) {
+      window.clearTimeout(progressFlushRef.current);
+      progressFlushRef.current = null;
+    }
+    const patch = pendingProgressRef.current;
+    if (!patch || activitySync.isMirroring()) return;
+    pendingProgressRef.current = null;
+    void api("PATCH", "/api/activity/progress", patch);
+  }, []);
+  const syncProgress = useCallback(
+    (patch: { beat: number; cooldownUntil?: string | null }) => {
+      if (activitySync.isMirroring()) return;
+      const current = activityRef.current;
+      if (!current) return;
+      const next: Activity = { ...current };
+      if (patch.beat > 0) next.beat = patch.beat;
+      else delete next.beat;
+      if (patch.cooldownUntil) next.cooldownUntil = patch.cooldownUntil;
+      else delete next.cooldownUntil;
+      activityRef.current = next;
+      activitySync.trackLocalActivity(next);
+      pendingProgressRef.current = patch;
+      const boundary =
+        patch.beat === 0 || (patch.cooldownUntil !== undefined && patch.cooldownUntil !== null);
+      if (boundary) {
+        flushProgress();
+        return;
+      }
+      if (progressFlushRef.current) window.clearTimeout(progressFlushRef.current);
+      progressFlushRef.current = window.setTimeout(flushProgress, 3000);
+    },
+    [flushProgress],
+  );
   const setActivity = useCallback(
     (next: Activity | null, fromServer = false) => {
       if (!fromServer && activitySync.isMirroring()) {
@@ -327,25 +363,15 @@ export function GameProvider({ children }: { children: ReactNode }) {
       activitySync.trackLocalActivity(next);
       setActivityState(next);
       if (fromServer) return;
-      if (next === null) activitySync.release();
+      if (next === null) {
+        flushProgress();
+        activitySync.release();
+      }
       void api("PUT", "/api/activity", activityPayload(next));
     },
-    [applyState],
+    [applyState, flushProgress],
   );
   setActivityRef.current = setActivity;
-  const syncProgress = useCallback((patch: { beat: number; cooldownUntil?: string | null }) => {
-    if (activitySync.isMirroring()) return;
-    const current = activityRef.current;
-    if (!current) return;
-    const next: Activity = { ...current };
-    if (patch.beat > 0) next.beat = patch.beat;
-    else delete next.beat;
-    if (patch.cooldownUntil) next.cooldownUntil = patch.cooldownUntil;
-    else delete next.cooldownUntil;
-    activityRef.current = next;
-    activitySync.trackLocalActivity(next);
-    void api("PATCH", "/api/activity/progress", patch);
-  }, []);
   const persistActivity = useCallback((next: Activity | null) => {
     activityRef.current = next;
     void api("PUT", "/api/activity", activityPayload(next));
@@ -444,21 +470,33 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [hydrated, applyState, adoptActivityFromServer]);
   useEffect(() => {
     if (!ready) return undefined;
-    const sync = async () => {
+    let timer = 0;
+    const sync = () => {
       if (document.visibilityState !== "visible") return;
-      const answer = await request("POST", "/api/state");
-      if (answer.activity && !activitySync.isOwner() && !activitySync.isMirroring()) {
-        await activitySync.reclaim(answer.activity);
-      }
-      if (!activitySync.isMirroring()) adoptActivityFromServer(answer.activity);
+      window.clearTimeout(timer);
+      timer = window.setTimeout(async () => {
+        if (activitySync.isOwner()) return;
+        const answer = await request("POST", "/api/state");
+        if (answer.activity && !activitySync.isOwner() && !activitySync.isMirroring()) {
+          await activitySync.reclaim(answer.activity);
+        }
+        if (!activitySync.isMirroring()) adoptActivityFromServer(answer.activity);
+      }, 600);
     };
     document.addEventListener("visibilitychange", sync);
     window.addEventListener("focus", sync);
     return () => {
+      window.clearTimeout(timer);
       document.removeEventListener("visibilitychange", sync);
       window.removeEventListener("focus", sync);
     };
   }, [ready, request, adoptActivityFromServer]);
+  useEffect(() => {
+    if (!ready) return undefined;
+    const flush = () => flushProgress();
+    window.addEventListener("pagehide", flush);
+    return () => window.removeEventListener("pagehide", flush);
+  }, [ready, flushProgress]);
   const petResting =
     state.pet !== null &&
     state.pet.active === false &&

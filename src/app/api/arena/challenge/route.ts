@@ -1,4 +1,4 @@
-import { loadHunters } from "@/models/repositories/server/roster.store";
+import { cachedHunters } from "../../_lib/roster-cache";
 import { recordArenaDuel } from "@/models/repositories/server/arena.store";
 import { interruptRest } from "@/models/repositories/server/game.store";
 import { cooldownLeft, setCooldown } from "@/models/repositories/server/action-cooldown";
@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     if (cooldownLeft("arena:" + context.characterId) > 0) {
       return failure(state, "");
     }
-    const roster = await loadHunters(context.client);
+    const roster = await cachedHunters(context.client);
     const resolved = arenaController.resolveArena(state, roster, asText(body.hunterId, 80));
     if (!resolved.ok || !resolved.data) return resolved;
     const landed = arenaController.landArena(state, resolved.data, 0);

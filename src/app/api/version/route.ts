@@ -9,5 +9,8 @@ export async function GET(request: Request) {
   if (!rateLimit("version:" + clientIp(request), 60, 60000).allowed) {
     return NextResponse.json({ ok: false, message: "Devagar." }, { status: 429 });
   }
-  return NextResponse.json({ version: GAME_VERSION });
+  return NextResponse.json(
+    { version: GAME_VERSION },
+    { headers: { "Cache-Control": "public, max-age=60" } },
+  );
 }

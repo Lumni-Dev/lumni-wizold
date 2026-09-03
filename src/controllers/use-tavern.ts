@@ -52,9 +52,11 @@ export function useTavern(activeRoomId: string | null) {
     if (!enabled) return;
     const beat = () => {
       const mine = boardRef.current.rooms.filter((summary) => summary.isMember);
-      for (const summary of mine) {
-        void api("POST", "/api/tavern/rooms/" + encodeURIComponent(summary.room.id) + "/heartbeat");
-      }
+      mine.forEach((summary, index) => {
+        window.setTimeout(() => {
+          void api("POST", "/api/tavern/rooms/" + encodeURIComponent(summary.room.id) + "/heartbeat");
+        }, index * 250);
+      });
     };
     beat();
     const timer = window.setInterval(beat, HEARTBEAT_MS);

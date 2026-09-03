@@ -360,14 +360,19 @@ export function TavernScreen() {
   }
 
   async function open(roomId: string, password: string) {
+    showChatRoom(roomId);
     const result = await joinRoom(roomId, password);
-    if (!result) return;
-    notify(result.message, result.ok, "Taverna");
-    if (result.ok) {
-      playSound("door");
-      showChatRoom(roomId);
-      setJoinPasswords((current) => ({ ...current, [roomId]: "" }));
+    if (!result) {
+      if (tavernChatStore.isOpenFor(roomId)) tavernChatStore.closeWindow();
+      return;
     }
+    notify(result.message, result.ok, "Taverna");
+    if (!result.ok) {
+      if (tavernChatStore.isOpenFor(roomId)) tavernChatStore.closeWindow();
+      return;
+    }
+    playSound("door");
+    setJoinPasswords((current) => ({ ...current, [roomId]: "" }));
   }
 
   async function leave(roomId: string) {

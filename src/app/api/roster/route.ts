@@ -1,10 +1,14 @@
-import { success } from "@/models/entities/result";
-import { loadHunters } from "@/models/repositories/server/roster.store";
-import { withGame } from "../_lib/api";
+import { NextResponse } from "next/server";
+import { cachedHunters } from "../_lib/roster-cache";
+import { withSessionRead } from "../_lib/api";
 
 export async function GET(request: Request) {
-  return withGame(request, async (state, _body, context) => {
-    const hunters = await loadHunters(context.client);
-    return success(state, "", { hunters });
+  return withSessionRead(request, async (client) => {
+    const hunters = await cachedHunters(client);
+    return NextResponse.json({
+      ok: true,
+      message: "",
+      data: { hunters },
+    });
   });
 }

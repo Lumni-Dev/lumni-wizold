@@ -1,11 +1,11 @@
 import { failure, success } from "@/models/entities/result";
-import { loadHunters } from "@/models/repositories/server/roster.store";
+import { cachedHunters } from "../../_lib/roster-cache";
 import * as arenaController from "@/controllers/arena.controller";
 import { withGame } from "../../_lib/api";
 
 export async function POST(request: Request) {
   return withGame(request, async (state, _body, context) => {
-    const roster = await loadHunters(context.client);
+    const roster = await cachedHunters(context.client);
     if (roster.length <= 1) {
       return failure(state, "O fosso espera outros caçadores: por enquanto você é o único vivo.");
     }

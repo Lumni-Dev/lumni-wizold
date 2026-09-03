@@ -5,7 +5,7 @@ declare global {
 }
 function createPool(): Pool {
   const pool = new Pool({
-    max: 10,
+    max: Number(process.env.PGPOOL_MAX ?? 3),
     idleTimeoutMillis: 300000,
     connectionTimeoutMillis: 10000,
     keepAlive: true,
@@ -32,6 +32,16 @@ export async function withTransaction<T>(work: (client: PoolClient) => Promise<T
       await client.query("rollback");
     } catch {}
     throw error;
+  } finally {
+    client.release();
+  }
+}
+
+export async function withReadOnly<T>(work: (client: PoolClient) => Promise<T>): Promise<T> {
+  const client = await pool.connect();
+  try {
+    await client.query("set statement_timeout = '10s'");
+    return await work(client);
   } finally {
     client.release();
   }

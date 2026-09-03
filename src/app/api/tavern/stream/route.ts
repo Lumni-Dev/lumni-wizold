@@ -1,4 +1,4 @@
-import { withTransaction } from "@/models/repositories/server/database";
+import { withReadOnly } from "@/models/repositories/server/database";
 import { sessionClaims } from "../../_lib/session";
 import { bad, refuseAbuse, sessionIsLive } from "../../_lib/api";
 import { buildTavernBoard } from "../../_lib/tavern-board";
@@ -8,7 +8,7 @@ import { rateLimit } from "../../_lib/rate-limit";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const POLL_MS = 2000;
+const POLL_MS = 5000;
 const PING_MS = 15000;
 
 function sseChunk(event: string, data: unknown): Uint8Array {
@@ -31,7 +31,7 @@ export async function GET(request: Request) {
       const pushBoard = async () => {
         if (closed) return;
         try {
-          await withTransaction(async (client) => {
+          await withReadOnly(async (client) => {
             if (!(await sessionIsLive(client, claims))) {
               controller.enqueue(sseChunk("end", { reason: "session" }));
               controller.close();

@@ -9,6 +9,7 @@ import type { PackMate } from "../../entities/pack";
 import type { Pet, PetGender } from "../../entities/pet";
 import { fillAutomation } from "../../entities/automation";
 import { isActivityKind, type Activity, type ActivityKind } from "../../entities/activity";
+import { bumpRosterRevision } from "./roster.store";
 
 const int = (value: unknown): number => Number(value ?? 0);
 
@@ -309,6 +310,7 @@ export async function saveGame(
   if (!character) return;
   if (character === before.character && after.mining === before.mining) {
     await savePieces(client, characterId, before, after);
+    await bumpRosterRevision(client);
     return;
   }
   await client.query(
@@ -363,6 +365,7 @@ export async function saveGame(
     ],
   );
   await savePieces(client, characterId, before, after);
+  await bumpRosterRevision(client);
 }
 async function savePieces(
   client: PoolClient,

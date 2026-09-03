@@ -1,12 +1,48 @@
 import type { PoolClient } from "pg";
 import {
   MEMBER_TIMEOUT_MS,
+  MAX_ROOM_MESSAGES,
   type TavernMember,
   type TavernRoom,
   type TavernState,
   TAVERN_VERSION,
 } from "../../entities/tavern";
 import { nickColorCapacity, paintMembers } from "../../rules/tavern-nicks";
+
+type RoomRow = {
+  id: string;
+  name: string;
+  number?: unknown;
+  name_hidden?: unknown;
+  password_hash: string | null;
+  owner_id: string;
+  created_at: Date;
+  private_for?: string[] | null;
+};
+
+type MemberRow = {
+  room_id: string;
+  member_id: string;
+  member_name: string;
+  joined_at: Date;
+  last_seen: Date;
+  nick_color?: number;
+};
+
+type MessageRow = {
+  id: string;
+  room_id: string;
+  author_id: string;
+  author_name: string;
+  body: string;
+  sent_at: Date;
+};
+
+export interface TavernStructure {
+  roomRows: RoomRow[];
+  messageRows: MessageRow[];
+  hashes: Map<string, string>;
+}
 
 function roomNumberOf(value: unknown): number {
   const number = Number(value);
@@ -52,10 +88,7 @@ function assignMissingNumbers(rooms: TavernRoom[]): TavernRoom[] {
   });
 }
 
-function membersOf(
-  rows: { member_id: string; member_name: string; joined_at: Date; last_seen: Date; nick_color?: number }[],
-  privateFor?: string[],
-): TavernMember[] {
+function membersOf(rows: MemberRow[], privateFor?: string[]): TavernMember[] {
   return paintMembers(
     rows.map((member) => ({
       id: member.member_id,
@@ -67,7 +100,76 @@ function membersOf(
     nickColorCapacity({ privateFor }),
   );
 }
+
+function byRoom<T extends { room_id: string }>(roomId: string, rows: T[]): T[] {
+  return rows.filter((row) => row.room_id === roomId);
+}
+
+export function buildTavernFromParts(
+  structure: TavernStructure,
+  memberRows: MemberRow[],
+): LoadedTavern {
+  const state: TavernState = {
+    version: TAVERN_VERSION,
+    rooms: assignMissingNumbers(
+      structure.roomRows.map((row): TavernRoom => {
+        return roomFromRow(
+          row,
+          membersOf(byRoom(row.id, memberRows), row.private_for ?? undefined),
+          byRoom(row.id, structure.messageRows).map((message) => ({
+            id: message.id,
+            authorId: message.author_id,
+            authorName: message.author_name,
+            text: message.body,
+            at: new Date(message.sent_at).toISOString(),
+          })),
+        );
+      }),
+    ),
+  };
+  return { state, hashes: structure.hashes };
+}
+
+export async function loadTavernStructure(
+  client: PoolClient,
+  messageLimit: number,
+): Promise<TavernStructure> {
+  const rooms = await client.query<RoomRow>("select * from tavern_rooms order by created_at");
+  const messages = await client.query<MessageRow>(
+    `with ranked as (
+       select id, room_id, author_id, author_name, body, sent_at,
+              row_number() over (partition by room_id order by sent_at desc) as rn
+       from tavern_messages
+     )
+     select id, room_id, author_id, author_name, body, sent_at
+     from ranked where rn <= $1 order by room_id, sent_at`,
+    [messageLimit],
+  );
+  const hashes = new Map<string, string>();
+  for (const row of rooms.rows) {
+    if (row.password_hash) hashes.set(row.id, row.password_hash);
+  }
+  return { roomRows: rooms.rows, messageRows: messages.rows, hashes };
+}
+
+export async function loadTavernMembers(client: PoolClient): Promise<MemberRow[]> {
+  const members = await client.query<MemberRow>(
+    "select room_id, member_id, member_name, joined_at, last_seen, nick_color from tavern_members order by joined_at",
+  );
+  return members.rows;
+}
 const TAVERN_LOCK = 0x77697a01;
+let lastPruneAt = 0;
+const PRUNE_INTERVAL_MS = 30_000;
+
+export async function maybePruneStale(client: PoolClient): Promise<boolean> {
+  const now = Date.now();
+  if (now - lastPruneAt < PRUNE_INTERVAL_MS) return false;
+  lastPruneAt = now;
+  await pruneStale(client);
+  return true;
+}
+
 export async function lockTavern(client: PoolClient): Promise<void> {
   await client.query("select pg_advisory_xact_lock($1)", [TAVERN_LOCK]);
 }
@@ -103,9 +205,15 @@ export async function loadRoomState(
     "select * from tavern_members where room_id = $1 order by joined_at",
     [roomId],
   );
-  const messages = await client.query(
-    "select * from tavern_messages where room_id = $1 order by sent_at",
-    [roomId],
+  const messages = await client.query<MessageRow>(
+    `select id, room_id, author_id, author_name, body, sent_at
+     from (
+       select id, room_id, author_id, author_name, body, sent_at,
+              row_number() over (order by sent_at desc) as rn
+       from tavern_messages
+       where room_id = $1
+     ) recent where rn <= $2 order by sent_at`,
+    [roomId, MAX_ROOM_MESSAGES],
   );
   if (row.password_hash) hashes.set(row.id, row.password_hash);
   const state: TavernState = {
@@ -127,38 +235,11 @@ export async function loadRoomState(
   return { state, hashes };
 }
 export async function loadTavern(client: PoolClient): Promise<LoadedTavern> {
-  const rooms = await client.query("select * from tavern_rooms order by created_at");
-  const members = await client.query("select * from tavern_members order by joined_at");
-  const messages = await client.query("select * from tavern_messages order by sent_at");
-  const hashes = new Map<string, string>();
-  const byRoom = <
-    T extends {
-      room_id: string;
-    },
-  >(
-    roomId: string,
-    rows: T[],
-  ): T[] => rows.filter((row) => row.room_id === roomId);
-  const state: TavernState = {
-    version: TAVERN_VERSION,
-    rooms: assignMissingNumbers(
-      rooms.rows.map((row): TavernRoom => {
-        if (row.password_hash) hashes.set(row.id, row.password_hash);
-        return roomFromRow(
-          row,
-          membersOf(byRoom(row.id, members.rows), row.private_for ?? undefined),
-          byRoom(row.id, messages.rows).map((message) => ({
-            id: message.id,
-            authorId: message.author_id,
-            authorName: message.author_name,
-            text: message.body,
-            at: new Date(message.sent_at).toISOString(),
-          })),
-        );
-      }),
-    ),
-  };
-  return { state, hashes };
+  const [structure, members] = await Promise.all([
+    loadTavernStructure(client, MAX_ROOM_MESSAGES),
+    loadTavernMembers(client),
+  ]);
+  return buildTavernFromParts(structure, members);
 }
 async function saveRoom(
   client: PoolClient,

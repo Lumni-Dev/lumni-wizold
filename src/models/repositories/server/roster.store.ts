@@ -97,3 +97,12 @@ export async function loadHunterSummary(
     gender: row.gender,
   };
 }
+
+export async function readRosterRevision(client: PoolClient): Promise<number> {
+  const found = await client.query("select revision from roster_signal where id = 1");
+  return Number(found.rows[0]?.revision ?? 0);
+}
+
+export async function bumpRosterRevision(client: PoolClient): Promise<void> {
+  await client.query("update roster_signal set revision = revision + 1 where id = 1");
+}

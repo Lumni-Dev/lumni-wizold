@@ -10,11 +10,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, message: "Devagar." }, { status: 429 });
   }
   const moon = await serverMoon();
-  return NextResponse.json({
-    phase: moon.phase.key,
-    age: moon.age,
-    illumination: moon.illumination,
-    waxing: moon.waxing,
-    source: moon.source,
-  });
+  return NextResponse.json(
+    {
+      phase: moon.phase.key,
+      age: moon.age,
+      illumination: moon.illumination,
+      waxing: moon.waxing,
+      source: moon.source,
+    },
+    { headers: { "Cache-Control": "public, max-age=3600" } },
+  );
 }
