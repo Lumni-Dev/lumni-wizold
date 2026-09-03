@@ -1,4 +1,8 @@
-const PRODUCTION_ORIGIN = "https://wizold.lumni.dev.br";
+const PRODUCTION_ORIGINS = [
+  "https://wizold.com.br",
+  "https://www.wizold.com.br",
+  "https://wizold.lumni.dev.br",
+];
 
 const DEV_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"];
 
@@ -17,7 +21,7 @@ export function allowedOrigins(): string[] {
       .filter((entry): entry is string => entry !== null) ?? [];
   const site = process.env.NEXT_PUBLIC_SITE_URL?.trim();
   const siteOrigin = site ? parseOrigin(site) : null;
-  const base = siteOrigin ? [siteOrigin] : [PRODUCTION_ORIGIN];
+  const base = siteOrigin ? [siteOrigin, ...PRODUCTION_ORIGINS] : [...PRODUCTION_ORIGINS];
   if (process.env.NODE_ENV === "development") {
     return [...new Set([...base, ...DEV_ORIGINS, ...fromEnv])];
   }

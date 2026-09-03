@@ -1,4 +1,4 @@
-const DEFAULT_SITE_URL = "https://wizold.lumni.dev.br";
+const DEFAULT_SITE_URL = "https://wizold.com.br";
 
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? DEFAULT_SITE_URL).replace(/\/$/, "");
 

@@ -1,7 +1,7 @@
 import { createTransport } from "nodemailer";
-import { SITE_EMAIL, BRAND_LOGO_PNG_PATH } from "@/shared/constants/site";
+import { SITE_EMAIL, SITE_URL, BRAND_LOGO_PNG_PATH } from "@/shared/constants/site";
 
-const GAME_URL = "https://wizold.lumni.dev.br";
+const GAME_URL = SITE_URL;
 const GAME_NAME = "WIZOLD";
 const GAME_TAGLINE = "Crônica de Lumni e Luna";
 

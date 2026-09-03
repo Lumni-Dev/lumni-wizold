@@ -11,12 +11,16 @@ function secretKey(): string {
   return value;
 }
 
-export function webhookSecret(): string {
+export function webhookSecrets(): string[] {
   const value = live
     ? process.env.STRIPE_LIVE_WEBHOOK_SECRET
     : process.env.STRIPE_TEST_WEBHOOK_SECRET;
-  if (!value) throw new Error("Segredo do webhook do Stripe ausente no ambiente.");
-  return value;
+  const secrets = (value ?? "")
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter((entry) => entry.length > 0);
+  if (secrets.length === 0) throw new Error("Segredo do webhook do Stripe ausente no ambiente.");
+  return secrets;
 }
 
 async function stripeCall(
@@ -198,12 +202,14 @@ export function verifyStripeSignature(payload: string, header: string | null): b
   }
   const at = Number(timestamp) * 1000;
   if (!Number.isFinite(at) || Math.abs(Date.now() - at) > SIGNATURE_TOLERANCE_MS) return false;
-  const wanted = createHmac("sha256", webhookSecret())
-    .update(timestamp + "." + payload)
-    .digest("hex");
-  const expected = Buffer.from(wanted);
-  return given.some((candidate) => {
-    const bytes = Buffer.from(candidate);
-    return bytes.length === expected.length && timingSafeEqual(bytes, expected);
+  return webhookSecrets().some((secret) => {
+    const wanted = createHmac("sha256", secret)
+      .update(timestamp + "." + payload)
+      .digest("hex");
+    const expected = Buffer.from(wanted);
+    return given.some((candidate) => {
+      const bytes = Buffer.from(candidate);
+      return bytes.length === expected.length && timingSafeEqual(bytes, expected);
+    });
   });
 }
