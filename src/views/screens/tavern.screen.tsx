@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { tavernChatStore } from "@/controllers/tavern-chat.store";
+import { tavernUserStore, type TavernReadMap } from "@/controllers/tavern-user.store";
 import { useIsDesktop } from "@/controllers/use-is-desktop";
 import { useGame } from "@/controllers/game.context";
 import { isInPack, listPack } from "@/controllers/pack.controller";
@@ -14,10 +15,6 @@ import { useTavern } from "@/controllers/use-tavern";
 import { describeDoing, doingFor } from "@/models/entities/activity";
 import { MAX_PACK, type PackInvite, type PackMate } from "@/models/entities/pack";
 import type { PresenceStatus } from "@/models/entities/presence";
-import {
-  tavernReadRepository,
-  type TavernReadMap,
-} from "@/models/repositories/tavern-read.repository";
 import {
   tavernSentRepository,
   type TavernSentMap,
@@ -162,7 +159,11 @@ export function TavernScreen() {
     return () => window.clearInterval(timer);
   }, [refreshInvites]);
 
-  const [readMap, setReadMap] = useState<TavernReadMap>(() => tavernReadRepository.load());
+  const readMap = useSyncExternalStore(
+    tavernUserStore.subscribeRead,
+    tavernUserStore.readSnapshot,
+    (): TavernReadMap => ({}),
+  );
   const roomsRef = useRef(rooms);
   useEffect(() => {
     roomsRef.current = rooms;
@@ -223,12 +224,11 @@ export function TavernScreen() {
     if (summary) dismissTavernNotices(summary.room.name);
     const lastAt = summary?.room.messages[summary.room.messages.length - 1]?.at;
     if (!lastAt) return;
-    const next = tavernReadRepository.mark(
+    tavernUserStore.markRead(
       roomId,
       lastAt,
       roomsRef.current.map((entry) => entry.room.id),
     );
-    if (next) setReadMap(next);
   }, []);
 
   useEffect(() => {
@@ -312,10 +312,6 @@ export function TavernScreen() {
     setSentBeat(0);
     setCooldownLeft(0);
   }, [mobileChat, openRoomId]);
-
-  useEffect(() => {
-    setReadMap(tavernReadRepository.load());
-  }, [rooms, chat.open, chat.roomId]);
 
   const filteredRooms = useMemo(() => {
     return rooms.filter(({ room, isMember }) => roomMatchesSearch(room, isMember, roomSearch));

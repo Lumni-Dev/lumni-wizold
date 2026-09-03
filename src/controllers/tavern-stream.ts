@@ -3,11 +3,14 @@
 import { api } from "./api.client";
 import type { RoomSummary } from "./tavern.controller";
 import type { TavernIdentity } from "@/models/entities/tavern";
+import type { TavernUserState } from "@/models/entities/tavern";
+import { tavernUserStore } from "./tavern-user.store";
 
 export interface TavernBoardPayload {
   identity: TavernIdentity | null;
   rooms: RoomSummary[];
   revision?: number;
+  user?: TavernUserState;
 }
 
 type BoardListener = (board: TavernBoardPayload) => void;
@@ -20,6 +23,7 @@ let lastBoard: TavernBoardPayload | null = null;
 
 function notify(board: TavernBoardPayload) {
   lastBoard = board;
+  if (board.user) tavernUserStore.adoptUser(board.user, board.rooms);
   for (const listener of listeners) listener(board);
 }
 

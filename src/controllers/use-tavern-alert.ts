@@ -2,17 +2,17 @@
 
 import { useEffect, useRef, useState } from "react";
 import { tavernPushRepository } from "@/models/repositories/tavern-push.repository";
-import { tavernReadRepository } from "@/models/repositories/tavern-read.repository";
+import { tavernUserStore } from "./tavern-user.store";
 import { clearTavernAlerts, pushTavernAlert } from "./tavern-alert.store";
 import { useGame } from "./game.context";
 import { ensureTavernWorker, notifyTavernMessageLocal, tavernPushActive } from "./tavern-notify";
-import { subscribeTavernBoard } from "./tavern-stream";
+import { subscribeTavernBoard, tavernBoardSnapshot, type TavernBoardPayload } from "./tavern-stream";
 import type { RoomSummary } from "./tavern.controller";
 
 const ALERT_FLASH_MS = 1500;
 
 function unreadFromBoard(rooms: RoomSummary[], selfId: string): number {
-  const readMap = tavernReadRepository.load();
+  const readMap = tavernUserStore.readSnapshot();
   let total = 0;
   for (const { room, isMember } of rooms) {
     if (!isMember) continue;
@@ -31,7 +31,7 @@ function freshMessages(
   since: string | null,
 ): { roomName: string; authorName: string; text: string; at: string }[] {
   if (since === null) return [];
-  const readMap = tavernReadRepository.load();
+  const readMap = tavernUserStore.readSnapshot();
   const found: { roomName: string; authorName: string; text: string; at: string }[] = [];
   for (const { room, isMember } of rooms) {
     if (!isMember) continue;
@@ -56,6 +56,7 @@ export function useTavernAlert(watching: boolean) {
   const selfId = character?.id ?? "";
   const enabled = watching && authenticated && character !== null;
   const notifiedRef = useRef<string | null>(null);
+  const boardRef = useRef<TavernBoardPayload | null>(tavernBoardSnapshot());
 
   useEffect(() => {
     notifiedRef.current = null;
@@ -64,8 +65,13 @@ export function useTavernAlert(watching: boolean) {
       return;
     }
     ensureTavernWorker();
-    const stop = subscribeTavernBoard((board) => {
-      setUnread(unreadFromBoard(board.rooms, selfId));
+    const refreshUnread = () => {
+      const board = boardRef.current;
+      if (board) setUnread(unreadFromBoard(board.rooms, selfId));
+    };
+    const stopBoard = subscribeTavernBoard((board) => {
+      boardRef.current = board;
+      refreshUnread();
       const alertsOn = tavernPushRepository.enabled();
       const hidden = document.hidden;
       let latest = notifiedRef.current ?? "";
@@ -91,9 +97,11 @@ export function useTavernAlert(watching: boolean) {
       }
       notifiedRef.current = latest;
     });
+    const stopRead = tavernUserStore.subscribeRead(refreshUnread);
     return () => {
       notifiedRef.current = null;
-      stop();
+      stopBoard();
+      stopRead();
     };
   }, [enabled, selfId]);
 

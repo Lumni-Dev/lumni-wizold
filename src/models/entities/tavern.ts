@@ -110,3 +110,17 @@ export function validateRoomName(name: string): string | null {
   }
   return null;
 }
+
+export type TavernReadMap = Record<string, string>;
+
+export interface TavernUiState {
+  roomId: string | null;
+  open: boolean;
+  x: number;
+  y: number;
+}
+
+export interface TavernUserState {
+  read: TavernReadMap;
+  ui: TavernUiState;
+}

@@ -1,4 +1,4 @@
-import { tavernChatRepository } from "@/models/repositories/tavern-chat.repository";
+import { tavernUserStore } from "./tavern-user.store";
 
 export interface TavernChatSnapshot {
   roomId: string | null;
@@ -16,24 +16,8 @@ const CLOSED: TavernChatSnapshot = {
 
 const listeners = new Set<() => void>();
 
-let state: TavernChatSnapshot = CLOSED;
-let hydrated = false;
-
 function notify(): void {
   listeners.forEach((listener) => listener());
-}
-
-function hydrate(): void {
-  if (hydrated || typeof window === "undefined") return;
-  hydrated = true;
-  const saved = tavernChatRepository.load();
-  if (saved) state = saved;
-}
-
-function write(next: TavernChatSnapshot): void {
-  state = next;
-  tavernChatRepository.save(next);
-  notify();
 }
 
 function defaultPosition(): { x: number; y: number } {
@@ -48,8 +32,7 @@ function defaultPosition(): { x: number; y: number } {
 
 export const tavernChatStore = {
   snapshot(): TavernChatSnapshot {
-    hydrate();
-    return state;
+    return tavernUserStore.uiSnapshot();
   },
 
   serverSnapshot(): TavernChatSnapshot {
@@ -58,31 +41,37 @@ export const tavernChatStore = {
 
   subscribe(listener: () => void): () => void {
     listeners.add(listener);
-    return () => listeners.delete(listener);
+    const stop = tavernUserStore.subscribeUi(() => {
+      listener();
+      notify();
+    });
+    return () => {
+      stop();
+      listeners.delete(listener);
+    };
   },
 
   openRoom(roomId: string): string | null {
-    hydrate();
+    const current = tavernUserStore.uiSnapshot();
     const previous =
-      state.open && state.roomId !== null && state.roomId !== roomId ? state.roomId : null;
-    const position = state.open ? { x: state.x, y: state.y } : defaultPosition();
-    write({ roomId, open: true, x: position.x, y: position.y });
+      current.open && current.roomId !== null && current.roomId !== roomId ? current.roomId : null;
+    const position = current.open ? { x: current.x, y: current.y } : defaultPosition();
+    tavernUserStore.saveUi({ roomId, open: true, x: position.x, y: position.y });
     return previous;
   },
 
   closeWindow(): void {
-    hydrate();
-    write(CLOSED);
+    tavernUserStore.saveUi(CLOSED);
   },
 
   setPosition(x: number, y: number): void {
-    hydrate();
-    if (!state.open) return;
-    write({ ...state, x, y });
+    const current = tavernUserStore.uiSnapshot();
+    if (!current.open || !current.roomId) return;
+    tavernUserStore.saveUi({ ...current, x, y });
   },
 
   isOpenFor(roomId: string): boolean {
-    hydrate();
-    return state.open && state.roomId === roomId;
+    const current = tavernUserStore.uiSnapshot();
+    return current.open && current.roomId === roomId;
   },
 };

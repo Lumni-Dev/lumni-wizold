@@ -1,6 +1,6 @@
 export const SOCIAL = {
   roomMembers: 20,
-  roomMessages: 40,
+  roomMessages: 200,
   messageCooldownMs: 10_000,
   messageMaxLength: 150,
   roomNameMinLength: 3,

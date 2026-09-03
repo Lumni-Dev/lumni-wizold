@@ -20,9 +20,7 @@ import { usePackPresence } from "@/controllers/use-pack-presence";
 import { useTavernDoing } from "@/controllers/use-tavern-doing";
 import { useTavern } from "@/controllers/use-tavern";
 import type { PresenceStatus } from "@/models/entities/presence";
-import {
-  tavernReadRepository,
-} from "@/models/repositories/tavern-read.repository";
+import { tavernUserStore } from "@/controllers/tavern-user.store";
 import {
   tavernSentRepository,
   type TavernSentMap,
@@ -87,7 +85,7 @@ export function TavernChatWindow() {
     if (summary) dismissTavernNotices(summary.room.name);
     const lastAt = summary?.room.messages[summary.room.messages.length - 1]?.at;
     if (!lastAt) return;
-    tavernReadRepository.mark(
+    tavernUserStore.markRead(
       roomId,
       lastAt,
       rooms.map((entry) => entry.room.id),
