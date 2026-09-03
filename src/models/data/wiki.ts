@@ -36,6 +36,7 @@ import { MAX_PACK } from "../entities/pack";
 import {
   MAX_ROOM_MEMBERS,
   MAX_ROOM_MESSAGES,
+  MEMBER_TIMEOUT_MS,
   MESSAGE_COOLDOWN_MS,
   MESSAGE_MAX_LENGTH,
   OPEN_ROOM_MIN_LEVEL,
@@ -424,7 +425,9 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         MESSAGE_COOLDOWN_MS / 1000 +
         " segundos: conversa tem compasso.",
       "Fechar a janela da conversa não é sair da mesa: o lugar continua seu e Sentar devolve a mesma cadeira.",
-      "A mesa some do quadro quando a última pessoa sai, ou quando o dono a fecha.",
+      "A mesa some do quadro quando a última pessoa sai, quando o dono a fecha, ou quando ninguém volta em " +
+        MEMBER_TIMEOUT_MS / (60 * 60 * 1000) +
+        " horas.",
       "A matilha guarda até " +
         MAX_PACK +
         " nomes: convite mútuo, enviado pelo perfil de um caçador ou pelo nick na taverna.",

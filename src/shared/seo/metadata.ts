@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
 import { GAME_NAME, GAME_TAGLINE } from "@/shared/constants/game";
-import { OG_IMAGE_PATH, BRAND_ICON_PATH, BRAND_LOGO_PNG_PATH, SITE_URL } from "@/shared/constants/site";
+import {
+  OG_IMAGE_PATH,
+  OG_IMAGE_WIDTH,
+  OG_IMAGE_HEIGHT,
+  BRAND_ICON_PATH,
+  BRAND_LOGO_PNG_PATH,
+  SITE_URL,
+} from "@/shared/constants/site";
 
 export const SITE_DESCRIPTION =
   "Crônica de Lumni e Luna: jogo de navegador gratuito de lobisomem. Caçe criaturas, treine atributos, forje equipamentos e dispute o ranking.";
@@ -13,7 +20,7 @@ function fullTitle(title: string): string {
 }
 
 function socialImages(alt: string): NonNullable<Metadata["openGraph"]>["images"] {
-  return [{ url: OG_IMAGE_PATH, width: 1280, height: 648, alt }];
+  return [{ url: OG_IMAGE_PATH, width: OG_IMAGE_WIDTH, height: OG_IMAGE_HEIGHT, alt }];
 }
 
 export function rootMetadata(): Metadata {
@@ -56,10 +63,10 @@ export function rootMetadata(): Metadata {
       images: socialImages(alt),
     },
     twitter: {
-      card: "summary_large_image",
+      card: "summary",
       title: GAME_NAME,
       description: SITE_DESCRIPTION,
-      images: [OG_IMAGE_PATH],
+      images: socialImages(alt),
     },
     icons: {
       icon: [{ url: BRAND_ICON_PATH, type: "image/png" }],
@@ -94,10 +101,10 @@ export function pageMetadata(input: {
       images: socialImages(alt),
     },
     twitter: {
-      card: "summary_large_image",
+      card: "summary",
       title,
       description: input.description,
-      images: [OG_IMAGE_PATH],
+      images: socialImages(alt),
     },
   };
 }

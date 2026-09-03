@@ -5,6 +5,6 @@ export const SOCIAL = {
   messageMaxLength: 150,
   roomNameMinLength: 3,
   roomNameMaxLength: 25,
-  memberTimeoutMs: 150_000,
+  memberTimeoutMs: 86_400_000,
   openRoomMinLevel: 50,
 } as const;

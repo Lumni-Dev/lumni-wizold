@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ArtProvider } from "@/controllers/art.context";
 import { readArtManifest } from "@/models/repositories/art.repository";
 import { GAME_NAME, GAME_TAGLINE } from "@/shared/constants/game";
-import { SITE_URL } from "@/shared/constants/site";
+import { OG_IMAGE_PATH, SITE_URL } from "@/shared/constants/site";
 import { JsonLd } from "@/shared/seo/json-ld";
 import { pageMetadata, SITE_DESCRIPTION } from "@/shared/seo/metadata";
 import { LandingScreen } from "@/views/screens/landing.screen";
@@ -37,7 +37,7 @@ export default async function HomePage() {
               name: GAME_NAME,
               alternateName: GAME_TAGLINE,
               url: SITE_URL,
-              image: SITE_URL + "/assets/ui/background.jpg",
+              image: SITE_URL + OG_IMAGE_PATH,
               description: SITE_DESCRIPTION,
               inLanguage: "pt-BR",
               genre: ["RPG", "MMORPG"],
