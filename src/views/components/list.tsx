@@ -142,14 +142,14 @@ export function ArtRowButton({
             className,
           )}
         >
-          <span className="flex shrink-0 items-center border-r border-edge p-3">{art}</span>
+          <span className="flex aspect-square w-24 shrink-0 overflow-hidden border-r border-edge">
+            {art}
+          </span>
           <span className="flex min-w-0 grow items-center px-4 py-3">
             <RowText title={title} description={description} />
           </span>
           {trailing ? (
-            <span className="flex shrink-0 items-center gap-3 border-l border-edge px-4 py-3">
-              {trailing}
-            </span>
+            <span className="flex shrink-0 items-center gap-3 px-4 py-3">{trailing}</span>
           ) : null}
         </button>
       </ListRow>

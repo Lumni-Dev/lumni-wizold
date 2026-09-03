@@ -31,8 +31,7 @@ import { normalizeText } from "@/shared/utils/text";
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
 import { ConfirmDialog } from "../components/confirm-dialog";
-import { IconFrame } from "../components/icon-frame";
-import { ItemIcon } from "../components/item-icon";
+import { ItemArtFill, ItemIcon } from "../components/item-icon";
 import { EmptyState } from "../components/empty-state";
 import { ArtRowButton, RowText, List, ListRow } from "../components/list";
 import { Pagination } from "../components/pagination";
@@ -290,13 +289,7 @@ export function ForgeScreen() {
                 return (
                   <ArtRowButton
                     key={ore.id}
-                    art={
-                      fragment ? (
-                        <ItemIcon item={fragment} size="large" />
-                      ) : (
-                        <IconFrame size="large" tone="empty" />
-                      )
-                    }
+                    art={fragment ? <ItemArtFill item={fragment} /> : null}
                     divided
                     title={ore.label}
                     description={

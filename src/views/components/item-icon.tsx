@@ -59,3 +59,17 @@ export function ItemBanner({ item, enhancement = 0 }: { item: Item; enhancement?
     </div>
   );
 }
+
+export function ItemArtFill({ item }: { item: Item }) {
+  const source = useItemArt(item);
+
+  if (!source) {
+    return (
+      <span className="grid h-full w-full place-items-center font-mono text-sm tracking-widest text-ink-faint">
+        {itemInitials(item.name)}
+      </span>
+    );
+  }
+
+  return <ArtImage source={source} fit="contain" />;
+}
