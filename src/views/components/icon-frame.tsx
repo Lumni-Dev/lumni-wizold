@@ -136,7 +136,7 @@ export function IconArt({
         }}
         onError={() => onFail?.()}
         className={cn(
-          "h-full w-full drop-shadow-[0_2px_4px_rgba(0,0,0,0.55)] transition-opacity duration-300",
+          "art-soft-shadow h-full w-full transition-opacity duration-300",
           fit === "contain" ? "object-contain" : "object-cover",
           loaded ? "opacity-100" : "opacity-0",
           zoom && "cursor-zoom-in",
@@ -169,7 +169,7 @@ export function IconArt({
                   alt=""
                   referrerPolicy="no-referrer"
                   className={cn(
-                    "h-full w-full drop-shadow-[0_2px_4px_rgba(0,0,0,0.55)]",
+                    "art-soft-shadow h-full w-full",
                     fit === "contain" ? "object-contain" : "object-cover",
                     inset ? "p-[16px]" : "p-[14px]",
                   )}

@@ -38,7 +38,7 @@ export function ArtImage({
           setLoaded(true);
         }}
         className={cn(
-          "h-full w-full transition-opacity duration-300",
+          "art-soft-shadow h-full w-full transition-opacity duration-300",
           fit === "contain" ? "object-contain" : "object-cover",
           loaded ? "opacity-100" : "opacity-0",
         )}
