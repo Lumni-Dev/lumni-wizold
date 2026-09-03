@@ -262,7 +262,7 @@ export function SettingsScreen() {
             <div className={cn("flex items-center gap-3 border-b border-edge p-4", ICON_FRAME_INSET)}>
               {accountPicture ? (
                 <IconFrame size="medium" tone="strong">
-                  <IconArt source={accountPicture} padded={false} />
+                  <IconArt source={accountPicture} padded={false} zoom={false} />
                 </IconFrame>
               ) : (
                 <GenderIcon gender={character.gender} size="medium" />

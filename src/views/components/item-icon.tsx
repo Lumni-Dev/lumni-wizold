@@ -20,7 +20,12 @@ export function ItemIcon({
   return (
     <IconFrame size={size} className={source ? undefined : "tracking-widest"}>
       {source ? (
-        <IconArt source={source} glow badge={enhancement > 0 ? "+" + enhancement : undefined} />
+        <IconArt
+          source={source}
+          fit="contain"
+          glow
+          badge={enhancement > 0 ? "+" + enhancement : undefined}
+        />
       ) : (
         itemInitials(item.name)
       )}

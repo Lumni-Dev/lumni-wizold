@@ -69,7 +69,7 @@ export function IconFrame({
     </span>
   );
 }
-const PREVIEW_SIZE = 220;
+const PREVIEW_SIZE = 260;
 const ICON_PAD = "p-[5px]";
 export function IconArt({
   source,
