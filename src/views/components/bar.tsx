@@ -28,6 +28,7 @@ interface BarProps {
   tone?: BarTone;
   glows?: boolean;
   prominent?: boolean;
+  unit?: string;
   className?: string;
 }
 
@@ -45,6 +46,7 @@ export function Bar({
   tone = "light",
   glows = false,
   prominent = false,
+  unit,
   className,
 }: BarProps) {
   const target = percentage(current, maximum);
@@ -85,6 +87,7 @@ export function Bar({
         <span className="shrink-0 font-mono text-[11px] text-ink-soft">
           {formatNumber(current)}
           <span className="text-ink-faint">/{formatNumber(maximum)}</span>
+          {unit ? <span className="text-ink-faint"> {unit}</span> : null}
         </span>
       </div>
       <div

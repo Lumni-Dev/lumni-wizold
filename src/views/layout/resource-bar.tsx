@@ -32,7 +32,14 @@ export function ResourceBar() {
             tone="blood"
             prominent
           />
-          <Bar label="Baú" current={character.bronze} maximum={BAU_LIMIT} tone="ember" prominent />
+          <Bar
+            label="Baú"
+            current={character.bronze}
+            maximum={BAU_LIMIT}
+            tone="ember"
+            prominent
+            unit="WCoins"
+          />
           <Bar
             label={"Experiência (NV. " + formatNumber(character.level) + ")"}
             current={character.experience}
