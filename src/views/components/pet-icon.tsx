@@ -19,7 +19,7 @@ export function PetLandingBanner({ gender }: { gender: PetGender }) {
 
   return (
     <div className="aspect-square w-full overflow-hidden border-b border-edge p-4">
-      <ArtImage source={source} fit="contain" className={PET_ART_IMAGE_CLASS} />
+      <ArtImage source={source} fit="contain" />
     </div>
   );
 }

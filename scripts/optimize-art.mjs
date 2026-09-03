@@ -27,7 +27,7 @@ const MAX_SIZE = {
   attributes: 512,
   training: 512,
   genders: 512,
-  pet: 400,
+  pet: 1024,
 };
 
 const DEFAULT_SIZE = 512;
@@ -36,6 +36,7 @@ const QUALITY = {
   attributes: 95,
   training: 95,
   genders: 95,
+  pet: 95,
 };
 
 const force = process.argv.includes("--force");

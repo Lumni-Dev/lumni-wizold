@@ -87,7 +87,6 @@
     background-size: auto, cover;
     background-position: center top, center top;
     background-repeat: no-repeat;
-    filter: sepia(0.4) hue-rotate(-8deg) saturate(1.05);
   }
 
   body.landing-page {
@@ -98,8 +97,10 @@
     opacity: 0;
   }
 
-  .live-backdrop-media {
-    filter: sepia(0.4) hue-rotate(-8deg) saturate(1.05);
+  body::before,
+  .live-backdrop-media,
+  .video-ember-tone {
+    filter: sepia(0.58) hue-rotate(16deg) saturate(1.38) brightness(0.93);
   }
 
   .live-backdrop-shade {

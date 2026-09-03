@@ -142,7 +142,7 @@ export function LandingScreen() {
             {LORE_COMPANIONS.map((companion) => (
               <article
                 key={companion.gender}
-                className={cn("overflow-hidden rounded-lg border border-edge", GLASS_SECTION)}
+                className={cn("relative overflow-hidden rounded-lg border border-edge", GLASS_SECTION)}
               >
                 <PetLandingBanner gender={companion.gender} />
                 <div className="space-y-3 p-6 md:p-8">
@@ -153,6 +153,7 @@ export function LandingScreen() {
                     onClick={() => narration.toggle(companion.voice)}
                   />
                 </div>
+                <CornerAccents inside />
               </article>
             ))}
           </div>

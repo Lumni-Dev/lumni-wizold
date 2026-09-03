@@ -49,7 +49,7 @@ export function ArtVideo({
     };
   }, [source]);
 
-  if (failed) return <ArtImage source={poster} className={className} />;
+  if (failed) return <ArtImage source={poster} className={cn("video-ember-tone", className)} />;
 
   return (
     <video
@@ -61,7 +61,7 @@ export function ArtVideo({
       playsInline
       preload="metadata"
       onError={() => setFailed(true)}
-      className={cn("h-full w-full object-cover", className)}
+      className={cn("video-ember-tone h-full w-full object-cover", className)}
     />
   );
 }
