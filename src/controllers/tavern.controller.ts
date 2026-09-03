@@ -6,7 +6,7 @@ import {
   nextRoomNumber,
   MAX_ROOM_MEMBERS,
   MAX_ROOM_MESSAGES,
-  MESSAGE_COOLDOWN_MS,
+  messageCooldownOf,
   MESSAGE_MAX_LENGTH,
   MEMBER_TIMEOUT_MS,
   OPEN_ROOM_MIN_LEVEL,
@@ -377,18 +377,19 @@ export function sendMessage(
     return fail(state, "Esse link não é permitido na taverna.");
   }
 
-  const lastOwn = [...room.messages]
-    .reverse()
-    .find((message) => message.authorId === identity.id);
+  const cooldown = messageCooldownOf(room);
+  const lastOwn = cooldown
+    ? [...room.messages].reverse().find((message) => message.authorId === identity.id)
+    : undefined;
   if (lastOwn) {
     const elapsed = Date.now() - Date.parse(lastOwn.at);
-    if (elapsed >= 0 && elapsed < MESSAGE_COOLDOWN_MS) {
+    if (elapsed >= 0 && elapsed < cooldown) {
       return fail(
         state,
         "Uma fala a cada " +
-          MESSAGE_COOLDOWN_MS / 1000 +
+          cooldown / 1000 +
           " segundos: espere " +
-          Math.ceil((MESSAGE_COOLDOWN_MS - elapsed) / 1000) +
+          Math.ceil((cooldown - elapsed) / 1000) +
           "s.",
       );
     }

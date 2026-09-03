@@ -41,6 +41,7 @@ const PROTOCOL_URL = /https?:\/\/[^\s]+/gi;
 const WWW_URL = /\bwww\.[^\s]+/gi;
 const BARE_DOMAIN =
   /\b(?:[a-z0-9][a-z0-9-]*\.)+(?:com\.br|com|net|org|br|io|gg|app|dev|xyz|me|co|tv|site|online|link)(?:\/[^\s]*)?/gi;
+const EMAIL = /\b[a-z0-9._%+-]+@[a-z0-9][a-z0-9-]*(?:\.[a-z0-9-]+)+\b/gi;
 const TRAILING_PUNCT = /[),.!?;:]+$/;
 
 export type ChatTextPart =
@@ -72,11 +73,18 @@ function isAllowedLinkHost(host: string): boolean {
   );
 }
 
+/** Blanks out e-mail addresses, keeping every index, so a host inside one is never read as a link. */
+function withoutEmails(value: string): string {
+  EMAIL.lastIndex = 0;
+  return value.replace(EMAIL, (match) => " ".repeat(match.length));
+}
+
 function linkTokensOf(value: string): string[] {
   const tokens = new Set<string>();
+  const text = withoutEmails(value);
   for (const pattern of [PROTOCOL_URL, WWW_URL, BARE_DOMAIN]) {
     pattern.lastIndex = 0;
-    for (const match of value.matchAll(pattern)) {
+    for (const match of text.matchAll(pattern)) {
       tokens.add(match[0]);
     }
   }
@@ -101,9 +109,10 @@ export function chatLinkHref(token: string): string {
 
 function linkSpansOf(value: string): { start: number; end: number; raw: string }[] {
   const spans: { start: number; end: number; raw: string }[] = [];
+  const text = withoutEmails(value);
   for (const pattern of [PROTOCOL_URL, WWW_URL, BARE_DOMAIN]) {
     pattern.lastIndex = 0;
-    for (const match of value.matchAll(pattern)) {
+    for (const match of text.matchAll(pattern)) {
       if (match.index === undefined) continue;
       spans.push({ start: match.index, end: match.index + match[0].length, raw: match[0] });
     }

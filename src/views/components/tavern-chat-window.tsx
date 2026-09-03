@@ -25,7 +25,7 @@ import {
   tavernSentRepository,
   type TavernSentMap,
 } from "@/models/repositories/tavern-sent.repository";
-import { MESSAGE_COOLDOWN_MS, roomTitle } from "@/models/entities/tavern";
+import { messageCooldownOf, roomTitle } from "@/models/entities/tavern";
 import { CornerAccents } from "./corner-accents";
 import { TavernRoomNumber } from "./tavern-room-number";
 import {
@@ -120,16 +120,18 @@ export function TavernChatWindow() {
     return null;
   }, [activeRoom, selfId]);
 
+  const chatCooldown = activeRoom ? messageCooldownOf(activeRoom) : 0;
+
   useEffect(() => {
     const compute = () => {
       const marker = chat.roomId ? sentMapRef.current[chat.roomId] : undefined;
       const left =
         marker !== undefined
-          ? MESSAGE_COOLDOWN_MS - (Date.now() - marker)
+          ? chatCooldown - (Date.now() - marker)
           : lastMineAt
-            ? MESSAGE_COOLDOWN_MS - (Date.now() - Date.parse(lastMineAt))
+            ? chatCooldown - (Date.now() - Date.parse(lastMineAt))
             : 0;
-      return Math.max(0, Math.min(MESSAGE_COOLDOWN_MS, left));
+      return Math.max(0, Math.min(chatCooldown, left));
     };
     const tick = () => {
       const left = compute();
@@ -142,7 +144,7 @@ export function TavernChatWindow() {
       window.clearTimeout(first);
       window.clearInterval(interval);
     };
-  }, [lastMineAt, chat.roomId, sentBeat]);
+  }, [lastMineAt, chat.roomId, sentBeat, chatCooldown]);
 
   const lastMessageAt = activeRoom?.messages[activeRoom.messages.length - 1]?.at ?? null;
   useEffect(() => {

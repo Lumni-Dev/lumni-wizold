@@ -2128,12 +2128,12 @@ sec("taverna");
     const last = seatRoom.messages[seatRoom.messages.length - 1];
     if (last) last.at = new Date(Date.now() - 60000).toISOString();
   };
-  for (let index = 0; index < 50; index += 1) {
+  for (let index = 0; index < entTavern.MAX_ROOM_MESSAGES + 10; index += 1) {
     tavern = tavernCtrl.sendMessage(tavern, opened.roomId, me, "eco " + index).state;
     backdate();
   }
   ok(
-    "mesa guarda 40 falas",
+    "mesa guarda " + entTavern.MAX_ROOM_MESSAGES + " falas",
     tavernCtrl.findRoom(tavern, opened.roomId).messages.length === entTavern.MAX_ROOM_MESSAGES,
   );
   const rushedFirst = tavernCtrl.sendMessage(tavern, opened.roomId, me, "primeira do compasso");
@@ -2234,6 +2234,27 @@ sec("taverna");
     ok(
       "site recusado não vira link",
       blocked.every((part) => part.kind === "text"),
+    );
+  }
+  ok(
+    "e-mail passa na mesa",
+    tavernCtrl.sendMessage(tavern, opened.roomId, me, "me chama em daniel@gmail.com").ok === true,
+  );
+  ok(
+    "e-mail com dominio de fora passa",
+    tavernCtrl.sendMessage(tavern, opened.roomId, other, "escreve para lobo@malicioso.net").ok ===
+      true,
+  );
+  ok(
+    "link solto ao lado do e-mail ainda recusa",
+    tavernCtrl.sendMessage(tavern, opened.roomId, me, "daniel@gmail.com e https://malicioso.net/x")
+      .ok === false,
+  );
+  {
+    const mail = splitChatLinks("me chama em daniel@gmail.com agora");
+    ok(
+      "e-mail nao vira link",
+      mail.length === 1 && mail[0].kind === "text" && mail[0].value === "me chama em daniel@gmail.com agora",
     );
   }
   ok(
@@ -2357,6 +2378,17 @@ sec("taverna");
   );
   const reopened = tavernCtrl.openDirect(tavern, me, other);
   ok("reabrir acha a mesma mesa", reopened.ok && reopened.roomId === direct.roomId);
+  const dmFirst = tavernCtrl.sendMessage(tavern, direct.roomId, me, "primeira sem espera");
+  ok("mesa reservada aceita a fala", dmFirst.ok === true);
+  ok(
+    "mesa reservada fala sem compasso",
+    tavernCtrl.sendMessage(dmFirst.state, direct.roomId, me, "segunda imediata").ok === true,
+  );
+  ok(
+    "o compasso pertence a mesa aberta",
+    entTavern.messageCooldownOf({ privateFor: ["a", "b"] }) === 0 &&
+      entTavern.messageCooldownOf({}) === entTavern.MESSAGE_COOLDOWN_MS,
+  );
   {
     const nicks = load("models/rules/tavern-nicks.js");
     ok("primeiro assento pega a cor 0", nicks.claimNickColor([], 20) === 0);

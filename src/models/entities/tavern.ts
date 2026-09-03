@@ -80,6 +80,9 @@ export function roomMatchesSearch(
 export function isPrivateTable(room: TavernRoom): boolean {
   return Array.isArray(room.privateFor);
 }
+export function messageCooldownOf(room: Pick<TavernRoom, "privateFor">): number {
+  return Array.isArray(room.privateFor) ? 0 : MESSAGE_COOLDOWN_MS;
+}
 export interface TavernState {
   version: number;
   rooms: TavernRoom[];

@@ -21,7 +21,7 @@ import {
 } from "@/models/repositories/tavern-sent.repository";
 import {
   MAX_ROOM_MEMBERS,
-  MESSAGE_COOLDOWN_MS,
+  messageCooldownOf,
   OPEN_ROOM_MIN_LEVEL,
   ROOM_NAME_MAX_LENGTH,
   canOpenUnlockedRoom,
@@ -267,17 +267,19 @@ export function TavernScreen() {
     return null;
   }, [activeRoom, selfId]);
 
+  const chatCooldown = activeRoom ? messageCooldownOf(activeRoom) : 0;
+
   useEffect(() => {
     if (!mobileChat || !openRoomId) return;
     const compute = () => {
       const marker = sentMapRef.current[openRoomId];
       const left =
         marker !== undefined
-          ? MESSAGE_COOLDOWN_MS - (Date.now() - marker)
+          ? chatCooldown - (Date.now() - marker)
           : lastMineAt
-            ? MESSAGE_COOLDOWN_MS - (Date.now() - Date.parse(lastMineAt))
+            ? chatCooldown - (Date.now() - Date.parse(lastMineAt))
             : 0;
-      return Math.max(0, Math.min(MESSAGE_COOLDOWN_MS, left));
+      return Math.max(0, Math.min(chatCooldown, left));
     };
     const tick = () => {
       const left = compute();
@@ -290,7 +292,7 @@ export function TavernScreen() {
       window.clearTimeout(first);
       window.clearInterval(interval);
     };
-  }, [mobileChat, lastMineAt, openRoomId, sentBeat]);
+  }, [mobileChat, lastMineAt, openRoomId, sentBeat, chatCooldown]);
 
   const lastMessageAt = activeRoom?.messages[activeRoom.messages.length - 1]?.at ?? null;
   useEffect(() => {

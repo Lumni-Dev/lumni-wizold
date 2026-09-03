@@ -418,12 +418,14 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         MAX_ROOM_MESSAGES +
         " falas: o que veio antes a noite leva.",
       "Links de Wizold, Lumni, Twitch, YouTube, Instagram, Facebook, WhatsApp, TikTok e X passam e abrem numa aba nova; qualquer outro endereço é recusado.",
+      "E-mail passa inteiro na fala, mas fica como texto: ninguém clica nele por engano.",
       "Nomes de caçador e mesa passam por moderação na hora. A fala entra na mesa na hora; se a auditoria achar insulto, racismo ou pedofilia, vira Conteúdo impróprio.",
       "Cada fala cabe em " +
         MESSAGE_MAX_LENGTH +
-        " caracteres, e a mesa aceita uma sua a cada " +
+        " caracteres, e a mesa aberta aceita uma sua a cada " +
         MESSAGE_COOLDOWN_MS / 1000 +
-        " segundos: conversa tem compasso.",
+        " segundos: conversa de muitos tem compasso.",
+      "Na mesa reservada não há espera entre as falas: são duas pessoas, e ninguém precisa esperar a vez.",
       "Fechar a janela da conversa não é sair da mesa: o lugar continua seu e Sentar devolve a mesma cadeira.",
       "A mesa some do quadro quando a última pessoa sai, quando o dono a fecha, ou quando ninguém volta em " +
         MEMBER_TIMEOUT_MS / (60 * 60 * 1000) +
