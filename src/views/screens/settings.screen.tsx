@@ -15,6 +15,7 @@ import { musicRepository } from "@/models/repositories/music.repository";
 import { soundRepository } from "@/models/repositories/sound.repository";
 import { tavernPushRepository } from "@/models/repositories/tavern-push.repository";
 import { NAME_MAX_LENGTH, RENAME_COOLDOWN_DAYS, RENAME_PRICE } from "@/shared/constants/game";
+import { TWO_FACTOR_CODE_LENGTH } from "@/shared/constants/auth";
 import { BRAND_LOGO_PNG_PATH, BRAND_LOGO_WEBP_PATH } from "@/shared/constants/site";
 import { formatNumber, formatBronze, formatReais, formatDay } from "@/shared/utils/format";
 import { sanitizeName } from "@/shared/utils/text";
@@ -760,10 +761,12 @@ export function SettingsScreen() {
           <Field
             label="Código"
             numeric
-            maxLength={8}
+            maxLength={TWO_FACTOR_CODE_LENGTH}
             value={twoFactorCode}
             autoComplete="one-time-code"
-            onChange={(event) => setTwoFactorCode(event.target.value.slice(0, 8))}
+            onChange={(event) =>
+              setTwoFactorCode(event.target.value.slice(0, TWO_FACTOR_CODE_LENGTH))
+            }
           />
         </div>
       </Modal>

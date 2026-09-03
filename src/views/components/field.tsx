@@ -19,6 +19,7 @@ export function Field({
   accent = false,
   className,
   onChange,
+  maxLength,
   ...rest
 }: FieldProps) {
   return (
@@ -37,10 +38,15 @@ export function Field({
             className,
           )}
           {...rest}
+          maxLength={maxLength}
           type={numeric ? "text" : rest.type}
           inputMode={numeric ? "numeric" : rest.inputMode}
           onChange={(event) => {
-            if (numeric) event.target.value = event.target.value.replace(/\D/g, "");
+            if (numeric) {
+              let value = event.target.value.replace(/\D/g, "");
+              if (maxLength !== undefined) value = value.slice(0, maxLength);
+              event.target.value = value;
+            }
             onChange?.(event);
           }}
         />

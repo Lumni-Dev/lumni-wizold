@@ -6,6 +6,7 @@ import { useGame } from "@/controllers/game.context";
 import { playSound } from "@/controllers/sound";
 import { loadBirth, saveBirth } from "@/models/repositories/birth.repository";
 import { GAME_NAME, MIN_AGE } from "@/shared/constants/game";
+import { TWO_FACTOR_CODE_LENGTH } from "@/shared/constants/auth";
 import { BRAND_ICON_PATH } from "@/shared/constants/site";
 import { GLASS_SECTION } from "@/shared/constants/ui";
 import { ageOf, EMPTY_BIRTH, isRealBirth } from "@/shared/utils/birth";
@@ -247,10 +248,12 @@ export function LoginScreen() {
                   <Field
                     label="Código"
                     numeric
-                    maxLength={8}
+                    maxLength={TWO_FACTOR_CODE_LENGTH}
                     value={twoFactorCode}
                     autoComplete="one-time-code"
-                    onChange={(event) => setTwoFactorCode(event.target.value.slice(0, 8))}
+                    onChange={(event) =>
+                      setTwoFactorCode(event.target.value.slice(0, TWO_FACTOR_CODE_LENGTH))
+                    }
                   />
                   <div className="grid grid-cols-2 gap-2">
                     <Button
