@@ -6,7 +6,7 @@ import type { TavernIdentity, TavernState } from "@/models/entities/tavern";
 import { isVip } from "@/models/rules/vip";
 import { syncCharacter } from "@/controllers/character.controller";
 import { withTransaction } from "@/models/repositories/server/database";
-import { loadGame, saveGame, type LoadedGame } from "@/models/repositories/server/game.store";
+import { loadGame, readActivity, saveGame, type LoadedGame } from "@/models/repositories/server/game.store";
 import { isTutorialDone } from "@/models/repositories/server/user.store";
 import {
   loadRoomState,
@@ -125,7 +125,8 @@ export async function withGame<T>(request: Request, action: GameAction<T>): Prom
         await recordClientVersion(client, userId, request.headers.get("x-game-version"));
       }
       const tutorial = await isTutorialDone(client, userId);
-      return reply(result, { tutorial });
+      const { activity } = await readActivity(client, loaded.characterId);
+      return reply(result, { tutorial, activity });
     });
   } catch (error) {
     console.error("[api]", request.method, new URL(request.url).pathname, error);

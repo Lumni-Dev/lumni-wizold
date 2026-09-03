@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { activityRuntimeStore } from "@/controllers/activity-runtime";
-import { activityMirrorStore, askToStop } from "@/controllers/activity-sync";
 import { findForgePiece, listMining } from "@/controllers/forge.controller";
 import { listTerritories, resolveHuntCreatureId } from "@/controllers/hunt.controller";
 import { useGame } from "@/controllers/game.context";
@@ -38,18 +37,11 @@ export function ActivityDock() {
     activityRuntimeStore.snapshot,
     activityRuntimeStore.serverSnapshot,
   );
-  const mirror = useSyncExternalStore(
-    activityMirrorStore.subscribe,
-    activityMirrorStore.snapshot,
-    activityMirrorStore.serverSnapshot,
-  );
-  const running = activity ?? mirror?.activity ?? null;
+  const running = activity;
   const dock = runtime.dock;
-  const owner = mirror?.tab ?? null;
   const stop = useCallback(() => {
     if (activity) setActivity(null);
-    else if (owner) askToStop(owner);
-  }, [activity, owner, setActivity]);
+  }, [activity, setActivity]);
   const minimized = useSyncExternalStore(
     dockRepository.subscribe,
     dockRepository.minimized,

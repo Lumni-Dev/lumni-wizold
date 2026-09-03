@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { findForgePiece } from "@/controllers/forge.controller";
 import {
   listTerritories,
@@ -9,7 +9,6 @@ import {
 } from "@/controllers/hunt.controller";
 import { listExercises } from "@/controllers/training.controller";
 import { loadHuntSelection } from "@/models/repositories/hunt-selection.repository";
-import { progressRepository } from "@/models/repositories/progress.repository";
 import type { Activity } from "@/models/entities/activity";
 import type { GameState } from "@/models/entities/game-state";
 import { findItem } from "@/models/data/items";
@@ -37,11 +36,14 @@ import {
   patchActivityRuntime,
   type ActivityDockView,
 } from "./activity-runtime";
-import { activityMirrorStore } from "./activity-sync";
 
-function idleRuntime(patch: Parameters<typeof patchActivityRuntime>[0]): void {
-  if (activityMirrorStore.snapshot()) return;
+function patchRuntime(patch: Parameters<typeof patchActivityRuntime>[0]): void {
   patchActivityRuntime(patch);
+}
+
+function cooldownLeft(activity: Activity | null): number {
+  if (!activity?.cooldownUntil) return 0;
+  return Math.max(0, Math.ceil((Date.parse(activity.cooldownUntil) - Date.now()) / 1000));
 }
 
 const HUNT_READY_KEY = "lumni-wizold:hunt-ready";
@@ -122,6 +124,7 @@ export function ActivityEngine() {
     ready,
     activity,
     setActivity,
+    syncProgress,
     state,
     hunt,
     landHunt,
@@ -131,6 +134,16 @@ export function ActivityEngine() {
     enhance,
     notify,
   } = useGame();
+
+  const [visible, setVisible] = useState(
+    () => typeof document === "undefined" || document.visibilityState === "visible",
+  );
+
+  useEffect(() => {
+    const onVis = () => setVisible(document.visibilityState === "visible");
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, []);
 
   const stateRef = useRef(state);
   const autoRef = useRef(state.automation);
@@ -142,6 +155,7 @@ export function ActivityEngine() {
   const enhanceRef = useRef(enhance);
   const notifyRef = useRef(notify);
   const setActivityRef = useRef(setActivity);
+  const syncProgressRef = useRef(syncProgress);
 
   useEffect(() => {
     stateRef.current = state;
@@ -154,16 +168,17 @@ export function ActivityEngine() {
     enhanceRef.current = enhance;
     notifyRef.current = notify;
     setActivityRef.current = setActivity;
+    syncProgressRef.current = syncProgress;
   });
 
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || !visible) return;
     const paused = activity?.paused === true;
     const activeHunt =
       activity?.kind === "hunt" && !paused && activity.id ? activity.id : null;
 
     if (!activeHunt) {
-      idleRuntime({ hunt: null });
+      patchRuntime({ hunt: null });
       return;
     }
 
@@ -251,8 +266,7 @@ export function ActivityEngine() {
       });
     };
 
-    const startCooldown = () => {
-      let left = CYCLE_OPTOUT_SECS;
+    const startCooldown = (left = CYCLE_OPTOUT_SECS) => {
       push(left);
       coolTimer = window.setInterval(() => {
         left -= 1;
@@ -337,16 +351,16 @@ export function ActivityEngine() {
       if (fillTimer) window.clearTimeout(fillTimer);
       if (pending) landHuntRef.current();
     };
-  }, [ready, activity?.kind, activity?.id, activity?.paused]);
+  }, [ready, visible, activity?.kind, activity?.id, activity?.paused]);
 
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || !visible) return;
     const paused = activity?.paused === true;
     const activeExercise =
       activity?.kind === "train" && !paused && activity.id ? activity.id : null;
 
     if (!activeExercise) {
-      idleRuntime({ train: null });
+      patchRuntime({ train: null });
       return;
     }
 
@@ -358,8 +372,7 @@ export function ActivityEngine() {
     let alive = true;
     let barTimer = 0;
     let coolTimer = 0;
-    const bank = "train:" + activeExercise;
-    let carry = progressRepository.get(bank, trainingSessionTicks());
+    let carry = activity?.beat ?? 0;
     let beat = 0;
     let ticks = trainingSessionTicks();
     let resumable = true;
@@ -377,8 +390,7 @@ export function ActivityEngine() {
           ? "Treino do lobo"
           : (exercises.find((row) => row.exercise.id === activeExercise)?.exercise.name ??
             "Treino");
-      progressRepository.set(bank, beat);
-      patchActivityRuntime({
+      patchRuntime({
         train: { id: activeExercise, beat, max: ticks, cooldown },
         dock: dockOf("train", label, "Sessão em andamento", beat, ticks, cooldown),
       });
@@ -388,9 +400,11 @@ export function ActivityEngine() {
       ticks = trainingSessionTicks();
       beat = Math.min(carry, Math.max(0, ticks - 1));
       carry = 0;
+      syncProgressRef.current({ beat, cooldownUntil: null });
       push(null);
       barTimer = window.setInterval(() => {
         beat += 1;
+        syncProgressRef.current({ beat, cooldownUntil: null });
         push(null);
         if (beat < ticks) {
           const effort = activeExercise === PET_EXERCISE_ID ? "growl" : activeExercise;
@@ -413,7 +427,7 @@ export function ActivityEngine() {
               }
             }
             beat = 0;
-            progressRepository.clear(bank);
+            syncProgressRef.current({ beat: 0, cooldownUntil: null });
             if (!landed) {
               setActivityRef.current(
                 autoRef.current.train && resumable
@@ -426,15 +440,16 @@ export function ActivityEngine() {
               setActivityRef.current(null);
               return;
             }
-            startCooldown();
+            startCooldown(CYCLE_OPTOUT_SECS);
           });
         };
         settle();
       }, TRAINING_TICK_MS);
     };
 
-    const startCooldown = () => {
-      let left = CYCLE_OPTOUT_SECS;
+    const startCooldown = (left = CYCLE_OPTOUT_SECS) => {
+      const until = new Date(Date.now() + left * 1000).toISOString();
+      syncProgressRef.current({ beat: 0, cooldownUntil: until });
       push(left);
       coolTimer = window.setInterval(() => {
         left -= 1;
@@ -448,35 +463,35 @@ export function ActivityEngine() {
       }, 1000);
     };
 
-    startBar();
+    const resumeCooldown = cooldownLeft(activity);
+    if (resumeCooldown > 0) startCooldown(resumeCooldown);
+    else startBar();
     return () => {
       alive = false;
       if (barTimer) window.clearInterval(barTimer);
       if (coolTimer) window.clearInterval(coolTimer);
     };
-  }, [ready, activity?.kind, activity?.id, activity?.paused]);
+  }, [ready, visible, activity?.kind, activity?.id, activity?.paused, activity?.beat, activity?.cooldownUntil]);
 
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || !visible) return;
     const paused = activity?.paused === true;
     const activeOre = activity?.kind === "mine" && !paused && activity.id ? activity.id : null;
 
     if (!activeOre) {
-      idleRuntime({ mine: null });
+      patchRuntime({ mine: null });
       return;
     }
 
     let alive = true;
     let barTimer = 0;
     let coolTimer = 0;
-    const bank = "mine:" + activeOre;
-    let carry = progressRepository.get(bank, miningSwingTicks());
+    let carry = activity?.beat ?? 0;
     let beat = 0;
     let ticks = miningSwingTicks();
 
     const push = (cooldown: number | null) => {
       const name = findItem(activeOre)?.name ?? "Mina";
-      progressRepository.set(bank, beat);
       patchActivityRuntime({
         mine: { id: activeOre, beat, max: ticks, cooldown },
         dock: dockOf("mine", "Minerando · " + name, "Golpe da picareta", beat, ticks, cooldown),
@@ -487,9 +502,11 @@ export function ActivityEngine() {
       ticks = miningSwingTicks();
       beat = Math.min(carry, Math.max(0, ticks - 1));
       carry = 0;
+      syncProgressRef.current({ beat, cooldownUntil: null });
       push(null);
       barTimer = window.setInterval(() => {
         beat += 1;
+        syncProgressRef.current({ beat, cooldownUntil: null });
         playSound("mine");
         push(null);
         if (beat < ticks) return;
@@ -503,7 +520,7 @@ export function ActivityEngine() {
               return;
             }
             beat = 0;
-            progressRepository.clear(bank);
+            syncProgressRef.current({ beat: 0, cooldownUntil: null });
             if (!mined) {
               setActivityRef.current(
                 autoRef.current.mine ? { kind: "mine", id: activeOre, paused: true } : null,
@@ -514,15 +531,16 @@ export function ActivityEngine() {
               setActivityRef.current(null);
               return;
             }
-            startCooldown();
+            startCooldown(CYCLE_OPTOUT_SECS);
           });
         };
         settle();
       }, MINING_TICK_MS);
     };
 
-    const startCooldown = () => {
-      let left = CYCLE_OPTOUT_SECS;
+    const startCooldown = (left = CYCLE_OPTOUT_SECS) => {
+      const until = new Date(Date.now() + left * 1000).toISOString();
+      syncProgressRef.current({ beat: 0, cooldownUntil: until });
       push(left);
       coolTimer = window.setInterval(() => {
         left -= 1;
@@ -536,38 +554,38 @@ export function ActivityEngine() {
       }, 1000);
     };
 
-    startBar();
+    const resumeCooldown = cooldownLeft(activity);
+    if (resumeCooldown > 0) startCooldown(resumeCooldown);
+    else startBar();
     return () => {
       alive = false;
       if (barTimer) window.clearInterval(barTimer);
       if (coolTimer) window.clearInterval(coolTimer);
     };
-  }, [ready, activity?.kind, activity?.id, activity?.paused]);
+  }, [ready, visible, activity?.kind, activity?.id, activity?.paused, activity?.beat, activity?.cooldownUntil]);
 
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || !visible) return;
     const paused = activity?.paused === true;
     const activeItem =
       activity?.kind === "forge" && !paused && activity.id ? activity.id : null;
     const startLevel = activity?.kind === "forge" ? (activity.enhancement ?? 0) : 0;
 
     if (!activeItem) {
-      idleRuntime({ forge: null });
+      patchRuntime({ forge: null });
       return;
     }
 
     let alive = true;
     let barTimer = 0;
     let coolTimer = 0;
-    const bank = "forge:" + activeItem;
-    let carry = progressRepository.get(bank, FORGE_TICKS);
+    let carry = activity?.beat ?? 0;
     let beat = 0;
     let level = startLevel;
 
     const push = (cooldown: number | null) => {
       const slot = findForgePiece(stateRef.current, activeItem, level);
       const name = slot?.item.name ?? activeItem;
-      progressRepository.set(bank, beat);
       patchActivityRuntime({
         forge: { id: activeItem, beat, max: FORGE_TICKS, cooldown, level },
         dock: dockOf(
@@ -585,9 +603,11 @@ export function ActivityEngine() {
       const tickMs = forgeDurationMs(level) / FORGE_TICKS;
       beat = Math.min(carry, Math.max(0, FORGE_TICKS - 1));
       carry = 0;
+      syncProgressRef.current({ beat, cooldownUntil: null });
       push(null);
       barTimer = window.setInterval(() => {
         beat += 1;
+        syncProgressRef.current({ beat, cooldownUntil: null });
         push(null);
         if (beat < FORGE_TICKS) {
           playSound("forge");
@@ -608,7 +628,7 @@ export function ActivityEngine() {
               if (landed.raised) level += 1;
             }
             beat = 0;
-            progressRepository.clear(bank);
+            syncProgressRef.current({ beat: 0, cooldownUntil: null });
             if (!landed) {
               setActivityRef.current(
                 autoRef.current.forge
@@ -621,15 +641,16 @@ export function ActivityEngine() {
               setActivityRef.current(null);
               return;
             }
-            startCooldown();
+            startCooldown(CYCLE_OPTOUT_SECS);
           });
         };
         settle();
       }, tickMs);
     };
 
-    const startCooldown = () => {
-      let left = CYCLE_OPTOUT_SECS;
+    const startCooldown = (left = CYCLE_OPTOUT_SECS) => {
+      const until = new Date(Date.now() + left * 1000).toISOString();
+      syncProgressRef.current({ beat: 0, cooldownUntil: until });
       push(left);
       coolTimer = window.setInterval(() => {
         left -= 1;
@@ -643,18 +664,20 @@ export function ActivityEngine() {
       }, 1000);
     };
 
-    startBar();
+    const resumeCooldown = cooldownLeft(activity);
+    if (resumeCooldown > 0) startCooldown(resumeCooldown);
+    else startBar();
     return () => {
       alive = false;
       if (barTimer) window.clearInterval(barTimer);
       if (coolTimer) window.clearInterval(coolTimer);
     };
-  }, [ready, activity?.kind, activity?.id, activity?.enhancement, activity?.paused]);
+  }, [ready, visible, activity?.kind, activity?.id, activity?.enhancement, activity?.paused, activity?.beat, activity?.cooldownUntil]);
 
   useEffect(() => {
     if (!ready) return;
     if (!activity) {
-      if (!activityMirrorStore.snapshot()) clearActivityRuntime();
+      clearActivityRuntime();
       return;
     }
     if (activity.kind === "rest") {

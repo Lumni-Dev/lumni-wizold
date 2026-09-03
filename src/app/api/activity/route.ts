@@ -1,7 +1,21 @@
 import { NextResponse } from "next/server";
 import { isActivityKind } from "@/models/entities/activity";
-import { updateActivity } from "@/models/repositories/server/game.store";
-import { asText, readBody, withIdentity } from "../_lib/api";
+import { readActivity, updateActivity } from "@/models/repositories/server/game.store";
+import { asInt, asText, readBody, withIdentity } from "../_lib/api";
+
+function readResume(body: Record<string, unknown>) {
+  const resume = body.resume;
+  if (typeof resume !== "object" || resume === null) {
+    return { resumeKind: null, resumeTargetId: null, resumeEnhancement: null };
+  }
+  const row = resume as Record<string, unknown>;
+  const kind = asText(row.kind, 16);
+  return {
+    resumeKind: isActivityKind(kind) ? kind : null,
+    resumeTargetId: asText(row.id, 120) || null,
+    resumeEnhancement: typeof row.enhancement === "number" ? Math.round(row.enhancement) : null,
+  };
+}
 
 export async function PUT(request: Request) {
   return withIdentity(request, async (identity, client) => {
@@ -9,12 +23,25 @@ export async function PUT(request: Request) {
     const kind = asText(body.kind, 16);
     if (!kind) {
       await updateActivity(client, identity.id, null);
-      return NextResponse.json({ ok: true, message: "", data: null });
+      return NextResponse.json({ ok: true, message: "", data: null, activity: null });
     }
     if (!isActivityKind(kind)) {
       return NextResponse.json({ ok: false, message: "Atividade inválida.", data: null });
     }
-    await updateActivity(client, identity.id, { kind });
-    return NextResponse.json({ ok: true, message: "", data: null });
+    const resume = readResume(body);
+    await updateActivity(client, identity.id, {
+      kind,
+      targetId: asText(body.id, 120) || null,
+      enhancement: typeof body.enhancement === "number" ? Math.round(body.enhancement) : null,
+      paused: body.paused === true,
+      beat: Math.max(0, asInt(body.beat, 0)),
+      cooldownUntil: asText(body.cooldownUntil, 40) || null,
+      resumeKind: resume.resumeKind,
+      resumeTargetId: resume.resumeTargetId,
+      resumeEnhancement: resume.resumeEnhancement,
+      startedAt: kind === "rest" ? new Date().toISOString() : null,
+    });
+    const { activity } = await readActivity(client, identity.id);
+    return NextResponse.json({ ok: true, message: "", data: null, activity });
   });
 }

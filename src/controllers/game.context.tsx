@@ -20,7 +20,6 @@ import type { Character, Gender } from "@/models/entities/character";
 import type { Pet, PetGender } from "@/models/entities/pet";
 import type { PackInvite } from "@/models/entities/pack";
 import type { PresenceStatus } from "@/models/entities/presence";
-import { activityRepository } from "@/models/repositories/activity.repository";
 import { moonRepository } from "@/models/repositories/moon.repository";
 import type { MoonState } from "@/models/rules/moon";
 import {
@@ -40,21 +39,6 @@ import type { ArenaResolution } from "./arena.controller";
 import type { TrainingReport } from "./training.controller";
 import * as automationController from "./automation.controller";
 import { ActivityEngine } from "./activity-engine";
-import { activityRuntimeStore } from "./activity-runtime";
-import {
-  HANDSHAKE_MS,
-  OWNER_BEAT_MS,
-  activityMirrorStore,
-  announceBeat,
-  announceHello,
-  announceIdle,
-  dropMirror,
-  listenToTabs,
-  shareNotice,
-  shareState,
-  watchMirror,
-  yieldsTo,
-} from "./activity-sync";
 import { api, isTransientApiMessage, type ApiAnswer } from "./api.client";
 import { usePresenceHeartbeat } from "./use-presence-heartbeat";
 import { playSound, preloadSounds, setVoiceProfile } from "./sound";
@@ -105,6 +89,7 @@ interface GameContextValue {
   rest: () => Promise<void>;
   activity: Activity | null;
   setActivity: (activity: Activity | null) => void;
+  syncProgress: (patch: { beat: number; cooldownUntil?: string | null }) => void;
   train: (exerciseId: string) => Promise<{ message: string; raised: boolean } | "retry" | null>;
   hunt: (territoryId: string, creatureId?: string) => Promise<HuntAttempt>;
   landHunt: () => void;
@@ -169,7 +154,19 @@ interface HeldLanding {
   at: number;
 }
 const HELD_LANDING_TTL_MS = 30000;
-let ownedClaim: { activity: Activity; since: number } | null = null;
+
+function activityPayload(next: Activity | null): Record<string, unknown> | { kind: null } {
+  if (!next) return { kind: null };
+  return {
+    kind: next.kind,
+    id: next.id ?? null,
+    enhancement: next.enhancement ?? null,
+    paused: next.paused ?? false,
+    beat: next.beat ?? 0,
+    cooldownUntil: next.cooldownUntil ?? null,
+    resume: next.resume ?? null,
+  };
+}
 
 export function GameProvider({ children }: { children: ReactNode }) {
   const hydrated = useSyncExternalStore(
@@ -182,9 +179,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [authenticated, setAuthenticated] = useState(false);
   const [tutorial, setTutorial] = useState(true);
   const [notices, setNotices] = useState<Notice[]>([]);
-  const [activity, setActivityState] = useState<Activity | null>(
-    () => ownedClaim?.activity ?? null,
-  );
+  const [activity, setActivityState] = useState<Activity | null>(null);
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [updateVersion, setUpdateVersion] = useState<string | null>(null);
   const noticeCounter = useRef(0);
@@ -206,9 +201,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
     [],
   );
   const announce = useCallback(
-    (text: string, ok: boolean, source: string, dot?: PresenceStatus, local = false) => {
+    (text: string, ok: boolean, source: string, dot?: PresenceStatus, _local = false) => {
       pushNotice(text, ok, source, dot, true);
-      if (!local) shareNotice(text, ok, source);
     },
     [pushNotice],
   );
@@ -274,18 +268,22 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [state, activity]);
   const mintRef = useRef(0);
   const appliedRef = useRef(0);
-  const claimedAtRef = useRef(ownedClaim?.since ?? 0);
   const heldHuntRef = useRef<HeldLanding | null>(null);
   const heldArenaRef = useRef<HeldLanding | null>(null);
   const inFlightRef = useRef(0);
-  const applyState = useCallback((next: GameState, seq: number, share = true) => {
+  const adoptActivityFromServer = useCallback((next: Activity | null | undefined) => {
+    if (next === undefined) return;
+    if (heldHuntRef.current || heldArenaRef.current) return;
+    activityRef.current = next;
+    setActivityState(next);
+  }, []);
+  const applyState = useCallback((next: GameState, seq: number) => {
     if (seq <= appliedRef.current) return;
     appliedRef.current = seq;
     setState(next);
-    if (share) shareState(next);
   }, []);
   const setActivity = useCallback(
-    (next: Activity | null, mine = true) => {
+    (next: Activity | null, fromServer = false) => {
       const prev = activityRef.current;
       if (prev?.kind === "hunt" && (next?.kind !== "hunt" || next.id !== prev.id)) {
         const held = heldHuntRef.current;
@@ -296,24 +294,23 @@ export function GameProvider({ children }: { children: ReactNode }) {
       }
       activityRef.current = next;
       setActivityState(next);
-      if (!mine) {
-        if (!next) ownedClaim = null;
-        return;
-      }
-      activityRepository.save(next);
-      void api("PUT", "/api/activity", { kind: next?.kind ?? null });
-      if (next) {
-        dropMirror();
-        claimedAtRef.current = Date.now();
-        ownedClaim = { activity: next, since: claimedAtRef.current };
-        announceBeat(claimedAtRef.current, next, activityRuntimeStore.snapshot());
-      } else {
-        ownedClaim = null;
-        announceIdle();
-      }
+      if (fromServer) return;
+      void api("PUT", "/api/activity", activityPayload(next));
     },
     [applyState],
   );
+  const syncProgress = useCallback((patch: { beat: number; cooldownUntil?: string | null }) => {
+    const current = activityRef.current;
+    if (!current) return;
+    const next: Activity = { ...current };
+    if (patch.beat > 0) next.beat = patch.beat;
+    else delete next.beat;
+    if (patch.cooldownUntil) next.cooldownUntil = patch.cooldownUntil;
+    else delete next.cooldownUntil;
+    activityRef.current = next;
+    setActivityState(next);
+    void api("PATCH", "/api/activity/progress", patch);
+  }, []);
   const request = useCallback(
     async <T,>(
       method: "GET" | "POST" | "PATCH" | "PUT" | "DELETE",
@@ -356,12 +353,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
             applyState(answer.state, seq);
           }
         }
+        adoptActivityFromServer(answer.activity);
         return answer;
       } finally {
         if (defer) inFlightRef.current -= 1;
       }
     },
-    [applyState],
+    [applyState, adoptActivityFromServer],
   );
   const act = useCallback(
     async <T,>(
@@ -378,18 +376,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
     },
     [request, announce],
   );
-  const adoptOrphanedActivity = useCallback(() => {
-    if (activityRef.current) return;
-    if (activityMirrorStore.snapshot()) return;
-    const saved = activityRepository.load();
-    if (!saved || !stateRef.current.character) return;
-    void request("POST", "/api/state").then((answer) => {
-      if (activityRef.current || activityMirrorStore.snapshot()) return;
-      if (answer.status === 401) return;
-      if (!activityRepository.load()) return;
-      setActivity(saved);
-    });
-  }, [request, setActivity]);
   useEffect(() => {
     if (!hydrated) return;
     void (async () => {
@@ -400,64 +386,17 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [hydrated, request]);
   useEffect(() => {
     if (!ready) return undefined;
-    announceHello();
-    const timer = window.setTimeout(() => {
-      if (activityMirrorStore.snapshot()) return;
-      if (activityRef.current) return;
-      const saved = activityRepository.load();
-      if (!saved || !stateRef.current.character) return;
-      claimedAtRef.current = 0;
-      ownedClaim = { activity: saved, since: 0 };
-      activityRef.current = saved;
-      setActivityState(saved);
-    }, HANDSHAKE_MS);
-    return () => window.clearTimeout(timer);
-  }, [ready]);
-  useEffect(() => {
-    if (!activity) return undefined;
-    const send = () =>
-      announceBeat(claimedAtRef.current, activity, activityRuntimeStore.snapshot());
-    send();
-    const leave = () => announceIdle();
-    const unsubscribe = activityRuntimeStore.subscribe(send);
-    const timer = window.setInterval(send, OWNER_BEAT_MS);
-    window.addEventListener("pagehide", leave);
-    return () => {
-      unsubscribe();
-      window.clearInterval(timer);
-      window.removeEventListener("pagehide", leave);
+    const sync = () => {
+      if (document.visibilityState !== "visible") return;
+      void request("POST", "/api/state");
     };
-  }, [activity]);
-  useEffect(() => {
-    return listenToTabs({
-      onBeat: (claim) => {
-        const mine = activityRef.current;
-        if (mine && !yieldsTo(claimedAtRef.current, claim.since, claim.tab)) return;
-        if (mine) setActivity(null, false);
-        watchMirror(claim);
-      },
-      onIdle: (tab) => dropMirror(tab),
-      onStop: () => setActivity(null),
-      onState: (incoming) => {
-        if (activityRef.current) return;
-        applyState(incoming, ++mintRef.current, false);
-      },
-      onNotice: (notice) => pushNotice(notice.text, notice.ok, notice.source, undefined, false),
-      onHello: () => {
-        const mine = activityRef.current;
-        if (mine) announceBeat(claimedAtRef.current, mine, activityRuntimeStore.snapshot());
-      },
-    });
-  }, [applyState, pushNotice, setActivity]);
-  useEffect(() => {
-    let seen = activityMirrorStore.snapshot();
-    return activityMirrorStore.subscribe(() => {
-      const next = activityMirrorStore.snapshot();
-      const lost = seen !== null && next === null;
-      seen = next;
-      if (lost) adoptOrphanedActivity();
-    });
-  }, [adoptOrphanedActivity]);
+    document.addEventListener("visibilitychange", sync);
+    window.addEventListener("focus", sync);
+    return () => {
+      document.removeEventListener("visibilitychange", sync);
+      window.removeEventListener("focus", sync);
+    };
+  }, [ready, request]);
   const petResting =
     state.pet !== null &&
     state.pet.active === false &&
@@ -505,7 +444,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
     const beat = async () => {
       if (busy) return;
       if (inFlightRef.current > 0 || heldHuntRef.current || heldArenaRef.current) return;
-      if (activityMirrorStore.snapshot() !== null) return;
       if (!isVip(stateRef.current.character, Date.now())) return;
       busy = true;
       try {
@@ -518,19 +456,23 @@ export function GameProvider({ children }: { children: ReactNode }) {
             );
             return;
           case "rest": {
-            const answer = await act("POST", "/api/character/rest", undefined, "Recuperação", () =>
-              playSound("rest"),
-            );
-            if (answer.ok) {
-              const interrupted = activityRef.current;
-              setActivity({
-                kind: "rest",
+            const interrupted = activityRef.current;
+            await act(
+              "POST",
+              "/api/character/rest",
+              {
                 resume:
                   interrupted && interrupted.kind !== "rest"
-                    ? { kind: interrupted.kind, id: interrupted.id }
+                    ? {
+                        kind: interrupted.kind,
+                        id: interrupted.id,
+                        enhancement: interrupted.enhancement,
+                      }
                     : undefined,
-              });
-            }
+              },
+              "Recuperação",
+              () => playSound("rest"),
+            );
             return;
           }
           case "feed":
@@ -699,13 +641,27 @@ export function GameProvider({ children }: { children: ReactNode }) {
         return answer.ok;
       },
       rest: async () => {
-        const answer = await act("POST", "/api/character/rest", undefined, "Recuperação", () =>
-          playSound("rest"),
+        const interrupted = activityRef.current;
+        await act(
+          "POST",
+          "/api/character/rest",
+          {
+            resume:
+              interrupted && interrupted.kind !== "rest"
+                ? {
+                    kind: interrupted.kind,
+                    id: interrupted.id,
+                    enhancement: interrupted.enhancement,
+                  }
+                : undefined,
+          },
+          "Recuperação",
+          () => playSound("rest"),
         );
-        if (answer.ok) setActivity({ kind: "rest" });
       },
       activity,
       setActivity,
+      syncProgress,
       train: async (exerciseId) => {
         if (exerciseId === PET_EXERCISE_ID) {
           const answer = await request<{ leveled: boolean }>("POST", "/api/training/pet");
@@ -1032,6 +988,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     request,
     applyState,
     setActivity,
+    syncProgress,
   ]);
   return (
     <GameContext.Provider value={value}>

@@ -2,7 +2,6 @@
 
 import { useSyncExternalStore } from "react";
 import { activityRuntimeStore } from "./activity-runtime";
-import { activityMirrorStore } from "./activity-sync";
 import { useGame } from "./game.context";
 
 const LABEL: Record<string, string> = {
@@ -22,14 +21,9 @@ export function useActivityLock(): { locked: boolean; reason: string } {
     activityRuntimeStore.snapshot,
     activityRuntimeStore.serverSnapshot,
   );
-  const mirror = useSyncExternalStore(
-    activityMirrorStore.subscribe,
-    activityMirrorStore.snapshot,
-    activityMirrorStore.serverSnapshot,
-  );
 
   const dock = runtime.dock;
-  const running = activity ?? mirror?.activity ?? null;
+  const running = activity;
   if (running === null || dock === null || dock.canStop) return { locked: false, reason: "" };
 
   return {

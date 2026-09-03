@@ -8,7 +8,58 @@ import type { LogEntry, LogKind } from "../../entities/log-entry";
 import type { PackMate } from "../../entities/pack";
 import type { Pet, PetGender } from "../../entities/pet";
 import { fillAutomation } from "../../entities/automation";
+import { isActivityKind, type Activity, type ActivityKind } from "../../entities/activity";
+
 const int = (value: unknown): number => Number(value ?? 0);
+
+interface ActivityRow {
+  kind: string;
+  target_id: string | null;
+  paused: boolean;
+  resume_kind: string | null;
+  resume_target_id: string | null;
+  resume_enhancement: number | null;
+  enhancement: number | null;
+  beat: number;
+  started_at: Date | string;
+  cooldown_until: Date | string | null;
+}
+
+function rowToActivity(row: ActivityRow | undefined): Activity | null {
+  if (!row || !isActivityKind(row.kind)) return null;
+  const activity: Activity = { kind: row.kind };
+  if (row.target_id) activity.id = row.target_id;
+  if (row.enhancement !== null && row.enhancement !== undefined) activity.enhancement = int(row.enhancement);
+  if (row.paused) activity.paused = true;
+  if (row.beat > 0) activity.beat = int(row.beat);
+  const cooldownUntil = stamp(row.cooldown_until);
+  if (cooldownUntil && Date.parse(cooldownUntil) > Date.now()) activity.cooldownUntil = cooldownUntil;
+  if (row.resume_kind && isActivityKind(row.resume_kind)) {
+    activity.resume = { kind: row.resume_kind as ActivityKind };
+    if (row.resume_target_id) activity.resume.id = row.resume_target_id;
+    if (row.resume_enhancement !== null && row.resume_enhancement !== undefined) {
+      activity.resume.enhancement = int(row.resume_enhancement);
+    }
+  }
+  return activity;
+}
+
+export async function readActivity(
+  client: PoolClient,
+  characterId: string,
+): Promise<{ activity: Activity | null; startedAt: string | null }> {
+  const found = await client.query(
+    `select kind, target_id, paused, resume_kind, resume_target_id, resume_enhancement,
+            enhancement, beat, started_at, cooldown_until
+     from activities where character_id = $1`,
+    [characterId],
+  );
+  const row = found.rows[0] as ActivityRow | undefined;
+  return {
+    activity: rowToActivity(row),
+    startedAt: stamp(row?.started_at) ?? null,
+  };
+}
 const iso = (value: unknown): string =>
   value instanceof Date ? value.toISOString() : String(value ?? new Date().toISOString());
 const stamp = (value: unknown): string | undefined =>
@@ -60,6 +111,7 @@ export interface LoadedGame {
   characterId: string;
   state: GameState;
   petRestCollectedAt: string | null;
+  activity: Activity | null;
   activityKind: string | null;
   activityStartedAt: string | null;
 }
@@ -116,10 +168,14 @@ export async function loadGame(
     "select id, kind, message, created_at from log_entries where character_id = $1 order by created_at desc limit 120",
     [characterId],
   );
-  const activity = await client.query(
-    "select kind, started_at from activities where character_id = $1",
+  const activityFound = await client.query(
+    `select kind, target_id, paused, resume_kind, resume_target_id, resume_enhancement,
+            enhancement, beat, started_at, cooldown_until
+     from activities where character_id = $1`,
     [characterId],
   );
+  const activityRow = activityFound.rows[0] as ActivityRow | undefined;
+  const activity = rowToActivity(activityRow);
   const equipment = emptyEquipment();
   for (const entry of equipped.rows) {
     equipment[entry.slot as EquipmentSlot] = {
@@ -208,8 +264,9 @@ export async function loadGame(
     characterId,
     state,
     petRestCollectedAt: stamp(petRow?.rest_collected_at) ?? null,
-    activityKind: activity.rows[0]?.kind ?? null,
-    activityStartedAt: stamp(activity.rows[0]?.started_at) ?? null,
+    activity,
+    activityKind: activityRow?.kind ?? null,
+    activityStartedAt: stamp(activityRow?.started_at) ?? null,
   };
 }
 
@@ -617,10 +674,14 @@ export async function updateActivity(
   activity: {
     kind: string;
     targetId?: string | null;
+    enhancement?: number | null;
     paused?: boolean;
     resumeKind?: string | null;
     resumeTargetId?: string | null;
-    startedAt?: string;
+    resumeEnhancement?: number | null;
+    startedAt?: string | null;
+    beat?: number;
+    cooldownUntil?: string | null;
   } | null,
 ): Promise<void> {
   if (!activity) {
@@ -629,20 +690,53 @@ export async function updateActivity(
   }
   await client.query(
     `insert into activities
-       (character_id, kind, target_id, paused, resume_kind, resume_target_id, started_at)
-     values ($1, $2::activity_kind, $3, $4, $5::activity_kind, $6, $7)
+       (character_id, kind, target_id, enhancement, paused, resume_kind, resume_target_id,
+        resume_enhancement, beat, started_at, cooldown_until)
+     values ($1, $2::activity_kind, $3, $4, $5, $6::activity_kind, $7, $8, $9,
+             coalesce($10::timestamptz, now()), $11::timestamptz)
      on conflict (character_id) do update set
-       kind = $2::activity_kind, target_id = $3, paused = $4,
-       resume_kind = $5::activity_kind, resume_target_id = $6, started_at = $7`,
+       kind = $2::activity_kind,
+       target_id = $3,
+       enhancement = $4,
+       paused = $5,
+       resume_kind = $6::activity_kind,
+       resume_target_id = $7,
+       resume_enhancement = $8,
+       beat = $9,
+       started_at = coalesce(
+         $10::timestamptz,
+         case
+           when activities.kind is not distinct from $2::activity_kind
+            and activities.target_id is not distinct from $3
+           then activities.started_at
+         end,
+         now()
+       ),
+       cooldown_until = $11::timestamptz`,
     [
       characterId,
       activity.kind,
       activity.targetId ?? null,
+      activity.enhancement ?? null,
       activity.paused ?? false,
       activity.resumeKind ?? null,
       activity.resumeTargetId ?? null,
-      activity.startedAt ?? new Date().toISOString(),
+      activity.resumeEnhancement ?? null,
+      activity.beat ?? 0,
+      activity.startedAt ?? null,
+      activity.cooldownUntil ?? null,
     ],
+  );
+}
+
+export async function updateActivityProgress(
+  client: PoolClient,
+  characterId: string,
+  patch: { beat: number; cooldownUntil?: string | null },
+): Promise<void> {
+  await client.query(
+    `update activities set beat = $2, cooldown_until = $3::timestamptz where character_id = $1`,
+    [characterId, patch.beat, patch.cooldownUntil ?? null],
   );
 }
 export async function setPetRestCollectedAt(

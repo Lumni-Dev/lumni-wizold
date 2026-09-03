@@ -6,6 +6,8 @@ export interface Activity {
   enhancement?: number;
   resume?: { kind: ActivityKind; id?: string; enhancement?: number };
   paused?: boolean;
+  beat?: number;
+  cooldownUntil?: string;
 }
 
 export const ACTIVITY_KINDS: readonly ActivityKind[] = ["hunt", "train", "mine", "forge", "rest"];
@@ -68,6 +70,8 @@ export function isActivity(data: unknown): data is Activity {
     (activity.id === undefined || typeof activity.id === "string") &&
     (activity.enhancement === undefined || typeof activity.enhancement === "number") &&
     (activity.paused === undefined || typeof activity.paused === "boolean") &&
+    (activity.beat === undefined || (typeof activity.beat === "number" && Number.isFinite(activity.beat))) &&
+    (activity.cooldownUntil === undefined || typeof activity.cooldownUntil === "string") &&
     (activity.resume === undefined || isResume(activity.resume))
   );
 }
