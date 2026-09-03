@@ -34,6 +34,8 @@ import { ChipTabs } from "../components/chip-tabs";
 import { Panel } from "../components/panel";
 import { AttributeArtFill } from "../components/attribute-icon";
 import { CreatureArtFill } from "../components/creature-icon";
+import { TerritoryArtFill } from "../components/territory-icon";
+import { TrainingArtFill } from "../components/training-icon";
 import { ItemArtFill } from "../components/item-icon";
 import { WikiMasonry, WikiMasonryItem } from "../components/wiki-masonry";
 import { WikiPaginatedPanel } from "../components/wiki-paginated-panel";
@@ -262,7 +264,11 @@ export function WikiScreen() {
             >
               <List>
                 {EXERCISES.map((exercise) => (
-                  <ListRow key={exercise.id} layout="column">
+                  <ListRow
+                    key={exercise.id}
+                    art={<TrainingArtFill attribute={exercise.attribute} />}
+                    layout="column"
+                  >
                     <div className="flex items-baseline justify-between gap-2">
                       <p className="text-sm text-ink">{exercise.name}</p>
                       <p className="shrink-0 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
@@ -299,7 +305,11 @@ export function WikiScreen() {
             >
               <List>
                 {TERRITORIES.map((territory) => (
-                  <ListRow key={territory.id} layout="column">
+                  <ListRow
+                    key={territory.id}
+                    art={<TerritoryArtFill territory={territory} />}
+                    layout="column"
+                  >
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="text-sm text-ink">{territory.name}</p>
                       <Tag tone="faint">{DANGER_LABEL[territory.danger]}</Tag>
