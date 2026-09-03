@@ -60,7 +60,7 @@ import {
   tavernRoomChatAction,
 } from "../components/tavern-room-chat";
 
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 8;
 
 function MemberName({
   href,
@@ -731,7 +731,7 @@ export function TavernScreen() {
                 <FilteredEmptyState description="Nenhuma mesa combina com essa busca." />
               ) : (
                 <>
-                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                     {roomsOnPage.map(({ room, locked, full, memberCount, isMember, isPrivate }) => {
                       const unread = unreadByRoom.get(room.id) ?? 0;
                       const seatedHere = openRoomId === room.id;

@@ -66,7 +66,7 @@ export const PREVIEW_SHOTS: readonly PreviewShot[] = [
     label: "Taverna",
     title: "Mesas que não esperam refresh",
     text:
-      "Três mesas por linha, caneca em cada card e paginação quando o salão passa de nove. " +
+      "Duas mesas por linha, caneca em cada card e paginação quando o salão passa de oito. " +
       "Salas abertas ou trancadas, mensagens ao vivo, convite de matilha e aviso quando a cadeira acende.",
     image: "/assets/landing/tavern.webp?v=12",
   },
