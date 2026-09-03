@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useGame } from "@/controllers/game.context";
 import { detailInventory } from "@/controllers/inventory.controller";
@@ -184,7 +184,76 @@ export function InventoryScreen() {
             const consumable = item.category === "potion" || item.category === "pet";
             const sellable = !isForgeMaterial(item);
             const fragment = !sellable;
-            const hasActions = isEquippable(item) || consumable || sellable || fragment;
+            const actions: ReactNode[] = [];
+
+            if (sellable) {
+              actions.push(
+                <Button
+                  key="sell"
+                  variant="outline"
+                  fullWidth
+                  onClick={() =>
+                    router.push(
+                      "/market?sell=" + item.id + (enhancement > 0 ? "&enh=" + enhancement : ""),
+                    )
+                  }
+                >
+                  Vender
+                </Button>,
+              );
+            }
+
+            if (fragment) {
+              actions.push(
+                <Button
+                  key="bazaar"
+                  variant="outline"
+                  fullWidth
+                  onClick={() => router.push("/bazaar")}
+                >
+                  Bazar
+                </Button>,
+                <Button
+                  key="forge"
+                  variant="primary"
+                  fullWidth
+                  onClick={() => router.push("/forge")}
+                >
+                  Forjar
+                </Button>,
+              );
+            }
+
+            if (isEquippable(item)) {
+              actions.push(
+                <Button
+                  key="equip"
+                  variant="primary"
+                  fullWidth
+                  onClick={() => handleEquip(item.id, item.category, enhancement)}
+                  disabled={levelTooLow}
+                >
+                  Equipar
+                </Button>,
+              );
+            }
+
+            if (consumable) {
+              actions.push(
+                item.potion === "rage" ? (
+                  <FuryUseButton key="use" onClick={() => consumeItem(item.id)} />
+                ) : (
+                  <Button
+                    key="use"
+                    variant="primary"
+                    fullWidth
+                    onClick={() => consumeItem(item.id)}
+                  >
+                    {item.category === "pet" ? "Alimentar" : "Beber"}
+                  </Button>
+                ),
+              );
+            }
 
             return (
               <ItemCard
@@ -197,56 +266,17 @@ export function InventoryScreen() {
                   levelTooLow ? "Requer NV. " + item.minLevel : null
                 }
                 footer={
-                  hasActions ? (
-                    <>
-                      <div className="flex flex-wrap gap-2">
-                        {sellable ? (
-                          <Button
-                            variant="outline"
-                            onClick={() =>
-                              router.push(
-                                "/market?sell=" +
-                                  item.id +
-                                  (enhancement > 0 ? "&enh=" + enhancement : ""),
-                              )
-                            }
-                          >
-                            Vender
-                          </Button>
-                        ) : null}
-                      </div>
-                      <div className="flex flex-wrap justify-end gap-2">
-                        {fragment ? (
-                          <>
-                            <Button variant="outline" onClick={() => router.push("/bazaar")}>
-                              Bazar
-                            </Button>
-                            <Button variant="primary" onClick={() => router.push("/forge")}>
-                              Forjar
-                            </Button>
-                          </>
-                        ) : null}
-                        {isEquippable(item) ? (
-                          <Button
-                            variant="primary"
-                            onClick={() => handleEquip(item.id, item.category, enhancement)}
-                            disabled={levelTooLow}
-                          >
-                            Equipar
-                          </Button>
-                        ) : null}
-                        {consumable ? (
-                          item.potion === "rage" ? (
-                            <FuryUseButton onClick={() => consumeItem(item.id)} />
-                          ) : (
-                            <Button variant="primary" onClick={() => consumeItem(item.id)}>
-                              {item.category === "pet" ? "Alimentar" : "Beber"}
-                            </Button>
-                          )
-                        ) : null}
-                      </div>
-                    </>
-                  ) : null
+                  actions.length === 0 ? null : actions.length === 1 ? (
+                    <div className="flex w-full justify-end">{actions}</div>
+                  ) : (
+                    <div className="grid w-full grid-cols-2 gap-2">
+                      {actions.map((action, index) => (
+                        <div key={index} className="[&>*]:w-full">
+                          {action}
+                        </div>
+                      ))}
+                    </div>
+                  )
                 }
               />
             );
