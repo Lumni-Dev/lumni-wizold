@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { activityMirrorStore } from "./activity-mirror.store";
 import { activityRuntimeStore } from "./activity-runtime";
 import { useGame } from "./game.context";
 
@@ -21,9 +22,15 @@ export function useActivityLock(): { locked: boolean; reason: string } {
     activityRuntimeStore.snapshot,
     activityRuntimeStore.serverSnapshot,
   );
+  const mirror = useSyncExternalStore(
+    activityMirrorStore.subscribe,
+    activityMirrorStore.snapshot,
+    activityMirrorStore.serverSnapshot,
+  );
 
-  const dock = runtime.dock;
-  const running = activity;
+  const running = mirror.mirroring ? mirror.activity : activity;
+  const dockRuntime = mirror.mirroring && mirror.runtime ? mirror.runtime : runtime;
+  const dock = dockRuntime.dock;
   if (running === null || dock === null || dock.canStop) return { locked: false, reason: "" };
 
   return {

@@ -39,6 +39,9 @@ import type { ArenaResolution } from "./arena.controller";
 import type { TrainingReport } from "./training.controller";
 import * as automationController from "./automation.controller";
 import { ActivityEngine } from "./activity-engine";
+import { activityMirrorStore } from "./activity-mirror.store";
+import { activityRuntimeStore } from "./activity-runtime";
+import { activitySync } from "./activity-sync";
 import { api, isTransientApiMessage, type ApiAnswer } from "./api.client";
 import { usePresenceHeartbeat } from "./use-presence-heartbeat";
 import { playSound, preloadSounds, setVoiceProfile } from "./sound";
@@ -90,6 +93,7 @@ interface GameContextValue {
   activity: Activity | null;
   setActivity: (activity: Activity | null) => void;
   syncProgress: (patch: { beat: number; cooldownUntil?: string | null }) => void;
+  persistActivity: (activity: Activity | null) => void;
   train: (exerciseId: string) => Promise<{ message: string; raised: boolean } | "retry" | null>;
   hunt: (territoryId: string, creatureId?: string) => Promise<HuntAttempt>;
   landHunt: () => void;
@@ -197,12 +201,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
       const line = { id: noticeCounter.current, text, ok, source, dot, at: Date.now() };
       setNotices((current) => [...current, line].slice(-NOTICE_STACK));
       if (!ok && sound) playSound("denied");
+      return line.id;
     },
     [],
   );
   const announce = useCallback(
-    (text: string, ok: boolean, source: string, dot?: PresenceStatus, _local = false) => {
-      pushNotice(text, ok, source, dot, true);
+    (text: string, ok: boolean, source: string, dot?: PresenceStatus, local = false) => {
+      const id = pushNotice(text, ok, source, dot, !local);
+      if (!local) activitySync.publishNotice({ text, ok, source, dot, id });
     },
     [pushNotice],
   );
@@ -273,17 +279,42 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const inFlightRef = useRef(0);
   const adoptActivityFromServer = useCallback((next: Activity | null | undefined) => {
     if (next === undefined) return;
+    if (activitySync.isMirroring() || activityMirrorStore.isMirroring()) return;
+    if (activitySync.isHandshaking()) return;
     if (heldHuntRef.current || heldArenaRef.current) return;
+    if (inFlightRef.current > 0) return;
+    const local = activityRef.current;
+    if (local && local.kind !== "rest") {
+      const dock = activityRuntimeStore.snapshot().dock;
+      if (dock && local.kind === dock.kind && !local.paused && !dock.canStop) return;
+    }
     activityRef.current = next;
+    activitySync.trackLocalActivity(next);
     setActivityState(next);
   }, []);
-  const applyState = useCallback((next: GameState, seq: number) => {
+  const adoptState = useCallback((next: GameState, seq: number) => {
     if (seq <= appliedRef.current) return;
     appliedRef.current = seq;
     setState(next);
   }, []);
+  const applyState = useCallback(
+    (next: GameState, seq: number) => {
+      adoptState(next, seq);
+      activitySync.publishState(next);
+    },
+    [adoptState],
+  );
+  const setActivityRef = useRef<(next: Activity | null, fromServer?: boolean) => void>(() => undefined);
   const setActivity = useCallback(
     (next: Activity | null, fromServer = false) => {
+      if (!fromServer && activitySync.isMirroring()) {
+        if (next === null) activitySync.requestStop();
+        return;
+      }
+      if (!fromServer && next !== null) {
+        if (typeof window !== "undefined" && window.location.pathname === "/") return;
+        if (!activitySync.tryClaim(next)) return;
+      }
       const prev = activityRef.current;
       if (prev?.kind === "hunt" && (next?.kind !== "hunt" || next.id !== prev.id)) {
         const held = heldHuntRef.current;
@@ -293,13 +324,17 @@ export function GameProvider({ children }: { children: ReactNode }) {
         }
       }
       activityRef.current = next;
+      activitySync.trackLocalActivity(next);
       setActivityState(next);
       if (fromServer) return;
+      if (next === null) activitySync.release();
       void api("PUT", "/api/activity", activityPayload(next));
     },
     [applyState],
   );
+  setActivityRef.current = setActivity;
   const syncProgress = useCallback((patch: { beat: number; cooldownUntil?: string | null }) => {
+    if (activitySync.isMirroring()) return;
     const current = activityRef.current;
     if (!current) return;
     const next: Activity = { ...current };
@@ -308,8 +343,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
     if (patch.cooldownUntil) next.cooldownUntil = patch.cooldownUntil;
     else delete next.cooldownUntil;
     activityRef.current = next;
-    setActivityState(next);
+    activitySync.trackLocalActivity(next);
     void api("PATCH", "/api/activity/progress", patch);
+  }, []);
+  const persistActivity = useCallback((next: Activity | null) => {
+    activityRef.current = next;
+    void api("PUT", "/api/activity", activityPayload(next));
   }, []);
   const request = useCallback(
     async <T,>(
@@ -378,12 +417,31 @@ export function GameProvider({ children }: { children: ReactNode }) {
   );
   useEffect(() => {
     if (!hydrated) return;
+    return activitySync.init({
+      shouldParticipate: () =>
+        typeof window !== "undefined" && window.location.pathname !== "/",
+      onRemoteStop: () => setActivityRef.current(null),
+      onRemoteState: (next) => {
+        if (!activitySync.isMirroring()) return;
+        setState(next);
+      },
+      onRemoteNotice: (payload) => {
+        pushNotice(payload.text, payload.ok, payload.source, payload.dot, false);
+      },
+    });
+  }, [hydrated, adoptState, pushNotice]);
+  useEffect(() => {
+    if (!hydrated) return;
     void (async () => {
-      const answer = await request("POST", "/api/state");
+      const answer = await api("POST", "/api/state");
       if (answer.status !== 401) setAuthenticated(true);
+      if (typeof answer.tutorial === "boolean") setTutorial(answer.tutorial);
+      if (answer.state) applyState(answer.state, ++mintRef.current);
+      await activitySync.handshake(answer.activity);
+      if (!activitySync.isMirroring()) adoptActivityFromServer(answer.activity);
       setBooted(true);
     })();
-  }, [hydrated, request]);
+  }, [hydrated, applyState, adoptActivityFromServer]);
   useEffect(() => {
     if (!ready) return undefined;
     const sync = () => {
@@ -443,6 +501,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     let busy = false;
     const beat = async () => {
       if (busy) return;
+      if (activitySync.isMirroring()) return;
       if (inFlightRef.current > 0 || heldHuntRef.current || heldArenaRef.current) return;
       if (!isVip(stateRef.current.character, Date.now())) return;
       busy = true;
@@ -662,6 +721,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       activity,
       setActivity,
       syncProgress,
+      persistActivity,
       train: async (exerciseId) => {
         if (exerciseId === PET_EXERCISE_ID) {
           const answer = await request<{ leveled: boolean }>("POST", "/api/training/pet");
@@ -713,17 +773,18 @@ export function GameProvider({ children }: { children: ReactNode }) {
         applyState(held.state, held.seq);
       },
       sufferBlow: (damage) => {
-        setState((current) =>
-          current.character
-            ? {
-                ...current,
-                character: {
-                  ...current.character,
-                  health: Math.max(1, current.character.health - Math.max(0, Math.round(damage))),
-                },
-              }
-            : current,
-        );
+        setState((current) => {
+          if (!current.character) return current;
+          const next = {
+            ...current,
+            character: {
+              ...current.character,
+              health: Math.max(1, current.character.health - Math.max(0, Math.round(damage))),
+            },
+          };
+          activitySync.publishState(next);
+          return next;
+        });
       },
       drawOpponent: async () => {
         const answer = await request<{
@@ -989,6 +1050,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     applyState,
     setActivity,
     syncProgress,
+    persistActivity,
   ]);
   return (
     <GameContext.Provider value={value}>
