@@ -25,7 +25,6 @@ import { formatDay, formatNumber, formatBronze } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
 import { emphasizeDamage, narrationOf, type NarrationLine } from "../presenters/hunt.presenter";
 import { Bar } from "../components/bar";
-import { AttributeIcon } from "../components/attribute-icon";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
 import { BodyGate } from "../components/body-gate";
 import { Button } from "../components/button";
@@ -468,33 +467,24 @@ export function ArenaScreen() {
                   </CardHeader>
 
                   <CardBody className="p-0">
-                    <div className="divide-y divide-edge">
-                      <div className="grid grid-cols-5 divide-x divide-edge">
-                        {ATTRIBUTES.map((attribute) => (
-                          <div
-                            key={attribute.key}
-                            className="flex flex-col items-center gap-1 px-1 py-2"
-                          >
-                            <AttributeIcon attribute={attribute.key} size="mini" />
-                            <p className="font-mono text-[11px] text-ink">
-                              {formatNumber(rival.totalAttributes[attribute.key])}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="grid grid-cols-3 divide-x divide-edge">
-                        {[
-                          { label: "Vida", value: formatNumber(rival.maxHealth) },
-                          { label: "Esquiva", value: rival.dodge + "%" },
-                          { label: "Crítico", value: rival.critical + "%" },
-                        ].map((cell) => (
-                          <Tooltip key={cell.label} label={cell.label}>
-                            <div className="px-2 py-2 text-center">
-                              <p className="font-mono text-[11px] text-ink">{cell.value}</p>
-                            </div>
-                          </Tooltip>
-                        ))}
-                      </div>
+                    <div className="grid grid-cols-4 divide-x divide-y divide-edge">
+                      {[
+                        ...ATTRIBUTES.map((attribute) => ({
+                          key: attribute.key,
+                          label: attribute.name,
+                          value: formatNumber(rival.totalAttributes[attribute.key]),
+                        })),
+                        { key: "health", label: "Vida", value: formatNumber(rival.maxHealth) },
+                        { key: "dodge", label: "Esquiva", value: rival.dodge + "%" },
+                        { key: "critical", label: "Crítico", value: rival.critical + "%" },
+                      ].map((cell) => (
+                        <div key={cell.key} className="px-2 py-3 text-center">
+                          <p className="truncate text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                            {cell.label}
+                          </p>
+                          <p className="mt-1 font-mono text-[11px] text-ink">{cell.value}</p>
+                        </div>
+                      ))}
                     </div>
                   </CardBody>
 
@@ -521,6 +511,7 @@ export function ArenaScreen() {
                       >
                         <Button
                           variant={inBand && !resting ? "primary" : "outline"}
+                          fullWidth
                           disabled={!inBand || resting || !view.canFight || busy || locked}
                           onClick={() => challenge(hunter, rival)}
                         >
