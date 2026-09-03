@@ -492,9 +492,12 @@ export function ArenaScreen() {
                     <BodyGate
                       open={inBand && !resting && !busy && view.charges.left > 0}
                       requireFull
+                      fullWidth
                       reason="Recupere-se antes do fosso."
                     >
                       <Tooltip
+                        block
+                        className="w-full"
                         label={
                           !inBand
                             ? "Fora da sua faixa: a arena só marca luta entre NV. " +

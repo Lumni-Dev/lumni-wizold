@@ -9,11 +9,13 @@ export function BodyGate({
   open,
   reason,
   requireFull = false,
+  fullWidth = false,
   children,
 }: {
   open: boolean;
   reason: string;
   requireFull?: boolean;
+  fullWidth?: boolean;
   children: ReactNode;
 }) {
   const { character, stats, activity, setActivity, rest } = useGame();
@@ -26,6 +28,7 @@ export function BodyGate({
 
   return (
     <RecoveryButton
+      fullWidth={fullWidth}
       recovering={activity?.kind === "rest"}
       beat={String(character.health)}
       recoveringLabel="Recuperando-se..."
