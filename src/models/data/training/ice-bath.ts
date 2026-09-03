@@ -2,7 +2,7 @@ import type { Exercise } from "./types";
 
 export const iceBath: Exercise = {
   id: "ice-bath",
-  name: "Banho de Gelo",
-  description: "Ficar no rio até o corpo parar de reclamar.",
+  name: "Segurar Peso",
+  description: "Erguer a pedra e segurar até o braço tremer, depois segurar mais um pouco.",
   attribute: "endurance",
 };
