@@ -41,5 +41,11 @@ export function RecoveryButton({
     </Button>
   );
 
-  return tooltip ? <Tooltip label={tooltip}>{button}</Tooltip> : button;
+  return tooltip ? (
+    <Tooltip block={fullWidth} className={fullWidth ? "w-full" : undefined} label={tooltip}>
+      {button}
+    </Tooltip>
+  ) : (
+    button
+  );
 }

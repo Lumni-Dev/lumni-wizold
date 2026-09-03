@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useArt } from "@/controllers/art.context";
 import type { Creature } from "@/models/entities/creature";
+import { cn } from "@/shared/utils/class-names";
 import { IconArt, IconFrame, type IconSize, type FrameTone } from "./icon-frame";
 
 function creatureInitials(name: string): string {
@@ -17,25 +18,34 @@ export function CreatureIcon({
   inset,
   tone,
   zoom,
+  className,
+  priority = false,
 }: {
   creature: Creature;
   size?: IconSize;
   inset?: string;
   tone?: FrameTone;
   zoom?: boolean;
+  className?: string;
+  priority?: boolean;
 }) {
   const art = useArt();
   const source = art.creatures[creature.id];
   const [broken, setBroken] = useState(false);
 
   return (
-    <IconFrame size={size} tone={tone} className={source && !broken ? undefined : "tracking-widest"}>
+    <IconFrame
+      size={size}
+      tone={tone}
+      className={cn(!source || broken ? "tracking-widest" : undefined, className)}
+    >
       {source && !broken ? (
         <IconArt
           source={source}
           fit="contain"
           inset={inset}
           zoom={zoom}
+          priority={priority}
           onFail={() => setBroken(true)}
         />
       ) : (

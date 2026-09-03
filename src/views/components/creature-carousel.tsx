@@ -7,7 +7,7 @@ import type { Creature } from "@/models/entities/creature";
 import { CreatureIcon } from "./creature-icon";
 
 const SECONDS_PER_CREATURE = 1.6;
-const RESTING = 0.7;
+const RESTING_OPACITY = 0.55;
 const REACH_IN_ITEMS = 2.5;
 
 export function CreatureCarousel() {
@@ -39,15 +39,14 @@ export function CreatureCarousel() {
     if (pitch <= 0) return undefined;
 
     const reach = pitch * REACH_IN_ITEMS;
-    const resting = "scale(" + String(RESTING) + ")";
     let frame = 0;
     let swollen: HTMLElement[] = [];
 
-    for (const item of items) item.style.transform = resting;
+    for (const item of items) item.style.opacity = String(RESTING_OPACITY);
 
     const clear = () => {
       for (const item of swollen) {
-        item.style.transform = resting;
+        item.style.opacity = String(RESTING_OPACITY);
         item.style.zIndex = "";
       }
       swollen = [];
@@ -67,9 +66,9 @@ export function CreatureCarousel() {
         const centre = start + index * pitch + half;
         const closeness = Math.max(0, 1 - Math.abs(centre - middle) / reach);
         if (closeness <= 0) continue;
-        const scale = RESTING + (1 - RESTING) * closeness * closeness;
-        items[index].style.transform = "scale(" + String(scale) + ")";
-        items[index].style.zIndex = "1";
+        const opacity = RESTING_OPACITY + (1 - RESTING_OPACITY) * closeness * closeness;
+        items[index].style.opacity = String(opacity);
+        items[index].style.zIndex = closeness > 0.45 ? "1" : "";
         swollen.push(items[index]);
       }
 
@@ -80,7 +79,7 @@ export function CreatureCarousel() {
     return () => {
       window.cancelAnimationFrame(frame);
       for (const item of items) {
-        item.style.transform = "";
+        item.style.opacity = "";
         item.style.zIndex = "";
       }
     };
@@ -101,9 +100,11 @@ export function CreatureCarousel() {
             key={String(position) + "-" + creature.id}
             creature={creature}
             size="huge"
-            inset="p-3"
+            className="h-32 w-32 m-4"
+            inset="p-4"
             tone="glass"
             zoom={false}
+            priority
           />
         ))}
       </div>

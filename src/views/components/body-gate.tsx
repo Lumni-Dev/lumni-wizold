@@ -26,7 +26,7 @@ export function BodyGate({
     : character.health <= stats.maxHealth * MIN_HEALTH_RATIO_TO_ACT;
   if (!blocked) return <>{children}</>;
 
-  return (
+  const recovery = (
     <RecoveryButton
       fullWidth={fullWidth}
       recovering={activity?.kind === "rest"}
@@ -37,4 +37,6 @@ export function BodyGate({
       onClick={activity?.kind === "rest" ? () => setActivity(null) : rest}
     />
   );
+
+  return fullWidth ? <div className="w-full">{recovery}</div> : recovery;
 }

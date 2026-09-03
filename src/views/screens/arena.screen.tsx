@@ -488,7 +488,7 @@ export function ArenaScreen() {
                     </div>
                   </CardBody>
 
-                  <CardFooter>
+                  <CardFooter className="w-full">
                     <BodyGate
                       open={inBand && !resting && !busy && view.charges.left > 0}
                       requireFull

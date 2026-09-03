@@ -79,6 +79,7 @@ export function IconArt({
   inset,
   fit = "cover",
   zoom = true,
+  priority = false,
   onFail,
 }: {
   source: string;
@@ -88,6 +89,7 @@ export function IconArt({
   inset?: string;
   fit?: "cover" | "contain";
   zoom?: boolean;
+  priority?: boolean;
   onFail?: () => void;
 }) {
   const imgRef = useRef<HTMLImageElement>(null);
@@ -125,7 +127,8 @@ export function IconArt({
         ref={imgRef}
         src={source}
         alt=""
-        loading="lazy"
+        loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : undefined}
         referrerPolicy="no-referrer"
         onLoad={() => {
           markArtCached(source);

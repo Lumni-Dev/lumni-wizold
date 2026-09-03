@@ -14,6 +14,7 @@ import { Button } from "../components/button";
 import { CornerAccents } from "../components/corner-accents";
 import { Field } from "../components/field";
 import { LiveBackdrop } from "../components/live-backdrop";
+import { LandingMusic } from "../components/game-music";
 import { Select, type SelectOption } from "../components/select";
 
 function GoogleMark() {
@@ -201,6 +202,7 @@ export function LoginScreen() {
   return (
     <div className="relative flex min-h-screen flex-col">
       <LiveBackdrop />
+      <LandingMusic />
       <main className="relative z-10 flex min-h-screen items-center justify-center p-4 md:p-8">
         <div className="w-full max-w-md space-y-6">
           <header className="text-center">

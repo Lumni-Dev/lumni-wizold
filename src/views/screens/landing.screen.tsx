@@ -14,6 +14,7 @@ import { PetLandingBanner } from "../components/pet-icon";
 import { CreatureCarousel } from "../components/creature-carousel";
 import { PreviewGallery } from "../components/preview-gallery";
 import { LiveBackdrop } from "../components/live-backdrop";
+import { LandingMusic } from "../components/game-music";
 import { useNarration } from "@/controllers/use-narration";
 import { LandingCtaButton } from "../components/landing-cta-button";
 import { Footer } from "../layout/footer";
@@ -34,6 +35,7 @@ export function LandingScreen() {
   return (
     <div className="relative flex min-h-screen flex-col">
       <LiveBackdrop />
+      <LandingMusic />
       <header className="relative flex min-h-screen flex-col items-center justify-center px-4 text-center">
         <div className="relative z-10 flex flex-col items-center gap-8">
           <div className="space-y-5">
@@ -140,21 +142,22 @@ export function LandingScreen() {
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             {LORE_COMPANIONS.map((companion) => (
-              <article
-                key={companion.gender}
-                className={cn("relative overflow-hidden rounded-lg border border-edge", GLASS_SECTION)}
-              >
-                <PetLandingBanner gender={companion.gender} />
-                <div className="space-y-3 p-6 md:p-8">
-                  <h3 className="heading text-[11px] text-ink">{companion.title}</h3>
-                  <p className="text-xs leading-relaxed text-ink-soft">{companion.text}</p>
-                  <NarrationButton
-                    playing={narration.current === companion.voice}
-                    onClick={() => narration.toggle(companion.voice)}
-                  />
-                </div>
-                <CornerAccents inside />
-              </article>
+              <div key={companion.gender} className="relative">
+                <article
+                  className={cn("overflow-hidden rounded-lg border border-edge", GLASS_SECTION)}
+                >
+                  <PetLandingBanner gender={companion.gender} />
+                  <div className="space-y-3 p-6 md:p-8">
+                    <h3 className="heading text-[11px] text-ink">{companion.title}</h3>
+                    <p className="text-xs leading-relaxed text-ink-soft">{companion.text}</p>
+                    <NarrationButton
+                      playing={narration.current === companion.voice}
+                      onClick={() => narration.toggle(companion.voice)}
+                    />
+                  </div>
+                </article>
+                <CornerAccents />
+              </div>
             ))}
           </div>
         </section>
