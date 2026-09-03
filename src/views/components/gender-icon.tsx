@@ -31,6 +31,25 @@ export function GenderIcon({
   );
 }
 
+export function GenderArtFill({ gender }: { gender: Gender }) {
+  const art = useArt();
+  const source = art.genders[gender];
+
+  if (!source) {
+    return (
+      <span className="grid h-full w-full place-items-center font-mono text-sm tracking-widest text-ink-faint">
+        {findGender(gender).label.slice(0, 1)}
+      </span>
+    );
+  }
+
+  return (
+    <span className="relative flex h-full w-full">
+      <IconArt source={source} padded={false} />
+    </span>
+  );
+}
+
 export function GenderBanner({ gender }: { gender: Gender }) {
   const art = useArt();
   const source = art.genders[gender];

@@ -32,7 +32,7 @@ import { Button } from "../components/button";
 import { DataRow } from "../components/data-row";
 import { EmptyState } from "../components/empty-state";
 import { HunterSearchField } from "../components/hunter-search-field";
-import { GenderIcon } from "../components/gender-icon";
+import { GenderArtFill, GenderIcon } from "../components/gender-icon";
 import { List, ListRow, RowText } from "../components/list";
 import { Pagination } from "../components/pagination";
 import { Panel } from "../components/panel";
@@ -449,8 +449,7 @@ export function ArenaScreen() {
               const resting = cooldownLeft > 0;
               return (
                 <Card key={hunter.id} height="fill">
-                  <CardHeader>
-                    <GenderIcon gender={hunter.gender} size="medium" />
+                  <CardHeader art={<GenderArtFill gender={hunter.gender} />}>
                     <RowText
                       title={
                         <Link
