@@ -48,14 +48,14 @@ const HUNT_READY_KEY = "lumni-wizold:hunt-ready";
 
 function huntReadyInMs(): number {
   if (typeof window === "undefined") return 0;
-  const at = Number(window.sessionStorage.getItem(HUNT_READY_KEY));
+  const at = Number(window.localStorage.getItem(HUNT_READY_KEY));
   if (!Number.isFinite(at)) return 0;
   return Math.max(0, Math.ceil(at - Date.now()));
 }
 
 function markHuntReadyIn(ms: number): void {
   if (typeof window === "undefined") return;
-  window.sessionStorage.setItem(HUNT_READY_KEY, String(Date.now() + Math.max(0, ms)));
+  window.localStorage.setItem(HUNT_READY_KEY, String(Date.now() + Math.max(0, ms)));
 }
 
 function territoryName(id: string): string {

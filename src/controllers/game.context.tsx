@@ -378,6 +378,18 @@ export function GameProvider({ children }: { children: ReactNode }) {
     },
     [request, announce],
   );
+  const adoptOrphanedActivity = useCallback(() => {
+    if (activityRef.current) return;
+    if (activityMirrorStore.snapshot()) return;
+    const saved = activityRepository.load();
+    if (!saved || !stateRef.current.character) return;
+    void request("POST", "/api/state").then((answer) => {
+      if (activityRef.current || activityMirrorStore.snapshot()) return;
+      if (answer.status === 401) return;
+      if (!activityRepository.load()) return;
+      setActivity(saved);
+    });
+  }, [request, setActivity]);
   useEffect(() => {
     if (!hydrated) return;
     void (async () => {
@@ -437,6 +449,15 @@ export function GameProvider({ children }: { children: ReactNode }) {
       },
     });
   }, [applyState, pushNotice, setActivity]);
+  useEffect(() => {
+    let seen = activityMirrorStore.snapshot();
+    return activityMirrorStore.subscribe(() => {
+      const next = activityMirrorStore.snapshot();
+      const lost = seen !== null && next === null;
+      seen = next;
+      if (lost) adoptOrphanedActivity();
+    });
+  }, [adoptOrphanedActivity]);
   const petResting =
     state.pet !== null &&
     state.pet.active === false &&
