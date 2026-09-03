@@ -22,11 +22,11 @@ const SOURCE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg"]);
 const MAX_SIZE = {
   inventory: 512,
   store: 512,
-  creatures: 512,
+  creatures: 768,
   hunt: 1200,
   attributes: 512,
   training: 512,
-  genders: 512,
+  genders: 1024,
   pet: 1024,
 };
 
@@ -37,6 +37,7 @@ const QUALITY = {
   training: 95,
   genders: 95,
   pet: 95,
+  creatures: 95,
 };
 
 const force = process.argv.includes("--force");
