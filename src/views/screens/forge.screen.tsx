@@ -290,7 +290,14 @@ export function ForgeScreen() {
                 return (
                   <ArtRowButton
                     key={ore.id}
-                    art={fragment ? <ItemIcon item={fragment} /> : <IconFrame tone="empty" />}
+                    art={
+                      fragment ? (
+                        <ItemIcon item={fragment} size="large" />
+                      ) : (
+                        <IconFrame size="large" tone="empty" />
+                      )
+                    }
+                    artSide="trailing"
                     title={ore.label}
                     description={
                       unlocked
@@ -303,12 +310,12 @@ export function ForgeScreen() {
                     }
                     trailing={
                       <>
-                        <span className="shrink-0 self-center font-mono text-[11px] text-ink-faint">
+                        <span className="shrink-0 font-mono text-[11px] text-ink-faint">
                           x{formatNumber(owned)}
                         </span>
                         <span
                           className={cn(
-                            "grid h-4 w-4 shrink-0 place-items-center self-center rounded-full border",
+                            "grid h-4 w-4 shrink-0 place-items-center rounded-full border",
                             isSelected ? "border-ember" : "border-edge-strong",
                           )}
                         >

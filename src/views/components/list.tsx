@@ -108,6 +108,7 @@ export function ArtRow({
 
 export function ArtRowButton({
   art,
+  artSide = "leading",
   title,
   description,
   trailing,
@@ -117,6 +118,7 @@ export function ArtRowButton({
   className,
 }: {
   art: ReactNode;
+  artSide?: "leading" | "trailing";
   title: ReactNode;
   description?: ReactNode;
   trailing?: ReactNode;
@@ -125,6 +127,35 @@ export function ArtRowButton({
   pressed?: boolean;
   className?: string;
 }) {
+  if (artSide === "trailing") {
+    return (
+      <ListRow padding="art" className="p-0">
+        <button
+          type="button"
+          onClick={onClick}
+          disabled={disabled}
+          aria-pressed={pressed}
+          className={cn(
+            "flex w-full items-stretch text-left transition-colors",
+            ICON_FRAME_INSET,
+            disabled && "opacity-60",
+            className,
+          )}
+        >
+          <span className="flex min-w-0 grow items-center px-4 py-3">
+            <RowText title={title} description={description} />
+          </span>
+          <span className="flex shrink-0 items-center border-l border-edge p-3">{art}</span>
+          {trailing ? (
+            <span className="flex shrink-0 items-center gap-3 border-l border-edge px-4 py-3">
+              {trailing}
+            </span>
+          ) : null}
+        </button>
+      </ListRow>
+    );
+  }
+
   return (
     <ListRow padding="art" className="p-0">
       <button
