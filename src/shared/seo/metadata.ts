@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { GAME_NAME, GAME_TAGLINE } from "@/shared/constants/game";
-import { OG_IMAGE_PATH, SITE_URL } from "@/shared/constants/site";
+import { OG_IMAGE_PATH, BRAND_ICON_PATH, BRAND_LOGO_PNG_PATH, SITE_URL } from "@/shared/constants/site";
 
 export const SITE_DESCRIPTION =
   "Crônica de Lumni e Luna: jogo de navegador gratuito de lobisomem. Caçe criaturas, treine atributos, forje equipamentos e dispute o ranking.";
@@ -62,8 +62,8 @@ export function rootMetadata(): Metadata {
       images: [OG_IMAGE_PATH],
     },
     icons: {
-      icon: [{ url: "/icon.png", type: "image/png" }],
-      apple: [{ url: "/assets/ui/logo.png", type: "image/png" }],
+      icon: [{ url: BRAND_ICON_PATH, type: "image/png" }],
+      apple: [{ url: BRAND_LOGO_PNG_PATH, type: "image/png" }],
     },
     ...(verification ? { verification: { google: verification } } : {}),
   };

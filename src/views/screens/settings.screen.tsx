@@ -15,6 +15,7 @@ import { musicRepository } from "@/models/repositories/music.repository";
 import { soundRepository } from "@/models/repositories/sound.repository";
 import { tavernPushRepository } from "@/models/repositories/tavern-push.repository";
 import { NAME_MAX_LENGTH, RENAME_COOLDOWN_DAYS, RENAME_PRICE } from "@/shared/constants/game";
+import { BRAND_LOGO_PNG_PATH, BRAND_LOGO_WEBP_PATH } from "@/shared/constants/site";
 import { formatNumber, formatBronze, formatReais, formatDay } from "@/shared/utils/format";
 import { sanitizeName } from "@/shared/utils/text";
 import { ICON_FRAME_INSET } from "@/shared/constants/ui";
@@ -61,8 +62,6 @@ export function SettingsScreen() {
     disableTwoFactor,
     setAutomation,
     buyVip,
-    cancelVip,
-    reactivateVip,
   } = useGame();
   const router = useRouter();
   const [now] = useState(() => Date.now());
@@ -96,14 +95,13 @@ export function SettingsScreen() {
   const art = useArt();
   const [confirmingClear, setConfirmingClear] = useState(false);
   const [clearing, setClearing] = useState(false);
-  const [cancelingVip, setCancelingVip] = useState(false);
 
   async function clearGameCache() {
     setClearing(true);
     try {
       const urls = [
-        "/assets/ui/logo.webp?v=3",
-        "/assets/ui/logo.png?v=3",
+        BRAND_LOGO_WEBP_PATH,
+        BRAND_LOGO_PNG_PATH,
         "/assets/ui/background.jpg?v=2",
         ...Object.values(art.items),
         ...Object.values(art.attributes),
@@ -438,15 +436,9 @@ export function SettingsScreen() {
                       ? "VIP ativo até " + formatDay(character.vipUntil ?? "") + ", sem renovar."
                       : "Assinatura ativa, renova em " + formatDay(character.vipUntil ?? "") + "."}
                   </span>
-                  {character.vipCanceling ? (
-                    <Button variant="primary" onClick={() => reactivateVip()}>
-                      Reativar assinatura
-                    </Button>
-                  ) : (
-                    <Button variant="outline" onClick={() => setCancelingVip(true)}>
-                      Cancelar assinatura
-                    </Button>
-                  )}
+                  <Button variant="outline" onClick={() => router.push("/store")}>
+                    Gerenciar na loja
+                  </Button>
                 </div>
               ) : (
                 <div className="flex flex-wrap items-center justify-between gap-3">
@@ -711,18 +703,6 @@ export function SettingsScreen() {
         onConfirm={async () => {
           await clearGameCache();
           setConfirmingClear(false);
-        }}
-      />
-
-      <ConfirmDialog
-        open={cancelingVip}
-        title="Cancelar assinatura VIP"
-        description="A cobrança mensal para de renovar. O VIP continua ativo até o fim do período já pago, e dá para reativar antes disso."
-        confirmLabel="Cancelar assinatura"
-        onCancel={() => setCancelingVip(false)}
-        onConfirm={async () => {
-          await cancelVip();
-          setCancelingVip(false);
         }}
       />
 

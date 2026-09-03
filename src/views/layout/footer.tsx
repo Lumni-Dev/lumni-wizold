@@ -1,5 +1,6 @@
 import { COMPANY } from "@/shared/constants/company";
 import { GAME_NAME, GAME_TAGLINE } from "@/shared/constants/game";
+import { BRAND_ICON_PATH } from "@/shared/constants/site";
 import { ActionIcon } from "../components/app-icon";
 import { BackToTop } from "./back-to-top";
 
@@ -12,7 +13,7 @@ export function Footer() {
         <div className="max-w-md space-y-3">
           <div className="flex items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/icon.png" alt={GAME_NAME} className="h-8 w-8 shrink-0 rounded-md" />
+            <img src={BRAND_ICON_PATH} alt={GAME_NAME} className="h-8 w-8 shrink-0 rounded-md" />
             <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
               {GAME_TAGLINE}
             </p>

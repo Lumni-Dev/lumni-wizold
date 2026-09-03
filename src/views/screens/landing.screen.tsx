@@ -5,6 +5,7 @@ import { useGame } from "@/controllers/game.context";
 import { LORE_CHAPTERS, LORE_COMPANIONS, LORE_COUPLE, LORE_PILLARS } from "@/models/data/lore";
 import { PREVIEW_SHOTS } from "@/models/data/preview";
 import { GAME_NAME, GAME_TAGLINE } from "@/shared/constants/game";
+import { BRAND_LOGO_WEBP_PATH } from "@/shared/constants/site";
 import { GLASS_SECTION, GLASS_SECTION_STRONG } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { CornerAccents } from "../components/corner-accents";
@@ -41,7 +42,7 @@ export function LandingScreen() {
             </h1>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/assets/ui/logo.webp?v=3"
+              src={BRAND_LOGO_WEBP_PATH}
               alt={GAME_NAME}
               className="landing-hero-shadow-logo mx-auto w-72 max-w-full md:w-96"
             />

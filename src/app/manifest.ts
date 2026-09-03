@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { GAME_NAME, GAME_TAGLINE } from "@/shared/constants/game";
+import { BRAND_ICON_PATH, BRAND_LOGO_PNG_PATH } from "@/shared/constants/site";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
@@ -17,12 +18,12 @@ export default function manifest(): MetadataRoute.Manifest {
     categories: ["games", "entertainment"],
     icons: [
       {
-        src: "/icon.png",
+        src: BRAND_ICON_PATH,
         sizes: "512x512",
         type: "image/png",
       },
       {
-        src: "/assets/ui/logo.png",
+        src: BRAND_LOGO_PNG_PATH,
         sizes: "512x512",
         type: "image/png",
         purpose: "maskable",

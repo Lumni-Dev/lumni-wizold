@@ -6,6 +6,7 @@ import { useGame } from "@/controllers/game.context";
 import { playSound } from "@/controllers/sound";
 import { loadBirth, saveBirth } from "@/models/repositories/birth.repository";
 import { GAME_NAME, MIN_AGE } from "@/shared/constants/game";
+import { BRAND_ICON_PATH } from "@/shared/constants/site";
 import { GLASS_SECTION } from "@/shared/constants/ui";
 import { ageOf, EMPTY_BIRTH, isRealBirth } from "@/shared/utils/birth";
 import { cn } from "@/shared/utils/class-names";
@@ -209,7 +210,7 @@ export function LoginScreen() {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/icon.png"
+                src={BRAND_ICON_PATH}
                 alt={GAME_NAME}
                 className="landing-hero-shadow-logo h-32 w-32 shrink-0 rounded-md"
               />

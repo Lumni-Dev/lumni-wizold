@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { playSound } from "@/controllers/sound";
 import { GAME_TAGLINE } from "@/shared/constants/game";
+import { BRAND_ICON_PATH } from "@/shared/constants/site";
 import {
   NAVIGATION,
   SETTINGS_LINK,
@@ -26,7 +27,7 @@ function Brand() {
       className="flex h-[74px] items-center gap-3 border-b border-edge px-3"
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/icon.png" alt="" className="h-10 w-10 shrink-0 rounded-md" />
+      <img src={BRAND_ICON_PATH} alt="" className="h-10 w-10 shrink-0 rounded-md" />
       <div className="min-w-0 flex-1 text-left">
         <p className="text-[10px] uppercase leading-relaxed tracking-[0.16em] text-ink-faint">
           {GAME_TAGLINE}

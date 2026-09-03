@@ -1,5 +1,5 @@
 import { createTransport } from "nodemailer";
-import { SITE_EMAIL } from "@/shared/constants/site";
+import { SITE_EMAIL, BRAND_LOGO_PNG_PATH } from "@/shared/constants/site";
 
 const GAME_URL = "https://wizold.lumni.dev.br";
 const GAME_NAME = "WIZOLD";
@@ -13,7 +13,7 @@ const INK = "#f0e9e2";
 const INK_SOFT = "#ac9c8d";
 const INK_FAINT = "#79695a";
 const EMBER = "#e08d35";
-const LOGO_URL = GAME_URL + "/assets/ui/logo.png?v=3";
+const LOGO_URL = GAME_URL + BRAND_LOGO_PNG_PATH;
 
 function transporter() {
   const host = process.env.SMTP_HOST;
