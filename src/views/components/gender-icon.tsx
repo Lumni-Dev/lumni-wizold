@@ -7,7 +7,6 @@ import { GLASS_SECTION } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { ArtImage } from "./art-image";
 import { IconArt, IconFrame, type IconSize } from "./icon-frame";
-import { LandingParallaxBanner } from "./landing-parallax-banner";
 
 export function GenderIcon({
   gender,
@@ -58,9 +57,9 @@ export function GenderBanner({ gender }: { gender: Gender }) {
   if (!source) return null;
 
   return (
-    <LandingParallaxBanner>
+    <div className="aspect-square w-full border-b border-edge p-5">
       <ArtImage source={source} fit="contain" />
-    </LandingParallaxBanner>
+    </div>
   );
 }
 

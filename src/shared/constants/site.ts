@@ -12,5 +12,3 @@ export const BRAND_ASSET_VERSION = "6";
 export const BRAND_ICON_PATH = "/assets/ui/favicon.png?v=" + BRAND_ASSET_VERSION;
 export const BRAND_LOGO_WEBP_PATH = "/assets/ui/logo.webp?v=" + BRAND_ASSET_VERSION;
 export const BRAND_LOGO_PNG_PATH = "/assets/ui/logo.png?v=" + BRAND_ASSET_VERSION;
-
-export const LANDING_PARALLAX_BACK = "/assets/ui/landing-parallax-back.webp?v=1";
