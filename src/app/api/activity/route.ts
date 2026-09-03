@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { isActivityKind } from "@/models/entities/activity";
 import { readActivity, updateActivity } from "@/models/repositories/server/game.store";
-import { asInt, asText, readBody, withIdentity } from "../_lib/api";
+import { asInt, asText, readBody, withActivityLock } from "../_lib/api";
 
 function readResume(body: Record<string, unknown>) {
   const resume = body.resume;
@@ -18,18 +18,18 @@ function readResume(body: Record<string, unknown>) {
 }
 
 export async function PUT(request: Request) {
-  return withIdentity(request, async (identity, client) => {
+  return withActivityLock(request, async (client, characterId) => {
     const body = await readBody(request);
     const kind = asText(body.kind, 16);
     if (!kind) {
-      await updateActivity(client, identity.id, null);
+      await updateActivity(client, characterId, null);
       return NextResponse.json({ ok: true, message: "", data: null, activity: null });
     }
     if (!isActivityKind(kind)) {
       return NextResponse.json({ ok: false, message: "Atividade inválida.", data: null });
     }
     const resume = readResume(body);
-    await updateActivity(client, identity.id, {
+    await updateActivity(client, characterId, {
       kind,
       targetId: asText(body.id, 120) || null,
       enhancement: typeof body.enhancement === "number" ? Math.round(body.enhancement) : null,
@@ -41,7 +41,7 @@ export async function PUT(request: Request) {
       resumeEnhancement: resume.resumeEnhancement,
       startedAt: kind === "rest" ? new Date().toISOString() : null,
     });
-    const { activity } = await readActivity(client, identity.id);
+    const { activity } = await readActivity(client, characterId);
     return NextResponse.json({ ok: true, message: "", data: null, activity });
   });
 }

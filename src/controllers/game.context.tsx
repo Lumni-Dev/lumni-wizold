@@ -43,6 +43,7 @@ import { activityMirrorStore } from "./activity-mirror.store";
 import { activityRuntimeStore } from "./activity-runtime";
 import { activitySync } from "./activity-sync";
 import { api, isTransientApiMessage, type ApiAnswer } from "./api.client";
+import { activityApi, activityThreadBusy } from "./activity-thread";
 import { usePresenceHeartbeat } from "./use-presence-heartbeat";
 import { playSound, preloadSounds, setVoiceProfile } from "./sound";
 export interface Notice {
@@ -283,7 +284,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
     if (activitySync.isHandshaking()) return;
     if (heldHuntRef.current || heldArenaRef.current) return;
     if (inFlightRef.current > 0) return;
+    if (activityThreadBusy()) return;
     const local = activityRef.current;
+    if (local && next && local.kind === next.kind && (local.id ?? null) === (next.id ?? null)) {
+      if ((next.beat ?? 0) < (local.beat ?? 0)) return;
+    }
     if (local && local.kind !== "rest") {
       const dock = activityRuntimeStore.snapshot().dock;
       if (dock && local.kind === dock.kind && !local.paused && !dock.canStop) return;
@@ -315,7 +320,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     const patch = pendingProgressRef.current;
     if (!patch || activitySync.isMirroring()) return;
     pendingProgressRef.current = null;
-    void api("PATCH", "/api/activity/progress", patch);
+    void activityApi("PATCH", "/api/activity/progress", patch);
   }, []);
   const syncProgress = useCallback(
     (patch: { beat: number; cooldownUntil?: string | null }) => {
@@ -367,14 +372,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
         flushProgress();
         activitySync.release();
       }
-      void api("PUT", "/api/activity", activityPayload(next));
+      void activityApi("PUT", "/api/activity", activityPayload(next));
     },
     [applyState, flushProgress],
   );
   setActivityRef.current = setActivity;
   const persistActivity = useCallback((next: Activity | null) => {
     activityRef.current = next;
-    void api("PUT", "/api/activity", activityPayload(next));
+    void activityApi("PUT", "/api/activity", activityPayload(next));
   }, []);
   const request = useCallback(
     async <T,>(
@@ -545,6 +550,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       if (busy) return;
       if (activitySync.isMirroring()) return;
       if (inFlightRef.current > 0 || heldHuntRef.current || heldArenaRef.current) return;
+      if (activityThreadBusy()) return;
       if (!isVip(stateRef.current.character, Date.now())) return;
       busy = true;
       try {

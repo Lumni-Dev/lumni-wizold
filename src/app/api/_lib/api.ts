@@ -60,6 +60,33 @@ export async function withSessionRead(
     return bad("O servidor tropeçou. Tente de novo.", 500);
   }
 }
+
+export async function withActivityLock(
+  request: Request,
+  action: (client: PoolClient, characterId: string) => Promise<NextResponse>,
+): Promise<NextResponse> {
+  const refused = refuseAbuse(request);
+  if (refused) return refused;
+  const claims = await sessionClaims();
+  if (!claims) return bad("Entre para jogar.", 401);
+  const gate = rateLimit("act:" + claims.userId, 30, 10000);
+  if (!gate.allowed) return tooMany(gate.retryAfterMs);
+  try {
+    return await withTransaction(async (client) => {
+      if (!(await sessionIsLive(client, claims))) return bad("Sessão encerrada.", 401);
+      const found = await client.query<{ id: string }>(
+        "select id from characters where user_id = $1 for update",
+        [claims.userId],
+      );
+      const characterId = found.rows[0]?.id;
+      if (!characterId) return bad("Nenhum personagem ativo.", 404);
+      return action(client, characterId);
+    });
+  } catch (error) {
+    console.error("[api]", request.method, new URL(request.url).pathname, error);
+    return bad("O servidor tropeçou. Tente de novo.", 500);
+  }
+}
 export interface ApiContext {
   client: PoolClient;
   userId: string;
