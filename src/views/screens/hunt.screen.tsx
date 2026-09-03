@@ -22,7 +22,7 @@ import { ArtImage } from "../components/art-image";
 import { ArtVideo } from "../components/art-video";
 import { ChipTabs } from "../components/chip-tabs";
 import { NarrationButton } from "../components/narration-button";
-import { CreatureIcon } from "../components/creature-icon";
+import { CreatureArtFill } from "../components/creature-icon";
 import {
   loadHuntSelection,
   saveHuntSelection,
@@ -449,7 +449,8 @@ export function HuntScreen() {
                         return (
                           <ArtRowButton
                             key={creature.id}
-                            art={<CreatureIcon creature={creature} />}
+                            art={<CreatureArtFill creature={creature} />}
+                            divided
                             title={
                               <span
                                 className={cn(
@@ -483,7 +484,7 @@ export function HuntScreen() {
                             trailing={
                               <span
                                 className={cn(
-                                  "grid h-4 w-4 shrink-0 place-items-center self-center rounded-full border",
+                                  "grid h-4 w-4 shrink-0 place-items-center rounded-full border",
                                   isSelected ? "border-ember" : "border-edge-strong",
                                 )}
                               >

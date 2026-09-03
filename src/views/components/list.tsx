@@ -142,7 +142,7 @@ export function ArtRowButton({
             className,
           )}
         >
-          <span className="flex aspect-square w-24 shrink-0 overflow-hidden border-r border-edge">
+          <span className="flex aspect-square w-28 shrink-0 overflow-hidden border-r border-edge p-3">
             {art}
           </span>
           <span className="flex min-w-0 grow items-center px-4 py-3">

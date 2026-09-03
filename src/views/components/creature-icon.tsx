@@ -45,3 +45,29 @@ export function CreatureIcon({
     </IconFrame>
   );
 }
+
+export function CreatureArtFill({ creature }: { creature: Creature }) {
+  const art = useArt();
+  const source = art.creatures[creature.id];
+  const [broken, setBroken] = useState(false);
+
+  if (!source || broken) {
+    return (
+      <span className="grid h-full w-full place-items-center font-mono text-sm tracking-widest text-ink-faint">
+        {creatureInitials(creature.name)}
+      </span>
+    );
+  }
+
+  return (
+    <span className="relative flex h-full w-full">
+      <IconArt
+        source={source}
+        padded={false}
+        fit="contain"
+        glow
+        onFail={() => setBroken(true)}
+      />
+    </span>
+  );
+}
