@@ -93,7 +93,7 @@ export function CreatureCarousel() {
   } as CSSProperties;
 
   return (
-    <div aria-hidden="true" ref={boxRef} className="drift-fade relative overflow-hidden">
+    <div aria-hidden="true" ref={boxRef} className="drift-fade relative overflow-hidden py-4">
       <div ref={trackRef} className="creature-drift flex w-max items-center gap-2" style={style}>
         {strip.map((creature, position) => (
           <CreatureIcon

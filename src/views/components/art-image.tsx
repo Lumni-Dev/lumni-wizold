@@ -25,7 +25,7 @@ export function ArtImage({
   }, [source]);
 
   return (
-    <span className={cn("relative block h-full w-full", className)}>
+    <span className={cn("relative flex h-full w-full items-center justify-center", className)}>
       {!loaded ? <span aria-hidden="true" className="art-shimmer absolute inset-0" /> : null}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
@@ -38,8 +38,8 @@ export function ArtImage({
           setLoaded(true);
         }}
         className={cn(
-          "art-soft-shadow h-full w-full transition-opacity duration-300",
-          fit === "contain" ? "object-contain" : "object-cover",
+          "art-soft-shadow max-h-full max-w-full transition-opacity duration-300",
+          fit === "contain" ? "object-contain" : "h-full w-full object-cover",
           loaded ? "opacity-100" : "opacity-0",
         )}
       />

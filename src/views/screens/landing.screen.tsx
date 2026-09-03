@@ -71,7 +71,7 @@ export function LandingScreen() {
 
       <main className="relative z-10 mx-auto w-full max-w-5xl space-y-16 px-4 py-16 md:px-8 md:py-24">
         <section className="relative">
-          <div className={cn("overflow-hidden rounded-lg border border-edge", GLASS_SECTION)}>
+          <div className={cn("rounded-lg border border-edge", GLASS_SECTION)}>
             <div className="grid grid-cols-1 border-b border-edge sm:grid-cols-2">
               {(["male", "female"] as const).map((key) => (
                 <div
@@ -143,9 +143,7 @@ export function LandingScreen() {
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             {LORE_COMPANIONS.map((companion) => (
               <div key={companion.gender} className="relative">
-                <article
-                  className={cn("overflow-hidden rounded-lg border border-edge", GLASS_SECTION)}
-                >
+                <article className={cn("rounded-lg border border-edge", GLASS_SECTION)}>
                   <PetLandingBanner gender={companion.gender} />
                   <div className="space-y-3 p-6 md:p-8">
                     <h3 className="heading text-[11px] text-ink">{companion.title}</h3>

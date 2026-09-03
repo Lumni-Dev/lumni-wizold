@@ -58,7 +58,7 @@ export function IconFrame({
     >
       <span
         className={cn(
-          "relative flex h-full w-full items-center justify-center overflow-hidden rounded-md border font-mono",
+          "relative flex h-full w-full items-center justify-center overflow-visible rounded-md border p-1.5 font-mono",
           ICON_TEXT[size],
           TONES[tone],
         )}
@@ -122,30 +122,32 @@ export function IconArt({
       {!loaded ? (
         <span aria-hidden="true" className="art-shimmer pointer-events-none absolute inset-0" />
       ) : null}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        ref={imgRef}
-        src={source}
-        alt=""
-        loading={priority ? "eager" : "lazy"}
-        fetchPriority={priority ? "high" : undefined}
-        referrerPolicy="no-referrer"
-        onLoad={() => {
-          markArtCached(source);
-          setLoaded(true);
-        }}
-        onError={() => onFail?.()}
-        className={cn(
-          "art-soft-shadow h-full w-full transition-opacity duration-300",
-          fit === "contain" ? "object-contain" : "object-cover",
-          loaded ? "opacity-100" : "opacity-0",
-          zoom && "cursor-zoom-in",
-          inset ?? (padded && ICON_PAD),
-        )}
-        onMouseEnter={zoom ? place : undefined}
-        onMouseMove={zoom ? place : undefined}
-        onMouseLeave={zoom ? () => setPreview(null) : undefined}
-      />
+      <span className="relative flex h-full w-full items-center justify-center">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          ref={imgRef}
+          src={source}
+          alt=""
+          loading={priority ? "eager" : "lazy"}
+          fetchPriority={priority ? "high" : undefined}
+          referrerPolicy="no-referrer"
+          onLoad={() => {
+            markArtCached(source);
+            setLoaded(true);
+          }}
+          onError={() => onFail?.()}
+          className={cn(
+            "art-soft-shadow max-h-full max-w-full transition-opacity duration-300",
+            fit === "contain" ? "object-contain" : "h-full w-full object-cover",
+            loaded ? "opacity-100" : "opacity-0",
+            zoom && "cursor-zoom-in",
+            inset ?? (padded && ICON_PAD),
+          )}
+          onMouseEnter={zoom ? place : undefined}
+          onMouseMove={zoom ? place : undefined}
+          onMouseLeave={zoom ? () => setPreview(null) : undefined}
+        />
+      </span>
       {glow ? (
         <span className="item-glow pointer-events-none absolute -inset-1/2 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
       ) : null}
