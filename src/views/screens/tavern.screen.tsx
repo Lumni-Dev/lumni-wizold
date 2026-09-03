@@ -144,6 +144,7 @@ export function TavernScreen() {
     announceAway,
   } = useTavern(mobileChat ? openRoomId : null);
   const [closingRoomId, setClosingRoomId] = useState<string | null>(null);
+  const [closedRoomId, setClosedRoomId] = useState<string | null>(null);
 
   const fetchInvitesRef = useRef(fetchInvites);
   useEffect(() => {
@@ -344,6 +345,8 @@ export function TavernScreen() {
   const openTables = rooms.filter(({ isPrivate }) => !isPrivate).length;
 
   const closingRoom = rooms.find(({ room }) => room.id === closingRoomId) ?? null;
+  const stillClosing =
+    closedRoomId && rooms.some(({ room }) => room.id === closedRoomId) ? closedRoomId : null;
 
   const profileHref = (memberId: string): string | null =>
     memberId === identity.id ? "/character" : "/ranking/" + memberId;
@@ -831,7 +834,12 @@ export function TavernScreen() {
                   <CardFooter>
                     <div className="grid w-full grid-cols-2 gap-2">
                       {isPrivate || room.ownerId === identity.id ? (
-                        <Button variant="ghost" fullWidth onClick={() => setClosingRoomId(room.id)}>
+                        <Button
+                          variant="ghost"
+                          fullWidth
+                          busy={stillClosing === room.id}
+                          onClick={() => setClosingRoomId(room.id)}
+                        >
                           Fechar mesa
                         </Button>
                       ) : isMember ? (
@@ -843,7 +851,7 @@ export function TavernScreen() {
                         block
                         className={
                           !isPrivate && room.ownerId !== identity.id && !isMember
-                            ? "col-span-2"
+                            ? "col-start-2"
                             : undefined
                         }
                         label={
@@ -948,11 +956,14 @@ export function TavernScreen() {
         onConfirm={async () => {
           const roomId = closingRoomId;
           if (!roomId) return;
+          setClosedRoomId(roomId);
           const result = await closeRoom(roomId);
           if (result) notify(result.message, result.ok, "Taverna");
           if (result?.ok) {
             playSound("door");
             if (tavernChatStore.isOpenFor(roomId)) tavernChatStore.closeWindow();
+          } else {
+            setClosedRoomId(null);
           }
           setClosingRoomId(null);
         }}

@@ -17,6 +17,7 @@ import { formatTime } from "@/shared/utils/format";
 import { splitChatLinks } from "@/shared/utils/text";
 import { ActionIcon } from "./app-icon";
 import { AiAuditNotice } from "./ai-audit-notice";
+import { AI_AUDIT_CHAT_NOTICE } from "@/shared/constants/moderation";
 import { Button } from "./button";
 import { Field } from "./field";
 import { List, ListRow } from "./list";
@@ -358,7 +359,7 @@ export function TavernRoomChatComposer({
           {cooldownLeft > 0 ? Math.ceil(cooldownLeft / 1000) : "Falar"}
         </Button>
       </div>
-      <AiAuditNotice />
+      <AiAuditNotice text={AI_AUDIT_CHAT_NOTICE} />
     </form>
   );
 }

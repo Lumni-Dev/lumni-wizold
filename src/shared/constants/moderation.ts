@@ -1,6 +1,9 @@
 export const AI_AUDIT_NOTICE =
   "Nomes passam por auditoria de IA antes de entrar no jogo. Mensagens da taverna são auditadas depois do envio. A IA só recusa insulto, racismo e pedofilia; o resto passa.";
 
+export const AI_AUDIT_CHAT_NOTICE =
+  "Mensagens auditadas por IA, para evitar conteúdo impróprio.";
+
 export const MODERATION_REFUSAL =
   "O texto foi recusado pela auditoria de IA. Escolha outras palavras.";
 
