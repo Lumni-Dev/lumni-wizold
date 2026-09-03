@@ -1,5 +1,13 @@
 import type { GameState } from "@/models/entities/game-state";
 import { GAME_VERSION } from "@/shared/constants/version";
+export function isTransientApiMessage(message: string): boolean {
+  return (
+    message === "" ||
+    message.startsWith("Sem conexão") ||
+    message === "O servidor não respondeu direito."
+  );
+}
+
 export interface ApiAnswer<T> {
   ok: boolean;
   status: number;

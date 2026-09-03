@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { useGame } from "@/controllers/game.context";
 import { GLASS_SECTION } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
@@ -10,18 +9,8 @@ import { CornerAccents } from "../components/corner-accents";
 import { PresenceDot } from "../components/presence-dot";
 import { TavernAlertDock } from "../components/tavern-alert-dock";
 
-const DURATION_MS = 4000;
-
 export function GameCorner() {
   const { notices, dismissNotice } = useGame();
-  const oldest = notices[0];
-
-  useEffect(() => {
-    if (!oldest) return;
-
-    const timer = window.setTimeout(() => dismissNotice(oldest.id), DURATION_MS);
-    return () => window.clearTimeout(timer);
-  }, [oldest, dismissNotice]);
 
   return (
     <div

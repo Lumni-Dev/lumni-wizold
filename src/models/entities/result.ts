@@ -7,8 +7,8 @@ export interface Result<T = undefined> {
   data?: T;
 }
 
-export function failure(state: GameState, message: string): Result<never> {
-  return { ok: false, message, state };
+export function failure<T = never>(state: GameState, message: string, data?: T): Result<T> {
+  return { ok: false, message, state, data };
 }
 
 export function success<T = undefined>(state: GameState, message: string, data?: T): Result<T> {

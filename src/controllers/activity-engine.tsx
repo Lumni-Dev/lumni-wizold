@@ -2,7 +2,11 @@
 
 import { useEffect, useRef } from "react";
 import { findForgePiece } from "@/controllers/forge.controller";
-import { listTerritories, resolveHuntCreatureId } from "@/controllers/hunt.controller";
+import {
+  listTerritories,
+  resolveHuntCreatureId,
+  type HuntReport,
+} from "@/controllers/hunt.controller";
 import { listExercises } from "@/controllers/training.controller";
 import { loadHuntSelection } from "@/models/repositories/hunt-selection.repository";
 import { progressRepository } from "@/models/repositories/progress.repository";
@@ -38,6 +42,20 @@ import { activityMirrorStore } from "./activity-sync";
 function idleRuntime(patch: Parameters<typeof patchActivityRuntime>[0]): void {
   if (activityMirrorStore.snapshot()) return;
   patchActivityRuntime(patch);
+}
+
+const HUNT_READY_KEY = "lumni-wizold:hunt-ready";
+
+function huntReadyInMs(): number {
+  if (typeof window === "undefined") return 0;
+  const at = Number(window.sessionStorage.getItem(HUNT_READY_KEY));
+  if (!Number.isFinite(at)) return 0;
+  return Math.max(0, Math.ceil(at - Date.now()));
+}
+
+function markHuntReadyIn(ms: number): void {
+  if (typeof window === "undefined") return;
+  window.sessionStorage.setItem(HUNT_READY_KEY, String(Date.now() + Math.max(0, ms)));
 }
 
 function territoryName(id: string): string {
@@ -154,7 +172,7 @@ export function ActivityEngine() {
     let fillTimer = 0;
     let beat = 0;
     let script: ReturnType<typeof narrationOf> = [];
-    let pending: Awaited<ReturnType<typeof hunt>> | null = null;
+    let pending: HuntReport | null = null;
     let requesting = false;
     const bled = { last: stateRef.current.character?.health ?? 0 };
     const selection = loadHuntSelection();
@@ -193,16 +211,26 @@ export function ActivityEngine() {
       pending = null;
       requesting = true;
       push(null);
+      const wait = huntReadyInMs();
+      if (wait > 0) {
+        fillTimer = window.setTimeout(resolve, wait);
+        return;
+      }
       const row = listTerritories(stateRef.current).find(
         (entry) => entry.territory.id === activeHunt,
       );
       const creatureId = row
         ? resolveHuntCreatureId(row.creatures, selection[activeHunt])
         : selection[activeHunt];
-      void huntRef.current(activeHunt, creatureId || undefined).then((fight) => {
+      void huntRef.current(activeHunt, creatureId || undefined).then((result) => {
         if (!alive) return;
         requesting = false;
-        if (!fight) {
+        if (result.kind === "retry") {
+          markHuntReadyIn(result.retryAfterMs);
+          fillTimer = window.setTimeout(resolve, Math.max(HUNT_TICK_MS, result.retryAfterMs));
+          return;
+        }
+        if (result.kind === "stop") {
           setActivityRef.current(
             autoRef.current.hunt
               ? { kind: "hunt", id: activeHunt, paused: true }
@@ -210,10 +238,12 @@ export function ActivityEngine() {
           );
           return;
         }
+        const fight = result.report;
         pending = fight;
         bled.last = stateRef.current.character?.health ?? 0;
         script = narrationOf({ foe: fight.creature, combat: fight.combat });
         beat = 0;
+        markHuntReadyIn(script.length * HUNT_TICK_MS);
         push(null);
         fillTimer = window.setTimeout(() => {
           requesting = false;
@@ -305,6 +335,7 @@ export function ActivityEngine() {
       window.clearInterval(timer);
       if (coolTimer) window.clearInterval(coolTimer);
       if (fillTimer) window.clearTimeout(fillTimer);
+      if (pending) landHuntRef.current();
     };
   }, [ready, activity?.kind, activity?.id, activity?.paused]);
 
@@ -368,30 +399,37 @@ export function ActivityEngine() {
         }
         window.clearInterval(barTimer);
         barTimer = 0;
-        void trainRef.current(activeExercise).then((landed) => {
-          if (!alive) return;
-          if (landed) {
-            if (landed.message) notifyRef.current(landed.message, true, "Treino");
-            if (landed.raised) {
-              playSound(activeExercise === PET_EXERCISE_ID ? "pet-up" : "point");
+        const settle = () => {
+          void trainRef.current(activeExercise).then((landed) => {
+            if (!alive) return;
+            if (landed === "retry") {
+              barTimer = window.setTimeout(settle, TRAINING_TICK_MS);
+              return;
             }
-          }
-          beat = 0;
-          progressRepository.clear(bank);
-          if (!landed) {
-            setActivityRef.current(
-              autoRef.current.train && resumable
-                ? { kind: "train", id: activeExercise, paused: true }
-                : null,
-            );
-            return;
-          }
-          if (!autoRef.current.train) {
-            setActivityRef.current(null);
-            return;
-          }
-          startCooldown();
-        });
+            if (landed) {
+              if (landed.message) notifyRef.current(landed.message, true, "Treino");
+              if (landed.raised) {
+                playSound(activeExercise === PET_EXERCISE_ID ? "pet-up" : "point");
+              }
+            }
+            beat = 0;
+            progressRepository.clear(bank);
+            if (!landed) {
+              setActivityRef.current(
+                autoRef.current.train && resumable
+                  ? { kind: "train", id: activeExercise, paused: true }
+                  : null,
+              );
+              return;
+            }
+            if (!autoRef.current.train) {
+              setActivityRef.current(null);
+              return;
+            }
+            startCooldown();
+          });
+        };
+        settle();
       }, TRAINING_TICK_MS);
     };
 
@@ -457,22 +495,29 @@ export function ActivityEngine() {
         if (beat < ticks) return;
         window.clearInterval(barTimer);
         barTimer = 0;
-        void mineRef.current(activeOre).then((mined) => {
-          if (!alive) return;
-          beat = 0;
-          progressRepository.clear(bank);
-          if (!mined) {
-            setActivityRef.current(
-              autoRef.current.mine ? { kind: "mine", id: activeOre, paused: true } : null,
-            );
-            return;
-          }
-          if (!autoRef.current.mine) {
-            setActivityRef.current(null);
-            return;
-          }
-          startCooldown();
-        });
+        const settle = () => {
+          void mineRef.current(activeOre).then((mined) => {
+            if (!alive) return;
+            if (mined === "retry") {
+              barTimer = window.setTimeout(settle, MINING_TICK_MS);
+              return;
+            }
+            beat = 0;
+            progressRepository.clear(bank);
+            if (!mined) {
+              setActivityRef.current(
+                autoRef.current.mine ? { kind: "mine", id: activeOre, paused: true } : null,
+              );
+              return;
+            }
+            if (!autoRef.current.mine) {
+              setActivityRef.current(null);
+              return;
+            }
+            startCooldown();
+          });
+        };
+        settle();
       }, MINING_TICK_MS);
     };
 
@@ -550,29 +595,36 @@ export function ActivityEngine() {
         }
         window.clearInterval(barTimer);
         barTimer = 0;
-        void enhanceRef.current(activeItem, level).then((landed) => {
-          if (!alive) return;
-          if (landed) {
-            if (landed.message) notifyRef.current(landed.message, true, "Bigorna");
-            playSound(landed.raised ? "point" : "denied");
-            if (landed.raised) level += 1;
-          }
-          beat = 0;
-          progressRepository.clear(bank);
-          if (!landed) {
-            setActivityRef.current(
-              autoRef.current.forge
-                ? { kind: "forge", id: activeItem, enhancement: level, paused: true }
-                : null,
-            );
-            return;
-          }
-          if (level >= MAX_ENHANCEMENT || !autoRef.current.forge) {
-            setActivityRef.current(null);
-            return;
-          }
-          startCooldown();
-        });
+        const settle = () => {
+          void enhanceRef.current(activeItem, level).then((landed) => {
+            if (!alive) return;
+            if (landed === "retry") {
+              barTimer = window.setTimeout(settle, 400);
+              return;
+            }
+            if (landed) {
+              if (landed.message) notifyRef.current(landed.message, true, "Bigorna");
+              playSound(landed.raised ? "point" : "denied");
+              if (landed.raised) level += 1;
+            }
+            beat = 0;
+            progressRepository.clear(bank);
+            if (!landed) {
+              setActivityRef.current(
+                autoRef.current.forge
+                  ? { kind: "forge", id: activeItem, enhancement: level, paused: true }
+                  : null,
+              );
+              return;
+            }
+            if (level >= MAX_ENHANCEMENT || !autoRef.current.forge) {
+              setActivityRef.current(null);
+              return;
+            }
+            startCooldown();
+          });
+        };
+        settle();
       }, tickMs);
     };
 

@@ -23,14 +23,19 @@ import type { PresenceStatus } from "@/models/entities/presence";
 import { activityRepository } from "@/models/repositories/activity.repository";
 import { moonRepository } from "@/models/repositories/moon.repository";
 import type { MoonState } from "@/models/rules/moon";
-import { AUTOMATION_TICK_MS, PET_EXERCISE_ID, REST_TICK_MS } from "@/shared/constants/game";
+import {
+  AUTOMATION_TICK_MS,
+  HUNT_TICK_MS,
+  PET_EXERCISE_ID,
+  REST_TICK_MS,
+} from "@/shared/constants/game";
 import { GAME_VERSION, VERSION_POLL_MS } from "@/shared/constants/version";
 import { formatReais } from "@/shared/utils/format";
 import { petLevelOf, petMaxEnergy } from "@/models/rules/pet";
 import { deriveStats, type DerivedStats } from "@/models/rules/stats";
 import type { BirthDate } from "@/shared/utils/birth";
 import type { TavernIdentity } from "@/models/entities/tavern";
-import type { HuntReport } from "./hunt.controller";
+import type { HuntAttempt, HuntReport } from "./hunt.controller";
 import type { ArenaResolution } from "./arena.controller";
 import type { TrainingReport } from "./training.controller";
 import * as automationController from "./automation.controller";
@@ -50,7 +55,7 @@ import {
   watchMirror,
   yieldsTo,
 } from "./activity-sync";
-import { api, type ApiAnswer } from "./api.client";
+import { api, isTransientApiMessage, type ApiAnswer } from "./api.client";
 import { usePresenceHeartbeat } from "./use-presence-heartbeat";
 import { playSound, preloadSounds, setVoiceProfile } from "./sound";
 export interface Notice {
@@ -58,6 +63,7 @@ export interface Notice {
   text: string;
   ok: boolean;
   source: string;
+  at: number;
   dot?: PresenceStatus;
 }
 export type { Activity };
@@ -99,8 +105,8 @@ interface GameContextValue {
   rest: () => Promise<void>;
   activity: Activity | null;
   setActivity: (activity: Activity | null) => void;
-  train: (exerciseId: string) => Promise<{ message: string; raised: boolean } | null>;
-  hunt: (territoryId: string, creatureId?: string) => Promise<HuntReport | null>;
+  train: (exerciseId: string) => Promise<{ message: string; raised: boolean } | "retry" | null>;
+  hunt: (territoryId: string, creatureId?: string) => Promise<HuntAttempt>;
   landHunt: () => void;
   sufferBlow: (damage: number) => void;
   drawOpponent: () => Promise<{
@@ -128,11 +134,11 @@ interface GameContextValue {
   cancelVip: () => Promise<boolean>;
   reactivateVip: () => Promise<boolean>;
   confirmPayment: (sessionId: string) => Promise<boolean>;
-  mine: (oreId: string) => Promise<boolean>;
+  mine: (oreId: string) => Promise<boolean | "retry">;
   enhance: (
     itemId: string,
     enhancement?: number,
-  ) => Promise<{ message: string; raised: boolean } | null>;
+  ) => Promise<{ message: string; raised: boolean } | "retry" | null>;
   adoptPet: (gender: PetGender, name: string) => Promise<void>;
   releasePet: () => Promise<void>;
   setAutomation: (key: AutomationKey, on: boolean) => void;
@@ -163,6 +169,8 @@ interface HeldLanding {
   at: number;
 }
 const HELD_LANDING_TTL_MS = 30000;
+let ownedClaim: { activity: Activity; since: number } | null = null;
+
 export function GameProvider({ children }: { children: ReactNode }) {
   const hydrated = useSyncExternalStore(
     subscribeToClient,
@@ -174,21 +182,24 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [authenticated, setAuthenticated] = useState(false);
   const [tutorial, setTutorial] = useState(true);
   const [notices, setNotices] = useState<Notice[]>([]);
-  const [activity, setActivityState] = useState<Activity | null>(null);
+  const [activity, setActivityState] = useState<Activity | null>(
+    () => ownedClaim?.activity ?? null,
+  );
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [updateVersion, setUpdateVersion] = useState<string | null>(null);
   const noticeCounter = useRef(0);
+  const NOTICE_STACK = 4;
+  const NOTICE_DURATION_MS = 4000;
   const ready = hydrated && booted;
   const moon = useSyncExternalStore(
     moonRepository.subscribe,
     moonRepository.snapshot,
     moonRepository.serverSnapshot,
   );
-  const NOTICE_STACK = 4;
   const pushNotice = useCallback(
     (text: string, ok: boolean, source: string, dot: PresenceStatus | undefined, sound: boolean) => {
       noticeCounter.current += 1;
-      const line = { id: noticeCounter.current, text, ok, source, dot };
+      const line = { id: noticeCounter.current, text, ok, source, dot, at: Date.now() };
       setNotices((current) => [...current, line].slice(-NOTICE_STACK));
       if (!ok && sound) playSound("denied");
     },
@@ -204,6 +215,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const dismissNotice = useCallback((id: number) => {
     setNotices((current) => current.filter((line) => line.id !== id));
   }, []);
+  useEffect(() => {
+    const oldest = notices[0];
+    if (!oldest) return;
+    const left = oldest.at + NOTICE_DURATION_MS - Date.now();
+    const timer = window.setTimeout(() => dismissNotice(oldest.id), Math.max(0, left));
+    return () => window.clearTimeout(timer);
+  }, [notices, dismissNotice]);
   const applyUpdate = useCallback(() => {
     const reload = () => window.location.reload();
     try {
@@ -256,7 +274,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [state, activity]);
   const mintRef = useRef(0);
   const appliedRef = useRef(0);
-  const claimedAtRef = useRef(0);
+  const claimedAtRef = useRef(ownedClaim?.since ?? 0);
   const heldHuntRef = useRef<HeldLanding | null>(null);
   const heldArenaRef = useRef<HeldLanding | null>(null);
   const inFlightRef = useRef(0);
@@ -278,14 +296,19 @@ export function GameProvider({ children }: { children: ReactNode }) {
       }
       activityRef.current = next;
       setActivityState(next);
-      if (!mine) return;
+      if (!mine) {
+        if (!next) ownedClaim = null;
+        return;
+      }
       activityRepository.save(next);
       void api("PUT", "/api/activity", { kind: next?.kind ?? null });
       if (next) {
         dropMirror();
         claimedAtRef.current = Date.now();
+        ownedClaim = { activity: next, since: claimedAtRef.current };
         announceBeat(claimedAtRef.current, next, activityRuntimeStore.snapshot());
       } else {
+        ownedClaim = null;
         announceIdle();
       }
     },
@@ -368,9 +391,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
     announceHello();
     const timer = window.setTimeout(() => {
       if (activityMirrorStore.snapshot()) return;
+      if (activityRef.current) return;
       const saved = activityRepository.load();
       if (!saved || !stateRef.current.character) return;
       claimedAtRef.current = 0;
+      ownedClaim = { activity: saved, since: 0 };
       activityRef.current = saved;
       setActivityState(saved);
     }, HANDSHAKE_MS);
@@ -664,6 +689,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         if (exerciseId === PET_EXERCISE_ID) {
           const answer = await request<{ leveled: boolean }>("POST", "/api/training/pet");
           if (!answer.ok) {
+            if (isTransientApiMessage(answer.message)) return "retry";
             if (answer.message) announce(answer.message, false, "Treino");
             return null;
           }
@@ -673,23 +699,35 @@ export function GameProvider({ children }: { children: ReactNode }) {
           exerciseId,
         });
         if (!answer.ok) {
+          if (isTransientApiMessage(answer.message)) return "retry";
           if (answer.message) announce(answer.message, false, "Treino");
           return null;
         }
         return { message: answer.message, raised: answer.data?.attributeRaised === true };
       },
       hunt: async (territoryId, creatureId) => {
-        const answer = await request<HuntReport>(
+        const answer = await request<HuntReport | { retryAfterMs: number }>(
           "POST",
           "/api/hunt",
           { territoryId, creatureId },
           "hunt",
         );
-        if (!answer.ok) {
-          if (answer.message) announce(answer.message, false, "Caça");
-          return null;
+        if (answer.ok && answer.data && "combat" in answer.data) {
+          return { kind: "fight", report: answer.data };
         }
-        return answer.data;
+        const retryAfterMs =
+          answer.data &&
+          "retryAfterMs" in answer.data &&
+          typeof answer.data.retryAfterMs === "number"
+            ? answer.data.retryAfterMs
+            : isTransientApiMessage(answer.message)
+              ? HUNT_TICK_MS * 2
+              : null;
+        if (retryAfterMs !== null) {
+          return { kind: "retry", retryAfterMs };
+        }
+        if (answer.message) announce(answer.message, false, "Caça");
+        return { kind: "stop" };
       },
       landHunt: () => {
         const held = heldHuntRef.current;
@@ -829,12 +867,17 @@ export function GameProvider({ children }: { children: ReactNode }) {
         return answer.ok;
       },
       mine: async (oreId) => {
-        const answer = await act<{
+        const answer = await request<{
           levelsGained: number;
-        }>("POST", "/api/mine", { oreId }, "Mina", (data) => {
-          if ((data?.levelsGained ?? 0) > 0) playSound("vein", 220);
-        });
-        return answer.ok;
+        }>("POST", "/api/mine", { oreId });
+        if (!answer.ok) {
+          if (isTransientApiMessage(answer.message)) return "retry";
+          if (answer.message) announce(answer.message, false, "Mina");
+          return false;
+        }
+        if (answer.message) announce(answer.message, true, "Mina");
+        if ((answer.data?.levelsGained ?? 0) > 0) playSound("vein", 220);
+        return true;
       },
       enhance: async (itemId, enhancement = 0) => {
         const answer = await request<{ raised: boolean }>("POST", "/api/forge", {
@@ -842,6 +885,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
           enhancement,
         });
         if (!answer.ok) {
+          if (isTransientApiMessage(answer.message)) return "retry";
           if (answer.message) announce(answer.message, false, "Bigorna");
           return null;
         }

@@ -48,6 +48,11 @@ export interface HuntReport extends HuntResolution {
   petLeveled: boolean;
 }
 
+export type HuntAttempt =
+  | { kind: "fight"; report: HuntReport }
+  | { kind: "retry"; retryAfterMs: number }
+  | { kind: "stop" };
+
 function creaturesOf(territory: Territory): Creature[] {
   return territory.creatures
     .map((creatureId) => findCreature(creatureId))
