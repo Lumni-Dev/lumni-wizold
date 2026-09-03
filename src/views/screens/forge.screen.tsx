@@ -297,7 +297,7 @@ export function ForgeScreen() {
                         <IconFrame size="large" tone="empty" />
                       )
                     }
-                    artSide="trailing"
+                    divided
                     title={ore.label}
                     description={
                       unlocked
