@@ -186,7 +186,7 @@ export function MarketScreen() {
             onSearchChange={pickSearch}
           />
 
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {offersOnPage.map(
               ({ item, levelAllowed, affordable, ofLineage, ownedQuantity, reason }) => {
                 const petless = item.category === "pet" && !state.pet;
@@ -259,7 +259,7 @@ export function MarketScreen() {
           {visibleSellables.length === 0 ? (
             <FilteredEmptyState description="Nenhum item do inventário combina com a categoria escolhida." />
           ) : (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {sellablesOnPage.map(({ item, quantity, enhancement }) => (
                 <ItemCard
                   key={item.id + "-" + enhancement}
