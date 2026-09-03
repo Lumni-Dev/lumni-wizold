@@ -32,9 +32,9 @@ import { List, ListRow, RowText } from "../components/list";
 import { Field } from "../components/field";
 import { ChipTabs } from "../components/chip-tabs";
 import { Panel } from "../components/panel";
-import { AttributeIcon } from "../components/attribute-icon";
-import { CreatureIcon } from "../components/creature-icon";
-import { ItemIcon } from "../components/item-icon";
+import { AttributeArtFill } from "../components/attribute-icon";
+import { CreatureArtFill } from "../components/creature-icon";
+import { ItemArtFill } from "../components/item-icon";
 import { WikiMasonry, WikiMasonryItem } from "../components/wiki-masonry";
 import { WikiPaginatedPanel } from "../components/wiki-paginated-panel";
 import { PageHeader } from "../layout/page-header";
@@ -188,8 +188,7 @@ export function WikiScreen() {
             <Panel title="Atributos" description="Cinco eixos, todos treináveis." padding="none">
               <List>
                 {ATTRIBUTES.map((attribute) => (
-                  <ListRow key={attribute.key} padding="art">
-                    <AttributeIcon attribute={attribute.key} />
+                  <ListRow key={attribute.key} art={<AttributeArtFill attribute={attribute.key} />}>
                     <RowText title={attribute.name} description={attribute.effect} />
                   </ListRow>
                 ))}
@@ -232,8 +231,7 @@ export function WikiScreen() {
                 if (!item) return null;
                 const bonuses = summarizeEffect(item).join(", ");
                 return (
-                  <ListRow key={id} padding="art">
-                    <ItemIcon item={item} />
+                  <ListRow key={id} art={<ItemArtFill item={item} />}>
                     <RowText
                       title={
                         <>
@@ -339,8 +337,7 @@ export function WikiScreen() {
           >
             {(pageItems) =>
               pageItems.map((creature) => (
-                <ListRow key={creature.id} padding="art">
-                  <CreatureIcon creature={creature} />
+                <ListRow key={creature.id} art={<CreatureArtFill creature={creature} />}>
                   <RowText
                     title={creature.name}
                     label={SPECIES_LABEL[creature.species]}
@@ -379,8 +376,7 @@ export function WikiScreen() {
           >
             {(pageItems) =>
               pageItems.map((item) => (
-                <ListRow key={item.id} padding="art">
-                  <ItemIcon item={item} />
+                <ListRow key={item.id} art={<ItemArtFill item={item} />}>
                   <RowText title={item.name} description={wikiItemDescription(item)} />
                   <span className="shrink-0 font-mono text-[11px] text-ink-faint">mina</span>
                 </ListRow>
@@ -400,8 +396,7 @@ export function WikiScreen() {
           >
             {(pageItems) =>
               pageItems.map((item) => (
-                <ListRow key={item.id} padding="art">
-                  <ItemIcon item={item} />
+                <ListRow key={item.id} art={<ItemArtFill item={item} />}>
                   <RowText title={item.name} description={wikiItemDescription(item)} />
                   <span className="shrink-0 font-mono text-[11px] text-ink-faint">
                     {item.inMarket ? formatBronze(marketPriceOf(item, level)) : "drop"}
@@ -421,8 +416,7 @@ export function WikiScreen() {
           >
             {(pageItems) =>
               pageItems.map((item) => (
-                <ListRow key={item.id} padding="art">
-                  <ItemIcon item={item} />
+                <ListRow key={item.id} art={<ItemArtFill item={item} />}>
                   <RowText title={item.name} description={wikiItemDescription(item)} />
                   <span className="shrink-0 font-mono text-[11px] text-ink-faint">
                     {formatBronze(marketPriceOf(item, level))}

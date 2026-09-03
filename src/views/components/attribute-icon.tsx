@@ -22,3 +22,22 @@ export function AttributeIcon({
     </IconFrame>
   );
 }
+
+export function AttributeArtFill({ attribute }: { attribute: AttributeKey }) {
+  const art = useArt();
+  const source = art.attributes[attribute];
+
+  if (!source) {
+    return (
+      <span className="grid h-full w-full place-items-center font-mono text-sm tracking-widest text-ink-faint">
+        {findAttribute(attribute)?.code ?? ""}
+      </span>
+    );
+  }
+
+  return (
+    <span className="relative flex h-full w-full">
+      <IconArt source={source} padded={false} />
+    </span>
+  );
+}
