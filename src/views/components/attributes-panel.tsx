@@ -47,9 +47,12 @@ export function AttributesPanel({
               key={definition.key}
               art={<AttributeArtFill attribute={definition.key} />}
               layout="column"
+              padding="none"
             >
-              <RowText title={definition.name} description={definition.description} />
-              <div className="grid w-full grid-cols-3 divide-x divide-y divide-edge overflow-hidden rounded-md border border-edge sm:grid-cols-7 sm:divide-y-0">
+              <div className="px-4 py-3">
+                <RowText title={definition.name} description={definition.description} />
+              </div>
+              <div className="grid grid-cols-3 divide-x divide-y divide-edge border-t border-edge sm:grid-cols-7 sm:divide-y-0">
                 {cells.map((cell) => (
                   <div
                     key={cell.label}

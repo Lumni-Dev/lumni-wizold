@@ -47,9 +47,11 @@ export function ListRow({
     layout === "row"
       ? ROW_FLEX
       : layout === "column"
-        ? padding === "art" || art
-          ? "flex flex-col gap-3"
-          : LAYOUTS.column
+        ? padding === "none"
+          ? "flex flex-col"
+          : padding === "art" || art
+            ? "flex flex-col gap-3"
+            : LAYOUTS.column
         : LAYOUTS[layout];
 
   if (art) {
@@ -58,7 +60,15 @@ export function ListRow({
         <span className="flex aspect-square w-28 shrink-0 overflow-hidden border-r border-edge p-3">
           {art}
         </span>
-        <div className={cn("min-w-0 grow px-4 py-3", ICON_FRAME_INSET, rowLayout, className)}>
+        <div
+          className={cn(
+            "min-w-0 grow",
+            padding === "none" ? undefined : "px-4 py-3",
+            ICON_FRAME_INSET,
+            rowLayout,
+            className,
+          )}
+        >
           {children}
         </div>
       </li>
