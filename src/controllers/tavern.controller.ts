@@ -111,6 +111,9 @@ export function createRoom(
   if (problem) return fail(state, problem);
 
   const open = password.trim().length === 0;
+  if (hideName && open) {
+    return fail(state, "Mesa reservada precisa de senha.");
+  }
   if (open && !canOpenUnlockedRoom(identity)) {
     return fail(
       state,

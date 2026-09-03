@@ -411,7 +411,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         " pessoas, com ou sem senha, e você mantém uma por vez. Mesa aberta sem senha exige NV " +
         OPEN_ROOM_MIN_LEVEL +
         " ou VIP; com senha, qualquer nível.",
-      "Cada mesa ganha um número #, que dá para copiar e buscar. Mesa reservada esconde o nome: de fora só aparece o número.",
+      "Cada mesa ganha um número #, que dá para copiar e buscar. Mesa reservada esconde o nome e exige senha: de fora só aparece o número.",
       "Cada nome na mesa ganha uma cor só sua. Quem chega pega a primeira livre; quem sai devolve a cor. Mesa reservada usa duas.",
       "Cada mesa guarda as últimas " +
         MAX_ROOM_MESSAGES +

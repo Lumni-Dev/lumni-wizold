@@ -507,7 +507,7 @@ export function TavernScreen() {
                 ? "Você já tem uma mesa aberta: feche a sua para abrir outra."
                 : "Sem senha, NV " +
                   OPEN_ROOM_MIN_LEVEL +
-                  "+ ou VIP. Com senha, qualquer nível."
+                  "+ ou VIP. Com senha, qualquer nível. Mesa reservada sempre com senha."
             }
           >
             <form onSubmit={submitRoom} className="space-y-3">
@@ -524,11 +524,13 @@ export function TavernScreen() {
               />
               <AiAuditNotice />
               <Field
-                label="Senha (opcional)"
+                label={hideName ? "Senha" : "Senha (opcional)"}
                 type="password"
                 maxLength={60}
                 value={roomPassword}
-                placeholder="deixe vazio para mesa aberta"
+                placeholder={
+                  hideName ? "obrigatória na mesa reservada" : "deixe vazio para mesa aberta"
+                }
                 autoComplete="new-password"
                 disabled={Boolean(ownRoom)}
                 onChange={(event) => setRoomPassword(event.target.value)}
@@ -542,7 +544,7 @@ export function TavernScreen() {
               </Chip>
               {hideName ? (
                 <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                  De fora só aparece o número
+                  De fora só aparece o número. A senha é obrigatória.
                 </p>
               ) : null}
               <Tooltip
@@ -550,11 +552,13 @@ export function TavernScreen() {
                 label={
                   ownRoom
                     ? "Feche a sua mesa antes de abrir outra"
-                    : roomPassword.trim().length === 0 && !mayOpenUnlocked
-                      ? "Mesa sem senha é só a partir do NV " +
-                        OPEN_ROOM_MIN_LEVEL +
-                        ", ou com VIP. Ponha uma senha para abrir em qualquer nível."
-                      : ""
+                    : hideName && roomPassword.trim().length === 0
+                      ? "Mesa reservada precisa de senha."
+                      : roomPassword.trim().length === 0 && !mayOpenUnlocked
+                        ? "Mesa sem senha é só a partir do NV " +
+                          OPEN_ROOM_MIN_LEVEL +
+                          ", ou com VIP. Ponha uma senha para abrir em qualquer nível."
+                        : ""
                 }
               >
                 <Button
@@ -566,6 +570,7 @@ export function TavernScreen() {
                     creatingRoom ||
                     Boolean(ownRoom) ||
                     roomName.trim().length === 0 ||
+                    (hideName && roomPassword.trim().length === 0) ||
                     (roomPassword.trim().length === 0 && !mayOpenUnlocked)
                   }
                 >

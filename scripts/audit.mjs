@@ -2278,8 +2278,23 @@ sec("taverna");
     );
   }
   {
-    const hide = tavernCtrl.createRoom(entTavern.emptyTavern(), me, "Secreta", "", true);
-    ok("mesa oculta abre", hide.ok === true);
+    ok(
+      "mesa reservada sem senha recusa",
+      tavernCtrl.createRoom(entTavern.emptyTavern(), me, "Secreta", "", true).ok === false,
+    );
+    ok(
+      "VIP também não abre reservada sem senha",
+      tavernCtrl.createRoom(
+        entTavern.emptyTavern(),
+        { ...lowbie, vip: true },
+        "Secreta",
+        "",
+        true,
+      ).ok === false,
+    );
+    const hide = tavernCtrl.createRoom(entTavern.emptyTavern(), me, "Secreta", "chave", true);
+    ok("mesa oculta abre com senha", hide.ok === true);
+    ok("mesa oculta fica trancada", tavernCtrl.findRoom(hide.state, hide.roomId).password !== null);
     const pair = tavernCtrl.createRoom(hide.state, other, "Clara", "");
     ok(
       "segunda mesa é #2",
