@@ -23,15 +23,21 @@ export function TrainingIcon({
   );
 }
 
-export function TrainingBanner({ attribute }: { attribute: AttributeKey }) {
+export function TrainingArtFill({ attribute }: { attribute: AttributeKey }) {
   const art = useArt();
   const source = art.training[attribute] ?? art.attributes[attribute];
 
-  if (!source) return null;
+  if (!source) {
+    return (
+      <span className="grid h-full w-full place-items-center font-mono text-sm tracking-widest text-ink-faint">
+        {findAttribute(attribute)?.code ?? ""}
+      </span>
+    );
+  }
 
   return (
-    <div className="relative aspect-[3/2] w-full overflow-hidden border-b border-edge">
+    <span className="relative flex h-full w-full">
       <IconArt source={source} padded={false} />
-    </div>
+    </span>
   );
 }

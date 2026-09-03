@@ -64,15 +64,21 @@ export function PetIcon({
   );
 }
 
-export function PetBanner({ gender }: { gender: PetGender }) {
+export function PetArtFill({ gender }: { gender: PetGender }) {
   const art = useArt();
   const source = art.pets[gender];
 
-  if (!source) return null;
+  if (!source) {
+    return (
+      <span className="grid h-full w-full place-items-center font-mono text-sm tracking-widest text-ink-faint">
+        {findPet(gender).label.slice(0, 2).toUpperCase()}
+      </span>
+    );
+  }
 
   return (
-    <div className="relative aspect-[3/2] w-full overflow-hidden border-b border-edge">
+    <span className="relative flex h-full w-full">
       <IconArt source={source} padded={false} />
-    </div>
+    </span>
   );
 }
