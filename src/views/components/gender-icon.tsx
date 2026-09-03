@@ -57,7 +57,7 @@ export function GenderBanner({ gender }: { gender: Gender }) {
   if (!source) return null;
 
   return (
-    <div className="aspect-square w-full overflow-hidden border-b border-edge">
+    <div className="aspect-square w-full overflow-hidden border-b border-edge p-4">
       <ArtImage source={source} fit="contain" />
     </div>
   );

@@ -10,8 +10,8 @@ import { GLASS_SECTION, GLASS_SECTION_STRONG } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { CornerAccents } from "../components/corner-accents";
 import { GenderBanner } from "../components/gender-icon";
+import { PetLandingBanner } from "../components/pet-icon";
 import { CreatureCarousel } from "../components/creature-carousel";
-import { ArtImage } from "../components/art-image";
 import { PreviewGallery } from "../components/preview-gallery";
 import { LiveBackdrop } from "../components/live-backdrop";
 import { useNarration } from "@/controllers/use-narration";
@@ -144,9 +144,7 @@ export function LandingScreen() {
                 key={companion.gender}
                 className={cn("overflow-hidden rounded-lg border border-edge", GLASS_SECTION)}
               >
-                <div className="aspect-square w-full overflow-hidden border-b border-edge">
-                  <ArtImage source={companion.art} />
-                </div>
+                <PetLandingBanner gender={companion.gender} />
                 <div className="space-y-3 p-6 md:p-8">
                   <h3 className="heading text-[11px] text-ink">{companion.title}</h3>
                   <p className="text-xs leading-relaxed text-ink-soft">{companion.text}</p>

@@ -7,7 +7,6 @@ export interface LoreChapter {
 export interface LoreCompanion {
   gender: "male" | "female";
   title: string;
-  art: string;
   text: string;
   voice: string;
 }
@@ -75,7 +74,6 @@ export const LORE_COMPANIONS: readonly LoreCompanion[] = [
   {
     gender: "male",
     title: "O que fica na frente",
-    art: "/assets/landing/wolf-male.webp?v=1",
     text:
       "O primeiro veio sozinho, sem coleira e sem dono, e sentou na entrada do cercado como " +
       "quem espera há muito tempo. Peito largo, passo pesado, olhos que não desviavam. Naquela " +
@@ -89,7 +87,6 @@ export const LORE_COMPANIONS: readonly LoreCompanion[] = [
   {
     gender: "female",
     title: "A que acha o rastro",
-    art: "/assets/landing/wolf-female.webp?v=1",
     text:
       "A outra ninguém viu chegar, e é justamente esse o ponto. Magra, silenciosa, sempre três " +
       "passos adiante, achava o rastro antes de o caçador saber que havia rastro. Farejava o " +
