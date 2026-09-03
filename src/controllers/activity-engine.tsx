@@ -436,6 +436,7 @@ export function ActivityEngine() {
       stopBar?.();
       stopBar = createDriftLoop({
         periodMs: TRAINING_TICK_MS,
+        catchUp: false,
         alive: () => alive,
         ready: () => true,
         onTick: () => {
@@ -550,6 +551,7 @@ export function ActivityEngine() {
       stopBar?.();
       stopBar = createDriftLoop({
         periodMs: MINING_TICK_MS,
+        catchUp: false,
         alive: () => alive,
         ready: () => true,
         onTick: () => {
@@ -671,6 +673,7 @@ export function ActivityEngine() {
       stopBar?.();
       stopBar = createDriftLoop({
         periodMs: tickMs,
+        catchUp: false,
         alive: () => alive,
         ready: () => true,
         onTick: () => {
