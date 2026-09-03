@@ -466,7 +466,7 @@ export function ArenaScreen() {
                     />
                   </CardHeader>
 
-                  <CardBody className="p-0">
+                  <CardBody padding="none">
                     <div className="grid grid-cols-4 divide-x divide-y divide-edge">
                       {[
                         ...ATTRIBUTES.map((attribute) => ({

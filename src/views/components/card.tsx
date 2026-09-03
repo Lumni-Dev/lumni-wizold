@@ -120,16 +120,19 @@ export function CardStack({ children, className }: { children: ReactNode; classN
 export function CardBody({
   children,
   direction = "column",
+  padding = "default",
   className,
 }: {
   children: ReactNode;
   direction?: "column" | "row";
+  padding?: "default" | "none";
   className?: string;
 }) {
   return (
     <div
       className={cn(
-        "flex flex-1 gap-3 p-4",
+        "flex flex-1",
+        padding === "none" ? undefined : "gap-3 p-4",
         direction === "column" ? "flex-col" : "flex-row items-center",
         className,
       )}
