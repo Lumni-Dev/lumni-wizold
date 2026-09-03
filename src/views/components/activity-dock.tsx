@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { activityRuntimeStore } from "@/controllers/activity-runtime";
+import { activityMirrorStore } from "@/controllers/activity-mirror.store";
 import { findForgePiece, listMining } from "@/controllers/forge.controller";
 import { listTerritories, resolveHuntCreatureId } from "@/controllers/hunt.controller";
 import { useGame } from "@/controllers/game.context";
@@ -37,11 +38,17 @@ export function ActivityDock() {
     activityRuntimeStore.snapshot,
     activityRuntimeStore.serverSnapshot,
   );
-  const running = activity;
-  const dock = runtime.dock;
+  const mirror = useSyncExternalStore(
+    activityMirrorStore.subscribe,
+    activityMirrorStore.snapshot,
+    activityMirrorStore.serverSnapshot,
+  );
+  const running = mirror.mirroring ? mirror.activity : activity;
+  const dockRuntime = mirror.mirroring && mirror.runtime ? mirror.runtime : runtime;
+  const dock = dockRuntime.dock;
   const stop = useCallback(() => {
-    if (activity) setActivity(null);
-  }, [activity, setActivity]);
+    if (running) setActivity(null);
+  }, [running, setActivity]);
   const minimized = useSyncExternalStore(
     dockRepository.subscribe,
     dockRepository.minimized,
@@ -49,7 +56,7 @@ export function ActivityDock() {
   );
 
   const huntView = useMemo(() => {
-    const huntRt = runtime.hunt;
+    const huntRt = dockRuntime.hunt;
     if (!huntRt || running?.kind !== "hunt" || running.paused) return null;
     const territory = listTerritories(state).find((row) => row.territory.id === huntRt.territoryId);
     if (!territory) return null;
@@ -109,10 +116,10 @@ export function ActivityDock() {
           }
         : null,
     };
-  }, [pet, running, runtime.hunt, state]);
+  }, [pet, running, dockRuntime.hunt, state]);
 
   const trainView = useMemo(() => {
-    const trainRt = runtime.train;
+    const trainRt = dockRuntime.train;
     if (!trainRt || running?.kind !== "train" || running.paused) return null;
     const cooldown = trainRt.cooldown;
     const opting = cooldown !== null;
@@ -157,10 +164,10 @@ export function ActivityDock() {
           : "Treinando...",
       cooldown,
     };
-  }, [running, runtime.train, state]);
+  }, [running, dockRuntime.train, state]);
 
   const mineView = useMemo(() => {
-    const mineRt = runtime.mine;
+    const mineRt = dockRuntime.mine;
     if (!mineRt || running?.kind !== "mine" || running.paused) return null;
     const mining = listMining(state);
     const cooldown = mineRt.cooldown;
@@ -181,10 +188,10 @@ export function ActivityDock() {
           : "Minerando...",
       cooldown,
     };
-  }, [running, runtime.mine, state]);
+  }, [running, dockRuntime.mine, state]);
 
   const forgeView = useMemo(() => {
-    const forgeRt = runtime.forge;
+    const forgeRt = dockRuntime.forge;
     if (!forgeRt || running?.kind !== "forge" || running.paused) return null;
     const forgeEntry = findForgePiece(state, forgeRt.id, forgeRt.level);
     const cooldown = forgeRt.cooldown;
@@ -210,7 +217,7 @@ export function ActivityDock() {
           : "Forjando...",
       cooldown,
     };
-  }, [running, runtime.forge, state]);
+  }, [running, dockRuntime.forge, state]);
 
   const restView = useMemo(() => {
     if (running?.kind !== "rest" || !character || !stats) return null;
@@ -223,13 +230,13 @@ export function ActivityDock() {
     };
   }, [running, character, stats]);
 
-  const onOwnPage = activity !== null && pathname === dock?.href;
+  const onOwnPage = running !== null && pathname === dock?.href;
   const dockVisible = Boolean(running && dock && !onOwnPage);
   const [jolt, setJolt] = useState(0);
   const shaking = useShake(jolt);
 
   useEffect(() => {
-    const huntRt = runtime.hunt;
+    const huntRt = dockRuntime.hunt;
     if (!huntRt || running?.kind !== "hunt" || running.paused || huntRt.beat <= 0) return;
     const line = huntRt.script[Math.min(huntRt.beat, huntRt.script.length) - 1];
     if (line?.critical) {
@@ -237,7 +244,7 @@ export function ActivityDock() {
       setJolt((count) => count + 1);
       /* eslint-enable react-hooks/set-state-in-effect */
     }
-  }, [running, runtime.hunt]);
+  }, [running, dockRuntime.hunt]);
 
   useEffect(() => {
     if (!dockVisible || !dock) return undefined;
@@ -504,11 +511,13 @@ export function ActivityDock() {
               ) : null}
             </List>
 
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-edge px-4 py-3">
-              <span className="min-w-0 flex-1 truncate text-[11px] text-ink-faint">{statusText}</span>
+            <div className="flex flex-col gap-3 border-t border-edge px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+              <span className="min-w-0 text-[11px] text-ink-faint sm:flex-1 sm:truncate">{statusText}</span>
               <Button
                 variant={dock.canStop ? "secondary" : "outline"}
                 disabled={!dock.canStop}
+                fullWidth
+                className="sm:w-auto sm:shrink-0"
                 onClick={stop}
                 aria-label={dock.canStop ? "Parar atividade" : runningLabel}
               >

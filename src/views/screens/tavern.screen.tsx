@@ -744,33 +744,31 @@ export function TavernScreen() {
                   tone={isPrivate || room.ownerId === identity.id ? "highlighted" : "default"}
                 >
                   <CardHeader art={<TavernMugArt unread={unread} seated={seatedHere} />}>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <div className="flex min-w-0 items-center gap-2">
-                          <TavernRoomNumber number={room.number} className="text-sm" />
-                          {isMember || !room.nameHidden ? (
-                            <h3 className="min-w-0 truncate text-sm text-ink">{room.name}</h3>
-                          ) : (
-                            <h3 className="min-w-0 truncate text-sm text-ink-faint">Reservada</h3>
-                          )}
-                        </div>
-                        <div className="flex shrink-0 items-center gap-2">
-                          {isPrivate ? (
-                            <Tag tone="neutral">Reservada</Tag>
-                          ) : (
-                            <>
-                              {room.ownerId === identity.id ? (
-                                <Tag tone="neutral">Sua mesa</Tag>
-                              ) : null}
-                              {room.nameHidden ? <Tag tone="neutral">Reservada</Tag> : null}
-                              <Tag tone={locked ? "neutral" : "faint"}>
-                                {locked ? "Com senha" : "Aberta"}
-                              </Tag>
-                            </>
-                          )}
-                        </div>
+                    <div className="min-w-0 flex-1 space-y-2">
+                      <div className="flex min-w-0 items-center gap-2">
+                        <TavernRoomNumber number={room.number} className="text-sm shrink-0" />
+                        {isMember || !room.nameHidden ? (
+                          <h3 className="min-w-0 truncate text-sm text-ink">{room.name}</h3>
+                        ) : (
+                          <h3 className="min-w-0 truncate text-sm text-ink-faint">Reservada</h3>
+                        )}
                       </div>
-                      <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                      <div className="flex flex-wrap items-center gap-2">
+                        {isPrivate ? (
+                          <Tag tone="neutral">Reservada</Tag>
+                        ) : (
+                          <>
+                            {room.ownerId === identity.id ? (
+                              <Tag tone="neutral">Sua mesa</Tag>
+                            ) : null}
+                            {room.nameHidden ? <Tag tone="neutral">Reservada</Tag> : null}
+                            <Tag tone={locked ? "neutral" : "faint"}>
+                              {locked ? "Com senha" : "Aberta"}
+                            </Tag>
+                          </>
+                        )}
+                      </div>
+                      <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                         {isPrivate
                           ? "Mesa para dois"
                           : memberCount + " de " + MAX_ROOM_MEMBERS + " pessoas"}

@@ -630,8 +630,8 @@ export function SettingsScreen() {
                     }}
                   />
                   <p className="text-[11px] leading-relaxed text-ink-faint">
-                    A cortina na frente do vídeo: 0% mostra a noite crua, 50% deixa o vídeo respirar
-                    atrás do jogo e 100% fecha o pé da tela. O efeito aparece aqui atrás na hora.
+                    A cortina na frente do vídeo: 0% mostra a noite crua e 100% fecha o pé da tela,
+                    padrão ao entrar. O efeito aparece aqui atrás na hora.
                   </p>
                 </ListRow>
               ) : null}

@@ -19,17 +19,15 @@ export function Pagination({
   if (pages <= 1) return null;
 
   return (
-    <div className={cn("flex flex-wrap items-center justify-between gap-3", className)}>
-      <span className="text-[11px] text-ink-faint">
-        Página {formatNumber(page)} de {formatNumber(pages)}
-      </span>
+    <div className={cn("flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between", className)}>
+      <span className="text-[11px] text-ink-faint">Página {formatNumber(page)} de {formatNumber(pages)}</span>
 
-      <div className="flex flex-wrap items-center justify-end gap-2">
+      <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center sm:justify-end">
         {children}
-        <Button variant="outline" disabled={page <= 1} onClick={() => onChange(page - 1)}>
+        <Button variant="outline" fullWidth className="sm:w-auto" disabled={page <= 1} onClick={() => onChange(page - 1)}>
           Anterior
         </Button>
-        <Button variant="outline" disabled={page >= pages} onClick={() => onChange(page + 1)}>
+        <Button variant="outline" fullWidth className="sm:w-auto" disabled={page >= pages} onClick={() => onChange(page + 1)}>
           Próxima
         </Button>
       </div>

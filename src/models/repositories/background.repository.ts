@@ -1,6 +1,6 @@
 const ENABLED_KEY = "lumni-wizold:background";
 const DARKNESS_KEY = "lumni-wizold:background:darkness";
-const DEFAULT_DARKNESS = 0.5;
+const DEFAULT_DARKNESS = 1;
 
 const listeners = new Set<() => void>();
 
@@ -13,7 +13,21 @@ function notify(): void {
   listeners.forEach((listener) => listener());
 }
 
+function seedDefaults(): void {
+  if (typeof window === "undefined") return;
+  try {
+    if (window.localStorage.getItem(ENABLED_KEY) === null) {
+      window.localStorage.setItem(ENABLED_KEY, "on");
+    }
+    if (window.localStorage.getItem(DARKNESS_KEY) === null) {
+      window.localStorage.setItem(DARKNESS_KEY, String(DEFAULT_DARKNESS));
+    }
+  } catch {}
+}
+
 export const backgroundRepository = {
+  seedDefaults,
+
   enabled(): boolean {
     if (typeof window === "undefined") return true;
     try {

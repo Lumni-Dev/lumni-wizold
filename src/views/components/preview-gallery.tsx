@@ -80,12 +80,13 @@ export function PreviewGallery({ shots }: { shots: readonly PreviewShot[] }) {
         <p className="text-xs leading-relaxed text-ink-soft">{shot.text}</p>
       </div>
 
-      <div className="flex flex-wrap gap-2 p-4">
+      <div className="flex gap-2 overflow-x-auto p-4">
         {shots.map((one, position) => (
           <Chip
             key={one.key}
             active={position === index}
             aria-current={position === index}
+            className="shrink-0"
             onClick={() => setIndex(position)}
           >
             {one.label}

@@ -48,6 +48,11 @@ export function GameFrame({ children }: { children: ReactNode }) {
     if (ready && !character) router.replace("/");
   }, [ready, character, router]);
 
+  useEffect(() => {
+    if (!ready || !character) return;
+    backgroundRepository.seedDefaults();
+  }, [ready, character]);
+
   if (!ready || !character) return <Loading />;
 
   return (

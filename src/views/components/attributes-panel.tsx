@@ -52,7 +52,7 @@ export function AttributesPanel({
               <div className="px-4 py-3">
                 <RowText title={definition.name} description={definition.description} />
               </div>
-              <div className="grid grid-cols-3 divide-x divide-y divide-edge border-t border-edge sm:grid-cols-7 sm:divide-y-0">
+              <div className="grid grid-cols-2 divide-x divide-y divide-edge border-t border-edge sm:grid-cols-4 lg:grid-cols-7 lg:divide-y-0">
                 {cells.map((cell) => (
                   <div
                     key={cell.label}

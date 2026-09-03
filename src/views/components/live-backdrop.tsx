@@ -24,6 +24,10 @@ export function LiveBackdrop({ shade = "soft" }: { shade?: "soft" | "deep" }) {
   );
 
   useEffect(() => {
+    backgroundRepository.seedDefaults();
+  }, []);
+
+  useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 

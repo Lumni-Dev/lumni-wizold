@@ -467,7 +467,7 @@ export function ArenaScreen() {
                   </CardHeader>
 
                   <CardBody padding="none">
-                    <div className="grid grid-cols-4 divide-x divide-y divide-edge">
+                    <div className="grid grid-cols-2 divide-x divide-y divide-edge sm:grid-cols-4">
                       {[
                         ...ATTRIBUTES.map((attribute) => ({
                           key: attribute.key,
