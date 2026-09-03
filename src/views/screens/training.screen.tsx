@@ -46,7 +46,13 @@ export function TrainingScreen() {
   const session =
     trainRt && activeExercise === trainRt.id
       ? { id: trainRt.id, beat: trainRt.beat, max: trainRt.max }
-      : { id: activeExercise ?? "", beat: 0, max: TRAINING_TICKS_MAX };
+      : activeExercise
+        ? {
+            id: activeExercise,
+            beat: activity?.kind === "train" ? (activity.beat ?? 0) : 0,
+            max: TRAINING_TICKS_MIN,
+          }
+        : { id: "", beat: 0, max: TRAINING_TICKS_MIN };
   const cooldown = trainRt && activeExercise === trainRt.id ? trainRt.cooldown : null;
 
   const exercises = useMemo(() => listExercises(state), [state]);
@@ -143,7 +149,6 @@ export function TrainingScreen() {
                     current={session.id === exercise.id ? session.beat : 0}
                     maximum={session.id === exercise.id ? session.max : TRAINING_TICKS_MAX}
                     glows={active}
-                    wraps
                   />
                 </div>
 
@@ -224,7 +229,6 @@ export function TrainingScreen() {
                   current={session.id === PET_EXERCISE_ID ? session.beat : 0}
                   maximum={session.id === PET_EXERCISE_ID ? session.max : TRAINING_TICKS_MAX}
                   glows={petActive}
-                  wraps
                 />
               </div>
 

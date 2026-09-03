@@ -214,7 +214,7 @@ export function LoginScreen() {
               <img
                 src={BRAND_ICON_PATH}
                 alt={GAME_NAME}
-                className="landing-hero-shadow-logo h-32 w-32 shrink-0 rounded-md"
+                className="landing-hero-shadow-logo h-28 w-28 shrink-0 rounded-md"
               />
             </Link>
           </header>

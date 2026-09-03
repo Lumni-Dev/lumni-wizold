@@ -14,9 +14,6 @@ export function GameFooter() {
 
         <div className="space-y-1 sm:text-right">
           <p className="text-[11px] text-ink-faint">
-            A partida vive no servidor de Wizold e te espera em qualquer navegador.
-          </p>
-          <p className="text-[11px] text-ink-faint">
             Suporte:{" "}
             <a
               href={"mailto:" + SITE_EMAIL}

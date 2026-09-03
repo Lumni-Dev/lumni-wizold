@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
+import { usePathname } from "next/navigation";
 import { findForgePiece } from "@/controllers/forge.controller";
 import {
   listTerritories,
@@ -23,19 +24,34 @@ import {
   MAX_ENHANCEMENT,
   MINING_TICK_MS,
   PET_EXERCISE_ID,
+  TRAINING_TICKS_MIN,
   TRAINING_TICK_MS,
 } from "@/shared/constants/game";
 import { formatNumber } from "@/shared/utils/format";
 import { narrationOf } from "@/views/presenters/hunt.presenter";
 import { isGameSound, playSound } from "./sound";
 import { useGame } from "./game.context";
+import { activitySync } from "./activity-sync";
 import {
   activityHref,
+  activityRuntimeStore,
   activityTone,
   clearActivityRuntime,
   patchActivityRuntime,
   type ActivityDockView,
 } from "./activity-runtime";
+
+function resolveTrainingSessionTicks(exerciseId: string, carry: number): number {
+  const prior = activityRuntimeStore.snapshot().train;
+  if (
+    prior?.id === exerciseId &&
+    prior.max >= TRAINING_TICKS_MIN &&
+    (carry > 0 || (prior.beat > 0 && prior.beat < prior.max))
+  ) {
+    return prior.max;
+  }
+  return trainingSessionTicks();
+}
 
 function patchRuntime(patch: Parameters<typeof patchActivityRuntime>[0]): void {
   patchActivityRuntime(patch);
@@ -120,11 +136,15 @@ function pausedDock(state: GameState, activity: Activity): ActivityDockView {
 }
 
 export function ActivityEngine() {
+  const pathname = usePathname();
+  const syncRole = useSyncExternalStore(activitySync.subscribe, activitySync.role, () => "idle" as const);
+  const runsEngine = syncRole === "owner" && pathname !== "/";
   const {
     ready,
     activity,
     setActivity,
     syncProgress,
+    persistActivity,
     state,
     hunt,
     landHunt,
@@ -135,15 +155,8 @@ export function ActivityEngine() {
     notify,
   } = useGame();
 
-  const [visible, setVisible] = useState(
-    () => typeof document === "undefined" || document.visibilityState === "visible",
-  );
-
-  useEffect(() => {
-    const onVis = () => setVisible(document.visibilityState === "visible");
-    document.addEventListener("visibilitychange", onVis);
-    return () => document.removeEventListener("visibilitychange", onVis);
-  }, []);
+  const activityRef = useRef(activity);
+  activityRef.current = activity;
 
   const stateRef = useRef(state);
   const autoRef = useRef(state.automation);
@@ -156,6 +169,9 @@ export function ActivityEngine() {
   const notifyRef = useRef(notify);
   const setActivityRef = useRef(setActivity);
   const syncProgressRef = useRef(syncProgress);
+  const persistActivityRef = useRef(persistActivity);
+  const forgeLevelRef = useRef(0);
+  const forgeItemRef = useRef<string | null>(null);
 
   useEffect(() => {
     stateRef.current = state;
@@ -169,10 +185,11 @@ export function ActivityEngine() {
     notifyRef.current = notify;
     setActivityRef.current = setActivity;
     syncProgressRef.current = syncProgress;
+    persistActivityRef.current = persistActivity;
   });
 
   useEffect(() => {
-    if (!ready || !visible) return;
+    if (!ready || !runsEngine) return;
     const paused = activity?.paused === true;
     const activeHunt =
       activity?.kind === "hunt" && !paused && activity.id ? activity.id : null;
@@ -351,10 +368,10 @@ export function ActivityEngine() {
       if (fillTimer) window.clearTimeout(fillTimer);
       if (pending) landHuntRef.current();
     };
-  }, [ready, visible, activity?.kind, activity?.id, activity?.paused]);
+  }, [ready, activity?.kind, activity?.id, activity?.paused]);
 
   useEffect(() => {
-    if (!ready || !visible) return;
+    if (!ready || !runsEngine) return;
     const paused = activity?.paused === true;
     const activeExercise =
       activity?.kind === "train" && !paused && activity.id ? activity.id : null;
@@ -372,9 +389,12 @@ export function ActivityEngine() {
     let alive = true;
     let barTimer = 0;
     let coolTimer = 0;
-    let carry = activity?.beat ?? 0;
+    let carry =
+      activityRef.current?.kind === "train" && activityRef.current.id === activeExercise
+        ? (activityRef.current.beat ?? 0)
+        : 0;
     let beat = 0;
-    let ticks = trainingSessionTicks();
+    let ticks = resolveTrainingSessionTicks(activeExercise, carry);
     let resumable = true;
 
     const push = (cooldown: number | null) => {
@@ -397,7 +417,7 @@ export function ActivityEngine() {
     };
 
     const startBar = () => {
-      ticks = trainingSessionTicks();
+      ticks = resolveTrainingSessionTicks(activeExercise, carry);
       beat = Math.min(carry, Math.max(0, ticks - 1));
       carry = 0;
       syncProgressRef.current({ beat, cooldownUntil: null });
@@ -463,7 +483,7 @@ export function ActivityEngine() {
       }, 1000);
     };
 
-    const resumeCooldown = cooldownLeft(activity);
+    const resumeCooldown = cooldownLeft(activityRef.current);
     if (resumeCooldown > 0) startCooldown(resumeCooldown);
     else startBar();
     return () => {
@@ -471,10 +491,10 @@ export function ActivityEngine() {
       if (barTimer) window.clearInterval(barTimer);
       if (coolTimer) window.clearInterval(coolTimer);
     };
-  }, [ready, visible, activity?.kind, activity?.id, activity?.paused, activity?.beat, activity?.cooldownUntil]);
+  }, [ready, runsEngine, activity?.kind, activity?.id, activity?.paused]);
 
   useEffect(() => {
-    if (!ready || !visible) return;
+    if (!ready || !runsEngine) return;
     const paused = activity?.paused === true;
     const activeOre = activity?.kind === "mine" && !paused && activity.id ? activity.id : null;
 
@@ -486,7 +506,10 @@ export function ActivityEngine() {
     let alive = true;
     let barTimer = 0;
     let coolTimer = 0;
-    let carry = activity?.beat ?? 0;
+    let carry =
+      activityRef.current?.kind === "mine" && activityRef.current.id === activeOre
+        ? (activityRef.current.beat ?? 0)
+        : 0;
     let beat = 0;
     let ticks = miningSwingTicks();
 
@@ -554,7 +577,7 @@ export function ActivityEngine() {
       }, 1000);
     };
 
-    const resumeCooldown = cooldownLeft(activity);
+    const resumeCooldown = cooldownLeft(activityRef.current);
     if (resumeCooldown > 0) startCooldown(resumeCooldown);
     else startBar();
     return () => {
@@ -562,26 +585,37 @@ export function ActivityEngine() {
       if (barTimer) window.clearInterval(barTimer);
       if (coolTimer) window.clearInterval(coolTimer);
     };
-  }, [ready, visible, activity?.kind, activity?.id, activity?.paused, activity?.beat, activity?.cooldownUntil]);
+  }, [ready, activity?.kind, activity?.id, activity?.paused]);
 
   useEffect(() => {
-    if (!ready || !visible) return;
+    if (!ready || !runsEngine) return;
     const paused = activity?.paused === true;
     const activeItem =
       activity?.kind === "forge" && !paused && activity.id ? activity.id : null;
-    const startLevel = activity?.kind === "forge" ? (activity.enhancement ?? 0) : 0;
 
     if (!activeItem) {
       patchRuntime({ forge: null });
+      forgeItemRef.current = null;
       return;
+    }
+
+    if (activeItem !== forgeItemRef.current) {
+      forgeItemRef.current = activeItem;
+      forgeLevelRef.current =
+        activityRef.current?.kind === "forge" && activityRef.current.id === activeItem
+          ? (activityRef.current.enhancement ?? 0)
+          : 0;
     }
 
     let alive = true;
     let barTimer = 0;
     let coolTimer = 0;
-    let carry = activity?.beat ?? 0;
+    let carry =
+      activityRef.current?.kind === "forge" && activityRef.current.id === activeItem
+        ? (activityRef.current.beat ?? 0)
+        : 0;
     let beat = 0;
-    let level = startLevel;
+    let level = forgeLevelRef.current;
 
     const push = (cooldown: number | null) => {
       const slot = findForgePiece(stateRef.current, activeItem, level);
@@ -625,7 +659,14 @@ export function ActivityEngine() {
             if (landed) {
               if (landed.message) notifyRef.current(landed.message, true, "Bigorna");
               playSound(landed.raised ? "point" : "denied");
-              if (landed.raised) level += 1;
+              if (landed.raised) {
+                level += 1;
+                forgeLevelRef.current = level;
+                const current = activityRef.current;
+                if (current?.kind === "forge" && current.id === activeItem) {
+                  persistActivityRef.current({ ...current, enhancement: level, beat: 0 });
+                }
+              }
             }
             beat = 0;
             syncProgressRef.current({ beat: 0, cooldownUntil: null });
@@ -664,7 +705,7 @@ export function ActivityEngine() {
       }, 1000);
     };
 
-    const resumeCooldown = cooldownLeft(activity);
+    const resumeCooldown = cooldownLeft(activityRef.current);
     if (resumeCooldown > 0) startCooldown(resumeCooldown);
     else startBar();
     return () => {
@@ -672,10 +713,10 @@ export function ActivityEngine() {
       if (barTimer) window.clearInterval(barTimer);
       if (coolTimer) window.clearInterval(coolTimer);
     };
-  }, [ready, visible, activity?.kind, activity?.id, activity?.enhancement, activity?.paused, activity?.beat, activity?.cooldownUntil]);
+  }, [ready, activity?.kind, activity?.id, activity?.paused]);
 
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || !runsEngine) return;
     if (!activity) {
       clearActivityRuntime();
       return;

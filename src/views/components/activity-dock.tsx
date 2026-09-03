@@ -420,7 +420,6 @@ export function ActivityDock() {
                       current={trainView.sessionCurrent}
                       maximum={trainView.sessionMax}
                       glows={trainView.glows && trainView.cooldown === null}
-                      wraps
                     />
                   </ListRow>
                 </>

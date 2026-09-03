@@ -4,6 +4,7 @@ import { useEffect, useRef, useSyncExternalStore, type RefObject } from "react";
 import { musicRepository } from "@/models/repositories/music.repository";
 
 const TRACK = "/assets/sounds/trilha.mp3?v=1";
+const LANDING_VOLUME = 0.5;
 
 const UNLOCK_EVENTS: Array<keyof DocumentEventMap> = [
   "pointerdown",
@@ -97,7 +98,7 @@ export function LandingMusic() {
     musicRepository.serverSnapshot,
   );
 
-  useMusicPlayback(audioRef, { enabled, volume: 1 });
+  useMusicPlayback(audioRef, { enabled, volume: LANDING_VOLUME });
 
   if (!enabled) return null;
 
