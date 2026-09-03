@@ -42,7 +42,7 @@ interface PendingDeal {
   enhancement: number;
 }
 
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 6;
 
 type Tab = "buy" | "sell";
 

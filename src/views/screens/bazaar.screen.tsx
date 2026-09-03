@@ -48,7 +48,7 @@ import { Panel } from "../components/panel";
 import { Tag } from "../components/tag";
 import { PageHeader } from "../layout/page-header";
 
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 6;
 
 function formatRemaining(ms: number): string {
   const total = Math.floor(ms / 1000);
