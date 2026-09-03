@@ -29,8 +29,8 @@ export function UpdateGate() {
           {updateVersion ? <DataRow label="Nova versão" value={"v" + updateVersion} /> : null}
         </div>
         <p className="text-xs leading-relaxed text-ink-faint">
-          Ao atualizar, a página recarrega limpando o cache, para você jogar sempre na versão mais
-          recente.
+          Ao atualizar, a página recarrega limpando o cache. Se você estiver caçando, treinando,
+          minerando ou forjando, o trabalho retoma de onde parou.
         </p>
       </div>
     </Modal>

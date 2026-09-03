@@ -19,7 +19,6 @@ export async function clearPresence(client: PoolClient, characterId: string): Pr
     "update characters set presence_status = 'offline', presence_at = now() where id = $1",
     [characterId],
   );
-  await client.query("delete from activities where character_id = $1", [characterId]);
 }
 
 export async function clearPresenceForUser(client: PoolClient, userId: string): Promise<void> {

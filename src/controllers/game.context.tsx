@@ -21,9 +21,15 @@ import type { Pet, PetGender } from "@/models/entities/pet";
 import type { PackInvite } from "@/models/entities/pack";
 import type { PresenceStatus } from "@/models/entities/presence";
 import { moonRepository } from "@/models/repositories/moon.repository";
+import {
+  clearActivityResume,
+  mergeActivityResume,
+  stashActivityResume,
+} from "@/models/repositories/activity-resume.repository";
 import type { MoonState } from "@/models/rules/moon";
 import {
   AUTOMATION_TICK_MS,
+  CYCLE_OPTOUT_SECS,
   HUNT_TICK_MS,
   PET_EXERCISE_ID,
   REST_TICK_MS,
@@ -43,7 +49,7 @@ import { activityMirrorStore } from "./activity-mirror.store";
 import { activityRuntimeStore } from "./activity-runtime";
 import { activitySync } from "./activity-sync";
 import { api, isTransientApiMessage, type ApiAnswer } from "./api.client";
-import { activityApi, activityThreadBusy } from "./activity-thread";
+import { activityApi, activityQueuedApi, activitySlotRoute, activityThreadBusy, flushActivityKeepalive } from "./activity-thread";
 import { usePresenceHeartbeat } from "./use-presence-heartbeat";
 import { playSound, preloadSounds, setVoiceProfile } from "./sound";
 export interface Notice {
@@ -223,19 +229,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
     const timer = window.setTimeout(() => dismissNotice(oldest.id), Math.max(0, left));
     return () => window.clearTimeout(timer);
   }, [notices, dismissNotice]);
-  const applyUpdate = useCallback(() => {
-    const reload = () => window.location.reload();
-    try {
-      if (typeof caches !== "undefined") {
-        void caches
-          .keys()
-          .then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
-          .then(reload, reload);
-        return;
-      }
-    } catch {}
-    reload();
-  }, []);
   useEffect(() => {
     let alive = true;
     const check = async () => {
@@ -262,7 +255,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     preloadSounds();
   }, []);
-  usePresenceHeartbeat(authenticated && state.character !== null, activity?.kind ?? null);
+  usePresenceHeartbeat(authenticated && state.character !== null);
   const lineage = state.character?.gender ?? "male";
   useEffect(() => {
     setVoiceProfile(lineage);
@@ -278,6 +271,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const heldHuntRef = useRef<HeldLanding | null>(null);
   const heldArenaRef = useRef<HeldLanding | null>(null);
   const inFlightRef = useRef(0);
+  const resumeBootRef = useRef(true);
+  const progressFlushRef = useRef<number | null>(null);
+  const pendingProgressRef = useRef<{ beat: number; cooldownUntil?: string | null } | null>(null);
   const adoptActivityFromServer = useCallback((next: Activity | null | undefined) => {
     if (next === undefined) return;
     if (activitySync.isMirroring() || activityMirrorStore.isMirroring()) return;
@@ -285,17 +281,33 @@ export function GameProvider({ children }: { children: ReactNode }) {
     if (heldHuntRef.current || heldArenaRef.current) return;
     if (inFlightRef.current > 0) return;
     if (activityThreadBusy()) return;
+    let merged = next === null ? null : mergeActivityResume(next);
+    if (
+      resumeBootRef.current &&
+      merged?.kind === "hunt" &&
+      (merged.beat ?? 0) > 0 &&
+      !merged.cooldownUntil
+    ) {
+      merged = {
+        ...merged,
+        beat: 0,
+        cooldownUntil: new Date(Date.now() + CYCLE_OPTOUT_SECS * 1000).toISOString(),
+      };
+      stashActivityResume(merged);
+    }
+    if (resumeBootRef.current) resumeBootRef.current = false;
     const local = activityRef.current;
-    if (local && next && local.kind === next.kind && (local.id ?? null) === (next.id ?? null)) {
-      if ((next.beat ?? 0) < (local.beat ?? 0)) return;
+    if (local && merged && local.kind === merged.kind && (local.id ?? null) === (merged.id ?? null)) {
+      if ((merged.beat ?? 0) < (local.beat ?? 0)) return;
     }
     if (local && local.kind !== "rest") {
       const dock = activityRuntimeStore.snapshot().dock;
       if (dock && local.kind === dock.kind && !local.paused && !dock.canStop) return;
     }
-    activityRef.current = next;
-    activitySync.trackLocalActivity(next);
-    setActivityState(next);
+    activityRef.current = merged;
+    if (merged) activitySync.trackLocalActivity(merged);
+    else activitySync.trackLocalActivity(null);
+    setActivityState(merged);
   }, []);
   const adoptState = useCallback((next: GameState, seq: number) => {
     if (seq <= appliedRef.current) return;
@@ -310,9 +322,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     [adoptState],
   );
   const setActivityRef = useRef<(next: Activity | null, fromServer?: boolean) => void>(() => undefined);
-  const progressFlushRef = useRef<number | null>(null);
-  const pendingProgressRef = useRef<{ beat: number; cooldownUntil?: string | null } | null>(null);
-  const flushProgress = useCallback(() => {
+  const flushProgress = useCallback((keepalive = false) => {
     if (progressFlushRef.current) {
       window.clearTimeout(progressFlushRef.current);
       progressFlushRef.current = null;
@@ -320,8 +330,35 @@ export function GameProvider({ children }: { children: ReactNode }) {
     const patch = pendingProgressRef.current;
     if (!patch || activitySync.isMirroring()) return;
     pendingProgressRef.current = null;
-    void activityApi("PATCH", "/api/activity/progress", patch);
+    if (keepalive) {
+      flushActivityKeepalive("PATCH", "/api/activity/progress", patch);
+    } else {
+      void activityApi("PATCH", "/api/activity/progress", patch);
+    }
   }, []);
+  const flushBeforeUnload = useCallback(() => {
+    flushProgress(true);
+    const act = activityRef.current;
+    if (act?.kind === "rest") {
+      flushActivityKeepalive("PATCH", "/api/character/rest", {});
+    } else if (act) {
+      stashActivityResume(act);
+    }
+  }, [flushProgress]);
+  const applyUpdate = useCallback(() => {
+    flushBeforeUnload();
+    const reload = () => window.location.reload();
+    try {
+      if (typeof caches !== "undefined") {
+        void caches
+          .keys()
+          .then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+          .then(reload, reload);
+        return;
+      }
+    } catch {}
+    reload();
+  }, [flushBeforeUnload]);
   const syncProgress = useCallback(
     (patch: { beat: number; cooldownUntil?: string | null }) => {
       if (activitySync.isMirroring()) return;
@@ -334,6 +371,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       else delete next.cooldownUntil;
       activityRef.current = next;
       activitySync.trackLocalActivity(next);
+      stashActivityResume(next);
       pendingProgressRef.current = patch;
       const boundary =
         patch.beat === 0 || (patch.cooldownUntil !== undefined && patch.cooldownUntil !== null);
@@ -367,6 +405,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
       activityRef.current = next;
       activitySync.trackLocalActivity(next);
       setActivityState(next);
+      if (next === null) clearActivityResume();
+      else stashActivityResume(next);
       if (fromServer) return;
       if (next === null) {
         flushProgress();
@@ -397,7 +437,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
       }
       if (defer) inFlightRef.current += 1;
       try {
-        const answer = await api<T>(method, path, body);
+        const call = activitySlotRoute(method, path) ? activityQueuedApi<T> : api<T>;
+        const answer = await call(method, path, body);
         if (answer.status === 401) {
           setAuthenticated(false);
           setTutorial(true);
@@ -498,10 +539,16 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [ready, request, adoptActivityFromServer]);
   useEffect(() => {
     if (!ready) return undefined;
-    const flush = () => flushProgress();
-    window.addEventListener("pagehide", flush);
-    return () => window.removeEventListener("pagehide", flush);
-  }, [ready, flushProgress]);
+    const onHide = () => {
+      if (document.visibilityState === "hidden") flushBeforeUnload();
+    };
+    window.addEventListener("pagehide", flushBeforeUnload);
+    document.addEventListener("visibilitychange", onHide);
+    return () => {
+      window.removeEventListener("pagehide", flushBeforeUnload);
+      document.removeEventListener("visibilitychange", onHide);
+    };
+  }, [ready, flushBeforeUnload]);
   const petResting =
     state.pet !== null &&
     state.pet.active === false &&

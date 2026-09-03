@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import type { ActivityKind } from "@/models/entities/activity";
+import { useEffect } from "react";
 import { PRESENCE_HEARTBEAT_MS } from "@/models/rules/presence";
 import { api } from "./api.client";
 
@@ -9,18 +8,12 @@ function currentStatus(): "active" | "away" {
   return document.visibilityState === "visible" ? "active" : "away";
 }
 
-export function usePresenceHeartbeat(enabled: boolean, doing: ActivityKind | null) {
-  const doingRef = useRef(doing);
-  doingRef.current = doing;
-
+export function usePresenceHeartbeat(enabled: boolean) {
   useEffect(() => {
     if (!enabled) return;
 
     const ping = (status: "active" | "away") => {
-      void api("PATCH", "/api/presence", {
-        status,
-        ...(doingRef.current ? { activity: doingRef.current } : {}),
-      });
+      void api("PATCH", "/api/presence", { status });
     };
 
     const sync = () => {
