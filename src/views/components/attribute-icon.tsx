@@ -18,7 +18,11 @@ export function AttributeIcon({
 
   return (
     <IconFrame size={size} className={className}>
-      {source ? <IconArt source={source} padded={false} /> : (findAttribute(attribute)?.code ?? "")}
+      {source ? (
+        <IconArt source={source} padded={false} fit="contain" />
+      ) : (
+        (findAttribute(attribute)?.code ?? "")
+      )}
     </IconFrame>
   );
 }
@@ -37,7 +41,7 @@ export function AttributeArtFill({ attribute }: { attribute: AttributeKey }) {
 
   return (
     <span className="relative flex h-full w-full">
-      <IconArt source={source} padded={false} />
+      <IconArt source={source} padded={false} fit="contain" />
     </span>
   );
 }

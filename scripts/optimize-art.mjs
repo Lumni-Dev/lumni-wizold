@@ -24,14 +24,18 @@ const MAX_SIZE = {
   store: 512,
   creatures: 512,
   hunt: 1200,
-  attributes: 1254,
-  training: 1254,
+  attributes: 512,
+  training: 512,
   genders: 500,
   pet: 400,
 };
 
 const DEFAULT_SIZE = 512;
-const QUALITY = 80;
+const DEFAULT_QUALITY = 80;
+const QUALITY = {
+  attributes: 95,
+  training: 95,
+};
 
 const force = process.argv.includes("--force");
 const asked = process.argv.slice(2).filter((argument) => !argument.startsWith("-"));
@@ -71,37 +75,35 @@ let written = 0;
 
 for (const folder of folders) {
   const width = MAX_SIZE[folder] ?? DEFAULT_SIZE;
+  const quality = QUALITY[folder] ?? DEFAULT_QUALITY;
 
   for (const source of collect(join(ASSETS, folder))) {
     const target = source.replace(/\.(png|jpe?g)$/i, ".webp");
     if (existsSync(target) && !force) continue;
 
-    execFileSync(
-      "ffmpeg",
-      [
-        "-y",
-        "-loglevel",
-        "error",
-        "-i",
-        source,
-        "-vf",
-        "scale=w=" + width + ":h=" + width + ":force_original_aspect_ratio=decrease:flags=lanczos",
-        "-c:v",
-        "libwebp",
-        "-pix_fmt",
-        "yuva420p",
-        "-preset",
-        "picture",
-        "-compression_level",
-        "6",
-        "-q:v",
-        String(QUALITY),
-        "-frames:v",
-        "1",
-        target,
-      ],
-      { stdio: ["ignore", "ignore", "inherit"] },
-    );
+    const args = [
+      "-y",
+      "-loglevel",
+      "error",
+      "-i",
+      source,
+      "-vf",
+      "scale=w=" + width + ":h=" + width + ":force_original_aspect_ratio=decrease:flags=lanczos",
+      "-c:v",
+      "libwebp",
+      "-pix_fmt",
+      "yuva420p",
+      "-preset",
+      "picture",
+      "-compression_level",
+      "6",
+      "-q:v",
+      String(quality),
+      "-frames:v",
+      "1",
+    ];
+
+    execFileSync("ffmpeg", [...args, target], { stdio: ["ignore", "ignore", "inherit"] });
 
     const from = statSync(source).size;
     const to = statSync(target).size;
