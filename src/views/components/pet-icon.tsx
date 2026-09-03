@@ -8,13 +8,16 @@ import { cn } from "@/shared/utils/class-names";
 import { ArtImage } from "./art-image";
 import { IconArt, IconFrame, type IconSize } from "./icon-frame";
 
+const PET_ART_SCALE = "scale-[1.20] origin-center";
+const PET_ART_IMAGE_CLASS = "[&_img]:origin-center [&_img]:scale-[1.20]";
+
 export function PetPortrait({ gender }: { gender: PetGender }) {
   const art = useArt();
   const source = art.pets[gender];
 
   if (!source) return <PetIcon gender={gender} size="large" />;
 
-  return <ArtImage source={source} />;
+  return <ArtImage source={source} fit="contain" className={PET_ART_IMAGE_CLASS} />;
 }
 
 export function PetSheetHeader({
@@ -32,7 +35,7 @@ export function PetSheetHeader({
   return (
     <div className="relative border-b border-edge">
       <div className="aspect-[3/2] w-full overflow-hidden">
-        <ArtImage source={source} />
+        <ArtImage source={source} fit="contain" className={PET_ART_IMAGE_CLASS} />
       </div>
       <div className={cn("absolute inset-x-0 bottom-0 border-t border-edge px-4 py-3", GLASS_SECTION)}>
         {children}
@@ -56,7 +59,7 @@ export function PetIcon({
   return (
     <IconFrame size={size} tone="strong" className={className}>
       {source ? (
-        <IconArt source={source} padded={false} fit="contain" />
+        <IconArt source={source} padded={false} fit="contain" inset={PET_ART_SCALE} />
       ) : (
         findPet(gender).label.slice(0, 2).toUpperCase()
       )}
@@ -78,7 +81,7 @@ export function PetArtFill({ gender }: { gender: PetGender }) {
 
   return (
     <span className="relative flex h-full w-full">
-      <IconArt source={source} padded={false} fit="contain" />
+      <IconArt source={source} padded={false} fit="contain" inset={PET_ART_SCALE} />
     </span>
   );
 }

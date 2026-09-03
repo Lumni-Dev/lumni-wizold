@@ -77,7 +77,7 @@ export function GenderSheetHeader({
 
   return (
     <div className="relative border-b border-edge">
-      <div className="aspect-square w-full overflow-hidden">
+      <div className="aspect-square w-full overflow-hidden p-4">
         <ArtImage source={source} fit="contain" />
       </div>
       <div className={cn("absolute inset-x-0 bottom-0 border-t border-edge px-4 py-3", GLASS_SECTION)}>

@@ -267,15 +267,12 @@ export function WikiScreen() {
                   <ListRow
                     key={exercise.id}
                     art={<TrainingArtFill attribute={exercise.attribute} />}
-                    layout="column"
                   >
-                    <div className="flex items-baseline justify-between gap-2">
-                      <p className="text-sm text-ink">{exercise.name}</p>
-                      <p className="shrink-0 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                        {findAttribute(exercise.attribute)?.name ?? exercise.attribute}
-                      </p>
-                    </div>
-                    <p className="text-[11px] leading-relaxed text-ink-faint">{exercise.description}</p>
+                    <RowText
+                      label={findAttribute(exercise.attribute)?.name ?? exercise.attribute}
+                      title={exercise.name}
+                      description={exercise.description}
+                    />
                   </ListRow>
                 ))}
               </List>
