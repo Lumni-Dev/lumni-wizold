@@ -52,18 +52,16 @@ export function formatTime(iso: string): string {
   const pad = (value: number) => value.toString().padStart(2, "0");
   return pad(date.getHours()) + ":" + pad(date.getMinutes());
 }
-export function formatDay(iso: string): string {
+export function formatDate(iso: string): string {
   const date = new Date(iso);
+  if (!Number.isFinite(date.getTime())) return "";
   const pad = (value: number) => value.toString().padStart(2, "0");
-  return (
-    pad(date.getDate()) +
-    "/" +
-    pad(date.getMonth() + 1) +
-    "/" +
-    date.getFullYear() +
-    " - " +
-    formatTime(iso)
-  );
+  return pad(date.getDate()) + "/" + pad(date.getMonth() + 1) + "/" + date.getFullYear();
+}
+
+export function formatDay(iso: string): string {
+  const date = formatDate(iso);
+  return date ? date + " - " + formatTime(iso) : "";
 }
 export function formatCooldown(milliseconds: number): string {
   const minutes = Math.ceil(milliseconds / 60000);

@@ -60,6 +60,10 @@ export async function loadHunters(client: PoolClient): Promise<Hunter[]> {
       pet: petBy.get(row.id) ?? null,
       equipment,
       npc: row.is_npc === true,
+      createdAt:
+        row.created_at instanceof Date
+          ? row.created_at.toISOString()
+          : String(row.created_at ?? ""),
     };
   });
 }

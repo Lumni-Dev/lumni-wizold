@@ -59,6 +59,7 @@ function playerAsHunter(state: GameState): Hunter | null {
       : null,
     equipment: state.equipment,
     npc: false,
+    createdAt: character.createdAt,
     forge: EQUIPMENT_SLOTS.reduce(
       (total, slot) => total + (state.equipment[slot]?.enhancement ?? 0),
       0,

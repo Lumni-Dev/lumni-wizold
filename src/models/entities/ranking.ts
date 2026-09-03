@@ -28,6 +28,7 @@ export interface Hunter {
   pet: HunterPet | null;
   equipment: Equipment;
   npc: boolean;
+  createdAt: string;
 }
 
 export type RankingKey =

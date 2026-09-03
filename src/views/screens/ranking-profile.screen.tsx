@@ -11,7 +11,7 @@ import type { Hunter } from "@/models/entities/ranking";
 import { findPet } from "@/models/entities/pet";
 import { criticalMultiplierOf } from "@/models/rules/combat";
 import { PET_MAX_LEVEL } from "@/shared/constants/game";
-import { formatNumber } from "@/shared/utils/format";
+import { formatDate, formatNumber } from "@/shared/utils/format";
 import { Button } from "../components/button";
 import { CopyNick } from "../components/copy-nick";
 import { DataRow } from "../components/data-row";
@@ -119,6 +119,9 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
             <List>
               <DataRow label="Nível" value={"NV. " + formatNumber(hunter.level)} />
               <DataRow label="WCoins" value={formatNumber(hunter.bronze)} />
+              {hunter.createdAt ? (
+                <DataRow label="Criado" value={formatDate(hunter.createdAt)} />
+              ) : null}
             </List>
           </Panel>
 

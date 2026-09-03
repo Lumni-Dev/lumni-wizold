@@ -12,7 +12,7 @@ import { EQUIPMENT_SLOTS } from "@/models/entities/item";
 import { findGender } from "@/models/entities/character";
 import type { Hunter } from "@/models/entities/ranking";
 import { FURY } from "@/shared/constants/tuning/fury";
-import { formatNumber } from "@/shared/utils/format";
+import { formatDate, formatNumber } from "@/shared/utils/format";
 import { furyDurationCopy } from "../presenters/item.presenter";
 import { Button } from "../components/button";
 import { CopyNick } from "../components/copy-nick";
@@ -116,6 +116,9 @@ export function CharacterScreen() {
             <List>
               <DataRow label="Nível" value={"NV. " + formatNumber(character.level)} />
               <DataRow label="WCoins" value={formatNumber(character.bronze)} />
+              {character.createdAt ? (
+                <DataRow label="Criado" value={formatDate(character.createdAt)} />
+              ) : null}
             </List>
           </Panel>
 
