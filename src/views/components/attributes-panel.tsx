@@ -4,7 +4,7 @@ import type { DerivedStats } from "@/models/rules/stats";
 import { BASE_ATTRIBUTE_VALUE } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
 import { formatNumber } from "@/shared/utils/format";
-import { AttributeIcon } from "./attribute-icon";
+import { AttributeArtFill } from "./attribute-icon";
 import { List, ListRow, RowText } from "./list";
 import { Panel } from "./panel";
 
@@ -43,17 +43,18 @@ export function AttributesPanel({
           ];
 
           return (
-            <ListRow key={definition.key} layout="column" padding="art">
-              <div className="flex w-full min-w-0 items-center gap-3">
-                <AttributeIcon attribute={definition.key} size="medium" />
-                <RowText title={definition.name} description={definition.description} />
-              </div>
+            <ListRow
+              key={definition.key}
+              art={<AttributeArtFill attribute={definition.key} />}
+              layout="column"
+            >
+              <RowText title={definition.name} description={definition.description} />
               <div className="grid w-full grid-cols-3 divide-x divide-y divide-edge overflow-hidden rounded-md border border-edge sm:grid-cols-7 sm:divide-y-0">
                 {cells.map((cell) => (
                   <div
                     key={cell.label}
                     className={cn(
-                      "space-y-0.5 px-2 py-1.5 text-center",
+                      "space-y-0.5 px-2 py-3 text-center",
                       cell.sum && "bg-surface-high/40",
                     )}
                   >

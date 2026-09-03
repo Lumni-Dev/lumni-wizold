@@ -47,7 +47,7 @@ export function ListRow({
     layout === "row"
       ? ROW_FLEX
       : layout === "column"
-        ? padding === "art"
+        ? padding === "art" || art
           ? "flex flex-col gap-3"
           : LAYOUTS.column
         : LAYOUTS[layout];
