@@ -31,7 +31,7 @@ export function PetSheetHeader({
 
   return (
     <div className="relative border-b border-edge">
-      <div className="aspect-square w-full overflow-hidden">
+      <div className="aspect-[3/2] w-full overflow-hidden">
         <ArtImage source={source} />
       </div>
       <div className={cn("absolute inset-x-0 bottom-0 border-t border-edge px-4 py-3", GLASS_SECTION)}>
@@ -56,7 +56,7 @@ export function PetIcon({
   return (
     <IconFrame size={size} tone="strong" className={className}>
       {source ? (
-        <IconArt source={source} padded={false} />
+        <IconArt source={source} padded={false} fit="contain" />
       ) : (
         findPet(gender).label.slice(0, 2).toUpperCase()
       )}
@@ -78,7 +78,7 @@ export function PetArtFill({ gender }: { gender: PetGender }) {
 
   return (
     <span className="relative flex h-full w-full">
-      <IconArt source={source} padded={false} />
+      <IconArt source={source} padded={false} fit="contain" />
     </span>
   );
 }
