@@ -26,7 +26,7 @@ const MAX_SIZE = {
   hunt: 1200,
   attributes: 512,
   training: 512,
-  genders: 500,
+  genders: 512,
   pet: 400,
 };
 
@@ -35,6 +35,7 @@ const DEFAULT_QUALITY = 80;
 const QUALITY = {
   attributes: 95,
   training: 95,
+  genders: 95,
 };
 
 const force = process.argv.includes("--force");

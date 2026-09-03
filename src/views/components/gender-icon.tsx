@@ -23,7 +23,7 @@ export function GenderIcon({
   return (
     <IconFrame size={size} tone="strong" className={className}>
       {source ? (
-        <IconArt source={source} padded={false} />
+        <IconArt source={source} padded={false} fit="contain" />
       ) : (
         findGender(gender).label.slice(0, 1)
       )}
@@ -45,7 +45,7 @@ export function GenderArtFill({ gender }: { gender: Gender }) {
 
   return (
     <span className="relative flex h-full w-full">
-      <IconArt source={source} padded={false} />
+      <IconArt source={source} padded={false} fit="contain" />
     </span>
   );
 }
@@ -58,7 +58,7 @@ export function GenderBanner({ gender }: { gender: Gender }) {
 
   return (
     <div className="aspect-square w-full overflow-hidden border-b border-edge">
-      <ArtImage source={source} />
+      <ArtImage source={source} fit="contain" />
     </div>
   );
 }
@@ -78,7 +78,7 @@ export function GenderSheetHeader({
   return (
     <div className="relative border-b border-edge">
       <div className="aspect-square w-full overflow-hidden">
-        <ArtImage source={source} />
+        <ArtImage source={source} fit="contain" />
       </div>
       <div className={cn("absolute inset-x-0 bottom-0 border-t border-edge px-4 py-3", GLASS_SECTION)}>
         {children}
