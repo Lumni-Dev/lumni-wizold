@@ -97,6 +97,8 @@ export function LiveBackdrop({ shade = "soft" }: { shade?: "soft" | "deep" }) {
         />
       ) : null}
 
+      <div aria-hidden className="video-ember-tint" />
+
       <div
         className={
           (shade === "deep" ? "live-backdrop-shade-deep" : "live-backdrop-shade") +
