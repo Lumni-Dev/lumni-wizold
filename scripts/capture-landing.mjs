@@ -9,9 +9,10 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
 const BASE = process.env.SMOKE_BASE ?? "http://localhost:3001";
 // Production only (no Next.js dev badge): npm run build && PORT=3001 npm run start
-// then node scripts/capture-landing.mjs
+// then CAPTURE_AS=Luna node scripts/capture-landing.mjs
 const OUT = join(ROOT, "public", "assets", "landing");
 const EMAIL = "landing@wizold.test";
+const CAPTURE_AS = process.env.CAPTURE_AS ?? "";
 
 const SHOTS = [
   { key: "character", path: "/character", ready: "Personagem" },
@@ -49,40 +50,71 @@ const client = new pg.Client({
 });
 await client.connect();
 
-await client.query("delete from users where email = $1", [EMAIL]);
-
-const userId = "usr_" + Date.now().toString(36) + "_cap" + randomBytes(2).toString("hex");
-const epoch = 0;
-await client.query(
-  "insert into users (id, email, birth_date, session_epoch) values ($1, $2, $3, $4)",
-  [userId, EMAIL, "1990-01-01", epoch],
-);
-
-const expiry = Date.now() + 3600000;
-const payload = userId + "." + epoch + "." + expiry;
-const token =
-  payload + "." + createHmac("sha256", secret).update(payload).digest("base64url");
-const cookie = "wizold_session=" + token;
-
-const createResponse = await fetch(BASE + "/api/characters", {
-  method: "POST",
-  headers: { "content-type": "application/json", cookie },
-  body: JSON.stringify({ name: "Tour" + randomBytes(2).toString("hex"), gender: "female" }),
-});
-const createBody = await createResponse.text();
-let created;
-try {
-  created = createBody ? JSON.parse(createBody) : null;
-} catch {
-  console.error("character create returned non-json", createResponse.status, createBody);
-  await client.end();
-  process.exit(1);
+function signSession(userId, epoch) {
+  const expiry = Date.now() + 3600000;
+  const payload = userId + "." + epoch + "." + expiry;
+  const token =
+    payload + "." + createHmac("sha256", secret).update(payload).digest("base64url");
+  return token;
 }
 
-if (!created?.ok) {
-  console.error("character create failed", createResponse.status, created ?? createBody);
-  await client.end();
-  process.exit(1);
+let userId;
+let epoch;
+let cleanupUser = false;
+
+if (CAPTURE_AS) {
+  const { rows } = await client.query(
+    `select u.id as user_id, u.session_epoch, c.name
+       from characters c
+       join users u on u.id = c.user_id
+      where lower(c.name) = lower($1)
+      limit 1`,
+    [CAPTURE_AS],
+  );
+  if (!rows.length) {
+    console.error("character not found:", CAPTURE_AS);
+    await client.end();
+    process.exit(1);
+  }
+  userId = rows[0].user_id;
+  epoch = Number(rows[0].session_epoch ?? 0);
+  console.log("capturing as", rows[0].name);
+} else {
+  await client.query("delete from users where email = $1", [EMAIL]);
+
+  userId = "usr_" + Date.now().toString(36) + "_cap" + randomBytes(2).toString("hex");
+  epoch = 0;
+  cleanupUser = true;
+  await client.query(
+    "insert into users (id, email, birth_date, session_epoch) values ($1, $2, $3, $4)",
+    [userId, EMAIL, "1990-01-01", epoch],
+  );
+}
+
+const token = signSession(userId, epoch);
+const cookie = "wizold_session=" + token;
+
+if (!CAPTURE_AS) {
+  const createResponse = await fetch(BASE + "/api/characters", {
+    method: "POST",
+    headers: { "content-type": "application/json", cookie },
+    body: JSON.stringify({ name: "Tour" + randomBytes(2).toString("hex"), gender: "female" }),
+  });
+  const createBody = await createResponse.text();
+  let created;
+  try {
+    created = createBody ? JSON.parse(createBody) : null;
+  } catch {
+    console.error("character create returned non-json", createResponse.status, createBody);
+    await client.end();
+    process.exit(1);
+  }
+
+  if (!created?.ok) {
+    console.error("character create failed", createResponse.status, created ?? createBody);
+    await client.end();
+    process.exit(1);
+  }
 }
 
 mkdirSync(OUT, { recursive: true });
@@ -162,5 +194,7 @@ for (const shot of shots) {
 }
 
 await browser.close();
-await client.query("delete from users where id = $1", [userId]);
+if (cleanupUser) {
+  await client.query("delete from users where id = $1", [userId]);
+}
 await client.end();

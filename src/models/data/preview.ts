@@ -14,7 +14,7 @@ export const PREVIEW_SHOTS: readonly PreviewShot[] = [
     text:
       "Atributos, forma, lobo e combate na mesma tela, com a origem de cada ponto separada: " +
       "treino, equipamento, mascote, lua e fúria.",
-    image: "/assets/landing/character.webp?v=9",
+    image: "/assets/landing/character.webp?v=10",
   },
   {
     key: "hunt",
@@ -23,7 +23,7 @@ export const PREVIEW_SHOTS: readonly PreviewShot[] = [
     text:
       "A trilha enche, a presa responde e a luta desce linha a linha. Só a fera caça: " +
       "em pele humana o campo recusa.",
-    image: "/assets/landing/hunt.webp?v=9",
+    image: "/assets/landing/hunt.webp?v=10",
   },
   {
     key: "training",
@@ -32,7 +32,7 @@ export const PREVIEW_SHOTS: readonly PreviewShot[] = [
     text:
       "Cada atributo tem o seu pátio, a sessão cobra WCoins e o ganho acompanha o nível " +
       "sem presente escondido na faixa.",
-    image: "/assets/landing/training.webp?v=9",
+    image: "/assets/landing/training.webp?v=10",
   },
   {
     key: "market",
@@ -41,7 +41,7 @@ export const PREVIEW_SHOTS: readonly PreviewShot[] = [
     text:
       "Cinco sets sobem faixa a faixa, poções cobradas em caçadas da sua noite e uma cópia " +
       "de cada peça: o que já está na mochila ou no corpo o balcão recusa.",
-    image: "/assets/landing/market.webp?v=3",
+    image: "/assets/landing/market.webp?v=10",
   },
   {
     key: "forge",
@@ -50,7 +50,7 @@ export const PREVIEW_SHOTS: readonly PreviewShot[] = [
     text:
       "A mina abre os veios por faixa, a bigorna bate na peça que você já usa e cada +1 " +
       "permanece na peça, não no slot.",
-    image: "/assets/landing/forge.webp?v=9",
+    image: "/assets/landing/forge.webp?v=10",
   },
   {
     key: "arena",
@@ -59,7 +59,7 @@ export const PREVIEW_SHOTS: readonly PreviewShot[] = [
     text:
       "Adversário do ranking, prêmio em WCoins na bolsa dele e replay da luta na mesma " +
       "cadência da caça.",
-    image: "/assets/landing/arena.webp?v=9",
+    image: "/assets/landing/arena.webp?v=10",
   },
   {
     key: "tavern",
@@ -68,6 +68,6 @@ export const PREVIEW_SHOTS: readonly PreviewShot[] = [
     text:
       "Salas abertas ou trancadas, mensagens ao vivo, convite de matilha e aviso quando " +
       "a cadeira acende.",
-    image: "/assets/landing/tavern.webp?v=9",
+    image: "/assets/landing/tavern.webp?v=10",
   },
 ];
