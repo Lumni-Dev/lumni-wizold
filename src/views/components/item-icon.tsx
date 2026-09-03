@@ -3,6 +3,7 @@
 import { useArt } from "@/controllers/art.context";
 import type { Item } from "@/models/entities/item";
 import { itemInitials } from "../presenters/item.presenter";
+import { ArtImage } from "./art-image";
 import { IconArt, IconFrame, type IconSize } from "./icon-frame";
 
 export function ItemIcon({
@@ -35,5 +36,26 @@ export function ItemIcon({
         </span>
       ) : null}
     </IconFrame>
+  );
+}
+
+export function useItemArt(item: Item) {
+  return useArt().items[item.id];
+}
+
+export function ItemBanner({ item, enhancement = 0 }: { item: Item; enhancement?: number }) {
+  const source = useItemArt(item);
+
+  if (!source) return null;
+
+  return (
+    <div className="relative aspect-[3/2] w-full overflow-hidden border-b border-edge">
+      <ArtImage source={source} fit="contain" className="p-4" />
+      {enhancement > 0 ? (
+        <span className="absolute right-3 top-3 inline-flex h-5 items-center justify-center rounded border border-ember bg-ember px-1.5 font-mono text-[11px] font-bold tracking-normal text-base">
+          +{enhancement}
+        </span>
+      ) : null}
+    </div>
   );
 }

@@ -1,8 +1,10 @@
+"use client";
+
 import type { ReactNode } from "react";
 import type { Item } from "@/models/entities/item";
 import { itemSubtitle, summarizeEffect } from "../presenters/item.presenter";
 import { Card, CardBody, CardFooter, CardHeader } from "./card";
-import { ItemIcon } from "./item-icon";
+import { ItemBanner, ItemIcon, useItemArt } from "./item-icon";
 import { RowText } from "./list";
 import { Tag } from "./tag";
 
@@ -26,11 +28,14 @@ export function ItemCard({
   fromBazaar = false,
 }: ItemCardProps) {
   const effects = summarizeEffect(item, enhancement);
+  const drawn = Boolean(useItemArt(item));
 
   return (
     <Card tone={highlighted ? "highlighted" : "default"} height="fill" interactive>
+      {drawn ? <ItemBanner item={item} enhancement={enhancement} /> : null}
+
       <CardHeader>
-        <ItemIcon item={item} enhancement={enhancement} />
+        {drawn ? null : <ItemIcon item={item} enhancement={enhancement} />}
         <RowText title={item.name} description={itemSubtitle(item)} />
         {quantity && quantity > 1 ? (
           <span className="shrink-0 font-mono text-xs text-ink-soft">x{quantity}</span>
