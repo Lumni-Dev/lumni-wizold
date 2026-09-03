@@ -71,5 +71,9 @@ export function ItemArtFill({ item }: { item: Item }) {
     );
   }
 
-  return <ArtImage source={source} fit="contain" />;
+  return (
+    <span className="relative flex h-full w-full">
+      <IconArt source={source} padded={false} fit="contain" />
+    </span>
+  );
 }

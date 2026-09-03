@@ -28,7 +28,7 @@ export function List({
   );
 }
 
-type RowPadding = "text" | "art";
+type RowPadding = "text" | "art" | "none";
 
 export function ListRow({
   children,
@@ -53,7 +53,7 @@ export function ListRow({
   return (
     <li
       className={cn(
-        padding === "art" ? "p-4" : "px-4 py-3",
+        padding === "none" ? undefined : padding === "art" ? "p-4" : "px-4 py-3",
         ICON_FRAME_INSET,
         rowLayout,
         className,
@@ -129,7 +129,7 @@ export function ArtRowButton({
 }) {
   if (divided) {
     return (
-      <ListRow padding="art" className="p-0">
+      <ListRow padding="none">
         <button
           type="button"
           onClick={onClick}
@@ -157,7 +157,7 @@ export function ArtRowButton({
   }
 
   return (
-    <ListRow padding="art" className="p-0">
+    <ListRow padding="none">
       <button
         type="button"
         onClick={onClick}
