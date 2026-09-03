@@ -22,8 +22,8 @@ import { formatNumber, formatBronze } from "@/shared/utils/format";
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
 import { Tag } from "../components/tag";
-import { PetIcon } from "../components/pet-icon";
-import { TrainingIcon } from "../components/training-icon";
+import { PetBanner } from "../components/pet-icon";
+import { TrainingBanner } from "../components/training-icon";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
 import { RowText } from "../components/list";
 import { Panel } from "../components/panel";
@@ -103,8 +103,9 @@ export function TrainingScreen() {
                 interactive={active || ready}
                 tone={active ? "highlighted" : "default"}
               >
+                <TrainingBanner attribute={exercise.attribute} />
+
                 <CardHeader className="flex-wrap">
-                  <TrainingIcon attribute={exercise.attribute} size="medium" />
                   <div className="flex min-w-[7rem] flex-1">
                     <RowText
                       title={row?.name ?? exercise.name}
@@ -179,8 +180,9 @@ export function TrainingScreen() {
               interactive={petActive || petReady}
               tone={petActive ? "highlighted" : "default"}
             >
+              <PetBanner gender={petTraining.pet.gender} />
+
               <CardHeader className="flex-wrap">
-                <PetIcon gender={petTraining.pet.gender} size="medium" />
                 <div className="flex min-w-[7rem] flex-1">
                   <RowText title="Mascote" label="Treino do mascote" />
                 </div>

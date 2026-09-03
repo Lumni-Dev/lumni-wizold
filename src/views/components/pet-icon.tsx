@@ -63,3 +63,16 @@ export function PetIcon({
     </IconFrame>
   );
 }
+
+export function PetBanner({ gender }: { gender: PetGender }) {
+  const art = useArt();
+  const source = art.pets[gender];
+
+  if (!source) return null;
+
+  return (
+    <div className="relative aspect-[3/2] w-full overflow-hidden border-b border-edge">
+      <IconArt source={source} padded={false} />
+    </div>
+  );
+}

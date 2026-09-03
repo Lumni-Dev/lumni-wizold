@@ -22,3 +22,16 @@ export function TrainingIcon({
     </IconFrame>
   );
 }
+
+export function TrainingBanner({ attribute }: { attribute: AttributeKey }) {
+  const art = useArt();
+  const source = art.training[attribute] ?? art.attributes[attribute];
+
+  if (!source) return null;
+
+  return (
+    <div className="relative aspect-[3/2] w-full overflow-hidden border-b border-edge">
+      <IconArt source={source} padded={false} />
+    </div>
+  );
+}
