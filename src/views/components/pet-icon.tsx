@@ -7,6 +7,7 @@ import { GLASS_SECTION } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { ArtImage } from "./art-image";
 import { IconArt, IconFrame, type IconSize } from "./icon-frame";
+import { LandingParallaxBanner } from "./landing-parallax-banner";
 
 const PET_ART_SCALE = "scale-[1.20] origin-center";
 const PET_ART_IMAGE_CLASS = "[&_img]:origin-center [&_img]:scale-[1.20]";
@@ -18,9 +19,9 @@ export function PetLandingBanner({ gender }: { gender: PetGender }) {
   if (!source) return null;
 
   return (
-    <div className="aspect-square w-full border-b border-edge p-5">
+    <LandingParallaxBanner>
       <ArtImage source={source} fit="contain" />
-    </div>
+    </LandingParallaxBanner>
   );
 }
 
