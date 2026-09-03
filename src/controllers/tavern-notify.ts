@@ -1,11 +1,11 @@
 "use client";
 
 import { tavernPushRepository } from "@/models/repositories/tavern-push.repository";
+import { TAVERN_MUG_PATH } from "@/shared/constants/site";
 import { formatDay } from "@/shared/utils/format";
 import { api } from "./api.client";
 
 const SW_URL = "/sw.js";
-const ICON = "/assets/ui/caneca.png";
 
 interface NotificationOptionsWithActions extends NotificationOptions {
   actions?: { action: string; title: string }[];
@@ -138,7 +138,7 @@ export function notifyTavernMessageLocal(
   const title = authorName + " · " + roomName;
   const base: NotificationOptions = {
     body: text + "\n" + formatDay(at),
-    icon: ICON,
+    icon: TAVERN_MUG_PATH,
     tag: "tavern:" + roomName,
     requireInteraction: true,
   };

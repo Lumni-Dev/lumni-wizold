@@ -39,6 +39,7 @@ import { AiAuditNotice } from "../components/ai-audit-notice";
 import { Button } from "../components/button";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
 import { Chip } from "../components/chip";
+import { TavernMugArt } from "../components/tavern-mug-art";
 import { TavernRoomNumber } from "../components/tavern-room-number";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { Field } from "../components/field";
@@ -59,7 +60,7 @@ import {
   tavernRoomChatAction,
 } from "../components/tavern-room-chat";
 
-const PAGE_SIZE = 6;
+const PAGE_SIZE = 9;
 
 function MemberName({
   href,
@@ -730,7 +731,7 @@ export function TavernScreen() {
                 <FilteredEmptyState description="Nenhuma mesa combina com essa busca." />
               ) : (
                 <>
-                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {roomsOnPage.map(({ room, locked, full, memberCount, isMember, isPrivate }) => {
                       const unread = unreadByRoom.get(room.id) ?? 0;
                       const seatedHere = openRoomId === room.id;
@@ -742,7 +743,7 @@ export function TavernScreen() {
                   interactive={!full || isMember}
                   tone={isPrivate || room.ownerId === identity.id ? "highlighted" : "default"}
                 >
-                  <CardHeader>
+                  <CardHeader art={<TavernMugArt unread={unread} seated={seatedHere} />}>
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <div className="flex min-w-0 items-center gap-2">
@@ -754,11 +755,6 @@ export function TavernScreen() {
                           )}
                         </div>
                         <div className="flex shrink-0 items-center gap-2">
-                          {unread > 0 ? (
-                            <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-md border border-ember bg-ember px-2 font-mono text-[10px] font-bold tracking-normal text-base">
-                              {unread > 9 ? "9+" : unread}
-                            </span>
-                          ) : null}
                           {isPrivate ? (
                             <Tag tone="neutral">Reservada</Tag>
                           ) : (
@@ -827,7 +823,7 @@ export function TavernScreen() {
                     ) : null}
                   </CardBody>
 
-                  <CardFooter>
+                  <CardFooter className="flex-col items-stretch gap-2">
                     <span className="text-[11px] text-ink-faint">
                       {isPrivate
                         ? "Só vocês dois"
@@ -837,17 +833,23 @@ export function TavernScreen() {
                             ? "Seu lugar está guardado"
                             : "Livre"}
                     </span>
-                    <div className="flex items-center gap-2">
+                    <div className="grid w-full grid-cols-2 gap-2">
                       {isPrivate || room.ownerId === identity.id ? (
-                        <Button variant="ghost" onClick={() => setClosingRoomId(room.id)}>
+                        <Button variant="ghost" fullWidth onClick={() => setClosingRoomId(room.id)}>
                           Fechar mesa
                         </Button>
                       ) : isMember ? (
-                        <Button variant="ghost" onClick={() => leave(room.id)}>
+                        <Button variant="ghost" fullWidth onClick={() => leave(room.id)}>
                           Sair
                         </Button>
                       ) : null}
                       <Tooltip
+                        block
+                        className={
+                          !isPrivate && room.ownerId !== identity.id && !isMember
+                            ? "col-span-2"
+                            : undefined
+                        }
                         label={
                           seatedHere
                             ? "Você já está sentado nesta mesa"
@@ -858,6 +860,7 @@ export function TavernScreen() {
                       >
                         <Button
                           variant={seatedHere ? "secondary" : "primary"}
+                          fullWidth
                           disabled={seatedHere || (full && !isMember)}
                           onClick={() => open(room.id, joinPasswords[room.id] ?? "")}
                         >
