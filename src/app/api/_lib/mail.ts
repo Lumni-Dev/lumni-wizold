@@ -12,7 +12,7 @@ const EDGE = "#2e2118";
 const INK = "#f0e9e2";
 const INK_SOFT = "#ac9c8d";
 const INK_FAINT = "#79695a";
-const EMBER = "#e08d35";
+const EMBER = "#f2761b";
 const LOGO_URL = GAME_URL + "/assets/ui/logo.png?v=3";
 
 function transporter() {
