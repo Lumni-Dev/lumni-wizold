@@ -168,7 +168,7 @@ export function IconArt({
                   className={cn(
                     "h-full w-full drop-shadow-[0_2px_4px_rgba(0,0,0,0.55)]",
                     fit === "contain" ? "object-contain" : "object-cover",
-                    inset ? "p-[16px]" : padded && "p-[14px]",
+                    inset ? "p-[16px]" : "p-[14px]",
                   )}
                 />
                 {glow ? (
