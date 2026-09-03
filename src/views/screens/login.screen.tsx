@@ -98,7 +98,7 @@ function daysInMonth(month: string, year: string): number {
   return new Date(Number(year || "2000"), Number(month), 0).getDate();
 }
 export function LoginScreen() {
-  const { ready, character, enter, verifyTwoFactor, resendTwoFactor } = useGame();
+  const { ready, authenticated, character, enter, verifyTwoFactor, resendTwoFactor } = useGame();
   const router = useRouter();
   const [birth, setBirth] = useState(EMPTY_BIRTH);
   const [entering, setEntering] = useState(false);
@@ -126,8 +126,9 @@ export function LoginScreen() {
     return () => document.body.classList.remove("landing-page");
   }, []);
   useEffect(() => {
-    if (ready && character) router.replace("/character");
-  }, [ready, character, router]);
+    if (!ready || !authenticated) return;
+    router.replace(character ? "/character" : "/create");
+  }, [ready, authenticated, character, router]);
   useEffect(() => {
     const saved = loadBirth();
     if (!saved) return;

@@ -28,7 +28,7 @@ function Loading() {
 }
 
 export function GameFrame({ children }: { children: ReactNode }) {
-  const { ready, character, tutorial } = useGame();
+  const { ready, authenticated, character, tutorial } = useGame();
   const [reviewTutorial, setReviewTutorial] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
@@ -45,8 +45,9 @@ export function GameFrame({ children }: { children: ReactNode }) {
   );
 
   useEffect(() => {
-    if (ready && !character) router.replace("/");
-  }, [ready, character, router]);
+    if (!ready || character) return;
+    router.replace(authenticated ? "/create" : "/login");
+  }, [ready, authenticated, character, router]);
 
   useEffect(() => {
     if (!ready || !character) return;

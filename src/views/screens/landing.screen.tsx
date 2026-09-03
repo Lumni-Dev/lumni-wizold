@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useGame } from "@/controllers/game.context";
 import { LORE_CHAPTERS, LORE_COMPANIONS, LORE_COUPLE, LORE_PILLARS } from "@/models/data/lore";
 import { PREVIEW_SHOTS } from "@/models/data/preview";
@@ -19,18 +20,34 @@ import { useNarration } from "@/controllers/use-narration";
 import { LandingCtaButton } from "../components/landing-cta-button";
 import { Footer } from "../layout/footer";
 import { NarrationButton } from "../components/narration-button";
+import { Spinner } from "../components/spinner";
 
 const CHAPTER_NUMBERS = ["I", "II", "III", "IV"];
 
 export function LandingScreen() {
-  const { ready, character } = useGame();
+  const { ready, authenticated, character } = useGame();
+  const router = useRouter();
   const hasRun = ready && character !== null;
   const narration = useNarration();
+
+  useEffect(() => {
+    if (!ready || !authenticated) return;
+    router.replace(character ? "/character" : "/create");
+  }, [ready, authenticated, character, router]);
 
   useEffect(() => {
     document.body.classList.add("landing-page");
     return () => document.body.classList.remove("landing-page");
   }, []);
+
+  if (ready && authenticated) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 text-ink-faint">
+        <Spinner size="medium" />
+        <p className="heading text-[11px]">Carregando...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="relative flex min-h-screen flex-col">
