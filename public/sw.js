@@ -8,7 +8,7 @@ self.addEventListener("push", (event) => {
       if (windows.some((client) => client.visibilityState === "visible")) return;
       return self.registration.showNotification(payload.title, {
         body: payload.body,
-        icon: "/assets/ui/caneca.png",
+        icon: "/assets/ui/caneca.png?v=2",
         tag: "tavern:" + payload.roomName,
         data: { url: payload.url || "/tavern" },
         requireInteraction: true,

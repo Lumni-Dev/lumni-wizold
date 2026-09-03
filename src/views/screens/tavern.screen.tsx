@@ -821,16 +821,7 @@ export function TavernScreen() {
                     ) : null}
                   </CardBody>
 
-                  <CardFooter className="flex-col items-stretch gap-2">
-                    <span className="text-[11px] text-ink-faint">
-                      {isPrivate
-                        ? "Só vocês dois"
-                        : full && !isMember
-                          ? "Mesa cheia"
-                          : isMember
-                            ? "Seu lugar está guardado"
-                            : "Livre"}
-                    </span>
+                  <CardFooter>
                     <div className="grid w-full grid-cols-2 gap-2">
                       {isPrivate || room.ownerId === identity.id ? (
                         <Button variant="ghost" fullWidth onClick={() => setClosingRoomId(room.id)}>
