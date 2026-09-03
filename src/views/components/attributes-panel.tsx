@@ -35,7 +35,7 @@ export function AttributesPanel({
           const cells = [
             { label: "Natural", value: formatNumber(natural), sum: false },
             { label: "Treino", value: plus(lent(stats.sources.trained) - natural), sum: false },
-            { label: "Equipamento", value: plus(lent(stats.sources.equipment)), sum: false },
+            { label: "Equip.", value: plus(lent(stats.sources.equipment)), sum: false },
             { label: "Mascote", value: plus(lent(stats.sources.pet)), sum: false },
             { label: "Lua", value: plus(lent(stats.sources.moon)), sum: false },
             { label: "Fúria", value: plus(lent(stats.sources.fury)), sum: false },
