@@ -9,18 +9,35 @@ export function createDriftLoop(options: {
   alive: () => boolean;
   ready: () => boolean;
   onTick: () => void;
+  /** When false, a late poll never fires two beats; the bar stays one step at a time. */
+  catchUp?: boolean;
 }): () => void {
   const pollMs = options.pollMs ?? Math.min(DEFAULT_POLL_MS, options.periodMs);
+  const catchUp = options.catchUp !== false;
   let nextAt = Date.now() + options.periodMs;
+  let armed = options.ready();
 
   const flush = () => {
-    if (!options.alive() || !options.ready()) return;
+    if (!options.alive()) return;
+    if (!options.ready()) {
+      armed = false;
+      return;
+    }
     const now = Date.now();
+    if (!armed) {
+      armed = true;
+      nextAt = catchUp ? now + options.periodMs : now;
+      if (catchUp) return;
+    }
     let guard = 0;
     while (now >= nextAt && options.alive() && options.ready() && guard < 512) {
       options.onTick();
       nextAt += options.periodMs;
       guard += 1;
+      if (!catchUp) {
+        nextAt = now + options.periodMs;
+        break;
+      }
     }
   };
 

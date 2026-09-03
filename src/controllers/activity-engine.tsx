@@ -304,6 +304,7 @@ export function ActivityEngine() {
     resolve();
     const stopDrift = createDriftLoop({
       periodMs: HUNT_TICK_MS,
+      catchUp: false,
       alive: () => alive,
       ready: () => Boolean(pending) && !requesting,
       onTick: () => {
