@@ -444,9 +444,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [hydrated, applyState, adoptActivityFromServer]);
   useEffect(() => {
     if (!ready) return undefined;
-    const sync = () => {
+    const sync = async () => {
       if (document.visibilityState !== "visible") return;
-      void request("POST", "/api/state");
+      const answer = await request("POST", "/api/state");
+      if (answer.activity && !activitySync.isOwner() && !activitySync.isMirroring()) {
+        await activitySync.reclaim(answer.activity);
+      }
+      if (!activitySync.isMirroring()) adoptActivityFromServer(answer.activity);
     };
     document.addEventListener("visibilitychange", sync);
     window.addEventListener("focus", sync);
@@ -454,7 +458,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       document.removeEventListener("visibilitychange", sync);
       window.removeEventListener("focus", sync);
     };
-  }, [ready, request]);
+  }, [ready, request, adoptActivityFromServer]);
   const petResting =
     state.pet !== null &&
     state.pet.active === false &&

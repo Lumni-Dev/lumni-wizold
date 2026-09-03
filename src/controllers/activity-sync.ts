@@ -8,7 +8,8 @@ import { activityMirrorStore } from "./activity-mirror.store";
 import { activityRuntimeStore } from "./activity-runtime";
 
 export const HANDSHAKE_MS = 500;
-export const OWNER_SILENCE_MS = 12000;
+export const OWNER_SILENCE_MS = 20000;
+const OWNER_HEARTBEAT_MS = 4000;
 const CHANNEL_NAME = "lumni-wizold:activity";
 const TAB_KEY = "lumni-wizold:tab-id";
 
@@ -62,6 +63,7 @@ let handshaking = false;
 let handlers: Handlers | null = null;
 let silenceTimer = 0;
 let publishTimer = 0;
+let heartbeatTimer = 0;
 let localActivity: Activity | null = null;
 const roleListeners = new Set<() => void>();
 
@@ -179,7 +181,9 @@ function handleMessage(raw: MessageEvent<SyncMessage>): void {
       if (role === "owner") handlers?.onRemoteStop();
       break;
     case "idle":
-      if (role === "mirror" && ownerTabId === message.tabId) clearMirror();
+      if (role === "mirror" && ownerTabId === message.tabId) {
+        clearMirror();
+      }
       break;
     case "notice":
       handlers?.onRemoteNotice({
@@ -215,15 +219,22 @@ export const activitySync = {
 
     const offRuntime = activityRuntimeStore.subscribe(schedulePublish);
 
-    const onHide = () => {
-      if (role === "owner" && handlers?.shouldParticipate()) post({ type: "idle", tabId });
-    };
-    window.addEventListener("pagehide", onHide);
+    heartbeatTimer = window.setInterval(() => {
+      if (role !== "owner" || !localActivity || !handlers?.shouldParticipate()) return;
+      touchOwner();
+      post({
+        type: "sync",
+        tabId,
+        at: Date.now(),
+        activity: localActivity,
+        runtime: activityRuntimeStore.snapshot(),
+      });
+    }, OWNER_HEARTBEAT_MS);
 
     return () => {
-      window.removeEventListener("pagehide", onHide);
       offRuntime();
       window.clearInterval(silenceTimer);
+      window.clearInterval(heartbeatTimer);
       window.clearTimeout(publishTimer);
       channel?.removeEventListener("message", handleMessage);
       channel?.close();
@@ -337,6 +348,32 @@ export const activitySync = {
     ownClaim = null;
     localActivity = null;
     setRole("idle");
+  },
+
+  async reclaim(serverActivity: Activity | null | undefined): Promise<void> {
+    if (!serverActivity || !handlers?.shouldParticipate()) return;
+    if (role === "owner" || role === "mirror") return;
+    if (!supported()) {
+      setRole("owner");
+      localActivity = serverActivity;
+      return;
+    }
+    handshaking = true;
+    post({ type: "hello", tabId });
+    const claim: Claim = { tabId, at: Date.now() };
+    ownClaim = claim;
+    setRole("owner");
+    localActivity = serverActivity;
+    activityMirrorStore.clear();
+    post({ type: "claim", tabId, at: claim.at, activity: serverActivity });
+    await new Promise((resolve) => window.setTimeout(resolve, HANDSHAKE_MS));
+    handshaking = false;
+    if (remoteClaim && ownClaim && !beatsClaim(ownClaim, remoteClaim)) {
+      yieldOwner();
+      localActivity = null;
+      return;
+    }
+    schedulePublish();
   },
 
   publishNotice(payload: {

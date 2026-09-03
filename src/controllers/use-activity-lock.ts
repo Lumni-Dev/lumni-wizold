@@ -28,8 +28,10 @@ export function useActivityLock(): { locked: boolean; reason: string } {
     activityMirrorStore.serverSnapshot,
   );
 
-  const running = mirror.mirroring ? mirror.activity : activity;
-  const dockRuntime = mirror.mirroring && mirror.runtime ? mirror.runtime : runtime;
+  const running =
+    mirror.mirroring && mirror.activity !== null ? mirror.activity : activity;
+  const dockRuntime =
+    mirror.mirroring && mirror.runtime !== null ? mirror.runtime : runtime;
   const dock = dockRuntime.dock;
   if (running === null || dock === null || dock.canStop) return { locked: false, reason: "" };
 

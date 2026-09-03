@@ -32,6 +32,7 @@ import { narrationOf } from "@/views/presenters/hunt.presenter";
 import { isGameSound, playSound } from "./sound";
 import { useGame } from "./game.context";
 import { activitySync } from "./activity-sync";
+import { createDriftLoop } from "./activity-loop";
 import {
   activityHref,
   activityRuntimeStore,
@@ -284,91 +285,99 @@ export function ActivityEngine() {
     };
 
     const startCooldown = (left = CYCLE_OPTOUT_SECS) => {
+      const until = new Date(Date.now() + left * 1000).toISOString();
+      syncProgressRef.current({ beat: 0, cooldownUntil: until });
       push(left);
+      if (coolTimer) window.clearInterval(coolTimer);
       coolTimer = window.setInterval(() => {
-        left -= 1;
-        if (left <= 0) {
+        const remaining = cooldownLeft({ cooldownUntil: until } as Activity);
+        if (remaining <= 0) {
           window.clearInterval(coolTimer);
           coolTimer = 0;
           resolve();
         } else {
-          push(left);
+          push(remaining);
         }
-      }, 1000);
+      }, 250);
     };
 
     resolve();
-    const timer = window.setInterval(() => {
-      if (!pending || requesting) return;
-      beat += 1;
-      const line = script[Math.min(beat, script.length) - 1];
-      if (line?.blow === "ours") playSound(line.critical ? "crit" : "hit");
-      if (line?.blow === "pet") playSound("snap");
-      if (line?.blow === "theirs") playSound("hurt");
-      if (line?.characterHealth !== undefined) {
-        const delta = bled.last - line.characterHealth;
-        if (delta > 0) {
-          sufferRef.current(delta);
-          bled.last = line.characterHealth;
+    const stopDrift = createDriftLoop({
+      periodMs: HUNT_TICK_MS,
+      alive: () => alive,
+      ready: () => Boolean(pending) && !requesting,
+      onTick: () => {
+        beat += 1;
+        const line = script[Math.min(beat, script.length) - 1];
+        if (line?.blow === "ours") playSound(line.critical ? "crit" : "hit");
+        if (line?.blow === "pet") playSound("snap");
+        if (line?.blow === "theirs") playSound("hurt");
+        if (line?.characterHealth !== undefined) {
+          const delta = bled.last - line.characterHealth;
+          if (delta > 0) {
+            sufferRef.current(delta);
+            bled.last = line.characterHealth;
+          }
         }
-      }
-      push(null);
-      if (beat >= script.length) {
-        const held = pending;
-        pending = null;
-        landHuntRef.current();
-        script = [];
-        beat = 0;
-        patchActivityRuntime({ lastHuntReport: held });
-        if (held.combat.victory) {
-          playSound("spoils");
-          if (held.levelsGained > 0) playSound("levelup", 700);
-          if (held.petLeveled) playSound("pet-up", 1100);
-          const spoils = held.drops
-            .map((drop) => drop.name + (drop.quantity > 1 ? " x" + drop.quantity : ""))
-            .join(", ");
-          notifyRef.current(
-            held.creature.name +
-              " abatido: +" +
-              formatNumber(held.bronze) +
-              " WCoins e +" +
-              formatNumber(held.experience) +
-              " de experiência." +
-              (spoils ? " Espólio: " + spoils + "." : "") +
-              (held.levelsGained > 0 ? " Você subiu de nível!" : ""),
-            true,
-            "Caça",
-          );
-        } else if (held.combat.retreated) {
-          notifyRef.current(
-            "A caçada com " + held.creature.name + " se arrastou e os dois recuaram.",
-            true,
-            "Caça",
-          );
-        } else {
-          playSound("defeat");
-          notifyRef.current(
-            held.creature.name + " levou a melhor: a caçada não pagou nada.",
-            false,
-            "Caça",
-          );
+        push(null);
+        if (beat >= script.length) {
+          const held = pending;
+          if (!held) return;
+          pending = null;
+          landHuntRef.current();
+          script = [];
+          beat = 0;
+          patchActivityRuntime({ lastHuntReport: held });
+          if (held.combat.victory) {
+            playSound("spoils");
+            if (held.levelsGained > 0) playSound("levelup", 700);
+            if (held.petLeveled) playSound("pet-up", 1100);
+            const spoils = held.drops
+              .map((drop) => drop.name + (drop.quantity > 1 ? " x" + drop.quantity : ""))
+              .join(", ");
+            notifyRef.current(
+              held.creature.name +
+                " abatido: +" +
+                formatNumber(held.bronze) +
+                " WCoins e +" +
+                formatNumber(held.experience) +
+                " de experiência." +
+                (spoils ? " Espólio: " + spoils + "." : "") +
+                (held.levelsGained > 0 ? " Você subiu de nível!" : ""),
+              true,
+              "Caça",
+            );
+          } else if (held.combat.retreated) {
+            notifyRef.current(
+              "A caçada com " + held.creature.name + " se arrastou e os dois recuaram.",
+              true,
+              "Caça",
+            );
+          } else {
+            playSound("defeat");
+            notifyRef.current(
+              held.creature.name + " levou a melhor: a caçada não pagou nada.",
+              false,
+              "Caça",
+            );
+          }
+          if (!autoRef.current.hunt) {
+            setActivityRef.current(null);
+            return;
+          }
+          startCooldown();
         }
-        if (!autoRef.current.hunt) {
-          setActivityRef.current(null);
-          return;
-        }
-        startCooldown();
-      }
-    }, HUNT_TICK_MS);
+      },
+    });
 
     return () => {
       alive = false;
-      window.clearInterval(timer);
+      stopDrift();
       if (coolTimer) window.clearInterval(coolTimer);
       if (fillTimer) window.clearTimeout(fillTimer);
-      if (pending) landHuntRef.current();
+      if (pending && !activitySync.isMirroring()) landHuntRef.current();
     };
-  }, [ready, activity?.kind, activity?.id, activity?.paused]);
+  }, [ready, runsEngine, activity?.kind, activity?.id, activity?.paused]);
 
   useEffect(() => {
     if (!ready || !runsEngine) return;
@@ -387,7 +396,8 @@ export function ActivityEngine() {
     }
 
     let alive = true;
-    let barTimer = 0;
+    let stopBar: (() => void) | null = null;
+    let retryTimer = 0;
     let coolTimer = 0;
     let carry =
       activityRef.current?.kind === "train" && activityRef.current.id === activeExercise
@@ -422,65 +432,72 @@ export function ActivityEngine() {
       carry = 0;
       syncProgressRef.current({ beat, cooldownUntil: null });
       push(null);
-      barTimer = window.setInterval(() => {
-        beat += 1;
-        syncProgressRef.current({ beat, cooldownUntil: null });
-        push(null);
-        if (beat < ticks) {
-          const effort = activeExercise === PET_EXERCISE_ID ? "growl" : activeExercise;
-          if (isGameSound(effort)) playSound(effort);
-          return;
-        }
-        window.clearInterval(barTimer);
-        barTimer = 0;
-        const settle = () => {
-          void trainRef.current(activeExercise).then((landed) => {
-            if (!alive) return;
-            if (landed === "retry") {
-              barTimer = window.setTimeout(settle, TRAINING_TICK_MS);
-              return;
-            }
-            if (landed) {
-              if (landed.message) notifyRef.current(landed.message, true, "Treino");
-              if (landed.raised) {
-                playSound(activeExercise === PET_EXERCISE_ID ? "pet-up" : "point");
+      stopBar?.();
+      stopBar = createDriftLoop({
+        periodMs: TRAINING_TICK_MS,
+        alive: () => alive,
+        ready: () => true,
+        onTick: () => {
+          beat += 1;
+          syncProgressRef.current({ beat, cooldownUntil: null });
+          push(null);
+          if (beat < ticks) {
+            const effort = activeExercise === PET_EXERCISE_ID ? "growl" : activeExercise;
+            if (isGameSound(effort)) playSound(effort);
+            return;
+          }
+          stopBar?.();
+          stopBar = null;
+          const settle = () => {
+            void trainRef.current(activeExercise).then((landed) => {
+              if (!alive) return;
+              if (landed === "retry") {
+                retryTimer = window.setTimeout(settle, TRAINING_TICK_MS);
+                return;
               }
-            }
-            beat = 0;
-            syncProgressRef.current({ beat: 0, cooldownUntil: null });
-            if (!landed) {
-              setActivityRef.current(
-                autoRef.current.train && resumable
-                  ? { kind: "train", id: activeExercise, paused: true }
-                  : null,
-              );
-              return;
-            }
-            if (!autoRef.current.train) {
-              setActivityRef.current(null);
-              return;
-            }
-            startCooldown(CYCLE_OPTOUT_SECS);
-          });
-        };
-        settle();
-      }, TRAINING_TICK_MS);
+              if (landed) {
+                if (landed.message) notifyRef.current(landed.message, true, "Treino");
+                if (landed.raised) {
+                  playSound(activeExercise === PET_EXERCISE_ID ? "pet-up" : "point");
+                }
+              }
+              beat = 0;
+              syncProgressRef.current({ beat: 0, cooldownUntil: null });
+              if (!landed) {
+                setActivityRef.current(
+                  autoRef.current.train && resumable
+                    ? { kind: "train", id: activeExercise, paused: true }
+                    : null,
+                );
+                return;
+              }
+              if (!autoRef.current.train) {
+                setActivityRef.current(null);
+                return;
+              }
+              startCooldown(CYCLE_OPTOUT_SECS);
+            });
+          };
+          settle();
+        },
+      });
     };
 
     const startCooldown = (left = CYCLE_OPTOUT_SECS) => {
       const until = new Date(Date.now() + left * 1000).toISOString();
       syncProgressRef.current({ beat: 0, cooldownUntil: until });
       push(left);
+      if (coolTimer) window.clearInterval(coolTimer);
       coolTimer = window.setInterval(() => {
-        left -= 1;
-        if (left <= 0) {
+        const remaining = cooldownLeft({ cooldownUntil: until } as Activity);
+        if (remaining <= 0) {
           window.clearInterval(coolTimer);
           coolTimer = 0;
           startBar();
         } else {
-          push(left);
+          push(remaining);
         }
-      }, 1000);
+      }, 250);
     };
 
     const resumeCooldown = cooldownLeft(activityRef.current);
@@ -488,7 +505,8 @@ export function ActivityEngine() {
     else startBar();
     return () => {
       alive = false;
-      if (barTimer) window.clearInterval(barTimer);
+      stopBar?.();
+      if (retryTimer) window.clearTimeout(retryTimer);
       if (coolTimer) window.clearInterval(coolTimer);
     };
   }, [ready, runsEngine, activity?.kind, activity?.id, activity?.paused]);
@@ -504,7 +522,8 @@ export function ActivityEngine() {
     }
 
     let alive = true;
-    let barTimer = 0;
+    let stopBar: (() => void) | null = null;
+    let retryTimer = 0;
     let coolTimer = 0;
     let carry =
       activityRef.current?.kind === "mine" && activityRef.current.id === activeOre
@@ -527,54 +546,61 @@ export function ActivityEngine() {
       carry = 0;
       syncProgressRef.current({ beat, cooldownUntil: null });
       push(null);
-      barTimer = window.setInterval(() => {
-        beat += 1;
-        syncProgressRef.current({ beat, cooldownUntil: null });
-        playSound("mine");
-        push(null);
-        if (beat < ticks) return;
-        window.clearInterval(barTimer);
-        barTimer = 0;
-        const settle = () => {
-          void mineRef.current(activeOre).then((mined) => {
-            if (!alive) return;
-            if (mined === "retry") {
-              barTimer = window.setTimeout(settle, MINING_TICK_MS);
-              return;
-            }
-            beat = 0;
-            syncProgressRef.current({ beat: 0, cooldownUntil: null });
-            if (!mined) {
-              setActivityRef.current(
-                autoRef.current.mine ? { kind: "mine", id: activeOre, paused: true } : null,
-              );
-              return;
-            }
-            if (!autoRef.current.mine) {
-              setActivityRef.current(null);
-              return;
-            }
-            startCooldown(CYCLE_OPTOUT_SECS);
-          });
-        };
-        settle();
-      }, MINING_TICK_MS);
+      stopBar?.();
+      stopBar = createDriftLoop({
+        periodMs: MINING_TICK_MS,
+        alive: () => alive,
+        ready: () => true,
+        onTick: () => {
+          beat += 1;
+          syncProgressRef.current({ beat, cooldownUntil: null });
+          playSound("mine");
+          push(null);
+          if (beat < ticks) return;
+          stopBar?.();
+          stopBar = null;
+          const settle = () => {
+            void mineRef.current(activeOre).then((mined) => {
+              if (!alive) return;
+              if (mined === "retry") {
+                retryTimer = window.setTimeout(settle, MINING_TICK_MS);
+                return;
+              }
+              beat = 0;
+              syncProgressRef.current({ beat: 0, cooldownUntil: null });
+              if (!mined) {
+                setActivityRef.current(
+                  autoRef.current.mine ? { kind: "mine", id: activeOre, paused: true } : null,
+                );
+                return;
+              }
+              if (!autoRef.current.mine) {
+                setActivityRef.current(null);
+                return;
+              }
+              startCooldown(CYCLE_OPTOUT_SECS);
+            });
+          };
+          settle();
+        },
+      });
     };
 
     const startCooldown = (left = CYCLE_OPTOUT_SECS) => {
       const until = new Date(Date.now() + left * 1000).toISOString();
       syncProgressRef.current({ beat: 0, cooldownUntil: until });
       push(left);
+      if (coolTimer) window.clearInterval(coolTimer);
       coolTimer = window.setInterval(() => {
-        left -= 1;
-        if (left <= 0) {
+        const remaining = cooldownLeft({ cooldownUntil: until } as Activity);
+        if (remaining <= 0) {
           window.clearInterval(coolTimer);
           coolTimer = 0;
           startBar();
         } else {
-          push(left);
+          push(remaining);
         }
-      }, 1000);
+      }, 250);
     };
 
     const resumeCooldown = cooldownLeft(activityRef.current);
@@ -582,10 +608,11 @@ export function ActivityEngine() {
     else startBar();
     return () => {
       alive = false;
-      if (barTimer) window.clearInterval(barTimer);
+      stopBar?.();
+      if (retryTimer) window.clearTimeout(retryTimer);
       if (coolTimer) window.clearInterval(coolTimer);
     };
-  }, [ready, activity?.kind, activity?.id, activity?.paused]);
+  }, [ready, runsEngine, activity?.kind, activity?.id, activity?.paused]);
 
   useEffect(() => {
     if (!ready || !runsEngine) return;
@@ -608,7 +635,8 @@ export function ActivityEngine() {
     }
 
     let alive = true;
-    let barTimer = 0;
+    let stopBar: (() => void) | null = null;
+    let retryTimer = 0;
     let coolTimer = 0;
     let carry =
       activityRef.current?.kind === "forge" && activityRef.current.id === activeItem
@@ -639,70 +667,77 @@ export function ActivityEngine() {
       carry = 0;
       syncProgressRef.current({ beat, cooldownUntil: null });
       push(null);
-      barTimer = window.setInterval(() => {
-        beat += 1;
-        syncProgressRef.current({ beat, cooldownUntil: null });
-        push(null);
-        if (beat < FORGE_TICKS) {
-          playSound("forge");
-          return;
-        }
-        window.clearInterval(barTimer);
-        barTimer = 0;
-        const settle = () => {
-          void enhanceRef.current(activeItem, level).then((landed) => {
-            if (!alive) return;
-            if (landed === "retry") {
-              barTimer = window.setTimeout(settle, 400);
-              return;
-            }
-            if (landed) {
-              if (landed.message) notifyRef.current(landed.message, true, "Bigorna");
-              playSound(landed.raised ? "point" : "denied");
-              if (landed.raised) {
-                level += 1;
-                forgeLevelRef.current = level;
-                const current = activityRef.current;
-                if (current?.kind === "forge" && current.id === activeItem) {
-                  persistActivityRef.current({ ...current, enhancement: level, beat: 0 });
+      stopBar?.();
+      stopBar = createDriftLoop({
+        periodMs: tickMs,
+        alive: () => alive,
+        ready: () => true,
+        onTick: () => {
+          beat += 1;
+          syncProgressRef.current({ beat, cooldownUntil: null });
+          push(null);
+          if (beat < FORGE_TICKS) {
+            playSound("forge");
+            return;
+          }
+          stopBar?.();
+          stopBar = null;
+          const settle = () => {
+            void enhanceRef.current(activeItem, level).then((landed) => {
+              if (!alive) return;
+              if (landed === "retry") {
+                retryTimer = window.setTimeout(settle, 400);
+                return;
+              }
+              if (landed) {
+                if (landed.message) notifyRef.current(landed.message, true, "Bigorna");
+                playSound(landed.raised ? "point" : "denied");
+                if (landed.raised) {
+                  level += 1;
+                  forgeLevelRef.current = level;
+                  const current = activityRef.current;
+                  if (current?.kind === "forge" && current.id === activeItem) {
+                    persistActivityRef.current({ ...current, enhancement: level, beat: 0 });
+                  }
                 }
               }
-            }
-            beat = 0;
-            syncProgressRef.current({ beat: 0, cooldownUntil: null });
-            if (!landed) {
-              setActivityRef.current(
-                autoRef.current.forge
-                  ? { kind: "forge", id: activeItem, enhancement: level, paused: true }
-                  : null,
-              );
-              return;
-            }
-            if (level >= MAX_ENHANCEMENT || !autoRef.current.forge) {
-              setActivityRef.current(null);
-              return;
-            }
-            startCooldown(CYCLE_OPTOUT_SECS);
-          });
-        };
-        settle();
-      }, tickMs);
+              beat = 0;
+              syncProgressRef.current({ beat: 0, cooldownUntil: null });
+              if (!landed) {
+                setActivityRef.current(
+                  autoRef.current.forge
+                    ? { kind: "forge", id: activeItem, enhancement: level, paused: true }
+                    : null,
+                );
+                return;
+              }
+              if (level >= MAX_ENHANCEMENT || !autoRef.current.forge) {
+                setActivityRef.current(null);
+                return;
+              }
+              startCooldown(CYCLE_OPTOUT_SECS);
+            });
+          };
+          settle();
+        },
+      });
     };
 
     const startCooldown = (left = CYCLE_OPTOUT_SECS) => {
       const until = new Date(Date.now() + left * 1000).toISOString();
       syncProgressRef.current({ beat: 0, cooldownUntil: until });
       push(left);
+      if (coolTimer) window.clearInterval(coolTimer);
       coolTimer = window.setInterval(() => {
-        left -= 1;
-        if (left <= 0) {
+        const remaining = cooldownLeft({ cooldownUntil: until } as Activity);
+        if (remaining <= 0) {
           window.clearInterval(coolTimer);
           coolTimer = 0;
           startBar();
         } else {
-          push(left);
+          push(remaining);
         }
-      }, 1000);
+      }, 250);
     };
 
     const resumeCooldown = cooldownLeft(activityRef.current);
@@ -710,10 +745,11 @@ export function ActivityEngine() {
     else startBar();
     return () => {
       alive = false;
-      if (barTimer) window.clearInterval(barTimer);
+      stopBar?.();
+      if (retryTimer) window.clearTimeout(retryTimer);
       if (coolTimer) window.clearInterval(coolTimer);
     };
-  }, [ready, activity?.kind, activity?.id, activity?.paused]);
+  }, [ready, runsEngine, activity?.kind, activity?.id, activity?.paused]);
 
   useEffect(() => {
     if (!ready || !runsEngine) return;
