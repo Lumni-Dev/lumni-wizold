@@ -36,7 +36,6 @@ export function CreatureIcon({
           fit="contain"
           inset={inset}
           zoom={zoom}
-          glow
           onFail={() => setBroken(true)}
         />
       ) : (
@@ -61,13 +60,7 @@ export function CreatureArtFill({ creature }: { creature: Creature }) {
 
   return (
     <span className="relative flex h-full w-full">
-      <IconArt
-        source={source}
-        padded={false}
-        fit="contain"
-        glow
-        onFail={() => setBroken(true)}
-      />
+      <IconArt source={source} padded={false} fit="contain" onFail={() => setBroken(true)} />
     </span>
   );
 }
