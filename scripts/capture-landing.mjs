@@ -78,7 +78,8 @@ if (CAPTURE_AS) {
   }
   userId = rows[0].user_id;
   epoch = Number(rows[0].session_epoch ?? 0);
-  console.log("capturing as", rows[0].name);
+  await client.query("update users set tutorial = true where id = $1", [userId]);
+  console.log("capturing as", rows[0].name, "(tutorial marked done)");
 } else {
   await client.query("delete from users where email = $1", [EMAIL]);
 
