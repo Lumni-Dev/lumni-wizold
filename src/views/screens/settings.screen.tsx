@@ -45,7 +45,7 @@ const SECTIONS: readonly { key: string; label: string }[] = [
   { key: "automacao", label: "Automação" },
   { key: "som", label: "Som" },
   { key: "trilha", label: "Trilha" },
-  { key: "radio", label: "Rádio" },
+  { key: "radio", label: "W-Radio" },
   { key: "fundo", label: "Fundo" },
   { key: "cache", label: "Cache" },
   { key: "excluir", label: "Excluir conta" },
@@ -601,7 +601,7 @@ export function SettingsScreen() {
 
         {shows("radio") ? (
           <Panel
-            title="Rádio Wizold"
+            title="W-Radio"
             description="O volume do rádio. Ligar e desligar, pular faixa e ver o que toca ficam no mini player no rodapé do menu lateral. Enquanto o rádio toca, a trilha e os efeitos do jogo ficam em silêncio."
             padding="none"
           >

@@ -28,7 +28,7 @@ export function RadioMiniPlayer() {
   if (tracks.length === 0) return null;
 
   const current = tracks[Math.min(index, tracks.length - 1)] ?? null;
-  const label = enabled ? (current?.name ?? "Rádio Wizold") : "Rádio Wizold";
+  const label = enabled ? (current?.name ?? "W-Radio") : "W-Radio";
 
   return (
     <Tooltip label={label} block>
@@ -49,7 +49,7 @@ export function RadioMiniPlayer() {
           )}
         </button>
         <div className="min-w-0 flex-1 px-3 py-2">
-          <p className="truncate text-[10px] uppercase tracking-[0.16em] text-ink-faint">Rádio</p>
+          <p className="truncate text-[10px] uppercase tracking-[0.16em] text-ink-faint">W-Radio</p>
           <p className="truncate font-mono text-[11px] text-ink">
             {enabled ? (current?.name ?? "...") : "Desligado"}
           </p>
