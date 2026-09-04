@@ -1,5 +1,10 @@
 import type { Gender } from "@/models/entities/character";
+import { radioRepository } from "@/models/repositories/radio.repository";
 import { soundRepository } from "@/models/repositories/sound.repository";
+
+function soundActive(): boolean {
+  return soundRepository.enabled() && !radioRepository.enabled();
+}
 const SOURCES = {
   ui: "/assets/sounds/ui/ui.mp3",
   denied: "/assets/sounds/ui/denied.mp3",
@@ -83,7 +88,7 @@ function bindAudioUnlock(): void {
   document.addEventListener("keydown", unlock, { capture: true, passive: true });
 }
 async function primeAudio(): Promise<boolean> {
-  if (typeof window === "undefined" || !soundRepository.enabled()) return false;
+  if (typeof window === "undefined" || !soundActive()) return false;
   if (unlocked) return true;
   try {
     const audio = elementOf("ui");
@@ -102,7 +107,7 @@ function playbackVolume(): number {
   return soundRepository.volume();
 }
 function playLayer(sound: GameSound, level: number): void {
-  if (!soundRepository.enabled() || level <= 0) return;
+  if (!soundActive() || level <= 0) return;
   spokeAt = Date.now();
   const source = sourceOf(sound);
   const layer = elementOf(sound).cloneNode(true) as HTMLAudioElement;
@@ -121,18 +126,18 @@ export function preloadSounds(): void {
   }
 }
 export function playSoundPreview(sound: GameSound): void {
-  if (typeof window === "undefined" || !soundRepository.enabled()) return;
+  if (typeof window === "undefined" || !soundActive()) return;
   void primeAudio();
   playLayer(sound, Math.max(playbackVolume(), PREVIEW_FLOOR));
 }
 export function playSound(sound: GameSound, delayMs = 0): void {
-  if (typeof window === "undefined" || !soundRepository.enabled()) return;
+  if (typeof window === "undefined" || !soundActive()) return;
   const fire = () => playLayer(sound, playbackVolume());
   if (delayMs > 0) window.setTimeout(fire, delayMs);
   else fire();
 }
 export function playClick(): void {
-  if (typeof window === "undefined" || !soundRepository.enabled()) return;
+  if (typeof window === "undefined" || !soundActive()) return;
   void primeAudio();
   const at = Date.now();
   window.setTimeout(() => {
