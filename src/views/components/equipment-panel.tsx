@@ -1,9 +1,6 @@
 import { SLOT_LABEL, type EquipmentSlot, type Item } from "@/models/entities/item";
-import { ICON_FRAME_INSET } from "@/shared/constants/ui";
 import { formatNumber } from "@/shared/utils/format";
-import { cn } from "@/shared/utils/class-names";
-import { IconFrame } from "./icon-frame";
-import { ItemIcon } from "./item-icon";
+import { ItemArtFill } from "./item-icon";
 import { Panel } from "./panel";
 
 export interface GearSlot {
@@ -24,17 +21,22 @@ export function EquipmentPanel({ gear, forge }: { gear: GearSlot[]; forge: numbe
         {gear.map(({ slot, item, level }) => (
           <div
             key={slot}
-            className={cn(
-              "flex items-center gap-3 rounded-md border border-edge px-4 py-3",
-              ICON_FRAME_INSET,
-            )}
+            className="flex items-stretch overflow-hidden rounded-md border border-edge"
           >
-            {item ? <ItemIcon item={item} enhancement={level} /> : <IconFrame tone="empty" />}
-            <div className="min-w-0">
-              <p className="truncate text-sm text-ink">{item ? item.name : "Nada equipado"}</p>
-              <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                {SLOT_LABEL[slot]}
-              </p>
+            <span className="flex aspect-square w-16 shrink-0 overflow-hidden border-r border-edge p-2 sm:w-20">
+              {item ? (
+                <ItemArtFill item={item} enhancement={level} />
+              ) : (
+                <span aria-hidden className="h-full w-full" />
+              )}
+            </span>
+            <div className="flex min-w-0 grow items-center px-4 py-3">
+              <div className="min-w-0">
+                <p className="truncate text-sm text-ink">{item ? item.name : "Nada equipado"}</p>
+                <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                  {SLOT_LABEL[slot]}
+                </p>
+              </div>
             </div>
           </div>
         ))}
