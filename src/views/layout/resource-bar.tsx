@@ -20,7 +20,7 @@ export function ResourceBar() {
             label={
               resting ? (
                 <>
-                  Vida (Recuperando-se... <RestSeconds key={character.health} />)
+                  Vida (Recuperando-se... <RestSeconds />)
                 </>
               ) : (
                 "Vida"

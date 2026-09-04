@@ -7,7 +7,6 @@ import { Tooltip } from "./tooltip";
 
 export function RecoveryButton({
   recovering,
-  beat,
   recoveringLabel,
   label,
   tooltip,
@@ -33,7 +32,7 @@ export function RecoveryButton({
     >
       {recovering ? (
         <>
-          {recoveringLabel} <RestSeconds key={beat} />
+          {recoveringLabel} <RestSeconds />
         </>
       ) : (
         label

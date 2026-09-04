@@ -1,6 +1,7 @@
 "use client";
 
 import type { ActivityKind } from "@/models/entities/activity";
+import type { CombatOutcome } from "@/models/rules/combat";
 import type { HuntReport } from "./hunt.controller";
 import type { NarrationLine } from "@/views/presenters/hunt.presenter";
 
@@ -18,12 +19,19 @@ export interface ActivityDockView {
   canStop: boolean;
 }
 
+export interface HuntFoeSnapshot {
+  name: string;
+  health: number;
+  combat: CombatOutcome;
+}
+
 export interface HuntRuntime {
   territoryId: string;
   beat: number;
   script: NarrationLine[];
   pending: HuntReport | null;
   cooldown: number | null;
+  lastFoe?: HuntFoeSnapshot | null;
 }
 
 export interface CycleRuntime {

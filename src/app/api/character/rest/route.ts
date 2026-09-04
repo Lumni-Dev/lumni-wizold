@@ -44,9 +44,16 @@ export async function PATCH(request: Request) {
       return { ok: false, message: "Você não está repousando.", state };
     }
     const elapsed = Date.now() - Date.parse(startedAt);
+    if (!Number.isFinite(elapsed)) {
+      return success(state, "", { done: false, ticks: 0, nextInMs: REST_TICK_MS });
+    }
     const entitled = Math.floor(elapsed / REST_TICK_MS);
     if (entitled <= 0) {
-      return success(state, "", { done: false, ticks: 0, nextInMs: REST_TICK_MS - elapsed });
+      return success(state, "", {
+        done: false,
+        ticks: 0,
+        nextInMs: Math.max(250, REST_TICK_MS - elapsed),
+      });
     }
     let current = state;
     let done = false;

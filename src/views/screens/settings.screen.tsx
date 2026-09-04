@@ -593,7 +593,7 @@ export function SettingsScreen() {
         {shows("fundo") ? (
           <Panel
             title="Animação de fundo"
-            description="A noite viva atrás do jogo, a mesma da porta de entrada. Desligada, fica a imagem parada."
+            description="A noite viva atrás do jogo e os vídeos das áreas de caça. Desligada, ficam as imagens paradas."
             padding="none"
           >
             <List>

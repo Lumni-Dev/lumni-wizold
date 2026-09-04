@@ -11,8 +11,13 @@ import {
 } from "@/controllers/hunt.controller";
 import { ACTIVITY_WAIT_LABEL, useActivityLock } from "@/controllers/use-activity-lock";
 import { areaVoice, useNarration } from "@/controllers/use-narration";
-import { usePageActivity } from "@/controllers/use-page-activity";
-import { emphasizeDamage, narrationOf, type NarrationLine } from "../presenters/hunt.presenter";
+import {
+  emphasizeDamage,
+  narrationOf,
+  preyBarCurrent,
+  type NarrationLine,
+} from "../presenters/hunt.presenter";
+import { hunterRetreated, hunterWon } from "@/models/rules/combat";
 import { DANGER_LABEL } from "@/models/entities/territory";
 import { canPetFight, isPetActive, petLevelOf, petMaxEnergy } from "@/models/rules/pet";
 import { cn } from "@/shared/utils/class-names";
@@ -28,6 +33,7 @@ import {
   saveHuntSelection,
 } from "@/models/repositories/hunt-selection.repository";
 import { Bar } from "../components/bar";
+import { RestSeconds } from "../components/rest-seconds";
 import { Button } from "../components/button";
 import { Card } from "../components/card";
 import { useShake } from "../components/use-shake";
@@ -70,12 +76,12 @@ function accumulate(session: HuntSession, report: HuntReport): HuntSession {
       quantity: (current?.quantity ?? 0) + drop.quantity,
     };
   }
-  const lost = !report.combat.victory && !report.combat.retreated;
+  const lost = !hunterWon(report.combat) && !hunterRetreated(report.combat);
   return {
     hunts: session.hunts + 1,
-    wins: session.wins + (report.combat.victory ? 1 : 0),
+    wins: session.wins + (hunterWon(report.combat) ? 1 : 0),
     losses: session.losses + (lost ? 1 : 0),
-    retreats: session.retreats + (report.combat.retreated ? 1 : 0),
+    retreats: session.retreats + (hunterRetreated(report.combat) ? 1 : 0),
     bronze: session.bronze + report.bronze,
     experience: session.experience + report.experience,
     drops,
@@ -83,12 +89,12 @@ function accumulate(session: HuntSession, report: HuntReport): HuntSession {
 }
 function CombatReport({ report, lines }: { report: HuntReport; lines: NarrationLine[] }) {
   const { combat, creature, territory } = report;
-  const outcome = combat.victory ? "Vitória" : combat.retreated ? "Recuo" : "Derrota";
+  const outcome = hunterWon(combat) ? "Vitória" : hunterRetreated(combat) ? "Recuo" : "Derrota";
   return (
     <Panel
       title="Última caçada"
       description={territory.name + " - " + creature.name + " (NV. " + creature.level + ")"}
-      action={<Tag tone={combat.victory ? "light" : "neutral"}>{outcome}</Tag>}
+      action={<Tag tone={hunterWon(combat) ? "light" : "neutral"}>{outcome}</Tag>}
       padding="none"
     >
       <div className="grid grid-cols-1 items-start border-b border-edge sm:grid-cols-2 sm:divide-x sm:divide-edge">
@@ -152,8 +158,7 @@ function CombatReport({ report, lines }: { report: HuntReport; lines: NarrationL
   );
 }
 export function HuntScreen() {
-  const { state, character, pet, moon, activity, setActivity } = useGame();
-  usePageActivity(["hunt"]);
+  const { state, character, stats, pet, moon, activity, setActivity } = useGame();
   const { locked } = useActivityLock();
   const waitLabel = locked ? ACTIVITY_WAIT_LABEL : "";
   const narration = useNarration();
@@ -166,6 +171,10 @@ export function HuntScreen() {
   const paused = activity?.paused === true;
   const activeId = activity?.kind === "hunt" && !paused ? (activity.id ?? null) : null;
   const waitingId = activity?.kind === "hunt" && paused ? (activity.id ?? null) : null;
+  const restHuntId =
+    activity?.kind === "rest" && activity.resume?.kind === "hunt"
+      ? (activity.resume.id ?? null)
+      : null;
   const progress =
     huntRt && activeId === huntRt.territoryId
       ? { id: huntRt.territoryId, beat: huntRt.beat }
@@ -197,7 +206,10 @@ export function HuntScreen() {
       ? territories
       : territories.filter(
           ({ territory }) =>
-            territory.id === area || territory.id === activeId || territory.id === waitingId,
+            territory.id === area ||
+            territory.id === activeId ||
+            territory.id === waitingId ||
+            territory.id === restHuntId,
         );
   const xpBonus = moon.phase.experienceBonus;
   const animatedArt = useSyncExternalStore(
@@ -298,6 +310,8 @@ export function HuntScreen() {
           const ready = unlocked && hasHealth;
           const available = ready;
           const active = activeId === territory.id;
+          const recovering = restHuntId === territory.id;
+          const waiting = waitingId === territory.id;
           const opting = active && cooldown !== null;
           const selectedId = resolveHuntCreatureId(creatures, effectiveSelection[territory.id]);
           const onThis = active && progress.id === territory.id;
@@ -308,25 +322,30 @@ export function HuntScreen() {
           const replaying = onThis && pending !== null && line !== null;
           const filling = onThis && pending !== null && line === null;
           const foe = pending ?? report;
+          const lastFoe = onThis ? huntRt?.lastFoe : null;
           const shownFoe =
             (replaying || filling) && foe
               ? foe.creature
-              : (creatures.find((creature) => creature.id === selectedId) ?? prey ?? creatures[0]);
+              : lastFoe
+                ? { name: lastFoe.name, health: lastFoe.health }
+                : (creatures.find((creature) => creature.id === selectedId) ?? prey ?? creatures[0]);
           const monsterMax = Math.max(1, shownFoe?.health ?? 1);
-          const monsterCurrent =
-            replaying && line
-              ? Math.max(0, Math.min(monsterMax, line.creatureHealth))
-              : filling
-                ? monsterMax
-                : 0;
+          const ended =
+            pending?.combat ??
+            lastFoe?.combat ??
+            (foe && foe.territory.id === territory.id ? foe.combat : null);
+          const monsterCurrent = preyBarCurrent(monsterMax, line, replaying, filling, ended);
           const monsterStatus = replaying ? "Atacando" : filling ? "Preparando" : "Aguardando";
           return (
             <Card
               key={territory.id}
               height="content"
               interactive={available}
-              tone={active ? "highlighted" : "default"}
-              className={cn(!available && !active && "opacity-70", active && shaking && "card-shake")}
+              tone={active || waiting || recovering ? "highlighted" : "default"}
+              className={cn(
+                !available && !active && !waiting && !recovering && "opacity-70",
+                (active || waiting || recovering) && shaking && "card-shake",
+              )}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 md:divide-x md:divide-edge">
                 <div className="flex flex-col divide-y divide-edge">
@@ -358,6 +377,25 @@ export function HuntScreen() {
                       label={"Ouvir sobre " + territory.name}
                     />
                   </div>
+                  {stats && (active || waiting || recovering) ? (
+                    <div className="px-4 py-3">
+                      <Bar
+                        label={
+                          recovering ? (
+                            <>
+                              Vida (Recuperando-se... <RestSeconds />)
+                            </>
+                          ) : (
+                            "Vida"
+                          )
+                        }
+                        current={character.health}
+                        maximum={stats.maxHealth}
+                        tone="blood"
+                        glows={recovering && character.health < stats.maxHealth}
+                      />
+                    </div>
+                  ) : null}
                   {shownFoe ? (
                     <div className="px-4 py-3">
                       <Bar
@@ -416,7 +454,9 @@ export function HuntScreen() {
                           : state.automation.hunt
                             ? "Caçando sem parar..."
                             : "Caçando..."
-                        : waitingId === territory.id
+                        : recovering
+                          ? "O corpo descansa antes da próxima caçada."
+                          : waiting
                           ? "Esperando o corpo para voltar a caçar"
                           : (reason ?? "Trilha liberada")}
                     </span>

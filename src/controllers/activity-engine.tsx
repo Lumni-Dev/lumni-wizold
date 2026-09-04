@@ -28,6 +28,7 @@ import {
   TRAINING_TICK_MS,
 } from "@/shared/constants/game";
 import { formatNumber } from "@/shared/utils/format";
+import { hunterRetreated, hunterWon } from "@/models/rules/combat";
 import { narrationOf } from "@/views/presenters/hunt.presenter";
 import { isGameSound, playSound } from "./sound";
 import { useGame } from "./game.context";
@@ -101,6 +102,65 @@ function dockOf(
     href: activityHref(kind),
     canStop,
   };
+}
+
+function restDock(activity: Activity): ActivityDockView {
+  const resume = activity.resume?.kind;
+  const back =
+    resume === "hunt"
+      ? "volta à caça"
+      : resume === "train"
+        ? "volta ao treino"
+        : resume === "mine"
+          ? "volta à mina"
+          : resume === "forge"
+            ? "volta à forja"
+            : null;
+  const after =
+    resume === "hunt"
+      ? "A caça continua depois."
+      : resume === "train"
+        ? "O treino continua depois."
+        : resume === "mine"
+          ? "A mina continua depois."
+          : resume === "forge"
+            ? "A forja continua depois."
+            : "O corpo descansa.";
+  return dockOf(
+    "rest",
+    back ? "Recuperando-se · " + back : "Recuperando-se",
+    after,
+    0,
+    1,
+    null,
+    true,
+  );
+}
+
+function placeholderDock(state: GameState, activity: Activity): ActivityDockView {
+  if (activity.kind === "hunt") {
+    const name = activity.id ? territoryName(activity.id) : "Caçada";
+    return dockOf("hunt", "Caçando · " + name, "Rastreando a presa", 0, 1, null, false);
+  }
+  if (activity.kind === "train") {
+    const label =
+      activity.id === PET_EXERCISE_ID
+        ? "Treino do lobo"
+        : (listExercises(state).find((row) => row.exercise.id === activity.id)?.exercise.name ??
+          "Treino");
+    return dockOf("train", label, "Sessão em andamento", 0, 1, null, false);
+  }
+  if (activity.kind === "mine") {
+    const name = activity.id ? (findItem(activity.id)?.name ?? "Mina") : "Mina";
+    return dockOf("mine", "Minerando · " + name, "Golpe da picareta", 0, 1, null, false);
+  }
+  if (activity.kind === "forge") {
+    const name = activity.id
+      ? (findForgePiece(state, activity.id, activity.enhancement ?? 0)?.item.name ?? "Peça")
+      : "Peça";
+    return dockOf("forge", "Forjando · " + name, "Martelada em andamento", 0, 1, null, false);
+  }
+  return restDock(activity);
 }
 
 function pausedDock(state: GameState, activity: Activity): ActivityDockView {
@@ -206,6 +266,8 @@ export function ActivityEngine() {
     let beat = 0;
     let script: ReturnType<typeof narrationOf> = [];
     let pending: HuntReport | null = null;
+    const priorHunt = activityRuntimeStore.snapshot().hunt;
+    let lastFoe = priorHunt?.territoryId === activeHunt ? priorHunt.lastFoe : null;
     let requesting = false;
     const bled = { last: stateRef.current.character?.health ?? 0 };
     const selection = loadHuntSelection();
@@ -226,6 +288,7 @@ export function ActivityEngine() {
           script,
           pending,
           cooldown,
+          lastFoe,
         },
         dock: dockOf(
           "hunt",
@@ -273,6 +336,11 @@ export function ActivityEngine() {
         }
         const fight = result.report;
         pending = fight;
+        lastFoe = {
+          name: fight.creature.name,
+          health: fight.creature.health,
+          combat: fight.combat,
+        };
         bled.last = stateRef.current.character?.health ?? 0;
         script = narrationOf({ foe: fight.creature, combat: fight.combat });
         beat = 0;
@@ -329,7 +397,7 @@ export function ActivityEngine() {
           script = [];
           beat = 0;
           patchActivityRuntime({ lastHuntReport: held });
-          if (held.combat.victory) {
+          if (hunterWon(held.combat)) {
             playSound("spoils");
             if (held.levelsGained > 0) playSound("levelup", 700);
             if (held.petLeveled) playSound("pet-up", 1100);
@@ -348,7 +416,7 @@ export function ActivityEngine() {
               true,
               "Caça",
             );
-          } else if (held.combat.retreated) {
+          } else if (hunterRetreated(held.combat)) {
             notifyRef.current(
               "A caçada com " + held.creature.name + " se arrastou e os dois recuaram.",
               true,
@@ -767,7 +835,7 @@ export function ActivityEngine() {
         train: null,
         mine: null,
         forge: null,
-        dock: dockOf("rest", "Recuperando-se", "O corpo descansa", 0, 1, null, true),
+        dock: restDock(activity),
       });
       return;
     }
@@ -781,7 +849,11 @@ export function ActivityEngine() {
       });
       return;
     }
-  }, [ready, activity]);
+    const current = activityRuntimeStore.snapshot().dock;
+    if (!current || current.kind !== activity.kind) {
+      patchActivityRuntime({ dock: placeholderDock(stateRef.current, activity) });
+    }
+  }, [ready, runsEngine, activity]);
 
   return null;
 }

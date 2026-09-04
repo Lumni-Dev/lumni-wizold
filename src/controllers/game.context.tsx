@@ -487,6 +487,26 @@ export function GameProvider({ children }: { children: ReactNode }) {
     },
     [request, announce],
   );
+  const beginRest = useCallback(async () => {
+    const interrupted = activityRef.current;
+    const resume =
+      interrupted && interrupted.kind !== "rest"
+        ? {
+            kind: interrupted.kind,
+            id: interrupted.id,
+            enhancement: interrupted.enhancement,
+          }
+        : undefined;
+    setActivity({ kind: "rest", resume }, true);
+    const answer = await act(
+      "POST",
+      "/api/character/rest",
+      { resume },
+      "Recuperação",
+      () => playSound("rest"),
+    );
+    if (!answer.ok) setActivity(null);
+  }, [act, setActivity]);
   useEffect(() => {
     if (!hydrated) return;
     return activitySync.init({
@@ -566,28 +586,59 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const resting = activity?.kind === "rest";
   useEffect(() => {
     if (!ready || !resting) return;
+    let alive = true;
+    let timer = 0;
+    let inflight = false;
+
+    const schedule = (ms: number) => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => void collect(), Math.max(250, ms));
+    };
+
     const collect = async () => {
-      const answer = await request<{
-        done: boolean;
-        ticks: number;
-      }>("PATCH", "/api/character/rest");
-      if (!answer.ok) {
-        setActivity(null);
-        return;
-      }
-      const ticks = answer.data?.ticks ?? 0;
-      if (ticks > 0) playSound("rest");
-      if (ticks > 0 && !answer.data?.done) {
-        announce("O corpo se recompõe aos poucos.", true, "Recuperação");
-      }
-      if (answer.data?.done) {
-        announce("Recuperação completa: vida inteira.", true, "Recuperação");
-        setActivity(automationController.resumeAfterRest(stateRef.current, activityRef.current));
+      if (!alive || inflight) return;
+      inflight = true;
+      try {
+        const answer = await request<{
+          done: boolean;
+          ticks: number;
+          nextInMs?: number;
+        }>("PATCH", "/api/character/rest");
+        if (!alive) return;
+        if (!answer.ok) {
+          if (
+            answer.status === 0 ||
+            answer.status === 429 ||
+            answer.status >= 500 ||
+            isTransientApiMessage(answer.message)
+          ) {
+            schedule(REST_TICK_MS);
+            return;
+          }
+          setActivity(null);
+          return;
+        }
+        const ticks = answer.data?.ticks ?? 0;
+        if (ticks > 0) playSound("rest");
+        if (ticks > 0 && !answer.data?.done) {
+          announce("O corpo se recompõe aos poucos.", true, "Recuperação");
+        }
+        if (answer.data?.done) {
+          announce("Recuperação completa: vida inteira.", true, "Recuperação");
+          setActivity(automationController.resumeAfterRest(stateRef.current, activityRef.current));
+          return;
+        }
+        schedule(answer.data?.nextInMs ?? REST_TICK_MS);
+      } finally {
+        inflight = false;
       }
     };
+
     void collect();
-    const timer = window.setInterval(() => void collect(), REST_TICK_MS);
-    return () => window.clearInterval(timer);
+    return () => {
+      alive = false;
+      window.clearTimeout(timer);
+    };
   }, [ready, resting, request, setActivity, announce]);
   const automationBeatRef = useRef<() => void>(() => {});
   useEffect(() => {
@@ -609,26 +660,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
               playSound("potion"),
             );
             return;
-          case "rest": {
-            const interrupted = activityRef.current;
-            await act(
-              "POST",
-              "/api/character/rest",
-              {
-                resume:
-                  interrupted && interrupted.kind !== "rest"
-                    ? {
-                        kind: interrupted.kind,
-                        id: interrupted.id,
-                        enhancement: interrupted.enhancement,
-                      }
-                    : undefined,
-              },
-              "Recuperação",
-              () => playSound("rest"),
-            );
+          case "rest":
+            await beginRest();
             return;
-          }
           case "feed":
             await act("POST", "/api/pet/feed", { itemId: step.itemId }, "Mascote", () =>
               playSound("pet-eat"),
@@ -653,7 +687,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       automationBeatRef.current = () => {};
       window.clearInterval(timer);
     };
-  }, [ready, act, setActivity]);
+  }, [ready, act, beginRest, setActivity]);
   useEffect(() => {
     if (!ready || !authenticated) return;
     const settle = async () => {
@@ -794,25 +828,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         }
         return answer.ok;
       },
-      rest: async () => {
-        const interrupted = activityRef.current;
-        await act(
-          "POST",
-          "/api/character/rest",
-          {
-            resume:
-              interrupted && interrupted.kind !== "rest"
-                ? {
-                    kind: interrupted.kind,
-                    id: interrupted.id,
-                    enhancement: interrupted.enhancement,
-                  }
-                : undefined,
-          },
-          "Recuperação",
-          () => playSound("rest"),
-        );
-      },
+      rest: beginRest,
       activity,
       setActivity,
       syncProgress,
@@ -1141,6 +1157,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     dismissNotice,
     announce,
     act,
+    beginRest,
     request,
     applyState,
     setActivity,

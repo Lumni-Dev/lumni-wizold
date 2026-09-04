@@ -9,7 +9,7 @@ import type { Creature } from "@/models/entities/creature";
 import type { GameState } from "@/models/entities/game-state";
 import { failure, success, type Result } from "@/models/entities/result";
 import type { Territory } from "@/models/entities/territory";
-import { simulateCombat, type CombatOutcome } from "@/models/rules/combat";
+import { hunterRetreated, hunterWon, simulateCombat, type CombatOutcome } from "@/models/rules/combat";
 import { canPetFight, spendPetEnergy } from "@/models/rules/pet";
 import { deriveStats } from "@/models/rules/stats";
 import { gainItems } from "./inventory.controller";
@@ -167,11 +167,10 @@ export function resolveHunt(
     random,
   });
 
-  const baseExperience = combat.victory
-    ? creature.experience
-    : Math.round(creature.experience * 0.2);
-  const bronze = combat.victory ? intBetween(creature.minBronze, creature.maxBronze, random) : 0;
-  const drops = combat.victory ? rollDrops(creature, character.gender, random) : [];
+  const won = hunterWon(combat);
+  const baseExperience = won ? creature.experience : Math.round(creature.experience * 0.2);
+  const bronze = won ? intBetween(creature.minBronze, creature.maxBronze, random) : 0;
+  const drops = won ? rollDrops(creature, character.gender, random) : [];
 
   return success<HuntResolution>(state, "", {
     territory,
@@ -195,7 +194,7 @@ export function landHunt(
   const { combat, creature, territory, bronze, drops } = resolution;
   const remainingLoss = Math.max(0, resolution.healthLost - Math.max(0, alreadyBled));
 
-  const lost = !combat.victory && !combat.retreated;
+  const lost = !hunterWon(combat) && !hunterRetreated(combat);
 
   const tired =
     state.pet && combat.petSpent > 0 ? spendPetEnergy(state.pet, combat.petSpent) : state.pet;
@@ -209,7 +208,7 @@ export function landHunt(
       health: Math.max(1, character.health - remainingLoss),
       bronze: capBronze(character.bronze + bronze),
       hunts: character.hunts + 1,
-      wins: character.wins + (combat.victory ? 1 : 0),
+      wins: character.wins + (hunterWon(combat) ? 1 : 0),
       losses: character.losses + (lost ? 1 : 0),
     },
     pet,
@@ -232,9 +231,9 @@ export function landHunt(
     .concat(drops.map((drop) => drop.name + " x" + drop.quantity))
     .join(", ");
 
-  const message = combat.victory
+  const message = hunterWon(combat)
     ? creature.name + " caiu em " + territory.name + ". Conquistas: " + loot + "."
-    : combat.retreated
+    : hunterRetreated(combat)
       ? "A luta contra " +
         creature.name +
         " se arrastou e você recuou de " +

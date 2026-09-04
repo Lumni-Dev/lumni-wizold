@@ -13,7 +13,9 @@ import { listAttributeProgress, listExercises } from "@/controllers/training.con
 import { dockRepository } from "@/models/repositories/dock.repository";
 import { loadHuntSelection } from "@/models/repositories/hunt-selection.repository";
 import { canPetFight, petLevelOf, petMaxEnergy } from "@/models/rules/pet";
+import { preyBarCurrent } from "../presenters/hunt.presenter";
 import {
+  CYCLE_OPTOUT_SECS,
   FORGE_TICKS,
   MAX_ENHANCEMENT,
   PET_EXERCISE_ID,
@@ -72,6 +74,7 @@ export function ActivityDock() {
     const script = huntRt.script;
     const pending = huntRt.pending;
     const cooldown = huntRt.cooldown;
+    const lastFoe = huntRt.lastFoe;
     const line =
       beat > 0 && script.length > 0 ? script[Math.min(beat, script.length) - 1] : null;
     const replaying = pending !== null && line !== null;
@@ -79,16 +82,19 @@ export function ActivityDock() {
     const shownFoe =
       (replaying || filling) && pending
         ? pending.creature
-        : (territory.creatures.find((creature) => creature.id === selectedId) ??
-          territory.prey ??
-          territory.creatures[0]);
+        : lastFoe
+          ? { name: lastFoe.name, health: lastFoe.health }
+          : (territory.creatures.find((creature) => creature.id === selectedId) ??
+            territory.prey ??
+            territory.creatures[0]);
     const monsterMax = Math.max(1, shownFoe?.health ?? 1);
-    const monsterCurrent =
-      replaying && line
-        ? Math.max(0, Math.min(monsterMax, line.creatureHealth))
-        : filling
-          ? monsterMax
-          : 0;
+    const monsterCurrent = preyBarCurrent(
+      monsterMax,
+      line,
+      replaying,
+      filling,
+      pending?.combat ?? lastFoe?.combat ?? null,
+    );
     const monsterStatus = replaying ? "Atacando" : filling ? "Preparando" : "Aguardando";
     const opting = cooldown !== null;
     const status = opting
@@ -100,12 +106,15 @@ export function ActivityDock() {
     const petAlong = pet && canPetFight(pet) ? pet : null;
 
     return {
+      hunterCurrent: character?.health ?? 0,
+      hunterMax: Math.max(1, stats?.maxHealth ?? 1),
       preyLabel: monsterStatus + " · " + (shownFoe?.name ?? "?"),
       preyCurrent: monsterCurrent,
       preyMax: monsterMax,
       huntLabel: "Caçando...",
-      huntCurrent: beat,
-      huntMax: Math.max(1, script.length),
+      huntCurrent: cooldown !== null ? cooldown : beat,
+      huntMax: cooldown !== null ? CYCLE_OPTOUT_SECS : Math.max(1, script.length),
+      wraps: cooldown === null && script.length > 1,
       glows: true,
       line,
       status,
@@ -118,7 +127,7 @@ export function ActivityDock() {
           }
         : null,
     };
-  }, [pet, running, dockRuntime.hunt, state]);
+  }, [character, pet, running, dockRuntime.hunt, state, stats]);
 
   const trainView = useMemo(() => {
     const trainRt = dockRuntime.train;
@@ -224,13 +233,75 @@ export function ActivityDock() {
   const restView = useMemo(() => {
     if (running?.kind !== "rest" || !character || !stats) return null;
     return {
-      beat: String(character.health),
       healthCurrent: character.health,
       healthMax: stats.maxHealth,
       glows: character.health < stats.maxHealth,
-      status: "O corpo descansa.",
+      status: dockRuntime.dock?.detail ?? "O corpo descansa.",
     };
-  }, [running, character, stats]);
+  }, [running, character, stats, dockRuntime.dock?.detail]);
+
+  const pausedView = useMemo(() => {
+    if (!running?.paused) return null;
+    if (running.kind === "hunt" && character && stats) {
+      return {
+        kind: "hunt" as const,
+        healthCurrent: character.health,
+        healthMax: stats.maxHealth,
+      };
+    }
+    if (running.kind === "train") {
+      if (running.id === PET_EXERCISE_ID) {
+        const petTraining = petTrainingView(state);
+        if (!petTraining) return { kind: "train" as const, progress: null };
+        return {
+          kind: "train" as const,
+          progress: {
+            label: "Mascote - Progresso",
+            current: petTraining.progress,
+            maximum: petTraining.needed,
+          },
+        };
+      }
+      const exercises = listExercises(state);
+      const progress = listAttributeProgress(state);
+      const entry = exercises.find((row) => row.exercise.id === running.id);
+      const row = progress.find((item) => item.key === entry?.exercise.attribute);
+      return {
+        kind: "train" as const,
+        progress: {
+          label: "Progresso",
+          current: row?.progress ?? 0,
+          maximum: row?.needed ?? 1,
+        },
+      };
+    }
+    if (running.kind === "mine") {
+      const mining = listMining(state);
+      return {
+        kind: "mine" as const,
+        daily: {
+          label: mining.dailyExhausted ? "Fôlego da mina esgotado" : "Fôlego da mina",
+          current: mining.dailyRemaining,
+          maximum: mining.dailyLimit,
+        },
+      };
+    }
+    if (running.kind === "forge" && running.id) {
+      const forgeEntry = findForgePiece(state, running.id, running.enhancement ?? 0);
+      if (!forgeEntry?.fragment || forgeEntry.level >= MAX_ENHANCEMENT) {
+        return { kind: "forge" as const, fragment: null };
+      }
+      return {
+        kind: "forge" as const,
+        fragment: {
+          label: forgeEntry.fragment.name,
+          current: forgeEntry.owned,
+          maximum: forgeEntry.cost,
+        },
+      };
+    }
+    return null;
+  }, [running, character, stats, state]);
 
   const onOwnPage = running !== null && pathname === dock?.href;
   const dockVisible = Boolean(running && dock && !onOwnPage);
@@ -320,6 +391,18 @@ export function ActivityDock() {
           >
             {dock.title}
           </Link>
+          {minimized && dock.canStop ? (
+            <Tooltip label="Parar">
+              <button
+                type="button"
+                onClick={stop}
+                aria-label="Parar atividade"
+                className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-edge text-ink-faint transition-colors hover:border-edge-strong hover:text-ink"
+              >
+                <ActionIcon action="stop" />
+              </button>
+            </Tooltip>
+          ) : null}
           <Tooltip label={minimized ? "Maximizar" : "Minimizar"}>
             <button
               type="button"
@@ -337,13 +420,63 @@ export function ActivityDock() {
           <>
             <List>
               {paused ? (
-                <ListRow layout="column">
-                  <p className="text-xs text-ink-faint">{dock.detail}</p>
-                </ListRow>
+                <>
+                  <ListRow layout="column">
+                    <p className="text-xs text-ink-faint">{dock.detail}</p>
+                  </ListRow>
+                  {pausedView?.kind === "hunt" ? (
+                    <ListRow layout="column">
+                      <Bar
+                        label="Vida"
+                        current={pausedView.healthCurrent}
+                        maximum={pausedView.healthMax}
+                        tone="blood"
+                      />
+                    </ListRow>
+                  ) : null}
+                  {pausedView?.kind === "train" && pausedView.progress ? (
+                    <ListRow layout="column">
+                      <Bar
+                        label={pausedView.progress.label}
+                        current={pausedView.progress.current}
+                        maximum={pausedView.progress.maximum}
+                        wraps
+                      />
+                    </ListRow>
+                  ) : null}
+                  {pausedView?.kind === "mine" ? (
+                    <ListRow layout="column">
+                      <Bar
+                        label={pausedView.daily.label}
+                        tone="tide"
+                        current={pausedView.daily.current}
+                        maximum={pausedView.daily.maximum}
+                      />
+                    </ListRow>
+                  ) : null}
+                  {pausedView?.kind === "forge" && pausedView.fragment ? (
+                    <ListRow layout="column">
+                      <Bar
+                        label={pausedView.fragment.label}
+                        tone="ember"
+                        current={pausedView.fragment.current}
+                        maximum={pausedView.fragment.maximum}
+                      />
+                    </ListRow>
+                  ) : null}
+                </>
               ) : null}
 
               {!paused && huntView ? (
                 <>
+                  <ListRow layout="column">
+                    <Bar
+                      label="Vida"
+                      current={huntView.hunterCurrent}
+                      maximum={huntView.hunterMax}
+                      tone="blood"
+                    />
+                  </ListRow>
                   <ListRow layout="column">
                     <Bar
                       label={huntView.preyLabel}
@@ -361,9 +494,8 @@ export function ActivityDock() {
                       }
                       current={huntView.huntCurrent}
                       maximum={huntView.huntMax}
-                      tone="blood"
                       glows={huntView.glows && huntView.cooldown === null}
-                      wraps
+                      wraps={huntView.wraps}
                     />
                   </ListRow>
                   {huntView.pet ? (
@@ -487,7 +619,7 @@ export function ActivityDock() {
                   <Bar
                     label={
                       <>
-                        Vida (Recuperando-se... <RestSeconds key={restView.beat} />)
+                        Vida (Recuperando-se... <RestSeconds />)
                       </>
                     }
                     current={restView.healthCurrent}

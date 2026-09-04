@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useGame } from "@/controllers/game.context";
 import { listOffers, listSellables, marketPriceOf, sellPrice } from "@/controllers/market.controller";
 import {
@@ -62,20 +62,35 @@ export function MarketScreen() {
   const [buying, setBuying] = useState("1");
   const [selling, setSelling] = useState("1");
   const [search, setSearch] = useState("");
+  const [sold, setSold] = useState<{ id: string; enhancement: number; quantity: number } | null>(
+    null,
+  );
+  const openedSell = useRef(false);
 
   const offers = useMemo(() => listOffers(state), [state]);
-  const sellables = useMemo(() => listSellables(state), [state]);
+  const sellables = useMemo(() => {
+    const rows = listSellables(state);
+    if (!sold) return rows;
+    return rows.flatMap((entry) => {
+      if (entry.item.id !== sold.id || entry.enhancement !== sold.enhancement) return [entry];
+      const left = entry.quantity - sold.quantity;
+      if (left <= 0) return [];
+      return [{ ...entry, quantity: left }];
+    });
+  }, [state, sold]);
 
   useEffect(() => {
+    if (openedSell.current) return;
     const params = new URLSearchParams(window.location.search);
     const sellId = params.get("sell");
     if (!sellId) return;
     const sellEnhancement = Math.max(0, Number(params.get("enh")) || 0);
-    window.history.replaceState(null, "", "/market");
     const slot = sellables.find(
       (entry) => entry.item.id === sellId && entry.enhancement === sellEnhancement,
     );
     if (!slot) return;
+    openedSell.current = true;
+    window.history.replaceState(null, "", "/market");
     /* eslint-disable react-hooks/set-state-in-effect */
     setTab("sell");
     setSelling(String(slot.quantity));
@@ -310,16 +325,21 @@ export function MarketScreen() {
         }
         confirmLabel={deal?.kind === "sell" ? "Vender" : "Pagar " + formatBronze(dealTotal)}
         onCancel={() => setDeal(null)}
-        onConfirm={async () => {
+        onConfirm={() => {
           if (!deal) return;
-
-          if (deal.kind === "buy") {
-            await buyItem(deal.item.id, dealQuantity);
-          } else {
-            await sellItem(deal.item.id, dealQuantity, deal.enhancement);
-          }
-
+          const current = deal;
+          const quantity = dealQuantity;
           setDeal(null);
+          if (current.kind === "buy") {
+            void buyItem(current.item.id, quantity);
+            return;
+          }
+          setSold({
+            id: current.item.id,
+            enhancement: current.enhancement,
+            quantity,
+          });
+          void sellItem(current.item.id, quantity, current.enhancement).finally(() => setSold(null));
         }}
       >
         {deal?.kind === "buy" && !dealWearable ? (
