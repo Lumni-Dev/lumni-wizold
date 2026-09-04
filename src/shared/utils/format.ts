@@ -44,6 +44,10 @@ export function formatNumber(value: number): string {
   }
   return formatExact(rounded);
 }
+export function formatVault(value: number): string {
+  const rounded = Math.round(value);
+  return Math.abs(rounded) >= 1_000_000 ? formatNumber(rounded) : formatExact(rounded);
+}
 export function formatBronze(value: number): string {
   return formatNumber(value) + (Math.abs(Math.round(value)) === 1 ? " WCoin" : " WCoins");
 }

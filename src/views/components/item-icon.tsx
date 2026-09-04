@@ -60,7 +60,7 @@ export function ItemBanner({ item, enhancement = 0 }: { item: Item; enhancement?
   );
 }
 
-export function ItemArtFill({ item }: { item: Item }) {
+export function ItemArtFill({ item, enhancement = 0 }: { item: Item; enhancement?: number }) {
   const source = useItemArt(item);
 
   if (!source) {
@@ -73,7 +73,17 @@ export function ItemArtFill({ item }: { item: Item }) {
 
   return (
     <span className="relative flex h-full w-full">
-      <IconArt source={source} padded={false} fit="contain" />
+      <IconArt
+        source={source}
+        padded={false}
+        fit="contain"
+        badge={enhancement > 0 ? "+" + enhancement : undefined}
+      />
+      {enhancement > 0 ? (
+        <span className="absolute right-1 top-1 inline-flex h-4 items-center justify-center rounded border border-ember bg-ember px-1 font-mono text-[10px] font-bold tracking-normal text-base">
+          +{enhancement}
+        </span>
+      ) : null}
     </span>
   );
 }

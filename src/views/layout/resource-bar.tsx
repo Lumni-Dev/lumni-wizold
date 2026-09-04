@@ -3,7 +3,7 @@
 import { useGame } from "@/controllers/game.context";
 import { useVisibleActivity } from "@/controllers/use-visible-activity";
 import { BAU_LIMIT } from "@/shared/constants/game";
-import { formatNumber } from "@/shared/utils/format";
+import { formatNumber, formatVault } from "@/shared/utils/format";
 import { Bar } from "../components/bar";
 import { RestSeconds } from "../components/rest-seconds";
 import { RestHealed } from "../components/rest-healed";
@@ -43,6 +43,7 @@ export function ResourceBar() {
             tone="ember"
             prominent
             unit="WCoins"
+            format={formatVault}
           />
           <Bar
             label={"Experiência (NV. " + formatNumber(character.level) + "/1000)"}

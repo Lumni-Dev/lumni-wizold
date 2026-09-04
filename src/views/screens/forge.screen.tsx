@@ -30,7 +30,7 @@ import { normalizeText } from "@/shared/utils/text";
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
 import { ConfirmDialog } from "../components/confirm-dialog";
-import { ItemArtFill, ItemIcon } from "../components/item-icon";
+import { ItemArtFill } from "../components/item-icon";
 import { EmptyState } from "../components/empty-state";
 import { ArtRowButton, RowText, List, ListRow } from "../components/list";
 import { Pagination } from "../components/pagination";
@@ -344,8 +344,13 @@ export function ForgeScreen() {
               ) : (
                 <List>
                   <ListRow padding="art">
-                    <span className={cn("inline-flex", forgeActive && forgeShake && "card-shake")}>
-                      <ItemIcon item={forgeEntry.item} enhancement={forgeEntry.level} />
+                    <span
+                      className={cn(
+                        "flex aspect-square w-28 shrink-0 overflow-hidden p-3",
+                        forgeActive && forgeShake && "card-shake",
+                      )}
+                    >
+                      <ItemArtFill item={forgeEntry.item} enhancement={forgeEntry.level} />
                     </span>
                     <RowText
                       title={forgeEntry.item.name}
@@ -480,7 +485,8 @@ export function ForgeScreen() {
                       return (
                         <ArtRowButton
                           key={key}
-                          art={<ItemIcon item={row.item} enhancement={row.level} />}
+                          divided
+                          art={<ItemArtFill item={row.item} enhancement={row.level} />}
                           title={row.item.name}
                           description={
                             row.canForge
