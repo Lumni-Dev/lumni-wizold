@@ -108,7 +108,7 @@ export function TrainingScreen() {
                     title={row?.name ?? exercise.name}
                     label={exercise.name}
                     description={
-                      <span className="font-mono text-sm text-ink">
+                      <span className="font-mono text-[11px] text-ink">
                         NV. {formatNumber(row?.value ?? 0)}
                         <span className="text-ink-faint">
                           {" / " + formatNumber(MAX_ATTRIBUTE_VALUE)}
@@ -188,7 +188,7 @@ export function TrainingScreen() {
                   title="Mascote"
                   label="Treino do mascote"
                   description={
-                    <span className="font-mono text-sm text-ink">
+                    <span className="font-mono text-[11px] text-ink">
                       NV. {formatNumber(petTraining.level)}
                       <span className="text-ink-faint">
                         {" / " + formatNumber(PET_MAX_LEVEL)}

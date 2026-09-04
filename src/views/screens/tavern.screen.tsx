@@ -531,6 +531,14 @@ export function TavernScreen() {
                   "+ ou VIP. Com senha, qualquer nível. Mesa reservada sempre com senha."
             }
           >
+            <div className="-mx-4 -mt-4 mb-4 border-b border-edge">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/assets/ui/taverna.webp?v=1"
+                alt=""
+                className="block aspect-[3/2] w-full object-cover"
+              />
+            </div>
             <form onSubmit={submitRoom} className="space-y-3">
               <Field
                 label="Nome da mesa"

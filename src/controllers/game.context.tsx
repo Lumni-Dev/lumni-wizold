@@ -558,7 +558,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
             enhancement: interrupted.enhancement,
           }
         : undefined;
-    setActivity({ kind: "rest", resume }, true);
+    const restActivity: Activity = { kind: "rest", resume };
+    if (!activitySync.isOwner()) activitySync.tryClaim(restActivity);
+    setActivity(restActivity, true);
     armRestClock(REST_TICK_MS);
     const answer = await act(
       "POST",
