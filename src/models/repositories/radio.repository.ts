@@ -1,0 +1,69 @@
+const ENABLED_KEY = "lumni-wizold:radio";
+const VOLUME_KEY = "lumni-wizold:radio:volume";
+const DEFAULT_VOLUME = 0.75;
+
+const listeners = new Set<() => void>();
+
+function clampVolume(value: number): number {
+  if (!Number.isFinite(value)) return DEFAULT_VOLUME;
+  return Math.max(0, Math.min(1, value));
+}
+
+function notify(): void {
+  listeners.forEach((listener) => listener());
+}
+
+export const radioRepository = {
+  defaultVolume(): number {
+    return DEFAULT_VOLUME;
+  },
+
+  enabled(): boolean {
+    if (typeof window === "undefined") return false;
+    try {
+      return window.localStorage.getItem(ENABLED_KEY) === "on";
+    } catch {
+      return false;
+    }
+  },
+
+  volume(): number {
+    if (typeof window === "undefined") return DEFAULT_VOLUME;
+    try {
+      const raw = window.localStorage.getItem(VOLUME_KEY);
+      if (raw === null) return DEFAULT_VOLUME;
+      return clampVolume(Number(raw));
+    } catch {
+      return DEFAULT_VOLUME;
+    }
+  },
+
+  setEnabled(on: boolean): void {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(ENABLED_KEY, on ? "on" : "off");
+    } catch {}
+    notify();
+  },
+
+  setVolume(value: number): void {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(VOLUME_KEY, String(clampVolume(value)));
+    } catch {}
+    notify();
+  },
+
+  subscribe(listener: () => void): () => void {
+    listeners.add(listener);
+    return () => listeners.delete(listener);
+  },
+
+  serverSnapshot(): boolean {
+    return false;
+  },
+
+  serverVolumeSnapshot(): number {
+    return DEFAULT_VOLUME;
+  },
+};

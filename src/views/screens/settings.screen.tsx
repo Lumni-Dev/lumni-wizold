@@ -12,6 +12,8 @@ import { playSoundPreview } from "@/controllers/sound";
 import { disableTavernPush, enableTavernPush, testTavernPush, webPushConfigured, tavernPushSupported } from "@/controllers/tavern-notify";
 import { backgroundRepository } from "@/models/repositories/background.repository";
 import { musicRepository } from "@/models/repositories/music.repository";
+import { radioRepository } from "@/models/repositories/radio.repository";
+import { radioStore } from "@/controllers/radio.store";
 import { soundRepository } from "@/models/repositories/sound.repository";
 import { tavernPushRepository } from "@/models/repositories/tavern-push.repository";
 import { NAME_MAX_LENGTH, RENAME_COOLDOWN_DAYS, RENAME_PRICE } from "@/shared/constants/game";
@@ -33,6 +35,7 @@ import { IconArt, IconFrame } from "../components/icon-frame";
 import { List, ListRow, RowText } from "../components/list";
 import { Panel } from "../components/panel";
 import { Tag } from "../components/tag";
+import { Tooltip } from "../components/tooltip";
 import { PageHeader } from "../layout/page-header";
 
 const SECTIONS: readonly { key: string; label: string }[] = [
@@ -44,6 +47,7 @@ const SECTIONS: readonly { key: string; label: string }[] = [
   { key: "automacao", label: "Automação" },
   { key: "som", label: "Som" },
   { key: "trilha", label: "Trilha" },
+  { key: "radio", label: "Rádio" },
   { key: "fundo", label: "Fundo" },
   { key: "cache", label: "Cache" },
   { key: "excluir", label: "Excluir conta" },
@@ -181,6 +185,27 @@ export function SettingsScreen() {
     musicRepository.setEnabled(on);
     if (on && musicRepository.volume() <= 0) musicRepository.setVolume(musicRepository.defaultVolume());
   }
+
+  const radioOn = useSyncExternalStore(
+    radioRepository.subscribe,
+    radioRepository.enabled,
+    radioRepository.serverSnapshot,
+  );
+  const radioVolume = useSyncExternalStore(
+    radioRepository.subscribe,
+    radioRepository.volume,
+    radioRepository.serverVolumeSnapshot,
+  );
+  const radio = useSyncExternalStore(
+    radioStore.subscribe,
+    radioStore.snapshot,
+    radioStore.serverSnapshot,
+  );
+  useEffect(() => {
+    radioStore.load();
+  }, []);
+  const currentRadioTrack = radio.tracks[radio.index] ?? null;
+
   const [section, setSection] = useState("all");
 
   function shows(key: string): boolean {
@@ -585,6 +610,86 @@ export function SettingsScreen() {
                     vale na hora.
                   </p>
                 </ListRow>
+              ) : null}
+            </List>
+          </Panel>
+        ) : null}
+
+        {shows("radio") ? (
+          <Panel
+            title="Rádio Wizold"
+            description="Toca as músicas que você largar na pasta radio dos assets, uma atrás da outra, em repetição. Enquanto está ligado, a trilha do jogo fica em silêncio."
+            padding="none"
+          >
+            <List>
+              <ListRow layout="split">
+                <RowText title="Estado" description="Ligado ou desligado neste aparelho." />
+                <div className="flex shrink-0 gap-2">
+                  <Chip active={radioOn} onClick={() => radioRepository.setEnabled(true)}>
+                    Ligado
+                  </Chip>
+                  <Chip active={!radioOn} onClick={() => radioRepository.setEnabled(false)}>
+                    Desligado
+                  </Chip>
+                </div>
+              </ListRow>
+              {radioOn ? (
+                radio.tracks.length > 0 ? (
+                  <>
+                    <ListRow layout="column">
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                          Tocando
+                        </span>
+                        <span className="font-mono text-[11px] text-ink-faint">
+                          {radio.index + 1}/{radio.tracks.length}
+                        </span>
+                      </div>
+                      <Tooltip label={currentRadioTrack?.name ?? "Rádio Wizold"} block>
+                        <p className="truncate text-sm text-ink">
+                          {currentRadioTrack?.name ?? "..."}
+                        </p>
+                      </Tooltip>
+                      <div className="flex gap-2">
+                        <Button variant="secondary" onClick={() => radioStore.prev()}>
+                          Anterior
+                        </Button>
+                        <Button variant="secondary" onClick={() => radioStore.next()}>
+                          Próxima
+                        </Button>
+                      </div>
+                    </ListRow>
+                    <ListRow layout="column">
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                          Volume
+                        </span>
+                        <span className="font-mono text-[11px] text-ink">
+                          {Math.round(radioVolume * 100)}%
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min={0}
+                        max={100}
+                        step={1}
+                        value={Math.round(radioVolume * 100)}
+                        aria-label="Volume do rádio"
+                        className="volume-slider w-full"
+                        onChange={(event) => {
+                          radioRepository.setVolume(Number(event.target.value) / 100);
+                        }}
+                      />
+                    </ListRow>
+                  </>
+                ) : (
+                  <ListRow layout="column">
+                    <p className="text-[11px] leading-relaxed text-ink-faint">
+                      Nenhuma música na pasta ainda. Coloque arquivos de áudio (mp3, ogg, m4a...) em
+                      public/assets/radio e recarregue a página.
+                    </p>
+                  </ListRow>
+                )
               ) : null}
             </List>
           </Panel>

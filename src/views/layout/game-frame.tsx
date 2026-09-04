@@ -9,6 +9,7 @@ import { useTavernAlert } from "@/controllers/use-tavern-alert";
 import { backgroundRepository } from "@/models/repositories/background.repository";
 import { LiveBackdrop } from "../components/live-backdrop";
 import { GameMusic } from "../components/game-music";
+import { RadioPlayer } from "../components/radio-player";
 import { Spinner } from "../components/spinner";
 import { WelcomeTutorial } from "../components/welcome-tutorial";
 import { GameFooter } from "./game-footer";
@@ -61,6 +62,7 @@ export function GameFrame({ children }: { children: ReactNode }) {
     <>
       {animatedBackground ? <LiveBackdrop shade="deep" /> : null}
       <GameMusic />
+      <RadioPlayer />
       <div className="relative z-10 flex min-h-screen">
         <Sidebar
           tavernUnread={asideUnread}
