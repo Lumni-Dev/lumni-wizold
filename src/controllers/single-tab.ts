@@ -39,11 +39,25 @@ function beat(): void {
   });
 }
 
-function makeTabId(): string {
+const TAB_ID_KEY = "lumni-wizold:tab-id";
+
+function freshId(): string {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
     return crypto.randomUUID();
   }
   return "tab-" + Date.now().toString(36) + "-" + Math.floor(Math.random() * 1e9).toString(36);
+}
+
+function makeTabId(): string {
+  try {
+    const existing = window.sessionStorage.getItem(TAB_ID_KEY);
+    if (existing) return existing;
+    const created = freshId();
+    window.sessionStorage.setItem(TAB_ID_KEY, created);
+    return created;
+  } catch {
+    return freshId();
+  }
 }
 
 function onHide(): void {
