@@ -13,6 +13,7 @@ import { Spinner } from "../components/spinner";
 import { WelcomeTutorial } from "../components/welcome-tutorial";
 import { GameFooter } from "./game-footer";
 import { GameCorner } from "./game-corner";
+import { SingleTabGate } from "../components/single-tab-gate";
 import { TavernChatWindow } from "../components/tavern-chat-window";
 import { MoonTracker } from "../components/moon-tracker";
 import { MobileNavigation, Sidebar } from "./sidebar";
@@ -83,6 +84,7 @@ export function GameFrame({ children }: { children: ReactNode }) {
         </div>
       </div>
       <GameCorner />
+      <SingleTabGate />
       <TavernChatWindow />
       <WelcomeTutorial
         open={tutorialOpen}

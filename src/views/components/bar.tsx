@@ -87,7 +87,7 @@ export function Bar({
           {label}
         </span>
         <span className="shrink-0 font-mono text-[11px] text-ink-soft">
-          {delta ? <span className="text-blood">{delta} </span> : null}
+          {delta ? <span className="font-bold text-blood">{delta} </span> : null}
           {formatNumber(current)}
           <span className="text-ink-faint">/{formatNumber(maximum)}</span>
           {unit ? <span className="text-ink-faint"> {unit}</span> : null}
