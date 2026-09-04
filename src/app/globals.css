@@ -411,6 +411,7 @@ button:not(:disabled) {
 }
 
 .fury-ring-frame__gradient {
+  height: 100%;
   padding: 2px;
   border-radius: inherit;
   background: conic-gradient(
