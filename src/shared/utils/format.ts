@@ -80,12 +80,20 @@ export function formatFuryClock(ms: number): string {
   const seconds = total % 60;
   if (days > 0) return days + "d " + hours + "h";
   if (hours > 0) return hours + "h " + minutes + "m";
-  return minutes + ":" + String(seconds).padStart(2, "0");
+  if (minutes > 0) return minutes + "m " + seconds + "s";
+  return seconds + "s";
+}
+
+export function formatMinutesLabel(minutes: number): string {
+  const total = Math.round(minutes * 60);
+  const wholeMinutes = Math.floor(total / 60);
+  const seconds = total % 60;
+  return seconds > 0 ? wholeMinutes + "m " + seconds + "s" : wholeMinutes + "m";
 }
 
 export function formatFuryDuration(baseMinutes: number, extraMs: number): string {
   const extraSeconds = Math.floor(Math.max(0, extraMs) / 1000);
-  const base = String(baseMinutes).replace(".", ",") + " min";
+  const base = formatMinutesLabel(baseMinutes);
   if (extraSeconds <= 0) return base;
   return base + " (+" + extraSeconds + "s vontade)";
 }

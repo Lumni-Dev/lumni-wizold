@@ -3,7 +3,7 @@ import { CATEGORY_LABEL, type Item } from "@/models/entities/item";
 import { enhancedEffect } from "@/models/rules/forge";
 import { furyWillpowerExtraMs } from "@/models/rules/moon";
 import { FURY_ATTRIBUTE_BONUS } from "@/shared/constants/game";
-import { formatFuryDuration } from "@/shared/utils/format";
+import { formatFuryDuration, formatMinutesLabel } from "@/shared/utils/format";
 
 export function itemInitials(name: string): string {
   const words = name.split(" ").filter((word) => word.length > 2);
@@ -35,7 +35,7 @@ export function summarizeEffect(item: Item, enhancement = 0, willpower?: number)
   if (effect.healthRatio) lines.push(percent(effect.healthRatio) + " da vida");
   if (effect.furyMinutes) {
     lines.push("+" + FURY_ATTRIBUTE_BONUS + " em todos os atributos");
-    lines.push(String(effect.furyMinutes).replace(".", ",") + " min de duração");
+    lines.push(formatMinutesLabel(effect.furyMinutes) + " de duração");
     if (willpower !== undefined) {
       const extraSeconds = Math.floor(furyWillpowerExtraMs(effect.furyMinutes, willpower) / 1000);
       if (extraSeconds > 0) lines.push("+" + extraSeconds + "s de vontade");
