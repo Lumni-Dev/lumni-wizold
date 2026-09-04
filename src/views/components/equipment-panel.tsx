@@ -1,5 +1,6 @@
 import { SLOT_LABEL, type EquipmentSlot, type Item } from "@/models/entities/item";
 import { formatNumber } from "@/shared/utils/format";
+import { cn } from "@/shared/utils/class-names";
 import { ItemArtFill } from "./item-icon";
 import { Panel } from "./panel";
 
@@ -21,9 +22,17 @@ export function EquipmentPanel({ gear, forge }: { gear: GearSlot[]; forge: numbe
         {gear.map(({ slot, item, level }) => (
           <div
             key={slot}
-            className="flex items-stretch overflow-hidden rounded-md border border-edge"
+            className={cn(
+              "flex items-stretch overflow-hidden rounded-md border border-edge",
+              !item && "border-dashed",
+            )}
           >
-            <span className="flex aspect-square w-16 shrink-0 overflow-hidden border-r border-edge p-2 sm:w-20">
+            <span
+              className={cn(
+                "flex aspect-square w-16 shrink-0 overflow-hidden border-r border-edge p-2 sm:w-20",
+                !item && "border-dashed",
+              )}
+            >
               {item ? (
                 <ItemArtFill item={item} enhancement={level} />
               ) : (

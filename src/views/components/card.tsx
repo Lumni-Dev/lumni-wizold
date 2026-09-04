@@ -78,6 +78,7 @@ export function CardHeader({
         <span
           className={cn(
             "flex aspect-square shrink-0 overflow-hidden border-r border-edge",
+            tone === "empty" && "border-dashed",
             artSize === "small" ? "w-16 p-2 sm:w-20" : "w-20 p-3 sm:w-28",
           )}
         >
