@@ -138,7 +138,7 @@ export function furyWillpowerBonus(willpower: number): number {
 
 export function furyDurationMs(minutes: number, willpower: number): number {
   const baseMs = minutes * 60_000;
-  return Math.floor(baseMs + baseMs * furyWillpowerBonus(willpower));
+  return Math.floor((baseMs + baseMs * furyWillpowerBonus(willpower)) / 1000) * 1000;
 }
 
 export function furyDurationMinutes(minutes: number, willpower: number): number {

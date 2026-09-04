@@ -3,6 +3,7 @@
 import { useState, useSyncExternalStore } from "react";
 import { useGame } from "@/controllers/game.context";
 import { furyRemainingMs, isFullMoon, potionFuryRemainingMs } from "@/models/rules/moon";
+import { serverNow } from "@/shared/utils/server-clock";
 
 const CLOCK_TICK_MS = 250;
 
@@ -13,9 +14,9 @@ const clockListeners = new Set<() => void>();
 function subscribeClock(listener: () => void): () => void {
   clockListeners.add(listener);
   if (clockListeners.size === 1) {
-    clockNow = Date.now();
+    clockNow = serverNow();
     clockTimer = window.setInterval(() => {
-      clockNow = Date.now();
+      clockNow = serverNow();
       for (const entry of clockListeners) entry();
     }, CLOCK_TICK_MS);
   }
@@ -40,7 +41,7 @@ export function useFuryClock() {
   const { character, moon } = useGame();
   const furyUntil = character?.furyUntil ?? "";
   const phase = moon.phase.key;
-  const [mountedAt] = useState(() => Date.now());
+  const [mountedAt] = useState(() => serverNow());
   const tickedAt = useSyncExternalStore(subscribeClock, readClock, readServerClock);
   const now = Math.max(mountedAt, tickedAt);
 

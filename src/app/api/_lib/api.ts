@@ -105,6 +105,7 @@ export function reply<T>(result: Result<T>, extra?: Record<string, unknown>): Ne
     message: result.message,
     data: result.data ?? null,
     state: result.state,
+    now: Date.now(),
     ...extra,
   });
 }

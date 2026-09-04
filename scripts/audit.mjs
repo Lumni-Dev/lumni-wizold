@@ -1607,8 +1607,8 @@ sec("vontade estica a fúria");
   ok("550 de Vontade rende 8,4 min no frasco médio", moon.furyDurationMinutes(5, 550) === 8.4);
   ok("sem Vontade o extra é zero", moon.furyWillpowerExtraMs(2.5, 0) === 0);
   ok(
-    "100 de Vontade no frasco pequeno soma 43s",
-    Math.round(moon.furyWillpowerExtraMs(2.5, 100) / 1000) === 43,
+    "100 de Vontade no frasco pequeno soma 42s inteiros",
+    moon.furyWillpowerExtraMs(2.5, 100) === 42_000,
   );
 
   const plain = baseState({ level: 10 });

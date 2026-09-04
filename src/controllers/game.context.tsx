@@ -29,6 +29,7 @@ import {
   stashActivityResume,
 } from "@/models/repositories/activity-resume.repository";
 import { potionFuryRemainingMs, type MoonState } from "@/models/rules/moon";
+import { serverNow } from "@/shared/utils/server-clock";
 import {
   AUTOMATION_TICK_MS,
   CYCLE_OPTOUT_SECS,
@@ -237,9 +238,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const furyUntil = state.character?.furyUntil ?? "";
   useEffect(() => {
     if (!furyUntil) return undefined;
-    const left = potionFuryRemainingMs({ furyUntil });
+    const left = potionFuryRemainingMs({ furyUntil }, serverNow());
     if (left <= 0) return undefined;
-    const timer = window.setTimeout(() => setFuryNow(Date.now()), left + 50);
+    const timer = window.setTimeout(() => setFuryNow(serverNow()), left + 50);
     return () => window.clearTimeout(timer);
   }, [furyUntil]);
   const pushNotice = useCallback(

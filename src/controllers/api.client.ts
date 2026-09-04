@@ -1,6 +1,7 @@
 import type { Activity } from "@/models/entities/activity";
 import type { GameState } from "@/models/entities/game-state";
 import { GAME_VERSION } from "@/shared/constants/version";
+import { noteServerNow } from "@/shared/utils/server-clock";
 export function isTransientApiMessage(message: string): boolean {
   return (
     message === "" ||
@@ -41,10 +42,12 @@ export async function api<T = unknown>(
       activity?: Activity | null;
       version?: string;
       tutorial?: boolean;
+      now?: number;
     } | null = null;
     try {
       payload = await response.json();
     } catch {}
+    if (typeof payload?.now === "number") noteServerNow(payload.now);
     return {
       ok: payload?.ok === true,
       status: response.status,
