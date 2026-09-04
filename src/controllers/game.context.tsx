@@ -685,11 +685,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         }
         const ticks = answer.data?.ticks ?? 0;
         if (ticks > 0) playSound("rest");
-        if (ticks > 0 && !answer.data?.done) {
-          announce("O corpo se recompõe aos poucos.", true, "Recuperação");
-        }
         if (answer.data?.done) {
-          announce("Recuperação completa: vida inteira.", true, "Recuperação");
           clearRestClock();
           setActivity(automationController.resumeAfterRest(stateRef.current, activityRef.current));
           return;

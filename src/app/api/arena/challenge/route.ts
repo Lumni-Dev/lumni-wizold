@@ -8,7 +8,7 @@ import * as arenaController from "@/controllers/arena.controller";
 import { asText, withGame } from "../../_lib/api";
 export async function POST(request: Request) {
   return withGame(request, async (state, body, context) => {
-    if (cooldownLeft("arena:" + context.characterId) > 0) {
+    if ((await cooldownLeft(context.client, context.characterId, "arena")) > 0) {
       return failure(state, "");
     }
     const roster = await cachedHunters(context.client);
@@ -17,7 +17,12 @@ export async function POST(request: Request) {
     const landed = arenaController.landArena(state, resolved.data, 0);
     if (landed.ok && landed.data) {
       await interruptRest(context.client, context.characterId);
-      setCooldown("arena:" + context.characterId, landed.data.combat.rounds.length * HUNT_TICK_MS);
+      await setCooldown(
+        context.client,
+        context.characterId,
+        "arena",
+        landed.data.combat.rounds.length * HUNT_TICK_MS,
+      );
       if (state.character) {
         const { combat, hunter, spoils } = landed.data;
         await recordArenaDuel(context.client, {

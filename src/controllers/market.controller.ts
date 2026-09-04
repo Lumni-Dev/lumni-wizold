@@ -22,8 +22,12 @@ export function marketPriceOf(item: Item, level: number): number {
   return Math.max(1, Math.round(huntPurse(level) * item.huntCost));
 }
 
+export const DROP_SELL_BONUS = 5;
+
 export function sellPrice(item: Item, level: number): number {
-  return Math.max(1, Math.round(marketPriceOf(item, level) * SELL_RATIO));
+  const base = Math.max(1, Math.round(marketPriceOf(item, level) * SELL_RATIO));
+  if (item.category === "material" && !isForgeMaterial(item)) return base + DROP_SELL_BONUS;
+  return base;
 }
 
 export interface MarketOffer {

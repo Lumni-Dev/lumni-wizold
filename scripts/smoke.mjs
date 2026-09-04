@@ -157,6 +157,10 @@ check(
 );
 const state2 = (await call("POST", "/api/state")).payload?.data;
 check("caçada contou no servidor", state2?.character?.hunts === 1);
+const huntTooSoon = await call("POST", "/api/hunt", { territoryId: "village-field" });
+check("cooldown do servidor barra a caçada imediata", huntTooSoon.payload?.ok === false);
+const stateAfterBlocked = (await call("POST", "/api/state")).payload?.data;
+check("caçada barrada não conta no servidor", stateAfterBlocked?.character?.hunts === 1);
 const bought = await call("POST", "/api/market/buy", {
   itemId: "health-potion-small",
   quantity: 1,

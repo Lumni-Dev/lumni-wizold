@@ -131,7 +131,7 @@ export function startRest(state: GameState): Result {
   }
 
   const message = "Você se recolhe. O corpo se regenera aos poucos.";
-  return success(addLog(state, "character", message), message);
+  return success(addLog(state, "character", message), "");
 }
 
 function restRecovery(maximum: number, ratio: number): number {

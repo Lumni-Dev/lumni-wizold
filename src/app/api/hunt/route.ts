@@ -6,7 +6,7 @@ import { HUNT_TICK_MS } from "@/shared/constants/game";
 import { asText, withGame } from "../_lib/api";
 export async function POST(request: Request) {
   return withGame(request, async (state, body, context) => {
-    if (cooldownLeft("hunt:" + context.characterId) > 0) {
+    if ((await cooldownLeft(context.client, context.characterId, "hunt")) > 0) {
       return failure(state, "");
     }
     const resolved = huntController.resolveHunt(
@@ -19,7 +19,12 @@ export async function POST(request: Request) {
     const landed = huntController.landHunt(state, resolved.data, 0);
     if (landed.ok && landed.data) {
       await interruptRest(context.client, context.characterId);
-      setCooldown("hunt:" + context.characterId, landed.data.combat.rounds.length * HUNT_TICK_MS);
+      await setCooldown(
+        context.client,
+        context.characterId,
+        "hunt",
+        landed.data.combat.rounds.length * HUNT_TICK_MS,
+      );
     }
     return landed;
   });

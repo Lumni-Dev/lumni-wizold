@@ -1730,10 +1730,10 @@ sec("inventário e mercado");
   );
   const fur = items.findItem("rabbit-fur");
   ok(
-    "venda paga metade",
+    "venda de drop paga metade mais o bônus de 5",
     sale.ok &&
       sale.state.character.bronze ===
-        state.character.bronze + Math.max(1, Math.round(fur.price * 0.5)) * 2,
+        state.character.bronze + (Math.max(1, Math.round(fur.price * 0.5)) + 5) * 2,
   );
   const forgedSale = marketCtrl.sellItem(
     { ...state, inventory: [{ itemId: "bronze-claw", quantity: 1, enhancement: 3 }] },
