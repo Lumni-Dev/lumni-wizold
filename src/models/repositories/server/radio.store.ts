@@ -20,7 +20,7 @@ export interface RadioTrack {
 }
 
 function prettyName(base: string): string {
-  const cleaned = base.replace(/[_-]+/g, " ").trim();
+  const cleaned = base.replace(/_+/g, " ").replace(/\s+/g, " ").trim();
   return cleaned.length > 0 ? cleaned : base;
 }
 
