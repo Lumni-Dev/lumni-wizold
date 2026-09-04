@@ -103,25 +103,22 @@ export function TrainingScreen() {
                 interactive={active || ready}
                 tone={active ? "highlighted" : "default"}
               >
-                <CardHeader
-                  art={<TrainingArtFill attribute={exercise.attribute} />}
-                  className="flex-wrap"
-                >
-                  <div className="flex min-w-[7rem] flex-1">
-                    <RowText
-                      title={row?.name ?? exercise.name}
-                      label={exercise.name}
-                    />
-                  </div>
-                  <span className="ml-auto shrink-0 self-center font-mono text-sm text-ink">
-                    NV. {formatNumber(row?.value ?? 0)}
-                    <span className="text-ink-faint">
-                      {" / " + formatNumber(MAX_ATTRIBUTE_VALUE)}
-                    </span>
-                    {(row?.value ?? 0) >= MAX_ATTRIBUTE_VALUE ? (
-                      <span className="ml-1 text-[10px] text-ink-faint">teto</span>
-                    ) : null}
-                  </span>
+                <CardHeader art={<TrainingArtFill attribute={exercise.attribute} />}>
+                  <RowText
+                    title={row?.name ?? exercise.name}
+                    label={exercise.name}
+                    description={
+                      <span className="font-mono text-sm text-ink">
+                        NV. {formatNumber(row?.value ?? 0)}
+                        <span className="text-ink-faint">
+                          {" / " + formatNumber(MAX_ATTRIBUTE_VALUE)}
+                        </span>
+                        {(row?.value ?? 0) >= MAX_ATTRIBUTE_VALUE ? (
+                          <span className="ml-1 text-[10px] text-ink-faint">teto</span>
+                        ) : null}
+                      </span>
+                    }
+                  />
                 </CardHeader>
 
                 <CardBody>
@@ -186,20 +183,22 @@ export function TrainingScreen() {
               interactive={petActive || petReady}
               tone={petActive ? "highlighted" : "default"}
             >
-              <CardHeader
-                art={<PetArtFill gender={petTraining.pet.gender} />}
-                className="flex-wrap"
-              >
-                <div className="flex min-w-[7rem] flex-1">
-                  <RowText title="Mascote" label="Treino do mascote" />
-                </div>
-                <span className="ml-auto shrink-0 self-center font-mono text-sm text-ink">
-                  NV. {formatNumber(petTraining.level)}
-                  <span className="text-ink-faint">{" / " + formatNumber(PET_MAX_LEVEL)}</span>
-                  {petTraining.level >= PET_MAX_LEVEL ? (
-                    <span className="ml-1 text-[10px] text-ink-faint">teto</span>
-                  ) : null}
-                </span>
+              <CardHeader art={<PetArtFill gender={petTraining.pet.gender} />}>
+                <RowText
+                  title="Mascote"
+                  label="Treino do mascote"
+                  description={
+                    <span className="font-mono text-sm text-ink">
+                      NV. {formatNumber(petTraining.level)}
+                      <span className="text-ink-faint">
+                        {" / " + formatNumber(PET_MAX_LEVEL)}
+                      </span>
+                      {petTraining.level >= PET_MAX_LEVEL ? (
+                        <span className="ml-1 text-[10px] text-ink-faint">teto</span>
+                      ) : null}
+                    </span>
+                  }
+                />
               </CardHeader>
 
               <CardBody>
