@@ -668,6 +668,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       if (!alive || inflight) return;
       inflight = true;
       try {
+        const restingActivity = activityRef.current;
         const answer = await request<{
           done: boolean;
           ticks: number;
@@ -703,7 +704,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         }
         if (answer.data?.done) {
           clearRestClock();
-          setActivity(automationController.resumeAfterRest(stateRef.current, activityRef.current));
+          setActivity(automationController.resumeAfterRest(stateRef.current, restingActivity));
           return;
         }
         const wait = answer.data?.nextInMs ?? REST_TICK_MS;

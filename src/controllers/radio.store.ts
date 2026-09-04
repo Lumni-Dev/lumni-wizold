@@ -45,7 +45,8 @@ export const radioStore = {
     void api<{ tracks: RadioTrack[] }>("GET", "/api/radio")
       .then((answer) => {
         const tracks = answer.ok && answer.data ? answer.data.tracks : [];
-        set({ tracks, index: 0, loaded: true });
+        const index = tracks.length > 0 ? Math.floor(Math.random() * tracks.length) : 0;
+        set({ tracks, index, loaded: true });
       })
       .finally(() => {
         loading = false;
@@ -60,11 +61,14 @@ export const radioStore = {
     return state.tracks[state.index] ?? null;
   },
   next(): void {
-    if (state.tracks.length === 0) return;
-    set({ ...state, index: (state.index + 1) % state.tracks.length });
-  },
-  prev(): void {
-    if (state.tracks.length === 0) return;
-    set({ ...state, index: (state.index - 1 + state.tracks.length) % state.tracks.length });
+    const total = state.tracks.length;
+    if (total === 0) return;
+    if (total === 1) {
+      set({ ...state, index: 0 });
+      return;
+    }
+    const draw = Math.floor(Math.random() * (total - 1));
+    const index = draw >= state.index ? draw + 1 : draw;
+    set({ ...state, index });
   },
 };

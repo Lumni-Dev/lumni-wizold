@@ -94,6 +94,7 @@ export function RadioPlayer() {
     <audio
       ref={audioRef}
       src={trackUrl}
+      loop={tracks.length <= 1}
       preload="none"
       aria-hidden="true"
       onEnded={() => radioStore.next()}
