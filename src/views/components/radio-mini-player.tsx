@@ -7,7 +7,7 @@ import { playSound } from "@/controllers/sound";
 import { radioRepository } from "@/models/repositories/radio.repository";
 import { Tooltip } from "./tooltip";
 
-const CELL = "flex w-8 shrink-0 items-center justify-center self-stretch text-ink-faint transition-colors hover:text-ink";
+const CELL = "flex w-12 shrink-0 items-center justify-center self-stretch text-ink-faint transition-colors hover:text-ink";
 
 export function RadioMiniPlayer() {
   const enabled = useSyncExternalStore(

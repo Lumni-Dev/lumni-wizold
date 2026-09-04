@@ -43,10 +43,10 @@ const SECTIONS: readonly { key: string; label: string }[] = [
   { key: "nome", label: "Nome" },
   { key: "taverna", label: "Taverna" },
   { key: "radio", label: "W-Radio" },
-  { key: "automacao", label: "Automação" },
   { key: "som", label: "Som" },
   { key: "trilha", label: "Trilha" },
   { key: "fundo", label: "Fundo" },
+  { key: "automacao", label: "Automação" },
   { key: "cache", label: "Cache" },
   { key: "excluir", label: "Excluir conta" },
 ];
@@ -457,72 +457,6 @@ export function SettingsScreen() {
           </Panel>
         ) : null}
 
-        {shows("automacao") ? (
-          <Panel
-            title="Automação"
-            description="O que a partida faz sozinha. Cada chave faz uma coisa só, e elas se ajudam: a caçada bebe, a poção acaba, o corpo descansa, a caçada volta. É um recurso VIP."
-            action={
-              vip ? (
-                <Tag tone="light">
-                  {formatNumber(active)} de {AUTOMATIONS.length} ativadas
-                </Tag>
-              ) : (
-                <Tag tone="neutral">Requer VIP</Tag>
-              )
-            }
-            padding="none"
-            footer={
-              vip ? (
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <span className="text-[11px] text-ink-faint">
-                    {character.vipCanceling
-                      ? "VIP ativo até " + formatDay(character.vipUntil ?? "") + ", sem renovar."
-                      : "Assinatura ativa, renova em " + formatDay(character.vipUntil ?? "") + "."}
-                  </span>
-                  <Button variant="outline" onClick={() => router.push("/store")}>
-                    Gerenciar na loja
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <span className="text-[11px] text-ink-faint">
-                    A automação é um recurso VIP. Ative para ligar as chaves.
-                  </span>
-                  <Button variant="primary" onClick={() => buyVip()}>
-                    Ativar VIP por {formatReais(VIP_PRICE_CENTS)}/mês
-                  </Button>
-                </div>
-              )
-            }
-          >
-            <List>
-              {AUTOMATIONS.map((entry) => (
-                <ListRow key={entry.key} layout="split">
-                  <RowText title={entry.label} description={entry.effect} />
-                  <div
-                    className={"flex shrink-0 gap-2" + (vip ? "" : " pointer-events-none opacity-50")}
-                  >
-                    <Chip
-                      active={state.automation[entry.key]}
-                      disabled={!vip}
-                      onClick={() => setAutomation(entry.key, true)}
-                    >
-                      Ativado
-                    </Chip>
-                    <Chip
-                      active={!state.automation[entry.key]}
-                      disabled={!vip}
-                      onClick={() => setAutomation(entry.key, false)}
-                    >
-                      Desativado
-                    </Chip>
-                  </div>
-                </ListRow>
-              ))}
-            </List>
-          </Panel>
-        ) : null}
-
         {shows("som") ? (
           <Panel
             title="Som"
@@ -678,6 +612,72 @@ export function SettingsScreen() {
                   </p>
                 </ListRow>
               ) : null}
+            </List>
+          </Panel>
+        ) : null}
+
+        {shows("automacao") ? (
+          <Panel
+            title="Automação"
+            description="O que a partida faz sozinha. Cada chave faz uma coisa só, e elas se ajudam: a caçada bebe, a poção acaba, o corpo descansa, a caçada volta. É um recurso VIP."
+            action={
+              vip ? (
+                <Tag tone="light">
+                  {formatNumber(active)} de {AUTOMATIONS.length} ativadas
+                </Tag>
+              ) : (
+                <Tag tone="neutral">Requer VIP</Tag>
+              )
+            }
+            padding="none"
+            footer={
+              vip ? (
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <span className="text-[11px] text-ink-faint">
+                    {character.vipCanceling
+                      ? "VIP ativo até " + formatDay(character.vipUntil ?? "") + ", sem renovar."
+                      : "Assinatura ativa, renova em " + formatDay(character.vipUntil ?? "") + "."}
+                  </span>
+                  <Button variant="outline" onClick={() => router.push("/store")}>
+                    Gerenciar na loja
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <span className="text-[11px] text-ink-faint">
+                    A automação é um recurso VIP. Ative para ligar as chaves.
+                  </span>
+                  <Button variant="primary" onClick={() => buyVip()}>
+                    Ativar VIP por {formatReais(VIP_PRICE_CENTS)}/mês
+                  </Button>
+                </div>
+              )
+            }
+          >
+            <List>
+              {AUTOMATIONS.map((entry) => (
+                <ListRow key={entry.key} layout="split">
+                  <RowText title={entry.label} description={entry.effect} />
+                  <div
+                    className={"flex shrink-0 gap-2" + (vip ? "" : " pointer-events-none opacity-50")}
+                  >
+                    <Chip
+                      active={state.automation[entry.key]}
+                      disabled={!vip}
+                      onClick={() => setAutomation(entry.key, true)}
+                    >
+                      Ativado
+                    </Chip>
+                    <Chip
+                      active={!state.automation[entry.key]}
+                      disabled={!vip}
+                      onClick={() => setAutomation(entry.key, false)}
+                    >
+                      Desativado
+                    </Chip>
+                  </div>
+                </ListRow>
+              ))}
             </List>
           </Panel>
         ) : null}
