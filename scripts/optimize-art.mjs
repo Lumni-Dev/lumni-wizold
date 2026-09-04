@@ -23,7 +23,7 @@ const MAX_SIZE = {
   inventory: 512,
   store: 512,
   creatures: 768,
-  hunt: 400,
+  hunt: 1080,
   attributes: 512,
   training: 512,
   genders: 1024,
