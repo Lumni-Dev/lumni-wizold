@@ -519,16 +519,17 @@ export function TavernScreen() {
         }
       />
 
-      {radio.tracks.length > 0 ? (
-        <div className="border-b border-edge pb-6">
-          <RadioPlayer />
-          <RadioMiniPlayer />
-        </div>
-      ) : null}
-
       <Panel
         title="Alcance desta taverna"
         description="Leia antes de combinar encontro com alguém."
+        footer={
+          radio.tracks.length > 0 ? (
+            <>
+              <RadioPlayer />
+              <RadioMiniPlayer />
+            </>
+          ) : undefined
+        }
       >
         <p className="text-xs leading-relaxed text-ink-soft">
           As mesas vivem no servidor: quem estiver jogando, de qualquer máquina, senta nas mesmas
