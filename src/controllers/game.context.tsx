@@ -92,6 +92,7 @@ interface GameContextValue {
   ) => Promise<{
     hasCharacter: boolean;
     needsTwoFactor?: boolean;
+    banished?: boolean;
   } | null>;
   verifyTwoFactor: (code: string) => Promise<{ hasCharacter: boolean } | null>;
   resendTwoFactor: () => Promise<boolean>;
@@ -840,6 +841,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         const answer = await api<{
           hasCharacter: boolean;
           needsTwoFactor?: boolean;
+          banished?: boolean;
           tutorial?: boolean;
         }>("POST", "/api/auth/enter", {
           credential,
@@ -848,6 +850,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
         if (!answer.ok) {
           announce(answer.message, false, "Conta");
           return null;
+        }
+        if (answer.data?.banished) {
+          disableGoogleAutoSelect();
+          return { hasCharacter: false, banished: true };
         }
         if (typeof answer.data?.tutorial === "boolean") setTutorial(answer.data.tutorial);
         if (answer.data?.needsTwoFactor) {

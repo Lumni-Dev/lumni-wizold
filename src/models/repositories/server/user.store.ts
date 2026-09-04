@@ -8,6 +8,7 @@ export interface UserRow {
   epoch: number;
   twoFactorEnabled: boolean;
   tutorial: boolean;
+  banished: boolean;
 }
 
 function asUser(row: {
@@ -17,6 +18,7 @@ function asUser(row: {
   session_epoch: number;
   two_factor_enabled: boolean;
   tutorial: boolean;
+  banished: boolean;
 }): UserRow {
   return {
     id: row.id,
@@ -25,12 +27,13 @@ function asUser(row: {
     epoch: Number(row.session_epoch),
     twoFactorEnabled: row.two_factor_enabled === true,
     tutorial: row.tutorial === true,
+    banished: row.banished === true,
   };
 }
 
 export async function findUserByEmail(client: PoolClient, email: string): Promise<UserRow | null> {
   const found = await client.query(
-    "select id, email, birth_date, session_epoch, two_factor_enabled, tutorial from users where lower(email) = lower($1)",
+    "select id, email, birth_date, session_epoch, two_factor_enabled, tutorial, banished from users where lower(email) = lower($1)",
     [email],
   );
   const row = found.rows[0];
@@ -54,6 +57,7 @@ export async function createUser(
     epoch: 0,
     twoFactorEnabled: false,
     tutorial: false,
+    banished: false,
   };
 }
 

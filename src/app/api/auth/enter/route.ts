@@ -42,6 +42,13 @@ export async function POST(request: Request) {
   try {
     return await withTransaction(async (client) => {
       const existing = await findUserByEmail(client, identity.email);
+      if (existing?.banished) {
+        return NextResponse.json({
+          ok: true,
+          message: "",
+          data: { banished: true },
+        });
+      }
       if (!existing && (!isRealBirth(birth) || age === null)) {
         return bad("Preencha a data de nascimento.", 400);
       }

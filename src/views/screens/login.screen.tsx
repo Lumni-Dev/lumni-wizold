@@ -11,6 +11,7 @@ import { BRAND_ICON_PATH } from "@/shared/constants/site";
 import { GLASS_SECTION } from "@/shared/constants/ui";
 import { ageOf, EMPTY_BIRTH, isRealBirth } from "@/shared/utils/birth";
 import { cn } from "@/shared/utils/class-names";
+import { BanishedGate } from "../components/banished-gate";
 import { Button } from "../components/button";
 import { CornerAccents } from "../components/corner-accents";
 import { Field } from "../components/field";
@@ -105,6 +106,7 @@ export function LoginScreen() {
   const [birth, setBirth] = useState(EMPTY_BIRTH);
   const [entering, setEntering] = useState(false);
   const [twoFactor, setTwoFactor] = useState<{ hasCharacter: boolean } | null>(null);
+  const [banished, setBanished] = useState(false);
   const [twoFactorCode, setTwoFactorCode] = useState("");
   const [verifying, setVerifying] = useState(false);
   const birthRef = useRef(birth);
@@ -161,6 +163,10 @@ export function LoginScreen() {
             try {
               const opened = await enterRef.current(answer.credential, birthRef.current);
               if (!opened) return;
+              if (opened.banished) {
+                setBanished(true);
+                return;
+              }
               if (opened.needsTwoFactor) {
                 setTwoFactor({ hasCharacter: opened.hasCharacter });
                 setTwoFactorCode("");
@@ -222,6 +228,7 @@ export function LoginScreen() {
     <div className="relative flex min-h-screen flex-col">
       <LiveBackdrop />
       <LandingMusic />
+      <BanishedGate open={banished} onClose={() => setBanished(false)} />
       <main className="relative z-10 flex min-h-screen items-center justify-center p-4 md:p-8">
         <div className="w-full max-w-md space-y-6">
           <header className="text-center">

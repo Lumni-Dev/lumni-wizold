@@ -5,7 +5,9 @@ import type { Hunter, HunterPet } from "@/models/entities/ranking";
 import type { TavernIdentity } from "@/models/entities/tavern";
 
 export async function loadHunters(client: PoolClient): Promise<Hunter[]> {
-  const characters = await client.query("select * from characters");
+  const characters = await client.query(
+    "select c.* from characters c join users u on u.id = c.user_id where u.banished = false",
+  );
   const pets = await client.query(
     "select character_id, name, gender, level, energy, active from pets",
   );
@@ -69,13 +71,15 @@ export async function loadHunters(client: PoolClient): Promise<Hunter[]> {
 }
 
 export async function loadNames(client: PoolClient): Promise<TavernIdentity[]> {
-  const found = await client.query("select id, name from characters");
+  const found = await client.query(
+    "select c.id, c.name from characters c join users u on u.id = c.user_id where u.banished = false",
+  );
   return found.rows.map((row) => ({ id: row.id, name: row.name }));
 }
 
 export async function loadHunterIds(client: PoolClient): Promise<{ id: string; name: string }[]> {
   const found = await client.query<{ id: string; name: string }>(
-    "select id, name from characters order by level desc, name asc",
+    "select c.id, c.name from characters c join users u on u.id = c.user_id where u.banished = false order by c.level desc, c.name asc",
   );
   return found.rows;
 }
@@ -85,7 +89,7 @@ export async function loadHunterSummary(
   id: string,
 ): Promise<{ id: string; name: string; level: number; gender: string } | null> {
   const found = await client.query<{ id: string; name: string; level: string; gender: string }>(
-    "select id, name, level, gender from characters where id = $1",
+    "select c.id, c.name, c.level, c.gender from characters c join users u on u.id = c.user_id where c.id = $1 and u.banished = false",
     [id],
   );
   const row = found.rows[0];

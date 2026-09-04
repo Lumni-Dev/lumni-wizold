@@ -29,13 +29,14 @@ async function sessionGate(
   client: PoolClient,
   claims: SessionClaims,
 ): Promise<{ live: boolean; tutorial: boolean }> {
-  const found = await client.query("select session_epoch, tutorial from users where id = $1", [
-    claims.userId,
-  ]);
+  const found = await client.query(
+    "select session_epoch, tutorial, banished from users where id = $1",
+    [claims.userId],
+  );
   const row = found.rows[0];
   if (!row) return { live: false, tutorial: false };
   return {
-    live: Number(row.session_epoch) === claims.epoch,
+    live: Number(row.session_epoch) === claims.epoch && row.banished !== true,
     tutorial: row.tutorial === true,
   };
 }
