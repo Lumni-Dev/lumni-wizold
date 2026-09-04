@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useGame } from "@/controllers/game.context";
+import { useVisibleActivity } from "@/controllers/use-visible-activity";
 import { MIN_HEALTH_RATIO_TO_ACT } from "@/shared/constants/game";
 import { RecoveryButton } from "./recovery-button";
 
@@ -18,7 +19,8 @@ export function BodyGate({
   fullWidth?: boolean;
   children: ReactNode;
 }) {
-  const { character, stats, activity, setActivity, rest } = useGame();
+  const { character, stats, setActivity, rest } = useGame();
+  const { activity } = useVisibleActivity();
   if (!character || !stats || !open) return <>{children}</>;
 
   const blocked = requireFull

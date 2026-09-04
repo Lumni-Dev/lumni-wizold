@@ -11,3 +11,5 @@ export const MODERATION_UNAVAILABLE =
   "A auditoria de IA está indisponível. Tente de novo em instantes.";
 
 export const CHAT_CENSORED_TEXT = "Conteúdo impróprio.";
+
+export const TAVERN_NOTICE_BODY = "Nova mensagem na mesa.";

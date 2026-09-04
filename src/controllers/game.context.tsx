@@ -26,7 +26,7 @@ import {
   mergeActivityResume,
   stashActivityResume,
 } from "@/models/repositories/activity-resume.repository";
-import type { MoonState } from "@/models/rules/moon";
+import { potionFuryRemainingMs, type MoonState } from "@/models/rules/moon";
 import {
   AUTOMATION_TICK_MS,
   CYCLE_OPTOUT_SECS,
@@ -48,8 +48,9 @@ import { ActivityEngine } from "./activity-engine";
 import { activityMirrorStore } from "./activity-mirror.store";
 import { activityRuntimeStore, armRestClock, clearRestClock } from "./activity-runtime";
 import { activitySync } from "./activity-sync";
-import { api, isTransientApiMessage, type ApiAnswer } from "./api.client";
 import { activityApi, activityQueuedApi, activitySlotRoute, activityThreadBusy, flushActivityKeepalive } from "./activity-thread";
+import { api, isTransientApiMessage, type ApiAnswer } from "./api.client";
+import { bindAutomationPulse } from "./automation-pulse";
 import { usePresenceHeartbeat } from "./use-presence-heartbeat";
 import { playSound, preloadSounds, setVoiceProfile } from "./sound";
 export interface Notice {
@@ -99,7 +100,7 @@ interface GameContextValue {
   rest: () => Promise<void>;
   activity: Activity | null;
   setActivity: (activity: Activity | null) => void;
-  syncProgress: (patch: { beat: number; cooldownUntil?: string | null }) => void;
+  syncProgress: (patch: { beat: number; cooldownUntil?: string | null; laps?: number }) => void;
   persistActivity: (activity: Activity | null) => void;
   train: (exerciseId: string) => Promise<{ message: string; raised: boolean } | "retry" | null>;
   hunt: (territoryId: string, creatureId?: string) => Promise<HuntAttempt>;
@@ -174,9 +175,31 @@ function activityPayload(next: Activity | null): Record<string, unknown> | { kin
     enhancement: next.enhancement ?? null,
     paused: next.paused ?? false,
     beat: next.beat ?? 0,
+    laps: next.laps ?? 0,
     cooldownUntil: next.cooldownUntil ?? null,
     resume: next.resume ?? null,
   };
+}
+
+function replayOverlay(incoming: GameState, live: GameState): GameState {
+  if (!incoming.character || !live.character) return incoming;
+  return {
+    ...incoming,
+    character: { ...incoming.character, health: live.character.health },
+  };
+}
+
+function landingIsStale(held: GameState, incoming: GameState): boolean {
+  const a = held.character;
+  const b = incoming.character;
+  if (!a || !b) return false;
+  return (
+    b.hunts < a.hunts ||
+    b.wins < a.wins ||
+    b.losses < a.losses ||
+    b.arenaWins < a.arenaWins ||
+    b.arenaLosses < a.arenaLosses
+  );
 }
 
 export function GameProvider({ children }: { children: ReactNode }) {
@@ -193,6 +216,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [activity, setActivityState] = useState<Activity | null>(null);
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [updateVersion, setUpdateVersion] = useState<string | null>(null);
+  const [furyNow, setFuryNow] = useState(0);
   const noticeCounter = useRef(0);
   const NOTICE_STACK = 4;
   const NOTICE_DURATION_MS = 4000;
@@ -202,6 +226,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
     moonRepository.snapshot,
     moonRepository.serverSnapshot,
   );
+  const furyUntil = state.character?.furyUntil ?? "";
+  useEffect(() => {
+    if (!furyUntil) return undefined;
+    const left = potionFuryRemainingMs({ furyUntil });
+    if (left <= 0) return undefined;
+    const timer = window.setTimeout(() => setFuryNow(Date.now()), left + 50);
+    return () => window.clearTimeout(timer);
+  }, [furyUntil]);
   const pushNotice = useCallback(
     (text: string, ok: boolean, source: string, dot: PresenceStatus | undefined, sound: boolean) => {
       noticeCounter.current += 1;
@@ -273,7 +305,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const inFlightRef = useRef(0);
   const resumeBootRef = useRef(true);
   const progressFlushRef = useRef<number | null>(null);
-  const pendingProgressRef = useRef<{ beat: number; cooldownUntil?: string | null } | null>(null);
+  const pendingProgressRef = useRef<{
+    beat: number;
+    cooldownUntil?: string | null;
+    laps?: number;
+  } | null>(null);
   const adoptActivityFromServer = useCallback((next: Activity | null | undefined) => {
     if (next === undefined) return;
     if (activitySync.isMirroring() || activityMirrorStore.isMirroring()) return;
@@ -347,6 +383,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [flushProgress]);
   const applyUpdate = useCallback(() => {
     flushBeforeUnload();
+    if (activitySync.isOwner()) activitySync.release();
     const reload = () => window.location.reload();
     try {
       if (typeof caches !== "undefined") {
@@ -360,13 +397,17 @@ export function GameProvider({ children }: { children: ReactNode }) {
     reload();
   }, [flushBeforeUnload]);
   const syncProgress = useCallback(
-    (patch: { beat: number; cooldownUntil?: string | null }) => {
+    (patch: { beat: number; cooldownUntil?: string | null; laps?: number }) => {
       if (activitySync.isMirroring()) return;
       const current = activityRef.current;
       if (!current) return;
       const next: Activity = { ...current };
       if (patch.beat > 0) next.beat = patch.beat;
       else delete next.beat;
+      if (patch.laps !== undefined) {
+        if (patch.laps > 0) next.laps = patch.laps;
+        else delete next.laps;
+      }
       if (patch.cooldownUntil) next.cooldownUntil = patch.cooldownUntil;
       else delete next.cooldownUntil;
       activityRef.current = next;
@@ -384,6 +425,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
     },
     [flushProgress],
   );
+  const automationBeatRef = useRef<() => void>(() => {});
+  const lastFuryDrinkRef = useRef(0);
   const setActivity = useCallback(
     (next: Activity | null, fromServer = false) => {
       if (!fromServer && activitySync.isMirroring()) {
@@ -413,10 +456,15 @@ export function GameProvider({ children }: { children: ReactNode }) {
         activitySync.release();
       }
       void activityApi("PUT", "/api/activity", activityPayload(next));
+      if (next?.kind === "hunt") {
+        window.setTimeout(() => automationBeatRef.current(), 0);
+      }
     },
     [applyState, flushProgress],
   );
-  setActivityRef.current = setActivity;
+  useEffect(() => {
+    setActivityRef.current = setActivity;
+  }, [setActivity]);
   const persistActivity = useCallback((next: Activity | null) => {
     activityRef.current = next;
     void activityApi("PUT", "/api/activity", activityPayload(next));
@@ -447,21 +495,28 @@ export function GameProvider({ children }: { children: ReactNode }) {
         if (typeof answer.tutorial === "boolean") setTutorial(answer.tutorial);
         if (answer.state) {
           const seq = ++mintRef.current;
+          const incoming = answer.state;
           if (defer === "hunt" && answer.ok) {
             heldHuntRef.current = {
-              state: answer.state,
+              state: incoming,
               seq,
               report: answer.data as HuntReport,
               at: Date.now(),
             };
           } else if (defer === "arena" && answer.ok) {
-            heldArenaRef.current = { state: answer.state, seq, report: null, at: Date.now() };
+            heldArenaRef.current = { state: incoming, seq, report: null, at: Date.now() };
           } else if (heldHuntRef.current) {
-            heldHuntRef.current = { ...heldHuntRef.current, state: answer.state, seq };
+            if (!landingIsStale(heldHuntRef.current.state, incoming)) {
+              heldHuntRef.current = { ...heldHuntRef.current, state: incoming, seq };
+              setState((current) => replayOverlay(incoming, current));
+            }
           } else if (heldArenaRef.current) {
-            heldArenaRef.current = { ...heldArenaRef.current, state: answer.state, seq };
+            if (!landingIsStale(heldArenaRef.current.state, incoming)) {
+              heldArenaRef.current = { ...heldArenaRef.current, state: incoming, seq };
+              setState((current) => replayOverlay(incoming, current));
+            }
           } else {
-            applyState(answer.state, seq);
+            applyState(incoming, seq);
           }
         }
         adoptActivityFromServer(answer.activity);
@@ -488,6 +543,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     [request, announce],
   );
   const beginRest = useCallback(async () => {
+    if (activitySync.isMirroring() || activityMirrorStore.isMirroring()) return;
     const interrupted = activityRef.current;
     const resume =
       interrupted && interrupted.kind !== "rest"
@@ -506,7 +562,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
       "Recuperação",
       () => playSound("rest"),
     );
-    if (!answer.ok) setActivity(null);
+    if (!answer.ok) {
+      clearRestClock();
+      setActivity(interrupted ?? null, true);
+    }
   }, [act, setActivity]);
   useEffect(() => {
     if (!hydrated) return;
@@ -563,10 +622,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
     const onHide = () => {
       if (document.visibilityState === "hidden") flushBeforeUnload();
     };
-    window.addEventListener("pagehide", flushBeforeUnload);
+    const onPageHide = (event: PageTransitionEvent) => {
+      flushBeforeUnload();
+      if (!event.persisted && activitySync.isOwner()) activitySync.release();
+    };
+    window.addEventListener("pagehide", onPageHide);
     document.addEventListener("visibilitychange", onHide);
     return () => {
-      window.removeEventListener("pagehide", flushBeforeUnload);
+      window.removeEventListener("pagehide", onPageHide);
       document.removeEventListener("visibilitychange", onHide);
     };
   }, [ready, flushBeforeUnload]);
@@ -645,7 +708,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
       window.clearTimeout(timer);
     };
   }, [ready, resting, request, setActivity, announce]);
-  const automationBeatRef = useRef<() => void>(() => {});
   useEffect(() => {
     if (!ready) return;
     let busy = false;
@@ -660,11 +722,21 @@ export function GameProvider({ children }: { children: ReactNode }) {
         const step = automationController.nextAutomationStep(stateRef.current, activityRef.current);
         if (!step) return;
         switch (step.kind) {
-          case "potion":
-            await act("POST", "/api/inventory/consume", { itemId: step.itemId }, "Inventário", () =>
-              playSound("potion"),
+          case "potion": {
+            const furyMinutes = findItem(step.itemId)?.effect.furyMinutes ?? 0;
+            if (furyMinutes > 0 && Date.now() - lastFuryDrinkRef.current < furyMinutes * 60000) {
+              return;
+            }
+            const drank = await act(
+              "POST",
+              "/api/inventory/consume",
+              { itemId: step.itemId },
+              "Inventário",
+              () => playSound("potion"),
             );
+            if (furyMinutes > 0 && drank.ok) lastFuryDrinkRef.current = Date.now();
             return;
+          }
           case "rest":
             await beginRest();
             return;
@@ -687,9 +759,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
       }
     };
     automationBeatRef.current = () => void beat();
+    const stopPulse = bindAutomationPulse(() => void beat());
     const timer = window.setInterval(() => void beat(), AUTOMATION_TICK_MS);
     return () => {
       automationBeatRef.current = () => {};
+      stopPulse();
       window.clearInterval(timer);
     };
   }, [ready, act, beginRest, setActivity]);
@@ -713,7 +787,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [ready, authenticated, request, announce]);
   const value = useMemo<GameContextValue>(() => {
     const stats = state.character
-      ? deriveStats(state.character, state.equipment, state.pet, moon.phase.key)
+      ? deriveStats(
+          state.character,
+          state.equipment,
+          state.pet,
+          moon.phase.key,
+          furyNow > 0 ? furyNow : undefined,
+        )
       : null;
     const character =
       state.character && stats
@@ -1068,6 +1148,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
         if (on) window.setTimeout(() => automationBeatRef.current(), 0);
         void api("PUT", "/api/automation", { key, on }).then((answer) => {
           if (!answer.ok) {
+            stateRef.current = {
+              ...stateRef.current,
+              automation: { ...stateRef.current.automation, [key]: previous },
+            };
             setState((current) => ({
               ...current,
               automation: { ...current.automation, [key]: previous },
@@ -1156,6 +1240,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     notices,
     activity,
     moon,
+    furyNow,
     updateAvailable,
     updateVersion,
     applyUpdate,

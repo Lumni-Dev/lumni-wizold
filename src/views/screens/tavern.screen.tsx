@@ -6,7 +6,7 @@ import { tavernChatStore } from "@/controllers/tavern-chat.store";
 import { tavernUserStore, type TavernReadMap } from "@/controllers/tavern-user.store";
 import { useIsDesktop } from "@/controllers/use-is-desktop";
 import { useGame } from "@/controllers/game.context";
-import { isInPack, listPack } from "@/controllers/pack.controller";
+import { listPack } from "@/controllers/pack.controller";
 import { usePackPresence } from "@/controllers/use-pack-presence";
 import { useTavernDoing } from "@/controllers/use-tavern-doing";
 import { playSound } from "@/controllers/sound";
@@ -61,6 +61,18 @@ import {
 } from "../components/tavern-room-chat";
 
 const PAGE_SIZE = 8;
+
+function subscribeHydration(): () => void {
+  return () => {};
+}
+
+function readHydrated(): boolean {
+  return true;
+}
+
+function readServerHydrated(): boolean {
+  return false;
+}
 
 function MemberName({
   href,
@@ -124,11 +136,22 @@ export function TavernScreen() {
   const messagesRef = useRef<HTMLUListElement>(null);
   const sentMapRef = useRef<TavernSentMap>({});
   const openRoomId = chat.open ? chat.roomId : null;
-  const [layoutReady, setLayoutReady] = useState(false);
-  useEffect(() => {
-    setLayoutReady(true);
-  }, []);
+  const layoutReady = useSyncExternalStore(subscribeHydration, readHydrated, readServerHydrated);
   const mobileChat = layoutReady && !isDesktop;
+  const [enteredAt] = useState(() => Date.now());
+
+  const chatResetKey = mobileChat && openRoomId ? openRoomId : "";
+  const [prevChatResetKey, setPrevChatResetKey] = useState(chatResetKey);
+  if (chatResetKey !== prevChatResetKey) {
+    setPrevChatResetKey(chatResetKey);
+    if (chatResetKey) {
+      setDraft("");
+      setEmojiOpen(false);
+      setInvitingMemberId(null);
+      setSentBeat(0);
+      setCooldownLeft(0);
+    }
+  }
 
   const {
     identity,
@@ -308,15 +331,6 @@ export function TavernScreen() {
     if (!entry?.isMember) tavernChatStore.closeWindow();
   }, [ready, mobileChat, openRoomId, rooms]);
 
-  useEffect(() => {
-    if (!mobileChat || !openRoomId) return;
-    setDraft("");
-    setEmojiOpen(false);
-    setInvitingMemberId(null);
-    setSentBeat(0);
-    setCooldownLeft(0);
-  }, [mobileChat, openRoomId]);
-
   const filteredRooms = useMemo(() => {
     return rooms.filter(({ room, isMember }) => roomMatchesSearch(room, isMember, roomSearch));
   }, [rooms, roomSearch]);
@@ -336,7 +350,7 @@ export function TavernScreen() {
 
   const mayOpenUnlocked = canOpenUnlockedRoom({
     ...identity,
-    vip: identity.vip ?? isVip(character, Date.now()),
+    vip: identity.vip ?? isVip(character, enteredAt),
   });
 
   const ownRoom =

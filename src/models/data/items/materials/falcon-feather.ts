@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Pena de Falcão: despojo de caça, trocado por bronze no mercado.
 export const falconFeather: Item = {
   id: "falcon-feather",
   name: "Pena de Falcão",

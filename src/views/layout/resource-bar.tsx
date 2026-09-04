@@ -1,13 +1,15 @@
 "use client";
 
 import { useGame } from "@/controllers/game.context";
+import { useVisibleActivity } from "@/controllers/use-visible-activity";
 import { BAU_LIMIT } from "@/shared/constants/game";
 import { formatNumber } from "@/shared/utils/format";
 import { Bar } from "../components/bar";
 import { RestSeconds } from "../components/rest-seconds";
 
 export function ResourceBar() {
-  const { character, stats, activity } = useGame();
+  const { character, stats } = useGame();
+  const { activity } = useVisibleActivity();
   if (!character || !stats) return null;
 
   const resting = activity?.kind === "rest";

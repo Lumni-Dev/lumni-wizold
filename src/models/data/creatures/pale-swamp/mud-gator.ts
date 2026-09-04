@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Jacaré do Lodo (NV. 311 a 320) da área Pântano Pálido.
 export const mudGator: Creature = {
   id: "mud-gator",
   name: "Jacaré do Lodo",

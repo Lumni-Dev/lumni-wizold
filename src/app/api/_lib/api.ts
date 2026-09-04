@@ -247,7 +247,11 @@ export async function withTavern(
       if (!identity) return bad("Nenhum personagem ativo.", 404);
       if (options.write) {
         await lockTavern(client);
-        await pruneStale(client);
+        if (await pruneStale(client)) {
+          const { bumpTavernRevision } = await import("./tavern-board");
+          const { publishTavernRevision } = await import("./tavern-bus");
+          publishTavernRevision(await bumpTavernRevision(client));
+        }
       }
       const tavern = options.write ? await loadTavern(client) : await loadTavernCached(client);
       return action(tavern.state, body, { client, userId: guarded.userId, identity, tavern });

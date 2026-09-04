@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Unicórnio Selvagem (NV. 901 a 910) da área Clareira Branca.
 export const wildUnicorn: Creature = {
   id: "wild-unicorn",
   name: "Unicórnio Selvagem",

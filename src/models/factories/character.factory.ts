@@ -20,6 +20,7 @@ const STARTING_ATTRIBUTES: Attributes = {
 
 const STARTING_INVENTORY: InventorySlot[] = [
   { itemId: "health-potion-small", quantity: 10, enhancement: 0 },
+  { itemId: "rage-potion-small", quantity: 10, enhancement: 0 },
 ];
 
 function createCharacter(name: string, gender: Gender): Character {

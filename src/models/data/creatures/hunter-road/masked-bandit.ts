@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Bandido Mascarado (NV. 451 a 460) da área Estrada dos Caçadores.
 export const maskedBandit: Creature = {
   id: "masked-bandit",
   name: "Bandido Mascarado",

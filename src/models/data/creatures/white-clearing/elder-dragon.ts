@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Dragão Ancião (NV. 961 a 970) da área Clareira Branca.
 export const elderDragon: Creature = {
   id: "elder-dragon",
   name: "Dragão Ancião",

@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Serpente do Pântano (NV. 331 a 340) da área Pântano Pálido.
 export const swampSerpent: Creature = {
   id: "swamp-serpent",
   name: "Serpente do Pântano",

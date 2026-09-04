@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Serafim Caído (NV. 971 a 980) da área Clareira Branca.
 export const fallenSeraph: Creature = {
   id: "fallen-seraph",
   name: "Serafim Caído",

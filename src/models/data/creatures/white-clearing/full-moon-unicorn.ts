@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Unicórnio da Lua Cheia (NV. 981 a 990) da área Clareira Branca.
 export const fullMoonUnicorn: Creature = {
   id: "full-moon-unicorn",
   name: "Unicórnio da Lua Cheia",

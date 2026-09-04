@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Iéti Jovem (NV. 261 a 270) da área Serra das Brumas.
 export const youngYeti: Creature = {
   id: "young-yeti",
   name: "Iéti Jovem",

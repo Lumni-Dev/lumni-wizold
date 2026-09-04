@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Enigma da Esfinge: despojo de caça, trocado por bronze no mercado.
 export const sphinxRiddle: Item = {
   id: "sphinx-riddle",
   name: "Enigma da Esfinge",

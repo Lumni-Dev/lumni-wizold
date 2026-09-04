@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Presa de Dragão: despojo de caça, trocado por bronze no mercado.
 export const dragonFang: Item = {
   id: "dragon-fang",
   name: "Presa de Dragão",

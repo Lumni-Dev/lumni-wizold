@@ -47,14 +47,11 @@ export interface CombatOutcome {
 }
 
 export function hunterWon(combat: CombatOutcome): boolean {
-  if (combat.finalHealth <= 0) return false;
-  if (combat.victory) return true;
-  const last = combat.rounds[combat.rounds.length - 1];
-  return Boolean(last && last.creatureHealth <= 0);
+  return combat.victory;
 }
 
 export function hunterRetreated(combat: CombatOutcome): boolean {
-  return combat.finalHealth > 0 && !hunterWon(combat);
+  return combat.retreated;
 }
 
 export interface CombatPet {

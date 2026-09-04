@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Escama de Górgona: despojo de caça, trocado por bronze no mercado.
 export const gorgonScale: Item = {
   id: "gorgon-scale",
   name: "Escama de Górgona",

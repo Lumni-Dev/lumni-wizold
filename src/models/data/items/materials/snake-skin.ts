@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Pele de Cobra: despojo de caça, trocado por bronze no mercado.
 export const snakeSkin: Item = {
   id: "snake-skin",
   name: "Pele de Cobra",

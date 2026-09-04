@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Sanguessuga Gigante (NV. 321 a 330) da área Pântano Pálido.
 export const giantLeech: Creature = {
   id: "giant-leech",
   name: "Sanguessuga Gigante",

@@ -199,10 +199,8 @@ export function consumeItem(
     if (isFullMoon()) {
       return failure(state, "A lua cheia já mantém você em fúria.");
     }
-    if (character.furyUntil && Date.now() < Date.parse(character.furyUntil)) {
-      return failure(state, "Você já está em fúria: espere ela passar para beber de novo.");
-    }
-    const willpower = deriveStats(character, state.equipment, state.pet).totalAttributes.willpower;
+    const derived = deriveStats(character, state.equipment, state.pet);
+    const willpower = derived.totalAttributes.willpower - derived.sources.fury.willpower;
     const lastingMs = furyDurationMs(furyMinutes, willpower);
     const until = new Date(Date.now() + lastingMs).toISOString();
     const consumed: GameState = {
@@ -215,7 +213,7 @@ export function consumeItem(
       " consumida: +10 em todos os atributos por " +
       formatFuryDuration(furyMinutes, furyWillpowerExtraMs(furyMinutes, willpower)) +
       ".";
-    return success(addLog(next, "inventory", message), message);
+    return success(addLog(syncCharacter(next), "inventory", message), message);
   }
 
   const stats = deriveStats(character, state.equipment, state.pet);

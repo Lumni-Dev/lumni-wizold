@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Arqueiro de Prata (NV. 431 a 440) da área Estrada dos Caçadores.
 export const silverArcher: Creature = {
   id: "silver-archer",
   name: "Arqueiro de Prata",

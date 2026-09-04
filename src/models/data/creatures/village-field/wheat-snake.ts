@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Cobra do Trigo (NV. 71 a 80) da área Campo do Vilarejo.
 export const wheatSnake: Creature = {
   id: "wheat-snake",
   name: "Cobra do Trigo",

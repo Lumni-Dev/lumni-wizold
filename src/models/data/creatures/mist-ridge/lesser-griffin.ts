@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Grifo Menor (NV. 291 a 300) da área Serra das Brumas.
 export const lesserGriffin: Creature = {
   id: "lesser-griffin",
   name: "Grifo Menor",

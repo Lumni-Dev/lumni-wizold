@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Pelo de Iéti: despojo de caça, trocado por bronze no mercado.
 export const yetiFur: Item = {
   id: "yeti-fur",
   name: "Pelo de Iéti",

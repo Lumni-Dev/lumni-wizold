@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Presa de Javali: despojo de caça, trocado por bronze no mercado.
 export const boarTusk: Item = {
   id: "boar-tusk",
   name: "Presa de Javali",

@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Mestre Caçador (NV. 491 a 500) da área Estrada dos Caçadores.
 export const masterHunter: Creature = {
   id: "master-hunter",
   name: "Mestre Caçador",

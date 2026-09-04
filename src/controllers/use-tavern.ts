@@ -15,6 +15,31 @@ import type { RoomSummary } from "./tavern.controller";
 
 const HEARTBEAT_MS = 12000;
 
+let heartbeatHolders = 0;
+let heartbeatTimer = 0;
+
+function startTavernHeartbeat(): void {
+  heartbeatHolders += 1;
+  if (heartbeatTimer) return;
+  const beat = () => {
+    const mine = (tavernBoardSnapshot()?.rooms ?? []).filter((summary) => summary.isMember);
+    mine.forEach((summary, index) => {
+      window.setTimeout(() => {
+        void api("POST", "/api/tavern/rooms/" + encodeURIComponent(summary.room.id) + "/heartbeat");
+      }, index * 250);
+    });
+  };
+  beat();
+  heartbeatTimer = window.setInterval(beat, HEARTBEAT_MS);
+}
+
+function stopTavernHeartbeat(): void {
+  heartbeatHolders = Math.max(0, heartbeatHolders - 1);
+  if (heartbeatHolders > 0) return;
+  window.clearInterval(heartbeatTimer);
+  heartbeatTimer = 0;
+}
+
 export interface TavernAnswer {
   ok: boolean;
   message: string;
@@ -26,22 +51,23 @@ interface TavernBoard {
   rooms: RoomSummary[];
 }
 
+const EMPTY_BOARD: TavernBoard = { identity: null, rooms: [] };
+
 export function useTavern(activeRoomId: string | null) {
   const { character, authenticated, notify } = useGame();
-  const [board, setBoard] = useState<TavernBoard>({ identity: null, rooms: [] });
-  const [ready, setReady] = useState(false);
+  const [liveBoard, setBoard] = useState<TavernBoard>(EMPTY_BOARD);
+  const [liveReady, setReady] = useState(false);
+  const enabled = authenticated && character !== null;
+  const board = enabled ? liveBoard : EMPTY_BOARD;
+  const ready = enabled && liveReady;
+  const [enteredAt] = useState(() => Date.now());
   const boardRef = useRef(board);
   useEffect(() => {
     boardRef.current = board;
   }, [board]);
-  const enabled = authenticated && character !== null;
 
   useEffect(() => {
-    if (!enabled) {
-      setBoard({ identity: null, rooms: [] });
-      setReady(false);
-      return;
-    }
+    if (!enabled) return;
     return subscribeTavernBoard((payload) => {
       setBoard({ identity: payload.identity, rooms: payload.rooms });
       setReady(true);
@@ -50,17 +76,8 @@ export function useTavern(activeRoomId: string | null) {
 
   useEffect(() => {
     if (!enabled) return;
-    const beat = () => {
-      const mine = boardRef.current.rooms.filter((summary) => summary.isMember);
-      mine.forEach((summary, index) => {
-        window.setTimeout(() => {
-          void api("POST", "/api/tavern/rooms/" + encodeURIComponent(summary.room.id) + "/heartbeat");
-        }, index * 250);
-      });
-    };
-    beat();
-    const timer = window.setInterval(beat, HEARTBEAT_MS);
-    return () => window.clearInterval(timer);
+    startTavernHeartbeat();
+    return () => stopTavernHeartbeat();
   }, [enabled]);
 
   const perform = useCallback(
@@ -81,10 +98,10 @@ export function useTavern(activeRoomId: string | null) {
             id: character.id,
             name: character.name,
             level: character.level,
-            vip: isVip(character, Date.now()),
+            vip: isVip(character, enteredAt),
           }
         : null),
-    [board.identity, character],
+    [board.identity, character, enteredAt],
   );
   const rooms = board.rooms;
   const activeRoom = activeRoomId

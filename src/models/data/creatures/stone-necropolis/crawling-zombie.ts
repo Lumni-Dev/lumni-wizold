@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Zumbi Rastejante (NV. 611 a 620) da área Necrópole de Pedra.
 export const crawlingZombie: Creature = {
   id: "crawling-zombie",
   name: "Zumbi Rastejante",

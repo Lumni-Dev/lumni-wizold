@@ -1,6 +1,7 @@
 "use client";
 
 import { useGame } from "@/controllers/game.context";
+import { useVisibleActivity } from "@/controllers/use-visible-activity";
 import { REST_TICK_MS } from "@/shared/constants/game";
 import { RecoveryButton } from "./recovery-button";
 
@@ -11,7 +12,8 @@ export function VitalActionButton({
   size?: "small" | "medium";
   fullWidth?: boolean;
 }) {
-  const { character, stats, activity, setActivity, rest } = useGame();
+  const { character, stats, setActivity, rest } = useGame();
+  const { activity } = useVisibleActivity();
   if (!character || !stats) return null;
 
   const resting = activity?.kind === "rest";

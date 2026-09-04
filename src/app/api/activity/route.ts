@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { isActivityKind } from "@/models/entities/activity";
-import { ACTIVITY_BEAT_MAX } from "@/shared/constants/game";
+import { ACTIVITY_BEAT_MAX, ACTIVITY_LAPS_MAX } from "@/shared/constants/game";
 import { readActivity, updateActivity } from "@/models/repositories/server/game.store";
 import { asInt, asText, readBody, withActivityLock } from "../_lib/api";
 
@@ -36,6 +36,7 @@ export async function PUT(request: Request) {
       enhancement: typeof body.enhancement === "number" ? Math.round(body.enhancement) : null,
       paused: body.paused === true,
       beat: Math.min(ACTIVITY_BEAT_MAX, Math.max(0, asInt(body.beat, 0))),
+      laps: Math.min(ACTIVITY_LAPS_MAX, Math.max(0, asInt(body.laps, 0))),
       cooldownUntil: asText(body.cooldownUntil, 40) || null,
       resumeKind: resume.resumeKind,
       resumeTargetId: resume.resumeTargetId,

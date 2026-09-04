@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Chacal Faminto (NV. 531 a 540) da área Ermo Cinza.
 export const starvingJackal: Creature = {
   id: "starving-jackal",
   name: "Chacal Faminto",

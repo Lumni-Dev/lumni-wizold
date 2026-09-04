@@ -241,7 +241,7 @@ export function InventoryScreen() {
             if (consumable) {
               actions.push(
                 item.potion === "rage" ? (
-                  <FuryUseButton key="use" onClick={() => consumeItem(item.id)} />
+                  <FuryUseButton key="use" fullWidth onClick={() => consumeItem(item.id)} />
                 ) : (
                   <Button
                     key="use"

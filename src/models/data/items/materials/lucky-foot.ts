@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Pata de Coelho: despojo de caça, trocado por bronze no mercado.
 export const luckyFoot: Item = {
   id: "lucky-foot",
   name: "Pata de Coelho",

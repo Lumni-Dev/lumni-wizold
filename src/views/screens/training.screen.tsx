@@ -1,7 +1,6 @@
 "use client";
 
-import { useMemo, useSyncExternalStore } from "react";
-import { activityRuntimeStore } from "@/controllers/activity-runtime";
+import { useMemo } from "react";
 import { useGame } from "@/controllers/game.context";
 import { petTrainingView } from "@/controllers/pet.controller";
 import {
@@ -10,6 +9,7 @@ import {
   trainingSummaryLine,
 } from "@/controllers/training.controller";
 import { ACTIVITY_WAIT_LABEL, useActivityLock } from "@/controllers/use-activity-lock";
+import { useVisibleActivity } from "@/controllers/use-visible-activity";
 import {
   MAX_ATTRIBUTE_VALUE,
   PET_EXERCISE_ID,
@@ -29,14 +29,10 @@ import { Panel } from "../components/panel";
 import { PageHeader } from "../layout/page-header";
 
 export function TrainingScreen() {
-  const { state, character, stats, activity, setActivity } = useGame();
+  const { state, character, stats, setActivity } = useGame();
   const { locked } = useActivityLock();
   const waitLabel = locked ? ACTIVITY_WAIT_LABEL : "";
-  const runtime = useSyncExternalStore(
-    activityRuntimeStore.subscribe,
-    activityRuntimeStore.snapshot,
-    activityRuntimeStore.serverSnapshot,
-  );
+  const { activity, runtime } = useVisibleActivity();
   const trainRt = runtime.train;
   const paused = activity?.paused === true;
   const activeExercise = activity?.kind === "train" && !paused ? (activity.id ?? null) : null;

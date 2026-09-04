@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useArt } from "@/controllers/art.context";
-import { activityRuntimeStore } from "@/controllers/activity-runtime";
 import { useGame } from "@/controllers/game.context";
+import { useVisibleActivity } from "@/controllers/use-visible-activity";
 import {
   listTerritories,
   normalizeHuntSelection,
@@ -13,6 +13,7 @@ import { ACTIVITY_WAIT_LABEL, useActivityLock } from "@/controllers/use-activity
 import { areaVoice, useNarration } from "@/controllers/use-narration";
 import {
   emphasizeDamage,
+  huntPreyView,
   narrationOf,
   preyBarCurrent,
   type NarrationLine,
@@ -29,8 +30,10 @@ import { ChipTabs } from "../components/chip-tabs";
 import { NarrationButton } from "../components/narration-button";
 import { CreatureArtFill } from "../components/creature-icon";
 import {
-  loadHuntSelection,
+  huntSelectionServerSnapshot,
+  huntSelectionSnapshot,
   saveHuntSelection,
+  subscribeHuntSelection,
 } from "@/models/repositories/hunt-selection.repository";
 import { Bar } from "../components/bar";
 import { RestSeconds } from "../components/rest-seconds";
@@ -158,15 +161,11 @@ function CombatReport({ report, lines }: { report: HuntReport; lines: NarrationL
   );
 }
 export function HuntScreen() {
-  const { state, character, stats, pet, moon, activity, setActivity } = useGame();
+  const { state, character, stats, pet, moon, setActivity } = useGame();
   const { locked } = useActivityLock();
   const waitLabel = locked ? ACTIVITY_WAIT_LABEL : "";
   const narration = useNarration();
-  const runtime = useSyncExternalStore(
-    activityRuntimeStore.subscribe,
-    activityRuntimeStore.snapshot,
-    activityRuntimeStore.serverSnapshot,
-  );
+  const { activity, runtime } = useVisibleActivity();
   const huntRt = runtime.hunt;
   const paused = activity?.paused === true;
   const activeId = activity?.kind === "hunt" && !paused ? (activity.id ?? null) : null;
@@ -185,7 +184,11 @@ export function HuntScreen() {
   const art = useArt();
   const petAlong = canPetFight(pet) ? pet : null;
   const [report, setReport] = useState<HuntReport | null>(null);
-  const [selection, setSelection] = useState<Record<string, string>>(() => loadHuntSelection());
+  const selection = useSyncExternalStore(
+    subscribeHuntSelection,
+    huntSelectionSnapshot,
+    huntSelectionServerSnapshot,
+  );
   const [reportLines, setReportLines] = useState<NarrationLine[]>([]);
   const [session, setSession] = useState<HuntSession>(EMPTY_SESSION);
   const [preyJolt, setPreyJolt] = useState(0);
@@ -269,10 +272,9 @@ export function HuntScreen() {
   if (!character) return null;
   const drops = Object.entries(session.drops);
   function selectCreature(territoryId: string, creatureId: string) {
-    setSelection((current) => {
-      const next = { ...normalizeHuntSelection(state, current), [territoryId]: creatureId };
-      saveHuntSelection(next);
-      return next;
+    saveHuntSelection({
+      ...normalizeHuntSelection(state, selection),
+      [territoryId]: creatureId,
     });
   }
   function toggleHunt(territoryId: string, available: boolean) {
@@ -321,20 +323,24 @@ export function HuntScreen() {
               : null;
           const replaying = onThis && pending !== null && line !== null;
           const filling = onThis && pending !== null && line === null;
-          const foe = pending ?? report;
-          const lastFoe = onThis ? huntRt?.lastFoe : null;
-          const shownFoe =
-            (replaying || filling) && foe
-              ? foe.creature
-              : lastFoe
-                ? { name: lastFoe.name, health: lastFoe.health }
-                : (creatures.find((creature) => creature.id === selectedId) ?? prey ?? creatures[0]);
+          const selectedCreature =
+            creatures.find((creature) => creature.id === selectedId) ?? prey ?? creatures[0] ?? null;
+          const preyView = huntPreyView({
+            replaying,
+            filling,
+            pending: onThis && pending ? pending : null,
+            lastFoe: onThis ? (huntRt?.lastFoe ?? null) : null,
+            selected: selectedCreature,
+          });
+          const shownFoe = preyView.foe;
           const monsterMax = Math.max(1, shownFoe?.health ?? 1);
-          const ended =
-            pending?.combat ??
-            lastFoe?.combat ??
-            (foe && foe.territory.id === territory.id ? foe.combat : null);
-          const monsterCurrent = preyBarCurrent(monsterMax, line, replaying, filling, ended);
+          const monsterCurrent = preyBarCurrent(
+            monsterMax,
+            line,
+            replaying,
+            filling,
+            preyView.combat,
+          );
           const monsterStatus = replaying ? "Atacando" : filling ? "Preparando" : "Aguardando";
           return (
             <Card
@@ -484,7 +490,7 @@ export function HuntScreen() {
                     <List className="max-h-[560px] overflow-y-auto border-t border-edge md:absolute md:inset-0 md:max-h-none">
                       {creatures.map((creature) => {
                         const isSelected = creature.id === selectedId;
-                        const isPrey = active && creature.id === selectedId;
+                        const isPrey = active && shownFoe !== null && creature.id === shownFoe.id;
                         const reached = character.level >= creature.level;
                         return (
                           <ArtRowButton

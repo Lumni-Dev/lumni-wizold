@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Corvo Faminto (NV. 41 a 50) da área Campo do Vilarejo.
 export const hungryCrow: Creature = {
   id: "hungry-crow",
   name: "Corvo Faminto",

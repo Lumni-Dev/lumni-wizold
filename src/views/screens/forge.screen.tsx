@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
-import { activityRuntimeStore } from "@/controllers/activity-runtime";
+import { useEffect, useMemo, useState } from "react";
 import { useGame } from "@/controllers/game.context";
 import { listForge, listMining } from "@/controllers/forge.controller";
 import { ACTIVITY_WAIT_LABEL, useActivityLock } from "@/controllers/use-activity-lock";
+import { useVisibleActivity } from "@/controllers/use-visible-activity";
 import type { Activity } from "@/models/entities/activity";
 import {
   matchesCategoryAndSet,
@@ -55,14 +55,10 @@ function pieceKey(itemId: string, level: number): string {
 const FORGE_PAGE_SIZE = 5;
 
 export function ForgeScreen() {
-  const { state, character, activity, setActivity } = useGame();
+  const { state, character, setActivity } = useGame();
   const { locked } = useActivityLock();
   const waitLabel = locked ? ACTIVITY_WAIT_LABEL : "";
-  const runtime = useSyncExternalStore(
-    activityRuntimeStore.subscribe,
-    activityRuntimeStore.snapshot,
-    activityRuntimeStore.serverSnapshot,
-  );
+  const { activity, runtime } = useVisibleActivity();
   const paused = activity?.paused === true;
   const activeOre = activity?.kind === "mine" && !paused ? (activity.id ?? null) : null;
   const forgeItemId = activity?.kind === "forge" ? (activity.id ?? null) : null;

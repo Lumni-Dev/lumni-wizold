@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Asa de Súcubo: despojo de caça, trocado por bronze no mercado.
 export const succubusWing: Item = {
   id: "succubus-wing",
   name: "Asa de Súcubo",

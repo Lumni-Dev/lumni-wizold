@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Dragão das Cavernas (NV. 791 a 800) da área Abismo Uivante.
 export const caveDragon: Creature = {
   id: "cave-dragon",
   name: "Dragão das Cavernas",

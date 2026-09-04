@@ -8,8 +8,6 @@ import { fileURLToPath } from "node:url";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
 const BASE = process.env.SMOKE_BASE ?? "http://localhost:3001";
-// Production only (no Next.js dev badge): npm run build && PORT=3001 npm run start
-// then CAPTURE_AS=Luna node scripts/capture-landing.mjs
 const OUT = join(ROOT, "public", "assets", "landing");
 const EMAIL = "landing@wizold.test";
 const CAPTURE_AS = process.env.CAPTURE_AS ?? "";

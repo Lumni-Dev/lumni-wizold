@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Basilisco (NV. 581 a 590) da área Ermo Cinza.
 export const basilisk: Creature = {
   id: "basilisk",
   name: "Basilisco",

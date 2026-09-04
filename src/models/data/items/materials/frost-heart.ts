@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Coração Gelado: despojo de caça, trocado por bronze no mercado.
 export const frostHeart: Item = {
   id: "frost-heart",
   name: "Coração Gelado",

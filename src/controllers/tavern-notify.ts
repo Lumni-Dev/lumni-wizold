@@ -107,7 +107,6 @@ export async function enableTavernPush(): Promise<NotificationPermission> {
       await subscribeOnServer(subscription);
     }
   } catch {
-    // O switch fica ligado: avisos locais e no painel seguem valendo.
   }
 
   return permission;
@@ -124,7 +123,6 @@ export async function disableTavernPush(): Promise<void> {
     await unsubscribeOnServer(endpoint);
     await subscription.unsubscribe();
   } catch {
-    // O switch já foi desligado neste aparelho.
   }
 }
 

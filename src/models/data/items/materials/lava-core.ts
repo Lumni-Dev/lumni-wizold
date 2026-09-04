@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Núcleo de Lava: despojo de caça, trocado por bronze no mercado.
 export const lavaCore: Item = {
   id: "lava-core",
   name: "Núcleo de Lava",

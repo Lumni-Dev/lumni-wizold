@@ -138,9 +138,9 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     title: "Como jogar",
     summary: "O ciclo de uma noite qualquer em Wizold.",
     lines: [
-      "Você começa sem nada equipado, com " +
+        "Você começa sem nada equipado, com " +
         STARTING_BRONZE +
-        " WCoins e dez poções de vida. Escolha um território: a barra enche como \"Caçando...\" e só no último batimento a luta é decidida no servidor; depois o replay conta golpe a golpe. Parar na aproximação cancela; parar no replay aplica o resultado.",
+        " WCoins, dez poções de vida e dez poções de fúria pequena. Escolha um território e, na lista, a presa: a barra enche como \"Caçando...\" e só no último batimento a luta é decidida no servidor; depois o replay conta golpe a golpe. Parar na aproximação cancela; parar no replay aplica o resultado. Trocar de criatura no meio da caçada não muda a luta em curso, só a próxima volta.",
       "Para encadear caçadas, treino, mina ou forja sem tocar em nada, ative a automação VIP nas configurações. Cada área tem dez criaturas de números fixos: você fica mais forte, elas não.",
       "O golpe crítico multiplica o dano por " +
         criticalMultiplierOf().toFixed(2).replace(".", ",") +
@@ -263,7 +263,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     lines: [
       ...bandLines(),
       "Cada território tem dez criaturas fixas, em degraus de dez níveis dentro da faixa.",
-      "A caçada sempre enfrenta a criatura mais forte que você já alcançou na área, não sorteia entre elas.",
+      "Na lista da área você marca a presa. A luta que já começou fica com o bicho dela; a próxima volta usa o que você marcou.",
       "Todo requisito de nível do jogo termina em 0 ou 5.",
     ],
   },
@@ -419,7 +419,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         " falas: o que veio antes a noite leva.",
       "Links de Wizold, Lumni, Twitch, YouTube, Instagram, Facebook, WhatsApp, TikTok e X passam e abrem numa aba nova; qualquer outro endereço é recusado.",
       "E-mail passa inteiro na fala, mas fica como texto: ninguém clica nele por engano.",
-      "Nomes de caçador e mesa passam por moderação na hora. A fala entra na mesa na hora; se a auditoria achar insulto, racismo ou pedofilia, vira Conteúdo impróprio.",
+      "Nomes de caçador e mesa passam por moderação na hora. A fala entra na mesa na hora; se a auditoria achar insulto, racismo ou pedofilia, vira Conteúdo impróprio. O aviso no aparelho nunca mostra a fala, só que chegou mensagem.",
       "Cada fala cabe em " +
         MESSAGE_MAX_LENGTH +
         " caracteres, e a mesa aberta aceita uma sua a cada " +
@@ -515,7 +515,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     lines: [
       "Só quem tem VIP liga e desliga os interruptores nas configurações.",
       AUTOMATIONS.map((entry) => entry.label + ": " + entry.effect).join(" "),
-      "Nada liga sozinho: cada interruptor precisa estar ativado nas configurações. Trabalho pausado por falta de recurso retoma quando a chave daquele job estiver ligada. Na lua cheia a fúria automática não bebe poção: o céu já mantém o Modo Fúria.",
+      "Nada liga sozinho: cada interruptor precisa estar ativado nas configurações. Trabalho pausado por falta de recurso retoma quando a chave daquele job estiver ligada. A fúria automática bebe na caçada sem precisar da caçada automática; na lua cheia ela não bebe, o céu já mantém o Modo Fúria.",
     ],
   },
   {

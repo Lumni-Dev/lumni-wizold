@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Pégaso (NV. 941 a 950) da área Clareira Branca.
 export const pegasus: Creature = {
   id: "pegasus",
   name: "Pégaso",

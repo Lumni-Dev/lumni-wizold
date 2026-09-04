@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Dente de Ogro: despojo de caça, trocado por bronze no mercado.
 export const ogreTooth: Item = {
   id: "ogre-tooth",
   name: "Dente de Ogro",

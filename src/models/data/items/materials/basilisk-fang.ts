@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Presa de Basilisco: despojo de caça, trocado por bronze no mercado.
 export const basiliskFang: Item = {
   id: "basilisk-fang",
   name: "Presa de Basilisco",

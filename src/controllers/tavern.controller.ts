@@ -431,7 +431,6 @@ export function touchMember(
   });
 }
 
-/** Newest other-person line in a table the viewer sits at, or empty. */
 export function latestSeatedChatAt(rooms: RoomSummary[], selfId: string): string {
   let latest = "";
   for (const { room, isMember } of rooms) {

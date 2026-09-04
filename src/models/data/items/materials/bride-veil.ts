@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Véu da Noiva: despojo de caça, trocado por bronze no mercado.
 export const brideVeil: Item = {
   id: "bride-veil",
   name: "Véu da Noiva",

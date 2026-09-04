@@ -7,6 +7,7 @@ import {
   listPushSubscriptionsForUsers,
   userIdsForCharacters,
 } from "@/models/repositories/server/push.store";
+import { TAVERN_NOTICE_BODY } from "@/shared/constants/moderation";
 import { publishTavernRevision } from "./tavern-bus";
 import { bumpTavernRevision } from "./tavern-board";
 import { sendWebPush } from "./web-push";
@@ -16,7 +17,6 @@ export interface TavernMessagePush {
   roomName: string;
   authorCharacterId: string;
   authorName: string;
-  text: string;
   at: string;
 }
 
@@ -62,7 +62,7 @@ async function notifyTavernMessagePush(
 
   const payload = {
     title: push.authorName + " · " + push.roomName,
-    body: push.text,
+    body: TAVERN_NOTICE_BODY,
     url: "/tavern",
     roomName: push.roomName,
     at: push.at,

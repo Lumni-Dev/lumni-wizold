@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Lobisomem Rival (NV. 851 a 860) da área Castelo Escarlate.
 export const rivalWerewolf: Creature = {
   id: "rival-werewolf",
   name: "Lobisomem Rival",

@@ -22,6 +22,7 @@ interface ActivityRow {
   resume_enhancement: number | null;
   enhancement: number | null;
   beat: number;
+  laps: number | null;
   started_at: Date | string;
   cooldown_until: Date | string | null;
 }
@@ -33,6 +34,8 @@ function rowToActivity(row: ActivityRow | undefined): Activity | null {
   if (row.enhancement !== null && row.enhancement !== undefined) activity.enhancement = int(row.enhancement);
   if (row.paused) activity.paused = true;
   if (row.beat > 0) activity.beat = int(row.beat);
+  const laps = int(row.laps);
+  if (laps >= 1) activity.laps = laps;
   const cooldownUntil = stamp(row.cooldown_until);
   if (cooldownUntil && Date.parse(cooldownUntil) > Date.now()) activity.cooldownUntil = cooldownUntil;
   if (row.resume_kind && isActivityKind(row.resume_kind)) {
@@ -51,7 +54,7 @@ export async function readActivity(
 ): Promise<{ activity: Activity | null; startedAt: string | null }> {
   const found = await client.query(
     `select kind, target_id, paused, resume_kind, resume_target_id, resume_enhancement,
-            enhancement, beat, started_at, cooldown_until
+            enhancement, beat, laps, started_at, cooldown_until
      from activities where character_id = $1`,
     [characterId],
   );
@@ -63,8 +66,16 @@ export async function readActivity(
 }
 const iso = (value: unknown): string =>
   value instanceof Date ? value.toISOString() : String(value ?? new Date().toISOString());
-const stamp = (value: unknown): string | undefined =>
-  value instanceof Date ? value.toISOString() : undefined;
+const stamp = (value: unknown): string | undefined => {
+  if (value instanceof Date && Number.isFinite(value.getTime())) return value.toISOString();
+  if (typeof value === "string" && value.length > 0) {
+    const parsed = Date.parse(value);
+    if (Number.isFinite(parsed)) return new Date(parsed).toISOString();
+  }
+  return undefined;
+};
+const textId = (value: unknown): string | undefined =>
+  typeof value === "string" && value.length > 0 ? value : undefined;
 interface CharacterRow {
   id: string;
   user_id: string;
@@ -104,7 +115,7 @@ function rowToCharacter(row: CharacterRow): Character {
     renamedAt: stamp(row.renamed_at),
     furyUntil: stamp(row.fury_until),
     vipUntil: stamp(row.vip_until),
-    vipSubscriptionId: stamp(row.vip_subscription_id),
+    vipSubscriptionId: textId(row.vip_subscription_id),
     vipCanceling: row.vip_canceling === true,
   };
 }
@@ -171,7 +182,7 @@ export async function loadGame(
   );
   const activityFound = await client.query(
     `select kind, target_id, paused, resume_kind, resume_target_id, resume_enhancement,
-            enhancement, beat, started_at, cooldown_until
+            enhancement, beat, laps, started_at, cooldown_until
      from activities where character_id = $1`,
     [characterId],
   );
@@ -684,6 +695,7 @@ export async function updateActivity(
     resumeEnhancement?: number | null;
     startedAt?: string | null;
     beat?: number;
+    laps?: number | null;
     cooldownUntil?: string | null;
   } | null,
 ): Promise<void> {
@@ -694,9 +706,9 @@ export async function updateActivity(
   await client.query(
     `insert into activities
        (character_id, kind, target_id, enhancement, paused, resume_kind, resume_target_id,
-        resume_enhancement, beat, started_at, cooldown_until)
-     values ($1, $2::activity_kind, $3, $4, $5, $6::activity_kind, $7, $8, $9,
-             coalesce($10::timestamptz, now()), $11::timestamptz)
+        resume_enhancement, beat, laps, started_at, cooldown_until)
+     values ($1, $2::activity_kind, $3, $4, $5, $6::activity_kind, $7, $8, $9, $10,
+             coalesce($11::timestamptz, now()), $12::timestamptz)
      on conflict (character_id) do update set
        kind = $2::activity_kind,
        target_id = $3,
@@ -706,8 +718,9 @@ export async function updateActivity(
        resume_target_id = $7,
        resume_enhancement = $8,
        beat = $9,
+       laps = $10,
        started_at = coalesce(
-         $10::timestamptz,
+         $11::timestamptz,
          case
            when activities.kind is not distinct from $2::activity_kind
             and activities.target_id is not distinct from $3
@@ -715,7 +728,7 @@ export async function updateActivity(
          end,
          now()
        ),
-       cooldown_until = $11::timestamptz`,
+       cooldown_until = $12::timestamptz`,
     [
       characterId,
       activity.kind,
@@ -726,6 +739,7 @@ export async function updateActivity(
       activity.resumeTargetId ?? null,
       activity.resumeEnhancement ?? null,
       activity.beat ?? 0,
+      activity.laps && activity.laps > 0 ? activity.laps : null,
       activity.startedAt ?? null,
       activity.cooldownUntil ?? null,
     ],
@@ -735,12 +749,20 @@ export async function updateActivity(
 export async function updateActivityProgress(
   client: PoolClient,
   characterId: string,
-  patch: { beat: number; cooldownUntil?: string | null },
+  patch: { beat: number; cooldownUntil?: string | null; laps?: number | null },
 ): Promise<boolean> {
-  const updated = await client.query(
-    `update activities set beat = $2, cooldown_until = $3::timestamptz where character_id = $1`,
-    [characterId, patch.beat, patch.cooldownUntil ?? null],
-  );
+  const laps = patch.laps;
+  const updated =
+    laps === undefined
+      ? await client.query(
+          `update activities set beat = $2, cooldown_until = $3::timestamptz where character_id = $1`,
+          [characterId, patch.beat, patch.cooldownUntil ?? null],
+        )
+      : await client.query(
+          `update activities set beat = $2, cooldown_until = $3::timestamptz, laps = $4
+           where character_id = $1`,
+          [characterId, patch.beat, patch.cooldownUntil ?? null, laps != null && laps > 0 ? laps : null],
+        );
   return (updated.rowCount ?? 0) > 0;
 }
 export async function setPetRestCollectedAt(

@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Gárgula (NV. 671 a 680) da área Necrópole de Pedra.
 export const gargoyle: Creature = {
   id: "gargoyle",
   name: "Gárgula",

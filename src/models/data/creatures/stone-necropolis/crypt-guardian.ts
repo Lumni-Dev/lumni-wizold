@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Guardião da Cripta (NV. 691 a 700) da área Necrópole de Pedra.
 export const cryptGuardian: Creature = {
   id: "crypt-guardian",
   name: "Guardião da Cripta",

@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Grimório de Sangue: despojo de caça, trocado por bronze no mercado.
 export const bloodGrimoire: Item = {
   id: "blood-grimoire",
   name: "Grimório de Sangue",

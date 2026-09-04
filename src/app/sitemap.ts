@@ -36,7 +36,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       client.release();
     }
   } catch {
-    // Build and offline dev still ship the static routes.
   }
 
   return entries;

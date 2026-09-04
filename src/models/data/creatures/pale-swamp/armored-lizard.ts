@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Lagarto Blindado (NV. 341 a 350) da área Pântano Pálido.
 export const armoredLizard: Creature = {
   id: "armored-lizard",
   name: "Lagarto Blindado",

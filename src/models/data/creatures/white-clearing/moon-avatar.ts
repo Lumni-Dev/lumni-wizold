@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Avatar da Lua (NV. 991 a 1000) da área Clareira Branca.
 export const moonAvatar: Creature = {
   id: "moon-avatar",
   name: "Avatar da Lua",

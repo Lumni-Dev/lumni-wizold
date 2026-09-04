@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Capitão da Ordem (NV. 481 a 490) da área Estrada dos Caçadores.
 export const orderCaptain: Creature = {
   id: "order-captain",
   name: "Capitão da Ordem",

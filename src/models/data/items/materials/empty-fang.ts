@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Presa Vazia: despojo de caça, trocado por bronze no mercado.
 export const emptyFang: Item = {
   id: "empty-fang",
   name: "Presa Vazia",

@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Coroa do Abismo: despojo de caça, trocado por bronze no mercado.
 export const abyssCrown: Item = {
   id: "abyss-crown",
   name: "Coroa do Abismo",

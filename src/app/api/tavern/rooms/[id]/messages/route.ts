@@ -21,17 +21,15 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       const last = room?.messages[room.messages.length - 1];
       await commitTavernWrite(context.client, state, result.state, context.tavern.hashes);
       after(() => {
-        if (room && last) {
-          void deliverTavernMessagePush({
-            roomId: room.id,
-            roomName: room.name,
-            authorCharacterId: context.identity.id,
-            authorName: context.identity.name,
-            text: last.text,
-            at: last.at,
-          });
-        }
-        if (room && last && last.authorId === context.identity.id) {
+        if (!room || !last) return;
+        void deliverTavernMessagePush({
+          roomId: room.id,
+          roomName: room.name,
+          authorCharacterId: context.identity.id,
+          authorName: context.identity.name,
+          at: last.at,
+        });
+        if (last.authorId === context.identity.id) {
           void reviewChatMessageAfterSend({
             userId: context.userId,
             roomId: room.id,

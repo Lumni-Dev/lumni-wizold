@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Cavaleiro Escarlate (NV. 831 a 840) da área Castelo Escarlate.
 export const scarletKnight: Creature = {
   id: "scarlet-knight",
   name: "Cavaleiro Escarlate",

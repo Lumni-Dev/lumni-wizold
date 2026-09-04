@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Amuleto de Prata: despojo de caça, trocado por bronze no mercado.
 export const silverCharm: Item = {
   id: "silver-charm",
   name: "Amuleto de Prata",

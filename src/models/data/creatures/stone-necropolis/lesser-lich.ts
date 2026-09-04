@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Lich Menor (NV. 681 a 690) da área Necrópole de Pedra.
 export const lesserLich: Creature = {
   id: "lesser-lich",
   name: "Lich Menor",

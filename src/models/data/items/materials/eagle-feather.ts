@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Pena de Águia: despojo de caça, trocado por bronze no mercado.
 export const eagleFeather: Item = {
   id: "eagle-feather",
   name: "Pena de Águia",

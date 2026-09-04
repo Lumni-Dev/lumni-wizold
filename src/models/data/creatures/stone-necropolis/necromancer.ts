@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Necromante (NV. 661 a 670) da área Necrópole de Pedra.
 export const necromancer: Creature = {
   id: "necromancer",
   name: "Necromante",

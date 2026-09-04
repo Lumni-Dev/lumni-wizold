@@ -83,8 +83,9 @@ export function deriveStats(
   equipment: Equipment,
   pet: Pet | null = null,
   moonPhase?: MoonPhaseKey,
+  now = Date.now(),
 ): DerivedStats {
-  const furyActive = isFuryActive(character, moonPhase);
+  const furyActive = isFuryActive(character, moonPhase, now);
   return deriveStatsOf(
     { ...character, furyActive, petAttributes: petBonus(pet) },
     equipment,

@@ -166,24 +166,35 @@ export async function maybePruneStale(client: PoolClient): Promise<boolean> {
   const now = Date.now();
   if (now - lastPruneAt < PRUNE_INTERVAL_MS) return false;
   lastPruneAt = now;
-  await pruneStale(client);
-  return true;
+  return pruneStale(client);
 }
 
 export async function lockTavern(client: PoolClient): Promise<void> {
   await client.query("select pg_advisory_xact_lock($1)", [TAVERN_LOCK]);
 }
-export async function pruneStale(client: PoolClient): Promise<void> {
-  await client.query(
+export async function pruneStale(client: PoolClient): Promise<boolean> {
+  const members = await client.query(
     `delete from tavern_members using tavern_rooms
      where tavern_members.room_id = tavern_rooms.id
        and tavern_rooms.private_for is null
        and tavern_members.last_seen < now() - make_interval(secs => $1)`,
     [MEMBER_TIMEOUT_MS / 1000],
   );
-  await client.query(`delete from tavern_rooms
+  const rooms = await client.query(`delete from tavern_rooms
      where private_for is null
        and not exists (select 1 from tavern_members where room_id = tavern_rooms.id)`);
+  const extras = await client.query(
+    `delete from tavern_messages
+     where id in (
+       select id from (
+         select id, row_number() over (partition by room_id order by sent_at desc, id desc) as rn
+         from tavern_messages
+       ) ranked
+       where rn > $1
+     )`,
+    [MAX_ROOM_MESSAGES],
+  );
+  return (members.rowCount ?? 0) + (rooms.rowCount ?? 0) + (extras.rowCount ?? 0) > 0;
 }
 export interface LoadedTavern {
   state: TavernState;

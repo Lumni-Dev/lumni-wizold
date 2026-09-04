@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Behemoth Jovem (NV. 761 a 770) da área Abismo Uivante.
 export const youngBehemoth: Creature = {
   id: "young-behemoth",
   name: "Behemoth Jovem",

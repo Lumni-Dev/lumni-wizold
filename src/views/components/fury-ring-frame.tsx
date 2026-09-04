@@ -11,14 +11,16 @@ type FuryRingFrameProps<T extends ElementType = "div"> = {
   className?: string;
   fillClassName?: string;
   contentAlign?: FuryRingContentAlign;
+  animationKey?: string;
   as?: T;
-} & Omit<ComponentPropsWithoutRef<T>, "as" | "children" | "className">;
+} & Omit<ComponentPropsWithoutRef<T>, "as" | "children" | "className" | "animationKey">;
 
 export function FuryRingFrame<T extends ElementType = "div">({
   children,
   className,
   fillClassName,
   contentAlign = "center",
+  animationKey,
   as,
   ...rest
 }: FuryRingFrameProps<T>) {
@@ -26,7 +28,7 @@ export function FuryRingFrame<T extends ElementType = "div">({
 
   return (
     <Tag className={cn("fury-ring-frame", FURY_RING_RADIUS, className)} {...rest}>
-      <div className="fury-ring-frame__gradient">
+      <div key={animationKey ?? "ring"} className="fury-ring-frame__gradient">
         <div
           className={cn("fury-ring-frame__fill", FURY_RING_INNER_RADIUS, FURY_RING_FILL, fillClassName)}
         >

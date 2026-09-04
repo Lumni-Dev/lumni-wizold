@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Gato Selvagem (NV. 161 a 170) da área Mata do Orvalho.
 export const wildcat: Creature = {
   id: "wildcat",
   name: "Gato Selvagem",

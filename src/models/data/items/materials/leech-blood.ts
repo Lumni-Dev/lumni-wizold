@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Sangue de Sanguessuga: despojo de caça, trocado por bronze no mercado.
 export const leechBlood: Item = {
   id: "leech-blood",
   name: "Sangue de Sanguessuga",

@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Escama de Naga: despojo de caça, trocado por bronze no mercado.
 export const nagaScale: Item = {
   id: "naga-scale",
   name: "Escama de Naga",

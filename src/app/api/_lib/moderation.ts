@@ -134,7 +134,6 @@ async function callModeration(text: string, context: ModerationContext): Promise
   }
 }
 
-/** Returns a player-facing refusal message, or null when the text may proceed. */
 export async function moderationRefusal(
   client: PoolClient,
   userId: string,

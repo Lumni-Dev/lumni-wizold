@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Morcego Gigante (NV. 811 a 820) da área Castelo Escarlate.
 export const giantBat: Creature = {
   id: "giant-bat",
   name: "Morcego Gigante",

@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Placa Amaldiçoada: despojo de caça, trocado por bronze no mercado.
 export const cursedPlate: Item = {
   id: "cursed-plate",
   name: "Placa Amaldiçoada",

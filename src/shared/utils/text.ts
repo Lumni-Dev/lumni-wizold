@@ -18,7 +18,6 @@ export function normalizeText(value: string): string {
     .trim();
 }
 
-/** Host suffixes allowed in tavern chat (subdomains included). */
 const ALLOWED_LINK_SUFFIXES = [
   "lumni.dev.br",
   "wizold.com.br",
@@ -73,7 +72,6 @@ function isAllowedLinkHost(host: string): boolean {
   );
 }
 
-/** Blanks out e-mail addresses, keeping every index, so a host inside one is never read as a link. */
 function withoutEmails(value: string): string {
   EMAIL.lastIndex = 0;
   return value.replace(EMAIL, (match) => " ".repeat(match.length));
@@ -91,7 +89,6 @@ function linkTokensOf(value: string): string[] {
   return [...tokens];
 }
 
-/** True when the text carries a link outside the tavern allowlist. */
 export function containsLink(value: string): boolean {
   return linkTokensOf(value).some((token) => !isAllowedLinkHost(hostOf(token)));
 }
@@ -132,7 +129,6 @@ function linkSpansOf(value: string): { start: number; end: number; raw: string }
   return picked;
 }
 
-/** Splits tavern text into plain runs and allowed links, ready to render. */
 export function splitChatLinks(value: string): ChatTextPart[] {
   const spans = linkSpansOf(value);
   if (spans.length === 0) return [{ kind: "text", value }];

@@ -32,7 +32,6 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       client.release();
     }
   } catch {
-    // Offline build or missing database: fall back to a generic profile card.
   }
 
   return pageMetadata({

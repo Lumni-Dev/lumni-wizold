@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Puma da Serra (NV. 231 a 240) da área Serra das Brumas.
 export const ridgePuma: Creature = {
   id: "ridge-puma",
   name: "Puma da Serra",

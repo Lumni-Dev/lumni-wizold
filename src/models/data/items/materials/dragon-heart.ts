@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Coração de Dragão: despojo de caça, trocado por bronze no mercado.
 export const dragonHeart: Item = {
   id: "dragon-heart",
   name: "Coração de Dragão",

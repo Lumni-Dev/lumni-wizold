@@ -42,6 +42,11 @@ const client = new pg.Client({
 });
 await client.connect();
 const rows = async (sql, params) => (await client.query(sql, params)).rows;
+await client.query("delete from users where email in ($1, $2, $3)", [
+  EMAIL,
+  "rival@wizold.test",
+  "packmate@wizold.test",
+]);
 const anonymous = await call("POST", "/api/state");
 check("sem sessão é 401", anonymous.status === 401);
 const warm = await call("GET", "/api/cron/warm");
@@ -81,8 +86,6 @@ const badName = await call("POST", "/api/characters", { name: "dois nomes", gend
 check("nome com espaço recusa", badName.payload?.ok === false);
 const created = await call("POST", "/api/characters", { name: "Fumaca", gender: "female" });
 check("personagem criado", created.payload?.ok === true, created.payload?.message);
-// Nome único: uma segunda conta não nasce com o nome que outra já carrega, e a
-// checagem ignora maiúsculas porque "Fumaca" e "FUMACA" seriam linhas distintas.
 const rivalId = "usr_" + Date.now().toString(36) + "_riv" + randomBytes(2).toString("hex");
 await client.query("insert into users (id, email, birth_date) values ($1, $2, $3)", [
   rivalId,
@@ -123,13 +126,23 @@ const stockFury = await call("POST", "/api/market/buy", {
   itemId: "rage-potion-small",
   quantity: 2,
 });
-check("compra poção de fúria", stockFury.payload?.ok === true, stockFury.payload?.message);
+check("sem fundos a loja recusa", stockFury.payload?.ok === false, stockFury.payload?.message);
 const raged = await call("POST", "/api/inventory/consume", { itemId: "rage-potion-small" });
 check("poção de fúria acende a fera", raged.payload?.ok === true, raged.payload?.message);
 const afterFury = (await call("POST", "/api/state")).payload?.data;
 check("fúria fica marcada no personagem", typeof afterFury?.character?.furyUntil === "string");
 const ragedAgain = await call("POST", "/api/inventory/consume", { itemId: "rage-potion-small" });
-check("em fúria recusa nova poção", ragedAgain.payload?.ok === false, ragedAgain.payload?.message);
+check(
+  "beber de novo reinicia o relógio",
+  ragedAgain.payload?.ok === true,
+  ragedAgain.payload?.message,
+);
+const afterRecast = (await call("POST", "/api/state")).payload?.data;
+check(
+  "o novo prazo não fica atrás do anterior",
+  typeof afterRecast?.character?.furyUntil === "string" &&
+    Date.parse(afterRecast.character.furyUntil) >= Date.parse(afterFury.character.furyUntil),
+);
 const staleCollect = await call("PATCH", "/api/character/rest");
 check(
   "atividade derruba o repouso no servidor",
@@ -183,8 +196,6 @@ check(
   seat?.room?.messages?.some((m) => m.text === "Uivo de teste") === true,
 );
 
-// Convite de matilha, matilha mútua e permissão de DM: A convida, B aceita, viram
-// companheiros e só então a mesa reservada abre. Sair tira os dois um do outro.
 const aId = state1?.character?.id;
 const mateUserId = "usr_" + Date.now().toString(36) + "_pk" + randomBytes(2).toString("hex");
 await client.query("insert into users (id, email, birth_date) values ($1, $2, $3)", [

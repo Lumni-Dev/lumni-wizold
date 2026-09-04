@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Enxofre: despojo de caça, trocado por bronze no mercado.
 export const brimstone: Item = {
   id: "brimstone",
   name: "Enxofre",

@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Feiticeira de Sangue (NV. 841 a 850) da área Castelo Escarlate.
 export const bloodSorceress: Creature = {
   id: "blood-sorceress",
   name: "Feiticeira de Sangue",

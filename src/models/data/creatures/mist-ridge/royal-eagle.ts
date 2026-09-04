@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Águia Real (NV. 211 a 220) da área Serra das Brumas.
 export const royalEagle: Creature = {
   id: "royal-eagle",
   name: "Águia Real",

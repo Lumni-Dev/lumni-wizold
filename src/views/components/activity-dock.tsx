@@ -3,17 +3,20 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
-import { activityRuntimeStore } from "@/controllers/activity-runtime";
-import { activityMirrorStore } from "@/controllers/activity-mirror.store";
 import { findForgePiece, listMining } from "@/controllers/forge.controller";
 import { listTerritories, resolveHuntCreatureId } from "@/controllers/hunt.controller";
 import { useGame } from "@/controllers/game.context";
+import { useVisibleActivity } from "@/controllers/use-visible-activity";
 import { petTrainingView } from "@/controllers/pet.controller";
 import { listAttributeProgress, listExercises } from "@/controllers/training.controller";
 import { dockRepository } from "@/models/repositories/dock.repository";
-import { loadHuntSelection } from "@/models/repositories/hunt-selection.repository";
+import {
+  huntSelectionServerSnapshot,
+  huntSelectionSnapshot,
+  subscribeHuntSelection,
+} from "@/models/repositories/hunt-selection.repository";
 import { canPetFight, petLevelOf, petMaxEnergy } from "@/models/rules/pet";
-import { preyBarCurrent } from "../presenters/hunt.presenter";
+import { huntPreyView, preyBarCurrent } from "../presenters/hunt.presenter";
 import {
   CYCLE_OPTOUT_SECS,
   FORGE_TICKS,
@@ -34,21 +37,8 @@ import { useShake } from "./use-shake";
 
 export function ActivityDock() {
   const pathname = usePathname();
-  const { activity, state, character, stats, pet, setActivity } = useGame();
-  const runtime = useSyncExternalStore(
-    activityRuntimeStore.subscribe,
-    activityRuntimeStore.snapshot,
-    activityRuntimeStore.serverSnapshot,
-  );
-  const mirror = useSyncExternalStore(
-    activityMirrorStore.subscribe,
-    activityMirrorStore.snapshot,
-    activityMirrorStore.serverSnapshot,
-  );
-  const running =
-    mirror.mirroring && mirror.activity !== null ? mirror.activity : activity;
-  const dockRuntime =
-    mirror.mirroring && mirror.runtime !== null ? mirror.runtime : runtime;
+  const { state, character, stats, pet, setActivity } = useGame();
+  const { activity: running, runtime: dockRuntime } = useVisibleActivity();
   const dock = dockRuntime.dock;
   const stop = useCallback(() => {
     if (running) setActivity(null);
@@ -59,41 +49,50 @@ export function ActivityDock() {
     dockRepository.serverSnapshot,
   );
 
+  const huntSelection = useSyncExternalStore(
+    subscribeHuntSelection,
+    huntSelectionSnapshot,
+    huntSelectionServerSnapshot,
+  );
+
   const huntView = useMemo(() => {
     const huntRt = dockRuntime.hunt;
     if (!huntRt || running?.kind !== "hunt" || running.paused) return null;
     const territory = listTerritories(state).find((row) => row.territory.id === huntRt.territoryId);
     if (!territory) return null;
 
-    const selection = loadHuntSelection();
     const selectedId = resolveHuntCreatureId(
       territory.creatures,
-      selection[huntRt.territoryId],
+      huntSelection[huntRt.territoryId],
     );
     const beat = huntRt.beat;
     const script = huntRt.script;
     const pending = huntRt.pending;
     const cooldown = huntRt.cooldown;
-    const lastFoe = huntRt.lastFoe;
     const line =
       beat > 0 && script.length > 0 ? script[Math.min(beat, script.length) - 1] : null;
     const replaying = pending !== null && line !== null;
     const filling = pending !== null && line === null;
-    const shownFoe =
-      (replaying || filling) && pending
-        ? pending.creature
-        : lastFoe
-          ? { name: lastFoe.name, health: lastFoe.health }
-          : (territory.creatures.find((creature) => creature.id === selectedId) ??
-            territory.prey ??
-            territory.creatures[0]);
+    const selectedCreature =
+      territory.creatures.find((creature) => creature.id === selectedId) ??
+      territory.prey ??
+      territory.creatures[0] ??
+      null;
+    const preyView = huntPreyView({
+      replaying,
+      filling,
+      pending,
+      lastFoe: huntRt.lastFoe ?? null,
+      selected: selectedCreature,
+    });
+    const shownFoe = preyView.foe;
     const monsterMax = Math.max(1, shownFoe?.health ?? 1);
     const monsterCurrent = preyBarCurrent(
       monsterMax,
       line,
       replaying,
       filling,
-      pending?.combat ?? lastFoe?.combat ?? null,
+      preyView.combat,
     );
     const monsterStatus = replaying ? "Atacando" : filling ? "Preparando" : "Aguardando";
     const opting = cooldown !== null;
@@ -127,7 +126,7 @@ export function ActivityDock() {
           }
         : null,
     };
-  }, [character, pet, running, dockRuntime.hunt, state, stats]);
+  }, [character, huntSelection, pet, running, dockRuntime.hunt, state, stats]);
 
   const trainView = useMemo(() => {
     const trainRt = dockRuntime.train;

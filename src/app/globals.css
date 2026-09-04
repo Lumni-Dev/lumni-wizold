@@ -396,6 +396,9 @@ button:not(:disabled) {
 }
 
 @keyframes fury-ring-rotate {
+  from {
+    --fury-ring-angle: 0deg;
+  }
   to {
     --fury-ring-angle: 360deg;
   }

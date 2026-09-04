@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Pele de Lobo: despojo de caça, trocado por bronze no mercado.
 export const wolfPelt: Item = {
   id: "wolf-pelt",
   name: "Pele de Lobo",

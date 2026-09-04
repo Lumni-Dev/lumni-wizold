@@ -20,6 +20,7 @@ export interface ActivityDockView {
 }
 
 export interface HuntFoeSnapshot {
+  creatureId: string;
   name: string;
   health: number;
   combat: CombatOutcome;

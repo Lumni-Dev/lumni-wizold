@@ -7,6 +7,7 @@ export interface Activity {
   resume?: { kind: ActivityKind; id?: string; enhancement?: number };
   paused?: boolean;
   beat?: number;
+  laps?: number;
   cooldownUntil?: string;
 }
 
@@ -71,6 +72,8 @@ export function isActivity(data: unknown): data is Activity {
     (activity.enhancement === undefined || typeof activity.enhancement === "number") &&
     (activity.paused === undefined || typeof activity.paused === "boolean") &&
     (activity.beat === undefined || (typeof activity.beat === "number" && Number.isFinite(activity.beat))) &&
+    (activity.laps === undefined ||
+      (typeof activity.laps === "number" && Number.isFinite(activity.laps) && activity.laps >= 1)) &&
     (activity.cooldownUntil === undefined || typeof activity.cooldownUntil === "string") &&
     (activity.resume === undefined || isResume(activity.resume))
   );

@@ -12,6 +12,8 @@ import {
   nameTaken,
 } from "@/models/repositories/server/game.store";
 import { asText, bad, readBody, refuseAbuse, reply, sessionIsLive } from "../_lib/api";
+import { bumpTavernRevision } from "../_lib/tavern-board";
+import { publishTavernRevision } from "../_lib/tavern-bus";
 import { sendDepartureNoticeEmail, sendFarewellEmail } from "../_lib/mail";
 import { moderationRefusal } from "../_lib/moderation";
 import { rateLimit } from "../_lib/rate-limit";
@@ -67,8 +69,13 @@ export async function DELETE(request: Request) {
       );
       const row = found.rows[0];
       if (row?.character_id) {
-        await client.query("delete from tavern_messages where author_id = $1", [row.character_id]);
+        const swept = await client.query("delete from tavern_messages where author_id = $1", [
+          row.character_id,
+        ]);
         await client.query("delete from pack_mates where mate_id = $1", [row.character_id]);
+        if ((swept.rowCount ?? 0) > 0) {
+          publishTavernRevision(await bumpTavernRevision(client));
+        }
       }
       const testAccount = !row?.email || String(row.email).endsWith("@wizold.test");
       if (!testAccount) {

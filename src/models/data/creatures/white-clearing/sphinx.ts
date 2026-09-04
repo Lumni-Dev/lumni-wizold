@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Esfinge (NV. 951 a 960) da área Clareira Branca.
 export const sphinx: Creature = {
   id: "sphinx",
   name: "Esfinge",

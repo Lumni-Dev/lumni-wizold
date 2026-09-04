@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Pele de Hiena: despojo de caça, trocado por bronze no mercado.
 export const hyenaPelt: Item = {
   id: "hyena-pelt",
   name: "Pele de Hiena",

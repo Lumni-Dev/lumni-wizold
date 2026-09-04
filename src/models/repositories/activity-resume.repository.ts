@@ -17,6 +17,7 @@ export function stashActivityResume(activity: Activity | null): void {
       id: activity.id ?? null,
       enhancement: activity.enhancement ?? null,
       beat: activity.beat ?? 0,
+      laps: activity.laps ?? null,
       cooldownUntil: activity.cooldownUntil ?? null,
     }),
   );
@@ -62,8 +63,10 @@ export function mergeActivityResume(server: Activity | null): Activity | null {
   const merged: Activity = {
     ...server,
     beat: Math.max(server.beat ?? 0, stashed.beat ?? 0),
+    laps: stashed.laps ?? server.laps,
     cooldownUntil: server.cooldownUntil ?? stashed.cooldownUntil ?? undefined,
   };
+  if (!merged.laps) delete merged.laps;
   stashActivityResume(merged);
   return merged;
 }

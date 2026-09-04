@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Espólio de Saqueador: despojo de caça, trocado por bronze no mercado.
 export const raiderLoot: Item = {
   id: "raider-loot",
   name: "Espólio de Saqueador",

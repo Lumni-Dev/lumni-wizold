@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Cão do Inferno (NV. 711 a 720) da área Abismo Uivante.
 export const hellhound: Creature = {
   id: "hellhound",
   name: "Cão do Inferno",

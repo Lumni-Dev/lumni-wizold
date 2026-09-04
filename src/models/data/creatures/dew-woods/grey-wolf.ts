@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Lobo Cinzento (NV. 121 a 130) da área Mata do Orvalho.
 export const greyWolf: Creature = {
   id: "grey-wolf",
   name: "Lobo Cinzento",

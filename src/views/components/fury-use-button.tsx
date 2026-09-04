@@ -1,44 +1,60 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useGame } from "@/controllers/game.context";
-import { furyRemainingMs } from "@/models/rules/moon";
+import { playClick } from "@/controllers/sound";
+import { CONTROL_HEIGHT } from "@/shared/constants/ui";
+import { cn } from "@/shared/utils/class-names";
 import { formatFuryClock } from "@/shared/utils/format";
 import { Button } from "./button";
 import { FuryRingFrame } from "./fury-ring-frame";
+import { Tooltip } from "./tooltip";
+import { useFuryClock } from "./use-fury-clock";
 
-export function FuryUseButton({ onClick }: { onClick: () => void }) {
-  const { character, moon } = useGame();
-  const [now, setNow] = useState(() => Date.now());
+export function FuryUseButton({
+  onClick,
+  fullWidth = false,
+}: {
+  onClick: () => void;
+  fullWidth?: boolean;
+}) {
+  const { remaining, active, sky, furyUntil } = useFuryClock();
 
-  const remaining = character ? furyRemainingMs(character, moon.phase.key, now) : 0;
-  const furyActive = remaining > 0;
-
-  useEffect(() => {
-    if (!furyActive) return undefined;
-    const timer = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(timer);
-  }, [furyActive]);
-
-  if (!furyActive) {
+  if (!active) {
     return (
-      <Button variant="primary" onClick={onClick}>
+      <Button variant="primary" fullWidth={fullWidth} onClick={onClick}>
         Beber
       </Button>
     );
   }
 
+  const label = sky
+    ? "A lua cheia já mantém você em fúria."
+    : "Beber de novo reinicia o relógio.";
+
   return (
-    <FuryRingFrame
-      as="button"
-      type="button"
-      contentAlign="center"
-      disabled
-      aria-disabled
-      className="inline-block cursor-default border-0 bg-transparent p-0 font-[inherit]"
-      fillClassName="min-h-8"
-    >
-      <span className="px-3 font-mono text-[11px] text-ink">{formatFuryClock(remaining)}</span>
-    </FuryRingFrame>
+    <Tooltip label={label} block={fullWidth}>
+      <FuryRingFrame
+        as="button"
+        type="button"
+        animationKey={furyUntil || "sky"}
+        contentAlign="center"
+        disabled={sky}
+        aria-disabled={sky || undefined}
+        aria-label={sky ? label : "Beber e reiniciar a fúria"}
+        onClick={() => {
+          if (sky) return;
+          playClick();
+          onClick();
+        }}
+        className={cn(
+          CONTROL_HEIGHT,
+          "cursor-default border-0 bg-transparent p-0 font-[inherit]",
+          fullWidth ? "block w-full" : "inline-block",
+          !sky && "cursor-pointer",
+        )}
+        fillClassName={cn("h-full", fullWidth ? "w-full" : "min-w-[4.5rem]")}
+      >
+        <span className="px-3 font-mono text-[11px] text-ink">{formatFuryClock(remaining)}</span>
+      </FuryRingFrame>
+    </Tooltip>
   );
 }

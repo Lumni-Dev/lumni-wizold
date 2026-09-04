@@ -46,6 +46,61 @@ export function preyBarCurrent(
   return Math.max(0, Math.min(maximum, last?.creatureHealth ?? maximum));
 }
 
+export interface HuntPreyFoe {
+  id: string;
+  name: string;
+  health: number;
+}
+
+export interface HuntLastFoe {
+  creatureId?: string;
+  name: string;
+  health: number;
+  combat: CombatOutcome;
+}
+
+export interface HuntPreyInput {
+  replaying: boolean;
+  filling: boolean;
+  pending: { creature: HuntPreyFoe; combat: CombatOutcome } | null;
+  lastFoe: HuntLastFoe | null;
+  selected: HuntPreyFoe | null;
+}
+
+export interface HuntPreyView {
+  foe: HuntPreyFoe | null;
+  combat: CombatOutcome | null;
+}
+
+function lastFoeMatches(last: HuntLastFoe, selected: HuntPreyFoe): boolean {
+  if (last.creatureId) return last.creatureId === selected.id;
+  return last.name === selected.name;
+}
+
+export function huntPreyView(input: HuntPreyInput): HuntPreyView {
+  if ((input.replaying || input.filling) && input.pending) {
+    return { foe: input.pending.creature, combat: input.pending.combat };
+  }
+  const selected = input.selected;
+  const last = input.lastFoe;
+  if (selected && last && lastFoeMatches(last, selected)) {
+    return {
+      foe: { id: selected.id, name: last.name, health: last.health },
+      combat: last.combat,
+    };
+  }
+  if (selected) {
+    return { foe: selected, combat: null };
+  }
+  if (last) {
+    return {
+      foe: { id: last.creatureId ?? "", name: last.name, health: last.health },
+      combat: last.combat,
+    };
+  }
+  return { foe: null, combat: null };
+}
+
 export function narrationOf(report: NarratedFight): NarrationLine[] {
   const prey = report.foe.name;
   const full = report.foe.health;

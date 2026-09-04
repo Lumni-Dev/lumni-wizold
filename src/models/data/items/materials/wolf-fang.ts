@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Presa de Lobo: despojo de caça, trocado por bronze no mercado.
 export const wolfFang: Item = {
   id: "wolf-fang",
   name: "Presa de Lobo",

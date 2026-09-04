@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Senhor do Abismo (NV. 781 a 790) da área Abismo Uivante.
 export const abyssLord: Creature = {
   id: "abyss-lord",
   name: "Senhor do Abismo",

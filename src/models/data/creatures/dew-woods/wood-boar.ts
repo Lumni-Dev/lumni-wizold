@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Javali da Mata (NV. 131 a 140) da área Mata do Orvalho.
 export const woodBoar: Creature = {
   id: "wood-boar",
   name: "Javali da Mata",

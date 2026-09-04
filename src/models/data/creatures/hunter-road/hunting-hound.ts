@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Cão de Caça (NV. 441 a 450) da área Estrada dos Caçadores.
 export const huntingHound: Creature = {
   id: "hunting-hound",
   name: "Cão de Caça",

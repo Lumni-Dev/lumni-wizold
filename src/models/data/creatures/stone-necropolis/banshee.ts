@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Banshee (NV. 651 a 660) da área Necrópole de Pedra.
 export const banshee: Creature = {
   id: "banshee",
   name: "Banshee",

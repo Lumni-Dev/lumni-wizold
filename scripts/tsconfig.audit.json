@@ -19,6 +19,7 @@
     "../src/models/factories/**/*.ts",
     "../src/models/repositories/game.repository.ts",
     "../src/shared/**/*.ts",
-    "../src/controllers/*.controller.ts"
+    "../src/controllers/*.controller.ts",
+    "../src/views/presenters/hunt.presenter.ts"
   ]
 }

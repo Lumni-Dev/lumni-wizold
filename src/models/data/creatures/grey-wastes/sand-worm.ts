@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Verme das Areias (NV. 541 a 550) da área Ermo Cinza.
 export const sandWorm: Creature = {
   id: "sand-worm",
   name: "Verme das Areias",

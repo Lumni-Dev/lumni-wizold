@@ -72,6 +72,6 @@ export const MINING_RESET_HOUR_UTC = 9;
 export const FORGE_TICKS = 5;
 export const FORGE_BASE_MS = 5000;
 export const FORGE_MS_PER_LEVEL = 10;
-/** Server-side cap for synced bar beats; above any real lap length. */
 export const ACTIVITY_BEAT_MAX =
   MAX_COMBAT_ROUNDS + TRAINING_TICKS_MAX + MINING_TICKS_MAX + FORGE_TICKS + 8;
+export const ACTIVITY_LAPS_MAX = TRAINING_TICKS_MAX;

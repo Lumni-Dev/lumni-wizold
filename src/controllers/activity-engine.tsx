@@ -16,6 +16,7 @@ import { findItem } from "@/models/data/items";
 import { TERRITORIES } from "@/models/data/territories";
 import { forgeDurationMs } from "@/models/rules/forge";
 import { miningSwingTicks } from "@/models/rules/mining";
+import { isVip } from "@/models/rules/vip";
 import { trainingSessionTicks } from "@/models/rules/training";
 import {
   CYCLE_OPTOUT_SECS,
@@ -23,6 +24,7 @@ import {
   HUNT_TICK_MS,
   MAX_ENHANCEMENT,
   MINING_TICK_MS,
+  MINING_TICKS_MIN,
   PET_EXERCISE_ID,
   TRAINING_TICKS_MIN,
   TRAINING_TICK_MS,
@@ -30,6 +32,8 @@ import {
 import { formatNumber } from "@/shared/utils/format";
 import { hunterRetreated, hunterWon } from "@/models/rules/combat";
 import { narrationOf } from "@/views/presenters/hunt.presenter";
+import { rageFlaskToDrink } from "./automation.controller";
+import { requestAutomationPulse } from "./automation-pulse";
 import { isGameSound, playSound } from "./sound";
 import { useGame } from "./game.context";
 import { activitySync } from "./activity-sync";
@@ -43,7 +47,7 @@ import {
   type ActivityDockView,
 } from "./activity-runtime";
 
-function resolveTrainingSessionTicks(exerciseId: string, carry: number): number {
+function resolveTrainingSessionTicks(exerciseId: string, carry: number, activity: Activity | null): number {
   const prior = activityRuntimeStore.snapshot().train;
   if (
     prior?.id === exerciseId &&
@@ -52,7 +56,35 @@ function resolveTrainingSessionTicks(exerciseId: string, carry: number): number 
   ) {
     return prior.max;
   }
+  if (
+    activity?.kind === "train" &&
+    activity.id === exerciseId &&
+    (activity.laps ?? 0) >= TRAINING_TICKS_MIN &&
+    carry > 0
+  ) {
+    return activity.laps as number;
+  }
   return trainingSessionTicks();
+}
+
+function resolveMiningSwingTicks(oreId: string, carry: number, activity: Activity | null): number {
+  const prior = activityRuntimeStore.snapshot().mine;
+  if (
+    prior?.id === oreId &&
+    prior.max >= MINING_TICKS_MIN &&
+    (carry > 0 || (prior.beat > 0 && prior.beat < prior.max))
+  ) {
+    return prior.max;
+  }
+  if (
+    activity?.kind === "mine" &&
+    activity.id === oreId &&
+    (activity.laps ?? 0) >= MINING_TICKS_MIN &&
+    carry > 0
+  ) {
+    return activity.laps as number;
+  }
+  return miningSwingTicks();
 }
 
 function patchRuntime(patch: Parameters<typeof patchActivityRuntime>[0]): void {
@@ -217,8 +249,6 @@ export function ActivityEngine() {
   } = useGame();
 
   const activityRef = useRef(activity);
-  activityRef.current = activity;
-
   const stateRef = useRef(state);
   const autoRef = useRef(state.automation);
   const huntRef = useRef(hunt);
@@ -235,6 +265,7 @@ export function ActivityEngine() {
   const forgeItemRef = useRef<string | null>(null);
 
   useEffect(() => {
+    activityRef.current = activity;
     stateRef.current = state;
     autoRef.current = state.automation;
     huntRef.current = hunt;
@@ -269,8 +300,8 @@ export function ActivityEngine() {
     const priorHunt = activityRuntimeStore.snapshot().hunt;
     let lastFoe = priorHunt?.territoryId === activeHunt ? priorHunt.lastFoe : null;
     let requesting = false;
+    let furyWaitStarted = 0;
     const bled = { last: stateRef.current.character?.health ?? 0 };
-    const selection = loadHuntSelection();
 
     const push = (cooldown: number | null) => {
       const max = Math.max(1, script.length);
@@ -312,6 +343,19 @@ export function ActivityEngine() {
         fillTimer = window.setTimeout(resolve, wait);
         return;
       }
+      if (
+        rageFlaskToDrink(stateRef.current) &&
+        isVip(stateRef.current.character, Date.now())
+      ) {
+        if (!furyWaitStarted) furyWaitStarted = Date.now();
+        if (Date.now() - furyWaitStarted < 8000) {
+          requestAutomationPulse();
+          fillTimer = window.setTimeout(resolve, 250);
+          return;
+        }
+      }
+      furyWaitStarted = 0;
+      const selection = loadHuntSelection();
       const row = listTerritories(stateRef.current).find(
         (entry) => entry.territory.id === activeHunt,
       );
@@ -337,6 +381,7 @@ export function ActivityEngine() {
         const fight = result.report;
         pending = fight;
         lastFoe = {
+          creatureId: fight.creature.id,
           name: fight.creature.name,
           health: fight.creature.health,
           combat: fight.combat,
@@ -473,7 +518,7 @@ export function ActivityEngine() {
         ? (activityRef.current.beat ?? 0)
         : 0;
     let beat = 0;
-    let ticks = resolveTrainingSessionTicks(activeExercise, carry);
+    let ticks = resolveTrainingSessionTicks(activeExercise, carry, activityRef.current);
     let resumable = true;
 
     const push = (cooldown: number | null) => {
@@ -496,10 +541,10 @@ export function ActivityEngine() {
     };
 
     const startBar = () => {
-      ticks = resolveTrainingSessionTicks(activeExercise, carry);
+      ticks = resolveTrainingSessionTicks(activeExercise, carry, activityRef.current);
       beat = Math.min(carry, Math.max(0, ticks - 1));
       carry = 0;
-      syncProgressRef.current({ beat, cooldownUntil: null });
+      syncProgressRef.current({ beat, cooldownUntil: null, laps: ticks });
       push(null);
       stopBar?.();
       stopBar = createDriftLoop({
@@ -532,7 +577,7 @@ export function ActivityEngine() {
                 }
               }
               beat = 0;
-              syncProgressRef.current({ beat: 0, cooldownUntil: null });
+              syncProgressRef.current({ beat: 0, cooldownUntil: null, laps: 0 });
               if (!landed) {
                 setActivityRef.current(
                   autoRef.current.train && resumable
@@ -600,7 +645,7 @@ export function ActivityEngine() {
         ? (activityRef.current.beat ?? 0)
         : 0;
     let beat = 0;
-    let ticks = miningSwingTicks();
+    let ticks = resolveMiningSwingTicks(activeOre, carry, activityRef.current);
 
     const push = (cooldown: number | null) => {
       const name = findItem(activeOre)?.name ?? "Mina";
@@ -611,10 +656,10 @@ export function ActivityEngine() {
     };
 
     const startBar = () => {
-      ticks = miningSwingTicks();
+      ticks = resolveMiningSwingTicks(activeOre, carry, activityRef.current);
       beat = Math.min(carry, Math.max(0, ticks - 1));
       carry = 0;
-      syncProgressRef.current({ beat, cooldownUntil: null });
+      syncProgressRef.current({ beat, cooldownUntil: null, laps: ticks });
       push(null);
       stopBar?.();
       stopBar = createDriftLoop({
@@ -638,7 +683,7 @@ export function ActivityEngine() {
                 return;
               }
               beat = 0;
-              syncProgressRef.current({ beat: 0, cooldownUntil: null });
+              syncProgressRef.current({ beat: 0, cooldownUntil: null, laps: 0 });
               if (!mined) {
                 setActivityRef.current(
                   autoRef.current.mine ? { kind: "mine", id: activeOre, paused: true } : null,

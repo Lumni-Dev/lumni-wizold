@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Galinha do Mato (NV. 21 a 30) da área Campo do Vilarejo.
 export const wildHen: Creature = {
   id: "wild-hen",
   name: "Galinha do Mato",

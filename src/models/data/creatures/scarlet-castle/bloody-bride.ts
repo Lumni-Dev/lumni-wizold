@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Noiva Sangrenta (NV. 871 a 880) da área Castelo Escarlate.
 export const bloodyBride: Creature = {
   id: "bloody-bride",
   name: "Noiva Sangrenta",

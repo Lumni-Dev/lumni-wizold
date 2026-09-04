@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Cão Selvagem (NV. 51 a 60) da área Campo do Vilarejo.
 export const wildDog: Creature = {
   id: "wild-dog",
   name: "Cão Selvagem",

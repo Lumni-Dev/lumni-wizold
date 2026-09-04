@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Enxame de Mosquitos (NV. 351 a 360) da área Pântano Pálido.
 export const mosquitoSwarm: Creature = {
   id: "mosquito-swarm",
   name: "Enxame de Mosquitos",

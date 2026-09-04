@@ -72,6 +72,19 @@ export function TavernChatWindow() {
   const [cooldownLeft, setCooldownLeft] = useState(0);
   const [sentBeat, setSentBeat] = useState(0);
 
+  const resetKey = chat.open && chat.roomId ? chat.roomId : "";
+  const [prevResetKey, setPrevResetKey] = useState(resetKey);
+  if (resetKey !== prevResetKey) {
+    setPrevResetKey(resetKey);
+    if (resetKey) {
+      setDraft("");
+      setEmojiOpen(false);
+      setInvitingMemberId(null);
+      setSentBeat(0);
+      setCooldownLeft(0);
+    }
+  }
+
   const emojiRef = useRef<HTMLDivElement>(null);
   const messagesRef = useRef<HTMLUListElement>(null);
   const shellRef = useRef<HTMLDivElement>(null);
@@ -175,15 +188,6 @@ export function TavernChatWindow() {
     window.addEventListener("keydown", onKey, true);
     return () => window.removeEventListener("keydown", onKey, true);
   }, [chat.open, closeChat]);
-
-  useEffect(() => {
-    if (!chat.open || !chat.roomId) return;
-    setDraft("");
-    setEmojiOpen(false);
-    setInvitingMemberId(null);
-    setSentBeat(0);
-    setCooldownLeft(0);
-  }, [chat.roomId, chat.open]);
 
   useEffect(() => {
     if (!ready || !chat.open || !chat.roomId) return;

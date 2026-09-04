@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Pele de Rival: despojo de caça, trocado por bronze no mercado.
 export const rivalPelt: Item = {
   id: "rival-pelt",
   name: "Pele de Rival",

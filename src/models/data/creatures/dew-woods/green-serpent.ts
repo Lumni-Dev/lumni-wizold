@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Serpente Verde (NV. 141 a 150) da área Mata do Orvalho.
 export const greenSerpent: Creature = {
   id: "green-serpent",
   name: "Serpente Verde",

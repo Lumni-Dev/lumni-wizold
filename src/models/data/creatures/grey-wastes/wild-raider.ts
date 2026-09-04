@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Saqueador Selvagem (NV. 551 a 560) da área Ermo Cinza.
 export const wildRaider: Creature = {
   id: "wild-raider",
   name: "Saqueador Selvagem",

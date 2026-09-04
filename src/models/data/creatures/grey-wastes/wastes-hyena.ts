@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Hiena do Ermo (NV. 511 a 520) da área Ermo Cinza.
 export const wastesHyena: Creature = {
   id: "wastes-hyena",
   name: "Hiena do Ermo",

@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Mapa do Batedor: despojo de caça, trocado por bronze no mercado.
 export const scoutMap: Item = {
   id: "scout-map",
   name: "Mapa do Batedor",

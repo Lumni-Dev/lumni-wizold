@@ -541,7 +541,6 @@ function creatureFile(creature) {
     .join("\n");
   return `import type { Creature } from "../types";
 
-// ${creature.name} (NV. ${creature.level} a ${creature.level + BLOCK - 1}) da área ${creature.areaName}.
 export const ${camel(creature.id)}: Creature = {
   id: ${lit(creature.id)},
   name: ${lit(creature.name)},
@@ -712,7 +711,6 @@ for (const id of usedMaterials) {
     `${DATA}/items/materials/${id}.ts`,
     `import type { Item } from "../../../entities/item";
 
-// ${name}: despojo de caça, trocado por bronze no mercado.
 export const ${varName}: Item = {
   id: ${lit(id)},
   name: ${lit(name)},
@@ -737,7 +735,6 @@ write(
   `${materialImports.join("\n")}
 import type { Item } from "../../../entities/item";
 
-// Every material a creature drops. Assembled into the item catalog by items.ts.
 export const ALL_MATERIALS: readonly Item[] = [
 ${materialNames.map((n) => `  ${n},`).join("\n")}
 ];

@@ -2,14 +2,12 @@
 
 const DEFAULT_POLL_MS = 250;
 
-/** Keeps activity laps honest when the tab is throttled in the background. */
 export function createDriftLoop(options: {
   periodMs: number;
   pollMs?: number;
   alive: () => boolean;
   ready: () => boolean;
   onTick: () => void;
-  /** When false, a late poll never fires two beats; the bar stays one step at a time. */
   catchUp?: boolean;
 }): () => void {
   const pollMs = options.pollMs ?? Math.min(DEFAULT_POLL_MS, options.periodMs);

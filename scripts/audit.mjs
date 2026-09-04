@@ -66,6 +66,7 @@ const rankingCtrl = load("controllers/ranking.controller.js");
 const packCtrl = load("controllers/pack.controller.js");
 const logCtrl = load("controllers/log.controller.js");
 const tavernCtrl = load("controllers/tavern.controller.js");
+const huntPresenter = load("views/presenters/hunt.presenter.js");
 function setMoon(key) {
   moon.applyMoonState({
     phase: moon.findMoonPhase(key),
@@ -310,6 +311,26 @@ sec("combate");
     "dano do crítico é fixo, sem depender da fúria",
     combat.criticalMultiplierOf() === 1.5 + CONST.CRITICAL_DAMAGE_BONUS,
   );
+  const flags = {
+    rounds: [],
+    finalHealth: 10,
+    damageDealt: 0,
+    damageTaken: 0,
+    petBlows: 0,
+    petSpent: 0,
+  };
+  ok(
+    "vitória lê a bandeira",
+    combat.hunterWon({ ...flags, victory: true, retreated: false }) === true,
+  );
+  ok(
+    "derrota viva não é recuo",
+    combat.hunterRetreated({ ...flags, victory: false, retreated: false }) === false,
+  );
+  ok(
+    "recuo lê a bandeira",
+    combat.hunterRetreated({ ...flags, victory: false, retreated: true }) === true,
+  );
 }
 sec("bandas e presas");
 {
@@ -463,7 +484,6 @@ sec("ritmo dos ciclos");
 sec("economia");
 {
   for (const level of [1, 100, 340, 670, 1000]) {
-    const purse = species.huntPurse(level);
     const trainedValue = Math.max(1, Math.round(level * 0.55));
     ok(
       "sessão de treino é gratuita NV " + level,
@@ -843,6 +863,73 @@ sec("caçada");
     "a caçada enfrenta o bicho escolhido pelo id",
     picked.ok === true && picked.data.creature.id === "young-bear",
   );
+  const firstPrey = huntCtrl.resolveHunt(
+    state,
+    "village-field",
+    seededRandom(11),
+    "field-rabbit",
+  );
+  const nextPrey = huntCtrl.resolveHunt(state, "village-field", seededRandom(12), "thief-fox");
+  ok(
+    "a próxima caçada honra o id novo, não o da volta anterior",
+    firstPrey.ok &&
+      nextPrey.ok &&
+      firstPrey.data.creature.id === "field-rabbit" &&
+      nextPrey.data.creature.id === "thief-fox",
+  );
+  const stray = huntCtrl.resolveHunt(state, "village-field", seededRandom(13), "young-bear");
+  ok(
+    "um id de outra área cai na presa da trilha, não no forasteiro",
+    stray.ok === true && stray.data.creature.id !== "young-bear",
+  );
+  const rabbit = { id: "field-rabbit", name: "Coelho-do-campo", health: 40 };
+  const fox = { id: "thief-fox", name: "Raposa-ladra", health: 55 };
+  const fallen = {
+    victory: true,
+    retreated: false,
+    rounds: [],
+    finalHealth: 10,
+    damageDealt: 0,
+    damageTaken: 0,
+    petBlows: 0,
+    petSpent: 0,
+  };
+  const lastRabbit = {
+    creatureId: rabbit.id,
+    name: rabbit.name,
+    health: rabbit.health,
+    combat: fallen,
+  };
+  const kept = huntPresenter.huntPreyView({
+    replaying: false,
+    filling: false,
+    pending: null,
+    lastFoe: lastRabbit,
+    selected: rabbit,
+  });
+  ok(
+    "sem troca o cartão guarda o mesmo bicho no chão",
+    kept.foe && kept.foe.id === rabbit.id && kept.combat === fallen,
+  );
+  const swapped = huntPresenter.huntPreyView({
+    replaying: false,
+    filling: false,
+    pending: null,
+    lastFoe: lastRabbit,
+    selected: fox,
+  });
+  ok(
+    "trocar a presa no intervalo mostra o bicho novo inteiro",
+    swapped.foe && swapped.foe.id === fox.id && swapped.combat === null,
+  );
+  const midFight = huntPresenter.huntPreyView({
+    replaying: true,
+    filling: false,
+    pending: { creature: rabbit, combat: fallen },
+    lastFoe: lastRabbit,
+    selected: fox,
+  });
+  ok("a luta em curso não troca de bicho", midFight.foe && midFight.foe.id === rabbit.id);
   if (resolved.ok) {
     const beaten = {
       ...resolved.data,
@@ -1828,9 +1915,15 @@ sec("personagem");
   const derived = stats.deriveStats(run.character, run.equipment, null);
   ok(
     "nasce inteiro",
-    run.character.health === derived.maxHealth && run.character.rage === derived.maxRage,
+    run.character.health === derived.maxHealth,
   );
   ok("nasce com 200 de bronze", run.character.bronze === CONST.STARTING_BRONZE);
+  ok(
+    "nasce com dez poções de fúria pequena",
+    run.inventory.some(
+      (slot) => slot.itemId === "rage-potion-small" && slot.quantity === 10,
+    ),
+  );
   ok(
     "nasce sem equipamento",
     Object.values(run.equipment).every((slot) => slot === null),
@@ -1857,6 +1950,39 @@ sec("personagem");
       plainStats.totalAttributes.strength + CONST.FURY_ATTRIBUTE_BONUS,
   );
   ok("a poção de fúria não devolve vida", drank.state.character.health === state.character.health);
+  const withTwo = {
+    ...state,
+    inventory: [{ itemId: "rage-potion-small", quantity: 2, enhancement: 0 }],
+  };
+  const firstSip = inventoryCtrl.consumeItem(withTwo, "rage-potion-small");
+  const recast = firstSip.ok
+    ? inventoryCtrl.consumeItem(firstSip.state, "rage-potion-small")
+    : firstSip;
+  ok("beber de novo reinicia o relógio", recast.ok === true, recast.message);
+  if (firstSip.ok && recast.ok) {
+    ok(
+      "o novo prazo não fica atrás do anterior",
+      Date.parse(recast.state.character.furyUntil) >= Date.parse(firstSip.state.character.furyUntil),
+    );
+  }
+  const expired = {
+    ...state,
+    character: {
+      ...state.character,
+      furyUntil: new Date(Date.now() - 1000).toISOString(),
+    },
+    inventory: [{ itemId: "rage-potion-small", quantity: 1, enhancement: 0 }],
+  };
+  ok(
+    "prazo vencido não soma fúria",
+    stats.deriveStats(expired.character, expired.equipment, null).sources.fury.strength === 0,
+  );
+  const revived = inventoryCtrl.consumeItem(expired, "rage-potion-small");
+  ok(
+    "depois do prazo a fúria volta",
+    revived.ok === true && Date.parse(revived.state.character.furyUntil) > Date.now(),
+    revived.message,
+  );
 
   setMoon("full");
   const fullMoonPotion = {
@@ -1988,6 +2114,18 @@ sec("automação");
     "retomar volta ao mesmo trabalho",
     work?.activity.kind === "hunt" && work?.activity.id === "village-field",
   );
+  const spentMine = baseState({ level: 10 });
+  spentMine.mining = {
+    ...spentMine.mining,
+    count: CONST.MINING_DAILY_MININGS,
+    windowStart: new Date().toISOString(),
+  };
+  spentMine.automation = { ...spentMine.automation, mine: true };
+  ok(
+    "mina esgotada não retoma",
+    automationCtrl.nextAutomationStep(spentMine, { kind: "mine", id: "bronze-vein", paused: true }) ===
+      null,
+  );
   const furyHunt = {
     ...resumed,
     inventory: [{ itemId: "rage-potion-small", quantity: 1, enhancement: 0 }],
@@ -1997,6 +2135,23 @@ sec("automação");
   ok(
     "caçada pausada bebe fúria antes de retomar",
     furyStep?.kind === "potion" && furyStep.itemId === "rage-potion-small",
+  );
+  const furyAlone = {
+    ...furyHunt,
+    automation: { ...resumed.automation, hunt: false, transform: true },
+  };
+  ok(
+    "fúria automática bebe sozinha na caçada",
+    automationCtrl.nextAutomationStep(furyAlone, idle)?.itemId === "rage-potion-small",
+  );
+  ok(
+    "fúria automática não bebe parado",
+    automationCtrl.nextAutomationStep(furyAlone, null) === null,
+  );
+  ok(
+    "caçada em curso também pede o frasco",
+    automationCtrl.nextAutomationStep(furyAlone, { kind: "hunt", id: "village-field" })?.itemId ===
+      "rage-potion-small",
   );
   const furyReady = {
     ...furyHunt,

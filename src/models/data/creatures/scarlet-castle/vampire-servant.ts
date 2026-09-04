@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Servo Vampiro (NV. 801 a 810) da área Castelo Escarlate.
 export const vampireServant: Creature = {
   id: "vampire-servant",
   name: "Servo Vampiro",

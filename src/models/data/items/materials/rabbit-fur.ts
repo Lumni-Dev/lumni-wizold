@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Pelo de Coelho: despojo de caça, trocado por bronze no mercado.
 export const rabbitFur: Item = {
   id: "rabbit-fur",
   name: "Pelo de Coelho",

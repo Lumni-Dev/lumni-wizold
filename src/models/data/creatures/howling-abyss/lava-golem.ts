@@ -1,6 +1,5 @@
 import type { Creature } from "../types";
 
-// Golem de Lava (NV. 741 a 750) da área Abismo Uivante.
 export const lavaGolem: Creature = {
   id: "lava-golem",
   name: "Golem de Lava",

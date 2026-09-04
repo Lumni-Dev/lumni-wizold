@@ -1,6 +1,5 @@
 import type { Item } from "../../../entities/item";
 
-// Pele de Urso: despojo de caça, trocado por bronze no mercado.
 export const bearPelt: Item = {
   id: "bear-pelt",
   name: "Pele de Urso",

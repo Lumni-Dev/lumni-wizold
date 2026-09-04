@@ -6,7 +6,8 @@ import { loadTavernUser } from "@/models/repositories/server/tavern-user.store";
 import { maybePruneStale } from "@/models/repositories/server/tavern.store";
 import type { TavernUserState } from "@/models/entities/tavern";
 import type { RoomSummary } from "@/controllers/tavern.controller";
-import { invalidateTavernStructureCache, loadTavernCached } from "./tavern-snapshot-cache";
+import { loadTavernCached } from "./tavern-snapshot-cache";
+import { publishTavernRevision } from "./tavern-bus";
 
 export interface TavernBoardPayload {
   identity: TavernIdentity;
@@ -51,7 +52,10 @@ export async function buildTavernBoard(
   client: PoolClient,
   userId: string,
 ): Promise<TavernBoardPayload | null> {
-  if (await maybePruneStale(client)) invalidateTavernStructureCache();
+  if (await maybePruneStale(client)) {
+    const pruned = await bumpTavernRevision(client);
+    publishTavernRevision(pruned);
+  }
   const identity = await tavernIdentity(client, userId);
   if (!identity) return null;
   const [tavern, revision, user] = await Promise.all([
