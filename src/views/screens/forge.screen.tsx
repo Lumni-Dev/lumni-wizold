@@ -216,16 +216,20 @@ export function ForgeScreen() {
               <ListRow layout="column">
                 <Bar
                   label={
-                    "Mineração NV. " + formatNumber(mining.level) + (mining.maxed ? " - teto" : "")
+                    "Experiência (NV. " +
+                    formatNumber(mining.level) +
+                    "/1000)" +
+                    (mining.maxed ? " - teto" : "")
                   }
                   current={mining.progress}
                   maximum={mining.needed}
+                  tone="experience"
                   wraps
                 />
               </ListRow>
               <ListRow layout="column">
                 <Bar
-                  label={mining.dailyExhausted ? "Fôlego da mina esgotado" : "Fôlego da mina"}
+                  label={mining.dailyExhausted ? "Recursos da mina esgotados" : "Recursos da mina"}
                   tone="tide"
                   current={mining.dailyRemaining}
                   maximum={mining.dailyLimit}
@@ -253,9 +257,9 @@ export function ForgeScreen() {
                           ? "Minerando sem parar..."
                           : "Minerando..."
                       : waitingOre
-                        ? "Esperando fôlego para voltar a minerar"
+                        ? "Esperando recursos para voltar a minerar"
                         : mining.dailyExhausted
-                          ? "Fôlego esgotado, reabre em " + formatCountdown(miningResetLeft)
+                          ? "Recursos esgotados, voltam em " + formatCountdown(miningResetLeft)
                           : selectedEntry
                             ? selectedEntry.unlocked
                               ? selectedEntry.ore.label

@@ -45,10 +45,10 @@ export function ResourceBar() {
             unit="WCoins"
           />
           <Bar
-            label={"Experiência (NV. " + formatNumber(character.level) + ")"}
+            label={"Experiência (NV. " + formatNumber(character.level) + "/1000)"}
             current={character.experience}
             maximum={stats.experienceNeeded}
-            tone="fury"
+            tone="experience"
             wraps
             prominent
           />

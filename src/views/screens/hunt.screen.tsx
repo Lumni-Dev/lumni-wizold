@@ -443,7 +443,7 @@ export function HuntScreen() {
                   ) : null}
                   <div className="px-4 py-3">
                     <Bar
-                      label={active ? "Caçando..." : "Caçar"}
+                      label={approach ? "Procurando criatura..." : active ? "Caçando..." : "Caçar"}
                       current={approach ? approach.beat : onThis ? progress.beat : 0}
                       maximum={approach ? approach.max : Math.max(1, script.length)}
                       glows={active}

@@ -215,7 +215,7 @@ function pausedDock(state: GameState, activity: Activity): ActivityDockView {
   const details: Record<ActivityDockView["kind"], string> = {
     hunt: "Esperando vida ou poção para continuar",
     train: "Esperando WCoins para continuar",
-    mine: "Esperando fôlego para voltar a minerar",
+    mine: "Esperando recursos para voltar a minerar",
     forge: "Esperando fragmentos e WCoins para a próxima martelada",
     rest: "O corpo descansa.",
   };

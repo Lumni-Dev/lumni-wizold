@@ -9,13 +9,13 @@ const LAP_MS = 250;
 const REST_MS = 150;
 const RESUME_MS = 350;
 
-type BarTone = "light" | "blood" | "ember" | "fury" | "vigor" | "tide";
+type BarTone = "light" | "blood" | "ember" | "experience" | "vigor" | "tide";
 
 const FILLS: Record<BarTone, string> = {
   light: "bg-ember",
   blood: "bg-blood",
   ember: "bg-ember",
-  fury: "bg-fury",
+  experience: "bg-experience",
   vigor: "bg-vigor",
   tide: "bg-tide",
 };

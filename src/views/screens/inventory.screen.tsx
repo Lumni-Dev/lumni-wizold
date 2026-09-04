@@ -36,7 +36,7 @@ import { Panel } from "../components/panel";
 import { EmptyState } from "../components/empty-state";
 import { PageHeader } from "../layout/page-header";
 
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 8;
 
 export function InventoryScreen() {
   const router = useRouter();

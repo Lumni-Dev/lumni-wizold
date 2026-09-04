@@ -133,7 +133,13 @@ export function TrainingScreen() {
 
                 {row ? (
                   <div className="border-t border-edge px-4 py-3">
-                    <Bar label="Progresso" current={row.progress} maximum={row.needed} wraps />
+                    <Bar
+                      label={"Experiência (NV. " + formatNumber(row.value) + "/1000)"}
+                      current={row.progress}
+                      maximum={row.needed}
+                      tone="experience"
+                      wraps
+                    />
                   </div>
                 ) : null}
 
@@ -210,9 +216,10 @@ export function TrainingScreen() {
 
               <div className="border-t border-edge px-4 py-3">
                 <Bar
-                  label="Progresso"
+                  label={"Experiência (NV. " + formatNumber(petTraining.level) + "/1000)"}
                   current={petTraining.progress}
                   maximum={petTraining.needed}
+                  tone="experience"
                   wraps
                 />
               </div>

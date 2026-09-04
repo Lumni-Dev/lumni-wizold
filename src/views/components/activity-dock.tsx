@@ -25,6 +25,7 @@ import {
   PET_EXERCISE_ID,
 } from "@/shared/constants/game";
 import { GLASS_SECTION } from "@/shared/constants/ui";
+import { formatNumber } from "@/shared/utils/format";
 import { cn } from "@/shared/utils/class-names";
 import { ActionIcon, NavIcon } from "./app-icon";
 import { Bar } from "./bar";
@@ -113,7 +114,7 @@ export function ActivityDock() {
       preyLabel: monsterStatus + " · " + (shownFoe?.name ?? "?"),
       preyCurrent: monsterCurrent,
       preyMax: monsterMax,
-      huntLabel: "Caçando...",
+      huntLabel: approach ? "Procurando criatura..." : "Caçando...",
       huntCurrent: cooldown !== null ? cooldown : approach ? approach.beat : beat,
       huntMax:
         cooldown !== null
@@ -146,7 +147,7 @@ export function ActivityDock() {
 
     if (petActive && petTraining) {
       return {
-        progressLabel: "Mascote - Progresso",
+        progressLabel: "Mascote - Experiência (NV. " + formatNumber(petTraining.level) + "/1000)",
         progressCurrent: petTraining.progress,
         progressMax: petTraining.needed,
         sessionLabel: "Mascote - Treinamento",
@@ -168,7 +169,7 @@ export function ActivityDock() {
     const row = progress.find((item) => item.key === entry?.exercise.attribute);
 
     return {
-      progressLabel: "Progresso",
+      progressLabel: "Experiência (NV. " + formatNumber(row?.value ?? 0) + "/1000)",
       progressCurrent: row?.progress ?? 0,
       progressMax: row?.needed ?? 1,
       sessionLabel: "Treinamento",
@@ -192,7 +193,7 @@ export function ActivityDock() {
     const opting = cooldown !== null;
 
     return {
-      dailyLabel: mining.dailyExhausted ? "Fôlego da mina esgotado" : "Fôlego da mina",
+      dailyLabel: mining.dailyExhausted ? "Recursos da mina esgotados" : "Recursos da mina",
       dailyCurrent: mining.dailyRemaining,
       dailyMax: mining.dailyLimit,
       swingLabel: "Minerando...",
@@ -287,7 +288,7 @@ export function ActivityDock() {
       return {
         kind: "mine" as const,
         daily: {
-          label: mining.dailyExhausted ? "Fôlego da mina esgotado" : "Fôlego da mina",
+          label: mining.dailyExhausted ? "Recursos da mina esgotados" : "Recursos da mina",
           current: mining.dailyRemaining,
           maximum: mining.dailyLimit,
         },
@@ -554,6 +555,7 @@ export function ActivityDock() {
                       label={trainView.progressLabel}
                       current={trainView.progressCurrent}
                       maximum={trainView.progressMax}
+                      tone="experience"
                       wraps
                     />
                   </ListRow>
