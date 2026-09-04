@@ -5,7 +5,6 @@ import { activityRuntimeStore } from "@/controllers/activity-runtime";
 import { useGame } from "@/controllers/game.context";
 import { listForge, listMining } from "@/controllers/forge.controller";
 import { ACTIVITY_WAIT_LABEL, useActivityLock } from "@/controllers/use-activity-lock";
-import { usePageActivity } from "@/controllers/use-page-activity";
 import type { Activity } from "@/models/entities/activity";
 import {
   matchesCategoryAndSet,
@@ -57,7 +56,6 @@ const FORGE_PAGE_SIZE = 5;
 
 export function ForgeScreen() {
   const { state, character, activity, setActivity } = useGame();
-  usePageActivity(["mine", "forge"]);
   const { locked } = useActivityLock();
   const waitLabel = locked ? ACTIVITY_WAIT_LABEL : "";
   const runtime = useSyncExternalStore(

@@ -173,7 +173,8 @@ export function IconArt({
                   className={cn(
                     "art-soft-shadow h-full w-full",
                     fit === "contain" ? "object-contain" : "object-cover",
-                    inset ? "p-[16px]" : "p-[14px]",
+                    inset ? "p-[12px]" : "p-[14px]",
+                    inset,
                   )}
                 />
                 {glow ? (

@@ -6,7 +6,7 @@ import { withGame } from "../../_lib/api";
 export async function POST(request: Request) {
   return withGame(request, async (state, _body, context) => {
     if (state.character && hasVipSubscription(state.character)) {
-      return failure(state, "Você já tem uma assinatura VIP. Gerencie nas configurações.");
+      return failure(state, "Você já tem uma assinatura VIP. Cancele ou reative na loja.");
     }
     const origin = new URL(request.url).origin;
     try {

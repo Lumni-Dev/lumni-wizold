@@ -11,7 +11,9 @@ export async function POST(request: Request) {
     }
     try {
       const updated = await setSubscriptionCancel(subscriptionId, true);
-      if (!updated) return failure(state, "O Stripe não confirmou o cancelamento. Tente de novo.");
+      if (!updated || updated.cancelAtPeriodEnd !== true) {
+        return failure(state, "O Stripe não confirmou o cancelamento. Tente de novo.");
+      }
     } catch (error) {
       console.error("[api] POST /api/vip/cancel", error);
       return failure(state, "O Stripe não confirmou o cancelamento. Tente de novo.");

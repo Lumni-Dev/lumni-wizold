@@ -67,6 +67,24 @@ export function formatCooldown(milliseconds: number): string {
   const minutes = Math.ceil(milliseconds / 60000);
   return minutes >= 60 ? Math.ceil(minutes / 60) + "h" : minutes + "min";
 }
+
+export function formatFuryClock(ms: number): string {
+  const total = Math.max(0, Math.floor(ms / 1000));
+  const days = Math.floor(total / 86_400);
+  const hours = Math.floor((total % 86_400) / 3600);
+  const minutes = Math.floor((total % 3600) / 60);
+  const seconds = total % 60;
+  if (days > 0) return days + "d " + hours + "h";
+  if (hours > 0) return hours + "h " + minutes + "m";
+  return minutes + ":" + String(seconds).padStart(2, "0");
+}
+
+export function formatFuryDuration(baseMinutes: number, extraMs: number): string {
+  const extraSeconds = Math.floor(Math.max(0, extraMs) / 1000);
+  const base = String(baseMinutes).replace(".", ",") + " min";
+  if (extraSeconds <= 0) return base;
+  return base + " (+" + extraSeconds + "s vontade)";
+}
 export function formatReais(cents: number): string {
   return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(
     Math.round(cents) / 100,

@@ -3,6 +3,7 @@ import { CATEGORY_LABEL, type Item } from "@/models/entities/item";
 import { enhancedEffect } from "@/models/rules/forge";
 import { furyWillpowerExtraMs } from "@/models/rules/moon";
 import { FURY_ATTRIBUTE_BONUS } from "@/shared/constants/game";
+import { formatFuryDuration } from "@/shared/utils/format";
 
 export function itemInitials(name: string): string {
   const words = name.split(" ").filter((word) => word.length > 2);
@@ -46,8 +47,5 @@ export function summarizeEffect(item: Item, enhancement = 0): string[] {
 }
 
 export function furyDurationCopy(baseMinutes: number, willpower: number): string {
-  const base = String(baseMinutes).replace(".", ",") + " min";
-  const extraSeconds = Math.round(furyWillpowerExtraMs(baseMinutes, willpower) / 1000);
-  if (extraSeconds <= 0) return base;
-  return base + " (+" + extraSeconds + "s vontade)";
+  return formatFuryDuration(baseMinutes, furyWillpowerExtraMs(baseMinutes, willpower));
 }

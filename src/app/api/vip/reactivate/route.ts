@@ -11,7 +11,9 @@ export async function POST(request: Request) {
     }
     try {
       const updated = await setSubscriptionCancel(subscriptionId, false);
-      if (!updated) return failure(state, "O Stripe não confirmou a reativação. Tente de novo.");
+      if (!updated || updated.cancelAtPeriodEnd !== false) {
+        return failure(state, "O Stripe não confirmou a reativação. Tente de novo.");
+      }
     } catch (error) {
       console.error("[api] POST /api/vip/reactivate", error);
       return failure(state, "O Stripe não confirmou a reativação. Tente de novo.");

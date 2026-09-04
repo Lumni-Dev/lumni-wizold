@@ -137,7 +137,8 @@ export function furyWillpowerBonus(willpower: number): number {
 }
 
 export function furyDurationMs(minutes: number, willpower: number): number {
-  return Math.round(minutes * 60_000 * (1 + furyWillpowerBonus(willpower)));
+  const baseMs = minutes * 60_000;
+  return Math.floor(baseMs + baseMs * furyWillpowerBonus(willpower));
 }
 
 export function furyDurationMinutes(minutes: number, willpower: number): number {
@@ -145,7 +146,7 @@ export function furyDurationMinutes(minutes: number, willpower: number): number 
 }
 
 export function furyWillpowerExtraMs(minutes: number, willpower: number): number {
-  return Math.max(0, furyDurationMs(minutes, willpower) - Math.round(minutes * 60_000));
+  return Math.max(0, furyDurationMs(minutes, willpower) - minutes * 60_000);
 }
 
 export function potionFuryRemainingMs(character: FuryCarrier, now = Date.now()): number {

@@ -736,11 +736,12 @@ export async function updateActivityProgress(
   client: PoolClient,
   characterId: string,
   patch: { beat: number; cooldownUntil?: string | null },
-): Promise<void> {
-  await client.query(
+): Promise<boolean> {
+  const updated = await client.query(
     `update activities set beat = $2, cooldown_until = $3::timestamptz where character_id = $1`,
     [characterId, patch.beat, patch.cooldownUntil ?? null],
   );
+  return (updated.rowCount ?? 0) > 0;
 }
 export async function setPetRestCollectedAt(
   client: PoolClient,

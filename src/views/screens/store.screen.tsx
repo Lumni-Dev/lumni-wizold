@@ -1,15 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { api } from "@/controllers/api.client";
 import { useGame } from "@/controllers/game.context";
 import { listPacks } from "@/controllers/store.controller";
 import { findPack } from "@/models/data/store-packs";
-import { isVip, VIP_PRICE_CENTS } from "@/models/rules/vip";
+import { hasVipSubscription, isVip, VIP_PRICE_CENTS } from "@/models/rules/vip";
 import { formatDay, formatNumber, formatReais, formatBronze } from "@/shared/utils/format";
 import { Button } from "../components/button";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
+import { ConfirmDialog } from "../components/confirm-dialog";
 import { PackIcon } from "../components/pack-icon";
 import { DataRow } from "../components/data-row";
 import { EmptyState } from "../components/empty-state";
@@ -49,12 +49,13 @@ const STATUS_TONE: Record<string, "light" | "neutral" | "faint"> = {
 };
 
 export function StoreScreen() {
-  const { state, character, buyPack, buyVip, confirmPayment } = useGame();
-  const router = useRouter();
+  const { state, character, buyPack, buyVip, cancelVip, reactivateVip, confirmPayment } =
+    useGame();
   const [now] = useState(() => Date.now());
   const [historyPage, setHistoryPage] = useState(1);
   const [historyStamp, setHistoryStamp] = useState(0);
   const [history, setHistory] = useState<HistoryView | null>(null);
+  const [cancelingVip, setCancelingVip] = useState(false);
 
   const offers = useMemo(() => listPacks(state), [state]);
 
@@ -78,6 +79,7 @@ export function StoreScreen() {
   if (!character) return null;
 
   const vip = isVip(character, now);
+  const subscribed = hasVipSubscription(character);
 
   return (
     <>
@@ -95,16 +97,22 @@ export function StoreScreen() {
         footer={
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span className="text-[11px] text-ink-faint">
-              {vip
+              {subscribed
                 ? character.vipCanceling
                   ? "Ativo até " + formatDay(character.vipUntil ?? "") + ", sem renovar."
-                  : "Renova sozinho a cada mês. Cancele nas configurações."
+                  : "Renova sozinho a cada mês. Cancele para parar a cobrança no Stripe."
                 : "O VIP entra assim que o pagamento confirma."}
             </span>
-            {vip ? (
-              <Button variant="outline" onClick={() => router.push("/settings")}>
-                Gerenciar nas configurações
-              </Button>
+            {subscribed ? (
+              character.vipCanceling ? (
+                <Button variant="primary" onClick={() => reactivateVip()}>
+                  Reative
+                </Button>
+              ) : (
+                <Button variant="outline" onClick={() => setCancelingVip(true)}>
+                  Cancele
+                </Button>
+              )
             ) : (
               <Button variant="primary" onClick={() => buyVip()}>
                 Ativar VIP por {formatReais(VIP_PRICE_CENTS)}/mês
@@ -200,6 +208,18 @@ export function StoreScreen() {
           </List>
         )}
       </Panel>
+
+      <ConfirmDialog
+        open={cancelingVip}
+        title="Cancelar assinatura VIP"
+        description="A cobrança mensal para de renovar no Stripe. O VIP continua ativo até o fim do período já pago, e dá para reativar antes disso."
+        confirmLabel="Cancele"
+        onCancel={() => setCancelingVip(false)}
+        onConfirm={async () => {
+          await cancelVip();
+          setCancelingVip(false);
+        }}
+      />
     </>
   );
 }

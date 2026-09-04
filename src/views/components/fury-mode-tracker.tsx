@@ -4,19 +4,8 @@ import { Flame } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useGame } from "@/controllers/game.context";
 import { furyRemainingMs } from "@/models/rules/moon";
+import { formatFuryClock } from "@/shared/utils/format";
 import { FuryRingFrame } from "./fury-ring-frame";
-
-function furyClock(ms: number): string {
-  const total = Math.max(0, Math.ceil(ms / 1000));
-  const days = Math.floor(total / 86_400);
-  const hours = Math.floor((total % 86_400) / 3600);
-  const minutes = Math.floor((total % 3600) / 60);
-  const seconds = total % 60;
-
-  if (days > 0) return days + "d " + hours + "h";
-  if (hours > 0) return hours + "h " + minutes + "m";
-  return Math.floor(total / 60) + ":" + String(seconds).padStart(2, "0");
-}
 
 export function FuryModeTracker() {
   const { character, moon } = useGame();
@@ -33,7 +22,7 @@ export function FuryModeTracker() {
 
   if (!character || !active) return null;
 
-  const clock = furyClock(remaining);
+  const clock = formatFuryClock(remaining);
 
   return (
     <FuryRingFrame className="block w-full" contentAlign="start" fillClassName="w-full">

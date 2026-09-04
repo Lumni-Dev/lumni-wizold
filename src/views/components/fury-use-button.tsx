@@ -3,13 +3,9 @@
 import { useEffect, useState } from "react";
 import { useGame } from "@/controllers/game.context";
 import { furyRemainingMs } from "@/models/rules/moon";
+import { formatFuryClock } from "@/shared/utils/format";
 import { Button } from "./button";
 import { FuryRingFrame } from "./fury-ring-frame";
-
-function furyClock(ms: number): string {
-  const total = Math.max(0, Math.ceil(ms / 1000));
-  return Math.floor(total / 60) + ":" + String(total % 60).padStart(2, "0");
-}
 
 export function FuryUseButton({ onClick }: { onClick: () => void }) {
   const { character, moon } = useGame();
@@ -42,7 +38,7 @@ export function FuryUseButton({ onClick }: { onClick: () => void }) {
       className="inline-block cursor-default border-0 bg-transparent p-0 font-[inherit]"
       fillClassName="min-h-8"
     >
-      <span className="px-3 font-mono text-[11px] text-ink">{furyClock(remaining)}</span>
+      <span className="px-3 font-mono text-[11px] text-ink">{formatFuryClock(remaining)}</span>
     </FuryRingFrame>
   );
 }

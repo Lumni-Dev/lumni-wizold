@@ -10,7 +10,6 @@ import {
   trainingSummaryLine,
 } from "@/controllers/training.controller";
 import { ACTIVITY_WAIT_LABEL, useActivityLock } from "@/controllers/use-activity-lock";
-import { usePageActivity } from "@/controllers/use-page-activity";
 import {
   MAX_ATTRIBUTE_VALUE,
   PET_EXERCISE_ID,
@@ -31,7 +30,6 @@ import { PageHeader } from "../layout/page-header";
 
 export function TrainingScreen() {
   const { state, character, stats, activity, setActivity } = useGame();
-  usePageActivity(["train"]);
   const { locked } = useActivityLock();
   const waitLabel = locked ? ACTIVITY_WAIT_LABEL : "";
   const runtime = useSyncExternalStore(
