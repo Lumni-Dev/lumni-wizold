@@ -53,7 +53,9 @@ export function FuryUseButton({
         )}
         fillClassName={cn("h-full", fullWidth ? "w-full" : "min-w-[4.5rem]")}
       >
-        <span className="px-3 font-mono text-[11px] text-ink">{formatFuryClock(remaining)}</span>
+        <span className="px-3 font-mono text-[11px] text-ink">
+          {sky ? "Lua" : formatFuryClock(remaining)}
+        </span>
       </FuryRingFrame>
     </Tooltip>
   );
