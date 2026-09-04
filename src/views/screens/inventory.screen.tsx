@@ -88,14 +88,14 @@ export function InventoryScreen() {
         title="Equipado"
         description="Sete espaços: capacete, colar, armadura, calças, botas, luvas e anel."
       >
-        <div className="grid grid-cols-1 auto-rows-fr gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {EQUIPMENT_SLOTS.map((slot) => {
             const piece = state.equipment[slot];
             const item = piece ? findItem(piece.itemId) : undefined;
             const lockSecs = Math.max(0, Math.ceil(((equipLock[slot] ?? 0) - now) / 1000));
 
             return (
-              <Card key={slot} height="fill" tone={item ? "highlighted" : "empty"}>
+              <Card key={slot} height="content" tone={item ? "highlighted" : "empty"}>
                 <CardHeader>
                   {item ? (
                     <span className="flex aspect-square w-16 shrink-0 overflow-hidden rounded-md border border-edge p-1.5">
@@ -260,7 +260,6 @@ export function InventoryScreen() {
               <ItemCard
                 key={item.id}
                 item={item}
-                height="content"
                 quantity={quantity}
                 enhancement={enhancement}
                 fromBazaar={state.bazaarFinds.includes(item.id)}
