@@ -16,6 +16,7 @@ interface ItemCardProps {
   note?: ReactNode;
   highlighted?: boolean;
   fromBazaar?: boolean;
+  height?: "content" | "fill";
 }
 
 export function ItemCard({
@@ -26,12 +27,13 @@ export function ItemCard({
   note,
   highlighted = false,
   fromBazaar = false,
+  height = "fill",
 }: ItemCardProps) {
   const effects = summarizeEffect(item, enhancement);
   const drawn = Boolean(useItemArt(item));
 
   return (
-    <Card tone={highlighted ? "highlighted" : "default"} height="fill" interactive>
+    <Card tone={highlighted ? "highlighted" : "default"} height={height} interactive>
       {drawn ? <ItemBanner item={item} enhancement={enhancement} /> : null}
 
       <CardHeader>

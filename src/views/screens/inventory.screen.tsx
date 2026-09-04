@@ -26,10 +26,9 @@ import { Button } from "../components/button";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
 import { ItemFilterRow } from "../components/item-filter-row";
 import { Pagination } from "../components/pagination";
-import { IconFrame } from "../components/icon-frame";
 import { ItemCard } from "../components/item-card";
 import { FuryUseButton } from "../components/fury-use-button";
-import { ItemIcon } from "../components/item-icon";
+import { ItemArtFill } from "../components/item-icon";
 import { RowText } from "../components/list";
 import { Tag } from "../components/tag";
 import { Panel } from "../components/panel";
@@ -99,9 +98,11 @@ export function InventoryScreen() {
               <Card key={slot} height="fill" tone={item ? "highlighted" : "empty"}>
                 <CardHeader>
                   {item ? (
-                    <ItemIcon item={item} enhancement={piece?.enhancement ?? 0} />
+                    <span className="flex aspect-square w-16 shrink-0 overflow-hidden rounded-md border border-edge p-1.5">
+                      <ItemArtFill item={item} enhancement={piece?.enhancement ?? 0} />
+                    </span>
                   ) : (
-                    <IconFrame tone="empty" />
+                    <span className="flex aspect-square w-16 shrink-0 rounded-md border border-edge" />
                   )}
                   <RowText
                     label={SLOT_LABEL[slot]}
@@ -259,6 +260,7 @@ export function InventoryScreen() {
               <ItemCard
                 key={item.id}
                 item={item}
+                height="content"
                 quantity={quantity}
                 enhancement={enhancement}
                 fromBazaar={state.bazaarFinds.includes(item.id)}
