@@ -62,7 +62,7 @@ export function CharacterScreen() {
 
   const strength = stats.totalAttributes.strength;
   const endurance = stats.totalAttributes.endurance;
-  const willpower = stats.totalAttributes.willpower;
+  const willpower = stats.totalAttributes.willpower - stats.sources.fury.willpower;
 
   const genderDefinition = findGender(character.gender);
   const healthFull = character.health >= stats.maxHealth;

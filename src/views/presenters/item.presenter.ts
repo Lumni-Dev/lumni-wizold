@@ -21,7 +21,7 @@ function percent(ratio: number): string {
   return "+" + Math.round(ratio * 100) + "%";
 }
 
-export function summarizeEffect(item: Item, enhancement = 0): string[] {
+export function summarizeEffect(item: Item, enhancement = 0, willpower?: number): string[] {
   const effect = enhancement > 0 ? enhancedEffect(item, enhancement) : item.effect;
   const lines: string[] = [];
 
@@ -35,7 +35,11 @@ export function summarizeEffect(item: Item, enhancement = 0): string[] {
   if (effect.healthRatio) lines.push(percent(effect.healthRatio) + " da vida");
   if (effect.furyMinutes) {
     lines.push("+" + FURY_ATTRIBUTE_BONUS + " em todos os atributos");
-    lines.push(String(effect.furyMinutes).replace(".", ",") + " min de duração");
+    lines.push(
+      (willpower === undefined
+        ? String(effect.furyMinutes).replace(".", ",") + " min"
+        : furyDurationCopy(effect.furyMinutes, willpower)) + " de duração",
+    );
   }
 
   for (const definition of ATTRIBUTES) {

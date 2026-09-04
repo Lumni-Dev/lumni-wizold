@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import type { Item } from "@/models/entities/item";
+import { useGame } from "@/controllers/game.context";
 import { itemSubtitle, summarizeEffect } from "../presenters/item.presenter";
 import { Card, CardBody, CardFooter, CardHeader } from "./card";
 import { ItemBanner, ItemIcon, useItemArt } from "./item-icon";
@@ -29,7 +30,11 @@ export function ItemCard({
   fromBazaar = false,
   height = "fill",
 }: ItemCardProps) {
-  const effects = summarizeEffect(item, enhancement);
+  const { stats } = useGame();
+  const willpower = stats
+    ? stats.totalAttributes.willpower - stats.sources.fury.willpower
+    : undefined;
+  const effects = summarizeEffect(item, enhancement, willpower);
   const drawn = Boolean(useItemArt(item));
 
   return (
