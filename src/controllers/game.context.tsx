@@ -46,7 +46,7 @@ import type { TrainingReport } from "./training.controller";
 import * as automationController from "./automation.controller";
 import { ActivityEngine } from "./activity-engine";
 import { activityMirrorStore } from "./activity-mirror.store";
-import { activityRuntimeStore } from "./activity-runtime";
+import { activityRuntimeStore, armRestClock, clearRestClock } from "./activity-runtime";
 import { activitySync } from "./activity-sync";
 import { api, isTransientApiMessage, type ApiAnswer } from "./api.client";
 import { activityApi, activityQueuedApi, activitySlotRoute, activityThreadBusy, flushActivityKeepalive } from "./activity-thread";
@@ -498,6 +498,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
           }
         : undefined;
     setActivity({ kind: "rest", resume }, true);
+    armRestClock(REST_TICK_MS);
     const answer = await act(
       "POST",
       "/api/character/rest",
@@ -612,6 +613,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
             answer.status >= 500 ||
             isTransientApiMessage(answer.message)
           ) {
+            armRestClock(REST_TICK_MS);
             schedule(REST_TICK_MS);
             return;
           }
@@ -625,10 +627,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
         }
         if (answer.data?.done) {
           announce("Recuperação completa: vida inteira.", true, "Recuperação");
+          clearRestClock();
           setActivity(automationController.resumeAfterRest(stateRef.current, activityRef.current));
           return;
         }
-        schedule(answer.data?.nextInMs ?? REST_TICK_MS);
+        const wait = answer.data?.nextInMs ?? REST_TICK_MS;
+        armRestClock(wait);
+        schedule(wait);
       } finally {
         inflight = false;
       }

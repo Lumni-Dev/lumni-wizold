@@ -76,6 +76,11 @@ export async function PATCH(request: Request) {
         resumeEnhancement: resume?.enhancement ?? null,
       });
     }
-    return success(current, "", { done, ticks, nextInMs: REST_TICK_MS });
+    const remainder = elapsed - ticks * REST_TICK_MS;
+    return success(current, "", {
+      done,
+      ticks,
+      nextInMs: Math.max(250, REST_TICK_MS - remainder),
+    });
   });
 }

@@ -1,26 +1,43 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { activityMirrorStore } from "@/controllers/activity-mirror.store";
+import { activityRuntimeStore } from "@/controllers/activity-runtime";
 import { REST_TICK_MS } from "@/shared/constants/game";
 
 const TICK_SECS = REST_TICK_MS / 1000;
 
-function remainingFrom(origin: number): number {
-  const elapsed = Math.max(0, Date.now() - origin);
-  const left = TICK_SECS - (Math.floor(elapsed / 1000) % TICK_SECS);
-  return left === 0 ? TICK_SECS : left;
+function secondsUntil(nextAt: number | null | undefined): number {
+  if (nextAt == null) return TICK_SECS;
+  const left = Math.ceil((nextAt - Date.now()) / 1000);
+  return left <= 0 ? 1 : left;
 }
 
 export function RestSeconds() {
-  const [origin] = useState(() => Date.now());
-  const [seconds, setSeconds] = useState(() => remainingFrom(origin));
+  const nextAt = useSyncExternalStore(
+    (listener) => {
+      const offRuntime = activityRuntimeStore.subscribe(listener);
+      const offMirror = activityMirrorStore.subscribe(listener);
+      return () => {
+        offRuntime();
+        offMirror();
+      };
+    },
+    () => {
+      const mirror = activityMirrorStore.snapshot();
+      if (mirror.mirroring && mirror.runtime) return mirror.runtime.restNextAt ?? null;
+      return activityRuntimeStore.snapshot().restNextAt;
+    },
+    () => null,
+  );
+  const [seconds, setSeconds] = useState(() => secondsUntil(nextAt));
 
   useEffect(() => {
-    const sync = () => setSeconds(remainingFrom(origin));
+    const sync = () => setSeconds(secondsUntil(nextAt));
     sync();
     const timer = window.setInterval(sync, 250);
     return () => window.clearInterval(timer);
-  }, [origin]);
+  }, [nextAt]);
 
   return <>{seconds}</>;
 }

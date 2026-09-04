@@ -52,6 +52,7 @@ export interface ActivityRuntimeSnapshot {
   mine: CycleRuntime | null;
   forge: ForgeRuntime | null;
   lastHuntReport: HuntReport | null;
+  restNextAt: number | null;
 }
 
 export function activityHref(kind: ActivityKind): string {
@@ -76,6 +77,7 @@ const EMPTY: ActivityRuntimeSnapshot = {
   mine: null,
   forge: null,
   lastHuntReport: null,
+  restNextAt: null,
 };
 
 let snapshot: ActivityRuntimeSnapshot = EMPTY;
@@ -101,11 +103,21 @@ export function clearActivityRuntime(): void {
     snapshot.train === null &&
     snapshot.mine === null &&
     snapshot.forge === null &&
-    snapshot.lastHuntReport === null
+    snapshot.lastHuntReport === null &&
+    snapshot.restNextAt === null
   ) {
     return;
   }
   publishActivityRuntime(EMPTY);
+}
+
+export function armRestClock(nextInMs: number): void {
+  patchActivityRuntime({ restNextAt: Date.now() + Math.max(0, nextInMs) });
+}
+
+export function clearRestClock(): void {
+  if (snapshot.restNextAt === null) return;
+  patchActivityRuntime({ restNextAt: null });
 }
 
 export const activityRuntimeStore = {
