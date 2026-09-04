@@ -18,7 +18,7 @@ import { ARENA_DAILY_ATTACKS, arenaSpoilsRange, arenaStats } from "@/models/rule
 import type { DerivedStats } from "@/models/rules/stats";
 import { canPetFight, isPetActive, petLevelOf, petMaxEnergy } from "@/models/rules/pet";
 import { playSound } from "@/controllers/sound";
-import { HUNT_TICK_MS } from "@/shared/constants/game";
+import { HUNT_APPROACH_TICKS, HUNT_TICK_MS } from "@/shared/constants/game";
 import { ICON_FRAME_INSET } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { formatDay, formatNumber, formatBronze } from "@/shared/utils/format";
@@ -130,6 +130,8 @@ export function ArenaScreen() {
   const [roster, setRoster] = useState<Hunter[]>([]);
   const [fighting, setFighting] = useState<{ hunter: Hunter; maxHealth: number } | null>(null);
   const [beat, setBeat] = useState(0);
+  const [approachBeat, setApproachBeat] = useState(0);
+  const [approaching, setApproaching] = useState(false);
   const [report, setReport] = useState<ArenaResolution | null>(null);
   const [script, setScript] = useState<NarrationLine[]>([]);
   const [myJolt, setMyJolt] = useState(0);
@@ -181,33 +183,47 @@ export function ArenaScreen() {
     if (!fighting) return;
     const target = fighting.hunter.id;
     let alive = true;
-    let fillTimer = 0;
-    requestingRef.current = true;
+    let approachBeatLocal = 0;
+    let approachingLocal = true;
+    requestingRef.current = false;
     beatRef.current = 0;
     pendingRef.current = null;
     scriptRef.current = [];
     /* eslint-disable react-hooks/set-state-in-effect */
     setBeat(0);
     setScript([]);
+    setApproachBeat(0);
+    setApproaching(true);
     /* eslint-enable react-hooks/set-state-in-effect */
-    void challengeRef.current(target).then((resolution) => {
-      if (!alive) return;
-      if (!resolution) {
+    const fireChallenge = () => {
+      requestingRef.current = true;
+      void challengeRef.current(target).then((resolution) => {
+        if (!alive) return;
         requestingRef.current = false;
-        setFighting(null);
+        if (!resolution) {
+          setFighting(null);
+          return;
+        }
+        pendingRef.current = resolution;
+        bledRef.current = { last: characterRef.current?.health ?? 0, total: 0 };
+        scriptRef.current = narrationOf({ foe: resolution.foe, combat: resolution.combat });
+        setScript(scriptRef.current);
+        setBeat(0);
+      });
+    };
+    const timer = window.setInterval(() => {
+      if (requestingRef.current) return;
+      if (approachingLocal) {
+        approachBeatLocal += 1;
+        setApproachBeat(approachBeatLocal);
+        if (approachBeatLocal >= HUNT_APPROACH_TICKS) {
+          approachingLocal = false;
+          setApproaching(false);
+          fireChallenge();
+        }
         return;
       }
-      pendingRef.current = resolution;
-      bledRef.current = { last: characterRef.current?.health ?? 0, total: 0 };
-      scriptRef.current = narrationOf({ foe: resolution.foe, combat: resolution.combat });
-      setScript(scriptRef.current);
-      setBeat(0);
-      fillTimer = window.setTimeout(() => {
-        requestingRef.current = false;
-      }, HUNT_TICK_MS);
-    });
-    const timer = window.setInterval(() => {
-      if (!pendingRef.current || requestingRef.current) return;
+      if (!pendingRef.current) return;
       beatRef.current += 1;
       setBeat(beatRef.current);
       const line = scriptRef.current[Math.min(beatRef.current, scriptRef.current.length) - 1];
@@ -239,7 +255,6 @@ export function ArenaScreen() {
     return () => {
       alive = false;
       window.clearInterval(timer);
-      if (fillTimer) window.clearTimeout(fillTimer);
       if (pendingRef.current) {
         pendingRef.current = null;
         landRef.current();
@@ -382,13 +397,18 @@ export function ArenaScreen() {
               name={fighting.hunter.name}
               level={fighting.hunter.level}
               side="Desafiado"
-              health={duelLine ? duelLine.creatureHealth : script.length > 0 ? fighting.maxHealth : 0}
+              health={duelLine ? duelLine.creatureHealth : fighting.maxHealth}
               maximum={fighting.maxHealth}
             />
           </div>
 
           <div className="space-y-3 p-4">
-            <Bar label="Duelo" current={beat} maximum={Math.max(1, script.length)} glows />
+            <Bar
+              label={approaching ? "No fosso..." : "Duelo"}
+              current={approaching ? approachBeat : beat}
+              maximum={approaching ? HUNT_APPROACH_TICKS : Math.max(1, script.length)}
+              glows
+            />
             {petAlong ? (
               <Bar
                 label="Mascote - Energia"

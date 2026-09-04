@@ -2003,12 +2003,20 @@ sec("personagem");
   const resting = characterCtrl.startRest(tired);
   ok("repousar quando ferido é permitido", resting.ok);
   const tick = characterCtrl.restTick(resting.state);
-  const max = stats.deriveStats(resting.state.character, state.equipment, null).maxHealth;
+  const restedDerived = stats.deriveStats(resting.state.character, state.equipment, null);
+  const max = restedDerived.maxHealth;
+  const restHeal = Math.max(
+    1,
+    Math.ceil(max * characterCtrl.restRecoveryRatio(restedDerived.totalAttributes.willpower)),
+  );
   ok(
-    "o tique devolve vida pelo passo do descanso",
-    tick.ok &&
-      tick.state.character.health ===
-        Math.min(max, 50 + Math.max(1, Math.ceil(max * CONST.REST_HEALTH_RATIO))),
+    "o tique devolve vida pela vontade e pelo passo do descanso",
+    tick.ok && tick.state.character.health === Math.min(max, 50 + restHeal),
+  );
+  ok(
+    "a vontade acelera a recuperação",
+    characterCtrl.restRecoveryRatio(500) > characterCtrl.restRecoveryRatio(0) &&
+      characterCtrl.restRecoveryRatio(0) === CONST.REST_HEALTH_RATIO,
   );
   const whole = baseState({ level: 10 });
   ok("inteiro não repousa", characterCtrl.startRest(whole).ok === false);

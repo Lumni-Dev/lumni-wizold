@@ -38,6 +38,7 @@ import {
 } from "@/models/repositories/hunt-selection.repository";
 import { Bar } from "../components/bar";
 import { RestSeconds } from "../components/rest-seconds";
+import { RestHealed } from "../components/rest-healed";
 import { Button } from "../components/button";
 import { Card } from "../components/card";
 import { useShake } from "../components/use-shake";
@@ -343,6 +344,7 @@ export function HuntScreen() {
           const opting = active && cooldown !== null;
           const selectedId = resolveHuntCreatureId(creatures, effectiveSelection[territory.id]);
           const onThis = active && progress.id === territory.id;
+          const approach = onThis ? (huntRt?.approach ?? null) : null;
           const line =
             onThis && progress.beat > 0 && script.length > 0
               ? script[Math.min(progress.beat, script.length) - 1]
@@ -425,6 +427,7 @@ export function HuntScreen() {
                         maximum={stats.maxHealth}
                         tone="blood"
                         glows={recovering && character.health < stats.maxHealth}
+                        delta={recovering ? <RestHealed /> : undefined}
                       />
                     </div>
                   ) : null}
@@ -441,8 +444,8 @@ export function HuntScreen() {
                   <div className="px-4 py-3">
                     <Bar
                       label={active ? "Caçando..." : "Caçar"}
-                      current={onThis ? progress.beat : 0}
-                      maximum={Math.max(1, script.length)}
+                      current={approach ? approach.beat : onThis ? progress.beat : 0}
+                      maximum={approach ? approach.max : Math.max(1, script.length)}
                       glows={active}
                       wraps
                     />

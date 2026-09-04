@@ -28,6 +28,7 @@ import { GLASS_SECTION } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { ActionIcon, NavIcon } from "./app-icon";
 import { Bar } from "./bar";
+import { RestHealed } from "./rest-healed";
 import { Button } from "./button";
 import { CornerAccents } from "./corner-accents";
 import { List, ListRow } from "./list";
@@ -70,6 +71,7 @@ export function ActivityDock() {
     const script = huntRt.script;
     const pending = huntRt.pending;
     const cooldown = huntRt.cooldown;
+    const approach = huntRt.approach ?? null;
     const line =
       beat > 0 && script.length > 0 ? script[Math.min(beat, script.length) - 1] : null;
     const replaying = pending !== null && line !== null;
@@ -112,8 +114,13 @@ export function ActivityDock() {
       preyCurrent: monsterCurrent,
       preyMax: monsterMax,
       huntLabel: "Caçando...",
-      huntCurrent: cooldown !== null ? cooldown : beat,
-      huntMax: cooldown !== null ? CYCLE_OPTOUT_SECS : Math.max(1, script.length),
+      huntCurrent: cooldown !== null ? cooldown : approach ? approach.beat : beat,
+      huntMax:
+        cooldown !== null
+          ? CYCLE_OPTOUT_SECS
+          : approach
+            ? approach.max
+            : Math.max(1, script.length),
       wraps: cooldown === null && script.length > 1,
       glows: true,
       line,
@@ -632,6 +639,7 @@ export function ActivityDock() {
                     maximum={restView.healthMax}
                     tone="blood"
                     glows={restView.glows}
+                    delta={<RestHealed />}
                   />
                 </ListRow>
               ) : null}

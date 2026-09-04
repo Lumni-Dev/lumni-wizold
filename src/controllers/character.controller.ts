@@ -3,6 +3,8 @@ import {
   NAME_MIN_LENGTH,
   RENAME_COOLDOWN_DAYS,
   REST_HEALTH_RATIO,
+  REST_WILLPOWER_HALF,
+  REST_WILLPOWER_MAX_BONUS,
 } from "@/shared/constants/game";
 import { ECONOMY } from "@/shared/config/economy";
 import { formatBronze } from "@/shared/utils/format";
@@ -134,18 +136,25 @@ export function startRest(state: GameState): Result {
   return success(addLog(state, "character", message), "");
 }
 
-function restRecovery(maximum: number, ratio: number): number {
-  return Math.max(1, Math.ceil(maximum * ratio));
+export function restRecoveryRatio(willpower: number): number {
+  const value = Math.max(0, willpower);
+  return REST_HEALTH_RATIO + REST_WILLPOWER_MAX_BONUS * (value / (value + REST_WILLPOWER_HALF));
 }
 
-export function restTick(state: GameState): Result<{ done: boolean }> {
+function restRecovery(maximum: number, willpower: number): number {
+  return Math.max(1, Math.ceil(maximum * restRecoveryRatio(willpower)));
+}
+
+export function restTick(state: GameState): Result<{ done: boolean; healed: number }> {
   const character = state.character;
   if (!character) return failure(state, "Nenhum personagem ativo.");
 
   const stats = deriveStats(character, state.equipment, state.pet);
   const healthGained =
-    Math.min(stats.maxHealth, character.health + restRecovery(stats.maxHealth, REST_HEALTH_RATIO)) -
-    character.health;
+    Math.min(
+      stats.maxHealth,
+      character.health + restRecovery(stats.maxHealth, stats.totalAttributes.willpower),
+    ) - character.health;
 
   const next = updateCharacter(state, (current) => ({
     ...current,
@@ -157,11 +166,14 @@ export function restTick(state: GameState): Result<{ done: boolean }> {
 
   if (done) {
     const message = "Recuperação completa: vida inteira.";
-    return success(addLog(next, "character", message), message, { done });
+    return success(addLog(next, "character", message), message, { done, healed: healthGained });
   }
 
-  if (healthGained <= 0) return success(next, "", { done: false });
-  return success(next, "Você regenerou " + healthGained + " de vida.", { done: false });
+  if (healthGained <= 0) return success(next, "", { done: false, healed: 0 });
+  return success(next, "Você regenerou " + healthGained + " de vida.", {
+    done: false,
+    healed: healthGained,
+  });
 }
 
 export interface ExperienceGrant {

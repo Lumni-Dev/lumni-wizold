@@ -46,7 +46,12 @@ import type { TrainingReport } from "./training.controller";
 import * as automationController from "./automation.controller";
 import { ActivityEngine } from "./activity-engine";
 import { activityMirrorStore } from "./activity-mirror.store";
-import { activityRuntimeStore, armRestClock, clearRestClock } from "./activity-runtime";
+import {
+  activityRuntimeStore,
+  armRestClock,
+  clearRestClock,
+  patchActivityRuntime,
+} from "./activity-runtime";
 import { activitySync } from "./activity-sync";
 import { activityApi, activityQueuedApi, activitySlotRoute, activityThreadBusy, flushActivityKeepalive } from "./activity-thread";
 import { api, isTransientApiMessage, type ApiAnswer } from "./api.client";
@@ -666,6 +671,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         const answer = await request<{
           done: boolean;
           ticks: number;
+          healed?: number;
           nextInMs?: number;
         }>("PATCH", "/api/character/rest");
         if (!alive) return;
@@ -684,7 +690,17 @@ export function GameProvider({ children }: { children: ReactNode }) {
           return;
         }
         const ticks = answer.data?.ticks ?? 0;
+        const healed = answer.data?.healed ?? 0;
         if (ticks > 0) playSound("rest");
+        if (healed > 0) {
+          const at = Date.now();
+          patchActivityRuntime({ restHealed: { amount: healed, at } });
+          window.setTimeout(() => {
+            if (activityRuntimeStore.snapshot().restHealed?.at === at) {
+              patchActivityRuntime({ restHealed: null });
+            }
+          }, 2500);
+        }
         if (answer.data?.done) {
           clearRestClock();
           setActivity(automationController.resumeAfterRest(stateRef.current, activityRef.current));

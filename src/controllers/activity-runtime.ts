@@ -33,6 +33,7 @@ export interface HuntRuntime {
   pending: HuntReport | null;
   cooldown: number | null;
   lastFoe?: HuntFoeSnapshot | null;
+  approach?: { beat: number; max: number } | null;
 }
 
 export interface CycleRuntime {
@@ -54,6 +55,7 @@ export interface ActivityRuntimeSnapshot {
   forge: ForgeRuntime | null;
   lastHuntReport: HuntReport | null;
   restNextAt: number | null;
+  restHealed: { amount: number; at: number } | null;
 }
 
 export function activityHref(kind: ActivityKind): string {
@@ -79,6 +81,7 @@ const EMPTY: ActivityRuntimeSnapshot = {
   forge: null,
   lastHuntReport: null,
   restNextAt: null,
+  restHealed: null,
 };
 
 let snapshot: ActivityRuntimeSnapshot = EMPTY;
@@ -105,7 +108,8 @@ export function clearActivityRuntime(): void {
     snapshot.mine === null &&
     snapshot.forge === null &&
     snapshot.lastHuntReport === null &&
-    snapshot.restNextAt === null
+    snapshot.restNextAt === null &&
+    snapshot.restHealed === null
   ) {
     return;
   }

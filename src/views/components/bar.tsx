@@ -29,6 +29,7 @@ interface BarProps {
   glows?: boolean;
   prominent?: boolean;
   unit?: string;
+  delta?: ReactNode;
   className?: string;
 }
 
@@ -47,6 +48,7 @@ export function Bar({
   glows = false,
   prominent = false,
   unit,
+  delta,
   className,
 }: BarProps) {
   const target = percentage(current, maximum);
@@ -85,6 +87,7 @@ export function Bar({
           {label}
         </span>
         <span className="shrink-0 font-mono text-[11px] text-ink-soft">
+          {delta ? <span className="text-blood">{delta} </span> : null}
           {formatNumber(current)}
           <span className="text-ink-faint">/{formatNumber(maximum)}</span>
           {unit ? <span className="text-ink-faint"> {unit}</span> : null}

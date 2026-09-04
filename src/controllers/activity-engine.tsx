@@ -21,6 +21,7 @@ import { trainingSessionTicks } from "@/models/rules/training";
 import {
   CYCLE_OPTOUT_SECS,
   FORGE_TICKS,
+  HUNT_APPROACH_TICKS,
   HUNT_TICK_MS,
   MAX_ENHANCEMENT,
   MINING_TICK_MS,
@@ -295,6 +296,8 @@ export function ActivityEngine() {
     let coolTimer = 0;
     let fillTimer = 0;
     let beat = 0;
+    let approachBeat = 0;
+    let approaching = false;
     let script: ReturnType<typeof narrationOf> = [];
     let pending: HuntReport | null = null;
     const priorHunt = activityRuntimeStore.snapshot().hunt;
@@ -306,8 +309,9 @@ export function ActivityEngine() {
     const push = (cooldown: number | null) => {
       const max = Math.max(1, script.length);
       const line = script[Math.min(beat, script.length) - 1];
-      const detail =
-        pending && beat > 0 && line
+      const detail = approaching
+        ? "Rastreando a presa"
+        : pending && beat > 0 && line
           ? line.text.slice(0, 72) + (line.text.length > 72 ? "…" : "")
           : pending
             ? "Preparando a emboscada"
@@ -320,27 +324,30 @@ export function ActivityEngine() {
           pending,
           cooldown,
           lastFoe,
+          approach: approaching ? { beat: approachBeat, max: HUNT_APPROACH_TICKS } : null,
         },
         dock: dockOf(
           "hunt",
           "Caçando · " + territoryName(activeHunt),
           detail,
-          beat,
-          max,
+          approaching ? approachBeat : beat,
+          approaching ? HUNT_APPROACH_TICKS : max,
           cooldown,
         ),
       });
     };
 
-    const resolve = () => {
+    const startLap = () => {
       beat = 0;
+      approachBeat = 0;
+      approaching = false;
       script = [];
       pending = null;
       requesting = true;
       push(null);
       const wait = huntReadyInMs();
       if (wait > 0) {
-        fillTimer = window.setTimeout(resolve, wait);
+        fillTimer = window.setTimeout(startLap, wait);
         return;
       }
       if (
@@ -350,11 +357,18 @@ export function ActivityEngine() {
         if (!furyWaitStarted) furyWaitStarted = Date.now();
         if (Date.now() - furyWaitStarted < 8000) {
           requestAutomationPulse();
-          fillTimer = window.setTimeout(resolve, 250);
+          fillTimer = window.setTimeout(startLap, 250);
           return;
         }
       }
       furyWaitStarted = 0;
+      approaching = true;
+      requesting = false;
+      push(null);
+    };
+
+    const fireHunt = () => {
+      requesting = true;
       const selection = loadHuntSelection();
       const row = listTerritories(stateRef.current).find(
         (entry) => entry.territory.id === activeHunt,
@@ -367,7 +381,7 @@ export function ActivityEngine() {
         requesting = false;
         if (result.kind === "retry") {
           markHuntReadyIn(result.retryAfterMs);
-          fillTimer = window.setTimeout(resolve, Math.max(HUNT_TICK_MS, result.retryAfterMs));
+          fillTimer = window.setTimeout(startLap, Math.max(HUNT_TICK_MS, result.retryAfterMs));
           return;
         }
         if (result.kind === "stop") {
@@ -391,9 +405,6 @@ export function ActivityEngine() {
         beat = 0;
         markHuntReadyIn(script.length * HUNT_TICK_MS);
         push(null);
-        fillTimer = window.setTimeout(() => {
-          requesting = false;
-        }, HUNT_TICK_MS);
       });
     };
 
@@ -407,20 +418,29 @@ export function ActivityEngine() {
         if (remaining <= 0) {
           window.clearInterval(coolTimer);
           coolTimer = 0;
-          resolve();
+          startLap();
         } else {
           push(remaining);
         }
       }, 250);
     };
 
-    resolve();
+    startLap();
     const stopDrift = createDriftLoop({
       periodMs: HUNT_TICK_MS,
       catchUp: false,
       alive: () => alive,
-      ready: () => Boolean(pending) && !requesting,
+      ready: () => !requesting && (approaching || Boolean(pending)),
       onTick: () => {
+        if (approaching) {
+          approachBeat += 1;
+          push(null);
+          if (approachBeat >= HUNT_APPROACH_TICKS) {
+            approaching = false;
+            fireHunt();
+          }
+          return;
+        }
         beat += 1;
         const line = script[Math.min(beat, script.length) - 1];
         if (line?.blow === "ours") playSound(line.critical ? "crit" : "hit");

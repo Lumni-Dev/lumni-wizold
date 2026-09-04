@@ -77,9 +77,11 @@ export async function PATCH(request: Request) {
       });
     }
     const remainder = elapsed - ticks * REST_TICK_MS;
+    const healed = (current.character?.health ?? 0) - (state.character?.health ?? 0);
     return success(current, "", {
       done,
       ticks,
+      healed,
       nextInMs: Math.max(250, REST_TICK_MS - remainder),
     });
   });
