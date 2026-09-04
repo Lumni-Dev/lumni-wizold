@@ -22,6 +22,7 @@ import type { PackInvite } from "@/models/entities/pack";
 import type { PresenceStatus } from "@/models/entities/presence";
 import { moonRepository } from "@/models/repositories/moon.repository";
 import { clearSession, markSession } from "@/models/repositories/session-hint.repository";
+import { disableGoogleAutoSelect } from "./google-identity";
 import {
   clearActivityResume,
   mergeActivityResume,
@@ -916,6 +917,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         setActivity(null);
         setAuthenticated(false);
         clearSession();
+        disableGoogleAutoSelect();
         setTutorial(true);
       },
       logoutEverywhere: async () => {
@@ -926,6 +928,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         setActivity(null);
         setAuthenticated(false);
         clearSession();
+        disableGoogleAutoSelect();
         setTutorial(true);
       },
       deleteRun: async (code) => {
