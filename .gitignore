@@ -54,6 +54,7 @@ next-env.d.ts
 .sim-audit
 .sim-art
 public/art-manifest.json
+public/radio-manifest.json
 .sound-forge
 .art-forge
 public/assets/inventory/.tmp

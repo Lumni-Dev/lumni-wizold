@@ -1,7 +1,8 @@
-import { readdir, stat } from "node:fs/promises";
+import { readdir, readFile, stat } from "node:fs/promises";
 import { join, parse } from "node:path";
 
 const RADIO_DIR = join(process.cwd(), "public", "assets", "radio");
+const MANIFEST_PATH = join(process.cwd(), "public", "radio-manifest.json");
 const AUDIO_EXTENSIONS = new Set([
   ".mp3",
   ".ogg",
@@ -24,7 +25,7 @@ function prettyName(base: string): string {
   return cleaned.length > 0 ? cleaned : base;
 }
 
-export async function listRadioTracks(): Promise<RadioTrack[]> {
+export async function scanRadioTracksFromDisk(): Promise<RadioTrack[]> {
   let entries: string[];
   try {
     entries = await readdir(RADIO_DIR);
@@ -47,4 +48,16 @@ export async function listRadioTracks(): Promise<RadioTrack[]> {
   }
   tracks.sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
   return tracks;
+}
+
+export async function readRadioTracks(): Promise<RadioTrack[]> {
+  if (process.env.NODE_ENV !== "production") {
+    return scanRadioTracksFromDisk();
+  }
+  try {
+    const raw = await readFile(MANIFEST_PATH, "utf8");
+    return JSON.parse(raw) as RadioTrack[];
+  } catch {
+    return [];
+  }
 }
