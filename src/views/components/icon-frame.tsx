@@ -80,6 +80,7 @@ export function IconArt({
   fit = "cover",
   zoom = true,
   priority = false,
+  shadow = true,
   onFail,
 }: {
   source: string;
@@ -90,6 +91,7 @@ export function IconArt({
   fit?: "cover" | "contain";
   zoom?: boolean;
   priority?: boolean;
+  shadow?: boolean;
   onFail?: () => void;
 }) {
   const imgRef = useRef<HTMLImageElement>(null);
@@ -137,7 +139,8 @@ export function IconArt({
           }}
           onError={() => onFail?.()}
           className={cn(
-            "art-soft-shadow max-h-full max-w-full transition-opacity duration-300",
+            "max-h-full max-w-full transition-opacity duration-300",
+            shadow && "art-soft-shadow",
             fit === "contain" ? "object-contain" : "h-full w-full object-cover",
             loaded ? "opacity-100" : "opacity-0",
             zoom && "cursor-zoom-in",
@@ -171,7 +174,8 @@ export function IconArt({
                   alt=""
                   referrerPolicy="no-referrer"
                   className={cn(
-                    "art-soft-shadow h-full w-full",
+                    "h-full w-full",
+                    shadow && "art-soft-shadow",
                     fit === "contain" ? "object-contain" : "object-cover",
                     inset ? "p-[12px]" : "p-[14px]",
                     inset,
