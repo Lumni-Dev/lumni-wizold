@@ -1,9 +1,9 @@
 import type { Gender } from "@/models/entities/character";
-import { radioRepository } from "@/models/repositories/radio.repository";
 import { soundRepository } from "@/models/repositories/sound.repository";
+import { radioStore } from "./radio.store";
 
 function soundActive(): boolean {
-  return soundRepository.enabled() && !radioRepository.enabled();
+  return soundRepository.enabled() && !radioStore.isPlaying();
 }
 const SOURCES = {
   ui: "/assets/sounds/ui/ui.mp3",

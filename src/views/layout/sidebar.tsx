@@ -18,7 +18,6 @@ import { CONTROL_HEIGHT } from "@/shared/constants/ui";
 import { chipClass, ChipFrame } from "../components/chip";
 import { MoonTracker } from "../components/moon-tracker";
 import { FuryModeTracker } from "../components/fury-mode-tracker";
-import { RadioMiniPlayer } from "../components/radio-mini-player";
 import { NavIcon } from "../components/app-icon";
 
 function Brand() {
@@ -142,7 +141,6 @@ export function Sidebar({
         <FuryModeTracker />
         <NavLink item={STORE_LINK} active={pathname === STORE_LINK.href} highlighted />
         <NavLink item={SETTINGS_LINK} active={pathname === SETTINGS_LINK.href} />
-        <RadioMiniPlayer />
       </div>
     </aside>
   );

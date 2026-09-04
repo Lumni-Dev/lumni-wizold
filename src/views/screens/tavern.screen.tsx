@@ -10,6 +10,7 @@ import { listPack } from "@/controllers/pack.controller";
 import { usePackPresence } from "@/controllers/use-pack-presence";
 import { useTavernDoing } from "@/controllers/use-tavern-doing";
 import { playSound } from "@/controllers/sound";
+import { radioStore } from "@/controllers/radio.store";
 import { dismissTavernNotices } from "@/controllers/tavern-notify";
 import { useTavern } from "@/controllers/use-tavern";
 import { describeDoing, doingFor } from "@/models/entities/activity";
@@ -53,6 +54,8 @@ import { FilteredEmptyState } from "../components/filtered-empty-state";
 import { Tooltip } from "../components/tooltip";
 import { PageHeader } from "../layout/page-header";
 import { PRESENCE_LABELS, PresenceDot } from "../components/presence-dot";
+import { RadioPlayer } from "../components/radio-player";
+import { RadioMiniPlayer } from "../components/radio-mini-player";
 import {
   TavernRoomChatComposer,
   TavernRoomChatMembers,
@@ -331,6 +334,15 @@ export function TavernScreen() {
     if (!entry?.isMember) tavernChatStore.closeWindow();
   }, [ready, mobileChat, openRoomId, rooms]);
 
+  const radio = useSyncExternalStore(
+    radioStore.subscribe,
+    radioStore.snapshot,
+    radioStore.serverSnapshot,
+  );
+  useEffect(() => {
+    radioStore.load();
+  }, []);
+
   const filteredRooms = useMemo(() => {
     return rooms.filter(({ room, isMember }) => roomMatchesSearch(room, isMember, roomSearch));
   }, [rooms, roomSearch]);
@@ -506,6 +518,13 @@ export function TavernScreen() {
           </Tag>
         }
       />
+
+      {radio.tracks.length > 0 ? (
+        <div className="border-b border-edge pb-6">
+          <RadioPlayer />
+          <RadioMiniPlayer />
+        </div>
+      ) : null}
 
       <Panel
         title="Alcance desta taverna"

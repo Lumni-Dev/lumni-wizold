@@ -11,9 +11,10 @@ interface RadioState {
   tracks: RadioTrack[];
   index: number;
   loaded: boolean;
+  playing: boolean;
 }
 
-const EMPTY: RadioState = { tracks: [], index: 0, loaded: false };
+const EMPTY: RadioState = { tracks: [], index: 0, loaded: false, playing: false };
 
 let state: RadioState = EMPTY;
 let loading = false;
@@ -46,7 +47,7 @@ export const radioStore = {
       .then((answer) => {
         const tracks = answer.ok && answer.data ? answer.data.tracks : [];
         const index = tracks.length > 0 ? Math.floor(Math.random() * tracks.length) : 0;
-        set({ tracks, index, loaded: true });
+        set({ tracks, index, loaded: true, playing: state.playing });
       })
       .finally(() => {
         loading = false;
@@ -59,6 +60,13 @@ export const radioStore = {
   },
   current(): RadioTrack | null {
     return state.tracks[state.index] ?? null;
+  },
+  setPlaying(on: boolean): void {
+    if (state.playing === on) return;
+    set({ ...state, playing: on });
+  },
+  isPlaying(): boolean {
+    return state.playing;
   },
   next(): void {
     const total = state.tracks.length;

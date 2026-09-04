@@ -39,6 +39,11 @@ export function RadioPlayer() {
   const trackUrl = track?.url ?? null;
 
   useEffect(() => {
+    radioStore.setPlaying(Boolean(trackUrl));
+    return () => radioStore.setPlaying(false);
+  }, [trackUrl]);
+
+  useEffect(() => {
     const audio = audioRef.current;
     if (audio) audio.volume = volume;
   }, [volume, trackUrl]);

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useSyncExternalStore, type RefObject } from "react";
 import { musicRepository } from "@/models/repositories/music.repository";
-import { radioRepository } from "@/models/repositories/radio.repository";
+import { radioStore } from "@/controllers/radio.store";
 
 const TRACK = "/assets/sounds/trilha.mp3?v=1";
 const LANDING_VOLUME = 0.5;
@@ -83,12 +83,12 @@ export function GameMusic() {
     musicRepository.volume,
     musicRepository.serverVolumeSnapshot,
   );
-  const radioOn = useSyncExternalStore(
-    radioRepository.subscribe,
-    radioRepository.enabled,
-    radioRepository.serverSnapshot,
+  const radioPlaying = useSyncExternalStore(
+    radioStore.subscribe,
+    radioStore.isPlaying,
+    () => false,
   );
-  const playing = enabled && !radioOn;
+  const playing = enabled && !radioPlaying;
 
   useMusicPlayback(audioRef, { enabled: playing, volume });
 

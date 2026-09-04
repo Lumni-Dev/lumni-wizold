@@ -602,7 +602,7 @@ export function SettingsScreen() {
         {shows("radio") ? (
           <Panel
             title="W-Radio"
-            description="O volume do rádio. Ligar e desligar, pular faixa e ver o que toca ficam no mini player no rodapé do menu lateral. Enquanto o rádio toca, a trilha e os efeitos do jogo ficam em silêncio."
+            description="O volume do rádio. Ligar e desligar, pular faixa e ver o que toca ficam no player da taverna, e o rádio só toca lá. Enquanto o rádio toca, a trilha e os efeitos do jogo ficam em silêncio."
             padding="none"
           >
             <List>
