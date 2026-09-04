@@ -97,6 +97,7 @@ export function InventoryScreen() {
             return (
               <Card key={slot} height="content" tone={item ? "highlighted" : "empty"}>
                 <CardHeader
+                  artSize="small"
                   art={
                     item ? (
                       <ItemArtFill item={item} enhancement={piece?.enhancement ?? 0} />

@@ -61,10 +61,12 @@ export function Card({
 
 export function CardHeader({
   art,
+  artSize = "default",
   children,
   className,
 }: {
   art?: ReactNode;
+  artSize?: "default" | "small";
   children: ReactNode;
   className?: string;
 }) {
@@ -73,7 +75,12 @@ export function CardHeader({
   if (art) {
     return (
       <div className={cn("flex items-stretch", tone !== "empty" && "border-b border-edge")}>
-        <span className="flex aspect-square w-20 shrink-0 overflow-hidden border-r border-edge p-3 sm:w-28">
+        <span
+          className={cn(
+            "flex aspect-square shrink-0 overflow-hidden border-r border-edge",
+            artSize === "small" ? "w-16 p-2 sm:w-20" : "w-20 p-3 sm:w-28",
+          )}
+        >
           {art}
         </span>
         <div className={cn("flex min-w-0 grow items-center gap-3 px-4 py-3", ICON_FRAME_INSET, className)}>
