@@ -17,6 +17,7 @@ import { Field } from "../components/field";
 import { LiveBackdrop } from "../components/live-backdrop";
 import { LandingMusic } from "../components/game-music";
 import { Select, type SelectOption } from "../components/select";
+import { Spinner } from "../components/spinner";
 
 function GoogleMark() {
   return (
@@ -140,7 +141,7 @@ export function LoginScreen() {
     birthRef.current = birth;
   }, [birth]);
   useEffect(() => {
-    if (!oldEnough || !GOOGLE_CLIENT_ID) return;
+    if (!ready || authenticated || !oldEnough || !GOOGLE_CLIENT_ID) return;
     let alive = true;
     const arm = () => {
       const host = buttonHost.current;
@@ -200,7 +201,17 @@ export function LoginScreen() {
       alive = false;
       script.removeEventListener("load", arm);
     };
-  }, [oldEnough, enter, router]);
+  }, [ready, authenticated, oldEnough, enter, router]);
+
+  if (!ready || authenticated) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 text-ink-faint">
+        <Spinner size="medium" />
+        <p className="heading text-[11px]">Carregando...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="relative flex min-h-screen flex-col">
       <LiveBackdrop />

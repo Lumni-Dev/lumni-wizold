@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { useGame } from "@/controllers/game.context";
+import { sessionHint } from "@/models/repositories/session-hint.repository";
 import { LORE_CHAPTERS, LORE_COMPANIONS, LORE_COUPLE, LORE_PILLARS } from "@/models/data/lore";
 import { PREVIEW_SHOTS } from "@/models/data/preview";
 import { GAME_NAME, GAME_TAGLINE } from "@/shared/constants/game";
@@ -29,6 +30,11 @@ export function LandingScreen() {
   const router = useRouter();
   const hasRun = ready && character !== null;
   const narration = useNarration();
+  const maybeLoggedIn = useSyncExternalStore(
+    sessionHint.subscribe,
+    sessionHint.snapshot,
+    sessionHint.serverSnapshot,
+  );
 
   useEffect(() => {
     if (!ready || !authenticated) return;
@@ -40,7 +46,7 @@ export function LandingScreen() {
     return () => document.body.classList.remove("landing-page");
   }, []);
 
-  if (ready && authenticated) {
+  if (ready ? authenticated : maybeLoggedIn) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-3 text-ink-faint">
         <Spinner size="medium" />

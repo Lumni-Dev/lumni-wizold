@@ -21,6 +21,7 @@ import type { Pet, PetGender } from "@/models/entities/pet";
 import type { PackInvite } from "@/models/entities/pack";
 import type { PresenceStatus } from "@/models/entities/presence";
 import { moonRepository } from "@/models/repositories/moon.repository";
+import { clearSession, markSession } from "@/models/repositories/session-hint.repository";
 import {
   clearActivityResume,
   mergeActivityResume,
@@ -494,6 +495,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         const answer = await call(method, path, body);
         if (answer.status === 401) {
           setAuthenticated(false);
+          clearSession();
           setTutorial(true);
           return answer;
         }
@@ -593,7 +595,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
     if (!hydrated) return;
     void (async () => {
       const answer = await api("POST", "/api/state");
-      if (answer.status !== 401) setAuthenticated(true);
+      if (answer.status !== 401) {
+        setAuthenticated(true);
+        markSession();
+      } else {
+        clearSession();
+      }
       if (typeof answer.tutorial === "boolean") setTutorial(answer.tutorial);
       if (answer.state) applyState(answer.state, ++mintRef.current);
       await activitySync.handshake(answer.activity);
@@ -849,9 +856,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
             needsTwoFactor: true,
           };
         }
-        setAuthenticated(true);
-        announce(answer.message, true, "Conta");
         await request("POST", "/api/state");
+        setAuthenticated(true);
+        markSession();
+        announce(answer.message, true, "Conta");
         return { hasCharacter: answer.data?.hasCharacter === true };
       },
       verifyTwoFactor: async (code) => {
@@ -862,9 +870,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
           announce(answer.message, false, "Conta");
           return null;
         }
-        setAuthenticated(true);
-        announce(answer.message, true, "Conta");
         await request("POST", "/api/state");
+        setAuthenticated(true);
+        markSession();
+        announce(answer.message, true, "Conta");
         return { hasCharacter: answer.data?.hasCharacter === true };
       },
       resendTwoFactor: async () => {
@@ -906,6 +915,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         applyState(initialState(), ++mintRef.current);
         setActivity(null);
         setAuthenticated(false);
+        clearSession();
         setTutorial(true);
       },
       logoutEverywhere: async () => {
@@ -915,6 +925,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         applyState(initialState(), ++mintRef.current);
         setActivity(null);
         setAuthenticated(false);
+        clearSession();
         setTutorial(true);
       },
       deleteRun: async (code) => {
@@ -924,6 +935,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
           applyState(initialState(), ++mintRef.current);
           setActivity(null);
           setAuthenticated(false);
+          clearSession();
           setTutorial(true);
         }
         return answer.ok;

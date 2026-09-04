@@ -20,8 +20,6 @@ import { TWO_FACTOR_CODE_LENGTH } from "@/shared/constants/auth";
 import { BRAND_LOGO_PNG_PATH, BRAND_LOGO_WEBP_PATH } from "@/shared/constants/site";
 import { formatNumber, formatBronze, formatReais, formatDay } from "@/shared/utils/format";
 import { sanitizeName } from "@/shared/utils/text";
-import { ICON_FRAME_INSET } from "@/shared/constants/ui";
-import { cn } from "@/shared/utils/class-names";
 import { Button } from "../components/button";
 import { AiAuditNotice } from "../components/ai-audit-notice";
 import { Chip } from "../components/chip";
@@ -29,8 +27,8 @@ import { ChipTabs } from "../components/chip-tabs";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { Field } from "../components/field";
 import { Modal } from "../components/modal";
-import { GenderIcon } from "../components/gender-icon";
-import { IconArt, IconFrame } from "../components/icon-frame";
+import { GenderArtFill } from "../components/gender-icon";
+import { IconArt } from "../components/icon-frame";
 import { List, ListRow, RowText } from "../components/list";
 import { Panel } from "../components/panel";
 import { Tag } from "../components/tag";
@@ -267,19 +265,21 @@ export function SettingsScreen() {
               </div>
             }
           >
-            <div className={cn("flex items-center gap-3 border-b border-edge p-4", ICON_FRAME_INSET)}>
-              {accountPicture ? (
-                <IconFrame size="medium" tone="strong">
+            <div className="flex items-stretch border-b border-edge">
+              <span className="flex aspect-square w-16 shrink-0 items-center justify-center overflow-hidden border-r border-edge p-2 sm:w-20">
+                {accountPicture ? (
                   <IconArt source={accountPicture} padded={false} zoom={false} />
-                </IconFrame>
-              ) : (
-                <GenderIcon gender={character.gender} size="medium" />
-              )}
-              <div className="min-w-0">
-                <p className="truncate text-sm text-ink">Conectado com Google</p>
-                <p className="truncate font-mono text-[11px] text-ink-faint">
-                  {accountEmail ?? "carregando..."}
-                </p>
+                ) : (
+                  <GenderArtFill gender={character.gender} />
+                )}
+              </span>
+              <div className="flex min-w-0 grow items-center px-4 py-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm text-ink">Conectado com Google</p>
+                  <p className="truncate font-mono text-[11px] text-ink-faint">
+                    {accountEmail ?? "carregando..."}
+                  </p>
+                </div>
               </div>
             </div>
             <p className="p-4 text-xs leading-relaxed text-ink-faint">
