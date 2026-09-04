@@ -262,7 +262,6 @@ export function ActivityEngine() {
   const setActivityRef = useRef(setActivity);
   const syncProgressRef = useRef(syncProgress);
   const persistActivityRef = useRef(persistActivity);
-  const pathnameRef = useRef(pathname);
   const forgeLevelRef = useRef(0);
   const forgeItemRef = useRef<string | null>(null);
 
@@ -280,7 +279,6 @@ export function ActivityEngine() {
     setActivityRef.current = setActivity;
     syncProgressRef.current = syncProgress;
     persistActivityRef.current = persistActivity;
-    pathnameRef.current = pathname;
   });
 
   useEffect(() => {
@@ -593,9 +591,6 @@ export function ActivityEngine() {
                 return;
               }
               if (landed) {
-                if (landed.message && pathnameRef.current !== "/training") {
-                  notifyRef.current(landed.message, true, "Treino");
-                }
                 if (landed.raised) {
                   playSound(activeExercise === PET_EXERCISE_ID ? "pet-up" : "point");
                 }
