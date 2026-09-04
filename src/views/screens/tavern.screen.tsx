@@ -554,7 +554,7 @@ export function TavernScreen() {
             <div className="-mx-4 -mt-4 mb-4 border-b border-edge p-4">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/assets/ui/taverna.webp?v=1"
+                src="/assets/ui/tavern.webp?v=1"
                 alt=""
                 className="block aspect-[3/2] w-full rounded-md object-cover"
               />

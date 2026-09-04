@@ -15,5 +15,5 @@ export const BRAND_LOGO_WEBP_PATH = "/assets/ui/logo.webp?v=" + BRAND_ASSET_VERS
 export const BRAND_LOGO_PNG_PATH = "/assets/ui/logo.png?v=" + BRAND_ASSET_VERSION;
 
 export const TAVERN_MUG_VERSION = "3";
-export const TAVERN_MUG_PATH = "/assets/ui/caneca.webp?v=" + TAVERN_MUG_VERSION;
-export const TAVERN_MUG_PNG_PATH = "/assets/ui/caneca.png?v=" + TAVERN_MUG_VERSION;
+export const TAVERN_MUG_PATH = "/assets/ui/tavern-mug.webp?v=" + TAVERN_MUG_VERSION;
+export const TAVERN_MUG_PNG_PATH = "/assets/ui/tavern-mug.png?v=" + TAVERN_MUG_VERSION;
