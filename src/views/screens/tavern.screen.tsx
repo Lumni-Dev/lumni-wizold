@@ -531,7 +531,7 @@ export function TavernScreen() {
                   "+ ou VIP. Com senha, qualquer nível. Mesa reservada sempre com senha."
             }
           >
-            <div className="-mx-4 -mt-4 mb-4 border-b border-edge">
+            <div className="mb-3 overflow-hidden rounded-md border border-edge">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/assets/ui/taverna.webp?v=1"
