@@ -96,14 +96,15 @@ export function InventoryScreen() {
 
             return (
               <Card key={slot} height="content" tone={item ? "highlighted" : "empty"}>
-                <CardHeader>
-                  {item ? (
-                    <span className="flex aspect-square w-16 shrink-0 overflow-hidden rounded-md border border-edge p-1.5">
+                <CardHeader
+                  art={
+                    item ? (
                       <ItemArtFill item={item} enhancement={piece?.enhancement ?? 0} />
-                    </span>
-                  ) : (
-                    <span className="flex aspect-square w-16 shrink-0 rounded-md border border-edge" />
-                  )}
+                    ) : (
+                      <span aria-hidden className="h-full w-full" />
+                    )
+                  }
+                >
                   <RowText
                     label={SLOT_LABEL[slot]}
                     title={item ? item.name : "Nada equipado"}
