@@ -266,7 +266,7 @@ export function SettingsScreen() {
             }
           >
             <div className="flex items-stretch border-b border-edge">
-              <span className="flex aspect-square w-16 shrink-0 items-center justify-center overflow-hidden border-r border-edge p-2 sm:w-20">
+              <span className="flex aspect-square w-16 shrink-0 items-center justify-center overflow-hidden border-r border-edge sm:w-20">
                 {accountPicture ? (
                   <IconArt source={accountPicture} padded={false} zoom={false} />
                 ) : (
