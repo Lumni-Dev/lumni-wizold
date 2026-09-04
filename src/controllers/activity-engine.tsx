@@ -704,9 +704,7 @@ export function ActivityEngine() {
               beat = 0;
               syncProgressRef.current({ beat: 0, cooldownUntil: null, laps: 0 });
               if (!mined) {
-                setActivityRef.current(
-                  autoRef.current.mine ? { kind: "mine", id: activeOre, paused: true } : null,
-                );
+                setActivityRef.current(null);
                 return;
               }
               if (!autoRef.current.mine) {
