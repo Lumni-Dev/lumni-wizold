@@ -1,0 +1,167 @@
+[OBJETO OU CRIATURA]
+
+Create a highly detailed fantasy RPG creature/object illustration of the subject above, presented as an isolated full-body game asset.
+
+VISUAL STYLE:
+Dark fantasy bestiary illustration, premium RPG concept art, highly detailed hand-rendered digital painting with the visual richness of traditional engraved fantasy artwork.
+
+Strong, precise linework and razor-sharp contours. Dense micro-detailing throughout the entire subject. Every visible material and surface — bone, ivory, horn, tooth, fur, feather, scale, skin, fabric fiber, leather grain, stitching and metallic surface — should be individually defined and carefully rendered.
+
+The rendering should combine realistic natural anatomy and material structure with slightly exaggerated heroic fantasy proportions. Powerful silhouette, dramatic form and strong visual personality. The subject should feel like a collectible RPG item, creature component, inventory asset or high-end fantasy game bestiary artwork.
+
+RENDERING:
+Extremely intricate texture work.
+Fine etched and engraved-looking strokes mixed with realistic digital painting.
+Layered directional strokes following the anatomy, curvature and surface texture.
+Strong dark brown and near-black shadows between anatomical forms, leather pieces, cloth folds and metallic components.
+Warm bronze, copper, burnt orange, sienna, umber and earthy brown palette.
+Subtle golden-orange rim lighting along selected edges.
+Rich highlights with high local contrast.
+Deep dimensional shading.
+Extremely crisp details across the entire subject.
+Realistic scratches, cracks, chips, pores, stains, wear and natural imperfections where appropriate.
+No soft airbrushed appearance.
+No flat vector shading.
+No smooth plastic surfaces.
+No simplified cartoon rendering.
+
+CHARACTER / OBJECT DESIGN:
+Equip the subject with rugged dark-brown leather fantasy harnesses, belts, bindings or straps when anatomically appropriate.
+
+The leather must look aged, weathered and handcrafted, with visible stitching, punched holes, worn edges, scratches, folds, buckles, rings, rivets and small geometric bronze ornaments.
+
+Include pieces of distressed burnt-orange fabric wrapped naturally around appropriate sections of the subject.
+
+The cloth should have irregular torn edges, visible woven fibers, holes, fraying and long damaged ends flowing dynamically away from the subject.
+
+Add small aged bronze and copper metallic details and hardware throughout the design.
+
+All metallic components should feel worn, handcrafted and slightly medieval, featuring scratches, tarnish, oxidation, dark recessed areas, edge wear and realistic patina.
+
+Avoid excessive decoration that obscures the main silhouette. The primary subject must remain immediately recognizable.
+
+SIGNATURE MEDALLION:
+Include a circular antique bronze/copper medallion hanging naturally from the leather harness, matching the overall rugged medieval fantasy design.
+
+At the center of the medallion, prominently feature a single capital letter “W”, clearly readable and precisely formed.
+
+The “W” must be embossed or engraved in raised aged bronze/copper metal, with sharp, elegant serif-like fantasy styling, similar to a handcrafted heraldic emblem.
+
+The letter “W” must remain unmistakable, symmetrical and clearly legible.
+
+Do not replace the “W” with another letter.
+Do not replace it with a rune.
+Do not replace it with an animal emblem.
+Do not replace it with an abstract symbol.
+Do not replace it with a decorative glyph.
+Do not distort the letter into an unreadable fantasy symbol.
+Do not add additional letters or words.
+
+The medallion should have a dark recessed metal interior that creates strong contrast behind the raised bronze/copper “W”.
+
+Surround the dark center with a weathered antique bronze outer rim featuring subtle engraved ornamental details, small geometric accents, scratches, oxidation, patina and realistic metallic wear.
+
+Attach the medallion naturally to a small aged bronze ring hanging from one of the leather straps.
+
+The medallion should hang naturally according to gravity and feel physically connected to the harness rather than floating independently.
+
+It should look like a recognizable signature RPG inventory emblem integrated into the overall design.
+
+The medallion must be large enough in the composition for the capital “W” to remain clearly visible and readable without becoming the dominant element of the entire image.
+
+IMPORTANT:
+The circular bronze medallion is a REQUIRED design element, not optional.
+
+The exact capital letter “W” is a REQUIRED visual element.
+
+Preserve the exact capital letter “W” as the central symbol of the medallion.
+
+POSE / PRESENTATION:
+Dynamic three-quarter presentation.
+Strong diagonal composition.
+The subject should feel dramatic, valuable and visually powerful rather than positioned like a simple reference photograph.
+
+Emphasize the defining shape, structure and personality of [PERSONAGEM / OBJETO].
+
+For creature parts, trophies, teeth, tusks, horns, claws, bones, weapons or inventory objects, use an angled three-quarter presentation that clearly shows their complete silhouette, curvature, thickness and surface details.
+
+Create a clear primary visual focal point.
+
+COMPOSITION:
+Complete subject visible.
+Do not crop any important part of the subject.
+Do not crop the tip, base or defining extremities.
+Do not crop the signature medallion.
+
+Centered isolated composition with enough breathing room around the entire silhouette.
+
+Readable silhouette even at thumbnail size.
+
+Premium fantasy game asset / RPG inventory item / bestiary entry presentation.
+
+No scenery.
+No landscape.
+No decorative frame.
+No interface.
+No title.
+No typography.
+No text anywhere except for the single required capital letter “W” embossed or engraved on the signature medallion.
+
+BACKGROUND:
+Completely transparent background.
+True isolated PNG asset appearance.
+No colored backdrop.
+No gradient backdrop.
+No environment.
+No scenery.
+No floor unless physically necessary for the presentation.
+
+If minimal interaction debris is necessary, use only a very small amount of isolated dirt, dust, stones or fragments immediately around the subject, while everything else remains transparent.
+
+LIGHTING:
+Dramatic warm fantasy lighting emphasizing the silhouette and material definition.
+
+Warm golden-orange rim lighting selectively tracing the outer contours.
+
+Controlled highlights on ivory, bone, leather and bronze surfaces.
+
+Deep brown and near-black contact shadows between overlapping materials.
+
+Metallic highlights should emphasize the raised capital “W” on the medallion, making it especially crisp and readable against the darker recessed background.
+
+Maintain strong separation between materials:
+ivory/bone should look naturally hard and organic;
+leather should look dry, worn and textured;
+fabric should look fibrous and distressed;
+bronze/copper should look aged, metallic and patinated.
+
+QUALITY:
+Ultra-detailed.
+Extremely sharp.
+Intricate.
+Professional fantasy game illustration.
+Premium collectible card / RPG bestiary quality.
+AAA fantasy game inventory asset quality.
+Highly polished.
+Consistent detail density across the entire subject.
+Natural structure combined with controlled fantasy exaggeration.
+Dramatic but immediately readable silhouette.
+High material realism.
+Crisp isolated edges.
+Highly detailed even when viewed close-up.
+
+FINAL REQUIREMENTS:
+One isolated subject only.
+Complete subject visible.
+Transparent background.
+No scenery.
+No decorative border.
+No UI elements.
+No title or typography.
+No random letters or symbols.
+Include rugged dark-brown leather elements.
+Include distressed #e08d35 fabric.
+Include aged bronze/copper hardware.
+Include the circular signature medallion.
+The medallion MUST contain one clearly readable capital letter “W”.
+The “W” must be centered, embossed or engraved in aged bronze/copper and remain unmistakably legible.
