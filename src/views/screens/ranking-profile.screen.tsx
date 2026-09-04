@@ -16,7 +16,7 @@ import { Button } from "../components/button";
 import { CopyNick } from "../components/copy-nick";
 import { DataRow } from "../components/data-row";
 import { EmptyState } from "../components/empty-state";
-import { GenderSheetHeader } from "../components/gender-icon";
+import { GenderBanner } from "../components/gender-icon";
 import { PetSheetHeader } from "../components/pet-icon";
 import { List, ListRow } from "../components/list";
 import { AttributesPanel } from "../components/attributes-panel";
@@ -103,7 +103,8 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-1">
           <Panel title="Ficha" padding="none">
-            <GenderSheetHeader gender={hunter.gender}>
+            <GenderBanner gender={hunter.gender} />
+            <div className="border-b border-edge px-4 py-3">
               <div className="min-w-0 space-y-1">
                 <div className="flex items-center gap-2">
                   <p className="min-w-0 truncate text-sm text-ink">{hunter.name}</p>
@@ -113,7 +114,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
                   {genderDefinition.label}
                 </p>
               </div>
-            </GenderSheetHeader>
+            </div>
 
             <List>
               <DataRow label="Nível" value={"NV. " + formatNumber(hunter.level)} />
