@@ -109,6 +109,8 @@ export function LoginScreen() {
   const [verifying, setVerifying] = useState(false);
   const birthRef = useRef(birth);
   const buttonHost = useRef<HTMLDivElement>(null);
+  const enterRef = useRef(enter);
+  const armedRef = useRef(false);
   const age = ageOf(birth);
   const complete = isRealBirth(birth);
   const oldEnough = age !== null && age >= MIN_AGE;
@@ -141,19 +143,23 @@ export function LoginScreen() {
     birthRef.current = birth;
   }, [birth]);
   useEffect(() => {
-    if (!ready || authenticated || !oldEnough || !GOOGLE_CLIENT_ID) return;
+    enterRef.current = enter;
+  }, [enter]);
+  useEffect(() => {
+    if (!ready || authenticated || !oldEnough || !GOOGLE_CLIENT_ID || armedRef.current) return;
     let alive = true;
     const arm = () => {
       const host = buttonHost.current;
       const identity = window.google?.accounts?.id;
-      if (!alive || !host || !identity) return;
+      if (!alive || !host || !identity || armedRef.current) return;
+      armedRef.current = true;
       identity.initialize({
         client_id: GOOGLE_CLIENT_ID,
         callback: (answer) => {
           void (async () => {
             setEntering(true);
             try {
-              const opened = await enter(answer.credential, birthRef.current);
+              const opened = await enterRef.current(answer.credential, birthRef.current);
               if (!opened) return;
               if (opened.needsTwoFactor) {
                 setTwoFactor({ hasCharacter: opened.hasCharacter });
@@ -201,7 +207,7 @@ export function LoginScreen() {
       alive = false;
       script.removeEventListener("load", arm);
     };
-  }, [ready, authenticated, oldEnough, enter, router]);
+  }, [ready, authenticated, oldEnough, router]);
 
   if (!ready || authenticated) {
     return (
