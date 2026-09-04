@@ -42,10 +42,10 @@ const SECTIONS: readonly { key: string; label: string }[] = [
   { key: "2fa", label: "Duas etapas" },
   { key: "nome", label: "Nome" },
   { key: "taverna", label: "Taverna" },
+  { key: "radio", label: "W-Radio" },
   { key: "automacao", label: "Automação" },
   { key: "som", label: "Som" },
   { key: "trilha", label: "Trilha" },
-  { key: "radio", label: "W-Radio" },
   { key: "fundo", label: "Fundo" },
   { key: "cache", label: "Cache" },
   { key: "excluir", label: "Excluir conta" },
@@ -424,6 +424,39 @@ export function SettingsScreen() {
           </Panel>
         ) : null}
 
+        {shows("radio") ? (
+          <Panel
+            title="W-Radio"
+            description="O volume do rádio. Ligar e desligar, pular faixa e ver o que toca ficam no player da taverna, e o rádio só toca lá. Enquanto o rádio toca, a trilha e os efeitos do jogo ficam em silêncio."
+            padding="none"
+          >
+            <List>
+              <ListRow layout="column">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                    Volume
+                  </span>
+                  <span className="font-mono text-[11px] text-ink">
+                    {Math.round(radioVolume * 100)}%
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={Math.round(radioVolume * 100)}
+                  aria-label="Volume do rádio"
+                  className="volume-slider w-full"
+                  onChange={(event) => {
+                    radioRepository.setVolume(Number(event.target.value) / 100);
+                  }}
+                />
+              </ListRow>
+            </List>
+          </Panel>
+        ) : null}
+
         {shows("automacao") ? (
           <Panel
             title="Automação"
@@ -595,39 +628,6 @@ export function SettingsScreen() {
                   </p>
                 </ListRow>
               ) : null}
-            </List>
-          </Panel>
-        ) : null}
-
-        {shows("radio") ? (
-          <Panel
-            title="W-Radio"
-            description="O volume do rádio. Ligar e desligar, pular faixa e ver o que toca ficam no player da taverna, e o rádio só toca lá. Enquanto o rádio toca, a trilha e os efeitos do jogo ficam em silêncio."
-            padding="none"
-          >
-            <List>
-              <ListRow layout="column">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                    Volume
-                  </span>
-                  <span className="font-mono text-[11px] text-ink">
-                    {Math.round(radioVolume * 100)}%
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min={0}
-                  max={100}
-                  step={1}
-                  value={Math.round(radioVolume * 100)}
-                  aria-label="Volume do rádio"
-                  className="volume-slider w-full"
-                  onChange={(event) => {
-                    radioRepository.setVolume(Number(event.target.value) / 100);
-                  }}
-                />
-              </ListRow>
             </List>
           </Panel>
         ) : null}

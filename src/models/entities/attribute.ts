@@ -47,9 +47,9 @@ export const ATTRIBUTES: readonly AttributeDefinition[] = [
     key: "willpower",
     name: "Vontade",
     code: "VON",
-    description: "Quanto tempo você segura a fera. Estica a duração da poção de fúria.",
+    description: "Quanto tempo você segura a fera e quão rápido o corpo se refaz. Estica a poção de fúria e acelera a recuperação de vida.",
     effect:
-      "A poção de fúria dura o tempo do frasco multiplicado por 1 mais Vontade dividido por Vontade mais 250, rumo ao dobro: um frasco médio de 5 min passa de 6,4 min com 100 de Vontade e de 8,4 min com 550. A conta usa a Vontade da ficha inteira, então colar e anel também esticam o frasco. A fúria da lua cheia não muda, ela dura o que o céu manda.",
+      "A poção de fúria dura o tempo do frasco multiplicado por 1 mais Vontade dividido por Vontade mais 250, rumo ao dobro: um frasco médio de 5 min passa de 6,4 min com 100 de Vontade e de 8,4 min com 550. A conta usa a Vontade da ficha inteira, então colar e anel também esticam o frasco. A fúria da lua cheia não muda, ela dura o que o céu manda. A Vontade também acelera Recuperar-se: o descanso devolve 5% da vida por vez sem Vontade e sobe rumo a 10%, com metade desse ganho já em 400 de Vontade, então quanto mais Vontade, menos tempo até o corpo ficar inteiro.",
   },
 ] as const;
 

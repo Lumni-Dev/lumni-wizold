@@ -350,7 +350,7 @@ export function TavernScreen() {
   const pack = useMemo(() => listPack(state), [state]);
   const packIds = useMemo(() => pack.map((mate) => mate.id), [pack]);
   const packPresence = usePackPresence(packIds, Boolean(character));
-  const tavernDoing = useTavernDoing(Boolean(character));
+  const { doing: tavernDoing, levels: tavernLevels } = useTavernDoing(Boolean(character));
   const mineDoing = activity?.kind ?? null;
   const chatPresence = useMemo(() => {
     const next: Record<string, PresenceStatus> = {};
@@ -524,10 +524,10 @@ export function TavernScreen() {
         description="Leia antes de combinar encontro com alguém."
         footer={
           radio.tracks.length > 0 ? (
-            <>
+            <div className="-m-4">
               <RadioPlayer />
               <RadioMiniPlayer />
-            </>
+            </div>
           ) : undefined
         }
       >
@@ -964,6 +964,7 @@ export function TavernScreen() {
                 state={state}
                 presence={chatPresence}
                 doing={tavernDoing}
+                levels={tavernLevels}
                 mine={mineDoing}
                 profileHref={profileHref}
                 invitingMemberId={invitingMemberId}
@@ -974,6 +975,7 @@ export function TavernScreen() {
                 identityId={identity.id}
                 presence={chatPresence}
                 doing={tavernDoing}
+                levels={tavernLevels}
                 mine={mineDoing}
                 profileHref={profileHref}
                 messagesRef={messagesRef}

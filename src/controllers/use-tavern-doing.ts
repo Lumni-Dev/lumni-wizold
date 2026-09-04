@@ -6,23 +6,30 @@ import { PRESENCE_POLL_MS } from "@/models/rules/presence";
 import { api } from "./api.client";
 
 const NOBODY: Record<string, HunterDoing> = {};
+const NO_LEVELS: Record<string, number> = {};
 
 export function useTavernDoing(enabled: boolean) {
   const [doing, setDoing] = useState<Record<string, HunterDoing>>({});
+  const [levels, setLevels] = useState<Record<string, number>>({});
 
   useEffect(() => {
     if (!enabled) return;
 
     let alive = true;
     const load = async () => {
-      const answer = await api<{ people: { id: string; doing: HunterDoing }[] }>(
+      const answer = await api<{ people: { id: string; doing: HunterDoing; level: number }[] }>(
         "GET",
         "/api/tavern/doing",
       );
       if (!alive || !answer.ok || !answer.data) return;
-      const next: Record<string, HunterDoing> = {};
-      for (const person of answer.data.people) next[person.id] = person.doing;
-      setDoing(next);
+      const nextDoing: Record<string, HunterDoing> = {};
+      const nextLevels: Record<string, number> = {};
+      for (const person of answer.data.people) {
+        nextDoing[person.id] = person.doing;
+        nextLevels[person.id] = person.level;
+      }
+      setDoing(nextDoing);
+      setLevels(nextLevels);
     };
 
     void load();
@@ -39,5 +46,5 @@ export function useTavernDoing(enabled: boolean) {
     };
   }, [enabled]);
 
-  return enabled ? doing : NOBODY;
+  return enabled ? { doing, levels } : { doing: NOBODY, levels: NO_LEVELS };
 }

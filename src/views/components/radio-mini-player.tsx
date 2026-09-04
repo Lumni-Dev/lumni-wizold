@@ -32,7 +32,7 @@ export function RadioMiniPlayer() {
 
   return (
     <Tooltip label={label} block>
-      <div className="flex items-stretch overflow-hidden rounded-md border border-edge">
+      <div className="flex items-stretch">
         <button
           type="button"
           onClick={() => {

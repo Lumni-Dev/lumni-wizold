@@ -9,7 +9,6 @@ import {
   MINING_DAILY_MININGS,
   MINING_TICKS_MAX,
   MINING_TICKS_MIN,
-  MIN_HEALTH_RATIO_TO_ACT,
   PET_BASE_BONUS,
   PET_BASE_ENERGY,
   PET_BITE_ENERGY,
@@ -20,6 +19,8 @@ import {
   PET_REST_RATIO,
   REST_TICK_MS,
   REST_HEALTH_RATIO,
+  REST_WILLPOWER_MAX_BONUS,
+  REST_WILLPOWER_HALF,
   PET_MIN_LEVEL,
   PET_PRICE,
   PET_RENAME_PRICE,
@@ -140,7 +141,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     lines: [
         "Você começa sem nada equipado, com " +
         STARTING_BRONZE +
-        " WCoins, dez poções de vida e dez poções de fúria pequena. Escolha um território e, na lista, a presa: a barra enche como \"Caçando...\" e só no último batimento a luta é decidida no servidor; depois o replay conta golpe a golpe. Parar na aproximação cancela; parar no replay aplica o resultado. Trocar de criatura no meio da caçada não muda a luta em curso, só a próxima volta.",
+        " WCoins, dez poções de vida e dez poções de fúria pequena. Escolha um território e, na lista, a presa: a barra enche como \"Procurando criatura...\" e só no último batimento a luta é decidida no servidor; depois o replay conta golpe a golpe como \"Caçando...\". Parar na aproximação cancela; parar no replay aplica o resultado. Trocar de criatura no meio da caçada não muda a luta em curso, só a próxima volta.",
       "Para encadear caçadas, treino, mina ou forja sem tocar em nada, ative a automação VIP nas configurações. Cada área tem dez criaturas de números fixos: você fica mais forte, elas não.",
       "O golpe crítico multiplica o dano por " +
         criticalMultiplierOf().toFixed(2).replace(".", ",") +
@@ -165,12 +166,14 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         Math.round(REST_HEALTH_RATIO * 100) +
         "% do máximo a cada " +
         REST_TICK_MS / 1000 +
-        " segundos. A poção é o atalho pago quando o número fixo ainda vale a pena.",
+        " segundos sem Vontade, e sobe rumo a " +
+        Math.round((REST_HEALTH_RATIO + REST_WILLPOWER_MAX_BONUS) * 100) +
+        "% conforme a Vontade cresce, com metade desse ganho já em " +
+        REST_WILLPOWER_HALF +
+        " de Vontade: mais Vontade, menos tempo até ficar inteiro. A poção é o atalho pago quando o número fixo ainda vale a pena.",
       "Zerou a vida na caçada, você escapa com 1 de vida e registra uma derrota.",
       "Com menos de 1 de vida, o chão recusa caçada: Recuperar-se ou use uma poção.",
-      "Com menos de " +
-        Math.round(MIN_HEALTH_RATIO_TO_ACT * 100) +
-        "% de vida máxima, o chão recusa duelo: Recuperar-se primeiro.",
+      "Sem a vida cheia, o fosso recusa duelo: a arena só abre com o corpo inteiro, então Recuperar-se primeiro.",
       "Luta que se arrasta até o teto de rodadas termina em recuo: a caçada conta, mas ninguém vence nem perde.",
     ],
   },
@@ -236,9 +239,9 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     summary: "Resolvido em rodadas, sem entrada do jogador durante a luta.",
     lines: [
       "Cinco números e só: Força, Agilidade, Resistência, Instinto e Vontade. Dano = Força² ÷ (Força + Resistência do alvo), com 10% de variação na Força.",
-      "A Vontade não entra na conta da luta: ela estica a poção de fúria, e a fúria é que soma +" +
+      "A Vontade não entra na conta da luta: ela estica a poção de fúria e acelera a recuperação de vida fora do combate. A fúria é que soma +" +
         FURY_ATTRIBUTE_BONUS +
-        " em todos os atributos enquanto dura. Quanto mais Vontade, mais tempo cada frasco rende.",
+        " em todos os atributos enquanto dura, e quanto mais Vontade, mais tempo cada frasco rende.",
       "Quem tem mais Agilidade começa. Esquiva e crítico sobem a vida toda sem teto: 35% e 45% no horizonte.",
       "Crítico multiplica por " +
         criticalMultiplierOf().toFixed(2).replace(".", ",") +
@@ -251,7 +254,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     summary: "Sete espaços, cinco conjuntos, um item por espaço.",
     lines: [
       "Espaços: gorro, colar, casaco, calças, botas, luvas e anel. " + setRequirementsLine(),
-      "Toda peça dá atributo e nada além: luvas/anel = Força e Vontade; casaco/calças/gorro = Resistência; botas = Agilidade; colar = Instinto e Vontade. A Vontade do colar e do anel estica a poção de fúria.",
+      "Toda peça dá atributo e nada além: luvas = Força; anel = Força e Vontade; casaco = Resistência; calças = Resistência e Agilidade; gorro = Resistência e Instinto; botas = Agilidade; colar = Instinto e Vontade. A Vontade do colar e do anel estica a poção de fúria e acelera a recuperação de vida.",
       "Casaco tem corte de linhagem (Lumni/Luna). Mercado vende uma peça de cada; o que já está na mochila ou no corpo não se compra de novo.",
       "Nenhum equipamento cai na caça. Peça forjada na mochila carrega o +X; desequipe para forjar, equipe de novo para usar.",
     ],
@@ -259,7 +262,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
   {
     id: "bestiary-rule",
     title: "Presas",
-    summary: "Seis espécies dividem os mil níveis em faixas iguais.",
+    summary: "Seis espécies repartem os mil níveis em faixas de tamanhos diferentes.",
     lines: [
       ...bandLines(),
       "Cada território tem dez criaturas fixas, em degraus de dez níveis dentro da faixa.",
@@ -363,7 +366,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     lines: [
       boardLine() +
         " Personagem filtra por linhagem sem renumerar; a busca mantém a posição real do quadro.",
-      "Clicar em um nome abre a ficha de leitura; o seu leva para a ficha completa. Só entra caçador de verdade.",
+      "Clicar em um nome abre a ficha de leitura; o seu leva para a ficha completa. Entram caçadores de verdade e os NPCs da casa, estes com o selo NPC.",
     ],
   },
   {
@@ -533,7 +536,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         formatBronze(PET_PRICE) +
         " e renomear o lobo " +
         formatBronze(PET_RENAME_PRICE) +
-        ". Poção, arena e treino do mascote seguem a bolsa da faixa.",
+        ". Ração do lobo, arena e treino do mascote seguem a bolsa da faixa; a poção tem preço fixo.",
       setCostRangeLine() +
         " Subir de nível dentro de uma faixa não enche o bolso: quem muda o tamanho da bolsa é abrir a faixa seguinte.",
       "O mercado vende pelo preço de tabela e recompra pela metade. Materiais só servem para venda; nenhum equipamento cai na caça.",

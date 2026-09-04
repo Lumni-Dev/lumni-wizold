@@ -58,7 +58,7 @@ export async function listVisibleDoing(
   client: PoolClient,
   viewerId: string,
   now = Date.now(),
-): Promise<{ id: string; doing: HunterDoing }[]> {
+): Promise<{ id: string; doing: HunterDoing; level: number }[]> {
   const visible = await client.query<{ id: string }>(
     `select $1::text as id
      union
@@ -88,6 +88,11 @@ export async function listVisibleDoing(
     [ids],
   );
   const byId = new Map(found.rows.map((row) => [row.character_id, row]));
+  const levelRows = await client.query<{ id: string; level: number }>(
+    "select id, level from characters where id = any($1::text[])",
+    [ids],
+  );
+  const levelById = new Map(levelRows.rows.map((row) => [row.id, row.level]));
   return ids.map((id) => {
     const row = byId.get(id);
     return {
@@ -97,6 +102,7 @@ export async function listVisibleDoing(
         row?.started_at ? new Date(row.started_at).toISOString() : null,
         now,
       ),
+      level: levelById.get(id) ?? 1,
     };
   });
 }

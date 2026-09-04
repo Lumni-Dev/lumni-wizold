@@ -83,6 +83,7 @@ function ChatNick({
   className,
   status,
   doing,
+  level,
 }: {
   at: string;
   href: string | null;
@@ -90,6 +91,7 @@ function ChatNick({
   className?: string;
   status?: PresenceStatus;
   doing: HunterDoing;
+  level?: number;
 }) {
   return (
     <span className="mr-2 inline-flex items-center gap-2">
@@ -102,6 +104,7 @@ function ChatNick({
       <Tooltip label={describeDoing(name, doing)}>
         <MemberName href={href} name={name} className={className} />
       </Tooltip>
+      {level ? <span className="font-mono text-[10px] text-ink-faint">NV. {level}</span> : null}
       <span className="text-ink-faint">:</span>
     </span>
   );
@@ -113,6 +116,7 @@ export function TavernRoomChatMembers({
   state,
   presence,
   doing,
+  levels,
   mine,
   profileHref,
   invitingMemberId,
@@ -123,6 +127,7 @@ export function TavernRoomChatMembers({
   state: GameState;
   presence: Record<string, PresenceStatus>;
   doing: Record<string, HunterDoing>;
+  levels: Record<string, number>;
   mine: ActivityKind | null;
   profileHref: (memberId: string) => string | null;
   invitingMemberId: string | null;
@@ -155,6 +160,9 @@ export function TavernRoomChatMembers({
                     className={nickColorClass(member.nickColor)}
                   />
                 </Tooltip>
+                {levels[member.id] ? (
+                  <span className="font-mono text-[10px] text-ink-faint">NV. {levels[member.id]}</span>
+                ) : null}
                 {kept && !yourself ? <span className="text-ink-faint">- na matilha</span> : null}
               </Tag>
               {!yourself && !kept ? (
@@ -184,6 +192,7 @@ export function TavernRoomChatMessages({
   identityId,
   presence,
   doing,
+  levels,
   mine,
   profileHref,
   messagesRef,
@@ -193,6 +202,7 @@ export function TavernRoomChatMessages({
   identityId: string;
   presence: Record<string, PresenceStatus>;
   doing: Record<string, HunterDoing>;
+  levels: Record<string, number>;
   mine: ActivityKind | null;
   profileHref: (memberId: string) => string | null;
   messagesRef: RefObject<HTMLUListElement | null>;
@@ -206,7 +216,6 @@ export function TavernRoomChatMessages({
             {message.authorId === "system" ? (
               <span className="mr-2 inline-flex items-center gap-2">
                 <span className="font-mono text-[10px] text-ink-faint">{formatTime(message.at)}</span>
-                <span className="text-ink-faint">{message.authorName}:</span>
               </span>
             ) : (
               <ChatNick
@@ -216,6 +225,7 @@ export function TavernRoomChatMessages({
                 className={nickColorClass(nickColorOf(activeRoom, message.authorId))}
                 status={authorPresence(message.authorId, identityId, presence)}
                 doing={doingFor(message.authorId, identityId, mine, doing)}
+                level={levels[message.authorId]}
               />
             )}
             <span
