@@ -12,6 +12,7 @@ import { playSoundPreview } from "@/controllers/sound";
 import { disableTavernPush, enableTavernPush, testTavernPush, webPushConfigured, tavernPushSupported } from "@/controllers/tavern-notify";
 import { backgroundRepository } from "@/models/repositories/background.repository";
 import { musicRepository } from "@/models/repositories/music.repository";
+import { radioRepository } from "@/models/repositories/radio.repository";
 import { soundRepository } from "@/models/repositories/sound.repository";
 import { tavernPushRepository } from "@/models/repositories/tavern-push.repository";
 import { NAME_MAX_LENGTH, RENAME_COOLDOWN_DAYS, RENAME_PRICE } from "@/shared/constants/game";
@@ -44,6 +45,7 @@ const SECTIONS: readonly { key: string; label: string }[] = [
   { key: "automacao", label: "Automação" },
   { key: "som", label: "Som" },
   { key: "trilha", label: "Trilha" },
+  { key: "radio", label: "Rádio" },
   { key: "fundo", label: "Fundo" },
   { key: "cache", label: "Cache" },
   { key: "excluir", label: "Excluir conta" },
@@ -181,6 +183,12 @@ export function SettingsScreen() {
     musicRepository.setEnabled(on);
     if (on && musicRepository.volume() <= 0) musicRepository.setVolume(musicRepository.defaultVolume());
   }
+
+  const radioVolume = useSyncExternalStore(
+    radioRepository.subscribe,
+    radioRepository.volume,
+    radioRepository.serverVolumeSnapshot,
+  );
 
   const [section, setSection] = useState("all");
 
@@ -587,6 +595,39 @@ export function SettingsScreen() {
                   </p>
                 </ListRow>
               ) : null}
+            </List>
+          </Panel>
+        ) : null}
+
+        {shows("radio") ? (
+          <Panel
+            title="Rádio Wizold"
+            description="O volume do rádio. Ligar e desligar, pular faixa e ver o que toca ficam no mini player no rodapé do menu lateral. Enquanto o rádio toca, a trilha e os efeitos do jogo ficam em silêncio."
+            padding="none"
+          >
+            <List>
+              <ListRow layout="column">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                    Volume
+                  </span>
+                  <span className="font-mono text-[11px] text-ink">
+                    {Math.round(radioVolume * 100)}%
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={Math.round(radioVolume * 100)}
+                  aria-label="Volume do rádio"
+                  className="volume-slider w-full"
+                  onChange={(event) => {
+                    radioRepository.setVolume(Number(event.target.value) / 100);
+                  }}
+                />
+              </ListRow>
             </List>
           </Panel>
         ) : null}
