@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useArt } from "@/controllers/art.context";
 import { useGame } from "@/controllers/game.context";
+import { activityCardStore } from "@/controllers/activity-card.store";
 import { useVisibleActivity } from "@/controllers/use-visible-activity";
 import {
   listTerritories,
@@ -269,6 +270,31 @@ export function HuntScreen() {
     }
   }, [huntRt, activeId]);
 
+  const focusId = activeId ?? waitingId;
+  useEffect(() => {
+    if (!focusId) {
+      activityCardStore.set(true);
+      return;
+    }
+    const target = document.querySelector('[data-hunt-card="' + focusId + '"]');
+    if (!target) {
+      activityCardStore.set(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry) activityCardStore.set(entry.isIntersecting);
+      },
+      { threshold: 0 },
+    );
+    observer.observe(target);
+    return () => {
+      observer.disconnect();
+      activityCardStore.set(true);
+    };
+  }, [focusId]);
+
   if (!character) return null;
   const drops = Object.entries(session.drops);
   function selectCreature(territoryId: string, creatureId: string) {
@@ -343,8 +369,8 @@ export function HuntScreen() {
           );
           const monsterStatus = replaying ? "Atacando" : filling ? "Preparando" : "Aguardando";
           return (
+            <div key={territory.id} data-hunt-card={territory.id}>
             <Card
-              key={territory.id}
               height="content"
               interactive={available}
               tone={active || waiting || recovering ? "highlighted" : "default"}
@@ -549,6 +575,7 @@ export function HuntScreen() {
                 </div>
               </div>
             </Card>
+            </div>
           );
         })}
       </div>

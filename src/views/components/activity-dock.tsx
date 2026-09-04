@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 
 import { findForgePiece, listMining } from "@/controllers/forge.controller";
 import { listTerritories, resolveHuntCreatureId } from "@/controllers/hunt.controller";
 import { useGame } from "@/controllers/game.context";
+import { activityCardStore } from "@/controllers/activity-card.store";
 import { useVisibleActivity } from "@/controllers/use-visible-activity";
 import { petTrainingView } from "@/controllers/pet.controller";
 import { listAttributeProgress, listExercises } from "@/controllers/training.controller";
@@ -302,8 +303,14 @@ export function ActivityDock() {
     return null;
   }, [running, character, stats, state]);
 
+  const cardOnScreen = useSyncExternalStore(
+    activityCardStore.subscribe,
+    activityCardStore.snapshot,
+    activityCardStore.serverSnapshot,
+  );
   const onOwnPage = running !== null && pathname === dock?.href;
-  const dockVisible = Boolean(running && dock && !onOwnPage);
+  const revealOnOwnPage = onOwnPage && !cardOnScreen;
+  const dockVisible = Boolean(running && dock && (!onOwnPage || revealOnOwnPage));
   const [jolt, setJolt] = useState(0);
   const shaking = useShake(jolt);
 
@@ -334,7 +341,7 @@ export function ActivityDock() {
   }, [dock, dockVisible, running, stop]);
 
   if (!running || !dock) return null;
-  if (onOwnPage) return null;
+  if (onOwnPage && !revealOnOwnPage) return null;
 
   const paused = running.paused === true;
 
