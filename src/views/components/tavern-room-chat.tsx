@@ -209,7 +209,7 @@ export function TavernRoomChatMessages({
   className?: string;
 }) {
   return (
-    <List ref={messagesRef} className={className}>
+    <List ref={messagesRef} className={cn("select-text", className)}>
       {activeRoom.messages.map((message, index) => (
         <ListRow key={message.id} className={cn(index % 2 === 1 && "bg-charcoal")}>
           <p className="min-w-0 flex-1 break-words text-xs leading-relaxed">
