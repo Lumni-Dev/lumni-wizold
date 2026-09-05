@@ -2371,6 +2371,11 @@ sec("taverna");
     tavernCtrl.sendMessage(tavern, opened.roomId, me, "www.twitch.tv/canal").ok === true,
   );
   ok(
+    "imgur passa",
+    tavernCtrl.sendMessage(tavern, opened.roomId, me, "print em https://i.imgur.com/abc123.png").ok ===
+      true,
+  );
+  ok(
     "site aleatório ainda recusa",
     tavernCtrl.sendMessage(tavern, opened.roomId, me, "spam em https://malicioso.net/x").ok === false,
   );

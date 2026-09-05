@@ -34,6 +34,7 @@ const ALLOWED_LINK_SUFFIXES = [
   "x.com",
   "twitter.com",
   "t.co",
+  "imgur.com",
 ] as const;
 
 const PROTOCOL_URL = /https?:\/\/[^\s]+/gi;
