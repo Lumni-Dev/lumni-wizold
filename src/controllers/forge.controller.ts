@@ -16,6 +16,8 @@ import {
   enhancementCost,
   enhancedEffect,
   enhancedName,
+  enhancementGainPerLevel,
+  exactEnhancedValue,
   forgeBronzeCost,
 } from "@/models/rules/forge";
 import {
@@ -147,7 +149,16 @@ export interface ForgePiece {
   canForge: boolean;
   reason: string | null;
   forgeBonus: number;
-  attributes: { key: AttributeKey; name: string; value: number; nextValue: number }[];
+  exactBonus: number;
+  attributes: {
+    key: AttributeKey;
+    name: string;
+    value: number;
+    nextValue: number;
+    exact: number;
+    nextExact: number;
+    gain: number;
+  }[];
 }
 
 function fragmentOf(item: Item): Item | null {
@@ -185,6 +196,10 @@ export function listForge(state: GameState): ForgePiece[] {
       const rawBase = item.effect.attributes?.[definition.key] ?? 0;
       return sum + Math.max(0, enhanced - rawBase);
     }, 0);
+    const exactBonus = ATTRIBUTES.reduce((sum, definition) => {
+      const rawBase = item.effect.attributes?.[definition.key] ?? 0;
+      return sum + Math.max(0, exactEnhancedValue(rawBase, level) - rawBase);
+    }, 0);
 
     pieces.push({
       item,
@@ -195,6 +210,7 @@ export function listForge(state: GameState): ForgePiece[] {
       owned,
       bronzeCost,
       forgeBonus,
+      exactBonus,
       canForge: Boolean(fragment) && !maxed && owned >= cost && bronze >= bronzeCost,
       reason: maxed
         ? "No teto de +" + MAX_ENHANCEMENT
@@ -203,12 +219,18 @@ export function listForge(state: GameState): ForgePiece[] {
           : null,
       attributes: ATTRIBUTES.filter(
         (definition) => (current.attributes?.[definition.key] ?? 0) > 0,
-      ).map((definition) => ({
-        key: definition.key,
-        name: definition.name,
-        value: current.attributes?.[definition.key] ?? 0,
-        nextValue: next.attributes?.[definition.key] ?? 0,
-      })),
+      ).map((definition) => {
+        const rawBase = item.effect.attributes?.[definition.key] ?? 0;
+        return {
+          key: definition.key,
+          name: definition.name,
+          value: current.attributes?.[definition.key] ?? 0,
+          nextValue: next.attributes?.[definition.key] ?? 0,
+          exact: exactEnhancedValue(rawBase, level),
+          nextExact: exactEnhancedValue(rawBase, level + 1),
+          gain: enhancementGainPerLevel(rawBase),
+        };
+      }),
     });
   }
 

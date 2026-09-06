@@ -24,7 +24,7 @@ import { cn } from "@/shared/utils/class-names";
 import { Field } from "../components/field";
 import { FILTER_COLUMN, FilterRow, FilterSelect } from "../components/filter-select";
 import { FilteredEmptyState } from "../components/filtered-empty-state";
-import { formatBronze, formatNumber } from "@/shared/utils/format";
+import { formatBronze, formatFraction, formatNumber } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf, pageOfPosition } from "@/shared/utils/pagination";
 import { normalizeText } from "@/shared/utils/text";
 import { Bar } from "../components/bar";
@@ -358,15 +358,23 @@ export function ForgeScreen() {
                         <>
                           {forgeEntry.attributes.map((attribute) => (
                             <p key={attribute.key} className="font-mono text-ink-soft">
-                              {attribute.name} {formatNumber(attribute.value)}
-                              {forgeEntry.level >= MAX_ENHANCEMENT
-                                ? ""
-                                : " → " + formatNumber(attribute.nextValue)}
+                              {attribute.name} {formatFraction(attribute.exact)}
+                              {forgeEntry.level >= MAX_ENHANCEMENT ? (
+                                ""
+                              ) : (
+                                <>
+                                  {" → " + formatFraction(attribute.nextExact)}
+                                  <span className="text-ink-faint">
+                                    {" (+" + formatFraction(attribute.gain) + " por nível)"}
+                                  </span>
+                                </>
+                              )}
                             </p>
                           ))}
                           {forgeEntry.level > 0 ? (
                             <p className="font-mono text-[10px]">
-                              Já somou +{formatNumber(forgeEntry.forgeBonus)} de forja
+                              Já somou +{formatFraction(forgeEntry.exactBonus)} de atributos com a
+                              forja
                             </p>
                           ) : null}
                         </>

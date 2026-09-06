@@ -11,7 +11,7 @@ import type { Hunter } from "@/models/entities/ranking";
 import { findPet } from "@/models/entities/pet";
 import { criticalMultiplierOf } from "@/models/rules/combat";
 import { PET_MAX_LEVEL } from "@/shared/constants/game";
-import { formatDate, formatNumber } from "@/shared/utils/format";
+import { formatDate, formatFraction, formatNumber } from "@/shared/utils/format";
 import { Button } from "../components/button";
 import { CopyNick } from "../components/copy-nick";
 import { DataRow } from "../components/data-row";
@@ -200,8 +200,8 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
         <div className="space-y-6 lg:col-span-2">
           <Panel title="Combate" description="Cada linha diz de qual atributo ela sai." padding="none">
             <List>
-              <DataRow label="Golpe (Força)" value={formatNumber(strength)} />
-              <DataRow label="Defesa (Resistência)" value={formatNumber(endurance)} />
+              <DataRow label="Golpe (Força)" value={formatFraction(strength)} />
+              <DataRow label="Defesa (Resistência)" value={formatFraction(endurance)} />
               <DataRow label="Esquiva (Agilidade)" value={stats.dodge + "%"} />
               <DataRow label="Crítico (Instinto)" value={stats.critical + "%"} />
               <DataRow

@@ -44,6 +44,11 @@ export function formatNumber(value: number): string {
   }
   return formatExact(rounded);
 }
+export function formatFraction(value: number): string {
+  if (Math.abs(value) >= COMPACT_FLOOR) return formatNumber(value);
+  const decimals = value !== 0 && Math.abs(value) < 0.01 ? 3 : 2;
+  return new Intl.NumberFormat("pt-BR", { maximumFractionDigits: decimals }).format(value);
+}
 export function formatVault(value: number): string {
   const rounded = Math.round(value);
   return Math.abs(rounded) >= 1_000_000 ? formatNumber(rounded) : formatExact(rounded);

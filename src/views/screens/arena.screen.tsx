@@ -21,7 +21,7 @@ import { playSound } from "@/controllers/sound";
 import { HUNT_APPROACH_TICKS, HUNT_TICK_MS } from "@/shared/constants/game";
 import { ICON_FRAME_INSET } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
-import { formatDay, formatNumber, formatBronze } from "@/shared/utils/format";
+import { formatDay, formatFraction, formatNumber, formatBronze } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
 import { emphasizeDamage, narrationOf, type NarrationLine } from "../presenters/hunt.presenter";
 import { Bar } from "../components/bar";
@@ -492,7 +492,7 @@ export function ArenaScreen() {
                         ...ATTRIBUTES.map((attribute) => ({
                           key: attribute.key,
                           label: attribute.name,
-                          value: formatNumber(rival.totalAttributes[attribute.key]),
+                          value: formatFraction(rival.totalAttributes[attribute.key]),
                         })),
                         { key: "health", label: "Vida", value: formatNumber(rival.maxHealth) },
                         { key: "dodge", label: "Esquiva", value: rival.dodge + "%" },

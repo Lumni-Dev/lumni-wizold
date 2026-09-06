@@ -21,7 +21,7 @@ export function forgeBronzeCost(characterLevel: number, level: number): number {
 export function enhancedEffect(item: Item, level: number): ItemEffect {
   if (level <= 0) return item.effect;
 
-  const forged = (value: number) => Math.round(value * (1 + ENHANCEMENT_STEP * level));
+  const forged = (value: number) => value * (1 + ENHANCEMENT_STEP * level);
 
   const attributes = item.effect.attributes
     ? Object.fromEntries(
@@ -30,6 +30,14 @@ export function enhancedEffect(item: Item, level: number): ItemEffect {
     : undefined;
 
   return { ...item.effect, attributes: attributes as ItemEffect["attributes"] };
+}
+
+export function exactEnhancedValue(base: number, level: number): number {
+  return base * (1 + ENHANCEMENT_STEP * Math.max(0, level));
+}
+
+export function enhancementGainPerLevel(base: number): number {
+  return base * ENHANCEMENT_STEP;
 }
 
 export function forgeDurationMs(level: number): number {

@@ -1232,8 +1232,8 @@ sec("forja e mina");
   const forged = forgeRules.enhancedEffect(claw, 100);
   const base = claw.effect.attributes.strength;
   ok(
-    "forja multiplica a peça (0,3% por nível, sem termo fixo)",
-    forged.attributes.strength === Math.round(base * (1 + 0.003 * 100)),
+    "forja multiplica a peça (0,3% por nível, fracionado, sem arredondar)",
+    Math.abs(forged.attributes.strength - base * (1 + 0.003 * 100)) < 1e-9,
   );
   ok("forja zero devolve o efeito puro", forgeRules.enhancedEffect(claw, 0) === claw.effect);
   const state = baseState({ level: 1 });

@@ -3,13 +3,13 @@ import { findGender, type Gender } from "@/models/entities/character";
 import type { DerivedStats } from "@/models/rules/stats";
 import { BASE_ATTRIBUTE_VALUE } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
-import { formatNumber } from "@/shared/utils/format";
+import { formatFraction } from "@/shared/utils/format";
 import { AttributeArtFill } from "./attribute-icon";
 import { List, ListRow, RowText } from "./list";
 import { Panel } from "./panel";
 
 function plus(value: number): string {
-  return value > 0 ? "+" + formatNumber(value) : "0";
+  return value > 0 ? "+" + formatFraction(value) : "0";
 }
 
 export function AttributesPanel({
@@ -33,13 +33,13 @@ export function AttributesPanel({
           const total = stats.totalAttributes[definition.key];
           const natural = BASE_ATTRIBUTE_VALUE + (genderBonus[definition.key] ?? 0);
           const cells = [
-            { label: "Natural", value: formatNumber(natural), sum: false },
+            { label: "Natural", value: formatFraction(natural), sum: false },
             { label: "Treino", value: plus(lent(stats.sources.trained) - natural), sum: false },
             { label: "Equip.", value: plus(lent(stats.sources.equipment)), sum: false },
             { label: "Mascote", value: plus(lent(stats.sources.pet)), sum: false },
             { label: "Lua", value: plus(lent(stats.sources.moon)), sum: false },
             { label: "Fúria", value: plus(lent(stats.sources.fury)), sum: false },
-            { label: "Total", value: formatNumber(total), sum: true },
+            { label: "Total", value: formatFraction(total), sum: true },
           ];
 
           return (

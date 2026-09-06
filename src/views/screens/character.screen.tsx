@@ -12,7 +12,7 @@ import { EQUIPMENT_SLOTS } from "@/models/entities/item";
 import { findGender } from "@/models/entities/character";
 import type { Hunter } from "@/models/entities/ranking";
 import { FURY } from "@/shared/constants/tuning/fury";
-import { formatDate, formatNumber } from "@/shared/utils/format";
+import { formatDate, formatFraction, formatNumber } from "@/shared/utils/format";
 import { furyDurationCopy } from "../presenters/item.presenter";
 import { Button } from "../components/button";
 import { CopyNick } from "../components/copy-nick";
@@ -246,8 +246,8 @@ export function CharacterScreen() {
 
           <Panel title="Combate" description="Cada linha diz de qual atributo ela sai." padding="none">
             <List>
-              <DataRow label="Golpe (Força)" value={formatNumber(strength)} />
-              <DataRow label="Defesa (Resistência)" value={formatNumber(endurance)} />
+              <DataRow label="Golpe (Força)" value={formatFraction(strength)} />
+              <DataRow label="Defesa (Resistência)" value={formatFraction(endurance)} />
               <DataRow label="Esquiva (Agilidade)" value={stats.dodge + "%"} />
               <DataRow label="Crítico (Instinto)" value={stats.critical + "%"} />
               <DataRow
