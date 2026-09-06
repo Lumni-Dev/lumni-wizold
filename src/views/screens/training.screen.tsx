@@ -17,7 +17,7 @@ import {
   TRAINING_TICKS_MAX,
   TRAINING_TICKS_MIN,
 } from "@/shared/constants/game";
-import { formatNumber, formatBronze } from "@/shared/utils/format";
+import { formatFraction, formatNumber, formatBronze } from "@/shared/utils/format";
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
 import { Tag } from "../components/tag";
@@ -208,7 +208,10 @@ export function TrainingScreen() {
                 </p>
 
                 <div className="flex flex-wrap gap-2">
-                  <Tag>+{petTraining.effort.progress} de progresso por treinamento</Tag>
+                  <Tag>
+                    +{formatFraction(petTraining.effort.progress / petTraining.needed)} de nível
+                    por treinamento
+                  </Tag>
                   <Tag>Treino por {formatBronze(petTraining.cost)}</Tag>
                 </div>
               </CardBody>

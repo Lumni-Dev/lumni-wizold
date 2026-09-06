@@ -10,6 +10,7 @@ import {
   trainingSessionsPerPoint,
   type TrainingEffort,
 } from "@/models/rules/training";
+import { formatFraction } from "@/shared/utils/format";
 import { syncCharacter } from "./character.controller";
 import { addLog } from "./log.controller";
 
@@ -57,14 +58,17 @@ export function trainingSummaryLine(
   effort: TrainingEffort,
 ): string {
   const sessions = trainingSessionsPerPoint(value);
+  const pointShare = effort.progress / progressNeeded(value);
   return (
-    "Treina " +
+    "Este treino está somando atualmente +" +
+    formatFraction(pointShare) +
+    " ponto de " +
     attributeName +
-    ": cada ponto completo soma +1. Agora +" +
+    " por sessão (+" +
     effort.progress +
-    " de progresso por sessão; faltam cerca de " +
+    " de progresso), e o ponto fecha em cerca de " +
     sessions +
-    " sessões para o próximo ponto. Gratuito."
+    " sessões. Gratuito."
   );
 }
 
