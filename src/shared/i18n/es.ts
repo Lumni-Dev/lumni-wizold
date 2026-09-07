@@ -1335,4 +1335,9 @@ export const ES: Record<string, string> = {
   "New messages": "Mensajes nuevos",
   "Regeneration (Willpower)": "Regeneración (Voluntad)",
   "Fury duration (Willpower)": "Duración de la furia (Voluntad)",
+  "Automatic arena": "Arena automática",
+  "Challenges every rested rival in the band, drinking health potions between duels, until the day's attacks or the rivals run out. Off, each click books one duel.": "Desafía a cada rival descansado de la franja, bebiendo pociones de vida entre los duelos, hasta que se acaben los ataques del día o los rivales. Apagada, cada clic marca un duelo.",
+  "The automatic arena stopped: the day's attacks are spent.": "La arena automática paró: los ataques del día se acabaron.",
+  "The automatic arena stopped: no potion to make the body whole.": "La arena automática paró: sin poción para dejar el cuerpo entero.",
+  "The automatic arena stopped: nobody left to challenge.": "La arena automática paró: no queda nadie a quien desafiar.",
 };

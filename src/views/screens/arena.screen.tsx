@@ -15,7 +15,8 @@ import { ARENA_HISTORY_SIZE, type ArenaHistoryEntry } from "@/models/entities/ar
 import { ATTRIBUTES } from "@/models/entities/attribute";
 import type { Gender } from "@/models/entities/character";
 import type { Hunter } from "@/models/entities/ranking";
-import { ARENA_DAILY_ATTACKS, arenaSpoilsRange, arenaStats } from "@/models/rules/arena";
+import { findItem } from "@/models/data/items";
+import { ARENA_DAILY_ATTACKS, arenaCharges, arenaSpoilsRange, arenaStats } from "@/models/rules/arena";
 import type { DerivedStats } from "@/models/rules/stats";
 import { canPetFight, isPetActive, petLevelOf, petMaxEnergy } from "@/models/rules/pet";
 import { playSound } from "@/controllers/sound";
@@ -128,8 +129,19 @@ function DuelReport({ report }: { report: ArenaResolution }) {
   );
 }
 export function ArenaScreen() {
-  const { state, character, stats, pet, moon, drawOpponent, challengeArena, sufferBlow, landArena } =
-    useGame();
+  const {
+    state,
+    character,
+    stats,
+    pet,
+    moon,
+    drawOpponent,
+    challengeArena,
+    sufferBlow,
+    landArena,
+    consumeItem,
+    notify,
+  } = useGame();
   const { locked } = useActivityLock();
   const t = useT();
   const waitLabel = locked ? ACTIVITY_WAIT_LABEL : "";
@@ -145,6 +157,7 @@ export function ArenaScreen() {
   const [myJolt, setMyJolt] = useState(0);
   const [foeJolt, setFoeJolt] = useState(0);
   const shaking = useShake(myJolt + foeJolt);
+  const [autoRunning, setAutoRunning] = useState(false);
   const beatRef = useRef(0);
   const scriptRef = useRef<NarrationLine[]>([]);
   const pendingRef = useRef<ArenaResolution | null>(null);
@@ -154,12 +167,115 @@ export function ArenaScreen() {
   const challengeRef = useRef(challengeArena);
   const sufferRef = useRef(sufferBlow);
   const landRef = useRef(landArena);
+  const stateRef = useRef(state);
+  const statsRef = useRef(stats);
+  const rosterRef = useRef(roster);
+  const autoRef = useRef(false);
+  const autoTimerRef = useRef(0);
+  const drawRef = useRef(drawOpponent);
+  const consumeRef = useRef(consumeItem);
+  const notifyRef = useRef(notify);
+  // The landing effect closes over an old render, so the continuation always
+  // goes through this ref to reach the freshest closure (fighting already null).
+  const continueAutoRef = useRef<() => Promise<void>>(async () => {});
+  function beginDuel(hunter: Hunter, maxHealth: number) {
+    if (fighting) return;
+    if (autoTimerRef.current) {
+      window.clearTimeout(autoTimerRef.current);
+      autoTimerRef.current = 0;
+    }
+    beatRef.current = 0;
+    pendingRef.current = null;
+    scriptRef.current = [];
+    setBeat(0);
+    setScript([]);
+    setReport(null);
+    setFighting({ hunter, maxHealth });
+  }
+  function armAutomation() {
+    if (!state.automation.arena || autoRef.current) return;
+    autoRef.current = true;
+    setAutoRunning(true);
+  }
+  function stopAuto(message?: string) {
+    autoRef.current = false;
+    setAutoRunning(false);
+    if (autoTimerRef.current) {
+      window.clearTimeout(autoTimerRef.current);
+      autoTimerRef.current = 0;
+    }
+    if (message) notifyRef.current(message, true, "Arena");
+  }
   useEffect(() => {
     characterRef.current = character;
     challengeRef.current = challengeArena;
     sufferRef.current = sufferBlow;
     landRef.current = landArena;
+    stateRef.current = state;
+    statsRef.current = stats;
+    rosterRef.current = roster;
+    drawRef.current = drawOpponent;
+    consumeRef.current = consumeItem;
+    notifyRef.current = notify;
+    // The screen owns this loop, like the old job loops did: after each landed
+    // duel it tops the body up with health potions, draws the next rested
+    // rival and books again, until the day's attacks or the rivals run out.
+    // It lives here so every firing runs the freshest closure.
+    continueAutoRef.current = async () => {
+      autoTimerRef.current = 0;
+      if (!autoRef.current) return;
+      if (!stateRef.current.automation.arena) {
+        stopAuto();
+        return;
+      }
+      const charges = arenaCharges(stateRef.current.arenaDuels, Date.now());
+      if (charges.left === 0) {
+        stopAuto("The automatic arena stopped: the day's attacks are spent.");
+        return;
+      }
+      for (let guard = 0; guard < 40; guard += 1) {
+        const body = stateRef.current.character;
+        const maximum = statsRef.current?.maxHealth ?? 0;
+        if (!body || !autoRef.current) return;
+        if (body.health >= maximum) break;
+        const flask = stateRef.current.inventory
+          .filter((entry) => findItem(entry.itemId)?.potion === "health")
+          .sort(
+            (first, second) =>
+              (findItem(first.itemId)?.effect.healthMax ?? 0) -
+              (findItem(second.itemId)?.effect.healthMax ?? 0),
+          )[0];
+        if (!flask) {
+          stopAuto("The automatic arena stopped: no potion to make the body whole.");
+          return;
+        }
+        await consumeRef.current(flask.itemId);
+        await new Promise((resolve) => window.setTimeout(resolve, 250));
+      }
+      const body = stateRef.current.character;
+      if (!body || body.health < (statsRef.current?.maxHealth ?? 0)) {
+        stopAuto("The automatic arena stopped: no potion to make the body whole.");
+        return;
+      }
+      if (!autoRef.current) return;
+      const opponent = await drawRef.current();
+      if (!autoRef.current) return;
+      const hunter = opponent
+        ? rosterRef.current.find((entry) => entry.id === opponent.hunterId)
+        : undefined;
+      if (!hunter) {
+        stopAuto("The automatic arena stopped: nobody left to challenge.");
+        return;
+      }
+      beginDuel(hunter, arenaStats(hunter).maxHealth);
+    };
   });
+  useEffect(() => {
+    return () => {
+      autoRef.current = false;
+      if (autoTimerRef.current) window.clearTimeout(autoTimerRef.current);
+    };
+  }, []);
   useEffect(() => {
     let alive = true;
     void api<{ hunters: Hunter[] }>("GET", "/api/roster").then((answer) => {
@@ -258,6 +374,9 @@ export function ArenaScreen() {
         if (held.combat.victory) playSound("victory");
         else if (!held.combat.retreated) playSound("defeat");
         setFighting(null);
+        if (autoRef.current) {
+          autoTimerRef.current = window.setTimeout(() => void continueAutoRef.current(), 3000);
+        }
       }
     }, HUNT_TICK_MS);
     return () => {
@@ -272,17 +391,8 @@ export function ArenaScreen() {
   if (!character || !stats) return null;
   const busy = fighting !== null;
   const petAlong = canPetFight(pet) ? pet : null;
-  function beginDuel(hunter: Hunter, maxHealth: number) {
-    if (fighting) return;
-    beatRef.current = 0;
-    pendingRef.current = null;
-    scriptRef.current = [];
-    setBeat(0);
-    setScript([]);
-    setReport(null);
-    setFighting({ hunter, maxHealth });
-  }
   function challenge(hunter: Hunter, rival: DerivedStats) {
+    armAutomation();
     beginDuel(hunter, rival.maxHealth);
   }
   async function challengeDrawn() {
@@ -291,6 +401,7 @@ export function ArenaScreen() {
     if (!opponent) return;
     const hunter = roster.find((entry) => entry.id === opponent.hunterId);
     if (!hunter) return;
+    armAutomation();
     beginDuel(hunter, arenaStats(hunter).maxHealth);
   }
   const currentPage = clampPage(page, view.rivals.length, PAGE_SIZE);
@@ -354,21 +465,27 @@ export function ArenaScreen() {
             <span className="text-[11px] text-ink-faint">
               {t(view.reason ?? "Choose an opponent from your band or draw one at random.")}
             </span>
-            <BodyGate
-              open={!busy && view.charges.left > 0}
-              requireFull
-              reason="Recover before the pit."
-            >
-              <Tooltip label={view.reason}>
-                <Button
-                  variant="primary"
-                  disabled={!view.canFight || busy || locked}
-                  onClick={challengeDrawn}
-                >
-                  {busy ? "In the pit..." : waitLabel || "Find an opponent"}
-                </Button>
-              </Tooltip>
-            </BodyGate>
+            {autoRunning ? (
+              <Button variant="primary" onClick={() => stopAuto()}>
+                Stop
+              </Button>
+            ) : (
+              <BodyGate
+                open={!busy && view.charges.left > 0}
+                requireFull
+                reason="Recover before the pit."
+              >
+                <Tooltip label={view.reason}>
+                  <Button
+                    variant="primary"
+                    disabled={!view.canFight || busy || locked}
+                    onClick={challengeDrawn}
+                  >
+                    {busy ? "In the pit..." : waitLabel || "Find an opponent"}
+                  </Button>
+                </Tooltip>
+              </BodyGate>
+            )}
           </div>
         }
       >
@@ -513,7 +630,7 @@ export function ArenaScreen() {
                           value: formatFraction(rival.totalAttributes[attribute.key]),
                         })),
                         { key: "health", label: "Health", value: formatNumber(rival.maxHealth) },
-                        { key: "dodge", label: "Esquiva", value: rival.dodge + "%" },
+                        { key: "dodge", label: "Dodge", value: rival.dodge + "%" },
                         { key: "critical", label: "Critical", value: rival.critical + "%" },
                       ].map((cell) => (
                         <div key={cell.key} className="px-2 py-3 text-center">
@@ -553,7 +670,9 @@ export function ArenaScreen() {
                         <Button
                           variant={inBand && !resting ? "primary" : "outline"}
                           fullWidth
-                          disabled={!inBand || resting || !view.canFight || busy || locked}
+                          disabled={
+                            !inBand || resting || !view.canFight || busy || locked || autoRunning
+                          }
                           onClick={() => challenge(hunter, rival)}
                         >
                           {!inBand

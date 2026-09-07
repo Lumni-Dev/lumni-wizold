@@ -512,7 +512,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         " per month and keeps VIP for " +
         VIP_DAYS +
         " days per confirmed charge.",
-      "It unlocks every automation switch in the settings: hunt, training, mine, forge, rest, fury, potion and companion.",
+      "It unlocks every automation switch in the settings: hunt, arena, training, mine, forge, rest, fury, potion and companion.",
       "Without VIP, each click does one cycle; with VIP, the run repeats the work on its own while there are resources.",
       "Cancel at the Wizold Store: the charge stops renewing on Stripe and VIP lasts until the end of the paid period; reactivate before it runs out to keep the feature.",
       "Payment opens at the Stripe checkout; confirmation turns VIP on at once.",

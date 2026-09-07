@@ -1,5 +1,6 @@
 export interface Automation {
   hunt: boolean;
+  arena: boolean;
   train: boolean;
   mine: boolean;
   forge: boolean;
@@ -18,6 +19,12 @@ export const AUTOMATIONS: readonly { key: AutomationKey; label: string; effect: 
     label: "Automatic hunt",
     effect:
       "Chains hunts on its own and returns to hunting when the body is whole again. Off, each click hunts once.",
+  },
+  {
+    key: "arena",
+    label: "Automatic arena",
+    effect:
+      "Challenges every rested rival in the band, drinking health potions between duels, until the day's attacks or the rivals run out. Off, each click books one duel.",
   },
   {
     key: "train",
@@ -69,6 +76,7 @@ export const AUTOMATIONS: readonly { key: AutomationKey; label: string; effect: 
 export function noAutomation(): Automation {
   return {
     hunt: false,
+    arena: false,
     train: false,
     mine: false,
     forge: false,

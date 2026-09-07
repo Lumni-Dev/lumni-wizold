@@ -550,7 +550,7 @@ function ptTopics(): readonly WikiTopic[] {
           " por mês e mantém o VIP por " +
           VIP_DAYS +
           " dias a cada cobrança confirmada.",
-        "Libera todos os interruptores de automação nas configurações: caçada, treino, mina, forja, descanso, fúria, poção e mascote.",
+        "Libera todos os interruptores de automação nas configurações: caçada, arena, treino, mina, forja, descanso, fúria, poção e mascote.",
         "Sem VIP, cada clique faz um ciclo só; com VIP, a partida repete o trabalho sozinha enquanto houver recurso.",
         "Cancele na Wizold Store: a cobrança para de renovar no Stripe e o VIP vale até o fim do período já pago; reative antes do vencimento para não perder o recurso.",
         "O pagamento abre no checkout do Stripe; a confirmação liga o VIP na hora.",
@@ -959,7 +959,7 @@ function esTopics(): readonly WikiTopic[] {
           " por mes y mantiene el VIP por " +
           VIP_DAYS +
           " días por cada cobro confirmado.",
-        "Desbloquea todos los interruptores de automatización en la configuración: cacería, entrenamiento, mina, forja, descanso, furia, poción y compañero.",
+        "Desbloquea todos los interruptores de automatización en la configuración: cacería, arena, entrenamiento, mina, forja, descanso, furia, poción y compañero.",
         "Sin VIP, cada clic hace un solo ciclo; con VIP, la partida repite el trabajo sola mientras haya recursos.",
         "Cancela en la Wizold Store: el cobro deja de renovarse en Stripe y el VIP vale hasta el fin del período ya pagado; reactiva antes del vencimiento para no perder el recurso.",
         "El pago abre en el checkout de Stripe; la confirmación enciende el VIP al momento.",
