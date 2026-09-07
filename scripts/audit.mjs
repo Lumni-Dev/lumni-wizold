@@ -76,7 +76,7 @@ function setMoon(key) {
     source: "local",
   });
 }
-setMoon("new");
+setMoon("waning");
 let failures = 0;
 let checks = 0;
 let section = "";
@@ -205,6 +205,7 @@ sec("stats");
     { level: 1, attributes: attrs, form: "human" },
     entItem.emptyEquipment(),
   );
+  setMoon("waning");
   for (const key of Object.keys(attrs)) {
     ok(
       "lua cheia ativa fúria em " + key,
@@ -638,6 +639,7 @@ sec("progressão");
   const waxing = characterCtrl.grantExperience(state, 100);
   setMoon("new");
   const plain = characterCtrl.grantExperience(state, 100);
+  setMoon("waning");
   ok("crescente paga 105", waxing.granted === 105);
   ok("lua nova paga 100", plain.granted === 100);
 }
@@ -1575,7 +1577,21 @@ sec("lua");
   setMoon("waxing");
   ok("crescente paga 5%", moon.withMoonBonus(100) === 105);
   ok("crescente não é lua cheia", !moon.isFullMoon());
+  ok("crescente paga 5% no treino", moon.withMoonTrainingBonus(100) === 105);
+  ok("crescente não paga na mina", moon.withMoonMiningBonus(100) === 100);
   setMoon("new");
+  ok("nova paga 5% na mina", moon.withMoonMiningBonus(100) === 105);
+  ok(
+    "nova não paga caça nem treino",
+    moon.withMoonBonus(100) === 100 && moon.withMoonTrainingBonus(100) === 100,
+  );
+  setMoon("waning");
+  ok(
+    "minguante não paga nada",
+    moon.withMoonBonus(100) === 100 &&
+      moon.withMoonTrainingBonus(100) === 100 &&
+      moon.withMoonMiningBonus(100) === 100,
+  );
 }
 sec("vontade estica a fúria");
 {
@@ -1991,7 +2007,7 @@ sec("personagem");
   };
   const refusedFury = inventoryCtrl.consumeItem(fullMoonPotion, "rage-potion-small");
   ok("lua cheia recusa poção de fúria", !refusedFury.ok);
-  setMoon("new");
+  setMoon("waning");
 
   const bloated = { ...state, character: { ...state.character, health: 99999 } };
   const squeezed = characterCtrl.syncCharacter(bloated);

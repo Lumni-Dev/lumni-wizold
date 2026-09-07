@@ -4,6 +4,7 @@ import { ATTRIBUTES, findAttribute, type AttributeKey } from "@/models/entities/
 import type { GameState } from "@/models/entities/game-state";
 import { failure, success, type Result } from "@/models/entities/result";
 import type { Exercise } from "@/models/entities/exercise";
+import { withMoonTrainingBonus } from "@/models/rules/moon";
 import { applyTrainingProgress, progressNeeded } from "@/models/rules/progression";
 import { trainingEffort, type TrainingEffort } from "@/models/rules/training";
 import { syncCharacter } from "./character.controller";
@@ -59,10 +60,11 @@ export function trainingSummary(
   effort: TrainingEffort,
 ): TrainingSummary {
   const needed = progressNeeded(value);
+  const boosted = withMoonTrainingBonus(effort.progress);
   return {
-    pointShare: effort.progress / needed,
-    progress: effort.progress,
-    sessions: Math.max(1, Math.ceil(Math.max(0, needed - progress) / effort.progress)),
+    pointShare: boosted / needed,
+    progress: boosted,
+    sessions: Math.max(1, Math.ceil(Math.max(0, needed - progress) / boosted)),
   };
 }
 
@@ -112,7 +114,7 @@ export function train(state: GameState, exerciseId: string): Result<TrainingRepo
   const { character: trained, pointsGained } = applyTrainingProgress(
     character,
     exercise.attribute,
-    effort.progress,
+    withMoonTrainingBonus(effort.progress),
   );
 
   let next = syncCharacter({ ...state, character: trained });

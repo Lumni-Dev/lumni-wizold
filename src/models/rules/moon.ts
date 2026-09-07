@@ -7,6 +7,8 @@ export interface MoonPhase {
   label: string;
 
   experienceBonus: number;
+  trainingBonus: number;
+  miningBonus: number;
   description: string;
 }
 
@@ -32,18 +34,25 @@ export const MOON_PHASES: readonly MoonPhase[] = [
     key: "new",
     label: "Lua Nova",
     experienceBonus: 0,
-    description: "Céu fechado. A fera dorme e a caça rende o de sempre.",
+    trainingBonus: 0,
+    miningBonus: 0.05,
+    description: "Céu fechado. A fera dorme, e no escuro a rocha rende mais para quem minera.",
   },
   {
     key: "waxing",
     label: "Lua Crescente",
     experienceBonus: 0.05,
-    description: "A lua engorda e o sangue começa a responder: é a fase que ensina mais rápido.",
+    trainingBonus: 0.05,
+    miningBonus: 0,
+    description:
+      "A lua engorda e o sangue começa a responder: é a fase que ensina mais rápido, na caça e no pátio.",
   },
   {
     key: "full",
     label: "Lua Cheia",
     experienceBonus: 0,
+    trainingBonus: 0,
+    miningBonus: 0,
     description:
       "A noite da matilha: a lua cheia mantém o Modo Fúria ativo enquanto durar a fase.",
   },
@@ -51,7 +60,9 @@ export const MOON_PHASES: readonly MoonPhase[] = [
     key: "waning",
     label: "Lua Minguante",
     experienceBonus: 0,
-    description: "A lua se apaga e o corpo volta ao ritmo de antes.",
+    trainingBonus: 0,
+    miningBonus: 0,
+    description: "A lua se apaga e o corpo volta ao ritmo de antes, sem bônus algum.",
   },
 ];
 
@@ -171,9 +182,26 @@ export function isFuryActive(
   return furyRemainingMs(character, moonPhase, now) > 0;
 }
 
+function phaseOf(moonPhase?: MoonPhaseKey, now = Date.now()): MoonPhase {
+  return moonPhase ? findMoonPhase(moonPhase) : currentMoon(now).phase;
+}
+
 export function withMoonBonus(experience: number, moonPhase?: MoonPhaseKey, now = Date.now()): number {
-  const bonus = moonPhase
-    ? findMoonPhase(moonPhase).experienceBonus
-    : currentMoon(now).phase.experienceBonus;
-  return Math.round(experience * (1 + bonus));
+  return Math.round(experience * (1 + phaseOf(moonPhase, now).experienceBonus));
+}
+
+export function withMoonTrainingBonus(
+  progress: number,
+  moonPhase?: MoonPhaseKey,
+  now = Date.now(),
+): number {
+  return Math.round(progress * (1 + phaseOf(moonPhase, now).trainingBonus));
+}
+
+export function withMoonMiningBonus(
+  effort: number,
+  moonPhase?: MoonPhaseKey,
+  now = Date.now(),
+): number {
+  return Math.round(effort * (1 + phaseOf(moonPhase, now).miningBonus));
 }

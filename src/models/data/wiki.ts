@@ -85,12 +85,17 @@ function setRequirementsLine(): string {
 
 function moonLines(): string[] {
   return MOON_PHASES.map((phase) => {
-    const bonus = Math.round(phase.experienceBonus * 100);
-    if (bonus > 0) return phase.label + ": +" + bonus + "% de experiência.";
+    const perks: string[] = [];
+    const experience = Math.round(phase.experienceBonus * 100);
+    const training = Math.round(phase.trainingBonus * 100);
+    const mining = Math.round(phase.miningBonus * 100);
+    if (experience > 0) perks.push("+" + experience + "% de experiência na caça");
+    if (training > 0) perks.push("+" + training + "% de progresso no treino");
+    if (mining > 0) perks.push("+" + mining + "% de experiência de mineração");
     if (phase.key === "full") {
-      return phase.label + ": Modo Fúria ativo (+" + FURY_ATTRIBUTE_BONUS + " em todos os atributos).";
+      perks.push("Modo Fúria ativo (+" + FURY_ATTRIBUTE_BONUS + " em todos os atributos)");
     }
-    return phase.label + ": sem bônus.";
+    return phase.label + ": " + (perks.length > 0 ? perks.join(", ") + "." : "sem bônus.");
   });
 }
 
@@ -202,7 +207,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "O mês lunar tem " +
         SYNODIC_MONTH_DAYS.toFixed(2) +
         " dias, então cada fase dura cerca de uma semana.",
-      "O bônus de experiência vale para a caça, a única fonte de experiência: o treino move só os atributos.",
+      "Cada fase paga em um canto: a crescente rende mais na caça e no treino, a nova rende mais na mina, e a minguante não dá bônus algum.",
       "A lua cheia não dá bônus pela coluna Lua: ela liga o Modo Fúria (+" +
         FURY_ATTRIBUTE_BONUS +
         " em todos os atributos) enquanto durar a fase, cerca de " +

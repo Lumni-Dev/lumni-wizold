@@ -20,6 +20,7 @@ import {
   exactEnhancedValue,
   forgeBronzeCost,
 } from "@/models/rules/forge";
+import { withMoonMiningBonus } from "@/models/rules/moon";
 import {
   applyMiningProgress,
   miningEffort,
@@ -109,7 +110,7 @@ export function mine(
   }
 
   const yielded = intBetween(ore.minYield, ore.maxYield, random);
-  const effort = miningEffort(rolled.level);
+  const effort = withMoonMiningBonus(miningEffort(rolled.level));
   const { mining: advanced, levelsGained } = applyMiningProgress(rolled, effort);
   const mining: MiningState = {
     ...advanced,

@@ -9,15 +9,15 @@ export function MoonTracker() {
   const { moon } = useGame();
 
   const xpBonus = Math.round(moon.phase.experienceBonus * 100);
+  const trainingBonus = Math.round(moon.phase.trainingBonus * 100);
+  const miningBonus = Math.round(moon.phase.miningBonus * 100);
   const furyBonus = moon.phase.key === "full" ? FURY_ATTRIBUTE_BONUS : 0;
-  const bonusLine =
-    xpBonus > 0 && furyBonus > 0
-      ? "+" + xpBonus + "% de experiência · Modo Fúria ativo"
-      : xpBonus > 0
-        ? "+" + xpBonus + "% de experiência na caça"
-        : furyBonus > 0
-          ? "Modo Fúria: +" + furyBonus + " em todos os atributos"
-          : "Sem bônus nesta fase";
+  const perks: string[] = [];
+  if (xpBonus > 0) perks.push("+" + xpBonus + "% de experiência na caça");
+  if (trainingBonus > 0) perks.push("+" + trainingBonus + "% no treino");
+  if (miningBonus > 0) perks.push("+" + miningBonus + "% na mineração");
+  if (furyBonus > 0) perks.push("Modo Fúria: +" + furyBonus + " em todos os atributos");
+  const bonusLine = perks.length > 0 ? perks.join(" · ") : "Sem bônus nesta fase";
 
   return (
     <Tooltip block label={moon.phase.description}>

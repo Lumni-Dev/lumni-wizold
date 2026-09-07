@@ -31,7 +31,7 @@ import { Panel } from "../components/panel";
 import { PageHeader } from "../layout/page-header";
 
 export function TrainingScreen() {
-  const { state, character, stats, setActivity } = useGame();
+  const { state, character, stats, moon, setActivity } = useGame();
   const { locked } = useActivityLock();
   const waitLabel = locked ? ACTIVITY_WAIT_LABEL : "";
   const { activity, runtime } = useVisibleActivity();
@@ -143,6 +143,9 @@ export function TrainingScreen() {
                     <li>
                       <strong className="font-bold">+{formatNumber(summary.progress)}</strong> de
                       experiência por sessão
+                      {moon.phase.trainingBonus > 0
+                        ? " (+" + Math.round(moon.phase.trainingBonus * 100) + "% lua)"
+                        : ""}
                     </li>
                     <li>
                       Ponto fecha em cerca de{" "}
