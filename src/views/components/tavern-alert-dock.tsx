@@ -6,6 +6,7 @@ import { useSyncExternalStore } from "react";
 import { dismissTavernAlert, tavernAlertStore } from "@/controllers/tavern-alert.store";
 import { tavernPushRepository } from "@/models/repositories/tavern-push.repository";
 import { formatDay } from "@/shared/utils/format";
+import { displayNick } from "@/shared/utils/text";
 import { GLASS_SECTION } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { NavIcon } from "./app-icon";
@@ -58,7 +59,7 @@ export function TavernAlertDock() {
             <List>
               <ListRow layout="column">
                 <p className="text-xs leading-relaxed text-ink">
-                  <span className="text-ink-soft">{alert.authorName}: </span>
+                  <span className="text-ink-soft">{displayNick(alert.authorName)}: </span>
                   {alert.text}
                 </p>
                 <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">

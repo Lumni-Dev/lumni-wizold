@@ -33,7 +33,7 @@ import {
 import { isVip } from "@/models/rules/vip";
 import { NAME_MAX_LENGTH } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
-import { sanitizeName, sanitizeRoomSearch } from "@/shared/utils/text";
+import { displayNick, sanitizeName, sanitizeRoomSearch } from "@/shared/utils/text";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
 import { ActionIcon } from "../components/app-icon";
 import { AiAuditNotice } from "../components/ai-audit-notice";
@@ -641,7 +641,7 @@ export function TavernScreen() {
                 {invites.map((entry) => (
                   <ListRow key={entry.id}>
                     <p className="min-w-0 flex-1 truncate text-sm text-ink">
-                      <MemberName href={profileHref(entry.fromId)} name={entry.fromName} />
+                      <MemberName href={profileHref(entry.fromId)} name={displayNick(entry.fromName)} />
                     </p>
                     <Tooltip label={"Accept " + entry.fromName}>
                       <Button
@@ -727,7 +727,7 @@ export function TavernScreen() {
                             doingFor(mate.id, identity.id, mineDoing, tavernDoing),
                           )}
                         >
-                          <MemberName href={profileHref(mate.id)} name={mate.name} />
+                          <MemberName href={profileHref(mate.id)} name={displayNick(mate.name)} />
                         </Tooltip>
                         {packVips[mate.id] ? <VipBadge className="ml-2" /> : null}
                       </p>

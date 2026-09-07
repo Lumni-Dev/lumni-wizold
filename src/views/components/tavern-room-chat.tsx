@@ -15,7 +15,7 @@ import { CONTROL_HEIGHT } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { useT } from "@/controllers/use-locale";
 import { formatTime } from "@/shared/utils/format";
-import { splitChatLinks } from "@/shared/utils/text";
+import { displayNick, splitChatLinks } from "@/shared/utils/text";
 import { ActionIcon } from "./app-icon";
 import { AiAuditNotice } from "./ai-audit-notice";
 import { AI_AUDIT_CHAT_NOTICE } from "@/shared/constants/moderation";
@@ -167,7 +167,7 @@ export function TavernRoomChatMembers({
                 <Tooltip label={describeDoing(member.name, job)}>
                   <MemberName
                     href={profileHref(member.id)}
-                    name={member.name}
+                    name={displayNick(member.name)}
                     className={nickColorClass(member.nickColor)}
                   />
                 </Tooltip>
@@ -237,7 +237,7 @@ export function TavernRoomChatMessages({
               <ChatNick
                 at={message.at}
                 href={profileHref(message.authorId)}
-                name={message.authorName}
+                name={displayNick(message.authorName)}
                 className={nickColorClass(nickColorOf(activeRoom, message.authorId))}
                 status={authorPresence(message.authorId, identityId, presence)}
                 doing={doingFor(message.authorId, identityId, mine, doing)}

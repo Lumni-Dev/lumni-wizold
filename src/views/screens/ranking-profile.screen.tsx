@@ -15,6 +15,7 @@ import { criticalMultiplierOf } from "@/models/rules/combat";
 import { PET_MAX_LEVEL, REST_TICK_MS } from "@/shared/constants/game";
 import { furyPotionClock } from "../presenters/item.presenter";
 import { formatDate, formatFraction, formatNumber } from "@/shared/utils/format";
+import { displayNick } from "@/shared/utils/text";
 import { Button } from "../components/button";
 import { CopyNick } from "../components/copy-nick";
 import { DataRow } from "../components/data-row";
@@ -80,7 +81,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
   return (
     <>
       <PageHeader
-        title={hunter.name}
+        title={displayNick(hunter.name)}
         description={
           isPlayer
             ? "What other hunters see of your public sheet."
@@ -113,7 +114,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
             <div className="border-b border-edge px-4 py-3">
               <div className="min-w-0 space-y-1">
                 <div className="flex items-center gap-2">
-                  <p className="min-w-0 truncate text-sm text-ink">{hunter.name}</p>
+                  <p className="min-w-0 truncate text-sm text-ink">{displayNick(hunter.name)}</p>
                   {hunter.vip ? <VipBadge /> : null}
                   <CopyNick name={hunter.name} />
                 </div>

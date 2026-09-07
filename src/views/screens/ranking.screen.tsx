@@ -14,6 +14,7 @@ import {
 } from "../presenters/item-filter.presenter";
 import { formatNumber } from "@/shared/utils/format";
 import { cn } from "@/shared/utils/class-names";
+import { displayNick } from "@/shared/utils/text";
 import { Chip } from "../components/chip";
 import { FILTER_COLUMN, FilterRow, FilterSelect } from "../components/filter-select";
 import { HunterSearchField } from "../components/hunter-search-field";
@@ -161,7 +162,7 @@ export function RankingScreen() {
                       entry.isPlayer ? "text-highlight" : "text-ink",
                     )}
                   >
-                    {entry.hunter.name}
+                    {displayNick(entry.hunter.name)}
                   </Link>
                   {entry.hunter.vip ? <VipBadge /> : null}
                 </span>

@@ -1,3 +1,6 @@
+"use client";
+
+import { useT } from "@/controllers/use-locale";
 import { COMPANY } from "@/shared/constants/company";
 import { GAME_NAME, GAME_TAGLINE } from "@/shared/constants/game";
 import { BRAND_ICON_PATH } from "@/shared/constants/site";
@@ -5,6 +8,7 @@ import { ActionIcon } from "../components/app-icon";
 import { BackToTop } from "./back-to-top";
 
 export function Footer() {
+  const t = useT();
   const year = new Date().getFullYear();
 
   return (
@@ -19,7 +23,7 @@ export function Footer() {
             </p>
           </div>
           <p className="text-[11px] leading-relaxed text-ink-faint">
-            Um jogo da{" "}
+            {t("A game by")}{" "}
             <a
               href={COMPANY.site}
               target="_blank"
@@ -28,7 +32,7 @@ export function Footer() {
             >
               {COMPANY.name}
             </a>
-            . {COMPANY.description}
+            . {t(COMPANY.description)}
           </p>
         </div>
 
@@ -38,13 +42,15 @@ export function Footer() {
               {COMPANY.legalName} - CNPJ {COMPANY.taxId}
             </p>
             <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-              © {year} {COMPANY.name}. Todos os direitos reservados.
+              © {year} {COMPANY.name}. {t("All rights reserved.")}
             </p>
           </div>
 
           <div className="flex flex-col items-start gap-4 sm:items-end">
             <nav aria-label="Lumni contact" className="space-y-3 sm:text-right">
-              <h2 className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">Contato</h2>
+              <h2 className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                {t("Contact")}
+              </h2>
               <ul className="space-y-2">
                 {COMPANY.channels.map((channel) => (
                   <li key={channel.kind}>
@@ -72,7 +78,7 @@ export function Footer() {
                 rel="noreferrer"
                 className="text-[11px] text-ink-soft transition-colors hover:text-ink"
               >
-                Privacidade
+                {t("Privacy")}
               </a>
               <a
                 href={COMPANY.termsUrl}
@@ -80,7 +86,7 @@ export function Footer() {
                 rel="noreferrer"
                 className="text-[11px] text-ink-soft transition-colors hover:text-ink"
               >
-                Termos
+                {t("Terms")}
               </a>
               <BackToTop />
             </nav>

@@ -1339,4 +1339,9 @@ export const PT: Record<string, string> = {
   "The automatic arena stopped: the day's attacks are spent.": "A arena automática parou: os ataques do dia acabaram.",
   "The automatic arena stopped: no potion to make the body whole.": "A arena automática parou: sem poção para deixar o corpo inteiro.",
   "The automatic arena stopped: nobody left to challenge.": "A arena automática parou: ninguém sobrou para desafiar.",
+  "All rights reserved.": "Todos os direitos reservados.",
+  "A game by": "Um jogo da",
+  "Contact": "Contato",
+  "Privacy": "Privacidade",
+  "Terms": "Termos",
 };

@@ -25,6 +25,7 @@ import { ICON_FRAME_INSET } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { formatDay, formatFraction, formatNumber, formatBronze } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
+import { displayNick } from "@/shared/utils/text";
 import { emphasizeDamage, narrationOf, type NarrationLine } from "../presenters/hunt.presenter";
 import { Bar } from "../components/bar";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
@@ -83,7 +84,7 @@ function DuelReport({ report }: { report: ArenaResolution }) {
   return (
     <Panel
       title="Last duel"
-      description={hunter.name + " (LV. " + formatNumber(hunter.level) + ")"}
+      description={displayNick(hunter.name) + " (LV. " + formatNumber(hunter.level) + ")"}
       action={<Tag tone="neutral">{outcome}</Tag>}
       padding="none"
     >
@@ -101,10 +102,10 @@ function DuelReport({ report }: { report: ArenaResolution }) {
           <p className="text-xs leading-relaxed text-ink-faint">
             {t(
               combat.victory
-                ? hunter.name + " stayed on the ground, and the purse is yours."
+                ? displayNick(hunter.name) + " stayed on the ground, and the purse is yours."
                 : combat.retreated
                   ? "Both held to the end and neither put the other on the ground."
-                  : hunter.name + " got the better of it. You leave beaten, but you leave.",
+                  : displayNick(hunter.name) + " got the better of it. You leave beaten, but you leave.",
             )}
           </p>
           <p className="text-xs text-ink-faint">
@@ -503,7 +504,7 @@ export function ArenaScreen() {
           title="Duel"
           description={
             "You against " +
-            fighting.hunter.name +
+            displayNick(fighting.hunter.name) +
             ". At stake, a piece of the fallen one's purse: " +
             formatNumber(arenaSpoilsRange(fighting.hunter.level).min) +
             " a " +
@@ -517,7 +518,7 @@ export function ArenaScreen() {
           <div className="grid grid-cols-1 divide-y divide-edge border-b border-edge sm:grid-cols-2 sm:divide-x sm:divide-y-0">
             <Fighter
               gender={character.gender}
-              name={character.name}
+              name={displayNick(character.name)}
               level={character.level}
               side="You"
               health={character.health}
@@ -526,7 +527,7 @@ export function ArenaScreen() {
             />
             <Fighter
               gender={fighting.hunter.gender}
-              name={fighting.hunter.name}
+              name={displayNick(fighting.hunter.name)}
               level={fighting.hunter.level}
               side="Challenged"
               health={duelLine ? duelLine.creatureHealth : fighting.maxHealth}
@@ -610,7 +611,7 @@ export function ArenaScreen() {
                           href={"/ranking/" + hunter.id}
                           className="transition-colors hover:text-highlight"
                         >
-                          {hunter.name}
+                          {displayNick(hunter.name)}
                         </Link>
                       }
                       label={
@@ -722,7 +723,7 @@ export function ArenaScreen() {
                       ? "Victory over "
                       : line.outcome === "defeat"
                         ? "Defeat to "
-                        : "Draw with ") + line.rivalName
+                        : "Draw with ") + displayNick(line.rivalName)
                   }
                   description={(line.mine ? "Your attack" : "Attack received") + " - " + formatDay(line.at)}
                 />

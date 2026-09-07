@@ -15,6 +15,7 @@ import { findGender } from "@/models/entities/character";
 import type { Hunter } from "@/models/entities/ranking";
 import { FURY } from "@/shared/constants/tuning/fury";
 import { formatDate, formatFraction, formatNumber } from "@/shared/utils/format";
+import { displayNick } from "@/shared/utils/text";
 import { furyDurationCopy, furyPotionClock } from "../presenters/item.presenter";
 import { Button } from "../components/button";
 import { CopyNick } from "../components/copy-nick";
@@ -110,7 +111,7 @@ export function CharacterScreen() {
             <div className="border-b border-edge px-4 py-3">
               <div className="min-w-0 space-y-1">
                 <div className="flex items-center gap-2">
-                  <p className="min-w-0 truncate text-sm text-ink">{character.name}</p>
+                  <p className="min-w-0 truncate text-sm text-ink">{displayNick(character.name)}</p>
                   {isVip(character, now) ? <VipBadge /> : null}
                   <CopyNick name={character.name} />
                 </div>
