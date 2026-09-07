@@ -711,16 +711,21 @@ sec("arena");
   );
   const bleeding = { ...inBand, character: { ...inBand.character, health: 1 } };
   ok(
-    "health on the floor is refused",
-    arenaCtrl.resolveArena(bleeding, pit, rival.id, random).ok === false,
+    "a body on the floor still descends into the pit",
+    arenaCtrl.resolveArena(bleeding, pit, rival.id, random).ok === true,
+  );
+  const lifeless = { ...inBand, character: { ...inBand.character, health: 0 } };
+  ok(
+    "no health at all is refused",
+    arenaCtrl.resolveArena(lifeless, pit, rival.id, random).ok === false,
   );
   const wounded = {
     ...inBand,
     character: { ...inBand.character, health: inBand.character.health - 1 },
   };
   ok(
-    "incomplete health is refused",
-    arenaCtrl.resolveArena(wounded, pit, rival.id, random).ok === false,
+    "incomplete health still duels",
+    arenaCtrl.resolveArena(wounded, pit, rival.id, random).ok === true,
   );
   const duel = arenaCtrl.resolveArena(inBand, pit, rival.id, seededRandom(7));
   ok("valid duel resolves", duel.ok === true);

@@ -72,8 +72,7 @@ export function listArena(
     };
   }
   const band = arenaBand(character.level);
-  const stats = deriveStats(character, state.equipment, state.pet);
-  const healthy = character.health >= stats.maxHealth;
+  const healthy = character.health >= 1;
   const charges = arenaCharges(state.arenaDuels, now);
   const ready = healthy && charges.left > 0;
   const pit = roster.filter((hunter) => hunter.id !== character.id);
@@ -103,7 +102,7 @@ export function listArena(
     ready,
     canFight: ready,
     reason: !healthy
-      ? "Recover before the pit: the arena only opens with a whole body."
+      ? "No health for the pit. Recover or use a potion."
       : charges.left === 0
         ? "The day's attacks are spent: the next returns in " +
           formatCooldown(charges.returnsIn) +
@@ -222,8 +221,10 @@ export function resolveArena(
     );
   }
   const stats = deriveStats(character, state.equipment, state.pet);
-  if (character.health < stats.maxHealth) {
-    return failure(state, "Recover before the pit: the arena only opens with a whole body.");
+  // The pit opens for any living body: descending wounded is the fighter's own
+  // risk, and losing while bled is the realistic price of that choice.
+  if (character.health < 1) {
+    return failure(state, "No health for the pit. Recover or use a potion.");
   }
   const foe = arenaCombatant(hunter);
   const ally = canPetFight(state.pet) ? state.pet : null;

@@ -29,7 +29,6 @@ import { displayNick } from "@/shared/utils/text";
 import { emphasizeDamage, narrationOf, type NarrationLine } from "../presenters/hunt.presenter";
 import { Bar } from "../components/bar";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
-import { BodyGate } from "../components/body-gate";
 import { Button } from "../components/button";
 import { DataRow } from "../components/data-row";
 import { EmptyState } from "../components/empty-state";
@@ -219,9 +218,11 @@ export function ArenaScreen() {
     consumeRef.current = consumeItem;
     notifyRef.current = notify;
     // The screen owns this loop, like the old job loops did: after each landed
-    // duel it tops the body up with health potions, draws the next rested
-    // rival and books again, until the day's attacks or the rivals run out.
-    // It lives here so every firing runs the freshest closure.
+    // duel it tops the body up with health potions while the bag has them,
+    // then draws the next rested rival and books again, wounded or not, until
+    // the day's attacks or the rivals run out. Descending bled is allowed on
+    // purpose: the pit opens for any living body, and losing while hurt is the
+    // realistic price. It lives here so every firing runs the freshest closure.
     continueAutoRef.current = async () => {
       autoTimerRef.current = 0;
       if (!autoRef.current) return;
@@ -246,19 +247,11 @@ export function ArenaScreen() {
               (findItem(first.itemId)?.effect.healthMax ?? 0) -
               (findItem(second.itemId)?.effect.healthMax ?? 0),
           )[0];
-        if (!flask) {
-          stopAuto("The automatic arena stopped: no potion to make the body whole.");
-          return;
-        }
+        if (!flask) break;
         await consumeRef.current(flask.itemId);
         await new Promise((resolve) => window.setTimeout(resolve, 250));
       }
-      const body = stateRef.current.character;
-      if (!body || body.health < (statsRef.current?.maxHealth ?? 0)) {
-        stopAuto("The automatic arena stopped: no potion to make the body whole.");
-        return;
-      }
-      if (!autoRef.current) return;
+      if (!stateRef.current.character || !autoRef.current) return;
       const opponent = await drawRef.current();
       if (!autoRef.current) return;
       const hunter = opponent
@@ -471,21 +464,15 @@ export function ArenaScreen() {
                 Stop
               </Button>
             ) : (
-              <BodyGate
-                open={!busy && view.charges.left > 0}
-                requireFull
-                reason="Recover before the pit."
-              >
-                <Tooltip label={view.reason}>
-                  <Button
-                    variant="primary"
-                    disabled={!view.canFight || busy || locked}
-                    onClick={challengeDrawn}
-                  >
-                    {busy ? "In the pit..." : waitLabel || "Find an opponent"}
-                  </Button>
-                </Tooltip>
-              </BodyGate>
+              <Tooltip label={view.reason}>
+                <Button
+                  variant="primary"
+                  disabled={!view.canFight || busy || locked}
+                  onClick={challengeDrawn}
+                >
+                  {busy ? "In the pit..." : waitLabel || "Find an opponent"}
+                </Button>
+              </Tooltip>
             )}
           </div>
         }
@@ -645,45 +632,38 @@ export function ArenaScreen() {
                   </CardBody>
 
                   <CardFooter className="w-full">
-                    <BodyGate
-                      open={inBand && !resting && !busy && view.charges.left > 0}
-                      requireFull
-                      fullWidth
-                      reason="Recover before the pit."
+                    <Tooltip
+                      block
+                      className="w-full"
+                      label={
+                        !inBand
+                          ? "Out of your band: the arena only books fights between LV. " +
+                            formatNumber(view.band.start) +
+                            " and LV. " +
+                            formatNumber(view.band.end) +
+                            "."
+                          : resting
+                            ? "You two already dueled today: the next challenge to them reopens at 06:00. " +
+                              formatCooldown(cooldownLeft) +
+                              " left."
+                            : view.reason
+                      }
                     >
-                      <Tooltip
-                        block
-                        className="w-full"
-                        label={
-                          !inBand
-                            ? "Out of your band: the arena only books fights between LV. " +
-                              formatNumber(view.band.start) +
-                              " and LV. " +
-                              formatNumber(view.band.end) +
-                              "."
-                            : resting
-                              ? "You two already dueled today: the next challenge to them reopens at 06:00. " +
-                                formatCooldown(cooldownLeft) +
-                                " left."
-                              : view.reason
+                      <Button
+                        variant={inBand && !resting ? "primary" : "outline"}
+                        fullWidth
+                        disabled={
+                          !inBand || resting || !view.canFight || busy || locked || autoRunning
                         }
+                        onClick={() => challenge(hunter, rival)}
                       >
-                        <Button
-                          variant={inBand && !resting ? "primary" : "outline"}
-                          fullWidth
-                          disabled={
-                            !inBand || resting || !view.canFight || busy || locked || autoRunning
-                          }
-                          onClick={() => challenge(hunter, rival)}
-                        >
-                          {!inBand
-                            ? "Out of band"
-                            : resting
-                              ? "Resting"
-                              : waitLabel || "Challenge"}
-                        </Button>
-                      </Tooltip>
-                    </BodyGate>
+                        {!inBand
+                          ? "Out of band"
+                          : resting
+                            ? "Resting"
+                            : waitLabel || "Challenge"}
+                      </Button>
+                    </Tooltip>
                   </CardFooter>
                 </Card>
               );

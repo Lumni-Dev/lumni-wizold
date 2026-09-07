@@ -179,7 +179,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         " Willpower: more Willpower, less time until whole. The potion is the paid shortcut while the fixed number is still worth it.",
       "Hit zero health on the hunt and you escape with 1 health and record a defeat.",
       "Below 1 health the ground refuses the hunt: Recover or drink a potion.",
-      "Without full health the pit refuses a duel: the arena only opens with a whole body, so Recover first.",
+      "The pit opens for any living body: you may descend wounded, and losing bled out is the risk you chose to take.",
       "A fight that drags to the round cap ends in retreat: the hunt counts, but nobody wins or loses.",
     ],
   },
