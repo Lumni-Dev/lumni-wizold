@@ -19,7 +19,7 @@ export function WelcomeTutorial({
   onFinished: () => void;
 }) {
   const { completeTutorial } = useGame();
-  const { current, play, stop, toggle } = useNarration();
+  const { current, loading, play, stop, toggle } = useNarration();
   const locale = useLocale();
   const welcome = welcomePack(locale);
   const voice = welcome.voice;
@@ -60,6 +60,7 @@ export function WelcomeTutorial({
         ))}
         <NarrationButton
           playing={current === voice}
+          loading={loading === voice}
           onClick={() => toggle(voice)}
           label="Ouvir a apresentação"
         />

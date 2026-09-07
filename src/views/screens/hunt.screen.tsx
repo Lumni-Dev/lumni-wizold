@@ -420,6 +420,7 @@ export function HuntScreen() {
                     </p>
                     <NarrationButton
                       playing={narration.current === areaVoice(territory.id, locale)}
+                      loading={narration.loading === areaVoice(territory.id, locale)}
                       onClick={() => narration.toggle(areaVoice(territory.id, locale))}
                       label={"Ouvir sobre " + territory.name}
                     />

@@ -142,6 +142,7 @@ export function LandingScreen() {
                   <p className="text-xs leading-relaxed text-ink-soft">{chapter.text}</p>
                   <NarrationButton
                     playing={narration.current === chapter.voice}
+                    loading={narration.loading === chapter.voice}
                     onClick={() => narration.toggle(chapter.voice)}
                   />
                 </article>
@@ -182,6 +183,7 @@ export function LandingScreen() {
                     <p className="text-xs leading-relaxed text-ink-soft">{companion.text}</p>
                     <NarrationButton
                       playing={narration.current === companion.voice}
+                      loading={narration.loading === companion.voice}
                       onClick={() => narration.toggle(companion.voice)}
                     />
                   </div>

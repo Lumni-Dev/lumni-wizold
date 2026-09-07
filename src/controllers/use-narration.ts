@@ -11,6 +11,7 @@ const UNLOCK_EVENTS: Array<keyof DocumentEventMap> = [
 
 export interface Narration {
   current: string | null;
+  loading: string | null;
   play: (source: string) => void;
   stop: () => void;
   toggle: (source: string) => void;
@@ -20,6 +21,7 @@ export function useNarration(): Narration {
   const audio = useRef<HTMLAudioElement | null>(null);
   const unlock = useRef<(() => void) | null>(null);
   const [current, setCurrent] = useState<string | null>(null);
+  const [loading, setLoading] = useState<string | null>(null);
 
   const unbind = useCallback(() => {
     if (!unlock.current) return;
@@ -33,17 +35,27 @@ export function useNarration(): Narration {
     audio.current?.pause();
     audio.current = null;
     setCurrent(null);
+    setLoading(null);
   }, [unbind]);
 
   const play = useCallback(
     (source: string) => {
       unbind();
       audio.current?.pause();
+      setCurrent(null);
+      setLoading(source);
       const element = new Audio(source);
       element.addEventListener("ended", () => {
         if (audio.current === element) {
           audio.current = null;
           setCurrent(null);
+        }
+      });
+      element.addEventListener("error", () => {
+        if (audio.current === element) {
+          audio.current = null;
+          setCurrent(null);
+          setLoading(null);
         }
       });
       audio.current = element;
@@ -53,6 +65,7 @@ export function useNarration(): Narration {
           () => {
             unbind();
             setCurrent(source);
+            setLoading(null);
           },
           () => undefined,
         );
@@ -70,18 +83,21 @@ export function useNarration(): Narration {
 
   const toggle = useCallback(
     (source: string) => {
-      if (audio.current && current === source) {
+      if (audio.current && (current === source || loading === source)) {
         stop();
         return;
       }
       play(source);
     },
-    [current, play, stop],
+    [current, loading, play, stop],
   );
 
   useEffect(() => () => stop(), [stop]);
 
-  return useMemo(() => ({ current, play, stop, toggle }), [current, play, stop, toggle]);
+  return useMemo(
+    () => ({ current, loading, play, stop, toggle }),
+    [current, loading, play, stop, toggle],
+  );
 }
 
 export function areaVoice(territoryId: string, locale: "pt" | "en" | "es" = "pt"): string {
