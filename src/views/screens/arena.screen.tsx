@@ -119,7 +119,7 @@ function DuelReport({ report }: { report: ArenaResolution }) {
               {round.index.toString().padStart(2, "0")}
             </span>
             <span className={cn(round.author === "character" ? "text-ink-soft" : "text-ink-faint")}>
-              {round.text}
+              {t(round.text)}
             </span>
           </ListRow>
         ))}
@@ -442,7 +442,7 @@ export function ArenaScreen() {
                   duelLine.critical ? "text-ember" : "text-ink-faint",
                 )}
               >
-                {emphasizeDamage(duelLine.text).map((part, index) =>
+                {emphasizeDamage(t(duelLine.text)).map((part, index) =>
                   typeof part === "string" ? (
                     part
                   ) : (

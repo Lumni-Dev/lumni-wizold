@@ -1,6 +1,7 @@
 "use client";
 
 import { LOG_KIND_LABEL, withinDiary, type LogEntry } from "@/models/entities/log-entry";
+import { useT } from "@/controllers/use-locale";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
 import { useState } from "react";
 import { formatTime } from "@/shared/utils/format";
@@ -13,6 +14,7 @@ const PAGE_SIZE = 6;
 
 export function ActivityLog({ entries }: { entries: LogEntry[] }) {
   const [page, setPage] = useState(1);
+  const t = useT();
 
   const kept = withinDiary(entries);
   const currentPage = clampPage(page, kept.length, PAGE_SIZE);
@@ -37,9 +39,9 @@ export function ActivityLog({ entries }: { entries: LogEntry[] }) {
         <List>
           {visible.map((entry) => (
             <ListRow key={entry.id} layout="column">
-              <p className="text-xs leading-relaxed text-ink-soft">{entry.message}</p>
+              <p className="text-xs leading-relaxed text-ink-soft">{t(entry.message)}</p>
               <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                {LOG_KIND_LABEL[entry.kind]}
+                {t(LOG_KIND_LABEL[entry.kind])}
                 <span className="font-mono normal-case tracking-normal">
                   {" "}
                   - {formatTime(entry.date)}

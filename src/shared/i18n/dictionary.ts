@@ -295,6 +295,194 @@ const RULES: readonly PatternRule[] = [
     en: "You climbed $1 level(s) on this hunt.",
     es: "Subiste $1 nivel(es) en esta cacería.",
   },
+  // Combat narration: full sentences first, then the damage suffixes, then the verbs.
+  {
+    pattern: /^(.+) acerta (.+) em cheio, que sai da luta sem fôlego\.$/,
+    en: "$1 hits $2 square on, and it leaves the fight out of breath.",
+    es: "$1 acierta de lleno a $2, que sale de la pelea sin aliento.",
+  },
+  {
+    pattern: /^(.+) investe contra (.+), que gane e volta ao combate\.$/,
+    en: "$1 charges at $2, which yelps and returns to the fight.",
+    es: "$1 embiste a $2, que gañe y vuelve al combate.",
+  },
+  {
+    pattern: /^(.+) desvia do golpe de (.+)\.$/,
+    en: "$1 dodges $2's strike.",
+    es: "$1 esquiva el golpe de $2.",
+  },
+  {
+    pattern: /^(.+) escapa por um fio das garras de (.+)\.$/,
+    en: "$1 escapes $2's claws by a hair.",
+    es: "$1 escapa por un pelo de las garras de $2.",
+  },
+  {
+    pattern: /^O bote de (.+) passa raspando por (.+)\.$/,
+    en: "$1's lunge grazes past $2.",
+    es: "El zarpazo de $1 pasa rozando a $2.",
+  },
+  {
+    pattern: /^(.+) escapa do bote de (.+)\.$/,
+    en: "$1 escapes $2's lunge.",
+    es: "$1 escapa del zarpazo de $2.",
+  },
+  {
+    pattern: /^(.+) rola para longe do ataque de (.+)\.$/,
+    en: "$1 rolls away from $2's attack.",
+    es: "$1 rueda lejos del ataque de $2.",
+  },
+  {
+    pattern: /^O golpe de (.+) corta só o vento\.$/,
+    en: "$1's blow cuts only wind.",
+    es: "El golpe de $1 corta solo el viento.",
+  },
+  {
+    pattern: /^(.+) se esquiva do bote de (.+)\.$/,
+    en: "$1 dodges $2's lunge.",
+    es: "$1 esquiva el zarpazo de $2.",
+  },
+  {
+    pattern: /^(.+) tomba e não levanta mais\.$/,
+    en: "$1 falls and does not rise again.",
+    es: "$1 se desploma y no se levanta más.",
+  },
+  {
+    pattern: /^(.+) cai\. A noite fica quieta\.$/,
+    en: "$1 falls. The night goes quiet.",
+    es: "$1 cae. La noche queda quieta.",
+  },
+  {
+    pattern: /^(.+) aguenta firme\. Melhor voltar\.$/,
+    en: "$1 holds firm. Better to turn back.",
+    es: "$1 aguanta firme. Mejor volver.",
+  },
+  {
+    pattern: /^(.+) leva a melhor desta vez\.$/,
+    en: "$1 gets the better of it this time.",
+    es: "$1 se lleva la mejor parte esta vez.",
+  },
+  {
+    pattern: /^Ferido, resta escapar de (.+)\.$/,
+    en: "Wounded, all that is left is to escape $1.",
+    es: "Herido, solo queda escapar de $1.",
+  },
+  {
+    pattern: /^(.+) causando (\d+) de dano crítico\.$/,
+    en: "$1 dealing $2 critical damage.",
+    es: "$1 causando $2 de daño crítico.",
+  },
+  {
+    pattern: /^(.+) causando (\d+) de dano\.$/,
+    en: "$1 dealing $2 damage.",
+    es: "$1 causando $2 de daño.",
+  },
+  { pattern: /^(.+) rasga o flanco de ([^.]+)$/, en: "$1 tears the flank of $2", es: "$1 rasga el flanco de $2" },
+  { pattern: /^(.+) crava as garras em ([^.]+)$/, en: "$1 sinks its claws into $2", es: "$1 clava las garras en $2" },
+  { pattern: /^(.+) crava os dentes em ([^.]+)$/, en: "$1 sinks its teeth into $2", es: "$1 clava los dientes en $2" },
+  { pattern: /^(.+) se lança sobre ([^.]+)$/, en: "$1 lunges at $2", es: "$1 se lanza sobre $2" },
+  { pattern: /^(.+) acerta ([^.]+)$/, en: "$1 strikes $2", es: "$1 golpea a $2" },
+  { pattern: /^(.+) morde ([^.]+)$/, en: "$1 bites $2", es: "$1 muerde a $2" },
+  { pattern: /^(.+) golpeia ([^.]+)$/, en: "$1 batters $2", es: "$1 aporrea a $2" },
+  { pattern: /^(.+) rasga ([^.]+)$/, en: "$1 tears into $2", es: "$1 desgarra a $2" },
+  { pattern: /^(.+) despedaça ([^.]+)$/, en: "$1 shatters $2", es: "$1 despedaza a $2" },
+  { pattern: /^(.+) abre ([^.]+)$/, en: "$1 rips open $2", es: "$1 abre en canal a $2" },
+  { pattern: /^(.+) atinge ([^.]+)$/, en: "$1 hits $2", es: "$1 alcanza a $2" },
+  { pattern: /^(.+) dilacera ([^.]+)$/, en: "$1 rends $2", es: "$1 dilacera a $2" },
+
+  // Server result messages
+  {
+    pattern: /^(.+) caiu em (.+)\. Conquistas: (.+)\.$/,
+    en: "$1 fell in $2. Spoils: $3.",
+    es: "$1 cayó en $2. Conquistas: $3.",
+  },
+  {
+    pattern: /^A luta contra (.+) se arrastou e você recuou de (.+)\. Pelo esforço: (.+) de experiência\.$/,
+    en: "The fight against $1 dragged on and you fell back from $2. For the effort: $3 experience.",
+    es: "La pelea contra $1 se alargó y te retiraste de $2. Por el esfuerzo: $3 de experiencia.",
+  },
+  {
+    pattern: /^(.+) venceu a disputa\. Você escapou por pouco de (.+)\. Pelo esforço: (.+) de experiência\.$/,
+    en: "$1 won the contest. You barely escaped $2. For the effort: $3 experience.",
+    es: "$1 ganó la disputa. Escapaste por poco de $2. Por el esfuerzo: $3 de experiencia.",
+  },
+  {
+    pattern: /^(\d+) de (.+) e (\d+) de experiência de mineração saem da rocha\.$/,
+    en: "$1 $2 and $3 mining experience come out of the rock.",
+    es: "$1 de $2 y $3 de experiencia de minería salen de la roca.",
+  },
+  {
+    pattern: /^(\d+) de (.+) e (\d+) de experiência de mineração\. A mineração subiu para (\d+)\.$/,
+    en: "$1 $2 and $3 mining experience. Mining rose to $4.",
+    es: "$1 de $2 y $3 de experiencia de minería. La minería subió a $4.",
+  },
+  {
+    pattern: /^(\d+) de (.+) sai da rocha\.$/,
+    en: "$1 $2 comes out of the rock.",
+    es: "$1 de $2 sale de la roca.",
+  },
+  {
+    pattern: /^Você já minerou o limite de hoje\. A veia reabre em (.+)\.$/,
+    en: "You already mined today's limit. The vein reopens in $1.",
+    es: "Ya minaste el límite de hoy. La veta reabre en $1.",
+  },
+  {
+    pattern: /^(.+) sai da bigorna em \+(\d+)\.$/,
+    en: "$1 leaves the anvil at +$2.",
+    es: "$1 sale del yunque en +$2.",
+  },
+  {
+    pattern: /^A martelada falha e os fragmentos se perdem: (.+) segue em \+(\d+)\.$/,
+    en: "The strike fails and the fragments are lost: $1 stays at +$2.",
+    es: "El golpe falla y los fragmentos se pierden: $1 sigue en +$2.",
+  },
+  {
+    pattern: /^A martelada falha e os fragmentos se perdem: (.+) segue como estava\.$/,
+    en: "The strike fails and the fragments are lost: $1 stays as it was.",
+    es: "El golpe falla y los fragmentos se pierden: $1 sigue como estaba.",
+  },
+  {
+    pattern: /^Faltam (\d+) (.+) para o próximo nível\.$/,
+    en: "$1 $2 short of the next level.",
+    es: "Faltan $1 de $2 para el próximo nivel.",
+  },
+  {
+    pattern: /^A martelada pede (.+) e a bolsa não cobre\.$/,
+    en: "The strike asks for $1 and the purse does not cover it.",
+    es: "El golpe pide $1 y la bolsa no alcanza.",
+  },
+  {
+    pattern: /^(.+) não está na mochila\.$/,
+    en: "$1 is not in the bag.",
+    es: "$1 no está en la mochila.",
+  },
+  {
+    pattern: /^(.+) já está no teto de \+(\d+)\.$/,
+    en: "$1 is already at the +$2 cap.",
+    es: "$1 ya está en el techo de +$2.",
+  },
+  {
+    pattern: /^(.+) já está no teto de (\d+)\.$/,
+    en: "$1 is already at the cap of $2.",
+    es: "$1 ya está en el techo de $2.",
+  },
+  { pattern: /^(.+) não aceita forja\.$/, en: "$1 takes no forging.", es: "$1 no acepta forja." },
+  {
+    pattern: /^(.+) concluído\. (.+) subiu para (\d+)\.$/,
+    en: "$1 complete. $2 rose to $3.",
+    es: "$1 completado. $2 subió a $3.",
+  },
+  {
+    pattern: /^(.+) concluído\. O corpo registra o esforço\.$/,
+    en: "$1 complete. The body records the effort.",
+    es: "$1 completado. El cuerpo registra el esfuerzo.",
+  },
+  {
+    pattern: /^(.+) exige mineração NV\. (\d+)\.$/,
+    en: "$1 asks for mining LV. $2.",
+    es: "$1 exige minería NV. $2.",
+  },
+  { pattern: /^Requer mineração NV\. (\d+)$/, en: "Requires mining LV. $1", es: "Requiere minería NV. $1" },
+
   // Keep last: forged names ("Gorro de Bronze +3") translate the base and keep the level.
   { pattern: /^(.+) \+(\d+)$/, en: "$1 +$2", es: "$1 +$2" },
 ];

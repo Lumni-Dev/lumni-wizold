@@ -657,6 +657,21 @@ export const EN: Record<string, string> = {
   "Sem fôlego, ele para: não morde, não empresta nada e espera comida ou repouso.":
     "Out of breath, it stops: it does not bite, lends nothing and waits for food or rest.",
 
+  "Sistema": "System",
+  "Treino": "Training",
+
+  // Server messages
+  "Nenhum personagem ativo.": "No active character.",
+  "Território desconhecido.": "Unknown territory.",
+  "Sem vida para caçar. Recupere-se ou use uma poção.":
+    "No health to hunt. Recover or use a potion.",
+  "A trilha não levou a nada.": "The trail led to nothing.",
+  "Exercício desconhecido.": "Unknown exercise.",
+  "Veio desconhecido.": "Unknown vein.",
+  "Item desconhecido.": "Unknown item.",
+  "Mensagem enviada.": "Message sent.",
+  "A luta se arrasta, e é hora de recuar.": "The fight drags on, and it is time to fall back.",
+
   // Login and creation
   "Verificação": "Verification",
   "A noite não cobra nada para começar.": "The night charges nothing to begin.",

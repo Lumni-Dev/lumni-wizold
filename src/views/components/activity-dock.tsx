@@ -561,7 +561,7 @@ export function ActivityDock() {
                           huntView.line.critical ? "text-ember" : "text-ink-faint",
                         )}
                       >
-                        {emphasizeDamage(huntView.line.text).map((part, index) =>
+                        {emphasizeDamage(t(huntView.line.text)).map((part, index) =>
                           typeof part === "string" ? (
                             part
                           ) : (

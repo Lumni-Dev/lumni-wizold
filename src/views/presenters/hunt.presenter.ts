@@ -129,9 +129,13 @@ export function narrationOf(report: NarratedFight): NarrationLine[] {
   ];
 }
 
+const DAMAGE_PIECE = /(\d+ (?:de dano(?: crítico)?|(?:critical )?damage|de daño(?: crítico)?))/;
+
 export function emphasizeDamage(text: string): (string | { damage: string })[] {
   return text
-    .split(/(\d+ de dano(?: crítico)?)/)
+    .split(DAMAGE_PIECE)
     .filter((part) => part.length > 0)
-    .map((part) => (/^\d+ de dano/.test(part) ? { damage: part } : part));
+    .map((part) =>
+      /^\d+ (?:de dano|de daño|critical damage|damage)/.test(part) ? { damage: part } : part,
+    );
 }

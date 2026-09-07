@@ -156,7 +156,7 @@ function CombatReport({ report, lines }: { report: HuntReport; lines: NarrationL
                 line.blow === "ours" || line.blow === "pet" ? "text-ink-soft" : "text-ink-faint",
               )}
             >
-              {line.text}
+              {t(line.text)}
             </span>
           </ListRow>
         ))}
@@ -488,7 +488,7 @@ export function HuntScreen() {
                         line.critical ? "text-ember" : "text-ink-faint",
                       )}
                     >
-                      {emphasizeDamage(line.text).map((part, index) =>
+                      {emphasizeDamage(t(line.text)).map((part, index) =>
                         typeof part === "string" ? (
                           part
                         ) : (
