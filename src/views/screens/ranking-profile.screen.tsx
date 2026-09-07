@@ -83,7 +83,6 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
         }
         action={
           <div className="flex flex-wrap items-center justify-end gap-2">
-            {hunter.vip ? <VipBadge /> : null}
             {isPlayer ? (
               <Link href="/character">
                 <Button variant="secondary">Ficha completa</Button>
@@ -110,6 +109,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
               <div className="min-w-0 space-y-1">
                 <div className="flex items-center gap-2">
                   <p className="min-w-0 truncate text-sm text-ink">{hunter.name}</p>
+                  {hunter.vip ? <VipBadge /> : null}
                   <CopyNick name={hunter.name} />
                 </div>
                 <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
