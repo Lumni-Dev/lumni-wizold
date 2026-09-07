@@ -23,7 +23,6 @@ import { formatFraction, formatNumber, formatBronze } from "@/shared/utils/forma
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
 import { GainDelta } from "../components/gain-delta";
-import { Tag } from "../components/tag";
 import { PetArtFill } from "../components/pet-icon";
 import { TrainingArtFill } from "../components/training-icon";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
@@ -126,16 +125,21 @@ export function TrainingScreen() {
                 </CardHeader>
 
                 <CardBody>
-                  <p className="text-xs leading-relaxed text-ink-soft">
-                    Este treino está somando atualmente{" "}
-                    <strong className="font-bold">+{formatFraction(summary.pointShare)}</strong>{" "}
-                    ponto de {row?.name ?? exercise.name} por sessão (
-                    <strong className="font-bold">+{formatNumber(summary.progress)}</strong> de
-                    progresso), e o ponto fecha em cerca de{" "}
-                    <strong className="font-bold">{formatNumber(summary.sessions)}</strong> sessões.
-                    Gratuito.
-                  </p>
-                  <p className="text-xs leading-relaxed text-ink-faint">{exercise.description}</p>
+                  <ul className="list-disc space-y-1 pl-4 text-xs leading-relaxed text-ink-soft">
+                    <li>
+                      <strong className="font-bold">+{formatFraction(summary.pointShare)}</strong>{" "}
+                      ponto por sessão
+                    </li>
+                    <li>
+                      <strong className="font-bold">+{formatNumber(summary.progress)}</strong> de
+                      experiência por sessão
+                    </li>
+                    <li>
+                      Ponto fecha em cerca de{" "}
+                      <strong className="font-bold">{formatNumber(summary.sessions)}</strong> sessões
+                    </li>
+                    <li>Gratuito</li>
+                  </ul>
                 </CardBody>
 
                 {row ? (
@@ -218,25 +222,23 @@ export function TrainingScreen() {
               </CardHeader>
 
               <CardBody>
-                <p className="text-xs leading-relaxed text-ink-soft">
-                  Cada nível soma <strong className="font-bold">1</strong> de Força,{" "}
-                  <strong className="font-bold">1</strong> de Agilidade e{" "}
-                  <strong className="font-bold">1</strong> de Instinto ao que o mascote empresta
-                  enquanto caça com você.
-                </p>
-
-                <div className="flex flex-wrap gap-2">
-                  <Tag>
+                <ul className="list-disc space-y-1 pl-4 text-xs leading-relaxed text-ink-soft">
+                  <li>
+                    <strong className="font-bold">+1</strong> Força,{" "}
+                    <strong className="font-bold">+1</strong> Agilidade e{" "}
+                    <strong className="font-bold">+1</strong> Instinto por nível
+                  </li>
+                  <li>
                     <strong className="font-bold">
                       +{formatFraction(petTraining.effort.progress / petTraining.needed)}
-                    </strong>
-                    {" de nível por treinamento"}
-                  </Tag>
-                  <Tag>
+                    </strong>{" "}
+                    de nível por treinamento
+                  </li>
+                  <li>
                     Treino por{" "}
                     <strong className="font-bold">{formatBronze(petTraining.cost)}</strong>
-                  </Tag>
-                </div>
+                  </li>
+                </ul>
               </CardBody>
 
               <div className="border-t border-edge px-4 py-3">
