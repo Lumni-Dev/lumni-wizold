@@ -5,15 +5,17 @@ import { api } from "@/controllers/api.client";
 import { useGame } from "@/controllers/game.context";
 import { detailInventory } from "@/controllers/inventory.controller";
 import { profileOf } from "@/controllers/ranking.controller";
+import { restRecoveryRatio } from "@/controllers/character.controller";
 import { criticalMultiplierOf } from "@/models/rules/combat";
 import { furyWillpowerBonus } from "@/models/rules/moon";
+import { REST_TICK_MS } from "@/shared/constants/game";
 import { findItem } from "@/models/data/items";
 import { EQUIPMENT_SLOTS } from "@/models/entities/item";
 import { findGender } from "@/models/entities/character";
 import type { Hunter } from "@/models/entities/ranking";
 import { FURY } from "@/shared/constants/tuning/fury";
 import { formatDate, formatFraction, formatNumber } from "@/shared/utils/format";
-import { furyDurationCopy } from "../presenters/item.presenter";
+import { furyDurationCopy, furyPotionClock } from "../presenters/item.presenter";
 import { Button } from "../components/button";
 import { CopyNick } from "../components/copy-nick";
 import { isVip } from "@/models/rules/vip";
@@ -252,16 +254,35 @@ export function CharacterScreen() {
             <List>
               <DataRow label="Strike (Strength)" value={formatFraction(strength)} />
               <DataRow label="Defense (Endurance)" value={formatFraction(endurance)} />
-              <DataRow label="Dodge (Agility)" value={stats.dodge + "%"} />
-              <DataRow label="Critical (Instinct)" value={stats.critical + "%"} />
+              <DataRow label="Dodge (Agility)" value={formatFraction(stats.dodgeExact) + "%"} />
+              <DataRow
+                label="Critical (Instinct)"
+                value={formatFraction(stats.criticalExact) + "%"}
+              />
               <DataRow
                 label="Bottled fury (Willpower)"
-                value={"+" + Math.round(furyWillpowerBonus(willpower) * 100) + "%"}
+                value={"+" + formatFraction(furyWillpowerBonus(willpower) * 100) + "%"}
               />
               <DataRow label="Max health" value={formatNumber(stats.maxHealth)} />
               <DataRow
+                label="Regeneration (Willpower)"
+                value={
+                  "+" +
+                  formatNumber(
+                    Math.max(1, Math.ceil(stats.maxHealth * restRecoveryRatio(willpower))),
+                  ) +
+                  " / " +
+                  REST_TICK_MS / 1000 +
+                  "s"
+                }
+              />
+              <DataRow
+                label="Fury duration (Willpower)"
+                value={furyPotionClock(willpower)}
+              />
+              <DataRow
                 label="Critical damage"
-                value={"×" + criticalMultiplierOf().toFixed(2).replace(".", ",")}
+                value={"×" + criticalMultiplierOf().toFixed(2)}
               />
             </List>
           </Panel>

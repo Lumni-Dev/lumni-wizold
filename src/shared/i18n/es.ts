@@ -1333,4 +1333,6 @@ export const ES: Record<string, string> = {
   "Account with no known e-mail.": "Cuenta sin correo conocido.",
   "Reply": "Responder",
   "New messages": "Mensajes nuevos",
+  "Regeneration (Willpower)": "Regeneración (Voluntad)",
+  "Fury duration (Willpower)": "Duración de la furia (Voluntad)",
 };

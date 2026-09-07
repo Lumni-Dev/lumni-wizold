@@ -10,8 +10,10 @@ import { profileOf } from "@/controllers/ranking.controller";
 import { findGender } from "@/models/entities/character";
 import type { Hunter } from "@/models/entities/ranking";
 import { findPet } from "@/models/entities/pet";
+import { restRecoveryRatio } from "@/controllers/character.controller";
 import { criticalMultiplierOf } from "@/models/rules/combat";
-import { PET_MAX_LEVEL } from "@/shared/constants/game";
+import { PET_MAX_LEVEL, REST_TICK_MS } from "@/shared/constants/game";
+import { furyPotionClock } from "../presenters/item.presenter";
 import { formatDate, formatFraction, formatNumber } from "@/shared/utils/format";
 import { Button } from "../components/button";
 import { CopyNick } from "../components/copy-nick";
@@ -73,6 +75,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
   const genderDefinition = findGender(hunter.gender);
   const strength = stats.totalAttributes.strength;
   const endurance = stats.totalAttributes.endurance;
+  const willpower = stats.totalAttributes.willpower;
 
   return (
     <>
@@ -208,11 +211,31 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
             <List>
               <DataRow label="Strike (Strength)" value={formatFraction(strength)} />
               <DataRow label="Defense (Endurance)" value={formatFraction(endurance)} />
-              <DataRow label="Dodge (Agility)" value={stats.dodge + "%"} />
-              <DataRow label="Critical (Instinct)" value={stats.critical + "%"} />
+              <DataRow label="Dodge (Agility)" value={formatFraction(stats.dodgeExact) + "%"} />
+              <DataRow
+                label="Critical (Instinct)"
+                value={formatFraction(stats.criticalExact) + "%"}
+              />
+              <DataRow label="Max health" value={formatNumber(stats.maxHealth)} />
+              <DataRow
+                label="Regeneration (Willpower)"
+                value={
+                  "+" +
+                  formatNumber(
+                    Math.max(1, Math.ceil(stats.maxHealth * restRecoveryRatio(willpower))),
+                  ) +
+                  " / " +
+                  REST_TICK_MS / 1000 +
+                  "s"
+                }
+              />
+              <DataRow
+                label="Fury duration (Willpower)"
+                value={furyPotionClock(willpower)}
+              />
               <DataRow
                 label="Critical damage"
-                value={"×" + criticalMultiplierOf().toFixed(2).replace(".", ",")}
+                value={"×" + criticalMultiplierOf().toFixed(2)}
               />
             </List>
           </Panel>

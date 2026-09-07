@@ -1444,6 +1444,7 @@ const RULES: readonly PatternRule[] = [
     pt: "$1 $2",
     es: "$1 $2",
   },
+  { pattern: /^Potion \+ (.+)$/, en: "Potion + $1", pt: "Poção + $1", es: "Poción + $1" },
   { pattern: /^LV\. ([\d.,]+)$/, en: "LV. $1", pt: "NV. $1", es: "NV. $1" },
   { pattern: /^(.+) - LV\. ([\d.,]+)$/, en: "$1 - LV. $2", pt: "$1 - NV. $2", es: "$1 - NV. $2" },
   { pattern: /^(.+) \(LV\. ([\d.,]+)\)$/, en: "$1 (LV. $2)", pt: "$1 (NV. $2)", es: "$1 (NV. $2)" },

@@ -1,8 +1,9 @@
 import { ATTRIBUTES } from "@/models/entities/attribute";
 import { CATEGORY_LABEL, type Item } from "@/models/entities/item";
 import { enhancedEffect, exactEnhancedValue } from "@/models/rules/forge";
-import { furyWillpowerExtraMs } from "@/models/rules/moon";
+import { furyDurationMs, furyWillpowerExtraMs } from "@/models/rules/moon";
 import { FURY_ATTRIBUTE_BONUS } from "@/shared/constants/game";
+import { FURY } from "@/shared/constants/tuning/fury";
 import { formatFraction, formatFuryDuration, formatMinutesLabel } from "@/shared/utils/format";
 
 export function itemInitials(name: string): string {
@@ -54,4 +55,13 @@ export function summarizeEffect(item: Item, enhancement = 0, willpower?: number)
 
 export function furyDurationCopy(baseMinutes: number, willpower: number): string {
   return formatFuryDuration(baseMinutes, furyWillpowerExtraMs(baseMinutes, willpower));
+}
+
+// What a medium flask lasts for this sheet, Willpower stretch included:
+// the combat panel's "Potion + 6m 24s" line on the character and profile pages.
+export function furyPotionClock(willpower: number): string {
+  const ms = furyDurationMs(FURY.durationMinutesBySize.medium, willpower);
+  const minutes = Math.floor(ms / 60_000);
+  const seconds = Math.floor(ms / 1000) % 60;
+  return "Potion + " + minutes + "m " + seconds + "s";
 }

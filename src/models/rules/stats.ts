@@ -32,15 +32,27 @@ export interface DerivedStats {
   maxHealth: number;
   dodge: number;
   critical: number;
+  // The exact curves, unrounded, for the sheet: combat keeps rolling on the
+  // rounded pair above, so showing 20.33 never changes a fight.
+  dodgeExact: number;
+  criticalExact: number;
   experienceNeeded: number;
 }
 
+function dodgeExactOf(agility: number): number {
+  return clamp((35 * agility) / (agility + 120), 0, 35);
+}
+
+function criticalExactOf(instinct: number): number {
+  return clamp(5 + (40 * instinct) / (instinct + 250), 0, 45);
+}
+
 function dodgeOf(agility: number): number {
-  return clamp(Math.round((35 * agility) / (agility + 120)), 0, 35);
+  return Math.round(dodgeExactOf(agility));
 }
 
 function criticalOf(instinct: number): number {
-  return clamp(Math.round(5 + (40 * instinct) / (instinct + 250)), 0, 45);
+  return Math.round(criticalExactOf(instinct));
 }
 
 function furyAttributes(active: boolean): Attributes {
@@ -118,6 +130,8 @@ export function deriveStatsOf(
     maxHealth,
     dodge: dodgeOf(total.agility),
     critical: criticalOf(total.instinct),
+    dodgeExact: dodgeExactOf(total.agility),
+    criticalExact: criticalExactOf(total.instinct),
     experienceNeeded: experienceForLevel(subject.level),
   };
 }
