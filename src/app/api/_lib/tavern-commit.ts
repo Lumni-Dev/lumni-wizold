@@ -66,6 +66,10 @@ async function notifyTavernMessagePush(
   // localized body and the reply label, so the service worker stays dumb.
   const locales = await userLocales(client, [...new Set(subscriptions.map((row) => row.userId))]);
 
+  // The sends fan out over the network, but the stale deletions wait their
+  // turn: pg runs one query per client, so two failures deleting in parallel
+  // on the shared client would trip the concurrent-query deprecation.
+  const stale: string[] = [];
   await Promise.all(
     subscriptions.map(async ({ userId, subscription }) => {
       const locale = locales.get(userId) ?? "en";
@@ -78,7 +82,10 @@ async function notifyTavernMessagePush(
         at: push.at,
       };
       const ok = await sendWebPush(subscription, payload);
-      if (!ok) await deletePushSubscriptionByEndpoint(client, subscription.endpoint);
+      if (!ok) stale.push(subscription.endpoint);
     }),
   );
+  for (const endpoint of stale) {
+    await deletePushSubscriptionByEndpoint(client, endpoint);
+  }
 }

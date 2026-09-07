@@ -248,10 +248,10 @@ export async function loadRoomState(
   return { state, hashes };
 }
 export async function loadTavern(client: PoolClient): Promise<LoadedTavern> {
-  const [structure, members] = await Promise.all([
-    loadTavernStructure(client, MAX_ROOM_MESSAGES),
-    loadTavernMembers(client),
-  ]);
+  // Sequential on purpose: pg runs one query per client, so two reads in
+  // parallel on the same client only queue with a deprecation warning.
+  const structure = await loadTavernStructure(client, MAX_ROOM_MESSAGES);
+  const members = await loadTavernMembers(client);
   return buildTavernFromParts(structure, members);
 }
 async function saveRoom(

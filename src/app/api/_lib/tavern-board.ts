@@ -58,11 +58,12 @@ export async function buildTavernBoard(
   }
   const identity = await tavernIdentity(client, userId);
   if (!identity) return null;
-  const [tavern, revision, user] = await Promise.all([
-    loadTavernCached(client),
-    readTavernRevision(client),
-    loadTavernUser(client, identity.id),
-  ]);
+  // One at a time on purpose: pg runs a single query per client, and firing
+  // these in parallel on the shared client is the deprecated pile-up that
+  // production logged on every stream poll.
+  const tavern = await loadTavernCached(client);
+  const revision = await readTavernRevision(client);
+  const user = await loadTavernUser(client, identity.id);
   return {
     identity,
     rooms: tavernController.listRooms(tavern.state, identity),
