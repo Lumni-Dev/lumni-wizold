@@ -11,9 +11,11 @@ import {
 import { ACTIVITY_WAIT_LABEL, useActivityLock } from "@/controllers/use-activity-lock";
 import { useT } from "@/controllers/use-locale";
 import { useVisibleActivity } from "@/controllers/use-visible-activity";
+import { findGender } from "@/models/entities/character";
 import { petTotalTraining } from "@/models/rules/pet";
 import { totalExperience } from "@/models/rules/progression";
 import {
+  BASE_ATTRIBUTE_VALUE,
   MAX_ATTRIBUTE_VALUE,
   PET_EXERCISE_ID,
   PET_MAX_LEVEL,
@@ -97,10 +99,17 @@ export function TrainingScreen() {
           {exercises.map(({ exercise, effort, affordable, maxed, reason }) => {
             const row = progress.find((entry) => entry.key === exercise.attribute);
             const summary = trainingSummary(row?.value ?? 0, row?.progress ?? 0, effort);
+            // Only what the yard itself conquered: the natural floor (base
+            // value plus the bloodline bonus) stays out of the count.
+            const natural =
+              BASE_ATTRIBUTE_VALUE + (findGender(character.gender).bonus[exercise.attribute] ?? 0);
             const exactValue = row
-              ? row.value >= MAX_ATTRIBUTE_VALUE
-                ? row.value
-                : row.value + row.progress / row.needed
+              ? Math.max(
+                  0,
+                  (row.value >= MAX_ATTRIBUTE_VALUE
+                    ? row.value
+                    : row.value + row.progress / row.needed) - natural,
+                )
               : 0;
             const ready = !maxed && affordable;
             const active = activeExercise === exercise.id;
