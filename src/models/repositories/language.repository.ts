@@ -32,7 +32,7 @@ export const languageRepository = {
   resolved(): Locale {
     const choice = languageRepository.choice();
     if (choice !== "auto") return choice;
-    if (typeof navigator === "undefined") return "pt";
+    if (typeof navigator === "undefined") return "en";
     return detectLocale(navigator.language);
   },
 
@@ -46,6 +46,6 @@ export const languageRepository = {
   },
 
   serverLocaleSnapshot(): Locale {
-    return "pt";
+    return "en";
   },
 };

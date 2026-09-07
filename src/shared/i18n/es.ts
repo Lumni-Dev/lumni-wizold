@@ -672,6 +672,75 @@ export const ES: Record<string, string> = {
   "Mensagem enviada.": "Mensaje enviado.",
   "A luta se arrasta, e é hora de recuar.": "La pelea se alarga, y es hora de retirarse.",
 
+  // Server messages: tavern
+  "Mesa aberta.": "Mesa abierta.",
+  "Você saiu e a mesa fechou.": "Saliste y la mesa se cerró.",
+  "A mesa reservada fechou.": "La mesa reservada se cerró.",
+  "Entre na mesa antes de falar.": "Entra a la mesa antes de hablar.",
+  "Escreva alguma coisa antes de enviar.": "Escribe algo antes de enviar.",
+  "Essa mesa está reservada.": "Esa mesa está reservada.",
+  "Essa mesa não existe mais.": "Esa mesa ya no existe.",
+  "Esse link não é permitido na taverna.": "Ese enlace no está permitido en la taberna.",
+  "Já existe uma mesa com esse nome.": "Ya existe una mesa con ese nombre.",
+  "Senha incorreta.": "Contraseña incorrecta.",
+  "Só quem abriu a mesa pode fechá-la.": "Solo quien abrió la mesa puede cerrarla.",
+  "Você já tem uma mesa aberta. Feche a sua antes de abrir outra.":
+    "Ya tienes una mesa abierta. Cierra la tuya antes de abrir otra.",
+  "Você não está nessa mesa.": "No estás en esa mesa.",
+  "Não dá para reservar mesa consigo mesmo.": "No se puede reservar una mesa contigo mismo.",
+
+  // Server messages: market, inventory, pet, character, arena, pack
+  "Quantidade inválida.": "Cantidad inválida.",
+  "WCoins insuficientes": "WCoins insuficientes",
+  "Fragmentos não se vendem por bronze: só a forja os aceita.":
+    "Los fragmentos no se venden por WCoins: solo la forja los acepta.",
+  "Sem mascote para alimentar: adote um lobo antes.":
+    "Sin compañero que alimentar: adopta un lobo antes.",
+  "Você se recolhe. O corpo se regenera aos poucos.":
+    "Te recoges. El cuerpo se regenera poco a poco.",
+  "Recuperação completa: vida inteira.": "Recuperación completa: vida entera.",
+  "Você já está inteiro.": "Ya estás entero.",
+  "Personagem criado. A caçada aguarda.": "Personaje creado. La cacería espera.",
+  "Esse já é o seu nome.": "Ese ya es tu nombre.",
+  "Um nick de jogo: só letras e números, sem espaço nem sinais.":
+    "Un nick de juego: solo letras y números, sin espacios ni signos.",
+  "O mascote agora caça com você. Treine para ele render na caçada.":
+    "El compañero ahora caza contigo. Entrénalo para que rinda en la cacería.",
+  "O mascote está de pé, inteiro e pronto.": "El compañero está de pie, entero y listo.",
+  "O mascote está na caçada, não em repouso.": "El compañero está en la cacería, no en reposo.",
+  "O mascote fica de fora das próximas caçadas.": "El compañero queda fuera de las próximas cacerías.",
+  "O mascote foi solto e parte sem olhar para trás.":
+    "El compañero fue soltado y parte sin mirar atrás.",
+  "O mascote já anda com você.": "El compañero ya anda contigo.",
+  "O mascote não precisa disso agora.": "El compañero no necesita eso ahora.",
+  "O mascote se levanta e volta a caçar com você.":
+    "El compañero se levanta y vuelve a cazar contigo.",
+  "O mascote se levanta e volta para a caçada.": "El compañero se levanta y vuelve a la cacería.",
+  "O mascote treina ao seu lado. O corpo dele registra o esforço.":
+    "El compañero entrena a tu lado. Su cuerpo registra el esfuerzo.",
+  "O mascote já responde por esse nome.": "El compañero ya responde por ese nombre.",
+  "Você não tem mascote.": "No tienes compañero.",
+  "Você não tem mascote para cuidar.": "No tienes compañero que cuidar.",
+  "Você não tem mascote para renomear.": "No tienes compañero que renombrar.",
+  "Você não tem mascote para soltar.": "No tienes compañero que soltar.",
+  "Você não tem mascote para treinar.": "No tienes compañero que entrenar.",
+  "Mascote no teto": "Compañero en el techo",
+  "Esse caçador não está no fosso.": "Ese cazador no está en el foso.",
+  "Recupere-se antes do fosso: a arena só abre com o corpo inteiro.":
+    "Recupérate antes del foso: la arena solo abre con el cuerpo entero.",
+  "Escreva o nick de alguém.": "Escribe el nick de alguien.",
+  "Esse nome não está na sua matilha.": "Ese nombre no está en tu manada.",
+  "Ninguém com esse nick na taverna nem no quadro.":
+    "Nadie con ese nick en la taberna ni en el tablero.",
+  "Você já anda com você mesmo.": "Ya andas contigo mismo.",
+  "gorro": "gorro",
+  "colar": "collar",
+  "casaco": "abrigo",
+  "calças": "pantalones",
+  "botas": "botas",
+  "luvas": "guantes",
+  "anel": "anillo",
+
   // Login and creation
   "Verificação": "Verificación",
   "A noite não cobra nada para começar.": "La noche no cobra nada para empezar.",

@@ -672,6 +672,75 @@ export const EN: Record<string, string> = {
   "Mensagem enviada.": "Message sent.",
   "A luta se arrasta, e é hora de recuar.": "The fight drags on, and it is time to fall back.",
 
+  // Server messages: tavern
+  "Mesa aberta.": "Table opened.",
+  "Você saiu e a mesa fechou.": "You left and the table closed.",
+  "A mesa reservada fechou.": "The reserved table closed.",
+  "Entre na mesa antes de falar.": "Join the table before speaking.",
+  "Escreva alguma coisa antes de enviar.": "Write something before sending.",
+  "Essa mesa está reservada.": "That table is reserved.",
+  "Essa mesa não existe mais.": "That table no longer exists.",
+  "Esse link não é permitido na taverna.": "That link is not allowed in the tavern.",
+  "Já existe uma mesa com esse nome.": "A table with that name already exists.",
+  "Senha incorreta.": "Wrong password.",
+  "Só quem abriu a mesa pode fechá-la.": "Only whoever opened the table can close it.",
+  "Você já tem uma mesa aberta. Feche a sua antes de abrir outra.":
+    "You already have an open table. Close yours before opening another.",
+  "Você não está nessa mesa.": "You are not at that table.",
+  "Não dá para reservar mesa consigo mesmo.": "You cannot reserve a table with yourself.",
+
+  // Server messages: market, inventory, pet, character, arena, pack
+  "Quantidade inválida.": "Invalid quantity.",
+  "WCoins insuficientes": "Not enough WCoins",
+  "Fragmentos não se vendem por bronze: só a forja os aceita.":
+    "Fragments do not sell for WCoins: only the forge takes them.",
+  "Sem mascote para alimentar: adote um lobo antes.":
+    "No companion to feed: adopt a wolf first.",
+  "Você se recolhe. O corpo se regenera aos poucos.":
+    "You settle down. The body mends little by little.",
+  "Recuperação completa: vida inteira.": "Recovery complete: full health.",
+  "Você já está inteiro.": "You are already whole.",
+  "Personagem criado. A caçada aguarda.": "Character created. The hunt awaits.",
+  "Esse já é o seu nome.": "That is already your name.",
+  "Um nick de jogo: só letras e números, sem espaço nem sinais.":
+    "A game nick: letters and digits only, no spaces and no signs.",
+  "O mascote agora caça com você. Treine para ele render na caçada.":
+    "The companion now hunts with you. Train it so it earns its keep on the hunt.",
+  "O mascote está de pé, inteiro e pronto.": "The companion is up, whole and ready.",
+  "O mascote está na caçada, não em repouso.": "The companion is on the hunt, not at rest.",
+  "O mascote fica de fora das próximas caçadas.": "The companion sits out the next hunts.",
+  "O mascote foi solto e parte sem olhar para trás.":
+    "The companion was released and leaves without looking back.",
+  "O mascote já anda com você.": "The companion already walks with you.",
+  "O mascote não precisa disso agora.": "The companion does not need that right now.",
+  "O mascote se levanta e volta a caçar com você.":
+    "The companion gets up and hunts with you again.",
+  "O mascote se levanta e volta para a caçada.": "The companion gets up and returns to the hunt.",
+  "O mascote treina ao seu lado. O corpo dele registra o esforço.":
+    "The companion trains at your side. Its body records the effort.",
+  "O mascote já responde por esse nome.": "The companion already answers to that name.",
+  "Você não tem mascote.": "You have no companion.",
+  "Você não tem mascote para cuidar.": "You have no companion to care for.",
+  "Você não tem mascote para renomear.": "You have no companion to rename.",
+  "Você não tem mascote para soltar.": "You have no companion to release.",
+  "Você não tem mascote para treinar.": "You have no companion to train.",
+  "Mascote no teto": "Companion at the cap",
+  "Esse caçador não está no fosso.": "That hunter is not in the pit.",
+  "Recupere-se antes do fosso: a arena só abre com o corpo inteiro.":
+    "Recover before the pit: the arena only opens with a whole body.",
+  "Escreva o nick de alguém.": "Write someone's nick.",
+  "Esse nome não está na sua matilha.": "That name is not in your pack.",
+  "Ninguém com esse nick na taverna nem no quadro.":
+    "No one with that nick in the tavern nor on the board.",
+  "Você já anda com você mesmo.": "You already walk with yourself.",
+  "gorro": "cap",
+  "colar": "necklace",
+  "casaco": "coat",
+  "calças": "pants",
+  "botas": "boots",
+  "luvas": "gloves",
+  "anel": "ring",
+
   // Login and creation
   "Verificação": "Verification",
   "A noite não cobra nada para começar.": "The night charges nothing to begin.",

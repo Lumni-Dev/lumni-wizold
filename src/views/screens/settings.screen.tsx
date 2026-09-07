@@ -264,16 +264,16 @@ export function SettingsScreen() {
                     Automático
                   </Chip>
                   <Chip
-                    active={languageChoice === "pt"}
-                    onClick={() => languageRepository.setChoice("pt")}
-                  >
-                    Português
-                  </Chip>
-                  <Chip
                     active={languageChoice === "en"}
                     onClick={() => languageRepository.setChoice("en")}
                   >
                     English
+                  </Chip>
+                  <Chip
+                    active={languageChoice === "pt"}
+                    onClick={() => languageRepository.setChoice("pt")}
+                  >
+                    Português
                   </Chip>
                   <Chip
                     active={languageChoice === "es"}

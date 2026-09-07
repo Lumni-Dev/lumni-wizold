@@ -483,6 +483,93 @@ const RULES: readonly PatternRule[] = [
   },
   { pattern: /^Requer mineração NV\. (\d+)$/, en: "Requires mining LV. $1", es: "Requiere minería NV. $1" },
 
+  // Tavern lines
+  { pattern: /^(.+) entrou na mesa\.$/, en: "$1 joined the table.", es: "$1 entró a la mesa." },
+  { pattern: /^(.+) retornou à mesa\.$/, en: "$1 returned to the table.", es: "$1 volvió a la mesa." },
+  { pattern: /^(.+) saiu da mesa\.$/, en: "$1 left the table.", es: "$1 salió de la mesa." },
+  { pattern: /^(.+) foi buscar uma bebida\.$/, en: "$1 went to get a drink.", es: "$1 fue por una bebida." },
+  { pattern: /^Você entrou em (.+)\.$/, en: "You joined $1.", es: "Entraste en $1." },
+  { pattern: /^Você saiu de (.+)\.$/, en: "You left $1.", es: "Saliste de $1." },
+  {
+    pattern: /^Abrir mesa sem senha é só a partir do NV (\d+)(.*)$/,
+    en: "Opening a table without a password takes LV $1 and up$2",
+    es: "Abrir una mesa sin contraseña es solo desde NV $1$2",
+  },
+  {
+    pattern: /^Sentar em mesa aberta é só a partir do NV (\d+)(.*)$/,
+    en: "Sitting at an open table takes LV $1 and up$2",
+    es: "Sentarse en una mesa abierta es solo desde NV $1$2",
+  },
+  {
+    pattern: /^Uma fala a cada (\d+)s\.(.*)$/,
+    en: "One line every $1s.$2",
+    es: "Una línea cada $1s.$2",
+  },
+
+  // Market and inventory results
+  { pattern: /^(.+) comprado por (.+)\.$/, en: "$1 bought for $2.", es: "$1 comprado por $2." },
+  { pattern: /^(.+) vendido por (.+)\.$/, en: "$1 sold for $2.", es: "$1 vendido por $2." },
+  { pattern: /^(.+) equipado em (.+)\.$/, en: "$1 equipped on the $2.", es: "$1 equipado en $2." },
+  {
+    pattern: /^(.+) guardado no inventário\.$/,
+    en: "$1 stored in the bag.",
+    es: "$1 guardado en la mochila.",
+  },
+  {
+    pattern: /^(.+) consumida: \+(\d+) vida\.$/,
+    en: "$1 consumed: +$2 health.",
+    es: "$1 consumida: +$2 de vida.",
+  },
+  {
+    pattern: /^(.+) consumida: \+10 em todos os atributos por (.+)\.$/,
+    en: "$1 consumed: +10 to all attributes for $2.",
+    es: "$1 consumida: +10 a todos los atributos por $2.",
+  },
+  { pattern: /^Nada equipado em (.+)\.$/, en: "Nothing equipped on the $1.", es: "Nada equipado en $1." },
+  { pattern: /^Nada a recuperar com (.+)\.$/, en: "Nothing to restore with $1.", es: "Nada que recuperar con $1." },
+  {
+    pattern: /^Você não tem essa quantidade de (.+)\.$/,
+    en: "You do not have that many $1.",
+    es: "No tienes esa cantidad de $1.",
+  },
+  { pattern: /^WCoins insuficientes para (.+)$/, en: "Not enough WCoins for $1", es: "WCoins insuficientes para $1" },
+
+  // Character, rest and rename
+  { pattern: /^Você regenerou (\d+) de vida\.$/, en: "You regenerated $1 health.", es: "Regeneraste $1 de vida." },
+  { pattern: /^A matilha agora responde por (.+)\.$/, en: "The pack now answers to $1.", es: "La manada ahora responde por $1." },
+  { pattern: /^O nome só pode trocar de novo em (.+)$/, en: "The name can only change again on $1", es: "El nombre solo puede cambiar de nuevo el $1" },
+  { pattern: /^A troca de nome custa (.+)$/, en: "The name change costs $1", es: "El cambio de nombre cuesta $1" },
+
+  // Pet results
+  { pattern: /^O mascote agora atende por (.+)\.$/, en: "The companion now answers to $1.", es: "El compañero ahora atiende por $1." },
+  {
+    pattern: /^O mascote termina a sessão maior do que entrou: NV\. (\d+)\.$/,
+    en: "The companion ends the session bigger than it entered: LV. $1.",
+    es: "El compañero termina la sesión más grande de lo que entró: NV. $1.",
+  },
+  {
+    pattern: /^O mascote já está no teto de NV\. (\d+)\.$/,
+    en: "The companion is already at the LV. $1 cap.",
+    es: "El compañero ya está en el techo de NV. $1.",
+  },
+  {
+    pattern: /^O lobo só caça ao lado de um NV (\d+) ou mais\.$/,
+    en: "The wolf only hunts beside a LV $1 or higher.",
+    es: "El lobo solo caza junto a un NV $1 o más.",
+  },
+  {
+    pattern: /^Cada treino é pago na hora: custa (.+)$/,
+    en: "Each training is paid on the spot: it costs $1",
+    es: "Cada entrenamiento se paga al momento: cuesta $1",
+  },
+
+  // Arena
+  {
+    pattern: /^Os ataques do dia acabaram: o próximo volta em (.+)\.$/,
+    en: "The day's attacks are spent: the next returns in $1.",
+    es: "Los ataques del día se acabaron: el próximo vuelve en $1.",
+  },
+
   // Keep last: forged names ("Gorro de Bronze +3") translate the base and keep the level.
   { pattern: /^(.+) \+(\d+)$/, en: "$1 +$2", es: "$1 +$2" },
 ];
