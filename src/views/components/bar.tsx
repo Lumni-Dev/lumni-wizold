@@ -10,6 +10,7 @@ const REST_MS = 150;
 const RESUME_MS = 350;
 
 type BarTone = "light" | "blood" | "ember" | "experience" | "vigor" | "tide";
+type DeltaTone = "blood" | "ember" | "experience" | "tide";
 
 const FILLS: Record<BarTone, string> = {
   light: "bg-ember",
@@ -18,6 +19,13 @@ const FILLS: Record<BarTone, string> = {
   experience: "bg-experience",
   vigor: "bg-vigor",
   tide: "bg-tide",
+};
+
+const DELTA_TEXTS: Record<DeltaTone, string> = {
+  blood: "text-blood",
+  ember: "text-ember",
+  experience: "text-experience",
+  tide: "text-tide",
 };
 
 interface BarProps {
@@ -30,6 +38,7 @@ interface BarProps {
   prominent?: boolean;
   unit?: string;
   delta?: ReactNode;
+  deltaTone?: DeltaTone;
   format?: (value: number) => string;
   className?: string;
 }
@@ -50,6 +59,7 @@ export function Bar({
   prominent = false,
   unit,
   delta,
+  deltaTone = "blood",
   format = formatNumber,
   className,
 }: BarProps) {
@@ -89,7 +99,7 @@ export function Bar({
           {label}
         </span>
         <span className="shrink-0 font-mono text-[11px] text-ink-soft">
-          {delta ? <span className="font-bold text-blood">{delta} </span> : null}
+          {delta ? <span className={cn("font-bold", DELTA_TEXTS[deltaTone])}>{delta} </span> : null}
           {format(current)}
           <span className="text-ink-faint">/{format(maximum)}</span>
           {unit ? <span className="text-ink-faint"> {unit}</span> : null}

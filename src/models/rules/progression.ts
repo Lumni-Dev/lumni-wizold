@@ -11,6 +11,12 @@ export function progressNeeded(currentValue: number): number {
   return levelRequirement(currentValue);
 }
 
+export function totalExperience(level: number, experience: number): number {
+  let sum = experience;
+  for (let step = 1; step < level; step += 1) sum += experienceForLevel(step);
+  return sum;
+}
+
 export interface ExperienceOutcome {
   character: Character;
   levelsGained: number;

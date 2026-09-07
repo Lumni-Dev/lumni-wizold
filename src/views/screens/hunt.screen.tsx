@@ -370,6 +370,15 @@ export function HuntScreen() {
             preyView.combat,
           );
           const monsterStatus = replaying ? "Atacando" : filling ? "Preparando" : "Aguardando";
+          const monsterLost = Math.max(0, monsterMax - monsterCurrent);
+          const healthLost = replaying
+            ? script
+                .slice(0, Math.min(progress.beat, script.length))
+                .reduce(
+                  (sum, entry) => sum + (entry.blow === "theirs" ? (entry.damage ?? 0) : 0),
+                  0,
+                )
+            : 0;
           return (
             <div key={territory.id} data-hunt-card={territory.id}>
             <Card
@@ -427,7 +436,13 @@ export function HuntScreen() {
                         maximum={stats.maxHealth}
                         tone="blood"
                         glows={recovering && character.health < stats.maxHealth}
-                        delta={recovering ? <RestHealed /> : undefined}
+                        delta={
+                          recovering ? (
+                            <RestHealed />
+                          ) : healthLost > 0 ? (
+                            "-" + formatNumber(healthLost)
+                          ) : undefined
+                        }
                       />
                     </div>
                   ) : null}
@@ -438,6 +453,7 @@ export function HuntScreen() {
                         current={monsterCurrent}
                         maximum={monsterMax}
                         tone="blood"
+                        delta={monsterLost > 0 ? "-" + formatNumber(monsterLost) : undefined}
                       />
                     </div>
                   ) : null}

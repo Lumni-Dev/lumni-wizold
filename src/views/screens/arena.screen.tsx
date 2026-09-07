@@ -47,6 +47,7 @@ function Fighter({
   side,
   health,
   maximum,
+  lost = 0,
 }: {
   gender: Gender;
   name: string;
@@ -54,6 +55,7 @@ function Fighter({
   side: string;
   health: number;
   maximum: number;
+  lost?: number;
 }) {
   const left = Math.max(0, Math.round(health));
   return (
@@ -66,6 +68,7 @@ function Fighter({
           current={left}
           maximum={maximum}
           tone={left > maximum / 2 ? "blood" : "ember"}
+          delta={lost > 0 ? "-" + formatNumber(lost) : undefined}
         />
       </div>
     </div>
@@ -290,6 +293,12 @@ export function ArenaScreen() {
   const onPage = pageOf(view.rivals, currentPage, PAGE_SIZE);
   const duelLine =
     fighting && script.length > 0 && beat > 0 ? script[Math.min(beat, script.length) - 1] : null;
+  const duelHealthLost =
+    fighting && script.length > 0
+      ? script
+          .slice(0, Math.min(beat, script.length))
+          .reduce((sum, entry) => sum + (entry.blow === "theirs" ? (entry.damage ?? 0) : 0), 0)
+      : 0;
   return (
     <>
       <PageHeader
@@ -391,6 +400,7 @@ export function ArenaScreen() {
               side="Você"
               health={character.health}
               maximum={stats.maxHealth}
+              lost={duelHealthLost}
             />
             <Fighter
               gender={fighting.hunter.gender}
@@ -399,6 +409,9 @@ export function ArenaScreen() {
               side="Desafiado"
               health={duelLine ? duelLine.creatureHealth : fighting.maxHealth}
               maximum={fighting.maxHealth}
+              lost={
+                duelLine ? Math.max(0, Math.round(fighting.maxHealth - duelLine.creatureHealth)) : 0
+              }
             />
           </div>
 

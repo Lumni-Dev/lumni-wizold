@@ -10,6 +10,7 @@ export interface NarrationLine {
   text: string;
   blow: "ours" | "pet" | "theirs" | null;
   critical: boolean;
+  damage?: number;
   creatureHealth: number;
   characterHealth?: number;
 }
@@ -115,6 +116,7 @@ export function narrationOf(report: NarratedFight): NarrationLine[] {
           ? "pet"
           : "ours",
     critical: round.critical,
+    damage: round.dodged ? 0 : round.damage,
     creatureHealth: round.creatureHealth,
     characterHealth: round.characterHealth,
   }));

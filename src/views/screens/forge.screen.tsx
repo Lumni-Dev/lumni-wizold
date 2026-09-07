@@ -224,6 +224,8 @@ export function ForgeScreen() {
                   current={mining.progress}
                   maximum={mining.needed}
                   tone="experience"
+                  delta={mining.maxed ? undefined : "+" + formatNumber(mining.effort)}
+                  deltaTone="experience"
                   wraps
                 />
               </ListRow>
@@ -233,6 +235,8 @@ export function ForgeScreen() {
                   tone="tide"
                   current={mining.dailyRemaining}
                   maximum={mining.dailyLimit}
+                  delta={mining.dailyExhausted ? undefined : "-1"}
+                  deltaTone="tide"
                 />
                 <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                   {"Reseta às " + RESET_LABEL + ", faltam " + formatCountdown(miningResetLeft)}

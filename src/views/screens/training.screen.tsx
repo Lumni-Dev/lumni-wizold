@@ -6,7 +6,7 @@ import { petTrainingView } from "@/controllers/pet.controller";
 import {
   listAttributeProgress,
   listExercises,
-  trainingSummaryLine,
+  trainingSummary,
 } from "@/controllers/training.controller";
 import { ACTIVITY_WAIT_LABEL, useActivityLock } from "@/controllers/use-activity-lock";
 import { useVisibleActivity } from "@/controllers/use-visible-activity";
@@ -92,6 +92,7 @@ export function TrainingScreen() {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {exercises.map(({ exercise, effort, affordable, maxed, reason }) => {
             const row = progress.find((entry) => entry.key === exercise.attribute);
+            const summary = trainingSummary(row?.value ?? 0, effort);
             const ready = !maxed && affordable;
             const active = activeExercise === exercise.id;
             const opting = active && cooldown !== null;
@@ -123,7 +124,13 @@ export function TrainingScreen() {
 
                 <CardBody>
                   <p className="text-xs leading-relaxed text-ink-soft">
-                    {trainingSummaryLine(row?.name ?? exercise.name, row?.value ?? 0, effort)}
+                    Este treino está somando atualmente{" "}
+                    <strong className="font-bold">+{formatFraction(summary.pointShare)}</strong>{" "}
+                    ponto de {row?.name ?? exercise.name} por sessão (
+                    <strong className="font-bold">+{formatNumber(summary.progress)}</strong> de
+                    progresso), e o ponto fecha em cerca de{" "}
+                    <strong className="font-bold">{formatNumber(summary.sessions)}</strong> sessões.
+                    Gratuito.
                   </p>
                   <p className="text-xs leading-relaxed text-ink-faint">{exercise.description}</p>
                 </CardBody>
@@ -135,6 +142,12 @@ export function TrainingScreen() {
                       current={row.progress}
                       maximum={row.needed}
                       tone="experience"
+                      delta={
+                        row.value < MAX_ATTRIBUTE_VALUE
+                          ? "+" + formatNumber(summary.progress)
+                          : undefined
+                      }
+                      deltaTone="experience"
                       wraps
                     />
                   </div>
@@ -203,16 +216,23 @@ export function TrainingScreen() {
 
               <CardBody>
                 <p className="text-xs leading-relaxed text-ink-soft">
-                  Cada nível soma 1 de Força, 1 de Agilidade e 1 de Instinto ao que o mascote
-                  empresta enquanto caça com você.
+                  Cada nível soma <strong className="font-bold">1</strong> de Força,{" "}
+                  <strong className="font-bold">1</strong> de Agilidade e{" "}
+                  <strong className="font-bold">1</strong> de Instinto ao que o mascote empresta
+                  enquanto caça com você.
                 </p>
 
                 <div className="flex flex-wrap gap-2">
                   <Tag>
-                    +{formatFraction(petTraining.effort.progress / petTraining.needed)} de nível
-                    por treinamento
+                    <strong className="font-bold">
+                      +{formatFraction(petTraining.effort.progress / petTraining.needed)}
+                    </strong>
+                    {" de nível por treinamento"}
                   </Tag>
-                  <Tag>Treino por {formatBronze(petTraining.cost)}</Tag>
+                  <Tag>
+                    Treino por{" "}
+                    <strong className="font-bold">{formatBronze(petTraining.cost)}</strong>
+                  </Tag>
                 </div>
               </CardBody>
 
@@ -222,6 +242,12 @@ export function TrainingScreen() {
                   current={petTraining.progress}
                   maximum={petTraining.needed}
                   tone="experience"
+                  delta={
+                    petTraining.maxed
+                      ? undefined
+                      : "+" + formatNumber(petTraining.effort.progress)
+                  }
+                  deltaTone="experience"
                   wraps
                 />
               </div>

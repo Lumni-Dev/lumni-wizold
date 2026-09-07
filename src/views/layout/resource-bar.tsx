@@ -2,15 +2,21 @@
 
 import { useGame } from "@/controllers/game.context";
 import { useVisibleActivity } from "@/controllers/use-visible-activity";
+import { totalExperience } from "@/models/rules/progression";
 import { BAU_LIMIT } from "@/shared/constants/game";
 import { formatNumber, formatVault } from "@/shared/utils/format";
 import { Bar } from "../components/bar";
 import { RestSeconds } from "../components/rest-seconds";
 import { RestHealed } from "../components/rest-healed";
+import { useGained } from "../components/use-gained";
 
 export function ResourceBar() {
   const { character, stats } = useGame();
   const { activity } = useVisibleActivity();
+  const bronzeGained = useGained(character?.bronze ?? 0);
+  const experienceGained = useGained(
+    character ? totalExperience(character.level, character.experience) : 0,
+  );
   if (!character || !stats) return null;
 
   const resting = activity?.kind === "rest";
@@ -43,6 +49,8 @@ export function ResourceBar() {
             tone="ember"
             prominent
             unit="WCoins"
+            delta={bronzeGained > 0 ? "+" + formatNumber(bronzeGained) : undefined}
+            deltaTone="ember"
             format={formatVault}
           />
           <Bar
@@ -52,6 +60,8 @@ export function ResourceBar() {
             tone="experience"
             wraps
             prominent
+            delta={experienceGained > 0 ? "+" + formatNumber(experienceGained) : undefined}
+            deltaTone="experience"
           />
         </div>
       </div>
