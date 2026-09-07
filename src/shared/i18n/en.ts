@@ -536,4 +536,139 @@ export const EN: Record<string, string> = {
   "Fora da faixa": "Out of band",
   "Descansando": "Resting",
   "Faixa vazia esta noite": "Empty band tonight",
+  "Ataque seu": "Your attack",
+  "Ataque recebido": "Attack received",
+
+  // Moon phases
+  "Lua Nova": "New Moon",
+  "Lua Crescente": "Waxing Moon",
+  "Lua Cheia": "Full Moon",
+  "Lua Minguante": "Waning Moon",
+  "Céu fechado. A fera dorme, e no escuro a rocha rende mais para quem minera.":
+    "Closed sky. The beast sleeps, and in the dark the rock pays more to whoever mines.",
+  "A lua engorda e o sangue começa a responder: é a fase que ensina mais rápido, na caça e no pátio.":
+    "The moon fattens and the blood starts to answer: it is the phase that teaches fastest, on the hunt and in the yard.",
+  "A noite da matilha: a lua cheia mantém o Modo Fúria ativo enquanto durar a fase.":
+    "The pack's night: the full moon keeps Fury Mode on while the phase lasts.",
+  "A lua se apaga e o corpo volta ao ritmo de antes, sem bônus algum.":
+    "The moon fades and the body returns to its old pace, with no bonus at all.",
+  "Sem bônus nesta fase": "No bonus this phase",
+
+  // Months
+  "Janeiro": "January",
+  "Fevereiro": "February",
+  "Março": "March",
+  "Abril": "April",
+  "Maio": "May",
+  "Junho": "June",
+  "Julho": "July",
+  "Agosto": "August",
+  "Setembro": "September",
+  "Outubro": "October",
+  "Novembro": "November",
+  "Dezembro": "December",
+
+  // Store and VIP
+  "Aguardando pagamento": "Awaiting payment",
+  "Assinatura VIP": "VIP subscription",
+  "Cada pacote pago aparece aqui, com valor, data e status.":
+    "Every paid pack shows up here, with value, date and status.",
+  "O VIP entra assim que o pagamento confirma.": "VIP starts as soon as the payment confirms.",
+  "Renova sozinho a cada mês. Cancele para parar a cobrança no Stripe.":
+    "Renews on its own every month. Cancel to stop the charge on Stripe.",
+  "Cancele": "Cancel",
+  "Aprovado": "Approved",
+  "Expirado": "Expired",
+  "Reembolsado": "Refunded",
+
+  // Withdrawal
+  "Chave Pix": "Pix key",
+  "Como está no documento": "As it reads on the document",
+  "Nome completo": "Full name",
+  "e-mail, CPF ou chave aleatória": "e-mail, CPF or random key",
+  "O saque desta versão é de demonstração: o pedido fica registrado com estes dados e nada é transferido ainda.":
+    "Withdrawal in this version is a demonstration: the request is recorded with this data and nothing is transferred yet.",
+
+  // Bazaar extras
+  "Seu anúncio": "Your listing",
+  "Vencido: remova para recolher as peças.": "Expired: remove it to collect the pieces.",
+  "Expira a qualquer instante.": "Expires at any moment.",
+
+  // Gates and chrome
+  "Conta banida": "Account banned",
+  "Uma janela por vez": "One window at a time",
+  "Avisos e atividade": "Notices and activity",
+  "Páginas do jogo": "Game pages",
+  "Fechar aviso": "Close notice",
+  "Atividade em andamento": "Activity in progress",
+  "Maximizar atividade": "Maximize activity",
+  "Minimizar atividade": "Minimize activity",
+  "Parar atividade": "Stop activity",
+  "O corpo descansa.": "The body rests.",
+  "Mascote - Progresso": "Companion - Progress",
+  "Mascote - Treinamento": "Companion - Training",
+  "Limpando e recarregando...": "Clearing and reloading...",
+  "Online na aba do jogo": "Online in the game tab",
+  "Jogo aberto em segundo plano": "Game open in the background",
+  "Tocar o rádio": "Play the radio",
+  "Pausar o rádio": "Pause the radio",
+  "Próxima música": "Next song",
+  "Próxima tela": "Next screen",
+  "Tela anterior": "Previous screen",
+  "Ouvir a apresentação": "Listen to the introduction",
+
+  // Tavern extras
+  "Se sentou": "Sat down",
+  "Você já está sentado nesta mesa": "You are already sitting at this table",
+  "Você já tem uma mesa aberta: feche a sua para abrir outra.":
+    "You already have an open table: close yours to open another.",
+  "Feche a sua mesa antes de abrir outra": "Close your table before opening another",
+  "Fechar mesa reservada": "Close reserved table",
+  "Mesa reservada precisa de senha.": "A reserved table needs a password.",
+  "obrigatória na mesa reservada": "required on the reserved table",
+  "Senha (opcional)": "Password (optional)",
+  "Na mesa": "At the table",
+  "Diga alguma coisa": "Say something",
+  "número da mesa": "table number",
+
+  // Inventory and market extras
+  "Nada equipado": "Nothing equipped",
+  "Cace criaturas ou compre no mercado para encher a mochila.":
+    "Hunt creatures or buy at the market to fill the bag.",
+  "Sem mascote": "No companion",
+  "Pronta para forjar": "Ready to forge",
+  "Recupera vida": "Restores health",
+
+  // Diary
+  "Nada registrado": "Nothing recorded",
+  "Treine, cace ou negocie para começar a escrever.": "Train, hunt or trade to start writing.",
+  "Últimas 7 noites, em ordem.": "The last 7 nights, in order.",
+
+  // Pet extras
+  "a fêmea": "the female",
+  "o macho": "the male",
+  "Apelido da fêmea": "The female's name",
+  "Apelido do macho": "The male's name",
+  "Disponível": "Available",
+  "Não": "No",
+  "Sim": "Yes",
+  "Sem fôlego, ele para: não morde, não empresta nada e espera comida ou repouso.":
+    "Out of breath, it stops: it does not bite, lends nothing and waits for food or rest.",
+
+  // Login and creation
+  "Verificação": "Verification",
+  "A noite não cobra nada para começar.": "The night charges nothing to begin.",
+  "Escolha a linhagem de Lumni ou a de Luna.": "Choose Lumni's bloodline or Luna's.",
+
+  // Last sweep
+  "Buscar item pelo nome": "Search item by name",
+  "Nome do item": "Item name",
+  "Espaços": "Slots",
+  "Indisponível": "Unavailable",
+  "Contato da Lumni": "Lumni contact",
+  "Repousar": "Rest",
+  "O que a partida faz sozinha. Cada chave faz uma coisa só, e elas se ajudam: a caçada bebe, a poção acaba, o corpo descansa, a caçada volta. É um recurso VIP.":
+    "What the run does on its own. Each switch does one thing only, and they help each other: the hunt drinks, the potion runs out, the body rests, the hunt returns. A VIP feature.",
+  "O volume do rádio. Ligar e desligar, pular faixa e ver o que toca ficam no player da taverna, e o rádio só toca lá. Enquanto o rádio toca, a trilha e os efeitos do jogo ficam em silêncio.":
+    "The radio volume. On and off, skipping tracks and seeing what plays live in the tavern player, and the radio only plays there. While the radio plays, the soundtrack and the game's effects stay silent.",
 };

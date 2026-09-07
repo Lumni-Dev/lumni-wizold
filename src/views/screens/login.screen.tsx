@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useGame } from "@/controllers/game.context";
 import { playSound } from "@/controllers/sound";
+import { useT } from "@/controllers/use-locale";
 import { loadBirth, saveBirth } from "@/models/repositories/birth.repository";
 import { GAME_NAME, MIN_AGE } from "@/shared/constants/game";
 import { TWO_FACTOR_CODE_LENGTH } from "@/shared/constants/auth";
@@ -102,6 +103,7 @@ function daysInMonth(month: string, year: string): number {
 }
 export function LoginScreen() {
   const { ready, authenticated, character, enter, verifyTwoFactor, resendTwoFactor } = useGame();
+  const t = useT();
   const router = useRouter();
   const [birth, setBirth] = useState(EMPTY_BIRTH);
   const [entering, setEntering] = useState(false);
@@ -256,9 +258,11 @@ export function LoginScreen() {
                 {twoFactor ? "Verificação" : "Entrar"}
               </h1>
               <p className="landing-hero-shadow-text mt-1 text-xs text-ink-faint">
-                {twoFactor
-                  ? "Confirme o código enviado ao seu e-mail."
-                  : "A noite não cobra nada para começar."}
+                {t(
+                  twoFactor
+                    ? "Confirme o código enviado ao seu e-mail."
+                    : "A noite não cobra nada para começar.",
+                )}
               </p>
             </div>
 
@@ -340,11 +344,13 @@ export function LoginScreen() {
                 />
               </div>
                   <p className="landing-hero-shadow-text text-[11px] leading-relaxed text-ink-faint">
-                    {complete && !oldEnough
-                      ? "A caçada é para maiores de " + MIN_AGE + " anos."
-                      : "O jogo é para maiores de " +
-                        MIN_AGE +
-                        " anos: tem sangue na caça, duelo entre jogadores, mesa de conversa aberta e compra com dinheiro de verdade."}
+                    {t(
+                      complete && !oldEnough
+                        ? "A caçada é para maiores de " + MIN_AGE + " anos."
+                        : "O jogo é para maiores de " +
+                            MIN_AGE +
+                            " anos: tem sangue na caça, duelo entre jogadores, mesa de conversa aberta e compra com dinheiro de verdade.",
+                    )}
                   </p>
                 </div>
 

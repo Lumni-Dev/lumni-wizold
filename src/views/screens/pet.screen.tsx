@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useGame } from "@/controllers/game.context";
+import { useT } from "@/controllers/use-locale";
 import { detailInventory } from "@/controllers/inventory.controller";
 import { PETS, findPet, type PetGender } from "@/models/entities/pet";
 import { ATTRIBUTES } from "@/models/entities/attribute";
@@ -161,6 +162,7 @@ function Kennel({ bronze, level }: { bronze: number; level: number }) {
 
 export function PetScreen() {
   const { state, character, pet, releasePet, renamePet, feedPet, setPetActive } = useGame();
+  const t = useT();
   const [confirmingRelease, setConfirmingRelease] = useState(false);
   const [newPetName, setNewPetName] = useState("");
   const [confirmingRename, setConfirmingRename] = useState(false);
@@ -250,16 +252,18 @@ export function PetScreen() {
             footer={
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <span className="text-[11px] text-ink-faint">
-                  {active
-                    ? pet.name + " caça com você."
-                    : whole
-                      ? pet.name + " está inteiro, esperando ser chamado."
-                      : pet.name +
-                        " recupera " +
-                        formatNumber(petRestStep(pet)) +
-                        " de energia a cada " +
-                        REST_TICK_MS / 1000 +
-                        " segundos em repouso."}
+                  {t(
+                    active
+                      ? pet.name + " caça com você."
+                      : whole
+                        ? pet.name + " está inteiro, esperando ser chamado."
+                        : pet.name +
+                          " recupera " +
+                          formatNumber(petRestStep(pet)) +
+                          " de energia a cada " +
+                          REST_TICK_MS / 1000 +
+                          " segundos em repouso.",
+                  )}
                 </span>
                 {active ? (
                   <Button variant="secondary" onClick={() => setPetActive(false)}>

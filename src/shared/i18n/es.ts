@@ -536,4 +536,139 @@ export const ES: Record<string, string> = {
   "Fora da faixa": "Fuera de la franja",
   "Descansando": "Descansando",
   "Faixa vazia esta noite": "Franja vacía esta noche",
+  "Ataque seu": "Ataque tuyo",
+  "Ataque recebido": "Ataque recibido",
+
+  // Moon phases
+  "Lua Nova": "Luna Nueva",
+  "Lua Crescente": "Luna Creciente",
+  "Lua Cheia": "Luna Llena",
+  "Lua Minguante": "Luna Menguante",
+  "Céu fechado. A fera dorme, e no escuro a rocha rende mais para quem minera.":
+    "Cielo cerrado. La bestia duerme, y en la oscuridad la roca rinde más a quien mina.",
+  "A lua engorda e o sangue começa a responder: é a fase que ensina mais rápido, na caça e no pátio.":
+    "La luna engorda y la sangre empieza a responder: es la fase que enseña más rápido, en la caza y en el patio.",
+  "A noite da matilha: a lua cheia mantém o Modo Fúria ativo enquanto durar a fase.":
+    "La noche de la manada: la luna llena mantiene el Modo Furia activo mientras dura la fase.",
+  "A lua se apaga e o corpo volta ao ritmo de antes, sem bônus algum.":
+    "La luna se apaga y el cuerpo vuelve a su ritmo de antes, sin bono alguno.",
+  "Sem bônus nesta fase": "Sin bono en esta fase",
+
+  // Months
+  "Janeiro": "Enero",
+  "Fevereiro": "Febrero",
+  "Março": "Marzo",
+  "Abril": "Abril",
+  "Maio": "Mayo",
+  "Junho": "Junio",
+  "Julho": "Julio",
+  "Agosto": "Agosto",
+  "Setembro": "Septiembre",
+  "Outubro": "Octubre",
+  "Novembro": "Noviembre",
+  "Dezembro": "Diciembre",
+
+  // Store and VIP
+  "Aguardando pagamento": "Esperando el pago",
+  "Assinatura VIP": "Suscripción VIP",
+  "Cada pacote pago aparece aqui, com valor, data e status.":
+    "Cada paquete pagado aparece aquí, con valor, fecha y estado.",
+  "O VIP entra assim que o pagamento confirma.": "El VIP entra en cuanto se confirma el pago.",
+  "Renova sozinho a cada mês. Cancele para parar a cobrança no Stripe.":
+    "Se renueva solo cada mes. Cancela para detener el cobro en Stripe.",
+  "Cancele": "Cancela",
+  "Aprovado": "Aprobado",
+  "Expirado": "Expirado",
+  "Reembolsado": "Reembolsado",
+
+  // Withdrawal
+  "Chave Pix": "Clave Pix",
+  "Como está no documento": "Como figura en el documento",
+  "Nome completo": "Nombre completo",
+  "e-mail, CPF ou chave aleatória": "correo, CPF o clave aleatoria",
+  "O saque desta versão é de demonstração: o pedido fica registrado com estes dados e nada é transferido ainda.":
+    "El retiro de esta versión es una demostración: el pedido queda registrado con estos datos y aún no se transfiere nada.",
+
+  // Bazaar extras
+  "Seu anúncio": "Tu anuncio",
+  "Vencido: remova para recolher as peças.": "Vencido: quítalo para recoger las piezas.",
+  "Expira a qualquer instante.": "Expira en cualquier momento.",
+
+  // Gates and chrome
+  "Conta banida": "Cuenta baneada",
+  "Uma janela por vez": "Una ventana a la vez",
+  "Avisos e atividade": "Avisos y actividad",
+  "Páginas do jogo": "Páginas del juego",
+  "Fechar aviso": "Cerrar aviso",
+  "Atividade em andamento": "Actividad en curso",
+  "Maximizar atividade": "Maximizar actividad",
+  "Minimizar atividade": "Minimizar actividad",
+  "Parar atividade": "Parar actividad",
+  "O corpo descansa.": "El cuerpo descansa.",
+  "Mascote - Progresso": "Compañero - Progreso",
+  "Mascote - Treinamento": "Compañero - Entrenamiento",
+  "Limpando e recarregando...": "Limpiando y recargando...",
+  "Online na aba do jogo": "En línea en la pestaña del juego",
+  "Jogo aberto em segundo plano": "Juego abierto en segundo plano",
+  "Tocar o rádio": "Reproducir la radio",
+  "Pausar o rádio": "Pausar la radio",
+  "Próxima música": "Próxima canción",
+  "Próxima tela": "Próxima pantalla",
+  "Tela anterior": "Pantalla anterior",
+  "Ouvir a apresentação": "Escuchar la presentación",
+
+  // Tavern extras
+  "Se sentou": "Se sentó",
+  "Você já está sentado nesta mesa": "Ya estás sentado en esta mesa",
+  "Você já tem uma mesa aberta: feche a sua para abrir outra.":
+    "Ya tienes una mesa abierta: cierra la tuya para abrir otra.",
+  "Feche a sua mesa antes de abrir outra": "Cierra tu mesa antes de abrir otra",
+  "Fechar mesa reservada": "Cerrar mesa reservada",
+  "Mesa reservada precisa de senha.": "La mesa reservada necesita contraseña.",
+  "obrigatória na mesa reservada": "obligatoria en la mesa reservada",
+  "Senha (opcional)": "Contraseña (opcional)",
+  "Na mesa": "En la mesa",
+  "Diga alguma coisa": "Di algo",
+  "número da mesa": "número de la mesa",
+
+  // Inventory and market extras
+  "Nada equipado": "Nada equipado",
+  "Cace criaturas ou compre no mercado para encher a mochila.":
+    "Caza criaturas o compra en el mercado para llenar la mochila.",
+  "Sem mascote": "Sin compañero",
+  "Pronta para forjar": "Lista para forjar",
+  "Recupera vida": "Recupera vida",
+
+  // Diary
+  "Nada registrado": "Nada registrado",
+  "Treine, cace ou negocie para começar a escrever.": "Entrena, caza o negocia para empezar a escribir.",
+  "Últimas 7 noites, em ordem.": "Las últimas 7 noches, en orden.",
+
+  // Pet extras
+  "a fêmea": "la hembra",
+  "o macho": "el macho",
+  "Apelido da fêmea": "El nombre de la hembra",
+  "Apelido do macho": "El nombre del macho",
+  "Disponível": "Disponible",
+  "Não": "No",
+  "Sim": "Sí",
+  "Sem fôlego, ele para: não morde, não empresta nada e espera comida ou repouso.":
+    "Sin aliento, se detiene: no muerde, no presta nada y espera comida o reposo.",
+
+  // Login and creation
+  "Verificação": "Verificación",
+  "A noite não cobra nada para começar.": "La noche no cobra nada para empezar.",
+  "Escolha a linhagem de Lumni ou a de Luna.": "Elige el linaje de Lumni o el de Luna.",
+
+  // Last sweep
+  "Buscar item pelo nome": "Buscar objeto por nombre",
+  "Nome do item": "Nombre del objeto",
+  "Espaços": "Espacios",
+  "Indisponível": "No disponible",
+  "Contato da Lumni": "Contacto de Lumni",
+  "Repousar": "Reposar",
+  "O que a partida faz sozinha. Cada chave faz uma coisa só, e elas se ajudam: a caçada bebe, a poção acaba, o corpo descansa, a caçada volta. É um recurso VIP.":
+    "Lo que la partida hace sola. Cada llave hace una sola cosa, y se ayudan entre sí: la cacería bebe, la poción se acaba, el cuerpo descansa, la cacería vuelve. Es un recurso VIP.",
+  "O volume do rádio. Ligar e desligar, pular faixa e ver o que toca ficam no player da taverna, e o rádio só toca lá. Enquanto o rádio toca, a trilha e os efeitos do jogo ficam em silêncio.":
+    "El volumen de la radio. Encender y apagar, saltar de pista y ver qué suena quedan en el reproductor de la taberna, y la radio solo suena allí. Mientras suena la radio, la banda sonora y los efectos del juego quedan en silencio.",
 };
