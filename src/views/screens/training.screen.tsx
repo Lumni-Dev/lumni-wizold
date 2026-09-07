@@ -132,6 +132,11 @@ export function TrainingScreen() {
                 <CardBody>
                   <ul className="list-disc space-y-1 pl-4 text-xs leading-relaxed text-ink-soft">
                     <li>
+                      Atualmente você tem{" "}
+                      <strong className="font-bold">{formatFraction(exactValue)}</strong> pontos de{" "}
+                      {row?.name ?? exercise.name}
+                    </li>
+                    <li>
                       <strong className="font-bold">+{formatFraction(summary.pointShare)}</strong>{" "}
                       ponto por sessão
                     </li>
@@ -143,7 +148,6 @@ export function TrainingScreen() {
                       Ponto fecha em cerca de{" "}
                       <strong className="font-bold">{formatNumber(summary.sessions)}</strong> sessões
                     </li>
-                    <li>Gratuito</li>
                   </ul>
                 </CardBody>
 
