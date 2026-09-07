@@ -147,6 +147,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         criticalMultiplierOf().toFixed(2).replace(".", ",") +
         ", fixo; Instinto sobe a chance de crítico e Agilidade, a de esquiva.",
       "Treine para acumular progresso de atributo; equipe o que serve, venda o que sobra e volte a caçar.",
+      "As barras contam o que muda na hora, ao lado do valor: experiência ganha em roxo, WCoins e fragmentos em âmbar, vida perdida em vermelho e o fôlego gasto da mina em azul. Cada aviso soma os ganhos do momento e se apaga sozinho em seguida.",
       "Na forja, minere fragmentos e bata na peça que está na mochila, fora do corpo, para levantá-la de +1 em diante. No canil, adote um lobo: ele soma atributos enquanto estiver de pé. O ranking mostra onde você está entre os caçadores.",
     ],
   },
@@ -231,6 +232,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         " a " +
         TRAINING_TICKS_MAX +
         " passos, e o sorteio é só ritmo: o progresso que a sessão paga é o mesmo, curta ou longa.",
+      "O pátio mostra o atributo exato, com a fração do ponto em andamento (20.33 em vez de 20), quanto cada sessão paga de ponto e de experiência, e quantas sessões faltam para o ponto fechar: uma contagem que cai a cada sessão concluída.",
     ],
   },
   {
