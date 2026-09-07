@@ -32,7 +32,7 @@ export function TavernAlertDock() {
       {alerts.map((alert) => (
         <aside
           key={alert.id}
-          aria-label={"Mensagem na mesa " + alert.roomName}
+          aria-label={"Message at table " + alert.roomName}
           className="toast-in pointer-events-auto relative w-full"
         >
           <div className={cn("overflow-hidden rounded-lg border border-edge shadow-[0_12px_32px_-12px_rgba(0,0,0,0.95)]", GLASS_SECTION)}>

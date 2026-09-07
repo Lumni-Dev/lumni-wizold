@@ -92,7 +92,7 @@ export function LandingScreen() {
 
           <div className="flex flex-col items-center gap-4">
             {hasRun ? (
-              <LandingCtaButton href="/character" label={"Continuar com " + character.name} />
+              <LandingCtaButton href="/character" label={"Continue as " + character.name} />
             ) : (
               <LandingCtaButton href="/login" label={t("Play free")} />
             )}

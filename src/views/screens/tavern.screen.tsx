@@ -8,6 +8,7 @@ import { useIsDesktop } from "@/controllers/use-is-desktop";
 import { useGame } from "@/controllers/game.context";
 import { listPack } from "@/controllers/pack.controller";
 import { usePackPresence } from "@/controllers/use-pack-presence";
+import { useT } from "@/controllers/use-locale";
 import { useTavernDoing } from "@/controllers/use-tavern-doing";
 import { playSound } from "@/controllers/sound";
 import { radioStore } from "@/controllers/radio.store";
@@ -99,6 +100,7 @@ function MemberName({
 
 export function TavernScreen() {
   const isDesktop = useIsDesktop();
+  const t = useT();
   const {
     state,
     character,
@@ -508,13 +510,13 @@ export function TavernScreen() {
       <PageHeader
         title="Taverna"
         description={
-          "Mesas de conversa para até " +
+          "Chat tables for up to " +
           MAX_ROOM_MEMBERS +
-          " pessoas, com ou sem senha. A mesa fecha sozinha quando a última pessoa sai."
+          " people, with or without a password. A table closes itself when the last person leaves."
         }
         action={
           <Tag tone="neutral">
-            {openTables === 1 ? "1 mesa aberta" : openTables + " mesas abertas"}
+            {openTables === 1 ? "1 open table" : openTables + " open tables"}
           </Tag>
         }
       />
@@ -532,10 +534,9 @@ export function TavernScreen() {
         }
       >
         <p className="text-xs leading-relaxed text-ink-soft">
-          As mesas vivem no servidor: quem estiver jogando, de qualquer máquina, senta nas mesmas
-          mesas e lê as mesmas falas. A senha de mesa é uma combinação entre jogadores, guardada
-          cifrada; ainda assim, invente uma só para a mesa, nunca uma senha que você usa em outro
-          lugar.
+          {t(
+            "The tables live on the server: whoever is playing, from any machine, sits at the same tables and reads the same lines. A table password is an arrangement between players, stored encrypted; even so, invent one just for the table, never a password you use anywhere else.",
+          )}
         </p>
       </Panel>
 
@@ -546,9 +547,9 @@ export function TavernScreen() {
             description={
               ownRoom
                 ? "You already have an open table: close yours to open another."
-                : "Sem senha, NV " +
+                : "Without a password, LV " +
                   OPEN_ROOM_MIN_LEVEL +
-                  "+ ou VIP. Com senha, qualquer nível. Mesa reservada sempre com senha."
+                  "+ or VIP. With a password, any level. Reserved tables always take a password."
             }
           >
             <div className="-mx-4 -mt-4 mb-4 border-b border-edge p-4">
@@ -578,7 +579,7 @@ export function TavernScreen() {
                 maxLength={60}
                 value={roomPassword}
                 placeholder={
-                  hideName ? "required on the reserved table" : "deixe vazio para mesa aberta"
+                  hideName ? "required on the reserved table" : "leave empty for an open table"
                 }
                 autoComplete="new-password"
                 disabled={Boolean(ownRoom)}
@@ -593,7 +594,7 @@ export function TavernScreen() {
               </Chip>
               {hideName ? (
                 <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                  De fora só aparece o número. A senha é obrigatória.
+                  {t("From outside only the number shows. The password is required.")}
                 </p>
               ) : null}
               <Tooltip
@@ -604,9 +605,9 @@ export function TavernScreen() {
                     : hideName && roomPassword.trim().length === 0
                       ? "A reserved table needs a password."
                       : roomPassword.trim().length === 0 && !mayOpenUnlocked
-                        ? "Mesa sem senha é só a partir do NV " +
+                        ? "A table without a password takes LV " +
                           OPEN_ROOM_MIN_LEVEL +
-                          ", ou com VIP. Ponha uma senha para abrir em qualquer nível."
+                          " and up, or VIP. Set a password to open at any level."
                         : ""
                 }
               >
@@ -623,7 +624,7 @@ export function TavernScreen() {
                     (roomPassword.trim().length === 0 && !mayOpenUnlocked)
                   }
                 >
-                  {ownRoom ? "Sua mesa: " + roomTitle(ownRoom.room, true) : "Choose a table"}
+                  {ownRoom ? "Your table: " + roomTitle(ownRoom.room, true) : "Choose a table"}
                 </Button>
               </Tooltip>
             </form>
@@ -642,21 +643,21 @@ export function TavernScreen() {
                     <p className="min-w-0 flex-1 truncate text-sm text-ink">
                       <MemberName href={profileHref(entry.fromId)} name={entry.fromName} />
                     </p>
-                    <Tooltip label={"Aceitar " + entry.fromName}>
+                    <Tooltip label={"Accept " + entry.fromName}>
                       <Button
                         icon
                         variant="secondary"
-                        aria-label={"Aceitar " + entry.fromName}
+                        aria-label={"Accept " + entry.fromName}
                         onClick={() => accept(entry.id)}
                       >
                         <ActionIcon action="keep" />
                       </Button>
                     </Tooltip>
-                    <Tooltip label={"Recusar " + entry.fromName}>
+                    <Tooltip label={"Decline " + entry.fromName}>
                       <Button
                         icon
                         variant="ghost"
-                        aria-label={"Recusar " + entry.fromName}
+                        aria-label={"Decline " + entry.fromName}
                         onClick={() => decline(entry.id)}
                       >
                         <ActionIcon action="remove" />
@@ -732,21 +733,21 @@ export function TavernScreen() {
                       </p>
                     </div>
 
-                    <Tooltip label={"Falar com " + mate.name}>
+                    <Tooltip label={"Talk to " + mate.name}>
                       <Button
                         icon
                         variant="secondary"
-                        aria-label={"Falar com " + mate.name}
+                        aria-label={"Talk to " + mate.name}
                         onClick={() => speakTo(mate)}
                       >
                         <ActionIcon action="message" />
                       </Button>
                     </Tooltip>
-                    <Tooltip label={"Sair da matilha com " + mate.name}>
+                    <Tooltip label={"Leave the pack with " + mate.name}>
                       <Button
                         icon
                         variant="ghost"
-                        aria-label={"Sair da matilha com " + mate.name}
+                        aria-label={"Leave the pack with " + mate.name}
                         onClick={() => setRemoving(mate)}
                       >
                         <ActionIcon action="remove" />
@@ -835,7 +836,7 @@ export function TavernScreen() {
                       <Field
                         type="password"
                         maxLength={60}
-                        aria-label={"Senha da mesa " + roomTitle(room, isMember)}
+                        aria-label={"Password of table " + roomTitle(room, isMember)}
                         placeholder="table password"
                         value={joinPasswords[room.id] ?? ""}
                         onChange={(event) =>
@@ -880,7 +881,7 @@ export function TavernScreen() {
                           seatedHere
                             ? "You are already sitting at this table"
                             : full && !isMember
-                              ? "A mesa está cheia: " + MAX_ROOM_MEMBERS + " pessoas"
+                              ? "The table is full: " + MAX_ROOM_MEMBERS + " people"
                               : ""
                         }
                       >

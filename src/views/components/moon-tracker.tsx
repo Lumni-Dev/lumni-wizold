@@ -15,10 +15,10 @@ export function MoonTracker() {
   const miningBonus = Math.round(moon.phase.miningBonus * 100);
   const furyBonus = moon.phase.key === "full" ? FURY_ATTRIBUTE_BONUS : 0;
   const perks: string[] = [];
-  if (xpBonus > 0) perks.push(t("+" + xpBonus + "% de experiência na caça"));
-  if (trainingBonus > 0) perks.push(t("+" + trainingBonus + "% no treino"));
-  if (miningBonus > 0) perks.push(t("+" + miningBonus + "% na mineração"));
-  if (furyBonus > 0) perks.push(t("Modo Fúria: +" + furyBonus + " em todos os atributos"));
+  if (xpBonus > 0) perks.push(t("+" + xpBonus + "% hunt experience"));
+  if (trainingBonus > 0) perks.push(t("+" + trainingBonus + "% in training"));
+  if (miningBonus > 0) perks.push(t("+" + miningBonus + "% in mining"));
+  if (furyBonus > 0) perks.push(t("Fury Mode: +" + furyBonus + " to all attributes"));
   const bonusLine = perks.length > 0 ? perks.join(" · ") : t("No bonus this phase");
 
   return (

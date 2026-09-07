@@ -223,7 +223,7 @@ export function WikiScreen() {
             title="Equipment"
             description={
               equipmentCount +
-              " peças em cinco conjuntos, do bronze ao lunar. Cada linha traz a peça, o bônus e o preço no mercado."
+              " pieces in five sets, bronze to lunar. Each row carries the piece, the bonus and the market price."
             }
             items={equipment}
           >
@@ -338,7 +338,7 @@ export function WikiScreen() {
             title="Bestiary"
             description={
               WIKI_CREATURES.length +
-              " criaturas em seis espécies, ordenadas por nível. Números fixos por variant."
+              " creatures in six species, ordered by level. Fixed numbers per variant."
             }
             items={creatures}
           >
@@ -377,7 +377,7 @@ export function WikiScreen() {
             title="Fragments"
             description={
               WIKI_FRAGMENTS.length +
-              " lascas da mina, uma por conjunto. Só alimentam a forja; não caem na caça nem entram no mercado."
+              " shards from the mine, one per set. They only feed the forge; they do not drop on the hunt nor enter the market."
             }
             items={fragments}
           >
@@ -397,7 +397,7 @@ export function WikiScreen() {
             id="itens"
             title="Items"
             description={
-              WIKI_ITEMS.length + " materiais de caça e suprimentos de mascote no catálogo."
+              WIKI_ITEMS.length + " hunt materials and companion supplies in the catalog."
             }
             items={items}
           >
@@ -418,7 +418,7 @@ export function WikiScreen() {
           <WikiPaginatedPanel
             id="pocoes"
             title="Potions"
-            description={WIKI_POTIONS.length + " poções de vida e fúria vendidas no mercado."}
+            description={WIKI_POTIONS.length + " health and fury potions sold at the market."}
             items={potions}
           >
             {(pageItems) =>

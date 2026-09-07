@@ -148,7 +148,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
 
           <Panel
             title="Ranking"
-            description={"Onde aparece em cada quadro, entre " + formatNumber(boardSize) + "."}
+            description={"Where they stand on every board, among " + formatNumber(boardSize) + "."}
             padding="none"
             footer={
               <Link href="/ranking">

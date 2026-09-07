@@ -150,7 +150,7 @@ export function CharacterScreen() {
             <Panel
               title="Ranking"
               description={
-                "Onde você aparece em cada quadro, entre " + formatNumber(profile.boardSize) + "."
+                "Where you stand on every board, among " + formatNumber(profile.boardSize) + "."
               }
               padding="none"
             >
@@ -198,7 +198,7 @@ export function CharacterScreen() {
                     quantity={quantity}
                     description={
                       item.effect.healthMin !== undefined && item.effect.healthMax !== undefined
-                        ? "Recupera entre " + item.effect.healthMin + " e " + item.effect.healthMax + " de vida"
+                        ? "Restores between " + item.effect.healthMin + " and " + item.effect.healthMax + " health"
                         : "Restores health"
                     }
                     action={

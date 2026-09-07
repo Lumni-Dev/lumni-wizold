@@ -45,6 +45,7 @@ import { PageHeader } from "../layout/page-header";
 
 function Kennel({ bronze, level }: { bronze: number; level: number }) {
   const { adoptPet } = useGame();
+  const t = useT();
   const [gender, setGender] = useState<PetGender>("male");
   const [name, setName] = useState("");
   const [confirming, setConfirming] = useState(false);
@@ -93,11 +94,11 @@ function Kennel({ bronze, level }: { bronze: number; level: number }) {
       <Panel
         title="Adoption"
         description={
-          "O apelido é dado na porta; trocar depois custa " +
+          "The name is given at the door; changing it later costs " +
           formatBronze(petRenamePrice(level)) +
-          " no canil. A adoção exige NV " +
+          " at the kennel. Adoption asks for LV " +
           PET_MIN_LEVEL +
-          " e custa " +
+          " and costs " +
           formatBronze(price) +
           "."
         }
@@ -110,7 +111,7 @@ function Kennel({ bronze, level }: { bronze: number; level: number }) {
           }}
         >
           <Field
-            label={"Apelido d" + (gender === "male" ? "the male" : "the female")}
+            label={gender === "male" ? "The male's name" : "The female's name"}
             value={name}
             maxLength={NAME_MAX_LENGTH}
             placeholder="What you will call him for the rest of the run"
@@ -120,7 +121,7 @@ function Kennel({ bronze, level }: { bronze: number; level: number }) {
           <AiAuditNotice />
           {!oldEnough ? (
             <p className="text-[11px] text-ink-faint">
-              O lobo só caça ao lado de um NV {PET_MIN_LEVEL} ou mais.
+              {t("The wolf only hunts beside a LV " + PET_MIN_LEVEL + " or higher.")}
             </p>
           ) : null}
           <Button
@@ -130,10 +131,10 @@ function Kennel({ bronze, level }: { bronze: number; level: number }) {
             disabled={!oldEnough || !affordable || name.trim().length === 0}
           >
             {!oldEnough
-              ? "Exige NV " + PET_MIN_LEVEL
+              ? "Requires LV " + PET_MIN_LEVEL
               : affordable
-                ? "Adotar por " + formatBronze(price)
-                : "Faltam " + formatBronze(price - bronze)}
+                ? "Adopt for " + formatBronze(price)
+                : formatBronze(price - bronze) + " short"}
           </Button>
         </form>
       </Panel>
@@ -142,10 +143,10 @@ function Kennel({ bronze, level }: { bronze: number; level: number }) {
         open={confirming}
         title="Adopt"
         description={
-          "Adotar é compromisso: soltar depois não devolve WCoin nenhuma, e trocar o " +
-          "apelido custa " +
+          "Adopting is a commitment: releasing later returns no WCoin, and changing the " +
+          "name costs " +
           formatBronze(petRenamePrice(level)) +
-          " no canil."
+          " at the kennel."
         }
         detail={findPet(gender).label + " - " + name.trim() + " - " + formatBronze(price)}
         confirmLabel="Adopt"
@@ -254,15 +255,15 @@ export function PetScreen() {
                 <span className="text-[11px] text-ink-faint">
                   {t(
                     active
-                      ? pet.name + " caça com você."
+                      ? pet.name + " hunts with you."
                       : whole
-                        ? pet.name + " está inteiro, esperando ser chamado."
+                        ? pet.name + " is whole, waiting to be called."
                         : pet.name +
-                          " recupera " +
+                          " recovers " +
                           formatNumber(petRestStep(pet)) +
-                          " de energia a cada " +
+                          " energy every " +
                           REST_TICK_MS / 1000 +
-                          " segundos em repouso.",
+                          " seconds at rest.",
                   )}
                 </span>
                 {active ? (
@@ -297,7 +298,7 @@ export function PetScreen() {
           <Panel
             title="Supplies"
             description={
-              "O alimento devolve um quarto do fôlego na hora. Sem ele, o repouso faz o mesmo de graça, um passo a cada " +
+              "Food returns a quarter of the breath at once. Without it, rest does the same for free, one step every " +
               REST_TICK_MS / 1000 +
               " segundos."
             }
@@ -317,7 +318,7 @@ export function PetScreen() {
                     key={item.id}
                     item={item}
                     quantity={quantity}
-                    description={"+" + formatNumber(petRationOf(item, pet)) + " de energia"}
+                    description={"+" + formatNumber(petRationOf(item, pet)) + " energy"}
                     action={
                       <Button variant="primary" onClick={() => feedPet(item.id)}>
                         Alimentar
@@ -332,7 +333,7 @@ export function PetScreen() {
           <Panel
             title="Companion name"
             description={
-              "A troca custa " + formatBronze(PET_RENAME_PRICE) + " WCoins na hora."
+              "The change costs " + formatBronze(PET_RENAME_PRICE) + " WCoins on the spot."
             }
           >
             <form
@@ -361,8 +362,8 @@ export function PetScreen() {
                 disabled={newPetName.trim().length === 0 || !petRenameAffordable}
               >
                 {petRenameAffordable
-                  ? "Alterar por " + formatBronze(petRenameCost)
-                  : "Faltam " + formatBronze(petRenameCost - character.bronze)}
+                  ? "Change for " + formatBronze(petRenameCost)
+                  : formatBronze(petRenameCost - character.bronze) + " short"}
               </Button>
             </form>
           </Panel>
@@ -372,7 +373,7 @@ export function PetScreen() {
             description="A released wolf does not come back. The name is freed for the next one."
             footer={
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <span className="text-[11px] text-ink-faint">Soltar não paga nada.</span>
+                <span className="text-[11px] text-ink-faint">{t("Releasing pays nothing.")}</span>
                 <Button variant="outline" onClick={() => setConfirmingRelease(true)}>
                   Soltar
                 </Button>
@@ -380,9 +381,9 @@ export function PetScreen() {
             }
           >
             <p className="text-xs leading-relaxed text-ink-faint">
-              Soltar não devolve WCoin nenhuma: adotar é um compromisso. Depois dá para adotar outro
-              no canil, de qualquer linhagem, e o apelido fica livre para usar de novo. Este{" "}
-              {pet.name} é que não volta.
+              {t(
+                "Releasing returns no WCoin: adopting is a commitment. Afterwards another can be adopted at the kennel, of either bloodline, and the name is freed to use again. This one is what does not come back.",
+              )}
             </p>
           </Panel>
         </div>
@@ -408,7 +409,7 @@ export function PetScreen() {
         title="Release the companion"
         description={
           pet.name +
-          " foi fiel, mas agora estará livre na floresta. Nada é devolvido, e o apelido fica livre para um próximo lobo, adotado no canil pelo preço cheio."
+          " was loyal, but will now be free in the forest. Nothing is returned, and the name is freed for a next wolf, adopted at the kennel for the full price."
         }
         confirmLabel="Release"
         onCancel={() => setConfirmingRelease(false)}

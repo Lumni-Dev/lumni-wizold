@@ -61,7 +61,7 @@ export function ResourceBar() {
             format={formatVault}
           />
           <Bar
-            label={"Experiência (NV. " + formatNumber(character.level) + "/1000)"}
+            label={"Experience (LV. " + formatNumber(character.level) + "/1000)"}
             current={character.experience}
             maximum={stats.experienceNeeded}
             tone="experience"

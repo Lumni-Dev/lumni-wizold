@@ -75,11 +75,11 @@ export function TrainingScreen() {
       <PageHeader
         title="Treinamento"
         description={
-          "Treino gratuito para sempre: um exercício por atributo, cada barra cheia vira +1 permanente. Cada sessão sorteia de " +
+          "Training is free forever: one exercise per attribute, every full bar becomes a permanent +1. Each session draws " +
           TRAINING_TICKS_MIN +
-          " a " +
+          " to " +
           TRAINING_TICKS_MAX +
-          " passos, então uma sai rápida e a seguinte cobra paciência. Não dá para parar no meio de uma sessão, mas entre uma e outra sobram três segundos para você mandar parar."
+          " steps, so one goes fast and the next asks for patience. You cannot stop mid-session, but between one and the next there are three seconds to call it off."
         }
       />
 
@@ -87,8 +87,8 @@ export function TrainingScreen() {
         title="Attributes"
         description={
           (state.automation.train
-            ? "O treino repete sozinho até você mandar parar, e o teto de cada atributo é "
-            : "Cada clique treina uma sessão, e o teto de cada atributo é ") +
+            ? "Training repeats on its own until you say stop, and each attribute caps at "
+            : "Each click trains one session, and each attribute caps at ") +
           formatNumber(MAX_ATTRIBUTE_VALUE) +
           "."
         }
@@ -160,7 +160,7 @@ export function TrainingScreen() {
                 {row ? (
                   <div className="border-t border-edge px-4 py-3">
                     <Bar
-                      label={"Experiência (NV. " + formatNumber(row.value) + "/1000)"}
+                      label={"Experience (LV. " + formatNumber(row.value) + "/1000)"}
                       current={row.progress}
                       maximum={row.needed}
                       tone="experience"
@@ -262,7 +262,7 @@ export function TrainingScreen() {
 
               <div className="border-t border-edge px-4 py-3">
                 <Bar
-                  label={"Experiência (NV. " + formatNumber(petTraining.level) + "/1000)"}
+                  label={"Companion - Experience (LV. " + formatNumber(petTraining.level) + "/1000)"}
                   current={petTraining.progress}
                   maximum={petTraining.needed}
                   tone="experience"

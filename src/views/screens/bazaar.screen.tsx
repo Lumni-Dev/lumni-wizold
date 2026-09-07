@@ -67,7 +67,7 @@ function formatRemaining(ms: number): string {
 function expiryLine(listing: BazaarListing, now: number): string {
   const remaining = listingExpiresAt(listing) - now;
   if (remaining <= 0) return "Expires at any moment.";
-  return "Expira em " + formatRemaining(remaining) + ".";
+  return "Expires in " + formatRemaining(remaining) + ".";
 }
 
 const FEE_LABEL = Math.round(BAZAAR_FEE_RATIO * 100) + "%";
@@ -181,8 +181,8 @@ export function BazaarScreen() {
       <Panel
         title="Saddlebag"
         description={
-          "A bolsa de couro onde cai o dinheiro das suas vendas, já sem a parte da casa. O saque " +
-          "sai a partir de " +
+          "The leather purse where your sale money lands, already net of the house's cut. Withdrawals " +
+          "start at " +
           formatReais(MIN_WITHDRAW_CENTS) +
           "."
         }
@@ -300,7 +300,7 @@ export function BazaarScreen() {
                         >
                           {entry.mine
                             ? "Remove"
-                            : "Comprar por " + formatReais(entry.listing.priceCents)}
+                            : "Buy for " + formatReais(entry.listing.priceCents)}
                         </Button>
                       </div>
                     }
@@ -367,13 +367,13 @@ export function BazaarScreen() {
                 <ItemIcon item={announcing.item} enhancement={announcing.enhancement} />
                 <RowText
                   title={announcing.item.name}
-                  description={"Você tem " + formatNumber(announcing.quantity) + "."}
+                  description={"You have " + formatNumber(announcing.quantity) + "."}
                 />
               </div>
 
               <QuantityField
-                hint={"Você tem " + formatNumber(announcing.quantity) + "."}
-                aria-label={"Quantidade de " + announcing.item.name + " para anunciar"}
+                hint={"You have " + formatNumber(announcing.quantity) + "."}
+                aria-label={"Quantity of " + announcing.item.name + " to announce"}
                 value={flow.quantity}
                 onChange={(quantity) => setFlow({ ...flow, quantity })}
               />
@@ -383,7 +383,7 @@ export function BazaarScreen() {
                 placeholder="R$ 0,00"
                 inputMode="numeric"
                 className="font-mono"
-                hint={"O mínimo é " + formatReais(MIN_LISTING_CENTS) + "."}
+                hint={"The minimum is " + formatReais(MIN_LISTING_CENTS) + "."}
                 value={flow.price}
                 onChange={(event) => {
                   const digits = event.target.value.replace(/\D/g, "").slice(0, 7);
@@ -428,7 +428,7 @@ export function BazaarScreen() {
                     description={
                       "x" +
                       formatNumber(entry.quantity) +
-                      " - sugestão " +
+                      " - suggested " +
                       formatReais(entry.suggestedCents)
                     }
                   />
@@ -495,7 +495,7 @@ export function BazaarScreen() {
             {buying.available > 1 ? (
               <div className="p-4">
                 <QuantityField
-                  hint={"Disponíveis: " + formatNumber(buying.available) + "."}
+                  hint={"Available: " + formatNumber(buying.available) + "."}
                   value={flow.quantity}
                   onChange={(quantity) => setFlow({ ...flow, quantity })}
                 />

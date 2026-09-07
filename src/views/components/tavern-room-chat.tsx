@@ -170,13 +170,13 @@ export function TavernRoomChatMembers({
                 {kept && !yourself ? <span className="text-ink-faint">- na matilha</span> : null}
               </Tag>
               {!yourself && !kept ? (
-                <Tooltip label={"Convidar " + member.name + " para a matilha"}>
+                <Tooltip label={"Invite " + member.name + " to the pack"}>
                   <Button
                     icon
                     variant="secondary"
                     busy={invitingMemberId === member.id}
                     disabled={invitingMemberId !== null && invitingMemberId !== member.id}
-                    aria-label={"Convidar " + member.name + " para a matilha"}
+                    aria-label={"Invite " + member.name + " to the pack"}
                     onClick={() => onInviteMember(member)}
                   >
                     <ActionIcon action="keep" />
@@ -343,7 +343,7 @@ export function TavernRoomChatComposer({
                 <button
                   key={emoji}
                   type="button"
-                  aria-label={"Inserir " + emoji}
+                  aria-label={"Insert " + emoji}
                   onClick={() =>
                     onDraftChange(
                       draft.length + emoji.length <= MESSAGE_MAX_LENGTH ? draft + emoji : draft,
@@ -382,5 +382,5 @@ export function TavernRoomChatComposer({
 }
 
 export function tavernRoomChatAction(activeRoom: TavernRoom): string {
-  return activeRoom.members.length + " de " + (activeRoom.privateFor ? 2 : MAX_ROOM_MEMBERS);
+  return activeRoom.members.length + " of " + (activeRoom.privateFor ? 2 : MAX_ROOM_MEMBERS);
 }

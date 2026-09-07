@@ -109,9 +109,9 @@ export function RankingScreen() {
         description={
           search
             ? formatNumber(view.total) +
-              " de " +
+              " of " +
               formatNumber(view.boardSize) +
-              " caçadores com esse nome."
+              " hunters with that name."
             : view.board.description
         }
         padding="none"

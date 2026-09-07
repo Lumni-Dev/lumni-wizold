@@ -220,10 +220,10 @@ export function ForgeScreen() {
               <ListRow layout="column">
                 <Bar
                   label={
-                    "Experiência (NV. " +
+                    "Experience (LV. " +
                     formatNumber(mining.level) +
                     "/1000)" +
-                    (mining.maxed ? " - teto" : "")
+                    (mining.maxed ? " - cap" : "")
                   }
                   current={mining.progress}
                   maximum={mining.needed}
@@ -249,7 +249,7 @@ export function ForgeScreen() {
                   deltaTone="tide"
                 />
                 <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                  {t("Reseta às " + RESET_LABEL + ", faltam " + formatCountdown(miningResetLeft))}
+                  {t("Resets at " + RESET_LABEL + ", " + formatCountdown(miningResetLeft) + " left")}
                 </p>
               </ListRow>
               <ListRow layout="column">
@@ -275,7 +275,7 @@ export function ForgeScreen() {
                         : waitingOre
                           ? "Waiting for resources to mine again"
                           : mining.dailyExhausted
-                            ? "Recursos esgotados, voltam em " + formatCountdown(miningResetLeft)
+                            ? "Resources spent, back in " + formatCountdown(miningResetLeft)
                             : selectedEntry
                               ? selectedEntry.unlocked
                                 ? selectedEntry.ore.label
@@ -311,9 +311,9 @@ export function ForgeScreen() {
                       unlocked
                         ? "+" +
                           formatNumber(ore.minYield) +
-                          " a " +
+                          " to " +
                           formatNumber(ore.maxYield) +
-                          " fragmentos por mineração"
+                          " fragments per mining"
                         : reason
                     }
                     trailing={
@@ -346,7 +346,7 @@ export function ForgeScreen() {
             <Panel
               title="Anvil"
               description={
-                "Escolha uma peça em Disponíveis e ela entra na bigorna. Cada nível soma 0,3% dos atributos da peça original, então um set forte rende muito e uma peça barata sobe devagar, até +" +
+                "Choose a piece under Available and it goes on the anvil. Each level adds 0.3% of the original piece's attributes, so a strong set pays a lot and a cheap piece climbs slowly, up to +" +
                 formatNumber(MAX_ENHANCEMENT) +
                 "."
               }
@@ -437,7 +437,7 @@ export function ForgeScreen() {
                             : waitingItem === forgeEntry.item.id
                               ? "Waiting for fragments and WCoins for the next strike"
                               : forgeEntry.fragment && forgeEntry.level < MAX_ENHANCEMENT
-                                ? "Forjar custa " + formatBronze(forgeEntry.bronzeCost)
+                                ? "Forging costs " + formatBronze(forgeEntry.bronzeCost)
                                 : (forgeEntry.reason ?? "Piece at the cap"),
                         )}
                       </span>

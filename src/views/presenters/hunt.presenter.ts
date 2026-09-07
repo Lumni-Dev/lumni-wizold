@@ -21,15 +21,21 @@ function pick(pool: string[]): string {
 
 function closerOf(report: NarratedFight, prey: string): string {
   if (hunterWon(report.combat)) {
-    return pick([prey + " tomba e não levanta mais.", prey + " cai. A noite fica quieta."]);
+    return pick([
+      prey + " falls and does not rise again.",
+      prey + " falls. The night goes quiet.",
+    ]);
   }
   if (hunterRetreated(report.combat)) {
     return pick([
       "The fight drags on, and it is time to fall back.",
-      prey + " aguenta firme. Melhor voltar.",
+      prey + " holds firm. Better to turn back.",
     ]);
   }
-  return pick([prey + " leva a melhor desta vez.", "Ferido, resta escapar de " + prey + "."]);
+  return pick([
+    prey + " gets the better of it this time.",
+    "Wounded, all that is left is to escape " + prey + ".",
+  ]);
 }
 
 export function preyBarCurrent(

@@ -16,7 +16,7 @@ export function EquipmentPanel({ gear, forge }: { gear: GearSlot[]; forge: numbe
     <Panel
       title="Equipamento"
       description={
-        "Os sete espaços, do elmo ao anel, somando +" + formatNumber(forge) + " de forja."
+        "The seven slots, helm to ring, adding +" + formatNumber(forge) + " of forge."
       }
     >
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">

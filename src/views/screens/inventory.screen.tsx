@@ -134,7 +134,7 @@ export function InventoryScreen() {
                       onClick={() => unequipItem(slot)}
                       disabled={lockSecs > 0}
                     >
-                      {lockSecs > 0 ? "Tirar (" + lockSecs + ")" : "Tirar"}
+                      {lockSecs > 0 ? "Take off (" + lockSecs + ")" : "Take off"}
                     </Button>
                   </CardFooter>
                 ) : null}
@@ -174,10 +174,10 @@ export function InventoryScreen() {
           description={
             filter === "all"
               ? "Hunt creatures or buy at the market to fill the bag."
-              : "Nenhum item de " +
+              : "No items of " +
                 (inventoryCategoryFilterOptions().find((option) => option.key === filter)?.label ??
                   "categoria").toLowerCase() +
-                " no momento."
+                " right now."
           }
         />
       ) : (
@@ -266,7 +266,7 @@ export function InventoryScreen() {
                 enhancement={enhancement}
                 fromBazaar={state.bazaarFinds.includes(item.id)}
                 note={
-                  levelTooLow ? "Requer NV. " + item.minLevel : null
+                  levelTooLow ? "Requires LV. " + item.minLevel : null
                 }
                 footer={
                   actions.length === 0 ? null : actions.length === 1 ? (

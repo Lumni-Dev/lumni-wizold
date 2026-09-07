@@ -212,7 +212,7 @@ export function MarketScreen() {
                     note={
                       ofLineage
                         ? (reason ??
-                          (ownedQuantity > 0 ? formatNumber(ownedQuantity) + " no inventário" : null))
+                          (ownedQuantity > 0 ? formatNumber(ownedQuantity) + " in the bag" : null))
                         : null
                     }
                     footer={
@@ -239,8 +239,8 @@ export function MarketScreen() {
                           {petless
                             ? "No companion"
                             : ofLineage
-                              ? "Comprar por " + formatBronze(priceOf(item))
-                              : "Apenas " + lineageName(item)}
+                              ? "Buy for " + formatBronze(priceOf(item))
+                              : "Only " + lineageName(item)}
                         </Button>
                       </div>
                     }
@@ -292,7 +292,7 @@ export function MarketScreen() {
                           setDeal({ kind: "sell", item, quantity, total: 0, enhancement });
                         }}
                       >
-                        {"Vender por " + formatBronze(sellOf(item))}
+                        {"Sell for " + formatBronze(sellOf(item))}
                       </Button>
                     </div>
                   }
@@ -323,7 +323,7 @@ export function MarketScreen() {
               formatBronze(dealTotal)
             : null
         }
-        confirmLabel={deal?.kind === "sell" ? "Sell" : "Pagar " + formatBronze(dealTotal)}
+        confirmLabel={deal?.kind === "sell" ? "Sell" : "Pay " + formatBronze(dealTotal)}
         onCancel={() => setDeal(null)}
         onConfirm={() => {
           if (!deal) return;
@@ -345,16 +345,16 @@ export function MarketScreen() {
         {deal?.kind === "buy" && !dealWearable ? (
           <QuantityField
             className="w-full"
-            hint={"Você consegue pagar por " + formatNumber(affordableAmount) + "."}
-            aria-label={"Quantidade de " + deal.item.name + " para comprar"}
+            hint={"You can pay for " + formatNumber(affordableAmount) + "."}
+            aria-label={"Quantity of " + deal.item.name + " to buy"}
             value={buying}
             onChange={setBuying}
           />
         ) : deal?.kind === "sell" ? (
           <QuantityField
             className="w-full"
-            hint={"Você tem " + formatNumber(sellOwned) + "."}
-            aria-label={"Quantidade de " + deal.item.name + " para vender"}
+            hint={"You have " + formatNumber(sellOwned) + "."}
+            aria-label={"Quantity of " + deal.item.name + " to sell"}
             value={selling}
             onChange={setSelling}
           />

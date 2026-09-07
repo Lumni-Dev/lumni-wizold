@@ -25,20 +25,20 @@ export function summarizeEffect(item: Item, enhancement = 0, willpower?: number)
   const effect = enhancement > 0 ? enhancedEffect(item, enhancement) : item.effect;
   const lines: string[] = [];
 
-  if (effect.health) lines.push("+" + effect.health + " vida");
+  if (effect.health) lines.push("+" + effect.health + " health");
   if (effect.healthMin !== undefined || effect.healthMax !== undefined) {
     const min = effect.healthMin ?? effect.healthMax ?? 0;
     const max = effect.healthMax ?? effect.healthMin ?? 0;
-    lines.push("+" + min + " a " + max + " vida");
+    lines.push("+" + min + " to " + max + " health");
   }
-  if (effect.petEnergyRatio) lines.push(percent(effect.petEnergyRatio) + " da energia do mascote");
-  if (effect.healthRatio) lines.push(percent(effect.healthRatio) + " da vida");
+  if (effect.petEnergyRatio) lines.push(percent(effect.petEnergyRatio) + " of the companion's energy");
+  if (effect.healthRatio) lines.push(percent(effect.healthRatio) + " of the health");
   if (effect.furyMinutes) {
-    lines.push("+" + FURY_ATTRIBUTE_BONUS + " em todos os atributos");
-    lines.push(formatMinutesLabel(effect.furyMinutes) + " de duração");
+    lines.push("+" + FURY_ATTRIBUTE_BONUS + " to all attributes");
+    lines.push(formatMinutesLabel(effect.furyMinutes) + " long");
     if (willpower !== undefined) {
       const extraSeconds = Math.floor(furyWillpowerExtraMs(effect.furyMinutes, willpower) / 1000);
-      if (extraSeconds > 0) lines.push("+" + extraSeconds + "s de vontade");
+      if (extraSeconds > 0) lines.push("+" + extraSeconds + "s of willpower");
     }
   }
 

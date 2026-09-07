@@ -30,10 +30,10 @@ export function VitalActionButton({
       label="Recover"
       tooltip={
         resting
-          ? "O corpo se recompõe a cada " +
+          ? "The body mends itself every " +
             REST_TICK_MS / 1000 +
-            " segundos. Clique para interromper."
-          : "Recupera parte da vida a cada " + REST_TICK_MS / 1000 + " segundos."
+            " seconds. Click to interrupt."
+          : "Restores part of the health every " + REST_TICK_MS / 1000 + " seconds."
       }
       onClick={resting ? () => setActivity(null) : rest}
     />

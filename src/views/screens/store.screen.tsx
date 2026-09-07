@@ -92,14 +92,14 @@ export function StoreScreen() {
         title="VIP"
         description="Unlocks every Automation switch in the settings: the run hunts, trains, mines and forges on its own, and recovers on its own. Monthly subscription, cancel whenever you want."
         action={
-          vip ? <Tag tone="light">Ativo até {formatDay(character.vipUntil ?? "")}</Tag> : undefined
+          vip ? <Tag tone="light">Active until {formatDay(character.vipUntil ?? "")}</Tag> : undefined
         }
         footer={
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span className="text-[11px] text-ink-faint">
               {subscribed
                 ? character.vipCanceling
-                  ? "Ativo até " + formatDay(character.vipUntil ?? "") + ", sem renovar."
+                  ? "VIP active until " + formatDay(character.vipUntil ?? "") + ", not renewing."
                   : "Renews on its own every month. Cancel to stop the charge on Stripe."
                 : "VIP starts as soon as the payment confirms."}
             </span>

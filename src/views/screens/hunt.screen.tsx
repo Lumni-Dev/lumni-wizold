@@ -136,7 +136,7 @@ function CombatReport({ report, lines }: { report: HuntReport; lines: NarrationL
           )}
           {report.levelsGained > 0 ? (
             <p className="text-xs text-ink">
-              {t("Você subiu " + report.levelsGained + " nível(is) nesta caçada.")}
+              {t("You climbed " + report.levelsGained + " level(s) on this hunt.")}
             </p>
           ) : null}
           {report.petLeveled ? (
@@ -422,7 +422,7 @@ export function HuntScreen() {
                       playing={narration.current === areaVoice(territory.id, locale)}
                       loading={narration.loading === areaVoice(territory.id, locale)}
                       onClick={() => narration.toggle(areaVoice(territory.id, locale))}
-                      label={"Ouvir sobre " + territory.name}
+                      label={"Hear about " + territory.name}
                     />
                   </div>
                   {stats && (active || waiting || recovering) ? (

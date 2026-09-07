@@ -96,14 +96,14 @@ function DuelReport({ report }: { report: ArenaResolution }) {
           <DataRow label="Damage taken" value={formatNumber(combat.damageTaken)} />
         </List>
         <div className="space-y-2 p-4">
-          <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">O fosso</p>
+          <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">The pit</p>
           <p className="text-xs leading-relaxed text-ink-faint">
             {t(
               combat.victory
-                ? hunter.name + " ficou no chão, e a bolsa é sua."
+                ? hunter.name + " stayed on the ground, and the purse is yours."
                 : combat.retreated
                   ? "Both held to the end and neither put the other on the ground."
-                  : hunter.name + " levou a melhor. Você sai por baixo, mas sai.",
+                  : hunter.name + " got the better of it. You leave beaten, but you leave.",
             )}
           </p>
           <p className="text-xs text-ink-faint">
@@ -330,23 +330,23 @@ export function ArenaScreen() {
       <Panel
         title="The pit"
         description={
-          "A arena só marca luta entre NV. " +
+          "The arena only books fights between LV. " +
           formatNumber(view.band.start) +
-          " e NV. " +
+          " and LV. " +
           formatNumber(view.band.end) +
           ": " +
           formatNumber(view.bandSize) +
-          " caçadores nessa faixa. Não se ganha experiência aqui: quem vence tira da bolsa do perdedor de " +
+          " hunters in that band. No experience is earned here: the winner draws " +
           formatNumber(view.spoils.min) +
-          " a " +
+          " to " +
           formatNumber(view.spoils.max) +
-          " WCoins, sorteadas, e nunca mais que um quarto do que ele carrega. Quem perde paga pela mesma régua. Quem já duelou com você descansa até as 06:00 antes de subir de novo."
+          " WCoins from the loser's purse, never more than a quarter of what they carry. The loser pays by the same rule. Whoever already dueled you rests until 06:00 before climbing again."
         }
         action={
           <Tag tone="neutral">
             {view.charges.left > 0
-              ? formatNumber(view.charges.left) + " de " + ARENA_DAILY_ATTACKS + " ataques"
-              : "Volta em " + formatCooldown(view.charges.returnsIn)}
+              ? formatNumber(view.charges.left) + " of " + ARENA_DAILY_ATTACKS + " attacks"
+              : "Back in " + formatCooldown(view.charges.returnsIn)}
           </Tag>
         }
         footer={
@@ -385,9 +385,9 @@ export function ArenaScreen() {
         <Panel
           title="Duel"
           description={
-            "Você contra " +
+            "You against " +
             fighting.hunter.name +
-            ". Em jogo, um pedaço da bolsa de quem cair: de " +
+            ". At stake, a piece of the fallen one's purse: " +
             formatNumber(arenaSpoilsRange(fighting.hunter.level).min) +
             " a " +
             formatBronze(arenaSpoilsRange(fighting.hunter.level).max) +
@@ -538,15 +538,15 @@ export function ArenaScreen() {
                         className="w-full"
                         label={
                           !inBand
-                            ? "Fora da sua faixa: a arena só marca luta entre NV. " +
+                            ? "Out of your band: the arena only books fights between LV. " +
                               formatNumber(view.band.start) +
-                              " e NV. " +
+                              " and LV. " +
                               formatNumber(view.band.end) +
                               "."
                             : resting
-                              ? "Vocês já duelaram hoje: o próximo desafio a ele reabre às 06:00. Faltam " +
+                              ? "You two already dueled today: the next challenge to them reopens at 06:00. " +
                                 formatCooldown(cooldownLeft) +
-                                "."
+                                " left."
                               : view.reason
                         }
                       >
@@ -575,9 +575,9 @@ export function ArenaScreen() {
       <Panel
         title="Latest fights"
         description={
-          "As " +
+          "The " +
           ARENA_HISTORY_SIZE +
-          " mais recentes do seu nome no fosso: as que você marcou e as que marcaram contra você."
+          " most recent under your name in the pit: the ones you booked and the ones booked against you."
         }
         padding="none"
       >
@@ -600,10 +600,10 @@ export function ArenaScreen() {
                 <RowText
                   title={
                     (line.outcome === "victory"
-                      ? "Vitória sobre "
+                      ? "Victory over "
                       : line.outcome === "defeat"
-                        ? "Derrota para "
-                        : "Empate com ") + line.rivalName
+                        ? "Defeat to "
+                        : "Draw with ") + line.rivalName
                   }
                   description={(line.mine ? "Your attack" : "Attack received") + " - " + formatDay(line.at)}
                 />

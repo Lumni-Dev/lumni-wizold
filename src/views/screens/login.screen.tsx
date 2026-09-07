@@ -346,10 +346,10 @@ export function LoginScreen() {
                   <p className="landing-hero-shadow-text text-[11px] leading-relaxed text-ink-faint">
                     {t(
                       complete && !oldEnough
-                        ? "A caçada é para maiores de " + MIN_AGE + " anos."
-                        : "O jogo é para maiores de " +
+                        ? "The hunt is for ages " + MIN_AGE + " and up."
+                        : "The game is for ages " +
                             MIN_AGE +
-                            " anos: tem sangue na caça, duelo entre jogadores, mesa de conversa aberta e compra com dinheiro de verdade.",
+                            " and up: there is blood on the hunt, player duels, open chat tables and purchases with real money.",
                     )}
                   </p>
                 </div>

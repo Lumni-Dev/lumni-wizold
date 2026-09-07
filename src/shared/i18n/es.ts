@@ -58,6 +58,16 @@ export const ES: Record<string, string> = {
   "Sell": "Vender",
   "Equip": "Equipar",
   "Unequip": "Desequipar",
+  "Take off": "Quitar",
+  "Releasing returns no WCoin: adopting is a commitment. Afterwards another can be adopted at the kennel, of either bloodline, and the name is freed to use again. This one is what does not come back.":
+    "Soltar no devuelve ninguna WCoin: adoptar es un compromiso. Después se puede adoptar otro en la perrera, de cualquier linaje, y el nombre queda libre para usarse de nuevo. Este es el que no vuelve.",
+  "1 open table": "1 mesa abierta",
+  "Invite to the pack": "Invitar a la manada",
+  "leave empty for an open table": "deja vacío para una mesa abierta",
+  "From outside only the number shows. The password is required.":
+    "Desde fuera solo se ve el número. La contraseña es obligatoria.",
+  "The tables live on the server: whoever is playing, from any machine, sits at the same tables and reads the same lines. A table password is an arrangement between players, stored encrypted; even so, invent one just for the table, never a password you use anywhere else.":
+    "Las mesas viven en el servidor: quien esté jugando, desde cualquier máquina, se sienta en las mismas mesas y lee las mismas líneas. La contraseña de una mesa es un acuerdo entre jugadores, guardada cifrada; aun así, inventa una solo para la mesa, nunca una contraseña que uses en otro lugar.",
   "Use": "Usar",
   "Sit down": "Sentarse",
   "Cancel": "Cancelar",

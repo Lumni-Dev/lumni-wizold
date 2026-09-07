@@ -396,9 +396,9 @@ export function SettingsScreen() {
           <Panel
             title="Character name"
             description={
-              "O nome pode mudar uma vez a cada " +
+              "The name can change once every " +
               RENAME_COOLDOWN_DAYS +
-              " dias, e a troca custa " +
+              " days, and the change costs " +
               formatBronze(RENAME_PRICE) +
               " WCoins."
             }
@@ -414,10 +414,10 @@ export function SettingsScreen() {
                 disabled={!canRename}
                 hint={
                   canRename
-                    ? "O próximo ajuste só em " + RENAME_COOLDOWN_DAYS + " dias."
-                    : "Pode trocar de novo em " +
+                    ? "The next change only in " + RENAME_COOLDOWN_DAYS + " days."
+                    : "Can change again in " +
                       formatNumber(daysLeft) +
-                      (daysLeft > 1 ? " dias." : " dia.")
+                      (daysLeft > 1 ? " days." : " day.")
                 }
                 onChange={(event) => setNewName(sanitizeName(event.target.value, NAME_MAX_LENGTH))}
               />
@@ -713,8 +713,8 @@ export function SettingsScreen() {
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <span className="text-[11px] text-ink-faint">
                     {character.vipCanceling
-                      ? "VIP ativo até " + formatDay(character.vipUntil ?? "") + ", sem renovar."
-                      : "Assinatura ativa, renova em " + formatDay(character.vipUntil ?? "") + "."}
+                      ? "VIP active until " + formatDay(character.vipUntil ?? "") + ", not renewing."
+                      : "Active subscription, renews on " + formatDay(character.vipUntil ?? "") + "."}
                   </span>
                   <Button variant="outline" onClick={() => router.push("/store")}>
                     Gerenciar na loja
@@ -831,9 +831,9 @@ export function SettingsScreen() {
         open={confirmingRename}
         title="Change name"
         description={
-          "As WCoins saem na hora e o novo nome fica travado por " +
+          "The WCoins leave on the spot and the new name is locked for " +
           RENAME_COOLDOWN_DAYS +
-          " dias, no ranking, na taverna e no bazar."
+          " days, on the ranking, in the tavern and in the bazaar."
         }
         detail={character.name + " → " + newName.trim() + " - " + formatBronze(cost)}
         confirmLabel="Change"

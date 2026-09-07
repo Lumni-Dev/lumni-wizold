@@ -159,7 +159,7 @@ export function ActivityDock() {
 
     if (petActive && petTraining) {
       return {
-        progressLabel: "Mascote - Experiência (NV. " + formatNumber(petTraining.level) + "/1000)",
+        progressLabel: "Companion - Experience (LV. " + formatNumber(petTraining.level) + "/1000)",
         progressCurrent: petTraining.progress,
         progressMax: petTraining.needed,
         progressTotal: petTotalTraining(petTraining.level, petTraining.progress),
@@ -183,7 +183,7 @@ export function ActivityDock() {
     const row = progress.find((item) => item.key === entry?.exercise.attribute);
 
     return {
-      progressLabel: "Experiência (NV. " + formatNumber(row?.value ?? 0) + "/1000)",
+      progressLabel: "Experience (LV. " + formatNumber(row?.value ?? 0) + "/1000)",
       progressCurrent: row?.progress ?? 0,
       progressMax: row?.needed ?? 1,
       progressTotal: totalExperience(row?.value ?? 0, row?.progress ?? 0),
@@ -209,7 +209,7 @@ export function ActivityDock() {
     const opting = cooldown !== null;
 
     return {
-      xpLabel: "Experiência (NV. " + formatNumber(mining.level) + "/1000)",
+      xpLabel: "Experience (LV. " + formatNumber(mining.level) + "/1000)",
       xpCurrent: mining.progress,
       xpMax: mining.needed,
       xpTotal: totalExperience(mining.level, mining.progress),
@@ -533,7 +533,7 @@ export function ActivityDock() {
                     <Bar
                       label={
                         huntView.cooldown !== null
-                          ? "Parar em " + huntView.cooldown + "s"
+                          ? "Stop in " + huntView.cooldown + "s"
                           : huntView.huntLabel
                       }
                       current={huntView.huntCurrent}
@@ -598,7 +598,7 @@ export function ActivityDock() {
                     <Bar
                       label={
                         trainView.cooldown !== null
-                          ? "Parar em " + trainView.cooldown + "s"
+                          ? "Stop in " + trainView.cooldown + "s"
                           : trainView.sessionLabel
                       }
                       current={trainView.sessionCurrent}
@@ -639,7 +639,7 @@ export function ActivityDock() {
                     <Bar
                       label={
                         mineView.cooldown !== null
-                          ? "Parar em " + mineView.cooldown + "s"
+                          ? "Stop in " + mineView.cooldown + "s"
                           : mineView.swingLabel
                       }
                       current={mineView.swingCurrent}
@@ -668,7 +668,7 @@ export function ActivityDock() {
                     <Bar
                       label={
                         forgeView.cooldown !== null
-                          ? "Parar em " + forgeView.cooldown + "s"
+                          ? "Stop in " + forgeView.cooldown + "s"
                           : forgeView.strikeLabel
                       }
                       current={forgeView.strikeCurrent}
@@ -702,7 +702,7 @@ export function ActivityDock() {
               {!paused && !huntView && !trainView && !mineView && !forgeView && !restView ? (
                 <ListRow layout="column">
                   <Bar
-                    label={dock.cooldown !== null ? "Parar em " + dock.cooldown + "s" : dock.detail}
+                    label={dock.cooldown !== null ? "Stop in " + dock.cooldown + "s" : dock.detail}
                     current={dock.beat}
                     hideValue={dock.cooldown !== null || dock.beat === 0}
                     maximum={dock.max}
