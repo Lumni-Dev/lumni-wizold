@@ -38,10 +38,10 @@ import { PageHeader } from "../layout/page-header";
 
 const SECTIONS: readonly { key: string; label: string }[] = [
   { key: "all", label: "Tudo" },
+  { key: "idioma", label: "Idioma" },
   { key: "conta", label: "Conta" },
   { key: "2fa", label: "Duas etapas" },
   { key: "nome", label: "Nome" },
-  { key: "idioma", label: "Idioma" },
   { key: "taverna", label: "Taverna" },
   { key: "radio", label: "W-Radio" },
   { key: "som", label: "Som" },
@@ -244,6 +244,49 @@ export function SettingsScreen() {
       <ChipTabs tabs={SECTIONS} value={section} onChange={setSection} />
 
       <div className="space-y-6">
+        {shows("idioma") ? (
+          <Panel
+            title="Idioma"
+            description="Em que língua o jogo fala com você neste aparelho."
+            padding="none"
+          >
+            <List>
+              <ListRow layout="split">
+                <RowText
+                  title="Idioma"
+                  description="Automático segue o idioma do navegador. O que ainda não tem tradução aparece em português."
+                />
+                <div className="flex shrink-0 flex-wrap gap-2">
+                  <Chip
+                    active={languageChoice === "auto"}
+                    onClick={() => languageRepository.setChoice("auto")}
+                  >
+                    Automático
+                  </Chip>
+                  <Chip
+                    active={languageChoice === "pt"}
+                    onClick={() => languageRepository.setChoice("pt")}
+                  >
+                    Português
+                  </Chip>
+                  <Chip
+                    active={languageChoice === "en"}
+                    onClick={() => languageRepository.setChoice("en")}
+                  >
+                    English
+                  </Chip>
+                  <Chip
+                    active={languageChoice === "es"}
+                    onClick={() => languageRepository.setChoice("es")}
+                  >
+                    Español
+                  </Chip>
+                </div>
+              </ListRow>
+            </List>
+          </Panel>
+        ) : null}
+
         {shows("conta") ? (
           <Panel
             title="Conta"
@@ -342,49 +385,6 @@ export function SettingsScreen() {
                     }}
                   >
                     Desativado
-                  </Chip>
-                </div>
-              </ListRow>
-            </List>
-          </Panel>
-        ) : null}
-
-        {shows("idioma") ? (
-          <Panel
-            title="Idioma"
-            description="Em que língua o jogo fala com você neste aparelho."
-            padding="none"
-          >
-            <List>
-              <ListRow layout="split">
-                <RowText
-                  title="Idioma"
-                  description="Automático segue o idioma do navegador. O que ainda não tem tradução aparece em português."
-                />
-                <div className="flex shrink-0 flex-wrap gap-2">
-                  <Chip
-                    active={languageChoice === "auto"}
-                    onClick={() => languageRepository.setChoice("auto")}
-                  >
-                    Automático
-                  </Chip>
-                  <Chip
-                    active={languageChoice === "pt"}
-                    onClick={() => languageRepository.setChoice("pt")}
-                  >
-                    Português
-                  </Chip>
-                  <Chip
-                    active={languageChoice === "en"}
-                    onClick={() => languageRepository.setChoice("en")}
-                  >
-                    English
-                  </Chip>
-                  <Chip
-                    active={languageChoice === "es"}
-                    onClick={() => languageRepository.setChoice("es")}
-                  >
-                    Español
                   </Chip>
                 </div>
               </ListRow>
