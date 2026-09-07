@@ -9,7 +9,7 @@ export async function POST(request: Request) {
   const refused = refuseAbuse(request);
   if (refused) return refused;
   const claims = await sessionClaims();
-  if (!claims) return bad("Entre para jogar.", 401);
+  if (!claims) return bad("Enter to play.", 401);
   const body = await readBody(request);
   const tabId = asText(body.tabId, 64).trim();
   const force = body.force === true;

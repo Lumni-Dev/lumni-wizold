@@ -8,7 +8,7 @@ export async function POST(request: Request) {
   const refused = refuseAbuse(request);
   if (refused) return refused;
   const claims = await sessionClaims();
-  if (!claims) return bad("Entre para jogar.", 401);
+  if (!claims) return bad("Enter to play.", 401);
   try {
     await withTransaction(async (client) => {
       await clearPresenceForUser(client, claims.userId);

@@ -1326,4 +1326,9 @@ export const ES: Record<string, string> = {
   "Search table by name or #": "Buscar mesa por nombre o #",
   "WCoin packs for real money to speed up training and equipment.": "Paquetes de WCoins por dinero real para acelerar entrenamiento y equipo.",
   "Live chat tables, pack invites and private messages between companions.": "Mesas de chat en vivo, invitaciones de manada y mensajes privados entre compañeros.",
+  "Enter to play.": "Entra para jugar.",
+  "Enter with Google to open the door.": "Entra con Google para abrir la puerta.",
+  "Fill in the birth date.": "Completa la fecha de nacimiento.",
+  "Welcome back.": "Bienvenido de vuelta.",
+  "Account with no known e-mail.": "Cuenta sin correo conocido.",
 };

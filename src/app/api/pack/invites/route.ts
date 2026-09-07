@@ -1,4 +1,5 @@
 import { after } from "next/server";
+import { detectLocale } from "@/shared/i18n/locale";
 import { failure, success } from "@/models/entities/result";
 import type { TavernIdentity } from "@/models/entities/tavern";
 import { loadNames } from "@/models/repositories/server/roster.store";
@@ -42,14 +43,15 @@ export async function POST(request: Request) {
     }
 
     const contact = await context.client.query(
-      "select u.email from users u join characters c on c.user_id = u.id where c.id = $1",
+      "select u.email, u.locale from users u join characters c on c.user_id = u.id where c.id = $1",
       [target.id],
     );
     const email = contact.rows[0]?.email;
+    const receiverLocale = detectLocale(contact.rows[0]?.locale ?? null);
     const inviterName = state.character?.name ?? "A hunter";
     if (email && !String(email).endsWith("@wizold.test")) {
       after(() =>
-        sendPackInviteEmail(String(email), inviterName).catch((error) =>
+        sendPackInviteEmail(String(email), inviterName, receiverLocale).catch((error) =>
           console.error("[mail] pack invite", error),
         ),
       );

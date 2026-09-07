@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { withTransaction } from "@/models/repositories/server/database";
-import { bad, refuseAbuse, sessionIsLive } from "../../../_lib/api";
+import { bad, clientLocale, refuseAbuse, sessionIsLive } from "../../../_lib/api";
 import { sendTwoFactorCodeEmail } from "../../../_lib/mail";
 import { rateLimit, rateLimitShared } from "../../../_lib/rate-limit";
 import {
@@ -39,9 +39,9 @@ export async function POST(request: Request) {
     });
 
     if (payload === undefined) return bad("The verification expired. Enter again with Google.", 401);
-    if (payload === null) return bad("Conta sem e-mail conhecido.", 404);
+    if (payload === null) return bad("Account with no known e-mail.", 404);
 
-    await sendTwoFactorCodeEmail(payload.to, payload.code, "login");
+    await sendTwoFactorCodeEmail(payload.to, payload.code, "login", clientLocale(request));
     return NextResponse.json({
       ok: true,
       message: "New code sent to your e-mail. It is good for 10 minutes.",

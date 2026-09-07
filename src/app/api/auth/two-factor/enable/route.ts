@@ -11,7 +11,7 @@ export async function POST(request: Request) {
 
   const claims = await sessionClaims();
   const userId = claims?.userId ?? null;
-  if (!userId) return bad("Entre para jogar.", 401);
+  if (!userId) return bad("Enter to play.", 401);
 
   const gate = rateLimit("2fa-enable:" + userId, 10, 600000);
   if (!gate.allowed) return bad("Too many tries. Wait a bit.", 429);

@@ -1,5 +1,6 @@
 import { randomUUID, timingSafeEqual } from "node:crypto";
 import { after } from "next/server";
+import { detectLocale } from "@/shared/i18n/locale";
 import * as characterController from "@/controllers/character.controller";
 import type { Gender } from "@/models/entities/character";
 import { initialState } from "@/models/entities/game-state";
@@ -22,7 +23,7 @@ export async function DELETE(request: Request) {
   const refused = refuseAbuse(request);
   if (refused) return refused;
   const claims = await sessionClaims();
-  if (!claims) return bad("Entre para jogar.", 401);
+  if (!claims) return bad("Enter to play.", 401);
   const userId = claims.userId;
   if (!rateLimit("delete:" + userId, 10, 600000).allowed) {
     return bad("Too many tries. Wait a bit.", 429);
@@ -62,7 +63,7 @@ export async function DELETE(request: Request) {
         return Response.json({ ok: false, message: "Wrong code. Check the e-mail.", data: null });
       }
       const found = await client.query(
-        `select u.email, c.id as character_id, c.name, c.level from users u
+        `select u.email, u.locale, c.id as character_id, c.name, c.level from users u
            left join characters c on c.user_id = u.id
           where u.id = $1`,
         [userId],
@@ -95,8 +96,9 @@ export async function DELETE(request: Request) {
         const farewell = String(row.email);
         const name = String(row.name ?? "Hunter");
         const level = Number(row.level ?? 1);
+        const farewellLocale = detectLocale(row.locale ?? null);
         after(() =>
-          sendFarewellEmail(farewell, name).catch((error) =>
+          sendFarewellEmail(farewell, name, farewellLocale).catch((error) =>
             console.error("[mail] farewell", error),
           ),
         );
@@ -125,7 +127,7 @@ export async function POST(request: Request) {
   const refused = refuseAbuse(request);
   if (refused) return refused;
   const claims = await sessionClaims();
-  if (!claims) return bad("Entre para jogar.", 401);
+  if (!claims) return bad("Enter to play.", 401);
   const userId = claims.userId;
   const gate = rateLimit("create:" + userId, 3, 60000);
   if (!gate.allowed) return bad("Easy: character creation has a rhythm.", 429);

@@ -1,4 +1,5 @@
 import type { PoolClient } from "pg";
+import { detectLocale, type Locale } from "@/shared/i18n/locale";
 import { generateId } from "@/shared/utils/id";
 
 export interface UserRow {
@@ -9,6 +10,7 @@ export interface UserRow {
   twoFactorEnabled: boolean;
   tutorial: boolean;
   banished: boolean;
+  locale: Locale;
 }
 
 function asUser(row: {
@@ -19,6 +21,7 @@ function asUser(row: {
   two_factor_enabled: boolean;
   tutorial: boolean;
   banished: boolean;
+  locale: string | null;
 }): UserRow {
   return {
     id: row.id,
@@ -28,12 +31,13 @@ function asUser(row: {
     twoFactorEnabled: row.two_factor_enabled === true,
     tutorial: row.tutorial === true,
     banished: row.banished === true,
+    locale: detectLocale(row.locale),
   };
 }
 
 export async function findUserByEmail(client: PoolClient, email: string): Promise<UserRow | null> {
   const found = await client.query(
-    "select id, email, birth_date, session_epoch, two_factor_enabled, tutorial, banished from users where lower(email) = lower($1)",
+    "select id, email, birth_date, session_epoch, two_factor_enabled, tutorial, banished, locale from users where lower(email) = lower($1)",
     [email],
   );
   const row = found.rows[0];
@@ -44,11 +48,12 @@ export async function createUser(
   client: PoolClient,
   email: string,
   birthDateIso: string,
+  locale: Locale = "en",
 ): Promise<UserRow> {
   const id = generateId("usr");
   await client.query(
-    "insert into users (id, email, birth_date, tutorial) values ($1, $2, $3, false)",
-    [id, email, birthDateIso],
+    "insert into users (id, email, birth_date, tutorial, locale) values ($1, $2, $3, false, $4)",
+    [id, email, birthDateIso, locale],
   );
   return {
     id,
@@ -58,7 +63,13 @@ export async function createUser(
     twoFactorEnabled: false,
     tutorial: false,
     banished: false,
+    locale,
   };
+}
+
+export async function userLocale(client: PoolClient, userId: string): Promise<Locale> {
+  const found = await client.query("select locale from users where id = $1", [userId]);
+  return detectLocale(found.rows[0]?.locale ?? null);
 }
 
 export async function isTutorialDone(client: PoolClient, userId: string): Promise<boolean> {

@@ -1,7 +1,7 @@
 import { randomInt } from "node:crypto";
 import { NextResponse } from "next/server";
 import { withTransaction } from "@/models/repositories/server/database";
-import { bad, refuseAbuse, sessionIsLive } from "../../_lib/api";
+import { bad, clientLocale, refuseAbuse, sessionIsLive } from "../../_lib/api";
 import { sendDeletionCodeEmail } from "../../_lib/mail";
 import { rateLimit, rateLimitShared } from "../../_lib/rate-limit";
 import { deletionCodeHash, sessionClaims } from "../../_lib/session";
@@ -11,7 +11,7 @@ export async function POST(request: Request) {
   if (refused) return refused;
   const claims = await sessionClaims();
   const userId = claims?.userId ?? null;
-  if (!userId) return bad("Entre para jogar.", 401);
+  if (!userId) return bad("Enter to play.", 401);
   const gate = rateLimit("delcode:" + userId, 3, 600000);
   const gateShared = await rateLimitShared("delcode:" + userId, 3, 600);
   if (!gate.allowed || !gateShared) {
@@ -33,8 +33,8 @@ export async function POST(request: Request) {
       );
       return to;
     });
-    if (!email) return bad("Conta sem e-mail conhecido.", 404);
-    await sendDeletionCodeEmail(email, code);
+    if (!email) return bad("Account with no known e-mail.", 404);
+    await sendDeletionCodeEmail(email, code, clientLocale(request));
     return NextResponse.json({
       ok: true,
       message: "Code sent to your e-mail. It is good for 10 minutes.",

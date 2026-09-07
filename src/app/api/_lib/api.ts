@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { PoolClient } from "pg";
+import { detectLocale, type Locale } from "@/shared/i18n/locale";
 import type { GameState } from "@/models/entities/game-state";
 import type { Result } from "@/models/entities/result";
 import type { TavernIdentity, TavernState } from "@/models/entities/tavern";
@@ -48,7 +49,7 @@ export async function withSessionRead(
   const refused = refuseAbuse(request);
   if (refused) return refused;
   const claims = await sessionClaims();
-  if (!claims) return bad("Entre para jogar.", 401);
+  if (!claims) return bad("Enter to play.", 401);
   const gate = rateLimit("read:" + claims.userId, 60, 10000);
   if (!gate.allowed) return tooMany(gate.retryAfterMs);
   try {
@@ -69,7 +70,7 @@ export async function withActivityLock(
   const refused = refuseAbuse(request);
   if (refused) return refused;
   const claims = await sessionClaims();
-  if (!claims) return bad("Entre para jogar.", 401);
+  if (!claims) return bad("Enter to play.", 401);
   const gate = rateLimit("act:" + claims.userId, 30, 10000);
   if (!gate.allowed) return tooMany(gate.retryAfterMs);
   try {
@@ -113,6 +114,11 @@ export function bad(message: string, status: number): NextResponse {
   return NextResponse.json({ ok: false, message, data: null }, { status });
 }
 const MAX_BODY_BYTES = 16384;
+// The client stamps x-game-locale on every request; anything unknown reads
+// English, the same rule detectLocale applies to a browser tag.
+export function clientLocale(request: Request): Locale {
+  return detectLocale(request.headers.get("x-game-locale"));
+}
 export function clientIp(request: Request): string {
   const cloudflare = request.headers.get("cf-connecting-ip");
   if (cloudflare) return cloudflare.trim();
@@ -161,11 +167,27 @@ async function recordClientVersion(
     [reported, userId],
   );
 }
+
+// Keeps users.locale following the language the player actually plays in, so
+// the letters speak it. Only reported values move the column; a request with
+// no header (an old bundle) changes nothing.
+async function recordClientLocale(
+  client: PoolClient,
+  userId: string,
+  reported: string | null,
+): Promise<void> {
+  if (!reported) return;
+  const locale = detectLocale(reported);
+  await client.query(
+    "update users set locale = $1 where id = $2 and locale is distinct from $1",
+    [locale, userId],
+  );
+}
 export async function withGame<T>(request: Request, action: GameAction<T>): Promise<NextResponse> {
   const refused = refuseAbuse(request);
   if (refused) return refused;
   const claims = await sessionClaims();
-  if (!claims) return bad("Entre para jogar.", 401);
+  if (!claims) return bad("Enter to play.", 401);
   const userId = claims.userId;
   const mutating = request.method !== "GET";
   const gate = rateLimit((mutating ? "act:" : "read:") + userId, mutating ? 30 : 60, 10000);
@@ -185,6 +207,7 @@ export async function withGame<T>(request: Request, action: GameAction<T>): Prom
       if (request.method !== "GET") {
         await saveGame(client, loaded.characterId, loaded.state, result.state);
         await recordClientVersion(client, userId, request.headers.get("x-game-version"));
+        await recordClientLocale(client, userId, request.headers.get("x-game-locale"));
       }
       const { tutorial } = await sessionGate(client, claims);
       const { activity } = await readActivity(client, loaded.characterId);
@@ -227,7 +250,7 @@ async function guardTavern(request: Request): Promise<SessionClaims | NextRespon
   const refused = refuseAbuse(request);
   if (refused) return refused;
   const claims = await sessionClaims();
-  if (!claims) return bad("Entre para jogar.", 401);
+  if (!claims) return bad("Enter to play.", 401);
   const gate = rateLimit("tavern:" + claims.userId, 30, 10000);
   if (!gate.allowed) return tooMany(gate.retryAfterMs);
   return claims;

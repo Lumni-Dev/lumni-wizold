@@ -9,7 +9,7 @@ export async function DELETE(request: Request) {
   const refused = refuseAbuse(request);
   if (refused) return refused;
   const claims = await sessionClaims();
-  if (!claims) return bad("Entre para jogar.", 401);
+  if (!claims) return bad("Enter to play.", 401);
   const gate = rateLimit("push-unsub:" + claims.userId, 10, 60000);
   if (!gate.allowed) return bad("Easy, wolf: too many requests. Breathe for a moment.", 429);
 

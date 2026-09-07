@@ -1,6 +1,7 @@
 "use client";
 
 import { api, type ApiAnswer } from "./api.client";
+import { languageRepository } from "@/models/repositories/language.repository";
 import { GAME_VERSION } from "@/shared/constants/version";
 
 let chain = Promise.resolve();
@@ -55,6 +56,7 @@ export function flushActivityKeepalive(
       headers: {
         "content-type": "application/json",
         "x-game-version": GAME_VERSION,
+        "x-game-locale": languageRepository.resolved(),
       },
       body: JSON.stringify(body),
       keepalive: true,

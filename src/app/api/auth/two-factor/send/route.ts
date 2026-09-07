@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { withTransaction } from "@/models/repositories/server/database";
-import { asText, bad, readBody, refuseAbuse, sessionIsLive } from "../../../_lib/api";
+import { asText, bad, clientLocale, readBody, refuseAbuse, sessionIsLive } from "../../../_lib/api";
 import { sendTwoFactorCodeEmail } from "../../../_lib/mail";
 import { rateLimit, rateLimitShared } from "../../../_lib/rate-limit";
 import { sessionClaims } from "../../../_lib/session";
@@ -12,7 +12,7 @@ export async function POST(request: Request) {
 
   const claims = await sessionClaims();
   const userId = claims?.userId ?? null;
-  if (!userId) return bad("Entre para jogar.", 401);
+  if (!userId) return bad("Enter to play.", 401);
 
   const body = await readBody(request);
   const action = asText(body.action, 16) === "disable" ? "disable" : "enable";
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
     });
 
     if (payload === undefined) return bad("Session ended.", 401);
-    if (payload === null) return bad("Conta sem e-mail conhecido.", 404);
+    if (payload === null) return bad("Account with no known e-mail.", 404);
     if (payload === false) {
       return NextResponse.json({
         ok: false,
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
       });
     }
 
-    await sendTwoFactorCodeEmail(payload.to, payload.code, action);
+    await sendTwoFactorCodeEmail(payload.to, payload.code, action, clientLocale(request));
     return NextResponse.json({
       ok: true,
       message: "Code sent to your e-mail. It is good for 10 minutes.",

@@ -5,7 +5,7 @@ import { ageOf, isRealBirth } from "@/shared/utils/birth";
 import { withTransaction } from "@/models/repositories/server/database";
 import { createUser, findUserByEmail } from "@/models/repositories/server/user.store";
 import { loadGame } from "@/models/repositories/server/game.store";
-import { asText, bad, clientIp, readBody, refuseAbuse } from "../../_lib/api";
+import { asText, bad, clientIp, clientLocale, readBody, refuseAbuse } from "../../_lib/api";
 import { verifyGoogleCredential } from "../../_lib/google";
 import { sendAccessEmail, sendTwoFactorCodeEmail, sendWelcomeEmail } from "../../_lib/mail";
 import { rateLimit, rateLimitShared } from "../../_lib/rate-limit";
@@ -22,9 +22,10 @@ export async function POST(request: Request) {
     return response;
   }
   const body = await readBody(request);
+  const locale = clientLocale(request);
   const credential = asText(body.credential, 4096).trim();
   if (!credential) {
-    return bad("Entre com o Google para abrir a porta.", 400);
+    return bad("Enter with Google to open the door.", 400);
   }
   const birth = {
     day: asText((body.birth as Record<string, unknown> | undefined)?.day, 2),
@@ -50,7 +51,7 @@ export async function POST(request: Request) {
         });
       }
       if (!existing && (!isRealBirth(birth) || age === null)) {
-        return bad("Preencha a data de nascimento.", 400);
+        return bad("Fill in the birth date.", 400);
       }
       const user =
         existing ??
@@ -62,11 +63,12 @@ export async function POST(request: Request) {
             birth.month.padStart(2, "0") +
             "-" +
             birth.day.padStart(2, "0"),
+          locale,
         ));
       if (!existing) {
         after(() =>
-          sendWelcomeEmail(identity.email).catch((error) =>
-            console.error("[mail] boas-vindas", error),
+          sendWelcomeEmail(identity.email, locale).catch((error) =>
+            console.error("[mail] welcome", error),
           ),
         );
       } else if (
@@ -75,14 +77,15 @@ export async function POST(request: Request) {
       ) {
         const accessedAt = new Date();
         after(() =>
-          sendAccessEmail(identity.email, accessedAt).catch((error) =>
-            console.error("[mail] aviso de acesso", error),
+          sendAccessEmail(identity.email, accessedAt, locale).catch((error) =>
+            console.error("[mail] access notice", error),
           ),
         );
       }
-      await client.query("update users set picture = $2 where id = $1", [
+      await client.query("update users set picture = $2, locale = $3 where id = $1", [
         user.id,
         identity.picture,
+        locale,
       ]);
 
       const loaded = await loadGame(client, user.id, false);
@@ -93,7 +96,7 @@ export async function POST(request: Request) {
         const code = mintTwoFactorCode();
         await saveTwoFactorCode(client, user.id, code);
         after(() =>
-          sendTwoFactorCodeEmail(identity.email, code, "login").catch((error) =>
+          sendTwoFactorCodeEmail(identity.email, code, "login", locale).catch((error) =>
             console.error("[mail] 2fa code", error),
           ),
         );
@@ -126,7 +129,7 @@ export async function POST(request: Request) {
       }
       return NextResponse.json({
         ok: true,
-        message: existing ? "Bem-vindo de volta." : "Account created. The hunt awaits.",
+        message: existing ? "Welcome back." : "Account created. The hunt awaits.",
         data: { userId: user.id, hasCharacter: loaded !== null, tutorial: user.tutorial },
       });
     });

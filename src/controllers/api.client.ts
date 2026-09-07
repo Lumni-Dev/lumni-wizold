@@ -1,5 +1,6 @@
 import type { Activity } from "@/models/entities/activity";
 import type { GameState } from "@/models/entities/game-state";
+import { languageRepository } from "@/models/repositories/language.repository";
 import { GAME_VERSION } from "@/shared/constants/version";
 import { noteServerNow } from "@/shared/utils/server-clock";
 export function isTransientApiMessage(message: string): boolean {
@@ -30,6 +31,7 @@ export async function api<T = unknown>(
       method,
       headers: {
         "x-game-version": GAME_VERSION,
+        "x-game-locale": languageRepository.resolved(),
         ...(body === undefined ? {} : { "content-type": "application/json" }),
       },
       body: body === undefined ? undefined : JSON.stringify(body),
