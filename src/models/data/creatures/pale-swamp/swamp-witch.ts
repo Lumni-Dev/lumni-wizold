@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const swampWitch: Creature = {
   id: "swamp-witch",
-  name: "Bruxa do Pântano",
-  description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
+  name: "Swamp Witch",
+  description: "Hunters, mercenaries and fanatics. They come with silver, fire and method.",
   species: "human",
   level: 391,
   health: 3743,

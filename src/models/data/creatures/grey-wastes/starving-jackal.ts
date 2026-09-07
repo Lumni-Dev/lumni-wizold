@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const starvingJackal: Creature = {
   id: "starving-jackal",
-  name: "Chacal Faminto",
-  description: "Fogem bem e chutam melhor. Alimentam uma matilha inteira por semanas.",
+  name: "Starving Jackal",
+  description: "They flee well and kick better. They feed a whole pack for weeks.",
   species: "deer",
   level: 531,
   health: 15339,

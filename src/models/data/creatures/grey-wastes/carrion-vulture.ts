@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const carrionVulture: Creature = {
   id: "carrion-vulture",
-  name: "Abutre Carniceiro",
-  description: "Pequenos, rápidos e em número maior do que parece. O primeiro sangue de qualquer lobisomem.",
+  name: "Carrion Vulture",
+  description: "Small, fast and more numerous than they look. The first blood of any werewolf.",
   species: "rabbit",
   level: 501,
   health: 11958,

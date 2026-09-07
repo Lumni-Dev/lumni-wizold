@@ -2,7 +2,7 @@ import type { Ore } from "./types";
 
 export const diamondVein: Ore = {
   id: "diamond-vein",
-  label: "Fragmento de Diamante",
+  label: "Diamond Fragment",
   fragmentId: "diamond-fragment",
   set: "diamond",
   requiredLevel: 601,

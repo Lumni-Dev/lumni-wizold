@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const thiefFox: Creature = {
   id: "thief-fox",
-  name: "Raposa Ladra",
-  description: "Fogem bem e chutam melhor. Alimentam uma matilha inteira por semanas.",
+  name: "Thief Fox",
+  description: "They flee well and kick better. They feed a whole pack for weeks.",
   species: "deer",
   level: 31,
   health: 307,

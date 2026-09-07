@@ -2,7 +2,7 @@ import type { Creature } from "../types";
 
 export const elderDragon: Creature = {
   id: "elder-dragon",
-  name: "Dragão Ancião",
+  name: "Elder Dragon",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 961,

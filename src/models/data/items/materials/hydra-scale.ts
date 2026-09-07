@@ -2,9 +2,9 @@ import type { Item } from "../../../entities/item";
 
 export const hydraScale: Item = {
   id: "hydra-scale",
-  name: "Escama de Hidra",
+  name: "Hydra Scale",
   description:
-    "Despojo da caça. Vale o bronze que o mercado paga por ele; não serve de arma nem de enfeite.",
+    "Spoils of the hunt. Worth the bronze the market pays for it; no use as a weapon or an ornament.",
   category: "material",
   rarity: "epic",
   price: 750,

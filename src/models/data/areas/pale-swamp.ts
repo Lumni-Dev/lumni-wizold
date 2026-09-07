@@ -2,8 +2,8 @@ import type { Territory } from "./types";
 
 export const paleSwamp: Territory = {
   id: "pale-swamp",
-  name: "Pântano Pálido",
-  description: "Água parada cor de chumbo e um cheiro doce de coisa afogada. O chão engole a bota e devolve bolha, e o que mora aqui aprendeu a esperar embaixo da lama até a presa passar. Cada passo é uma aposta, e a saída nunca fica onde você deixou.",
+  name: "Pale Swamp",
+  description: "Still water the color of lead and a sweet smell of drowned things. The ground swallows the boot and gives back bubbles, and what lives here learned to wait under the mud until the prey walks by. Every step is a bet, and the way out is never where you left it.",
   species: "bear",
   minLevel: 301,
   maxLevel: 400,

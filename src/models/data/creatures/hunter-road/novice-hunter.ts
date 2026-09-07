@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const noviceHunter: Creature = {
   id: "novice-hunter",
-  name: "Caçador Novato",
-  description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
+  name: "Novice Hunter",
+  description: "Hunters, mercenaries and fanatics. They come with silver, fire and method.",
   species: "human",
   level: 401,
   health: 6269,

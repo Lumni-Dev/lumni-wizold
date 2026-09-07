@@ -3,7 +3,7 @@ import type { Creature } from "../types";
 export const banshee: Creature = {
   id: "banshee",
   name: "Banshee",
-  description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
+  description: "They do not breathe, do not tire, and already know the taste of your blood.",
   species: "vampire",
   level: 651,
   health: 49757,

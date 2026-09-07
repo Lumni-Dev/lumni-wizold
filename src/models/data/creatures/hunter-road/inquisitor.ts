@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const inquisitor: Creature = {
   id: "inquisitor",
-  name: "Inquisidor",
-  description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
+  name: "Inquisitor",
+  description: "Hunters, mercenaries and fanatics. They come with silver, fire and method.",
   species: "human",
   level: 471,
   health: 11167,

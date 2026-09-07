@@ -52,10 +52,10 @@ const HEALTH_TIERS = [
 export const POTIONS: readonly Item[] = [
   ...HEALTH_TIERS.map((tier) => ({
     id: "health-potion-" + tier.size,
-    name: "Poção de Vida " + SIZE_LABEL[tier.size],
+    name: SIZE_LABEL[tier.size] + " Health Potion",
     description:
-      "Espessa e morna, com cheiro de ferro velho. Fecha em segundos o corte que a sua " +
-      "própria cura levaria a noite inteira para costurar.",
+      "Thick and warm, smelling of old iron. It closes in seconds the cut your own " +
+      "healing would take the whole night to stitch.",
     category: "potion" as const,
     rarity: tier.rarity,
     price: tier.price,
@@ -68,10 +68,10 @@ export const POTIONS: readonly Item[] = [
   })),
   ...RAGE_TIERS.map((tier) => ({
     id: "rage-potion-" + tier.size,
-    name: "Poção de Fúria " + SIZE_LABEL[tier.size],
+    name: SIZE_LABEL[tier.size] + " Fury Potion",
     description:
-      "Não devolve nada ao corpo: acende a fera por dentro. Enquanto dura, +10 em cada " +
-      "atributo, e o quanto dura depende do tamanho do frasco e da sua Vontade.",
+      "It gives nothing back to the body: it lights the beast from within. While it " +
+      "lasts, +10 to every attribute, and how long it lasts depends on the flask's size and your Willpower.",
     category: "potion" as const,
     rarity: tier.rarity,
     price: tier.price,

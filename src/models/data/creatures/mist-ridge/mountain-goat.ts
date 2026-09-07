@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const mountainGoat: Creature = {
   id: "mountain-goat",
-  name: "Cabra Montesa",
-  description: "Fogem bem e chutam melhor. Alimentam uma matilha inteira por semanas.",
+  name: "Mountain Goat",
+  description: "They flee well and kick better. They feed a whole pack for weeks.",
   species: "deer",
   level: 201,
   health: 1301,

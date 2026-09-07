@@ -2,7 +2,7 @@ import type { Exercise } from "./types";
 
 export const trunkPunches: Exercise = {
   id: "trunk-punches",
-  name: "Socos no Tronco",
-  description: "Bater até a casca ceder ou até a mão ceder primeiro.",
+  name: "Trunk Punches",
+  description: "Striking until the bark gives, or until the hand gives first.",
   attribute: "strength",
 };

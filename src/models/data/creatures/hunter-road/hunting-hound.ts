@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const huntingHound: Creature = {
   id: "hunting-hound",
-  name: "Cão de Caça",
-  description: "Fogem bem e chutam melhor. Alimentam uma matilha inteira por semanas.",
+  name: "Hunting Hound",
+  description: "They flee well and kick better. They feed a whole pack for weeks.",
   species: "deer",
   level: 441,
   health: 9058,

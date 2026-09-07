@@ -2,7 +2,7 @@ import type { Creature } from "../types";
 
 export const woodBoar: Creature = {
   id: "wood-boar",
-  name: "Javali da Mata",
+  name: "Forest Boar",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 131,

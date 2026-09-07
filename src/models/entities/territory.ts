@@ -14,8 +14,8 @@ export interface Territory {
 }
 
 export const DANGER_LABEL: Record<DangerLevel, string> = {
-  low: "Perigo baixo",
-  moderate: "Perigo moderado",
-  high: "Perigo alto",
-  extreme: "Perigo extremo",
+  low: "Low danger",
+  moderate: "Moderate danger",
+  high: "High danger",
+  extreme: "Extreme danger",
 };

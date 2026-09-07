@@ -3,13 +3,13 @@ import type { SetDefinition } from "./types";
 export const bronzeSet: SetDefinition = {
   key: "bronze",
   label: "Bronze",
-  suffixMasculine: "de Bronze",
-  suffixFeminine: "de Bronze",
+  suffixMasculine: "Bronze",
+  suffixFeminine: "Bronze",
   rarity: "common",
   minLevel: 1,
   inMarket: true,
-  description: "O primeiro conjunto. Barato, pesado e suficiente para o Campo do Vilarejo.",
+  description: "The first set. Cheap, heavy and enough for the Village Field.",
   flavor:
-    "Bronze bruto, martelado sem capricho nenhum. O ferreiro do vilarejo faz um por " +
-    "tarde e nunca pergunta por que a encomenda vem sempre dois números maior.",
+    "Raw bronze, hammered with no care at all. The village smith makes one per " +
+    "afternoon and never asks why the order always comes two sizes larger.",
   power: 20,};

@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const lesserGriffin: Creature = {
   id: "lesser-griffin",
-  name: "Grifo Menor",
-  description: "Nada aqui é gentil. O chifre atravessa antes de você ouvir o galope.",
+  name: "Lesser Griffin",
+  description: "Nothing here is gentle. The horn runs you through before you hear the gallop.",
   species: "unicorn",
   level: 291,
   health: 2939,

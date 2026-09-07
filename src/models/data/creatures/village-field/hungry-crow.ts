@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const hungryCrow: Creature = {
   id: "hungry-crow",
-  name: "Corvo Faminto",
-  description: "Fogem bem e chutam melhor. Alimentam uma matilha inteira por semanas.",
+  name: "Hungry Crow",
+  description: "They flee well and kick better. They feed a whole pack for weeks.",
   species: "deer",
   level: 41,
   health: 353,

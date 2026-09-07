@@ -2,7 +2,7 @@ import type { Creature } from "../types";
 
 export const slopeOgre: Creature = {
   id: "slope-ogre",
-  name: "Ogro da Encosta",
+  name: "Hillside Ogre",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 281,

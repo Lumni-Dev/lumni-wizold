@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const lesserGorgon: Creature = {
   id: "lesser-gorgon",
-  name: "Górgona Menor",
-  description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
+  name: "Lesser Gorgon",
+  description: "They do not breathe, do not tire, and already know the taste of your blood.",
   species: "vampire",
   level: 561,
   health: 20405,

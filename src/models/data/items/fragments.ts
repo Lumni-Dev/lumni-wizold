@@ -11,12 +11,12 @@ const FRAGMENT_LINES = [
 
 export const FRAGMENTS: readonly Item[] = FRAGMENT_LINES.map((line) => ({
   id: line.set + "-fragment",
-  name: "Fragmento de " + SET_LABEL[line.set],
+  name: SET_LABEL[line.set] + " Fragment",
   description:
-    "Lasca arrancada do veio de " +
+    "A shard torn from the " +
     SET_LABEL[line.set].toLowerCase() +
-    ". Não serve de arma nem de enfeite: serve para a forja bater de novo na peça " +
-    "que você já usa, até ela responder melhor do que o corpo.",
+    " vein. No use as a weapon or an ornament: it is for the forge to strike again " +
+    "at the piece you already wear, until it answers better than the body.",
   category: "material" as const,
   rarity: line.rarity,
   price: line.price,

@@ -2,14 +2,14 @@ import type { SetDefinition } from "./types";
 
 export const goldSet: SetDefinition = {
   key: "gold",
-  label: "Ouro",
-  suffixMasculine: "de Ouro",
-  suffixFeminine: "de Ouro",
+  label: "Gold",
+  suffixMasculine: "Gold",
+  suffixFeminine: "Gold",
   rarity: "rare",
   minLevel: 401,
   inMarket: true,
-  description: "Conjunto de quem já tem bronze sobrando e territórios abertos.",
+  description: "A set for those with bronze to spare and territories open.",
   flavor:
-    "Ouro trabalhado, mais firme do que a fama sugere e o único que a fera não tenta " +
-    "arrancar do corpo na virada. Só desce da serra o que a serra devolve.",
+    "Worked gold, firmer than its fame suggests and the only one the beast does not " +
+    "try to tear off the body in the turning. Only what the ridge gives back comes down from the ridge.",
   power: 500,};

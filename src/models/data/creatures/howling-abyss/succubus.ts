@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const succubus: Creature = {
   id: "succubus",
-  name: "Súcubo",
-  description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
+  name: "Succubus",
+  description: "They do not breathe, do not tire, and already know the taste of your blood.",
   species: "vampire",
   level: 751,
   health: 88844,

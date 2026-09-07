@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const peregrineFalcon: Creature = {
   id: "peregrine-falcon",
-  name: "Falcão Peregrino",
-  description: "Pequenos, rápidos e em número maior do que parece. O primeiro sangue de qualquer lobisomem.",
+  name: "Peregrine Falcon",
+  description: "Small, fast and more numerous than they look. The first blood of any werewolf.",
   species: "rabbit",
   level: 251,
   health: 1754,

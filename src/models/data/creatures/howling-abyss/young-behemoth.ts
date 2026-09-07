@@ -2,7 +2,7 @@ import type { Creature } from "../types";
 
 export const youngBehemoth: Creature = {
   id: "young-behemoth",
-  name: "Behemoth Jovem",
+  name: "Young Behemoth",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 761,

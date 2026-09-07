@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const reaper: Creature = {
   id: "reaper",
-  name: "Ceifador",
-  description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
+  name: "Reaper",
+  description: "They do not breathe, do not tire, and already know the taste of your blood.",
   species: "vampire",
   level: 771,
   health: 96613,

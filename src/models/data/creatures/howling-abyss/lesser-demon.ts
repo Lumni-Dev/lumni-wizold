@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const lesserDemon: Creature = {
   id: "lesser-demon",
-  name: "Demônio Menor",
-  description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
+  name: "Lesser Demon",
+  description: "Hunters, mercenaries and fanatics. They come with silver, fire and method.",
   species: "human",
   level: 721,
   health: 65945,

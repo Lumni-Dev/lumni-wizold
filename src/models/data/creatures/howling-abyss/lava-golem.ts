@@ -2,7 +2,7 @@ import type { Creature } from "../types";
 
 export const lavaGolem: Creature = {
   id: "lava-golem",
-  name: "Golem de Lava",
+  name: "Lava Golem",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 741,

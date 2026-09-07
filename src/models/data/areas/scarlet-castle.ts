@@ -2,8 +2,8 @@ import type { Territory } from "./types";
 
 export const scarletCastle: Territory = {
   id: "scarlet-castle",
-  name: "Castelo Escarlate",
-  description: "Portões abertos de par em par, velas acesas em corredor que ninguém varre há um século. A mesa está posta, o vinho é vermelho demais, e o dono desce a escada sem pressa, porque a noite é dele e você chegou cedo. Aqui a fera é a convidada, não a anfitriã.",
+  name: "Scarlet Castle",
+  description: "Gates open wide, candles lit in a corridor no one has swept for a century. The table is set, the wine is too red, and the master comes down the stairs unhurried, because the night is his and you arrived early. Here the beast is the guest, not the host.",
   species: "vampire",
   minLevel: 801,
   maxLevel: 900,

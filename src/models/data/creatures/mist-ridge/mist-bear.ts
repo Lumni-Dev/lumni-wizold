@@ -2,7 +2,7 @@ import type { Creature } from "../types";
 
 export const mistBear: Creature = {
   id: "mist-bear",
-  name: "Urso das Brumas",
+  name: "Mist Bear",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 221,

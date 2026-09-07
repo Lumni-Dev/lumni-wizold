@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const skeletonWarrior: Creature = {
   id: "skeleton-warrior",
-  name: "Esqueleto Guerreiro",
-  description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
+  name: "Warrior Skeleton",
+  description: "Hunters, mercenaries and fanatics. They come with silver, fire and method.",
   species: "human",
   level: 601,
   health: 25872,

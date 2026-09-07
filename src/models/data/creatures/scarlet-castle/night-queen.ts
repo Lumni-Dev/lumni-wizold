@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const nightQueen: Creature = {
   id: "night-queen",
-  name: "Rainha da Noite",
-  description: "Nada aqui é gentil. O chifre atravessa antes de você ouvir o galope.",
+  name: "Queen of the Night",
+  description: "Nothing here is gentle. The horn runs you through before you hear the gallop.",
   species: "unicorn",
   level: 891,
   health: 322281,

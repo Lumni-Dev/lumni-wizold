@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const pegasus: Creature = {
   id: "pegasus",
-  name: "Pégaso",
-  description: "Nada aqui é gentil. O chifre atravessa antes de você ouvir o galope.",
+  name: "Pegasus",
+  description: "Nothing here is gentle. The horn runs you through before you hear the gallop.",
   species: "unicorn",
   level: 941,
   health: 421444,

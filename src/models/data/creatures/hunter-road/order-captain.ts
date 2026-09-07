@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const orderCaptain: Creature = {
   id: "order-captain",
-  name: "Capitão da Ordem",
-  description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
+  name: "Captain of the Order",
+  description: "Hunters, mercenaries and fanatics. They come with silver, fire and method.",
   species: "human",
   level: 481,
   health: 11861,

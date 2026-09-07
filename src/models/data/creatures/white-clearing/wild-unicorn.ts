@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const wildUnicorn: Creature = {
   id: "wild-unicorn",
-  name: "Unicórnio Selvagem",
-  description: "Nada aqui é gentil. O chifre atravessa antes de você ouvir o galope.",
+  name: "Wild Unicorn",
+  description: "Nothing here is gentle. The horn runs you through before you hear the gallop.",
   species: "unicorn",
   level: 901,
   health: 342347,

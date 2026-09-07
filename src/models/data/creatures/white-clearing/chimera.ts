@@ -2,7 +2,7 @@ import type { Creature } from "../types";
 
 export const chimera: Creature = {
   id: "chimera",
-  name: "Quimera",
+  name: "Chimera",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 931,

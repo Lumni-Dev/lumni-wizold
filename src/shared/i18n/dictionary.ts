@@ -1394,6 +1394,56 @@ const RULES: readonly PatternRule[] = [
   { pattern: /^(.+) charges at (.+), which yelps and returns to the fight\.$/, en: "$1 charges at $2, which yelps and returns to the fight.", pt: "$1 investe contra $2, que gane e volta ao combate.", es: "$1 embiste a $2, que gañe y vuelve al combate." },
   { pattern: /^(.+) falls back panting, no breath left to stay in the fight\.$/, en: "$1 falls back panting, no breath left to stay in the fight.", pt: "$1 recua ofegante, sem fôlego para seguir na luta.", es: "$1 retrocede jadeando, sin aliento para seguir en la pelea." },
   { pattern: /^(.+) is (hunting|training|mining|forging|resting|idle)$/, en: "$1 is $2", pt: "$1 está $2", es: "$1 está $2" },
+  {
+    pattern: /^A shard torn from the (.+) vein\. No use as a weapon or an ornament: it is for the forge to strike again at the piece you already wear, until it answers better than the body\.$/,
+    en: "A shard torn from the $1 vein. No use as a weapon or an ornament: it is for the forge to strike again at the piece you already wear, until it answers better than the body.",
+    pt: "Lasca arrancada do veio de $1. Não serve de arma nem de enfeite: serve para a forja bater de novo na peça que você já usa, até ela responder melhor do que o corpo.",
+    es: "Esquirla arrancada de la veta de $1. No sirve de arma ni de adorno: sirve para que la forja golpee de nuevo la pieza que ya usas, hasta que responda mejor que el cuerpo.",
+  },
+  // Equipment descriptions are the slot flavor joined to the set flavor; each
+  // half has its own exact entry, so the rule splits on the slot's last period.
+  {
+    pattern: /^(Fur-lined leather with the flaps tied under the chin\. It hides what the face gives away when the beast starts to rise, and on a full night that spares explanations\.) (.+)$/,
+    en: "$1 $2",
+    pt: "$1 $2",
+    es: "$1 $2",
+  },
+  {
+    pattern: /^(It hangs over the chest and keeps the instinct awake even far from the trail\. The metal warms an instant before the prey appears, and the pack learned to trust that\.) (.+)$/,
+    en: "$1 $2",
+    pt: "$1 $2",
+    es: "$1 $2",
+  },
+  {
+    pattern: /^(Heavy leather and a fur collar covering the torso, which is where a beast aims when it recognizes another\. It is the piece that decides whether the bite becomes a scar to tell\.) (.+)$/,
+    en: "$1 $2",
+    pt: "$1 $2",
+    es: "$1 $2",
+  },
+  {
+    pattern: /^(Reinforced legs for the four-pawed run and the two-legged fall\. In a long chase, what gives first is never the arm\.) (.+)$/,
+    en: "$1 $2",
+    pt: "$1 $2",
+    es: "$1 $2",
+  },
+  {
+    pattern: /^(A firm sole for stone, mud and wet rooftops, loose enough for the foot that grows in the turning\. Reaching is half the hunt\.) (.+)$/,
+    en: "$1 $2",
+    pt: "$1 $2",
+    es: "$1 $2",
+  },
+  {
+    pattern: /^(Metal fangs for the fingers, useful on nights when yours have not come out yet\. It is the pack's blow, and the hand forgets it is armed until it sees the damage\.) (.+)$/,
+    en: "$1 $2",
+    pt: "$1 $2",
+    es: "$1 $2",
+  },
+  {
+    pattern: /^(Small, discreet, and still heavy in the hand\. It squeezes the finger when the fury climbs, like a short collar reminding who commands whom\.) (.+)$/,
+    en: "$1 $2",
+    pt: "$1 $2",
+    es: "$1 $2",
+  },
   { pattern: /^LV\. ([\d.,]+)$/, en: "LV. $1", pt: "NV. $1", es: "NV. $1" },
   { pattern: /^(.+) - LV\. ([\d.,]+)$/, en: "$1 - LV. $2", pt: "$1 - NV. $2", es: "$1 - NV. $2" },
   { pattern: /^(.+) \(LV\. ([\d.,]+)\)$/, en: "$1 (LV. $2)", pt: "$1 (NV. $2)", es: "$1 (NV. $2)" },

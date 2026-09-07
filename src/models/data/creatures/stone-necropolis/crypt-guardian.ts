@@ -2,7 +2,7 @@ import type { Creature } from "../types";
 
 export const cryptGuardian: Creature = {
   id: "crypt-guardian",
-  name: "Guardião da Cripta",
+  name: "Crypt Guardian",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 691,

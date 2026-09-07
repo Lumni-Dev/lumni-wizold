@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const giantScorpion: Creature = {
   id: "giant-scorpion",
-  name: "Escorpião Gigante",
-  description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
+  name: "Giant Scorpion",
+  description: "They do not breathe, do not tire, and already know the taste of your blood.",
   species: "vampire",
   level: 521,
   health: 17133,

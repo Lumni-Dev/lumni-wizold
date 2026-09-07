@@ -2,14 +2,14 @@ import type { SetDefinition } from "./types";
 
 export const diamondSet: SetDefinition = {
   key: "diamond",
-  label: "Diamante",
-  suffixMasculine: "de Diamante",
-  suffixFeminine: "de Diamante",
+  label: "Diamond",
+  suffixMasculine: "Diamond",
+  suffixFeminine: "Diamond",
   rarity: "epic",
   minLevel: 601,
   inMarket: true,
-  description: "O melhor que o mercado do vilarejo consegue oferecer.",
+  description: "The best the village market can offer.",
   flavor:
-    "Cravejado de diamante, devolve a lua inteira no meio da mata e corta a luz antes " +
-    "de cortar carne. É o limite do que o vilarejo monta sem começar a perguntar.",
+    "Studded with diamond, it gives the whole moon back in the middle of the woods and " +
+    "cuts the light before cutting flesh. It is the limit of what the village assembles without starting to ask questions.",
   power: 2500,};

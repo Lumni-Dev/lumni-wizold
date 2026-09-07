@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const wastesLord: Creature = {
   id: "wastes-lord",
-  name: "Senhor do Ermo",
-  description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
+  name: "Lord of the Wastes",
+  description: "Hunters, mercenaries and fanatics. They come with silver, fire and method.",
   species: "human",
   level: 591,
   health: 19553,

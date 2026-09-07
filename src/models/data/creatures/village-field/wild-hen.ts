@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const wildHen: Creature = {
   id: "wild-hen",
-  name: "Galinha do Mato",
-  description: "Pequenos, rápidos e em número maior do que parece. O primeiro sangue de qualquer lobisomem.",
+  name: "Wild Hen",
+  description: "Small, fast and more numerous than they look. The first blood of any werewolf.",
   species: "rabbit",
   level: 21,
   health: 230,

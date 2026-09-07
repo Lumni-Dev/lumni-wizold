@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const basilisk: Creature = {
   id: "basilisk",
-  name: "Basilisco",
-  description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
+  name: "Basilisk",
+  description: "They do not breathe, do not tire, and already know the taste of your blood.",
   species: "vampire",
   level: 581,
   health: 22044,

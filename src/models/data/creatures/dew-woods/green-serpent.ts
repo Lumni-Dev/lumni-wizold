@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const greenSerpent: Creature = {
   id: "green-serpent",
-  name: "Serpente Verde",
-  description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
+  name: "Green Serpent",
+  description: "They do not breathe, do not tire, and already know the taste of your blood.",
   species: "vampire",
   level: 141,
   health: 983,

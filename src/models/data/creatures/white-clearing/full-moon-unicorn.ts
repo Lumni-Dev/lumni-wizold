@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const fullMoonUnicorn: Creature = {
   id: "full-moon-unicorn",
-  name: "Unicórnio da Lua Cheia",
-  description: "Nada aqui é gentil. O chifre atravessa antes de você ouvir o galope.",
+  name: "Full Moon Unicorn",
+  description: "Nothing here is gentle. The horn runs you through before you hear the gallop.",
   species: "unicorn",
   level: 981,
   health: 500545,

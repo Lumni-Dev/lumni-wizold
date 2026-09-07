@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const bloodyBride: Creature = {
   id: "bloody-bride",
-  name: "Noiva Sangrenta",
-  description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
+  name: "Bloody Bride",
+  description: "They do not breathe, do not tire, and already know the taste of your blood.",
   species: "vampire",
   level: 871,
   health: 276743,

@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const silverArcher: Creature = {
   id: "silver-archer",
-  name: "Arqueiro de Prata",
-  description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
+  name: "Silver Archer",
+  description: "They do not breathe, do not tire, and already know the taste of your blood.",
   species: "vampire",
   level: 431,
   health: 9790,

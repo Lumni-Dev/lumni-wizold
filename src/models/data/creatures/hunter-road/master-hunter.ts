@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const masterHunter: Creature = {
   id: "master-hunter",
-  name: "Mestre Caçador",
-  description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
+  name: "Master Hunter",
+  description: "They do not breathe, do not tire, and already know the taste of your blood.",
   species: "vampire",
   level: 491,
   health: 14686,

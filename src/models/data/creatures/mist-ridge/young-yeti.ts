@@ -2,7 +2,7 @@ import type { Creature } from "../types";
 
 export const youngYeti: Creature = {
   id: "young-yeti",
-  name: "Iéti Jovem",
+  name: "Young Yeti",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 261,

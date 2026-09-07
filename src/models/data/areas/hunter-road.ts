@@ -2,8 +2,8 @@ import type { Territory } from "./types";
 
 export const hunterRoad: Territory = {
   id: "hunter-road",
-  name: "Estrada dos Caçadores",
-  description: "Tochas em fila até onde a vista alcança e correntes de prata penduradas nos galhos, tilintando com o vento para avisar quem passa. Não é armadilha para bicho, é recado. Eles vêm em grupo, dormem em turnos e sabem exatamente o que estão caçando.",
+  name: "Hunters' Road",
+  description: "Torches in a line as far as the eye can see and silver chains hung from the branches, chiming with the wind to warn whoever passes. It is not a trap for beasts, it is a message. They come in groups, sleep in shifts, and know exactly what they are hunting.",
   species: "human",
   minLevel: 401,
   maxLevel: 500,

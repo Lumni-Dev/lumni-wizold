@@ -2,7 +2,7 @@ import type { Creature } from "../types";
 
 export const armoredLizard: Creature = {
   id: "armored-lizard",
-  name: "Lagarto Blindado",
+  name: "Armored Lizard",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 341,

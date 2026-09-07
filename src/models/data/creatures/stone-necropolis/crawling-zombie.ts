@@ -2,7 +2,7 @@ import type { Creature } from "../types";
 
 export const crawlingZombie: Creature = {
   id: "crawling-zombie",
-  name: "Zumbi Rastejante",
+  name: "Crawling Zombie",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 611,

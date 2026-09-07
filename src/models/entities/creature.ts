@@ -10,11 +10,11 @@ export const SPECIES_ORDER: readonly SpeciesKey[] = [
 ];
 
 export const SPECIES_LABEL: Record<SpeciesKey, string> = {
-  rabbit: "Coelhos",
-  deer: "Veados",
-  bear: "Ursos",
-  human: "Humanos",
-  vampire: "Vampiros",
+  rabbit: "Rabbits",
+  deer: "Deer",
+  bear: "Bears",
+  human: "Humans",
+  vampire: "Vampires",
   unicorn: "Unicorns",
 };
 

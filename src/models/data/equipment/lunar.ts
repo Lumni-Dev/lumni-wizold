@@ -4,13 +4,13 @@ export const lunarSet: SetDefinition = {
   key: "lunar",
   label: "Lunar",
   suffixMasculine: "Lunar",
-  suffixFeminine: "Lunares",
+  suffixFeminine: "Lunar",
   rarity: "legendary",
   minLevel: 801,
   inMarket: true,
   description:
-    "O último conjunto. Custa uma fortuna no mercado e não cai na caça: é a peça que se compra de propósito.",
+    "The last set. It costs a fortune at the market and never drops on the hunt: it is the piece bought on purpose.",
   flavor:
-    "Forjado sob lua cheia, com a fera acordada segurando o martelo. Responde ao céu: " +
-    "brilha fraco no escuro e respira junto com quem veste, na noite da virada.",
+    "Forged under a full moon, with the beast awake holding the hammer. It answers the " +
+    "sky: it glows faintly in the dark and breathes along with its wearer, on the night of the turning.",
   power: 12500,};

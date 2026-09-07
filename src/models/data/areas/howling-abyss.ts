@@ -2,8 +2,8 @@ import type { Territory } from "./types";
 
 export const howlingAbyss: Territory = {
   id: "howling-abyss",
-  name: "Abismo Uivante",
-  description: "A pedra desce mais do que a tocha alcança, e o uivo sobe de um lugar que não tem fundo. O ar queima e o chão pulsa, quente como bicho adormecido. Ninguém desce por engano, e quase ninguém sobe de novo.",
+  name: "Howling Abyss",
+  description: "The stone goes down farther than the torch can reach, and the howl rises from a place with no bottom. The air burns and the ground pulses, warm like a sleeping beast. No one goes down by mistake, and almost no one climbs back up.",
   species: "vampire",
   minLevel: 701,
   maxLevel: 800,

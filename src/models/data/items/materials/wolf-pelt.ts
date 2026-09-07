@@ -2,9 +2,9 @@ import type { Item } from "../../../entities/item";
 
 export const wolfPelt: Item = {
   id: "wolf-pelt",
-  name: "Pele de Lobo",
+  name: "Wolf Pelt",
   description:
-    "Despojo da caça. Vale o bronze que o mercado paga por ele; não serve de arma nem de enfeite.",
+    "Spoils of the hunt. Worth the bronze the market pays for it; no use as a weapon or an ornament.",
   category: "material",
   rarity: "uncommon",
   price: 50,

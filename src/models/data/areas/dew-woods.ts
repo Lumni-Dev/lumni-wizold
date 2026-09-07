@@ -2,8 +2,8 @@ import type { Territory } from "./types";
 
 export const dewWoods: Territory = {
   id: "dew-woods",
-  name: "Mata do Orvalho",
-  description: "Árvores baixas e chão que nunca seca, guardando cada pegada como se fosse prova. A neblina rala engana a vista, mas não o faro, e o veado sabe disso: ele para, escuta e some antes de você levantar a cabeça. Quem volta de mãos vazias daqui costuma repetir o mesmo erro na semana seguinte.",
+  name: "Dew Woods",
+  description: "Low trees and ground that never dries, keeping every footprint like evidence. The thin mist fools the eye but not the nose, and the deer knows it: it stops, listens and vanishes before you lift your head. Whoever comes back empty-handed from here tends to repeat the same mistake the following week.",
   species: "deer",
   minLevel: 101,
   maxLevel: 200,

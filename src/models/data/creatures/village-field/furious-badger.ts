@@ -2,7 +2,7 @@ import type { Creature } from "../types";
 
 export const furiousBadger: Creature = {
   id: "furious-badger",
-  name: "Texugo Furioso",
+  name: "Furious Badger",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 81,

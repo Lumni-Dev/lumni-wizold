@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const bloodSorceress: Creature = {
   id: "blood-sorceress",
-  name: "Feiticeira de Sangue",
-  description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
+  name: "Blood Sorceress",
+  description: "Hunters, mercenaries and fanatics. They come with silver, fire and method.",
   species: "human",
   level: 841,
   health: 186968,

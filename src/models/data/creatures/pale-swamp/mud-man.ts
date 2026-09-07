@@ -2,7 +2,7 @@ import type { Creature } from "../types";
 
 export const mudMan: Creature = {
   id: "mud-man",
-  name: "Homem-Lodo",
+  name: "Mire Man",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 361,

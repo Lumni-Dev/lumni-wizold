@@ -2,7 +2,7 @@ import type { Ore } from "./types";
 
 export const goldVein: Ore = {
   id: "gold-vein",
-  label: "Fragmento de Ouro",
+  label: "Gold Fragment",
   fragmentId: "gold-fragment",
   set: "gold",
   requiredLevel: 401,

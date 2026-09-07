@@ -2,7 +2,7 @@ import type { Creature } from "../types";
 
 export const deadKnight: Creature = {
   id: "dead-knight",
-  name: "Cavaleiro Morto",
+  name: "Dead Knight",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 641,

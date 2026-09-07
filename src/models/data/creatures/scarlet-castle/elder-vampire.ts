@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const elderVampire: Creature = {
   id: "elder-vampire",
-  name: "Vampiro Ancião",
-  description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
+  name: "Elder Vampire",
+  description: "They do not breathe, do not tire, and already know the taste of your blood.",
   species: "vampire",
   level: 861,
   health: 257493,

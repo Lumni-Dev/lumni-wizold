@@ -3,13 +3,13 @@ import type { SetDefinition } from "./types";
 export const silverSet: SetDefinition = {
   key: "silver",
   label: "Metal",
-  suffixMasculine: "de Metal",
-  suffixFeminine: "de Metal",
+  suffixMasculine: "Metal",
+  suffixFeminine: "Metal",
   rarity: "uncommon",
   minLevel: 201,
   inMarket: true,
-  description: "Metal de verdade, do tipo que a fera não recusa no corpo.",
+  description: "Real metal, the kind the beast does not refuse on the body.",
   flavor:
-    "Chapa batida a frio e forrada de couro por dentro, sem uma linha de prata em lugar " +
-    "nenhum. Foi arrancada dos caçadores e refundida até não sobrar nada do que ardia.",
+    "Cold-beaten plate lined with leather inside, without a line of silver anywhere. " +
+    "It was torn from the hunters and resmelted until nothing that burned was left.",
   power: 100,};

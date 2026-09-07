@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const ghoul: Creature = {
   id: "ghoul",
-  name: "Carniçal",
-  description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
+  name: "Ghoul",
+  description: "They do not breathe, do not tire, and already know the taste of your blood.",
   species: "vampire",
   level: 631,
   health: 41988,

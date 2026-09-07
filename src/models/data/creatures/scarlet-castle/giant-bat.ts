@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const giantBat: Creature = {
   id: "giant-bat",
-  name: "Morcego Gigante",
-  description: "Pequenos, rápidos e em número maior do que parece. O primeiro sangue de qualquer lobisomem.",
+  name: "Giant Bat",
+  description: "Small, fast and more numerous than they look. The first blood of any werewolf.",
   species: "rabbit",
   level: 811,
   health: 123757,

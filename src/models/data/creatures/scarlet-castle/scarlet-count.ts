@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const scarletCount: Creature = {
   id: "scarlet-count",
-  name: "Conde Escarlate",
-  description: "Nada aqui é gentil. O chifre atravessa antes de você ouvir o galope.",
+  name: "Scarlet Count",
+  description: "Nothing here is gentle. The horn runs you through before you hear the gallop.",
   species: "unicorn",
   level: 881,
   health: 302601,

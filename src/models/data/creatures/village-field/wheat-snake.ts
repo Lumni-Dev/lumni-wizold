@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const wheatSnake: Creature = {
   id: "wheat-snake",
-  name: "Cobra do Trigo",
-  description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
+  name: "Wheat Snake",
+  description: "They do not breathe, do not tire, and already know the taste of your blood.",
   species: "vampire",
   level: 71,
   health: 588,

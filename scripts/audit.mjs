@@ -973,7 +973,7 @@ sec("hunt");
     .listTerritories(inGap)
     .find((entry) => entry.territory.id === "village-field");
   const topOfArea1 = creaturesData.findCreature("forest-lynx");
-  ok("the prey is the strongest unlocked variant", gapView.prey.name === "Lince do Mato");
+  ok("the prey is the strongest unlocked variant", gapView.prey.name === topOfArea1.name);
   ok("the fixed prey does not scale with hunter level", gapView.prey.health === topOfArea1.health);
   const withPet = baseState({ level: 10, form: "werewolf" });
   withPet.pet = {

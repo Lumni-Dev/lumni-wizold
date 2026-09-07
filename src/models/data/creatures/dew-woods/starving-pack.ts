@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const starvingPack: Creature = {
   id: "starving-pack",
-  name: "Alcateia Faminta",
-  description: "Caçadores, mercenários e fanáticos. Vêm com prata, fogo e método.",
+  name: "Starving Pack",
+  description: "Hunters, mercenaries and fanatics. They come with silver, fire and method.",
   species: "human",
   level: 191,
   health: 1087,

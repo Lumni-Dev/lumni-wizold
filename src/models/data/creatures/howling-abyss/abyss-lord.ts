@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const abyssLord: Creature = {
   id: "abyss-lord",
-  name: "Senhor do Abismo",
-  description: "Nada aqui é gentil. O chifre atravessa antes de você ouvir o galope.",
+  name: "Lord of the Abyss",
+  description: "Nothing here is gentle. The horn runs you through before you hear the gallop.",
   species: "unicorn",
   level: 781,
   health: 102821,

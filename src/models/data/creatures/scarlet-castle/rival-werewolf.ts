@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const rivalWerewolf: Creature = {
   id: "rival-werewolf",
-  name: "Lobisomem Rival",
-  description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
+  name: "Rival Werewolf",
+  description: "They do not breathe, do not tire, and already know the taste of your blood.",
   species: "vampire",
   level: 851,
   health: 237864,

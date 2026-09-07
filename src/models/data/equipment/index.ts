@@ -57,8 +57,9 @@ export function pieceId(set: EquipmentSet, slot: EquipmentSlot, lineage?: Gender
 
 export function pieceName(definition: SetDefinition, slot: EquipmentSlot): string {
   const blueprint = SLOTS[slot];
-  const suffix = blueprint.feminine ? definition.suffixFeminine : definition.suffixMasculine;
-  return blueprint.noun + " " + suffix;
+  const material = blueprint.feminine ? definition.suffixFeminine : definition.suffixMasculine;
+  // English order: the material comes first ("Bronze Cap", "Lunar Boots").
+  return material + " " + blueprint.noun;
 }
 
 function scaleAttributes(

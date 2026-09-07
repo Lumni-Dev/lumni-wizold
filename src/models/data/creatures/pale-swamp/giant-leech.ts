@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const giantLeech: Creature = {
   id: "giant-leech",
-  name: "Sanguessuga Gigante",
-  description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
+  name: "Giant Leech",
+  description: "They do not breathe, do not tire, and already know the taste of your blood.",
   species: "vampire",
   level: 321,
   health: 3322,

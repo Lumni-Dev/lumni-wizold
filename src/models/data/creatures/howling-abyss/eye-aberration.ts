@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const eyeAberration: Creature = {
   id: "eye-aberration",
-  name: "Aberração Ocular",
-  description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
+  name: "Ocular Aberration",
+  description: "They do not breathe, do not tire, and already know the taste of your blood.",
   species: "vampire",
   level: 731,
   health: 80997,

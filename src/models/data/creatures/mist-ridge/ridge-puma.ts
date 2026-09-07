@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const ridgePuma: Creature = {
   id: "ridge-puma",
-  name: "Puma da Serra",
-  description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
+  name: "Mountain Puma",
+  description: "They do not breathe, do not tire, and already know the taste of your blood.",
   species: "vampire",
   level: 231,
   health: 1977,

@@ -2,7 +2,7 @@ import type { Creature } from "../types";
 
 export const wanderingKnight: Creature = {
   id: "wandering-knight",
-  name: "Cavaleiro Errante",
+  name: "Wandering Knight",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 461,

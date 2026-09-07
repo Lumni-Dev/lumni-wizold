@@ -2,9 +2,9 @@ import type { Item } from "../../../entities/item";
 
 export const graveDirt: Item = {
   id: "grave-dirt",
-  name: "Terra de Cova",
+  name: "Grave Dirt",
   description:
-    "Despojo da caça. Vale o bronze que o mercado paga por ele; não serve de arma nem de enfeite.",
+    "Spoils of the hunt. Worth the bronze the market pays for it; no use as a weapon or an ornament.",
   category: "material",
   rarity: "common",
   price: 10,

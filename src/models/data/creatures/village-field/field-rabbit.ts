@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const fieldRabbit: Creature = {
   id: "field-rabbit",
-  name: "Coelho do Campo",
-  description: "Pequenos, rápidos e em número maior do que parece. O primeiro sangue de qualquer lobisomem.",
+  name: "Field Rabbit",
+  description: "Small, fast and more numerous than they look. The first blood of any werewolf.",
   species: "rabbit",
   level: 1,
   health: 145,

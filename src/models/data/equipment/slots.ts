@@ -3,62 +3,62 @@ import type { SlotBlueprint } from "./types";
 
 export const SLOTS: Record<EquipmentSlot, SlotBlueprint> = {
   helmet: {
-    noun: "Gorro",
+    noun: "Cap",
     feminine: false,
     flavor:
-      "Couro forrado de pele, com as abas amarradas por baixo do queixo. Esconde o que o " +
-      "rosto entrega quando a fera começa a subir, e numa noite cheia isso poupa explicação.",
-    attributes: { endurance: 0.35, instinct: 0.15 },  },
+      "Fur-lined leather with the flaps tied under the chin. It hides what the face " +
+      "gives away when the beast starts to rise, and on a full night that spares explanations.",
+    attributes: { endurance: 0.35, instinct: 0.15 },  },
   necklace: {
-    noun: "Colar",
+    noun: "Necklace",
     feminine: false,
     flavor:
-      "Pende sobre o peito e mantém o instinto desperto mesmo longe da trilha. O metal " +
-      "esquenta um instante antes de a presa aparecer, e a matilha aprendeu a confiar nisso.",
-    attributes: { instinct: 0.4, willpower: 0.3 },  },
+      "It hangs over the chest and keeps the instinct awake even far from the trail. The " +
+      "metal warms an instant before the prey appears, and the pack learned to trust that.",
+    attributes: { instinct: 0.4, willpower: 0.3 },  },
   armor: {
-    noun: "Casaco",
+    noun: "Coat",
     feminine: false,
     flavor:
-      "Couro pesado e gola de pele, cobrindo o tronco, que é onde uma fera mira quando " +
-      "reconhece outra. É a peça que decide se a mordida vira cicatriz para contar.",
-    attributes: { endurance: 0.75 },  },
+      "Heavy leather and a fur collar covering the torso, which is where a beast aims " +
+      "when it recognizes another. It is the piece that decides whether the bite becomes a scar to tell.",
+    attributes: { endurance: 0.75 },  },
   pants: {
-    noun: "Calças",
+    noun: "Pants",
     feminine: true,
     flavor:
-      "Reforço nas pernas para a corrida de quatro patas e a queda de duas. Numa " +
-      "perseguição longa, o que cede primeiro nunca é o braço.",
-    attributes: { endurance: 0.45, agility: 0.2 },  },
+      "Reinforced legs for the four-pawed run and the two-legged fall. In a long " +
+      "chase, what gives first is never the arm.",
+    attributes: { endurance: 0.45, agility: 0.2 },  },
   boots: {
-    noun: "Botas",
+    noun: "Boots",
     feminine: true,
     flavor:
-      "Solado firme para pedra, lama e telhado molhado, e folgado o bastante para o pé " +
-      "que cresce na virada. Alcançar é metade da caçada.",
-    attributes: { agility: 0.5 },  },
+      "A firm sole for stone, mud and wet rooftops, loose enough for the foot that " +
+      "grows in the turning. Reaching is half the hunt.",
+    attributes: { agility: 0.5 },  },
   claw: {
-    noun: "Luvas",
+    noun: "Gloves",
     feminine: true,
     flavor:
-      "Presas de metal para os dedos, úteis nas noites em que as suas ainda não saíram. " +
-      "É o golpe da matilha, e a mão esquece que está armada até ver o estrago.",
-    attributes: { strength: 1 },  },
+      "Metal fangs for the fingers, useful on nights when yours have not come out yet. " +
+      "It is the pack's blow, and the hand forgets it is armed until it sees the damage.",
+    attributes: { strength: 1 },  },
   ring: {
-    noun: "Anel",
+    noun: "Ring",
     feminine: false,
     flavor:
-      "Pequeno, discreto, e ainda assim pesa na mão. Aperta o dedo quando a fúria sobe, " +
-      "como uma coleira curta lembrando quem manda em quem.",
-    attributes: { strength: 0.25, willpower: 0.15 },  },
+      "Small, discreet, and still heavy in the hand. It squeezes the finger when the " +
+      "fury climbs, like a short collar reminding who commands whom.",
+    attributes: { strength: 0.25, willpower: 0.15 },  },
 };
 
 export const SLOT_ROLE: Record<EquipmentSlot, string> = {
-  helmet: "Resistência leve e atributos de percepção.",
-  necklace: "Somente atributos, sem resistência direta.",
-  armor: "A maior fatia de resistência do conjunto.",
-  pants: "Resistência média com ganho de agilidade.",
-  boots: "Resistência baixa, agilidade alta.",
-  claw: "Fonte principal de força.",
-  ring: "Somente atributos, sem resistência direta.",
+  helmet: "Light endurance and perception attributes.",
+  necklace: "Attributes only, no direct endurance.",
+  armor: "The set's biggest slice of endurance.",
+  pants: "Medium endurance with an agility gain.",
+  boots: "Low endurance, high agility.",
+  claw: "The main source of strength.",
+  ring: "Attributes only, no direct endurance.",
 };

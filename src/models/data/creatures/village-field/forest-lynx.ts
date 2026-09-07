@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const forestLynx: Creature = {
   id: "forest-lynx",
-  name: "Lince do Mato",
-  description: "Não respiram, não cansam e já conhecem o gosto do seu sangue.",
+  name: "Forest Lynx",
+  description: "They do not breathe, do not tire, and already know the taste of your blood.",
   species: "vampire",
   level: 91,
   health: 700,

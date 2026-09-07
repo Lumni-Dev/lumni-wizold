@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const wildDog: Creature = {
   id: "wild-dog",
-  name: "Cão Selvagem",
-  description: "Fogem bem e chutam melhor. Alimentam uma matilha inteira por semanas.",
+  name: "Wild Dog",
+  description: "They flee well and kick better. They feed a whole pack for weeks.",
   species: "deer",
   level: 51,
   health: 404,

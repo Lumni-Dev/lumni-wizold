@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const shadowImp: Creature = {
   id: "shadow-imp",
-  name: "Imp das Sombras",
-  description: "Pequenos, rápidos e em número maior do que parece. O primeiro sangue de qualquer lobisomem.",
+  name: "Shadow Imp",
+  description: "Small, fast and more numerous than they look. The first blood of any werewolf.",
   species: "rabbit",
   level: 701,
   health: 53464,

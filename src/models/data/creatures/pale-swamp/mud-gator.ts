@@ -2,7 +2,7 @@ import type { Creature } from "../types";
 
 export const mudGator: Creature = {
   id: "mud-gator",
-  name: "Jacaré do Lodo",
+  name: "Mud Alligator",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 311,

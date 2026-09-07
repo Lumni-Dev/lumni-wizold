@@ -2,8 +2,8 @@ import type { Creature } from "../types";
 
 export const moonAvatar: Creature = {
   id: "moon-avatar",
-  name: "Avatar da Lua",
-  description: "Nada aqui é gentil. O chifre atravessa antes de você ouvir o galope.",
+  name: "Avatar of the Moon",
+  description: "Nothing here is gentle. The horn runs you through before you hear the gallop.",
   species: "unicorn",
   level: 991,
   health: 520225,

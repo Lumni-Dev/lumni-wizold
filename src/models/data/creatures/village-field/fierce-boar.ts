@@ -2,7 +2,7 @@ import type { Creature } from "../types";
 
 export const fierceBoar: Creature = {
   id: "fierce-boar",
-  name: "Javali Bravo",
+  name: "Fierce Boar",
   description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
   species: "bear",
   level: 61,
