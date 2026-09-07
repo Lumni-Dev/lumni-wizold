@@ -117,7 +117,7 @@ export function TrainingScreen() {
                     label={exercise.name}
                     description={
                       <span className="font-mono text-[11px] text-ink">
-                        NV. {formatFraction(exactValue)}
+                        NV. {formatNumber(row?.value ?? 0)}
                         <span className="text-ink-faint">
                           {" / " + formatNumber(MAX_ATTRIBUTE_VALUE)}
                         </span>
@@ -218,12 +218,7 @@ export function TrainingScreen() {
                   label="Treino do mascote"
                   description={
                     <span className="font-mono text-[11px] text-ink">
-                      NV.{" "}
-                      {formatFraction(
-                        petTraining.maxed
-                          ? petTraining.level
-                          : petTraining.level + petTraining.progress / petTraining.needed,
-                      )}
+                      NV. {formatNumber(petTraining.level)}
                       <span className="text-ink-faint">
                         {" / " + formatNumber(PET_MAX_LEVEL)}
                       </span>
