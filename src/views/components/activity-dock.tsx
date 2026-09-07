@@ -400,7 +400,7 @@ export function ActivityDock() {
 
   const stopLabel =
     dock.canStop && dock.cooldown !== null
-      ? "Parar (" + dock.cooldown + ")"
+      ? "Stop (" + dock.cooldown + ")"
       : dock.canStop
         ? "Stop"
         : runningLabel;

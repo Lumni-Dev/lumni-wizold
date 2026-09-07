@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
+import { activityCardStore } from "@/controllers/activity-card.store";
 import { useGame } from "@/controllers/game.context";
 import { petTrainingView } from "@/controllers/pet.controller";
 import {
@@ -61,6 +62,33 @@ export function TrainingScreen() {
   const petActive = activeExercise === PET_EXERCISE_ID;
   const petReady = petTraining !== null && !petTraining.maxed && petTraining.affordable;
 
+  // Same deal as the hunt page: while the running card is scrolled out of
+  // sight, the floating dock steps in; back on screen, the dock stands down.
+  const focusExercise = activeExercise ?? waitingExercise;
+  useEffect(() => {
+    if (!focusExercise) {
+      activityCardStore.set(true);
+      return;
+    }
+    const target = document.querySelector('[data-train-card="' + focusExercise + '"]');
+    if (!target) {
+      activityCardStore.set(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry) activityCardStore.set(entry.isIntersecting);
+      },
+      { threshold: 0 },
+    );
+    observer.observe(target);
+    return () => {
+      observer.disconnect();
+      activityCardStore.set(true);
+    };
+  }, [focusExercise]);
+
   if (!character || !stats) return null;
 
   function toggleTraining(exerciseId: string, ready: boolean) {
@@ -116,8 +144,8 @@ export function TrainingScreen() {
             const opting = active && cooldown !== null;
 
             return (
+              <div key={exercise.id} data-train-card={exercise.id}>
               <Card
-                key={exercise.id}
                 height="fill"
                 interactive={active || ready}
                 tone={active ? "highlighted" : "default"}
@@ -214,17 +242,19 @@ export function TrainingScreen() {
                     disabled={active ? !opting : !ready || locked}
                   >
                     {opting
-                      ? "Parar (" + cooldown + ")"
+                      ? "Stop (" + cooldown + ")"
                       : active
                         ? "Training..."
                         : waitLabel || "Train"}
                   </Button>
                 </CardFooter>
               </Card>
+              </div>
             );
           })}
 
           {petTraining ? (
+            <div data-train-card={PET_EXERCISE_ID}>
             <Card
               height="fill"
               interactive={petActive || petReady}
@@ -241,7 +271,7 @@ export function TrainingScreen() {
                         {" / " + formatNumber(PET_MAX_LEVEL)}
                       </span>
                       {petTraining.level >= PET_MAX_LEVEL ? (
-                        <span className="ml-1 text-[10px] text-ink-faint">teto</span>
+                        <span className="ml-1 text-[10px] text-ink-faint">{t("cap")}</span>
                       ) : null}
                     </span>
                   }
@@ -315,13 +345,14 @@ export function TrainingScreen() {
                   disabled={petActive ? cooldown === null : !petReady || locked}
                 >
                   {petActive && cooldown !== null
-                    ? "Parar (" + cooldown + ")"
+                    ? "Stop (" + cooldown + ")"
                     : petActive
                       ? "Training..."
                       : waitLabel || "Train"}
                 </Button>
               </CardFooter>
             </Card>
+            </div>
           ) : null}
         </div>
       </Panel>

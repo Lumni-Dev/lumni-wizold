@@ -292,7 +292,7 @@ export function ForgeScreen() {
                     aria-label={activeOre ? "Stop mining" : "Mine the chosen vein"}
                   >
                     {mineOpting
-                      ? "Parar (" + cooldown + ")"
+                      ? "Stop (" + cooldown + ")"
                       : activeOre
                         ? "Mining..."
                         : waitLabel || "Mine"}
@@ -452,7 +452,7 @@ export function ForgeScreen() {
                         aria-label={forgeActive ? "Stop forging" : "Forge the chosen piece"}
                       >
                         {forgeOpting && forgeActive
-                          ? "Parar (" + cooldown + ")"
+                          ? "Stop (" + cooldown + ")"
                           : forgeActive
                             ? "Forging..."
                             : waitLabel || "Forge"}

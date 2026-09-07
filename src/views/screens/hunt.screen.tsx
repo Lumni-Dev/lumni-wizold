@@ -525,7 +525,7 @@ export function HuntScreen() {
                       disabled={active ? !opting : !available || locked}
                     >
                       {opting
-                        ? "Parar (" + cooldown + ")"
+                        ? "Stop (" + cooldown + ")"
                         : active
                           ? "Hunting..."
                           : waitLabel || "Hunt"}
