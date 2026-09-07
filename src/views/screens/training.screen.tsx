@@ -94,7 +94,7 @@ export function TrainingScreen() {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {exercises.map(({ exercise, effort, affordable, maxed, reason }) => {
             const row = progress.find((entry) => entry.key === exercise.attribute);
-            const summary = trainingSummary(row?.value ?? 0, effort);
+            const summary = trainingSummary(row?.value ?? 0, row?.progress ?? 0, effort);
             const exactValue = row
               ? row.value >= MAX_ATTRIBUTE_VALUE
                 ? row.value

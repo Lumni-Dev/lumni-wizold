@@ -5,11 +5,7 @@ import type { GameState } from "@/models/entities/game-state";
 import { failure, success, type Result } from "@/models/entities/result";
 import type { Exercise } from "@/models/entities/exercise";
 import { applyTrainingProgress, progressNeeded } from "@/models/rules/progression";
-import {
-  trainingEffort,
-  trainingSessionsPerPoint,
-  type TrainingEffort,
-} from "@/models/rules/training";
+import { trainingEffort, type TrainingEffort } from "@/models/rules/training";
 import { syncCharacter } from "./character.controller";
 import { addLog } from "./log.controller";
 
@@ -57,11 +53,16 @@ export interface TrainingSummary {
   sessions: number;
 }
 
-export function trainingSummary(value: number, effort: TrainingEffort): TrainingSummary {
+export function trainingSummary(
+  value: number,
+  progress: number,
+  effort: TrainingEffort,
+): TrainingSummary {
+  const needed = progressNeeded(value);
   return {
-    pointShare: effort.progress / progressNeeded(value),
+    pointShare: effort.progress / needed,
     progress: effort.progress,
-    sessions: trainingSessionsPerPoint(value),
+    sessions: Math.max(1, Math.ceil(Math.max(0, needed - progress) / effort.progress)),
   };
 }
 
