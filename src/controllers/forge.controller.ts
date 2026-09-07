@@ -44,7 +44,6 @@ export interface MiningView {
   level: number;
   progress: number;
   needed: number;
-  effort: number;
   maxed: boolean;
   ores: AvailableOre[];
   dailyRemaining: number;
@@ -77,7 +76,6 @@ export function listMining(state: GameState, now: number = Date.now()): MiningVi
     level: mining.level,
     progress: maxed ? needed : mining.progress,
     needed,
-    effort: miningEffort(mining.level),
     maxed,
     ores,
     dailyRemaining,

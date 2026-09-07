@@ -55,6 +55,12 @@ export function petTrainingEffort(level: number): number {
   return Math.max(1, Math.round(petTrainingNeeded(level) / 5));
 }
 
+export function petTotalTraining(level: number, progress: number): number {
+  let sum = progress;
+  for (let step = 1; step < level; step += 1) sum += petTrainingNeeded(step);
+  return sum;
+}
+
 export function petTrainingSessionCost(level: number, hunterLevel: number): number {
   const base = Math.max(1, Math.round(huntPurse(hunterLevel) * ECONOMY.trainingSessionHunts));
   return base + Math.max(0, level - 1);

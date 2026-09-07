@@ -14,6 +14,7 @@ import {
   type SetFilter,
 } from "../presenters/item-filter.presenter";
 import { enhancedName } from "@/models/rules/forge";
+import { totalExperience } from "@/models/rules/progression";
 import {
   FORGE_TICKS,
   MAX_ENHANCEMENT,
@@ -29,6 +30,7 @@ import { clampPage, pageCount, pageOf, pageOfPosition } from "@/shared/utils/pag
 import { normalizeText } from "@/shared/utils/text";
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
+import { GainDelta } from "../components/gain-delta";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { ItemArtFill } from "../components/item-icon";
 import { EmptyState } from "../components/empty-state";
@@ -224,7 +226,11 @@ export function ForgeScreen() {
                   current={mining.progress}
                   maximum={mining.needed}
                   tone="experience"
-                  delta={mining.maxed ? undefined : "+" + formatNumber(mining.effort)}
+                  delta={
+                    mining.maxed ? undefined : (
+                      <GainDelta total={totalExperience(mining.level, mining.progress)} />
+                    )
+                  }
                   deltaTone="experience"
                   wraps
                 />
@@ -235,7 +241,9 @@ export function ForgeScreen() {
                   tone="tide"
                   current={mining.dailyRemaining}
                   maximum={mining.dailyLimit}
-                  delta={mining.dailyExhausted ? undefined : "-1"}
+                  delta={
+                    <GainDelta total={mining.dailyLimit - mining.dailyRemaining} sign="-" />
+                  }
                   deltaTone="tide"
                 />
                 <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">

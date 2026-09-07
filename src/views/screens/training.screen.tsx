@@ -10,6 +10,8 @@ import {
 } from "@/controllers/training.controller";
 import { ACTIVITY_WAIT_LABEL, useActivityLock } from "@/controllers/use-activity-lock";
 import { useVisibleActivity } from "@/controllers/use-visible-activity";
+import { petTotalTraining } from "@/models/rules/pet";
+import { totalExperience } from "@/models/rules/progression";
 import {
   MAX_ATTRIBUTE_VALUE,
   PET_EXERCISE_ID,
@@ -20,6 +22,7 @@ import {
 import { formatFraction, formatNumber, formatBronze } from "@/shared/utils/format";
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
+import { GainDelta } from "../components/gain-delta";
 import { Tag } from "../components/tag";
 import { PetArtFill } from "../components/pet-icon";
 import { TrainingArtFill } from "../components/training-icon";
@@ -143,9 +146,9 @@ export function TrainingScreen() {
                       maximum={row.needed}
                       tone="experience"
                       delta={
-                        row.value < MAX_ATTRIBUTE_VALUE
-                          ? "+" + formatNumber(summary.progress)
-                          : undefined
+                        row.value < MAX_ATTRIBUTE_VALUE ? (
+                          <GainDelta total={totalExperience(row.value, row.progress)} />
+                        ) : undefined
                       }
                       deltaTone="experience"
                       wraps
@@ -243,9 +246,11 @@ export function TrainingScreen() {
                   maximum={petTraining.needed}
                   tone="experience"
                   delta={
-                    petTraining.maxed
-                      ? undefined
-                      : "+" + formatNumber(petTraining.effort.progress)
+                    petTraining.maxed ? undefined : (
+                      <GainDelta
+                        total={petTotalTraining(petTraining.level, petTraining.progress)}
+                      />
+                    )
                   }
                   deltaTone="experience"
                   wraps
