@@ -95,6 +95,7 @@ function accumulate(session: HuntSession, report: HuntReport): HuntSession {
 }
 function CombatReport({ report, lines }: { report: HuntReport; lines: NarrationLine[] }) {
   const { combat, creature, territory } = report;
+  const t = useT();
   const outcome = hunterWon(combat) ? "Vitória" : hunterRetreated(combat) ? "Recuo" : "Derrota";
   return (
     <Panel
@@ -135,11 +136,11 @@ function CombatReport({ report, lines }: { report: HuntReport; lines: NarrationL
           )}
           {report.levelsGained > 0 ? (
             <p className="text-xs text-ink">
-              Você subiu {report.levelsGained} nível(is) nesta caçada.
+              {t("Você subiu " + report.levelsGained + " nível(is) nesta caçada.")}
             </p>
           ) : null}
           {report.petLeveled ? (
-            <p className="text-xs text-ink">O lobo subiu de nível nesta caçada.</p>
+            <p className="text-xs text-ink">{t("O lobo subiu de nível nesta caçada.")}</p>
           ) : null}
         </div>
       </div>
@@ -407,14 +408,14 @@ export function HuntScreen() {
                     </div>
                   ) : null}
                   <div className="p-4">
-                    <h2 className="text-sm text-ink">{territory.name}</h2>
+                    <h2 className="text-sm text-ink">{t(territory.name)}</h2>
                     <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                      {DANGER_LABEL[territory.danger]}
+                      {t(DANGER_LABEL[territory.danger])}
                     </p>
                   </div>
                   <div className="space-y-3 px-4 py-3">
                     <p className="text-xs leading-relaxed text-ink-faint">
-                      {territory.description}
+                      {t(territory.description)}
                     </p>
                     <NarrationButton
                       playing={narration.current === areaVoice(territory.id)}
@@ -557,7 +558,7 @@ export function HuntScreen() {
                                       : "text-ink-faint",
                                 )}
                               >
-                                {creature.name}
+                                {t(creature.name)}
                               </span>
                             }
                             description={
@@ -570,9 +571,9 @@ export function HuntScreen() {
                                   {formatNumber(
                                     Math.round(creature.experience * (1 + xpBonus)),
                                   )}{" "}
-                                  de experiência
+                                  {t("de experiência")}
                                   {xpBonus > 0
-                                    ? " (+" + Math.round(xpBonus * 100) + "% lua)"
+                                    ? " (+" + Math.round(xpBonus * 100) + "% " + t("lua") + ")"
                                     : ""}
                                 </span>
                               </>

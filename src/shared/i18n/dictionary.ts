@@ -280,14 +280,39 @@ const RULES: readonly PatternRule[] = [
     en: "$1 hunt materials and companion supplies in the catalog.",
     es: "$1 materiales de caza y suministros de compañero en el catálogo.",
   },
+  {
+    pattern: /^(Atacando|Preparando|Aguardando) · (.+)$/,
+    en: "$1 · $2",
+    es: "$1 · $2",
+  },
+  {
+    pattern: /^(.+) - (.+) \(NV\. (.+)\)$/,
+    en: "$1 - $2 (LV. $3)",
+    es: "$1 - $2 (NV. $3)",
+  },
+  {
+    pattern: /^Você subiu (\d+) nível\(is\) nesta caçada\.$/,
+    en: "You climbed $1 level(s) on this hunt.",
+    es: "Subiste $1 nivel(es) en esta cacería.",
+  },
+  // Keep last: forged names ("Gorro de Bronze +3") translate the base and keep the level.
+  { pattern: /^(.+) \+(\d+)$/, en: "$1 +$2", es: "$1 +$2" },
 ];
 
-export function translate(text: string, locale: Locale): string {
+export function translate(text: string, locale: Locale, depth = 0): string {
   if (locale === "pt") return text;
   const direct = MAPS[locale][text];
   if (direct !== undefined) return direct;
+  if (depth >= 3) return text;
   for (const rule of RULES) {
-    if (rule.pattern.test(text)) return text.replace(rule.pattern, rule[locale]);
+    const match = text.match(rule.pattern);
+    if (match) {
+      // Captures are translated on their own, so a rule like "$1 +$2" can
+      // carry an item name or another translated phrase through.
+      return rule[locale].replace(/\$(\d)/g, (_, index: string) =>
+        translate(match[Number(index)] ?? "", locale, depth + 1),
+      );
+    }
   }
   return text;
 }
