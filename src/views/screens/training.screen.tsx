@@ -95,6 +95,11 @@ export function TrainingScreen() {
           {exercises.map(({ exercise, effort, affordable, maxed, reason }) => {
             const row = progress.find((entry) => entry.key === exercise.attribute);
             const summary = trainingSummary(row?.value ?? 0, effort);
+            const exactValue = row
+              ? row.value >= MAX_ATTRIBUTE_VALUE
+                ? row.value
+                : row.value + row.progress / row.needed
+              : 0;
             const ready = !maxed && affordable;
             const active = activeExercise === exercise.id;
             const opting = active && cooldown !== null;
@@ -112,7 +117,7 @@ export function TrainingScreen() {
                     label={exercise.name}
                     description={
                       <span className="font-mono text-[11px] text-ink">
-                        NV. {formatNumber(row?.value ?? 0)}
+                        NV. {formatFraction(exactValue)}
                         <span className="text-ink-faint">
                           {" / " + formatNumber(MAX_ATTRIBUTE_VALUE)}
                         </span>
@@ -209,7 +214,12 @@ export function TrainingScreen() {
                   label="Treino do mascote"
                   description={
                     <span className="font-mono text-[11px] text-ink">
-                      NV. {formatNumber(petTraining.level)}
+                      NV.{" "}
+                      {formatFraction(
+                        petTraining.maxed
+                          ? petTraining.level
+                          : petTraining.level + petTraining.progress / petTraining.needed,
+                      )}
                       <span className="text-ink-faint">
                         {" / " + formatNumber(PET_MAX_LEVEL)}
                       </span>
