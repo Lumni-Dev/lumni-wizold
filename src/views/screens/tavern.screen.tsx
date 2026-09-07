@@ -30,7 +30,6 @@ import {
   roomTitle,
 } from "@/models/entities/tavern";
 import { isVip } from "@/models/rules/vip";
-import { nickColorClass } from "@/models/rules/tavern-nicks";
 import { NAME_MAX_LENGTH } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
 import { sanitizeName, sanitizeRoomSearch } from "@/shared/utils/text";
@@ -819,38 +818,17 @@ export function TavernScreen() {
                             </Tag>
                           </>
                         )}
+                        <Tag tone="neutral">
+                          {memberCount +
+                            " / " +
+                            (isPrivate ? 2 : MAX_ROOM_MEMBERS) +
+                            (memberCount === 1 ? " pessoa" : " pessoas")}
+                        </Tag>
                       </div>
-                      <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                        {isPrivate
-                          ? "Mesa para dois"
-                          : memberCount + " de " + MAX_ROOM_MEMBERS + " pessoas"}
-                      </p>
                     </div>
                   </CardHeader>
 
                   <CardBody>
-                    <ul className="flex grow items-center gap-3 overflow-x-auto pb-1">
-                      {room.members.map((member) => (
-                        <li key={member.id} className="shrink-0 whitespace-nowrap text-xs">
-                          <Tooltip
-                            label={describeDoing(
-                              member.name,
-                              doingFor(member.id, identity.id, mineDoing, tavernDoing),
-                            )}
-                          >
-                            <MemberName
-                              href={profileHref(member.id)}
-                              name={member.name}
-                              className={nickColorClass(member.nickColor)}
-                            />
-                          </Tooltip>
-                          {!isPrivate && member.id === room.ownerId ? (
-                            <span className="ml-1 text-ink-faint">(dono)</span>
-                          ) : null}
-                        </li>
-                      ))}
-                    </ul>
-
                     {locked && !isMember ? (
                       <Field
                         type="password"
