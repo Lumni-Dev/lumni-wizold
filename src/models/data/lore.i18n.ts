@@ -23,51 +23,51 @@ export interface LorePack {
   pillars: readonly LorePillar[];
 }
 
-const EN_CHAPTERS: readonly { title: string; text: string }[] = [
+// English is the source in lore.ts; these are the Portuguese and Spanish packs.
+// The unsuffixed voice file is the Portuguese recording, so pt keeps the base
+// path and en/es derive their ".en"/".es" files.
+const PT_CHAPTERS: readonly { title: string; text: string }[] = [
   {
-    title: "The meeting",
+    title: "O encontro",
     text:
-      "Every story that matters begins with someone waiting in the dark. Luna climbed to the top " +
-      "of the field while the village was still at prayer, and stood in the tall grass counting " +
-      "her own heartbeats. Lumni came later, slow along the trail, carrying in his mouth a " +
-      "rehearsed line the wind took before its time. She laughed, and the laughter settled what " +
-      "the line never would. They stood shoulder to shoulder, speaking low of small things, " +
-      "because the big one fit into no word at all. She was the one who saw it first: the moon " +
-      "had risen whole behind the ridge, too white, too near, watching the two of them like " +
-      "someone recognizing an old debt.",
+      "Toda história que importa começa com alguém esperando no escuro. Luna subiu ao alto do " +
+      "campo quando o vilarejo ainda rezava, e ficou entre o capim alto contando os próprios " +
+      "batimentos. Lumni veio depois, devagar pela trilha, trazendo na boca uma frase ensaiada " +
+      "que o vento levou antes da hora. Ela riu, e o riso resolveu o que a frase não resolveria. " +
+      "Ficaram ombro com ombro, falando baixo de coisas pequenas, porque a grande não cabia em " +
+      "palavra nenhuma. Foi ela quem viu primeiro: a lua tinha subido inteira atrás da serra, " +
+      "branca demais, perto demais, olhando os dois como quem reconhece uma dívida antiga.",
   },
   {
-    title: "The turning",
+    title: "A virada",
     text:
-      "The pain came to both at the same time, and that is the part the village never accepted. " +
-      "There was no bite, no curse bought at a fair: there was the old blood the two had carried " +
-      "since the cradle, waiting for a full moon to remember what it was. Lumni let go first. " +
-      "The bones turned, the voice turned to howl, and the beast tore off into the field without " +
-      "waiting for a name. Luna held hers long enough to watch him vanish; then she understood " +
-      "that holding is also choosing, and let go, so he would not cross the first night alone. " +
-      "In the dark they knew each other by scent, which was still the same as before.",
+      "A dor veio nos dois ao mesmo tempo, e é essa a parte que o vilarejo nunca aceitou. Não " +
+      "houve mordida, nem maldição comprada em feira: havia o sangue antigo que os dois " +
+      "carregavam desde o berço, esperando uma lua cheia para lembrar o que era. Lumni soltou " +
+      "primeiro. Os ossos viraram, a voz virou uivo, e a fera partiu campo adentro sem esperar " +
+      "por nome. Luna segurou a sua o bastante para vê-lo sumir; então entendeu que segurar " +
+      "também é escolher, e soltou, para que ele não atravessasse a primeira noite sozinho. No " +
+      "escuro, reconheceram-se pelo cheiro, que seguia sendo o mesmo de antes.",
   },
   {
-    title: "The choice",
+    title: "A escolha",
     text:
-      "They could have gone down the ridge in opposite directions and never looked at each other " +
-      "again. That is what prudence ordered, and in the village prudence goes by the name of " +
-      "faith. They stayed. They hunted together until the sky lightened, and the body came back " +
-      "to what it was: dirty, trembling and holding hands. Out of that night came the first laws, " +
-      "spoken low before the first rooster: hide the torn clothes, lie well to those who ask " +
-      "little, and count the days by the moon, never by the priest's calendar, because only she " +
-      "knew when the two of them could be whole again.",
+      "Podiam ter descido a serra em direções opostas e nunca mais se olhado. Era o que a " +
+      "prudência mandava, e no vilarejo a prudência tem nome de fé. Ficaram. Caçaram juntos até " +
+      "o céu clarear, e o corpo voltou ao que era: sujo, tremendo e de mãos dadas. Daquela noite " +
+      "saíram as primeiras leis, ditas baixinho antes do primeiro galo: esconder a roupa rasgada, " +
+      "mentir bem para quem pergunta pouco, e contar os dias pela lua, nunca pelo calendário do " +
+      "padre, porque só ela sabia quando os dois poderiam ser inteiros de novo.",
   },
   {
-    title: "The pack",
+    title: "A matilha",
     text:
-      "Then came the others, as they always come. Some born this way, not knowing why the full " +
-      "moon hurts; others with the mark still fresh and no one to explain. They arrived afraid " +
-      "of themselves, and it was Luna who opened the door. She taught how to hold the beast " +
-      "until the right hour; Lumni taught that the right hour exists, and that every hunting " +
-      "night it arrives. The pack that fills the tavern today began there, at the top of the " +
-      "field, with two who only wanted to talk. The moon still rises. Still collects. And no " +
-      "one, on any night, hunts alone.",
+      "Depois vieram outros, como sempre vêm. Uns nascidos assim, sem entender por que a lua " +
+      "cheia dói; outros com a marca ainda fresca e ninguém para explicar. Chegavam com medo de " +
+      "si mesmos, e era Luna quem abria a porta. Ela ensinava a segurar a fera até a hora certa; " +
+      "Lumni ensinava que a hora certa existe, e que toda noite de caça ela chega. A matilha que " +
+      "hoje enche a taverna começou ali, no alto do campo, com dois que só queriam conversar. A " +
+      "lua ainda sobe. Ainda cobra. E ninguém, em noite nenhuma, caça sozinho.",
   },
 ];
 
@@ -118,29 +118,28 @@ const ES_CHAPTERS: readonly { title: string; text: string }[] = [
   },
 ];
 
-const EN_COMPANIONS: readonly { title: string; text: string }[] = [
+const PT_COMPANIONS: readonly { title: string; text: string }[] = [
   {
-    title: "The one who stands in front",
+    title: "O que fica na frente",
     text:
-      "The first came alone, with no collar and no owner, and sat at the gate of the pen like " +
-      "someone who has waited a long time. Broad chest, heavy step, eyes that never looked away. " +
-      "That night the beast went down to the field and he went too, without growling and without " +
-      "backing off: he put his body between the hunter and the creature, and took the first " +
-      "charge in place of the shoulder that was meant to take it. He woke dirty, breathing deep, " +
-      "alive. Since then the pack understands the deal. He does not chase the trail nor choose " +
-      "the prey. He stands in front, and standing in front is already the hardest part of the " +
-      "night.",
+      "O primeiro veio sozinho, sem coleira e sem dono, e sentou na entrada do cercado como " +
+      "quem espera há muito tempo. Peito largo, passo pesado, olhos que não desviavam. Naquela " +
+      "noite a fera desceu ao campo e ele foi junto, sem rosnar e sem recuar: pôs o corpo entre " +
+      "o caçador e a criatura, e levou a primeira investida no lugar do ombro que devia " +
+      "levá-la. Amanheceu sujo, respirando fundo, vivo. Desde então a matilha entende o " +
+      "acordo. Ele não persegue o rastro nem escolhe a presa. Ele fica na frente, e ficar na " +
+      "frente já é a parte mais difícil da noite.",
   },
   {
-    title: "The one who finds the trail",
+    title: "A que acha o rastro",
     text:
-      "The other one nobody saw arrive, and that is exactly the point. Lean, silent, always " +
-      "three steps ahead, she found the trail before the hunter knew there was one. She scented " +
-      "the wind, stopped, waited for the beast to reach her, and moved on again. They say that " +
-      "on a new-moon night, when not even Lumni could see the path, it was she who opened the " +
-      "way in the dark and brought the whole pack back to the field. She fights for no space " +
-      "and asks for nothing. She walks in front because that is where you see first, and she " +
-      "always comes back, because she chose whom she wants to be near.",
+      "A outra ninguém viu chegar, e é justamente esse o ponto. Magra, silenciosa, sempre três " +
+      "passos adiante, achava o rastro antes de o caçador saber que havia rastro. Farejava o " +
+      "vento, parava, esperava a fera alcançá-la, e seguia de novo. Contam que numa noite de " +
+      "lua nova, quando nem Lumni enxergava a trilha, foi ela quem abriu caminho no escuro e " +
+      "trouxe a matilha inteira de volta ao campo. Não briga por espaço e não pede nada. Anda " +
+      "na frente porque é de lá que se vê primeiro, e volta sempre, porque escolheu de quem " +
+      "quer estar perto.",
   },
 ];
 
@@ -169,30 +168,30 @@ const ES_COMPANIONS: readonly { title: string; text: string }[] = [
   },
 ];
 
-const EN_PILLARS: readonly LorePillar[] = [
+const PT_PILLARS: readonly LorePillar[] = [
   {
-    title: "Hunt",
+    title: "Caçar",
     text:
-      "Six territories that open as you climb, and prey that grows with you: the hunt never " +
-      "goes stale and never comes free.",
+      "Seis territórios que abrem conforme você sobe, e presas que crescem junto: a caçada nunca " +
+      "fica banal e nunca fica de graça.",
   },
   {
-    title: "Train",
+    title: "Treinar",
     text:
-      "Five attributes, one exercise for each and nothing that rises on its own. The level " +
-      "opens doors, but the one who hits harder is the one who trained.",
+      "Cinco atributos, um exercício para cada e nada que suba sozinho. O nível abre portas, mas " +
+      "quem bate mais forte é quem treinou.",
   },
   {
-    title: "Forge",
+    title: "Forjar",
     text:
-      "Go down the mine for fragments and strike the piece already on your body, from plus one " +
-      "onward, as far as the bronze will carry.",
+      "Desça na mina por fragmentos e bata na peça que já está no corpo, de mais um em diante, " +
+      "até onde o bronze aguentar.",
   },
   {
-    title: "The pack",
+    title: "A matilha",
     text:
-      "A tavern with reserved tables, a board with the best of every number and a pit where two " +
-      "werewolves settle it with their own hands.",
+      "Taverna com mesas reservadas, um quadro com os melhores de cada número e um fosso onde " +
+      "dois lobisomens resolvem no braço.",
   },
 ];
 
@@ -223,11 +222,11 @@ const ES_PILLARS: readonly LorePillar[] = [
   },
 ];
 
-const EN_WELCOME: readonly string[] = [
-  "You crossed the door. This is your place in the night.",
-  "On the sheet you see the body, the fury and what Willpower holds. On the hunt, only the beast goes out: gather the fury, turn, and come back before the clock runs out. The yard trains what the level does not give. The mine and the forge pay for the metal. The market and the bazaar trade what you carry. The pit measures equals. The tavern is table and pack.",
-  "Before anything, open the Settings. There you turn the sound and the soundtrack on or off, and choose the music volume. There you decide whether the background lives in video or stays still, and how closed the screen's veil gets. There the Tavern can ring your device when the table speaks. And there are the automation keys: hunt, train, mine, forge, drink and care for the wolf without you standing over every lap.",
-  "Nothing turns on by itself. Every key is yours. When the night is set your way, the door no longer needs a guide.",
+const PT_WELCOME: readonly string[] = [
+  "Você cruzou a porta. Este é o seu lugar na noite.",
+  "Na ficha você vê o corpo, a fúria e o que a Vontade segura. Na caça, só a fera sai: junte a fúria, vire, e volte antes do relógio acabar. O pátio treina o que o nível não dá. A mina e a forja pagam o metal. O mercado e o bazar trocam o que você carrega. O fosso mede iguais. A taverna é mesa e matilha.",
+  "Antes de tudo, abra as Configurações. Lá você liga ou corta o som e a trilha, e escolhe o volume da música. Lá você decide se o fundo vive em vídeo ou fica parado, e o quão fechado fica o véu da tela. Lá a Taverna pode avisar no aparelho quando a mesa fala. E lá estão as chaves da automação: caçar, treinar, minerar, forjar, beber e cuidar do lobo sem você ficar em cima de cada volta.",
+  "Nada liga sozinho. Cada chave é sua. Quando a noite estiver do seu jeito, a porta já não precisa de guia.",
 ];
 
 const ES_WELCOME: readonly string[] = [
@@ -244,12 +243,8 @@ export interface WelcomePack {
 }
 
 export function welcomePack(locale: Locale): WelcomePack {
-  if (locale === "en") {
-    return {
-      title: "Welcome",
-      paragraphs: EN_WELCOME,
-      voice: localizedVoice(WELCOME_VOICE, "en"),
-    };
+  if (locale === "pt") {
+    return { title: "Bem-vindo", paragraphs: PT_WELCOME, voice: WELCOME_VOICE };
   }
   if (locale === "es") {
     return {
@@ -258,13 +253,17 @@ export function welcomePack(locale: Locale): WelcomePack {
       voice: localizedVoice(WELCOME_VOICE, "es"),
     };
   }
-  return { title: "Bem-vindo", paragraphs: WELCOME_PARAGRAPHS, voice: WELCOME_VOICE };
+  return {
+    title: "Welcome",
+    paragraphs: WELCOME_PARAGRAPHS,
+    voice: localizedVoice(WELCOME_VOICE, "en"),
+  };
 }
 
-const COUPLE_TITLES: Record<Exclude<Locale, "pt">, LoreCoupleText> = {
-  en: {
-    male: { name: LORE_COUPLE.male.name, title: "The one who let go first" },
-    female: { name: LORE_COUPLE.female.name, title: "The one who knew how to hold" },
+const COUPLE_TITLES: Record<Exclude<Locale, "en">, LoreCoupleText> = {
+  pt: {
+    male: { name: LORE_COUPLE.male.name, title: "O que soltou primeiro" },
+    female: { name: LORE_COUPLE.female.name, title: "A que soube segurar" },
   },
   es: {
     male: { name: LORE_COUPLE.male.name, title: "El que soltó primero" },
@@ -278,33 +277,33 @@ function localizedVoice(voice: string, locale: Exclude<Locale, "pt">): string {
 
 function mergeChapters(
   translated: readonly { title: string; text: string }[],
-  locale: Exclude<Locale, "pt">,
+  locale: Exclude<Locale, "en">,
 ): readonly LoreChapter[] {
   return LORE_CHAPTERS.map((chapter, index) => ({
     ...chapter,
     ...(translated[index] ?? {}),
-    voice: localizedVoice(chapter.voice, locale),
+    voice: locale === "pt" ? chapter.voice : localizedVoice(chapter.voice, locale),
   }));
 }
 
 function mergeCompanions(
   translated: readonly { title: string; text: string }[],
-  locale: Exclude<Locale, "pt">,
+  locale: Exclude<Locale, "en">,
 ): readonly LoreCompanion[] {
   return LORE_COMPANIONS.map((companion, index) => ({
     ...companion,
     ...(translated[index] ?? {}),
-    voice: localizedVoice(companion.voice, locale),
+    voice: locale === "pt" ? companion.voice : localizedVoice(companion.voice, locale),
   }));
 }
 
 export function lorePack(locale: Locale): LorePack {
-  if (locale === "en") {
+  if (locale === "pt") {
     return {
-      couple: COUPLE_TITLES.en,
-      chapters: mergeChapters(EN_CHAPTERS, "en"),
-      companions: mergeCompanions(EN_COMPANIONS, "en"),
-      pillars: EN_PILLARS,
+      couple: COUPLE_TITLES.pt,
+      chapters: mergeChapters(PT_CHAPTERS, "pt"),
+      companions: mergeCompanions(PT_COMPANIONS, "pt"),
+      pillars: PT_PILLARS,
     };
   }
   if (locale === "es") {
@@ -317,8 +316,14 @@ export function lorePack(locale: Locale): LorePack {
   }
   return {
     couple: LORE_COUPLE,
-    chapters: LORE_CHAPTERS,
-    companions: LORE_COMPANIONS,
+    chapters: LORE_CHAPTERS.map((chapter) => ({
+      ...chapter,
+      voice: localizedVoice(chapter.voice, "en"),
+    })),
+    companions: LORE_COMPANIONS.map((companion) => ({
+      ...companion,
+      voice: localizedVoice(companion.voice, "en"),
+    })),
     pillars: LORE_PILLARS,
   };
 }

@@ -9,65 +9,65 @@ export interface PreviewShot {
 export const PREVIEW_SHOTS: readonly PreviewShot[] = [
   {
     key: "character",
-    label: "Personagem",
-    title: "A ficha inteira, sem número escondido",
+    label: "Character",
+    title: "The whole sheet, no hidden number",
     text:
-      "Atributos, forma, lobo e combate na mesma tela, com a origem de cada ponto separada: " +
-      "treino, equipamento, mascote, lua e fúria.",
+      "Attributes, form, wolf and combat on the same screen, with the origin of every " +
+      "point split apart: training, equipment, companion, moon and fury.",
     image: "/assets/landing/character.webp?v=11",
   },
   {
     key: "hunt",
-    label: "Caça",
-    title: "Seis territórios, narrados ao vivo",
+    label: "Hunt",
+    title: "Six territories, narrated live",
     text:
-      "A trilha enche, a presa responde e a luta desce linha a linha. Só a fera caça: " +
-      "em pele humana o campo recusa.",
+      "The trail fills, the prey answers and the fight runs down line by line. Only the " +
+      "beast hunts: in human skin the field refuses.",
     image: "/assets/landing/hunt.webp?v=11",
   },
   {
     key: "training",
-    label: "Treino",
-    title: "Cinco exercícios, uma vida inteira",
+    label: "Training",
+    title: "Five exercises, a whole lifetime",
     text:
-      "Cada atributo tem o seu pátio, a sessão cobra WCoins e o ganho acompanha o nível " +
-      "sem presente escondido na faixa.",
+      "Each attribute has its own yard, the session charges WCoins and the gain follows " +
+      "the level with no hidden gift in the band.",
     image: "/assets/landing/training.webp?v=11",
   },
   {
     key: "market",
-    label: "Mercado",
-    title: "Balcão de peças e poções",
+    label: "Market",
+    title: "A counter of pieces and potions",
     text:
-      "Cinco sets sobem faixa a faixa, poções cobradas em caçadas da sua noite e uma cópia " +
-      "de cada peça: o que já está na mochila ou no corpo o balcão recusa.",
+      "Five sets climb band by band, potions priced in hunts of your night and one copy " +
+      "of each piece: what is already in the bag or on the body the counter refuses.",
     image: "/assets/landing/market.webp?v=11",
   },
   {
     key: "forge",
-    label: "Forja",
-    title: "Veia, fragmento e martelo",
+    label: "Forge",
+    title: "Vein, fragment and hammer",
     text:
-      "A mina abre os veios por faixa, a bigorna bate na peça que você já usa e cada +1 " +
-      "permanece na peça, não no slot.",
+      "The mine opens the veins by band, the anvil strikes the piece you already wear " +
+      "and every +1 stays on the piece, not the slot.",
     image: "/assets/landing/forge.webp?v=11",
   },
   {
     key: "arena",
     label: "Arena",
-    title: "Fosso contra caçadores reais",
+    title: "A pit against real hunters",
     text:
-      "Adversário do ranking, prêmio em WCoins na bolsa dele e replay da luta na mesma " +
-      "cadência da caça.",
+      "A rival from the ranking, a WCoin prize from their purse and a replay of the " +
+      "fight at the same cadence as the hunt.",
     image: "/assets/landing/arena.webp?v=11",
   },
   {
     key: "tavern",
-    label: "Taverna",
-    title: "Mesas que não esperam refresh",
+    label: "Tavern",
+    title: "Tables that do not wait for a refresh",
     text:
-      "Duas mesas por linha, caneca em cada card e paginação quando o salão passa de oito. " +
-      "Salas abertas ou trancadas, mensagens ao vivo, convite de matilha e aviso quando a cadeira acende.",
+      "Two tables per row, a mug on every card and pagination when the hall passes eight. " +
+      "Open or locked rooms, live messages, pack invites and a notice when the chair lights up.",
     image: "/assets/landing/tavern.webp?v=13",
   },
 ];

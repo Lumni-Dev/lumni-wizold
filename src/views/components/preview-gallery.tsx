@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useT } from "@/controllers/use-locale";
 import type { PreviewShot } from "@/models/data/preview";
 import { GLASS_SECTION } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
@@ -35,6 +36,7 @@ function Arrow({
   );
 }
 export function PreviewGallery({ shots }: { shots: readonly PreviewShot[] }) {
+  const t = useT();
   const [index, setIndex] = useState(0);
   const [held, setHeld] = useState(false);
   useEffect(() => {
@@ -75,9 +77,9 @@ export function PreviewGallery({ shots }: { shots: readonly PreviewShot[] }) {
       </div>
 
       <div className="space-y-1 border-b border-edge p-4">
-        <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">{shot.label}</p>
-        <p className="text-sm text-ink">{shot.title}</p>
-        <p className="text-xs leading-relaxed text-ink-soft">{shot.text}</p>
+        <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">{t(shot.label)}</p>
+        <p className="text-sm text-ink">{t(shot.title)}</p>
+        <p className="text-xs leading-relaxed text-ink-soft">{t(shot.text)}</p>
       </div>
 
       <div className="flex gap-2 overflow-x-auto p-4">

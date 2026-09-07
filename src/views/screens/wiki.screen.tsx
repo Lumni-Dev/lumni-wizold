@@ -12,7 +12,9 @@ import { EXERCISES } from "@/models/data/exercises";
 import { trainingEffort } from "@/models/rules/training";
 import { findItem, ITEMS } from "@/models/data/items";
 import { TERRITORIES } from "@/models/data/territories";
-import { WIKI_TOPICS } from "@/models/data/wiki";
+import { type WikiTopic } from "@/models/data/wiki";
+import { wikiTopics } from "@/models/data/wiki.i18n";
+import { useLocale } from "@/controllers/use-locale";
 import { ATTRIBUTES, findAttribute } from "@/models/entities/attribute";
 import { SPECIES_LABEL } from "@/models/entities/creature";
 import {
@@ -43,9 +45,7 @@ import { WikiPaginatedPanel } from "../components/wiki-paginated-panel";
 import { PageHeader } from "../layout/page-header";
 import { summarizeEffect } from "../presenters/item.presenter";
 
-const SECTION_TABS: readonly { key: string; label: string }[] = [
-  { key: "all", label: "Tudo" },
-  ...WIKI_TOPICS.map((topic) => ({ key: topic.id, label: topic.title })),
+const FIXED_TABS: readonly { key: string; label: string }[] = [
   { key: "attributes", label: "Attributes" },
   { key: "slots", label: "Slots" },
   { key: "exercises", label: "Exercises" },
@@ -95,6 +95,16 @@ function wikiItemDescription(item: Item): string {
 export function WikiScreen() {
   const { character } = useGame();
   const t = useT();
+  const locale = useLocale();
+  const topics = useMemo(() => wikiTopics(locale), [locale]);
+  const sectionTabs = useMemo(
+    () => [
+      { key: "all", label: "All" },
+      ...topics.map((topic) => ({ key: topic.id, label: topic.title })),
+      ...FIXED_TABS,
+    ],
+    [topics],
+  );
   const level = character?.level ?? 1;
   const [section, setSection] = useState("loop");
   const [search, setSearch] = useState("");
@@ -142,7 +152,7 @@ export function WikiScreen() {
     return normalizeText(text).includes(wanted);
   }
 
-  function topicHit(topic: (typeof WIKI_TOPICS)[number]): boolean {
+  function topicHit(topic: WikiTopic): boolean {
     return hits(topic.title + " " + topic.summary + " " + topic.lines.join(" "));
   }
 
@@ -171,11 +181,11 @@ export function WikiScreen() {
             onChange={(event) => setSearch(event.target.value)}
           />
         </div>
-        <ChipTabs tabs={SECTION_TABS} value={section} onChange={setSection} />
+        <ChipTabs tabs={sectionTabs} value={section} onChange={setSection} />
       </div>
 
       <WikiMasonry>
-        {WIKI_TOPICS.filter((topic) => shows(topic.id, topicHit(topic))).map((topic) => (
+        {topics.filter((topic) => shows(topic.id, topicHit(topic))).map((topic) => (
           <WikiMasonryItem key={topic.id} id={topic.id}>
             <Panel title={topic.title} description={topic.summary}>
               <ul className="space-y-2 text-xs leading-relaxed text-ink-soft">

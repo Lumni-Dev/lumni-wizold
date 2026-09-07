@@ -78,9 +78,9 @@ export interface WikiTopic {
 
 function setRequirementsLine(): string {
   const parts = EQUIPMENT_SETS.map(
-    (definition) => definition.label + " (NV. " + definition.minLevel + ")",
+    (definition) => definition.label + " (LV. " + definition.minLevel + ")",
   );
-  return "Conjuntos, um por faixa de caça: " + parts.join(", ") + ".";
+  return "Sets, one per hunting band: " + parts.join(", ") + ".";
 }
 
 function moonLines(): string[] {
@@ -89,13 +89,13 @@ function moonLines(): string[] {
     const experience = Math.round(phase.experienceBonus * 100);
     const training = Math.round(phase.trainingBonus * 100);
     const mining = Math.round(phase.miningBonus * 100);
-    if (experience > 0) perks.push("+" + experience + "% de experiência na caça");
-    if (training > 0) perks.push("+" + training + "% de progresso no treino");
-    if (mining > 0) perks.push("+" + mining + "% de experiência de mineração");
+    if (experience > 0) perks.push("+" + experience + "% hunt experience");
+    if (training > 0) perks.push("+" + training + "% training progress");
+    if (mining > 0) perks.push("+" + mining + "% mining experience");
     if (phase.key === "full") {
-      perks.push("Modo Fúria ativo (+" + FURY_ATTRIBUTE_BONUS + " em todos os atributos)");
+      perks.push("Fury Mode on (+" + FURY_ATTRIBUTE_BONUS + " to every attribute)");
     }
-    return phase.label + ": " + (perks.length > 0 ? perks.join(", ") + "." : "sem bônus.");
+    return phase.label + ": " + (perks.length > 0 ? perks.join(", ") + "." : "no bonus.");
   });
 }
 
@@ -103,18 +103,18 @@ function oreLines(): string[] {
   return ORES.map(
     (ore) =>
       ore.label +
-      ": mineração NV. " +
+      ": mining LV. " +
       ore.requiredLevel +
-      ", de " +
+      ", " +
       ore.minYield +
-      " a " +
+      " to " +
       ore.maxYield +
-      " por mineração.",
+      " per mining.",
   );
 }
 
 function boardLine(): string {
-  return "Quadros: " + RANKING_BOARDS.map((board) => board.label).join(", ") + ".";
+  return "Boards: " + RANKING_BOARDS.map((board) => board.label).join(", ") + ".";
 }
 
 function bandLines(): string[] {
@@ -122,433 +122,433 @@ function bandLines(): string[] {
     const areas = TERRITORIES.filter((territory) => territory.species === species);
     const min = areas.reduce((low, territory) => Math.min(low, territory.minLevel), areas[0]?.minLevel ?? 1);
     const max = areas.reduce((high, territory) => Math.max(high, territory.maxLevel), areas[0]?.maxLevel ?? 1);
-    return SPECIES_LABEL[species] + ": NV. " + min + " a " + max + ".";
+    return SPECIES_LABEL[species] + ": LV. " + min + " to " + max + ".";
   });
 }
 
 function setCostRangeLine(): string {
   const parts = EQUIPMENT_SETS.map((definition) => {
     const total = EQUIPMENT_SLOTS.length * piecePrice(definition);
-    return definition.label + " (" + formatBronze(total) + ", " + formatBronze(piecePrice(definition)) + " por peça)";
+    return definition.label + " (" + formatBronze(total) + ", " + formatBronze(piecePrice(definition)) + " per piece)";
   });
-  return "Um conjunto completo custa: " + parts.join("; ") + ".";
+  return "A full set costs: " + parts.join("; ") + ".";
 }
 
 function forgeMultiplierAt(level: number): string {
-  return (1 + ENHANCEMENT_STEP * level).toFixed(2).replace(".", ",");
+  return (1 + ENHANCEMENT_STEP * level).toFixed(2);
 }
 
 export const WIKI_TOPICS: readonly WikiTopic[] = [
   {
     id: "loop",
-    title: "Como jogar",
-    summary: "O ciclo de uma noite qualquer em Wizold.",
+    title: "How to play",
+    summary: "The cycle of any given night in Wizold.",
     lines: [
-        "Você começa sem nada equipado, com " +
+      "You start with nothing equipped, " +
         STARTING_BRONZE +
-        " WCoins, dez poções de vida e dez poções de fúria pequena. Escolha um território e, na lista, a presa: a barra enche como \"Procurando criatura...\" e só no último batimento a luta é decidida no servidor; depois o replay conta golpe a golpe como \"Caçando...\". Parar na aproximação cancela; parar no replay aplica o resultado. Trocar de criatura no meio da caçada não muda a luta em curso, só a próxima volta.",
-      "Para encadear caçadas, treino, mina ou forja sem tocar em nada, ative a automação VIP nas configurações. Cada área tem dez criaturas de números fixos: você fica mais forte, elas não.",
-      "O golpe crítico multiplica o dano por " +
-        criticalMultiplierOf().toFixed(2).replace(".", ",") +
-        ", fixo; Instinto sobe a chance de crítico e Agilidade, a de esquiva.",
-      "Treine para acumular progresso de atributo; equipe o que serve, venda o que sobra e volte a caçar.",
-      "As barras contam o que muda na hora, ao lado do valor: experiência ganha em roxo, WCoins e fragmentos em âmbar, vida perdida em vermelho e o fôlego gasto da mina em azul. Cada aviso soma os ganhos do momento e se apaga sozinho em seguida.",
-      "Na forja, minere fragmentos e bata na peça que está na mochila, fora do corpo, para levantá-la de +1 em diante. No canil, adote um lobo: ele soma atributos enquanto estiver de pé. O ranking mostra onde você está entre os caçadores.",
+        " WCoins, ten health potions and ten small fury potions. Choose a territory and, in the list, the prey: the bar fills as \"Searching for creature...\" and only on the last beat is the fight decided on the server; the replay then tells it blow by blow as \"Hunting...\". Stopping during the approach cancels; stopping during the replay applies the result. Switching creatures mid-hunt does not change the fight in course, only the next lap.",
+      "To chain hunts, training, mine or forge without touching anything, turn on VIP automation in the settings. Every area has ten creatures with fixed numbers: you get stronger, they do not.",
+      "A critical blow multiplies the damage by " +
+        criticalMultiplierOf().toFixed(2) +
+        ", fixed; Instinct raises the critical chance and Agility the dodge chance.",
+      "Train to accumulate attribute progress; equip what serves, sell what is left and go back to hunting.",
+      "The bars count what changes on the spot, beside the value: experience gained in purple, WCoins and fragments in amber, health lost in red and the mine's spent breath in blue. Each notice sums the moment's gains and fades on its own right after.",
+      "At the forge, mine fragments and strike the piece that sits in the bag, off the body, to raise it from +1 onward. At the kennel, adopt a wolf: it adds attributes while it stands. The ranking shows where you are among the hunters.",
     ],
   },
   {
     id: "vitals",
-    title: "Vitais",
-    summary: "Vida sobe com o nível, como no Tibia: Lumni e Luna ganham ritmos diferentes.",
+    title: "Vitals",
+    summary: "Health rises with the level, Tibia-style: Lumni and Luna gain at different paces.",
     lines: [
-      "Vida máxima: " +
+      "Maximum health: " +
         VITALS.baseVital +
-        " no nível 1, mais " +
+        " at level 1, plus " +
         healthPerLevelFor("male") +
-        " por nível para Lumni e " +
+        " per level for Lumni and " +
         healthPerLevelFor("female") +
-        " por nível para Luna. A Resistência não engorda a barra; ela só corta o dano que cada golpe do inimigo tira.",
-      "Poções de vida curam um valor fixo e aleatório: pequena 150 a 200, média 200 a 300, grande 300 a 500. Recuperar-se devolve " +
+        " per level for Luna. Endurance does not fatten the bar; it only cuts the damage each enemy blow takes.",
+      "Health potions heal a fixed random amount: small 150 to 200, medium 200 to 300, large 300 to 500. Recovering gives back " +
         Math.round(REST_HEALTH_RATIO * 100) +
-        "% do máximo a cada " +
+        "% of the maximum every " +
         REST_TICK_MS / 1000 +
-        " segundos sem Vontade, e sobe rumo a " +
+        " seconds with no Willpower, and climbs toward " +
         Math.round((REST_HEALTH_RATIO + REST_WILLPOWER_MAX_BONUS) * 100) +
-        "% conforme a Vontade cresce, com metade desse ganho já em " +
+        "% as Willpower grows, with half that gain already at " +
         REST_WILLPOWER_HALF +
-        " de Vontade: mais Vontade, menos tempo até ficar inteiro. A poção é o atalho pago quando o número fixo ainda vale a pena.",
-      "Zerou a vida na caçada, você escapa com 1 de vida e registra uma derrota.",
-      "Com menos de 1 de vida, o chão recusa caçada: Recuperar-se ou use uma poção.",
-      "Sem a vida cheia, o fosso recusa duelo: a arena só abre com o corpo inteiro, então Recuperar-se primeiro.",
-      "Luta que se arrasta até o teto de rodadas termina em recuo: a caçada conta, mas ninguém vence nem perde.",
+        " Willpower: more Willpower, less time until whole. The potion is the paid shortcut while the fixed number is still worth it.",
+      "Hit zero health on the hunt and you escape with 1 health and record a defeat.",
+      "Below 1 health the ground refuses the hunt: Recover or drink a potion.",
+      "Without full health the pit refuses a duel: the arena only opens with a whole body, so Recover first.",
+      "A fight that drags to the round cap ends in retreat: the hunt counts, but nobody wins or loses.",
     ],
   },
   {
     id: "fury",
-    title: "Fúria",
-    summary: "Modo Fúria: poção paga ou lua cheia, +10 em todos os atributos por um tempo.",
+    title: "Fury",
+    summary: "Fury Mode: a paid potion or the full moon, +10 to every attribute for a while.",
     lines: [
-      "Não existe transformação: você caça, treina e duela direto, do jeito que está.",
-      "Modo Fúria dá +" +
+      "There is no transformation: you hunt, train and duel straight away, as you are.",
+      "Fury Mode gives +" +
         FURY_ATTRIBUTE_BONUS +
-        " em cada atributo enquanto durar; o ganho aparece na coluna Fúria da ficha e levanta dano, esquiva e crítico de uma vez. A barra de vida continua subindo só com o nível.",
-      "A poção de fúria não devolve vida. A duração vem pelo tamanho do frasco: pequena 2,5 minutos, média 5, grande 7,5. Beber de novo reinicia o relógio cheio.",
-      "Na lua cheia o céu mantém o Modo Fúria ativo sozinho enquanto durar a fase; a poção fica desabilitada nesse período, porque o céu já faz esse trabalho.",
-      "É um atalho pago para uma janela de força: guarde a poção para uma banda dura ou um duelo que você não quer perder, fora da lua cheia.",
+        " to each attribute while it lasts; the gain shows in the sheet's Fury column and lifts damage, dodge and critical at once. The health bar still rises only with the level.",
+      "The fury potion gives no health back. Duration comes from the flask's size: small 2.5 minutes, medium 5, large 7.5. Drinking again restarts the clock full.",
+      "On the full moon the sky keeps Fury Mode on by itself while the phase lasts; the potion is disabled during that window, because the sky is already doing that work.",
+      "It is a paid shortcut to a window of strength: save the potion for a hard band or a duel you do not want to lose, outside the full moon.",
     ],
   },
   {
     id: "moon",
-    title: "Fases da lua",
-    summary: "A lua do jogo é a lua lá fora, e ela muda quanto vale cada caçada.",
+    title: "Moon phases",
+    summary: "The game's moon is the moon outside, and it changes what every hunt is worth.",
     lines: [
       ...moonLines(),
-      "A fase vem de uma API pública de lua, com a fórmula astronômica como reserva quando não há rede.",
-      "O mês lunar tem " +
+      "The phase comes from a public moon API, with the astronomical formula as the fallback when there is no network.",
+      "The lunar month has " +
         SYNODIC_MONTH_DAYS.toFixed(2) +
-        " dias, então cada fase dura cerca de uma semana.",
-      "Cada fase paga em um canto: a crescente rende mais na caça e no treino, a nova rende mais na mina, e a minguante não dá bônus algum.",
-      "A lua cheia não dá bônus pela coluna Lua: ela liga o Modo Fúria (+" +
+        " days, so each phase lasts about a week.",
+      "Each phase pays in one corner: the waxing moon pays more on the hunt and in the yard, the new moon pays more in the mine, and the waning moon gives no bonus at all.",
+      "The full moon gives no bonus through the Moon column: it turns on Fury Mode (+" +
         FURY_ATTRIBUTE_BONUS +
-        " em todos os atributos) enquanto durar a fase, cerca de " +
-        (SYNODIC_MONTH_DAYS / 8).toFixed(1).replace(".", ",") +
-        " dias.",
-      "Durante a lua cheia a poção de fúria fica desabilitada na ficha; o relógio do Modo Fúria no menu lateral mostra quanto falta para a fase acabar.",
-      "A fase atual e o bônus dela ficam no rodapé do menu lateral no desktop e na barra abaixo da navegação no celular.",
+        " to every attribute) while the phase lasts, about " +
+        (SYNODIC_MONTH_DAYS / 8).toFixed(1) +
+        " days.",
+      "During the full moon the fury potion is disabled on the sheet; the Fury Mode clock in the side menu shows how long until the phase ends.",
+      "The current phase and its bonus sit at the foot of the side menu on desktop and in the bar below the navigation on the phone.",
     ],
   },
   {
     id: "progression",
-    title: "Progressão",
-    summary: "O nível vem da caça, o atributo vem do treino.",
+    title: "Progression",
+    summary: "The level comes from the hunt, the attribute comes from training.",
     lines: [
-      "Experiência para o próximo nível: " +
+      "Experience for the next level: " +
         experienceForLevel(1) +
-        " no 1, " +
+        " at 1, " +
         experienceForLevel(10) +
-        " no 10 e " +
+        " at 10 and " +
         experienceForLevel(100) +
-        " no 100. A curva sobe mais rápido do que a presa paga: cerca de 5 caçadas no começo e 585 no teto.",
-      "O teto é nível 1000 para personagem e atributo. Subir de nível não dá poder de graça: abre território, conjunto e veia; a força vem do treino e do que você veste. Nível não restaura vida.",
-      "Atributo só sobe no treino, pela mesma curva da experiência: barato no começo, caríssimo perto do teto; um ponto pede poucas sessões no começo e centenas no fim.",
-      "Treino é gratuito: cada exercício sobe um atributo (+1 Força, +1 Resistência, +1 Agilidade, +1 Instinto ou +1 Vontade por ponto). O progresso por sessão segue o valor atual daquele atributo. Equipamento soma por cima do teto treinado.",
-      "Cada sessão sorteia de " +
+        " at 100. The curve climbs faster than the prey pays: about 5 hunts at the start and 585 at the cap.",
+      "The cap is level 1000 for character and attribute. Leveling grants no free power: it opens territory, set and vein; strength comes from training and from what you wear. A level does not restore health.",
+      "An attribute only rises in training, on the same curve as experience: cheap at the start, very costly near the cap; a point takes a few sessions early on and hundreds at the end.",
+      "Training is free: each exercise raises one attribute (+1 Strength, +1 Endurance, +1 Agility, +1 Instinct or +1 Willpower per point). Progress per session follows that attribute's current value. Equipment adds on top of the trained cap.",
+      "Each session draws " +
         TRAINING_TICKS_MIN +
-        " a " +
+        " to " +
         TRAINING_TICKS_MAX +
-        " passos, e o sorteio é só ritmo: o progresso que a sessão paga é o mesmo, curta ou longa.",
-      "O pátio mostra o atributo exato, com a fração do ponto em andamento (20.33 em vez de 20), quanto cada sessão paga de ponto e de experiência, e quantas sessões faltam para o ponto fechar: uma contagem que cai a cada sessão concluída.",
+        " steps, and the draw is pacing only: the progress a session pays is the same, short or long.",
+      "The yard shows the exact attribute, with the fraction of the point in progress (20.33 instead of 20), how much each session pays in points and experience, and how many sessions are left for the point to close: a count that drops with each finished session.",
     ],
   },
   {
     id: "combat",
-    title: "Combate",
-    summary: "Resolvido em rodadas, sem entrada do jogador durante a luta.",
+    title: "Combat",
+    summary: "Resolved in rounds, with no player input during the fight.",
     lines: [
-      "Cinco números e só: Força, Agilidade, Resistência, Instinto e Vontade. Dano = Força² ÷ (Força + Resistência do alvo), com 10% de variação na Força.",
-      "A Vontade não entra na conta da luta: ela estica a poção de fúria e acelera a recuperação de vida fora do combate. A fúria é que soma +" +
+      "Five numbers and nothing else: Strength, Agility, Endurance, Instinct and Willpower. Damage = Strength² ÷ (Strength + target's Endurance), with 10% of spread on Strength.",
+      "Willpower does not enter the fight's math: it stretches the fury potion and speeds up health recovery outside combat. Fury is what adds +" +
         FURY_ATTRIBUTE_BONUS +
-        " em todos os atributos enquanto dura, e quanto mais Vontade, mais tempo cada frasco rende.",
-      "Quem tem mais Agilidade começa. Esquiva e crítico sobem a vida toda sem teto: 35% e 45% no horizonte.",
-      "Crítico multiplica por " +
-        criticalMultiplierOf().toFixed(2).replace(".", ",") +
-        ", fixo. Luta trava em 24 rodadas: recuo, sem vencedor.",
+        " to every attribute while it lasts, and the more Willpower, the longer each flask runs.",
+      "Whoever has more Agility starts. Dodge and critical climb for the whole run without a cap: 35% and 45% on the horizon.",
+      "A critical multiplies by " +
+        criticalMultiplierOf().toFixed(2) +
+        ", fixed. A fight locks at 24 rounds: retreat, no winner.",
     ],
   },
   {
     id: "equipment",
-    title: "Equipamento",
-    summary: "Sete espaços, cinco conjuntos, um item por espaço.",
+    title: "Equipment",
+    summary: "Seven slots, five sets, one item per slot.",
     lines: [
-      "Espaços: gorro, colar, casaco, calças, botas, luvas e anel. " + setRequirementsLine(),
-      "Toda peça dá atributo e nada além: luvas = Força; anel = Força e Vontade; casaco = Resistência; calças = Resistência e Agilidade; gorro = Resistência e Instinto; botas = Agilidade; colar = Instinto e Vontade. A Vontade do colar e do anel estica a poção de fúria e acelera a recuperação de vida.",
-      "Casaco tem corte de linhagem (Lumni/Luna). Mercado vende uma peça de cada; o que já está na mochila ou no corpo não se compra de novo.",
-      "Nenhum equipamento cai na caça. Peça forjada na mochila carrega o +X; desequipe para forjar, equipe de novo para usar.",
+      "Slots: cap, necklace, coat, pants, boots, gloves and ring. " + setRequirementsLine(),
+      "Every piece gives attributes and nothing else: gloves = Strength; ring = Strength and Willpower; coat = Endurance; pants = Endurance and Agility; cap = Endurance and Instinct; boots = Agility; necklace = Instinct and Willpower. The Willpower from necklace and ring stretches the fury potion and speeds up health recovery.",
+      "The coat has a bloodline cut (Lumni/Luna). The market sells one of each piece; what is already in the bag or on the body cannot be bought again.",
+      "No equipment drops on the hunt. A forged piece in the bag carries its +X; unequip to forge, equip again to wear.",
     ],
   },
   {
     id: "bestiary-rule",
-    title: "Presas",
-    summary: "Seis espécies repartem os mil níveis em faixas de tamanhos diferentes.",
+    title: "Prey",
+    summary: "Six species split the thousand levels into bands of different sizes.",
     lines: [
       ...bandLines(),
-      "Cada território tem dez criaturas fixas, em degraus de dez níveis dentro da faixa.",
-      "Na lista da área você marca a presa. A luta que já começou fica com o bicho dela; a próxima volta usa o que você marcou.",
-      "Todo requisito de nível do jogo termina em 0 ou 5.",
+      "Each territory has ten fixed creatures, in ten-level steps within the band.",
+      "In the area's list you mark the prey. A fight already begun keeps its creature; the next lap uses what you marked.",
+      "Every level requirement in the game ends in 0 or 5.",
     ],
   },
   {
     id: "forge",
-    title: "Forja e mina",
-    summary: "A bigorna não faz peça nova: melhora a que está na mochila, fora do corpo.",
+    title: "Forge and mine",
+    summary: "The anvil makes no new piece: it improves the one in the bag, off the body.",
     lines: [
-      "A mina rende a cada " +
+      "The mine pays every " +
         MINING_CYCLE_MIN_MS / 1000 +
-        " a " +
+        " to " +
         MINING_CYCLE_MAX_MS / 1000 +
-        " segundos, porque cada golpe sorteia de " +
+        " seconds, because each strike draws " +
         MINING_TICKS_MIN +
-        " a " +
+        " to " +
         MINING_TICKS_MAX +
-        " passadas: um clique vale um rendimento, e com a mineração automática ligada ela repete até você mandar parar.",
-      "O sorteio das passadas é só ritmo: o punhado que a veia entrega, o progresso de mineração e a mineração descontada da cota são os mesmos, golpe curto ou longo.",
-      "A picareta tem cota: " +
+        " steps: one click is one payout, and with automatic mining on it repeats until you say stop.",
+      "The step draw is pacing only: the handful the vein hands over, the mining progress and the mining counted against the quota are the same, short strike or long.",
+      "The pick has a quota: " +
         MINING_DAILY_MININGS +
-        " minerações por dia, contando a colheita e não cada batida. A cota zera às 06:00 de São Paulo, o mesmo horário para todo mundo.",
+        " minings per day, counting the harvest and not each swing. The quota resets at 06:00 São Paulo time, the same instant for everyone.",
       ...oreLines(),
-      "Mineração começa em 1 e vai até " +
+      "Mining starts at 1 and goes to " +
         MINING_MAX_LEVEL +
-        ", o mesmo teto do personagem: tudo que evolui sobe pela mesma curva.",
-      "O próximo nível de mineração pede " +
+        ", the same cap as the character: everything that evolves climbs the same curve.",
+      "The next mining level asks " +
         miningNeeded(1) +
-        " de progresso no nível 1, " +
+        " progress at level 1, " +
         miningNeeded(100) +
-        " no 100 e " +
+        " at 100 and " +
         miningNeeded(1000) +
-        " no teto: a escada da mina é a mesma da experiência.",
-      "O que cada veia rende é fixo e está na lista acima: o nível de mineração abre veias mais fundas, nunca multiplica o punhado que sai da rocha.",
-      "A forja só aceita peça desequipada, na mochila: tire do corpo para forjar. Cada peça come só o fragmento do conjunto dela.",
-      "Preço do próximo nível: a mesma curva da experiência do personagem, em fragmentos; subir a peça para +N custa o que o nível N custa de experiência, então +" +
+        " at the cap: the mine's ladder is the same as experience.",
+      "What each vein pays is fixed and listed above: the mining level opens deeper veins, it never multiplies the handful that comes out of the rock.",
+      "The forge only takes an unequipped piece, in the bag: take it off the body to forge. Each piece eats only its own set's fragment.",
+      "The price of the next level: the same curve as the character's experience, in fragments; raising a piece to +N costs what level N costs in experience, so +" +
         5 +
-        " custa " +
+        " costs " +
         enhancementCost(5) +
-        " e +1000 custa " +
+        " and +1000 costs " +
         enhancementCost(1000) +
         ".",
-      "Cada nível forja soma " +
-        (ENHANCEMENT_STEP * 100).toFixed(1).replace(".", ",") +
-        "% ao valor original de cada atributo da peça. Em +1000 a peça vale " +
+      "Each forge level adds " +
+        (ENHANCEMENT_STEP * 100).toFixed(1) +
+        "% of each attribute's original value to the piece. At +1000 the piece is worth " +
         forgeMultiplierAt(1000) +
-        " vezes o que valia.",
-      "A bigorna acerta " +
+        " times what it was.",
+      "The anvil lands " +
         Math.round(FORGE_SUCCESS_RATIO * 100) +
-        "% das marteladas. Quando falha, o que foi pago se perde e a peça segue como está: o risco faz parte do preço.",
-      "Cada martelada também cobra WCoins: " +
+        "% of its strikes. When it misses, what was paid is lost and the piece stays as it is: the risk is part of the price.",
+      "Each strike also charges WCoins: " +
         Math.round(FORGE_BRONZE_RATIO * 100) +
-        "% da bolsa de caçada do seu nível, mais um por nível já forjado da peça. O ferreiro não trabalha de graça.",
-      "O teto é +" +
+        "% of your level's hunt purse, plus one per level already forged on the piece. The smith does not work for free.",
+      "The cap is +" +
         MAX_ENHANCEMENT +
-        ", e o nível fica com a peça: forjada na mochila, ela leva o ganho quando volta ao corpo.",
+        ", and the level stays with the piece: forged in the bag, it carries the gain when it returns to the body.",
     ],
   },
   {
     id: "pet",
-    title: "Mascote",
-    summary: "Um lobo caça melhor acompanhado, enquanto estiver de pé.",
+    title: "Companion",
+    summary: "A wolf hunts better with company, while it stands.",
     lines: [
-      "A adoção exige NV " +
+      "Adoption takes LV " +
         PET_MIN_LEVEL +
-        " e custa " +
+        " and costs " +
         formatBronze(PET_PRICE) +
-        "; soltar não paga. O lobo nasce com +" +
+        "; releasing pays nothing. The wolf is born with +" +
         PET_BASE_BONUS +
-        " de Força, Agilidade e Instinto, +1 de cada por nível até " +
+        " Strength, Agility and Instinct, +1 of each per level up to " +
         PET_MAX_LEVEL +
         ".",
-      "Renomear no canil custa " +
+      "Renaming at the kennel costs " +
         formatBronze(PET_RENAME_PRICE) +
-        ". Só o pátio ensina o lobo; caçada ao lado não sobe nível dele.",
-      "Energia é o único vital: começa em " +
+        ". Only the yard teaches the wolf; hunting beside you does not raise its level.",
+      "Energy is its only vital: it starts at " +
         PET_BASE_ENERGY +
         ", +" +
         PET_ENERGY_PER_LEVEL +
-        " por nível. Caçada cobra " +
+        " per level. A hunt charges " +
         PET_ENERGY_PER_HUNT +
-        " para entrar, " +
+        " to enter, " +
         PET_ENERGY_PER_BLOW +
-        " por bote e " +
+        " per pounce and " +
         PET_BITE_ENERGY +
-        " quando mordem nele.",
-      "Acompanhar entra na luta e empresta atributo; repouso devolve " +
+        " when it gets bitten.",
+      "Going along joins the fight and lends attributes; repose gives back " +
         Math.round(PET_REST_RATIO * 100) +
-        "% da energia a cada " +
+        "% of the energy every " +
         REST_TICK_MS / 1000 +
-        " s. Alimento devolve 25% do fôlego na hora. Alimento automático e repouso automático cuidam disso nas configurações.",
+        " s. Food gives back 25% of the breath at once. Automatic food and automatic repose handle this in the settings.",
     ],
   },
   {
     id: "ranking",
     title: "Ranking",
-    summary: "Onde você está entre os caçadores que a lua conhece.",
+    summary: "Where you stand among the hunters the moon knows.",
     lines: [
       boardLine() +
-        " Personagem filtra por linhagem sem renumerar; a busca mantém a posição real do quadro.",
-      "Clicar em um nome abre a ficha de leitura; o seu leva para a ficha completa. Entram caçadores de verdade e os NPCs da casa, estes com o selo NPC.",
+        " Character filters by bloodline without renumbering; the search keeps the board's real position.",
+      "Clicking a name opens the read-only sheet; yours leads to the full sheet. Real hunters enter, plus the house NPCs, these wearing the NPC seal.",
     ],
   },
   {
     id: "arena",
     title: "Arena",
-    summary: "O fosso onde um lobisomem desafia outro.",
+    summary: "The pit where one werewolf challenges another.",
     lines: [
-      "A arena só marca luta entre pares: " +
+      "The arena only marks fights between equals: " +
         Math.round(ARENA_BAND_RATIO * 100) +
-        "% do seu nível para cada lado, e nunca menos que " +
+        "% of your level to each side, and never fewer than " +
         ARENA_MIN_BAND +
-        " níveis.",
-      "Você escolhe o nome pela busca ou pede um adversário qualquer da sua faixa.",
-      "São " +
+        " levels.",
+      "You pick the name through the search or ask for any rival in your band.",
+      "There are " +
         ARENA_DAILY_ATTACKS +
-        " ataques por dia, e todos voltam juntos às 06:00, a mesma hora que a mina reabre.",
-      "Quem você enfrentou descansa até as 06:00 antes de aceitar outro desafio seu.",
-      "O fosso tem memória: as " +
+        " attacks per day, and all of them return together at 06:00, the same hour the mine reopens.",
+      "Whoever you faced rests until 06:00 before taking another challenge from you.",
+      "The pit has a memory: your name's last " +
         ARENA_HISTORY_SIZE +
-        " últimas lutas do seu nome ficam registradas, as que você marcou e as que marcaram contra você, com o resultado e os WCoins que mudaram de mãos.",
-      "Os dois lutam com seus números atuais: atributos, equipamento e mascote incluídos.",
-      "O mascote desce junto: ativo e com fôlego, ele morde no duelo como na caçada, o seu e o do rival. Só o seu gasta energia aqui; o do rival se cansa nos duelos do próprio dono.",
-      "O fosso não paga experiência: quem sobe de nível é quem caça. O que se ganha aqui é a bolsa do outro.",
-      "Quem vence tira da bolsa do vencido o que " +
+        " fights stay recorded, the ones you marked and the ones marked against you, with the outcome and the WCoins that changed hands.",
+      "Both fight with their current numbers: attributes, equipment and companion included.",
+      "The companion goes down too: active and with breath, it bites in the duel as on the hunt, yours and the rival's. Only yours spends energy here; the rival's tires in its own owner's duels.",
+      "The pit pays no experience: levels are what the hunt is for. What you win here is the other's purse.",
+      "The winner takes from the loser's purse what " +
         ARENA_SPOILS_MIN_HUNTS +
-        " a " +
+        " to " +
         ARENA_SPOILS_MAX_HUNTS +
-        " caçadas da faixa rendem, sorteado a cada duelo: a faixa de nível é que põe o piso e o teto.",
-      "Ninguém sai limpo do fosso: esse pedaço nunca passa de " +
+        " hunts of the band pay, drawn each duel: the level band sets the floor and the ceiling.",
+      "Nobody leaves the pit cleaned out: that slice never passes " +
         Math.round(ARENA_SPOILS_MIN_SHARE * 100) +
-        "% a " +
+        "% to " +
         Math.round(ARENA_SPOILS_MAX_SHARE * 100) +
-        "% do que o perdedor carrega, então quem está duro paga pouco.",
-      "Perder custa a mesma coisa: sai da sua bolsa e vai para a dele, e você deixa o fosso com 1 de vida.",
-      "Duelo que chega ao teto de rodadas termina empatado: ninguém leva WCoins e ninguém marca ponto.",
-      "Os duelos ganhos têm quadro próprio no ranking.",
+        "% of what the loser carries, so the broke pay little.",
+      "Losing costs the same: it leaves your purse and enters theirs, and you leave the pit with 1 health.",
+      "A duel that reaches the round cap ends in a draw: nobody takes WCoins and nobody scores.",
+      "Duels won have their own board in the ranking.",
     ],
   },
   {
     id: "tavern",
-    title: "Taverna",
-    summary: "Mesas de conversa e os nomes que você guarda.",
+    title: "Tavern",
+    summary: "Chat tables and the names you keep.",
     lines: [
-      "Uma mesa aberta cabe " +
+      "An open table seats " +
         MAX_ROOM_MEMBERS +
-        " pessoas, com ou sem senha, e você mantém uma por vez. Mesa aberta sem senha exige NV " +
+        " people, with or without a password, and you keep one at a time. An open table without a password takes LV " +
         OPEN_ROOM_MIN_LEVEL +
-        " ou VIP; com senha, qualquer nível.",
-      "Cada mesa ganha um número #, que dá para copiar e buscar. Mesa reservada esconde o nome e exige senha: de fora só aparece o número.",
-      "Cada nome na mesa ganha uma cor só sua. Quem chega pega a primeira livre; quem sai devolve a cor. Mesa reservada usa duas.",
-      "Cada mesa guarda as últimas " +
+        " or VIP; with a password, any level.",
+      "Every table gets a # number you can copy and search. A reserved table hides its name and takes a password: from outside only the number shows.",
+      "Every name at the table gets a color of its own. Whoever arrives takes the first free one; whoever leaves gives it back. A reserved table uses two.",
+      "Each table keeps the last " +
         MAX_ROOM_MESSAGES +
-        " falas: o que veio antes a noite leva.",
-      "Links de Wizold, Lumni, Twitch, YouTube, Instagram, Facebook, WhatsApp, TikTok e X passam e abrem numa aba nova; qualquer outro endereço é recusado.",
-      "E-mail passa inteiro na fala, mas fica como texto: ninguém clica nele por engano.",
-      "Nomes de caçador e mesa passam por moderação na hora. A fala entra na mesa na hora; se a auditoria achar insulto, racismo ou pedofilia, vira Conteúdo impróprio. O aviso no aparelho nunca mostra a fala, só que chegou mensagem.",
-      "Cada fala cabe em " +
+        " lines: what came before, the night takes.",
+      "Links from Wizold, Lumni, Twitch, YouTube, Instagram, Facebook, WhatsApp, TikTok and X pass and open in a new tab; any other address is refused.",
+      "An e-mail address passes whole in a line, but stays as text: nobody clicks it by mistake.",
+      "Hunter and table names pass moderation on the spot. A line enters the table at once; if the audit finds insult, racism or pedophilia, it becomes Inappropriate content. The device notice never shows the line, only that a message arrived.",
+      "Each line fits in " +
         MESSAGE_MAX_LENGTH +
-        " caracteres, e a mesa aberta aceita uma sua a cada " +
+        " characters, and an open table takes one of yours every " +
         MESSAGE_COOLDOWN_MS / 1000 +
-        " segundos: conversa de muitos tem compasso.",
-      "Na mesa reservada não há espera entre as falas: são duas pessoas, e ninguém precisa esperar a vez.",
-      "Fechar a janela da conversa não é sair da mesa: o lugar continua seu e Sentar devolve a mesma cadeira.",
-      "A mesa some do quadro quando a última pessoa sai, quando o dono a fecha, ou quando ninguém volta em " +
+        " seconds: a conversation of many keeps a beat.",
+      "At a reserved table there is no wait between lines: it is two people, and nobody needs to wait a turn.",
+      "Closing the chat window is not leaving the table: the seat stays yours and Sit gives back the same chair.",
+      "A table leaves the board when the last person leaves, when the owner closes it, or when nobody returns within " +
         MEMBER_TIMEOUT_MS / (60 * 60 * 1000) +
-        " horas.",
-      "A matilha guarda até " +
+        " hours.",
+      "The pack keeps up to " +
         MAX_PACK +
-        " nomes: convite mútuo, enviado pelo perfil de um caçador ou pelo nick na taverna.",
-      "Quem recebe vê o convite em Convites na taverna e aceita ou recusa; aceitar coloca os dois na matilha um do outro.",
-      "Sair da matilha é mútuo: remover um nome apaga os dois lados.",
-      "Chamar alguém da matilha abre uma mesa reservada para vocês dois, que só vocês veem.",
-      "Uma fala nova na mesa em que você senta toca um aviso suave. O botão de som à esquerda do campo muta ou liga de novo; ligar toca o aviso para você ouvir.",
-      "Passar o mouse no nick mostra o que a pessoa está fazendo: caçando, treinando, forjando, minerando, repousando ou parado.",
-      "Quem está numa mesa agora responde primeiro à busca por nick; depois responde o quadro do ranking.",
-      "A mesa reservada nunca é varrida: a mensagem espera até que o outro nome apareça.",
-      "Excluir um nome não custa nada e guardar de novo também não; a mesa reservada continua até alguém fechá-la.",
-      "As mesas vivem no servidor: o quadro atualiza em tempo real por conexão contínua, sem depender de ficar atualizando a página.",
-      "Com a Taverna ligada nas configurações, mensagens novas nas mesas em que você senta chegam por notificação do sistema, mesmo com o jogo fechado.",
-      "A senha da mesa fica guardada cifrada; ainda assim, invente uma só para a mesa, nunca uma senha que você usa em outro lugar.",
+        " names: a mutual invite, sent from a hunter's profile or by nick in the tavern.",
+      "The receiver sees the invite under Invites in the tavern and accepts or declines; accepting puts each in the other's pack.",
+      "Leaving the pack is mutual: removing a name erases both sides.",
+      "Calling someone from the pack opens a reserved table for the two of you, which only you two see.",
+      "A new line at a table you sit at plays a soft notice. The sound button left of the field mutes or unmutes; unmuting plays the notice so you hear it.",
+      "Hovering a nick shows what the person is doing: hunting, training, forging, mining, resting or idle.",
+      "Whoever sits at a table right now answers the nick search first; the ranking board answers after.",
+      "The reserved table is never swept: the message waits until the other name shows up.",
+      "Deleting a name costs nothing and keeping it again costs nothing; the reserved table stays until someone closes it.",
+      "The tables live on the server: the board updates in real time over a continuous connection, without refreshing the page.",
+      "With the Tavern switch on in the settings, new messages at your tables arrive as system notifications, even with the game closed.",
+      "The table password is stored encrypted; even so, invent one just for the table, never a password you use elsewhere.",
     ],
   },
   {
     id: "bazaar",
-    title: "Bazar",
-    summary: "Peça forjada e fragmento trocando de dono por dinheiro de verdade.",
+    title: "Bazaar",
+    summary: "Forged pieces and fragments changing hands for real money.",
     lines: [
-      "Só entra o que a forja tocou: peça +1 ou mais fora do corpo, e fragmentos da mina.",
-      "O que o mercado vende igual não entra: peça sem forja fica de fora.",
-      "Anunciar tira as peças da mochila e cobra cerca de " +
+      "Only what the forge touched enters: a piece at +1 or more off the body, and fragments from the mine.",
+      "What the market sells plainly does not enter: an unforged piece stays out.",
+      "Announcing takes the pieces out of the bag and charges about " +
         BAZAAR_LISTING_HUNTS +
-        " caçadas do seu nível em WCoins; remover o anúncio devolve as peças, nunca a taxa.",
-      "Quem compra é gente de verdade: o anúncio fica no quadro até outro caçador pagar por ele, e o preço é você quem decide.",
-      "Todo anúncio dura " +
+        " hunts of your level in WCoins; removing the listing returns the pieces, never the fee.",
+      "The buyers are real people: the listing stays on the board until another hunter pays for it, and the price is yours to set.",
+      "Every listing lasts " +
         BAZAAR_LISTING_DAYS +
-        " dias: o quadro mostra quantos faltam e a hora em que vence, e o vencido sai da vitrine esperando o dono remover para recolher as peças.",
-      "A compra é paga no checkout do Stripe, com dinheiro de verdade; assim que o pagamento confirma, o item entra na mochila e o vendedor recebe no Alforje, já sem a taxa da casa.",
-      "O que veio do bazar carrega a insígnia Bazar na mochila: uma marca de origem, sem regra presa a ela, e a peça vende no mercado como qualquer outra.",
-      "Ninguém compra o próprio anúncio.",
-      "A casa fica com " +
+        " days: the board shows how many are left and the hour it expires, and an expired one leaves the shopfront waiting for the owner to remove it and collect the pieces.",
+      "The purchase is paid at the Stripe checkout, with real money; as soon as the payment confirms, the item enters the bag and the seller receives in the Saddlebag, already net of the house fee.",
+      "What came from the bazaar carries the Bazaar badge in the bag: a mark of origin, with no rule attached, and the piece sells at the market like any other.",
+      "Nobody buys their own listing.",
+      "The house keeps " +
         Math.round(BAZAAR_FEE_RATIO * 100) +
-        "% de cada venda; o resto cai no Alforje, a carteira do bazar.",
-      "O Alforje nasce com " +
+        "% of every sale; the rest lands in the Saddlebag, the bazaar's wallet.",
+      "The Saddlebag starts with " +
         formatReais(initialWallet().cents) +
-        " e o saque mínimo é " +
+        " and the minimum withdrawal is " +
         formatReais(MIN_WITHDRAW_CENTS) +
-        ", pedido com nome completo, CPF e chave Pix.",
-      "O saque desta versão é de demonstração: o pedido fica registrado com os dados informados e nada é transferido ainda.",
-      "Comprar uma peça mais forjada que a sua eleva a sua ao nível dela: a forja pertence à peça.",
-      "Qualquer dúvida com um pagamento, escreva para o suporte: " + SITE_EMAIL + ".",
+        ", requested with full name, CPF and Pix key.",
+      "This version's withdrawal is a demo: the order is recorded with the given details and nothing is transferred yet.",
+      "Buying a piece more forged than yours raises yours to its level: the forge belongs to the piece.",
+      "Any doubt about a payment, write to support: " + SITE_EMAIL + ".",
     ],
   },
   {
     id: "store",
     title: "Wizold Store",
-    summary: "WCoins por dinheiro, para quem quer pular a espera.",
+    summary: "WCoins for money, for those who want to skip the wait.",
     lines: [
-      "Três pacotes de WCoins, com a mesma quantia em qualquer nível.",
+      "Three WCoin packs, the same amount at any level.",
       ...STORE_PACKS.map(
         (pack) =>
-          pack.name + ": " + formatBronze(pack.bronze) + " por " + formatReais(pack.priceCents) + ".",
+          pack.name + ": " + formatBronze(pack.bronze) + " for " + formatReais(pack.priceCents) + ".",
       ),
-      "A loja não vende nível, atributo nem equipamento: experiência só a caça dá, e ponto de atributo só o treino dá.",
-      "O pagamento abre no checkout do Stripe e os WCoins caem na conta assim que ele confirma.",
-      "O histórico de compras fica na própria loja, cinco por página: valor, data e o status de cada pacote, de aguardando pagamento a aprovado, expirado ou devolvido.",
-      "Qualquer dúvida com um pagamento, escreva para o suporte: " + SITE_EMAIL + ".",
+      "The store sells no level, attribute or equipment: only the hunt gives experience, and only training gives attribute points.",
+      "Payment opens at the Stripe checkout and the WCoins land on the account as soon as it confirms.",
+      "The purchase history lives in the store itself, five per page: amount, date and each pack's status, from awaiting payment to approved, expired or refunded.",
+      "Any doubt about a payment, write to support: " + SITE_EMAIL + ".",
     ],
   },
   {
     id: "vip",
     title: "VIP",
-    summary: "Assinatura mensal que libera a automação.",
+    summary: "A monthly subscription that unlocks automation.",
     lines: [
-      "Custa " +
+      "It costs " +
         formatReais(VIP_PRICE_CENTS) +
-        " por mês e mantém o VIP por " +
+        " per month and keeps VIP for " +
         VIP_DAYS +
-        " dias a cada cobrança confirmada.",
-      "Libera todos os interruptores de automação nas configurações: caçada, treino, mina, forja, descanso, fúria, poção e mascote.",
-      "Sem VIP, cada clique faz um ciclo só; com VIP, a partida repete o trabalho sozinha enquanto houver recurso.",
-      "Cancele na Wizold Store: a cobrança para de renovar no Stripe e o VIP vale até o fim do período já pago; reative antes do vencimento para não perder o recurso.",
-      "O pagamento abre no checkout do Stripe; a confirmação liga o VIP na hora.",
+        " days per confirmed charge.",
+      "It unlocks every automation switch in the settings: hunt, training, mine, forge, rest, fury, potion and companion.",
+      "Without VIP, each click does one cycle; with VIP, the run repeats the work on its own while there are resources.",
+      "Cancel at the Wizold Store: the charge stops renewing on Stripe and VIP lasts until the end of the paid period; reactivate before it runs out to keep the feature.",
+      "Payment opens at the Stripe checkout; confirmation turns VIP on at once.",
     ],
   },
   {
     id: "automation",
-    title: "Automação",
-    summary: "Interruptores VIP que repetem trabalho por você.",
+    title: "Automation",
+    summary: "VIP switches that repeat work for you.",
     lines: [
-      "Só quem tem VIP liga e desliga os interruptores nas configurações.",
+      "Only VIP turns the switches on and off in the settings.",
       AUTOMATIONS.map((entry) => entry.label + ": " + entry.effect).join(" "),
-      "Nada liga sozinho: cada interruptor precisa estar ativado nas configurações. Trabalho pausado por falta de recurso retoma quando a chave daquele job estiver ligada. A fúria automática bebe na caçada sem precisar da caçada automática; na lua cheia ela não bebe, o céu já mantém o Modo Fúria.",
+      "Nothing turns on by itself: each switch must be enabled in the settings. Work paused for lack of resources resumes when that job's switch is on. Automatic fury drinks on the hunt without needing the automatic hunt; on the full moon it does not drink, the sky already keeps Fury Mode on.",
     ],
   },
   {
     id: "economy",
-    title: "Economia",
-    summary: "WCoins entram pela caça e saem pelo mercado.",
+    title: "Economy",
+    summary: "WCoins come in through the hunt and leave through the market.",
     lines: [
-      "A partida começa com " +
+      "The run starts with " +
         STARTING_BRONZE +
-        " WCoins. Renomear o personagem custa " +
+        " WCoins. Renaming the character costs " +
         formatBronze(RENAME_PRICE) +
-        " a cada " +
+        " every " +
         RENAME_COOLDOWN_DAYS +
-        " dias; adoção do lobo " +
+        " days; adopting the wolf " +
         formatBronze(PET_PRICE) +
-        " e renomear o lobo " +
+        " and renaming the wolf " +
         formatBronze(PET_RENAME_PRICE) +
-        ". Ração do lobo, arena e treino do mascote seguem a bolsa da faixa; a poção tem preço fixo.",
+        ". Wolf rations, the arena and companion training follow the band's purse; the potion has a fixed price.",
       setCostRangeLine() +
-        " Subir de nível dentro de uma faixa não enche o bolso: quem muda o tamanho da bolsa é abrir a faixa seguinte.",
-      "O mercado vende pelo preço de tabela e recompra pela metade. Materiais só servem para venda; nenhum equipamento cai na caça.",
-      "Poções de vida: pequena 50 WCoins, média 150, grande 300; fúria pequena 300, média 600, grande 900; ração do lobo, 1,5 caçada. A poção de fúria não se bebe na lua cheia: o céu já mantém o Modo Fúria. Fragmentos saem da mina e só alimentam a forja.",
-      "Comprar e vender pedem confirmação e deixam escolher a quantidade.",
+        " Leveling inside a band does not fill the pocket: what changes the purse's size is opening the next band.",
+      "The market sells at list price and buys back at half. Materials are for selling only; no equipment drops on the hunt.",
+      "Health potions: small 50 WCoins, medium 150, large 300; fury small 300, medium 600, large 900; wolf ration, 1.5 hunts. The fury potion is not drunk on the full moon: the sky already keeps Fury Mode on. Fragments come from the mine and feed only the forge.",
+      "Buying and selling ask for confirmation and let you choose the quantity.",
     ],
   },
 ];
