@@ -35,40 +35,68 @@ if (!key) {
   process.exit(1);
 }
 
-const lore = readFileSync(join(ROOT, "src", "models", "data", "lore.ts"), "utf8");
-const chapters = [];
-const block = /text:\s*((?:"(?:[^"\\]|\\.)*"\s*\+?\s*)+),\s*voice:\s*"\/assets\/voice\/([a-z]+)\.mp3/g;
-for (const match of lore.matchAll(block)) {
-  const text = Array.from(match[1].matchAll(/"((?:[^"\\]|\\.)*)"/g))
+const args = process.argv.slice(2);
+const locale = args[0] === "en" ? "en" : "pt";
+
+function joinedStrings(source) {
+  return Array.from(source.matchAll(/"((?:[^"\\]|\\.)*)"/g))
     .map((piece) => piece[1])
     .join("");
-  chapters.push({ name: match[2], text });
 }
 
-const welcomeBlock = lore.match(/export const WELCOME_PARAGRAPHS = \[([\s\S]*?)\] as const/);
-if (welcomeBlock) {
-  const text = Array.from(welcomeBlock[1].matchAll(/"((?:[^"\\]|\\.)*)"/g))
-    .map((piece) => piece[1])
-    .join(" ");
-  if (text) chapters.push({ name: "welcome", text });
-}
+const chapters = [];
 
-const AREAS = join(ROOT, "src", "models", "data", "areas");
-for (const entry of readdirSync(AREAS)) {
-  if (!entry.endsWith(".ts") || entry === "index.ts" || entry === "types.ts") continue;
-  const source = readFileSync(join(AREAS, entry), "utf8");
-  const id = source.match(/id:\s*"([^"]+)"/)?.[1];
-  const description = source.match(/description:\s*"((?:[^"\\]|\\.)*)"/)?.[1];
-  if (id && description) chapters.push({ name: "area-" + id, text: description });
+if (locale === "en") {
+  // English texts live in lore.i18n.ts; file order maps onto the pt voice names.
+  const i18n = readFileSync(join(ROOT, "src", "models", "data", "lore.i18n.ts"), "utf8");
+  const sets = [
+    { constant: "EN_CHAPTERS", names: ["meeting", "turning", "choice", "pack"] },
+    { constant: "EN_COMPANIONS", names: ["guardian", "tracker"] },
+  ];
+  for (const set of sets) {
+    const body = i18n.match(new RegExp("const " + set.constant + "[\\s\\S]*?\\n\\];"))?.[0] ?? "";
+    const texts = Array.from(
+      body.matchAll(/text:\s*((?:"(?:[^"\\]|\\.)*"\s*\+?\s*)+),/g),
+    ).map((match) => joinedStrings(match[1]));
+    texts.forEach((text, index) => {
+      const name = set.names[index];
+      if (name && text) chapters.push({ name: name + ".en", text });
+    });
+  }
+} else {
+  const lore = readFileSync(join(ROOT, "src", "models", "data", "lore.ts"), "utf8");
+  const block = /text:\s*((?:"(?:[^"\\]|\\.)*"\s*\+?\s*)+),\s*voice:\s*"\/assets\/voice\/([a-z]+)\.mp3/g;
+  for (const match of lore.matchAll(block)) {
+    chapters.push({ name: match[2], text: joinedStrings(match[1]) });
+  }
+
+  const welcomeBlock = lore.match(/export const WELCOME_PARAGRAPHS = \[([\s\S]*?)\] as const/);
+  if (welcomeBlock) {
+    const text = Array.from(welcomeBlock[1].matchAll(/"((?:[^"\\]|\\.)*)"/g))
+      .map((piece) => piece[1])
+      .join(" ");
+    if (text) chapters.push({ name: "welcome", text });
+  }
+
+  const AREAS = join(ROOT, "src", "models", "data", "areas");
+  for (const entry of readdirSync(AREAS)) {
+    if (!entry.endsWith(".ts") || entry === "index.ts" || entry === "types.ts") continue;
+    const source = readFileSync(join(AREAS, entry), "utf8");
+    const id = source.match(/id:\s*"([^"]+)"/)?.[1];
+    const description = source.match(/description:\s*"((?:[^"\\]|\\.)*)"/)?.[1];
+    if (id && description) chapters.push({ name: "area-" + id, text: description });
+  }
 }
 
 if (chapters.length === 0) {
-  console.error("no chapters found in lore.ts");
+  console.error("no chapters found");
   process.exit(1);
 }
 
-const only = process.argv[2];
-const wanted = only ? chapters.filter((chapter) => chapter.name === only) : chapters;
+const only = locale === "en" ? args[1] : args[0];
+const wanted = only
+  ? chapters.filter((chapter) => chapter.name === only || chapter.name === only + ".en")
+  : chapters;
 if (wanted.length === 0) {
   console.error("no chapter named " + only);
   process.exit(1);
