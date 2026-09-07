@@ -164,7 +164,6 @@ export function TavernRoomChatMembers({
                     className={nickColorClass(member.nickColor)}
                   />
                 </Tooltip>
-                {member.vip ? <VipBadge /> : null}
                 {levels[member.id] ? (
                   <span className="font-mono text-[10px] text-ink-faint">NV. {levels[member.id]}</span>
                 ) : null}

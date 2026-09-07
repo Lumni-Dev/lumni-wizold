@@ -151,16 +151,18 @@ export function RankingScreen() {
                   {formatNumber(entry.position)}º
                 </span>
                 <CopyNick name={entry.hunter.name} />
-                <Link
-                  href={entry.isPlayer ? "/character" : "/ranking/" + entry.hunter.id}
-                  className={cn(
-                    "min-w-0 flex-1 truncate text-sm transition-colors hover:text-highlight",
-                    entry.isPlayer ? "text-highlight" : "text-ink",
-                  )}
-                >
-                  {entry.hunter.name}
-                </Link>
-                {entry.hunter.vip ? <VipBadge /> : null}
+                <span className="flex min-w-0 flex-1 items-center gap-2">
+                  <Link
+                    href={entry.isPlayer ? "/character" : "/ranking/" + entry.hunter.id}
+                    className={cn(
+                      "min-w-0 truncate text-sm transition-colors hover:text-highlight",
+                      entry.isPlayer ? "text-highlight" : "text-ink",
+                    )}
+                  >
+                    {entry.hunter.name}
+                  </Link>
+                  {entry.hunter.vip ? <VipBadge /> : null}
+                </span>
                 <span className="hidden shrink-0 text-[10px] uppercase tracking-[0.16em] text-ink-faint sm:block">
                   {entry.hunter.gender === "male" ? "Lumni" : "Luna"}
                 </span>

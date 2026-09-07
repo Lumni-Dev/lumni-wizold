@@ -41,8 +41,9 @@ export async function listPackPresence(
     id: string;
     presence_status: PresenceStatus;
     presence_at: string | null;
+    vip_until: string | null;
   }>(
-    `select c.id, c.presence_status, c.presence_at
+    `select c.id, c.presence_status, c.presence_at, c.vip_until
      from pack_mates pm
      join characters c on c.id = pm.mate_id
      where pm.character_id = $1`,
@@ -51,6 +52,7 @@ export async function listPackPresence(
   return found.rows.map((row) => ({
     id: row.id,
     status: resolvePresence(row.presence_status, row.presence_at, now),
+    vip: row.vip_until ? new Date(row.vip_until).getTime() > now : false,
   }));
 }
 

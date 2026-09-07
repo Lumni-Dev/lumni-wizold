@@ -56,7 +56,7 @@ export function TavernChatWindow() {
     chat.open ? chat.roomId : null,
   );
   const packIds = useMemo(() => listPack(state).map((mate) => mate.id), [state]);
-  const packPresence = usePackPresence(packIds, Boolean(character) && chat.open);
+  const { statuses: packPresence } = usePackPresence(packIds, Boolean(character) && chat.open);
   const { doing: tavernDoing, levels: tavernLevels } = useTavernDoing(Boolean(character) && chat.open);
   const mineDoing = activity?.kind ?? null;
   const chatPresence = useMemo(() => {

@@ -51,6 +51,7 @@ import { Panel } from "../components/panel";
 import { EmptyState } from "../components/empty-state";
 import { FilteredEmptyState } from "../components/filtered-empty-state";
 import { Tooltip } from "../components/tooltip";
+import { VipBadge } from "../components/vip-badge";
 import { PageHeader } from "../layout/page-header";
 import { PRESENCE_LABELS, PresenceDot } from "../components/presence-dot";
 import { RadioPlayer } from "../components/radio-player";
@@ -348,7 +349,7 @@ export function TavernScreen() {
 
   const pack = useMemo(() => listPack(state), [state]);
   const packIds = useMemo(() => pack.map((mate) => mate.id), [pack]);
-  const packPresence = usePackPresence(packIds, Boolean(character));
+  const { statuses: packPresence, vips: packVips } = usePackPresence(packIds, Boolean(character));
   const { doing: tavernDoing, levels: tavernLevels } = useTavernDoing(Boolean(character));
   const mineDoing = activity?.kind ?? null;
   const chatPresence = useMemo(() => {
@@ -727,6 +728,7 @@ export function TavernScreen() {
                         >
                           <MemberName href={profileHref(mate.id)} name={mate.name} />
                         </Tooltip>
+                        {packVips[mate.id] ? <VipBadge className="ml-2" /> : null}
                       </p>
                     </div>
 

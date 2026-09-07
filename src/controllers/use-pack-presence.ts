@@ -5,10 +5,15 @@ import type { PresenceStatus } from "@/models/entities/presence";
 import { PRESENCE_POLL_MS } from "@/models/rules/presence";
 import { api } from "./api.client";
 
-const NOBODY: Record<string, PresenceStatus> = {};
+export interface PackPresenceView {
+  statuses: Record<string, PresenceStatus>;
+  vips: Record<string, boolean>;
+}
 
-export function usePackPresence(mateIds: string[], enabled: boolean) {
-  const [presence, setPresence] = useState<Record<string, PresenceStatus>>({});
+const NOBODY: PackPresenceView = { statuses: {}, vips: {} };
+
+export function usePackPresence(mateIds: string[], enabled: boolean): PackPresenceView {
+  const [presence, setPresence] = useState<PackPresenceView>(NOBODY);
   const roster = mateIds.join(",");
   const watching = enabled && mateIds.length > 0;
 
@@ -17,14 +22,17 @@ export function usePackPresence(mateIds: string[], enabled: boolean) {
 
     let alive = true;
     const load = async () => {
-      const answer = await api<{ mates: { id: string; status: PresenceStatus }[] }>(
-        "GET",
-        "/api/pack/presence",
-      );
+      const answer = await api<{
+        mates: { id: string; status: PresenceStatus; vip?: boolean }[];
+      }>("GET", "/api/pack/presence");
       if (!alive || !answer.ok || !answer.data) return;
-      const next: Record<string, PresenceStatus> = {};
-      for (const mate of answer.data.mates) next[mate.id] = mate.status;
-      setPresence(next);
+      const statuses: Record<string, PresenceStatus> = {};
+      const vips: Record<string, boolean> = {};
+      for (const mate of answer.data.mates) {
+        statuses[mate.id] = mate.status;
+        vips[mate.id] = mate.vip === true;
+      }
+      setPresence({ statuses, vips });
     };
 
     void load();
@@ -43,3 +51,4 @@ export function usePackPresence(mateIds: string[], enabled: boolean) {
 
   return watching ? presence : NOBODY;
 }
+
