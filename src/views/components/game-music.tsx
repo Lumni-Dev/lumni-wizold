@@ -1,11 +1,23 @@
 "use client";
 
-import { useEffect, useRef, useSyncExternalStore, type RefObject } from "react";
-import { musicRepository } from "@/models/repositories/music.repository";
+import { useEffect, useRef, useState, useSyncExternalStore, type RefObject } from "react";
+import { musicRepository, type MusicTrackChoice } from "@/models/repositories/music.repository";
 import { radioStore } from "@/controllers/radio.store";
 
-const TRACK = "/assets/sounds/trilha.mp3?v=1";
+type TrackKey = Exclude<MusicTrackChoice, "random">;
+
+const TRACKS: Record<TrackKey, string> = {
+  "1": "/assets/sounds/trilha.mp3?v=2",
+  "2": "/assets/sounds/trilha2.mp3?v=1",
+  "3": "/assets/sounds/trilha3.mp3?v=1",
+};
+const TRACK_KEYS: readonly TrackKey[] = ["1", "2", "3"];
 const LANDING_VOLUME = 0.5;
+
+function anotherTrack(current: TrackKey): TrackKey {
+  const others = TRACK_KEYS.filter((key) => key !== current);
+  return others[Math.floor(Math.random() * others.length)];
+}
 
 const UNLOCK_EVENTS: Array<keyof DocumentEventMap> = [
   "pointerdown",
@@ -18,7 +30,7 @@ const UNLOCK_EVENTS: Array<keyof DocumentEventMap> = [
 
 function useMusicPlayback(
   audioRef: RefObject<HTMLAudioElement | null>,
-  { enabled, volume }: { enabled: boolean; volume: number },
+  { enabled, volume, src }: { enabled: boolean; volume: number; src: string },
 ) {
   useEffect(() => {
     const audio = audioRef.current;
@@ -68,7 +80,7 @@ function useMusicPlayback(
       unbind();
       audio.pause();
     };
-  }, [audioRef, enabled, volume]);
+  }, [audioRef, enabled, volume, src]);
 }
 
 export function GameMusic() {
@@ -88,13 +100,35 @@ export function GameMusic() {
     radioStore.isPlaying,
     () => false,
   );
+  const choice = useSyncExternalStore(
+    musicRepository.subscribe,
+    musicRepository.track,
+    musicRepository.serverTrackSnapshot,
+  );
+  const [randomKey, setRandomKey] = useState<TrackKey>("1");
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setRandomKey(TRACK_KEYS[Math.floor(Math.random() * TRACK_KEYS.length)]);
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, []);
   const playing = enabled && !radioPlaying;
+  const random = choice === "random";
+  const src = TRACKS[random ? randomKey : choice];
 
-  useMusicPlayback(audioRef, { enabled: playing, volume });
+  useMusicPlayback(audioRef, { enabled: playing, volume, src });
 
   if (!playing) return null;
 
-  return <audio ref={audioRef} src={TRACK} loop preload="none" aria-hidden="true" />;
+  return (
+    <audio
+      ref={audioRef}
+      src={src}
+      loop={!random}
+      preload="none"
+      aria-hidden="true"
+      onEnded={random ? () => setRandomKey(anotherTrack) : undefined}
+    />
+  );
 }
 
 export function LandingMusic() {
@@ -105,9 +139,9 @@ export function LandingMusic() {
     musicRepository.serverSnapshot,
   );
 
-  useMusicPlayback(audioRef, { enabled, volume: LANDING_VOLUME });
+  useMusicPlayback(audioRef, { enabled, volume: LANDING_VOLUME, src: TRACKS["1"] });
 
   if (!enabled) return null;
 
-  return <audio ref={audioRef} src={TRACK} loop preload="auto" aria-hidden="true" />;
+  return <audio ref={audioRef} src={TRACKS["1"]} loop preload="auto" aria-hidden="true" />;
 }

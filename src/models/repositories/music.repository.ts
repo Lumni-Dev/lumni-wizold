@@ -1,6 +1,12 @@
 const ENABLED_KEY = "lumni-wizold:music";
 const VOLUME_KEY = "lumni-wizold:music:volume";
+const TRACK_KEY = "lumni-wizold:music:track";
 const DEFAULT_VOLUME = 0.75;
+
+export type MusicTrackChoice = "1" | "2" | "3" | "random";
+
+const TRACK_CHOICES: readonly MusicTrackChoice[] = ["1", "2", "3", "random"];
+const DEFAULT_TRACK: MusicTrackChoice = "random";
 
 const listeners = new Set<() => void>();
 
@@ -38,6 +44,26 @@ export const musicRepository = {
     }
   },
 
+  track(): MusicTrackChoice {
+    if (typeof window === "undefined") return DEFAULT_TRACK;
+    try {
+      const raw = window.localStorage.getItem(TRACK_KEY);
+      return TRACK_CHOICES.includes(raw as MusicTrackChoice)
+        ? (raw as MusicTrackChoice)
+        : DEFAULT_TRACK;
+    } catch {
+      return DEFAULT_TRACK;
+    }
+  },
+
+  setTrack(choice: MusicTrackChoice): void {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(TRACK_KEY, choice);
+    } catch {}
+    notify();
+  },
+
   setEnabled(on: boolean): void {
     if (typeof window === "undefined") return;
     try {
@@ -65,5 +91,9 @@ export const musicRepository = {
 
   serverVolumeSnapshot(): number {
     return DEFAULT_VOLUME;
+  },
+
+  serverTrackSnapshot(): MusicTrackChoice {
+    return DEFAULT_TRACK;
   },
 };

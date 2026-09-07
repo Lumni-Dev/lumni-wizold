@@ -176,6 +176,11 @@ export function SettingsScreen() {
     musicRepository.volume,
     musicRepository.serverVolumeSnapshot,
   );
+  const musicTrack = useSyncExternalStore(
+    musicRepository.subscribe,
+    musicRepository.track,
+    musicRepository.serverTrackSnapshot,
+  );
 
   function chooseMusic(on: boolean) {
     musicRepository.setEnabled(on);
@@ -533,6 +538,31 @@ export function SettingsScreen() {
                   </Chip>
                 </div>
               </ListRow>
+              {music ? (
+                <ListRow layout="split">
+                  <RowText
+                    title="Faixa"
+                    description="Qual trilha corre por baixo do jogo neste aparelho. Aleatória sorteia uma e, quando ela acaba, sorteia outra."
+                  />
+                  <div className="flex shrink-0 flex-wrap gap-2">
+                    <Chip active={musicTrack === "1"} onClick={() => musicRepository.setTrack("1")}>
+                      Trilha 1
+                    </Chip>
+                    <Chip active={musicTrack === "2"} onClick={() => musicRepository.setTrack("2")}>
+                      Trilha 2
+                    </Chip>
+                    <Chip active={musicTrack === "3"} onClick={() => musicRepository.setTrack("3")}>
+                      Trilha 3
+                    </Chip>
+                    <Chip
+                      active={musicTrack === "random"}
+                      onClick={() => musicRepository.setTrack("random")}
+                    >
+                      Aleatória
+                    </Chip>
+                  </div>
+                </ListRow>
+              ) : null}
               {music ? (
                 <ListRow layout="column">
                   <div className="flex items-center justify-between gap-3">
