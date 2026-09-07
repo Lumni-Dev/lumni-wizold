@@ -9,7 +9,7 @@ export function NarrationButton({
   playing,
   loading = false,
   onClick,
-  label = "Ouvir este capítulo",
+  label = "Listen to this chapter",
 }: {
   playing: boolean;
   loading?: boolean;
@@ -22,11 +22,11 @@ export function NarrationButton({
       variant="ghost"
       className="shrink-0"
       onClick={onClick}
-      aria-label={playing ? "Parar a narração" : label}
+      aria-label={playing ? "Stop the narration" : label}
       aria-busy={loading || undefined}
     >
       {loading ? <Spinner tone="ember" /> : <ActionIcon action={playing ? "pause" : "play"} />}
-      {t(playing ? "Parar" : loading ? "Carregando..." : "Ouvir")}
+      {t(playing ? "Stop" : loading ? "Loading..." : "Listen")}
     </Button>
   );
 }

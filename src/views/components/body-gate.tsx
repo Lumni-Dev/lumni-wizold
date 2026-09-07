@@ -35,9 +35,9 @@ export function BodyGate({
       fullWidth={fullWidth}
       recovering={activity?.kind === "rest"}
       beat={String(character.health)}
-      recoveringLabel="Recuperando-se..."
-      label="Recuperar-se"
-      tooltip={requireFull ? t(reason) : t("Vida baixa demais.") + " " + t(reason)}
+      recoveringLabel="Recovering..."
+      label="Recover"
+      tooltip={requireFull ? t(reason) : t("Health too low.") + " " + t(reason)}
       onClick={activity?.kind === "rest" ? () => setActivity(null) : rest}
     />
   );

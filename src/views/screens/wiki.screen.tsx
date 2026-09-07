@@ -45,15 +45,15 @@ import { summarizeEffect } from "../presenters/item.presenter";
 const SECTION_TABS: readonly { key: string; label: string }[] = [
   { key: "all", label: "Tudo" },
   ...WIKI_TOPICS.map((topic) => ({ key: topic.id, label: topic.title })),
-  { key: "attributes", label: "Atributos" },
-  { key: "slots", label: "Espaços" },
-  { key: "exercises", label: "Exercícios" },
-  { key: "territories", label: "Territórios" },
-  { key: "equipamentos", label: "Equipamentos" },
-  { key: "bestiary", label: "Bestiário" },
-  { key: "fragmentos", label: "Fragmentos" },
-  { key: "itens", label: "Itens" },
-  { key: "pocoes", label: "Poções" },
+  { key: "attributes", label: "Attributes" },
+  { key: "slots", label: "Slots" },
+  { key: "exercises", label: "Exercises" },
+  { key: "territories", label: "Territories" },
+  { key: "equipamentos", label: "Equipment" },
+  { key: "bestiary", label: "Bestiary" },
+  { key: "fragmentos", label: "Fragments" },
+  { key: "itens", label: "Items" },
+  { key: "pocoes", label: "Potions" },
 ];
 
 interface WikiEquipmentEntry {
@@ -155,15 +155,15 @@ export function WikiScreen() {
     <>
       <PageHeader
         title="Wiki"
-        description="Todas as regras, números e catálogos do jogo em um lugar só."
+        description="Every rule, number and catalog of the game in one place."
       />
 
       <div className="mb-6 space-y-3">
         <div className="sm:max-w-xs">
           <Field
             accent
-            aria-label="Buscar na wiki"
-            placeholder="Buscar peça, criatura ou item"
+            aria-label="Search the wiki"
+            placeholder="Search piece, creature or item"
             value={search}
             autoComplete="off"
             onChange={(event) => setSearch(event.target.value)}
@@ -185,9 +185,9 @@ export function WikiScreen() {
           </WikiMasonryItem>
         ))}
 
-        {shows("attributes", hits("Atributos")) ? (
+        {shows("attributes", hits("Attributes")) ? (
           <WikiMasonryItem id="attributes">
-            <Panel title="Atributos" description="Cinco eixos, todos treináveis." padding="none">
+            <Panel title="Attributes" description="Five axes, all trainable." padding="none">
               <List>
                 {ATTRIBUTES.map((attribute) => (
                   <ListRow key={attribute.key} art={<AttributeArtFill attribute={attribute.key} />}>
@@ -199,11 +199,11 @@ export function WikiScreen() {
           </WikiMasonryItem>
         ) : null}
 
-        {shows("slots", hits("Espaços")) ? (
+        {shows("slots", hits("Slots")) ? (
           <WikiMasonryItem id="slots">
             <Panel
-              title="Espaços de equipamento"
-              description="Um item por espaço, sete no total."
+              title="Equipment slots"
+              description="One item per slot, seven in total."
               padding="none"
             >
               <List>
@@ -220,7 +220,7 @@ export function WikiScreen() {
         {shows("equipamentos", equipment.length > 0) ? (
           <WikiPaginatedPanel
             id="equipamentos"
-            title="Equipamentos"
+            title="Equipment"
             description={
               equipmentCount +
               " peças em cinco conjuntos, do bronze ao lunar. Cada linha traz a peça, o bônus e o preço no mercado."
@@ -255,11 +255,11 @@ export function WikiScreen() {
           </WikiPaginatedPanel>
         ) : null}
 
-        {shows("exercises", hits("Exercícios")) ? (
+        {shows("exercises", hits("Exercises")) ? (
           <WikiMasonryItem id="exercises">
             <Panel
-              title="Exercícios"
-              description="Um por atributo, do primeiro ao último nível."
+              title="Exercises"
+              description="One per attribute, from the first level to the last."
               padding="none"
             >
               <List>
@@ -293,11 +293,11 @@ export function WikiScreen() {
           </WikiMasonryItem>
         ) : null}
 
-        {shows("territories", hits("Territórios")) ? (
+        {shows("territories", hits("Territories")) ? (
           <WikiMasonryItem id="territories">
             <Panel
-              title="Territórios"
-              description="Ordem natural de progressão da caça."
+              title="Territories"
+              description="The hunt's natural order of progression."
               padding="none"
             >
               <List>
@@ -335,7 +335,7 @@ export function WikiScreen() {
         {shows("bestiary", creatures.length > 0) ? (
           <WikiPaginatedPanel
             id="bestiary"
-            title="Bestiário"
+            title="Bestiary"
             description={
               WIKI_CREATURES.length +
               " criaturas em seis espécies, ordenadas por nível. Números fixos por variant."
@@ -374,7 +374,7 @@ export function WikiScreen() {
         {shows("fragmentos", fragments.length > 0) ? (
           <WikiPaginatedPanel
             id="fragmentos"
-            title="Fragmentos"
+            title="Fragments"
             description={
               WIKI_FRAGMENTS.length +
               " lascas da mina, uma por conjunto. Só alimentam a forja; não caem na caça nem entram no mercado."
@@ -395,7 +395,7 @@ export function WikiScreen() {
         {shows("itens", items.length > 0) ? (
           <WikiPaginatedPanel
             id="itens"
-            title="Itens"
+            title="Items"
             description={
               WIKI_ITEMS.length + " materiais de caça e suprimentos de mascote no catálogo."
             }
@@ -417,7 +417,7 @@ export function WikiScreen() {
         {shows("pocoes", potions.length > 0) ? (
           <WikiPaginatedPanel
             id="pocoes"
-            title="Poções"
+            title="Potions"
             description={WIKI_POTIONS.length + " poções de vida e fúria vendidas no mercado."}
             items={potions}
           >

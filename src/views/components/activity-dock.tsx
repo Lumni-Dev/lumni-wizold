@@ -103,7 +103,7 @@ export function ActivityDock() {
       filling,
       preyView.combat,
     );
-    const monsterStatus = replaying ? "Atacando" : filling ? "Preparando" : "Aguardando";
+    const monsterStatus = replaying ? "Attacking" : filling ? "Preparing" : "Waiting";
     const healthLost = replaying
       ? script
           .slice(0, Math.min(beat, script.length))
@@ -111,10 +111,10 @@ export function ActivityDock() {
       : 0;
     const opting = cooldown !== null;
     const status = opting
-      ? "Pode parar agora ou seguir para a próxima."
+      ? "You can stop now or go for the next one."
       : state.automation.hunt
-        ? "Caçando sem parar..."
-        : "Caçando...";
+        ? "Hunting non-stop..."
+        : "Hunting...";
 
     const petAlong = pet && canPetFight(pet) ? pet : null;
 
@@ -126,7 +126,7 @@ export function ActivityDock() {
       preyCurrent: monsterCurrent,
       preyMax: monsterMax,
       preyLost: Math.max(0, monsterMax - monsterCurrent),
-      huntLabel: approach ? "Procurando criatura..." : "Caçando...",
+      huntLabel: approach ? "Tracking a creature..." : "Hunting...",
       huntCurrent: cooldown !== null ? cooldown : approach ? approach.beat : beat,
       huntMax:
         cooldown !== null
@@ -141,7 +141,7 @@ export function ActivityDock() {
       cooldown,
       pet: petAlong
         ? {
-            label: "Mascote - Energia",
+            label: "Companion - Energy",
             current: petAlong.energy,
             maximum: petMaxEnergy(petLevelOf(petAlong)),
           }
@@ -164,15 +164,15 @@ export function ActivityDock() {
         progressMax: petTraining.needed,
         progressTotal: petTotalTraining(petTraining.level, petTraining.progress),
         maxed: petTraining.maxed,
-        sessionLabel: "Mascote - Treinamento",
+        sessionLabel: "Companion - Training",
         sessionCurrent: trainRt.beat,
         sessionMax: trainRt.max,
         glows: true,
         status: opting
-          ? "Segue sozinho..."
+          ? "Runs on its own..."
           : state.automation.train
-            ? "Treinando sem parar..."
-            : "Treinando...",
+            ? "Training non-stop..."
+            : "Training...",
         cooldown,
       };
     }
@@ -193,10 +193,10 @@ export function ActivityDock() {
       sessionMax: trainRt.max,
       glows: true,
       status: opting
-        ? "Segue sozinho..."
+        ? "Runs on its own..."
         : state.automation.train
-          ? "Treinando sem parar..."
-          : "Treinando...",
+          ? "Training non-stop..."
+          : "Training...",
       cooldown,
     };
   }, [running, dockRuntime.train, state]);
@@ -214,19 +214,19 @@ export function ActivityDock() {
       xpMax: mining.needed,
       xpTotal: totalExperience(mining.level, mining.progress),
       maxed: mining.maxed,
-      dailyLabel: mining.dailyExhausted ? "Recursos da mina esgotados" : "Recursos da mina",
+      dailyLabel: mining.dailyExhausted ? "Mine resources spent" : "Mine resources",
       dailyCurrent: mining.dailyRemaining,
       dailyMax: mining.dailyLimit,
       dailySpent: mining.dailyLimit - mining.dailyRemaining,
-      swingLabel: "Minerando...",
+      swingLabel: "Mining...",
       swingCurrent: mineRt.beat,
       swingMax: mineRt.max,
       glows: true,
       status: opting
-        ? "Segue sozinho..."
+        ? "Runs on its own..."
         : state.automation.mine
-          ? "Minerando sem parar..."
-          : "Minerando...",
+          ? "Mining non-stop..."
+          : "Mining...",
       cooldown,
     };
   }, [running, dockRuntime.mine, state]);
@@ -247,15 +247,15 @@ export function ActivityDock() {
               maximum: forgeEntry.cost,
             }
           : null,
-      strikeLabel: "Forjando...",
+      strikeLabel: "Forging...",
       strikeCurrent: forgeRt.beat,
       strikeMax: FORGE_TICKS,
       glows: true,
       status: opting
-        ? "Segue sozinho..."
+        ? "Runs on its own..."
         : state.automation.forge
-          ? "Forjando sem parar..."
-          : "Forjando...",
+          ? "Forging non-stop..."
+          : "Forging...",
       cooldown,
     };
   }, [running, dockRuntime.forge, state]);
@@ -266,7 +266,7 @@ export function ActivityDock() {
       healthCurrent: character.health,
       healthMax: stats.maxHealth,
       glows: character.health < stats.maxHealth,
-      status: dockRuntime.dock?.detail ?? "O corpo descansa.",
+      status: dockRuntime.dock?.detail ?? "The body rests.",
     };
   }, [running, character, stats, dockRuntime.dock?.detail]);
 
@@ -286,7 +286,7 @@ export function ActivityDock() {
         return {
           kind: "train" as const,
           progress: {
-            label: "Mascote - Progresso",
+            label: "Companion - Progress",
             current: petTraining.progress,
             maximum: petTraining.needed,
           },
@@ -310,7 +310,7 @@ export function ActivityDock() {
       return {
         kind: "mine" as const,
         daily: {
-          label: mining.dailyExhausted ? "Recursos da mina esgotados" : "Recursos da mina",
+          label: mining.dailyExhausted ? "Mine resources spent" : "Mine resources",
           current: mining.dailyRemaining,
           maximum: mining.dailyLimit,
         },
@@ -387,26 +387,26 @@ export function ActivityDock() {
   const runningLabel = paused
     ? "Pausado"
     : huntView
-    ? "Caçando..."
+    ? "Hunting..."
     : trainView
-      ? "Treinando..."
+      ? "Training..."
       : mineView
-        ? "Minerando..."
+        ? "Mining..."
         : forgeView
-          ? "Forjando..."
+          ? "Forging..."
           : restView
-            ? "Recuperando-se..."
+            ? "Recovering..."
             : dock.detail;
 
   const stopLabel =
     dock.canStop && dock.cooldown !== null
       ? "Parar (" + dock.cooldown + ")"
       : dock.canStop
-        ? "Parar"
+        ? "Stop"
         : runningLabel;
 
   return (
-    <aside aria-label="Atividade em andamento" className="pointer-events-auto relative w-full">
+    <aside aria-label="Activity in progress" className="pointer-events-auto relative w-full">
       <div
         className={cn(
           "overflow-hidden rounded-lg border border-edge shadow-[0_12px_32px_-12px_rgba(0,0,0,0.95)]",
@@ -428,11 +428,11 @@ export function ActivityDock() {
             {t(dock.title)}
           </Link>
           {minimized && dock.canStop ? (
-            <Tooltip label="Parar">
+            <Tooltip label="Stop">
               <button
                 type="button"
                 onClick={stop}
-                aria-label="Parar atividade"
+                aria-label="Stop activity"
                 className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-edge text-ink-faint transition-colors hover:border-edge-strong hover:text-ink"
               >
                 <ActionIcon action="stop" />
@@ -443,7 +443,7 @@ export function ActivityDock() {
             <button
               type="button"
               onClick={() => dockRepository.setMinimized(!minimized)}
-              aria-label={minimized ? "Maximizar atividade" : "Minimizar atividade"}
+              aria-label={minimized ? "Maximize activity" : "Minimize activity"}
               aria-expanded={!minimized}
               className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-edge text-ink-faint transition-colors hover:border-edge-strong hover:text-ink"
             >
@@ -463,7 +463,7 @@ export function ActivityDock() {
                   {pausedView?.kind === "hunt" ? (
                     <ListRow layout="column">
                       <Bar
-                        label="Vida"
+                        label="Health"
                         current={pausedView.healthCurrent}
                         maximum={pausedView.healthMax}
                         tone="blood"
@@ -507,7 +507,7 @@ export function ActivityDock() {
                 <>
                   <ListRow layout="column">
                     <Bar
-                      label="Vida"
+                      label="Health"
                       current={huntView.hunterCurrent}
                       maximum={huntView.hunterMax}
                       tone="blood"
@@ -724,7 +724,7 @@ export function ActivityDock() {
                 fullWidth
                 className="sm:w-auto sm:shrink-0"
                 onClick={stop}
-                aria-label={dock.canStop ? "Parar atividade" : runningLabel}
+                aria-label={dock.canStop ? "Stop activity" : runningLabel}
               >
                 {stopLabel}
               </Button>

@@ -23,8 +23,8 @@ export function AttributesPanel({
 
   return (
     <Panel
-      title="Atributos"
-      description="Cada coluna diz de onde vem o atributo. Some as colunas e você chega no total."
+      title="Attributes"
+      description="Each column says where the attribute comes from. Add the columns and you reach the total."
       padding="none"
     >
       <List>
@@ -38,7 +38,7 @@ export function AttributesPanel({
             { label: "Equip.", value: plus(lent(stats.sources.equipment)), sum: false },
             { label: "Mascote", value: plus(lent(stats.sources.pet)), sum: false },
             { label: "Lua", value: plus(lent(stats.sources.moon)), sum: false },
-            { label: "Fúria", value: plus(lent(stats.sources.fury)), sum: false },
+            { label: "Fury", value: plus(lent(stats.sources.fury)), sum: false },
             { label: "Total", value: formatFraction(total), sum: true },
           ];
 

@@ -18,7 +18,7 @@ export function SingleTabGate() {
   return (
     <Modal
       open={status === "blocked"}
-      title="Uma janela por vez"
+      title="One window at a time"
       onClose={() => {}}
       dismissible={false}
       footer={

@@ -34,7 +34,7 @@ export function ItemFilterRow({
   includeMaterial = false,
   search,
   onSearchChange,
-  searchLabel = "Buscar item pelo nome",
+  searchLabel = "Search item by name",
 }: ItemFilterRowProps) {
   const isPotion = category === "potion";
   const isPet = category === "pet" || category === "material";
@@ -43,7 +43,7 @@ export function ItemFilterRow({
     <FilterRow>
       <FilterSelect
         accent
-        label="Categoria"
+        label="Category"
         value={category}
         options={marketCategoryFilterOptions({ includeMaterial })}
         onChange={onCategoryChange}
@@ -59,7 +59,7 @@ export function ItemFilterRow({
       ) : (
         <FilterSelect
         accent
-          label="Conjunto"
+          label="Set"
           value={set}
           options={setFilterOptions({ marketOnly: true })}
           onChange={onSetChange}
@@ -69,9 +69,9 @@ export function ItemFilterRow({
         <div className={FILTER_COLUMN}>
           <Field
             accent
-            label="Busca"
+            label="Search"
             aria-label={searchLabel}
-            placeholder="Nome do item"
+            placeholder="Item name"
             value={search ?? ""}
             autoComplete="off"
             onChange={(event) => onSearchChange(event.target.value)}

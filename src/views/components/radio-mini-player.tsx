@@ -39,7 +39,7 @@ export function RadioMiniPlayer() {
             playSound("ui");
             radioRepository.setEnabled(!enabled);
           }}
-          aria-label={enabled ? "Pausar o rádio" : "Tocar o rádio"}
+          aria-label={enabled ? "Pause the radio" : "Play the radio"}
           className={CELL + " border-r border-edge"}
         >
           {enabled ? (
@@ -61,7 +61,7 @@ export function RadioMiniPlayer() {
               playSound("ui");
               radioStore.next();
             }}
-            aria-label="Próxima música"
+            aria-label="Next song"
             className={CELL + " border-l border-edge"}
           >
             <SkipForward aria-hidden strokeWidth={1.75} className="h-4 w-4" />

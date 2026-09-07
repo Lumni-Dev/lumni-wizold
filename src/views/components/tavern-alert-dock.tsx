@@ -47,7 +47,7 @@ export function TavernAlertDock() {
               <button
                 type="button"
                 onClick={() => dismissTavernAlert(alert.id)}
-                aria-label="Fechar aviso"
+                aria-label="Close notice"
                 className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-edge text-ink-faint transition-colors hover:border-edge-strong hover:text-ink"
               >
                 <span aria-hidden="true" className="text-sm leading-none">

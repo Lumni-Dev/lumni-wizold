@@ -19,7 +19,7 @@ export function MoonTracker() {
   if (trainingBonus > 0) perks.push(t("+" + trainingBonus + "% no treino"));
   if (miningBonus > 0) perks.push(t("+" + miningBonus + "% na mineração"));
   if (furyBonus > 0) perks.push(t("Modo Fúria: +" + furyBonus + " em todos os atributos"));
-  const bonusLine = perks.length > 0 ? perks.join(" · ") : t("Sem bônus nesta fase");
+  const bonusLine = perks.length > 0 ? perks.join(" · ") : t("No bonus this phase");
 
   return (
     <Tooltip block label={t(moon.phase.description)}>

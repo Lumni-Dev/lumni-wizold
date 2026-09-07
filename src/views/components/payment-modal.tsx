@@ -88,8 +88,8 @@ export function PaymentModal({
         </div>
 
         <Field
-          label="Nome completo"
-          placeholder="Como está no documento"
+          label="Full name"
+          placeholder="As it reads on the document"
           maxLength={80}
           autoComplete="off"
           value={payer.name}
@@ -106,8 +106,8 @@ export function PaymentModal({
         />
         {needsPix ? (
           <Field
-            label="Chave Pix"
-            placeholder="e-mail, CPF ou chave aleatória"
+            label="Pix key"
+            placeholder="e-mail, CPF or random key"
             maxLength={77}
             autoComplete="off"
             value={payer.pixKey}

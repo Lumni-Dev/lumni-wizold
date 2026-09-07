@@ -27,8 +27,8 @@ export function FuryUseButton({
   }
 
   const label = sky
-    ? "A lua cheia já mantém você em fúria."
-    : "Beber de novo reinicia o relógio.";
+    ? "The full moon already keeps you in fury."
+    : "Drinking again restarts the clock.";
 
   return (
     <Tooltip label={label} block={fullWidth}>
@@ -39,7 +39,7 @@ export function FuryUseButton({
         contentAlign="center"
         disabled={sky}
         aria-disabled={sky || undefined}
-        aria-label={sky ? label : "Beber e reiniciar a fúria"}
+        aria-label={sky ? label : "Drink and restart the fury"}
         onClick={() => {
           if (sky) return;
           playClick();

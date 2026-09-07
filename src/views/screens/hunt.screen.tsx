@@ -96,28 +96,28 @@ function accumulate(session: HuntSession, report: HuntReport): HuntSession {
 function CombatReport({ report, lines }: { report: HuntReport; lines: NarrationLine[] }) {
   const { combat, creature, territory } = report;
   const t = useT();
-  const outcome = hunterWon(combat) ? "Vitória" : hunterRetreated(combat) ? "Recuo" : "Derrota";
+  const outcome = hunterWon(combat) ? "Victory" : hunterRetreated(combat) ? "Retreat" : "Defeat";
   return (
     <Panel
-      title="Última caçada"
+      title="Last hunt"
       description={territory.name + " - " + creature.name + " (NV. " + creature.level + ")"}
       action={<Tag tone={hunterWon(combat) ? "light" : "neutral"}>{outcome}</Tag>}
       padding="none"
     >
       <div className="grid grid-cols-1 items-start border-b border-edge sm:grid-cols-2 sm:divide-x sm:divide-edge">
         <List>
-          <DataRow label="Experiência" value={"+" + formatNumber(report.experience)} />
+          <DataRow label="Experience" value={"+" + formatNumber(report.experience)} />
           <DataRow label="WCoins" value={"+" + formatNumber(report.bronze)} />
-          <DataRow label="Dano causado" value={formatNumber(combat.damageDealt)} />
-          <DataRow label="Dano recebido" value={formatNumber(combat.damageTaken)} />
+          <DataRow label="Damage dealt" value={formatNumber(combat.damageDealt)} />
+          <DataRow label="Damage taken" value={formatNumber(combat.damageTaken)} />
           {report.petEffort > 0 ? (
-            <DataRow label="Experiência do mascote" value={"+" + formatNumber(report.petEffort)} />
+            <DataRow label="Companion experience" value={"+" + formatNumber(report.petEffort)} />
           ) : null}
           {combat.petBlows > 0 ? (
-            <DataRow label="Botes do mascote" value={formatNumber(combat.petBlows)} />
+            <DataRow label="Companion bites" value={formatNumber(combat.petBlows)} />
           ) : null}
           {combat.petSpent > 0 ? (
-            <DataRow label="Energia do mascote" value={"-" + formatNumber(combat.petSpent)} />
+            <DataRow label="Companion energy" value={"-" + formatNumber(combat.petSpent)} />
           ) : null}
         </List>
         <div className="space-y-2 p-4">
@@ -140,7 +140,7 @@ function CombatReport({ report, lines }: { report: HuntReport; lines: NarrationL
             </p>
           ) : null}
           {report.petLeveled ? (
-            <p className="text-xs text-ink">{t("O lobo subiu de nível nesta caçada.")}</p>
+            <p className="text-xs text-ink">{t("The wolf leveled up on this hunt.")}</p>
           ) : null}
         </div>
       </div>
@@ -322,15 +322,15 @@ export function HuntScreen() {
     <>
       <PageHeader
         title="Caça"
-        description="A caçada roda sozinha: cada luta toca ao vivo e grava no fim. Não dá para parar no meio de uma luta, mas entre uma e outra sobram três segundos para você mandar parar."
+        description="The hunt runs on its own: each fight plays live and lands at the end. You cannot stop mid-fight, but between one and the next there are three seconds to call it off."
         action={
           pet ? (
             <Tag tone="neutral">
               {petAlong
-                ? "Mascote acompanhando"
+                ? "Companion along"
                 : isPetActive(pet)
-                  ? "Mascote sem energia"
-                  : "Mascote em repouso"}
+                  ? "Companion out of energy"
+                  : "Companion resting"}
             </Tag>
           ) : null
         }
@@ -373,7 +373,7 @@ export function HuntScreen() {
             filling,
             preyView.combat,
           );
-          const monsterStatus = replaying ? "Atacando" : filling ? "Preparando" : "Aguardando";
+          const monsterStatus = replaying ? "Attacking" : filling ? "Preparing" : "Waiting";
           const monsterLost = Math.max(0, monsterMax - monsterCurrent);
           const healthLost = replaying
             ? script
@@ -434,7 +434,7 @@ export function HuntScreen() {
                               Vida (Recuperando-se... <RestSeconds />)
                             </>
                           ) : (
-                            "Vida"
+                            "Health"
                           )
                         }
                         current={character.health}
@@ -464,7 +464,7 @@ export function HuntScreen() {
                   ) : null}
                   <div className="px-4 py-3">
                     <Bar
-                      label={approach ? "Procurando criatura..." : active ? "Caçando..." : "Caçar"}
+                      label={approach ? "Tracking a creature..." : active ? "Hunting..." : "Hunt"}
                       current={approach ? approach.beat : onThis ? progress.beat : 0}
                       maximum={approach ? approach.max : Math.max(1, script.length)}
                       glows={active}
@@ -475,7 +475,7 @@ export function HuntScreen() {
                   {active && petAlong ? (
                     <div className="px-4 py-3">
                       <Bar
-                        label="Mascote - Energia"
+                        label="Companion - Energy"
                         current={petAlong.energy}
                         maximum={petMaxEnergy(petLevelOf(petAlong))}
                         tone="vigor"
@@ -508,15 +508,15 @@ export function HuntScreen() {
                       {t(
                         active
                           ? opting
-                            ? "Pode parar agora ou seguir para a próxima."
+                            ? "You can stop now or go for the next one."
                             : state.automation.hunt
-                              ? "Caçando sem parar..."
-                              : "Caçando..."
+                              ? "Hunting non-stop..."
+                              : "Hunting..."
                           : recovering
-                            ? "O corpo descansa antes da próxima caçada."
+                            ? "The body rests before the next hunt."
                             : waiting
-                              ? "Esperando o corpo para voltar a caçar"
-                              : (reason ?? "Trilha liberada"),
+                              ? "Waiting for the body to hunt again"
+                              : (reason ?? "Trail open"),
                       )}
                     </span>
                     <Button
@@ -527,8 +527,8 @@ export function HuntScreen() {
                       {opting
                         ? "Parar (" + cooldown + ")"
                         : active
-                          ? "Caçando..."
-                          : waitLabel || "Caçar"}
+                          ? "Hunting..."
+                          : waitLabel || "Hunt"}
                     </Button>
                   </div>
                 </div>
@@ -573,9 +573,9 @@ export function HuntScreen() {
                                   {formatNumber(
                                     Math.round(creature.experience * (1 + xpBonus)),
                                   )}{" "}
-                                  {t("de experiência")}
+                                  {t("experience")}
                                   {xpBonus > 0
-                                    ? " (+" + Math.round(xpBonus * 100) + "% " + t("lua") + ")"
+                                    ? " (+" + Math.round(xpBonus * 100) + "% " + t("moon") + ")"
                                     : ""}
                                 </span>
                               </>
@@ -609,8 +609,8 @@ export function HuntScreen() {
 
       {session.hunts > 0 ? (
         <Panel
-          title="Sessão de caça"
-          description="Tudo que esta rodada rendeu até agora."
+          title="Hunting session"
+          description="Everything this round has paid so far."
           action={
             activeId ? <Tag tone="light">Em andamento</Tag> : <Tag tone="neutral">Parada</Tag>
           }
@@ -618,14 +618,14 @@ export function HuntScreen() {
         >
           <div className="grid grid-cols-1 divide-y divide-edge sm:grid-cols-2 sm:divide-x sm:divide-y-0">
             <List>
-              <DataRow label="Caçadas" value={formatNumber(session.hunts)} />
-              <DataRow label="Vitórias" value={formatNumber(session.wins)} />
-              <DataRow label="Derrotas" value={formatNumber(session.losses)} />
+              <DataRow label="Hunts" value={formatNumber(session.hunts)} />
+              <DataRow label="Victories" value={formatNumber(session.wins)} />
+              <DataRow label="Defeats" value={formatNumber(session.losses)} />
               {session.retreats > 0 ? (
-                <DataRow label="Recuos" value={formatNumber(session.retreats)} />
+                <DataRow label="Retreats" value={formatNumber(session.retreats)} />
               ) : null}
               <DataRow label="WCoins" value={"+" + formatNumber(session.bronze)} />
-              <DataRow label="Experiência" value={"+" + formatNumber(session.experience)} />
+              <DataRow label="Experience" value={"+" + formatNumber(session.experience)} />
             </List>
             <div className="space-y-2 p-4">
               <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
@@ -654,8 +654,8 @@ export function HuntScreen() {
         <CombatReport report={report} lines={reportLines} />
       ) : (
         <EmptyState
-          title="Nenhuma caçada nesta sessão"
-          description="Escolha um território e a caça começa a rodar sozinha, ciclo após ciclo."
+          title="No hunts this session"
+          description="Choose a territory and the hunt starts running on its own, cycle after cycle."
         />
       )}
     </>

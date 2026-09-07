@@ -73,7 +73,7 @@ export function RankingScreen() {
     <>
       <PageHeader
         title="Ranking"
-        description="Onde você está entre os caçadores que a lua conhece."
+        description="Where you stand among the hunters the moon knows."
         action={
           view.playerPosition ? (
             <Tag tone="neutral">
@@ -87,7 +87,7 @@ export function RankingScreen() {
       <FilterRow>
         <FilterSelect
           accent
-          label="Quadro"
+          label="Board"
           value={view.board.key}
           options={rankingBoardFilterOptions()}
           onChange={openBoard}
@@ -100,7 +100,7 @@ export function RankingScreen() {
           onChange={cutGender}
         />
         <div className={FILTER_COLUMN}>
-          <HunterSearchField accent label="Busca" value={search} onChange={find} />
+          <HunterSearchField accent label="Search" value={search} onChange={find} />
         </div>
       </FilterRow>
 
@@ -136,8 +136,8 @@ export function RankingScreen() {
         ) : view.entries.length === 0 ? (
           <div className="p-4">
             <EmptyState
-              title="Ninguém com esse nome"
-              description="A matilha é grande, mas não tanto. Tente outro pedaço do nome."
+              title="No one by that name"
+              description="The pack is big, but not that big. Try another piece of the name."
             />
           </div>
         ) : (

@@ -38,18 +38,18 @@ import { PageHeader } from "../layout/page-header";
 
 const SECTIONS: readonly { key: string; label: string }[] = [
   { key: "all", label: "Tudo" },
-  { key: "idioma", label: "Idioma" },
-  { key: "conta", label: "Conta" },
-  { key: "2fa", label: "Duas etapas" },
-  { key: "nome", label: "Nome" },
+  { key: "idioma", label: "Language" },
+  { key: "conta", label: "Account" },
+  { key: "2fa", label: "Two-step" },
+  { key: "nome", label: "Name" },
   { key: "taverna", label: "Taverna" },
   { key: "radio", label: "W-Radio" },
-  { key: "som", label: "Som" },
-  { key: "trilha", label: "Trilha" },
-  { key: "fundo", label: "Fundo" },
-  { key: "automacao", label: "Automação" },
+  { key: "som", label: "Sound" },
+  { key: "trilha", label: "Soundtrack" },
+  { key: "fundo", label: "Background" },
+  { key: "automacao", label: "Automation" },
   { key: "cache", label: "Cache" },
-  { key: "excluir", label: "Excluir conta" },
+  { key: "excluir", label: "Delete account" },
 ];
 
 export function SettingsScreen() {
@@ -237,8 +237,8 @@ export function SettingsScreen() {
   return (
     <>
       <PageHeader
-        title="Configurações"
-        description="A conta, o nome que a matilha conhece e a própria partida."
+        title="Settings"
+        description="The account, the name the pack knows and the run itself."
       />
 
       <ChipTabs tabs={SECTIONS} value={section} onChange={setSection} />
@@ -289,8 +289,8 @@ export function SettingsScreen() {
 
         {shows("conta") ? (
           <Panel
-            title="Conta"
-            description="Com quem esta partida está assinada."
+            title="Account"
+            description="Who this run is signed with."
             action={<Tag tone="neutral">Google</Tag>}
             padding="none"
             footer={
@@ -345,7 +345,7 @@ export function SettingsScreen() {
 
         {shows("2fa") ? (
           <Panel
-            title="Verificação em duas etapas"
+            title="Two-step verification"
             padding="none"
             footer={
               <p className="text-xs leading-relaxed text-ink-faint">
@@ -356,7 +356,7 @@ export function SettingsScreen() {
           >
             <List>
               <ListRow layout="split">
-                <RowText title="Estado" description="Ligado ou desligado na conta." />
+                <RowText title="State" description="On or off for the account." />
                 <div className="flex shrink-0 gap-2">
                   <Chip
                     active={twoFactorEnabled}
@@ -394,7 +394,7 @@ export function SettingsScreen() {
 
         {shows("nome") ? (
           <Panel
-            title="Nome do personagem"
+            title="Character name"
             description={
               "O nome pode mudar uma vez a cada " +
               RENAME_COOLDOWN_DAYS +
@@ -404,12 +404,12 @@ export function SettingsScreen() {
             }
           >
             <form onSubmit={submitRename} className="space-y-3">
-              <Field label="Nome atual" value={character.name} disabled className="font-mono" />
+              <Field label="Current name" value={character.name} disabled className="font-mono" />
               <Field
-                label="Novo nome"
+                label="New name"
                 value={newName}
                 maxLength={NAME_MAX_LENGTH}
-                placeholder="Como a matilha vai te chamar"
+                placeholder="What the pack will call you"
                 autoComplete="off"
                 disabled={!canRename}
                 hint={
@@ -444,7 +444,7 @@ export function SettingsScreen() {
           >
             <List>
               <ListRow layout="split">
-                <RowText title="Estado" description="Avisos de mesa neste aparelho." />
+                <RowText title="State" description="Table notices on this device." />
                 <div className="flex shrink-0 gap-2">
                   <Chip active={pushOn} onClick={() => choosePush(true)} disabled={!tavernPushSupported()}>
                     Ativado
@@ -480,7 +480,7 @@ export function SettingsScreen() {
         {shows("radio") ? (
           <Panel
             title="W-Radio"
-            description="O volume do rádio. Ligar e desligar, pular faixa e ver o que toca ficam no player da taverna, e o rádio só toca lá. Enquanto o rádio toca, a trilha e os efeitos do jogo ficam em silêncio."
+            description="The radio volume. On and off, skipping tracks and seeing what plays live in the tavern player, and the radio only plays there. While the radio plays, the soundtrack and the game's effects stay silent."
             padding="none"
           >
             <List>
@@ -499,7 +499,7 @@ export function SettingsScreen() {
                   max={100}
                   step={1}
                   value={Math.round(radioVolume * 100)}
-                  aria-label="Volume do rádio"
+                  aria-label="Radio volume"
                   className="volume-slider w-full"
                   onChange={(event) => {
                     radioRepository.setVolume(Number(event.target.value) / 100);
@@ -512,13 +512,13 @@ export function SettingsScreen() {
 
         {shows("som") ? (
           <Panel
-            title="Som"
-            description="Os efeitos do jogo: couro, moedas e o rugido da virada."
+            title="Sound"
+            description="The game's effects: leather, coins and the roar of the turning."
             padding="none"
           >
             <List>
               <ListRow layout="split">
-                <RowText title="Estado" description="Ligado ou desligado neste aparelho." />
+                <RowText title="State" description="On or off on this device." />
                 <div className="flex shrink-0 gap-2">
                   <Chip active={sound} onClick={() => chooseSound(true)}>
                     Ativado
@@ -540,7 +540,7 @@ export function SettingsScreen() {
                     max={100}
                     step={1}
                     value={Math.round(volume * 100)}
-                    aria-label="Volume do som"
+                    aria-label="Sound volume"
                     className="volume-slider w-full"
                     onPointerDown={(event) => {
                       volumeDragging.current = true;
@@ -570,13 +570,13 @@ export function SettingsScreen() {
 
         {shows("trilha") ? (
           <Panel
-            title="Trilha"
-            description="A música que toca por baixo do jogo. Não toca na porta de entrada."
+            title="Soundtrack"
+            description="The music running under the game. It does not play at the front door."
             padding="none"
           >
             <List>
               <ListRow layout="split">
-                <RowText title="Estado" description="Ligada ou desligada neste aparelho." />
+                <RowText title="State" description="On or off on this device." />
                 <div className="flex shrink-0 gap-2">
                   <Chip active={music} onClick={() => chooseMusic(true)}>
                     Ativada
@@ -589,8 +589,8 @@ export function SettingsScreen() {
               {music ? (
                 <ListRow layout="split">
                   <RowText
-                    title="Faixa"
-                    description="Qual trilha corre por baixo do jogo neste aparelho. Aleatória sorteia uma e, quando ela acaba, sorteia outra."
+                    title="Track"
+                    description="Which track runs under the game on this device. Random draws one and, when it ends, draws another."
                   />
                   <div className="flex shrink-0 flex-wrap gap-2">
                     <Chip active={musicTrack === "1"} onClick={() => musicRepository.setTrack("1")}>
@@ -627,7 +627,7 @@ export function SettingsScreen() {
                     max={100}
                     step={1}
                     value={Math.round(musicVolume * 100)}
-                    aria-label="Volume da trilha"
+                    aria-label="Soundtrack volume"
                     className="volume-slider w-full"
                     onChange={(event) => {
                       musicRepository.setVolume(Number(event.target.value) / 100);
@@ -646,13 +646,13 @@ export function SettingsScreen() {
 
         {shows("fundo") ? (
           <Panel
-            title="Animação de fundo"
-            description="A noite viva atrás do jogo e os vídeos das áreas de caça. Desligada, ficam as imagens paradas."
+            title="Background animation"
+            description="The living night behind the game and the hunt area videos. Off, the still images remain."
             padding="none"
           >
             <List>
               <ListRow layout="split">
-                <RowText title="Estado" description="Ligada ou desligada neste aparelho." />
+                <RowText title="State" description="On or off on this device." />
                 <div className="flex shrink-0 gap-2">
                   <Chip active={animatedBackground} onClick={() => backgroundRepository.setEnabled(true)}>
                     Ativado
@@ -678,7 +678,7 @@ export function SettingsScreen() {
                     max={100}
                     step={1}
                     value={Math.round(backdropDarkness * 100)}
-                    aria-label="Escuridão do fundo animado"
+                    aria-label="Darkness of the animated background"
                     className="volume-slider w-full"
                     onChange={(event) => {
                       backgroundRepository.setDarkness(Number(event.target.value) / 100);
@@ -696,8 +696,8 @@ export function SettingsScreen() {
 
         {shows("automacao") ? (
           <Panel
-            title="Automação"
-            description="O que a partida faz sozinha. Cada chave faz uma coisa só, e elas se ajudam: a caçada bebe, a poção acaba, o corpo descansa, a caçada volta. É um recurso VIP."
+            title="Automation"
+            description="What the run does on its own. Each switch does one thing only, and they help each other: the hunt drinks, the potion runs out, the body rests, the hunt returns. A VIP feature."
             action={
               vip ? (
                 <Tag tone="light">
@@ -762,12 +762,12 @@ export function SettingsScreen() {
 
         {shows("cache") ? (
           <Panel
-            title="Cache do jogo"
-            description="O que este aparelho guarda para abrir mais rápido."
+            title="Game cache"
+            description="What this device keeps to open faster."
             footer={
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <span className="text-[11px] text-ink-faint">
-                  {clearing ? "Limpando e recarregando..." : "A partida no servidor não muda"}
+                  {clearing ? "Clearing and reloading..." : "The run on the server does not change"}
                 </span>
                 <Button variant="outline" busy={clearing} onClick={() => setConfirmingClear(true)}>
                   Limpar cache
@@ -787,8 +787,8 @@ export function SettingsScreen() {
 
         {shows("excluir") ? (
           <Panel
-            title="Excluir conta"
-            description="Apaga a partida inteira do servidor. Não tem volta."
+            title="Delete account"
+            description="Erases the whole run from the server. There is no way back."
             footer={
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <span className="text-[11px] text-ink-faint">
@@ -816,10 +816,10 @@ export function SettingsScreen() {
 
       <ConfirmDialog
         open={confirmingClear}
-        title="Limpar cache"
+        title="Clear cache"
         description="As imagens serão baixadas de novo e as preferências deste aparelho (som, volume, trilha, animação e escuridão do fundo, data de nascimento lembrada e trabalho em andamento) voltam ao padrão. A partida no servidor não é tocada."
-        detail="A página recarrega ao terminar."
-        confirmLabel="Limpar"
+        detail="The page reloads when done."
+        confirmLabel="Clear"
         onCancel={() => setConfirmingClear(false)}
         onConfirm={async () => {
           await clearGameCache();
@@ -829,14 +829,14 @@ export function SettingsScreen() {
 
       <ConfirmDialog
         open={confirmingRename}
-        title="Alterar nome"
+        title="Change name"
         description={
           "As WCoins saem na hora e o novo nome fica travado por " +
           RENAME_COOLDOWN_DAYS +
           " dias, no ranking, na taverna e no bazar."
         }
         detail={character.name + " → " + newName.trim() + " - " + formatBronze(cost)}
-        confirmLabel="Alterar"
+        confirmLabel="Change"
         onCancel={() => setConfirmingRename(false)}
         onConfirm={() =>
           renameCharacter(newName).then((ok) => {
@@ -848,7 +848,7 @@ export function SettingsScreen() {
 
       <Modal
         open={twoFactorSetup !== null}
-        title={twoFactorSetup === "enable" ? "Ligar verificação" : "Desligar verificação"}
+        title={twoFactorSetup === "enable" ? "Turn verification on" : "Turn verification off"}
         onClose={() => setTwoFactorSetup(null)}
         footer={
           <div className="flex items-center justify-end gap-2">
@@ -879,7 +879,7 @@ export function SettingsScreen() {
             <span className="text-ink">{accountEmail ?? "o seu e-mail"}</span>.
           </p>
           <Field
-            label="Código"
+            label="Code"
             numeric
             maxLength={TWO_FACTOR_CODE_LENGTH}
             value={twoFactorCode}
@@ -893,7 +893,7 @@ export function SettingsScreen() {
 
       <Modal
         open={deleting !== null}
-        title="Excluir conta"
+        title="Delete account"
         onClose={() => setDeleting(null)}
         footer={
           deleting === "ask" ? (
@@ -949,8 +949,8 @@ export function SettingsScreen() {
           ) : (
             <Field
               numeric
-              label="Código de 4 dígitos"
-              hint="Chegou no e-mail da conta e vale por 10 minutos."
+              label="4-digit code"
+              hint="It arrived at the account e-mail and lasts 10 minutes."
               placeholder="0000"
               className="font-mono"
               autoComplete="off"

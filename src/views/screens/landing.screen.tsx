@@ -55,7 +55,7 @@ export function LandingScreen() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-3 text-ink-faint">
         <Spinner size="medium" />
-        <p className="heading text-[11px]">{t("Carregando...")}</p>
+        <p className="heading text-[11px]">{t("Loading...")}</p>
       </div>
     );
   }
@@ -86,7 +86,7 @@ export function LandingScreen() {
 
           <p className="landing-hero-shadow-text mx-auto max-w-xl text-sm leading-7 text-ink-soft">
             {t(
-              "Dois se encontraram numa noite de lua cheia e desceram a serra sendo outra coisa. A matilha que eles começaram ainda caça, e a lua que decide o preço de cada noite é a que está no céu agora, lá fora.",
+              "Two met on a full-moon night and came down the ridge as something else. The pack they started still hunts, and the moon that sets the price of every night is the one in the sky right now, outside.",
             )}
           </p>
 
@@ -94,7 +94,7 @@ export function LandingScreen() {
             {hasRun ? (
               <LandingCtaButton href="/character" label={"Continuar com " + character.name} />
             ) : (
-              <LandingCtaButton href="/login" label={t("Jogar grátis")} />
+              <LandingCtaButton href="/login" label={t("Play free")} />
             )}
           </div>
         </div>
@@ -154,10 +154,10 @@ export function LandingScreen() {
 
         <section className="space-y-6">
           <div className="space-y-1 text-center">
-            <h2 className="heading text-[11px] text-ink">{t("O que espera lá fora")}</h2>
+            <h2 className="heading text-[11px] text-ink">{t("What waits out there")}</h2>
             <p className="text-xs text-ink-faint">
               {t(
-                "Cem criaturas divididas em dez áreas, da primeira presa do campo ao que mora no abismo.",
+                "A hundred creatures across ten areas, from the field's first prey to what dwells in the abyss.",
               )}
             </p>
           </div>
@@ -167,9 +167,9 @@ export function LandingScreen() {
 
         <section className="space-y-6">
           <div className="space-y-1 text-center">
-            <h2 className="heading text-[11px] text-ink">{t("O lobo que anda junto")}</h2>
+            <h2 className="heading text-[11px] text-ink">{t("The wolf that walks along")}</h2>
             <p className="text-xs text-ink-faint">
-              {t("Ninguém caça sozinho. Duas linhagens chegaram à matilha, cada uma do seu jeito.")}
+              {t("No one hunts alone. Two bloodlines reached the pack, each in its own way.")}
             </p>
           </div>
 
@@ -196,9 +196,9 @@ export function LandingScreen() {
 
         <section className="space-y-6">
           <div className="space-y-1 text-center">
-            <h2 className="heading text-[11px] text-ink">{t("Por dentro do jogo")}</h2>
+            <h2 className="heading text-[11px] text-ink">{t("Inside the game")}</h2>
             <p className="text-xs text-ink-faint">
-              {t("Sete telas da mesma noite, do jeito que elas aparecem no navegador.")}
+              {t("Seven screens of the same night, the way they appear in the browser.")}
             </p>
           </div>
 
@@ -207,9 +207,9 @@ export function LandingScreen() {
 
         <section className="space-y-6">
           <div className="space-y-1 text-center">
-            <h2 className="heading text-[11px] text-ink">{t("O que a noite pede")}</h2>
+            <h2 className="heading text-[11px] text-ink">{t("What the night asks")}</h2>
             <p className="text-xs text-ink-faint">
-              {t("Tudo roda sozinho enquanto você olha, e nada sobe sem você mandar.")}
+              {t("Everything runs on its own while you watch, and nothing rises unless you say so.")}
             </p>
           </div>
 
@@ -230,12 +230,12 @@ export function LandingScreen() {
         <section className="space-y-4 text-center">
           <p className="landing-hero-shadow-text mx-auto max-w-lg text-sm leading-relaxed text-ink-soft">
             {t(
-              "Escolha um nome, escolha uma linhagem e desça. A primeira noite é a mais barata que você vai ter.",
+              "Choose a name, choose a bloodline and descend. The first night is the cheapest you will ever have.",
             )}
           </p>
           <LandingCtaButton
             href={hasRun ? "/character" : "/login"}
-            label={hasRun ? t("Voltar para a caçada") : t("Jogar grátis")}
+            label={hasRun ? t("Back to the hunt") : t("Play free")}
           />
         </section>
       </main>

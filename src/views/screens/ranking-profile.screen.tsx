@@ -51,10 +51,10 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
   if (!profile) {
     return (
       <>
-        <PageHeader title="Perfil" description="Ninguém com esse rastro no ranking." />
+        <PageHeader title="Profile" description="No one with that trail in the ranking." />
         <EmptyState
-          title="Caçador não encontrado"
-          description="O nome pode ter saído do quadro. Volte e procure de novo."
+          title="Hunter not found"
+          description="The name may have left the board. Go back and search again."
         />
         <div>
           <Link href="/ranking">
@@ -78,8 +78,8 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
         title={hunter.name}
         description={
           isPlayer
-            ? "O que os outros caçadores veem da sua ficha pública."
-            : "Amostra do que o quadro revela: progresso, equipamento e combate, sem vida nem suprimentos."
+            ? "What other hunters see of your public sheet."
+            : "A sample of what the board reveals: progress, gear and combat, without health or supplies."
         }
         action={
           <div className="flex flex-wrap items-center justify-end gap-2">
@@ -103,7 +103,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
 
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-1">
-          <Panel title="Ficha" padding="none">
+          <Panel title="Sheet" padding="none">
             <GenderBanner gender={hunter.gender} />
             <div className="border-b border-edge px-4 py-3">
               <div className="min-w-0 space-y-1">
@@ -119,30 +119,30 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
             </div>
 
             <List>
-              <DataRow label="Nível" value={"NV. " + formatNumber(hunter.level)} />
+              <DataRow label="Level" value={"NV. " + formatNumber(hunter.level)} />
               <DataRow label="WCoins" value={formatNumber(hunter.bronze)} />
               {hunter.createdAt ? (
-                <DataRow label="Criado" value={formatDate(hunter.createdAt)} />
+                <DataRow label="Created" value={formatDate(hunter.createdAt)} />
               ) : null}
             </List>
           </Panel>
 
-          <Panel title="Caçada" description="Caçadas, vitórias e derrotas na trilha." padding="none">
+          <Panel title="Hunt" description="Hunts, victories and defeats on the trail." padding="none">
             <List>
-              <DataRow label="Caçadas" value={formatNumber(hunter.hunts)} />
-              <DataRow label="Vitórias" value={formatNumber(hunter.wins)} />
-              <DataRow label="Derrotas" value={formatNumber(hunter.losses)} />
+              <DataRow label="Hunts" value={formatNumber(hunter.hunts)} />
+              <DataRow label="Victories" value={formatNumber(hunter.wins)} />
+              <DataRow label="Defeats" value={formatNumber(hunter.losses)} />
             </List>
           </Panel>
 
-          <Panel title="Arena" description="Duelos, vitórias e derrotas no fosso." padding="none">
+          <Panel title="Arena" description="Duels, victories and defeats in the pit." padding="none">
             <List>
               <DataRow
-                label="Duelos"
+                label="Duels"
                 value={formatNumber(hunter.arena + hunter.arenaLosses)}
               />
-              <DataRow label="Vitórias" value={formatNumber(hunter.arena)} />
-              <DataRow label="Derrotas" value={formatNumber(hunter.arenaLosses)} />
+              <DataRow label="Victories" value={formatNumber(hunter.arena)} />
+              <DataRow label="Defeats" value={formatNumber(hunter.arenaLosses)} />
             </List>
           </Panel>
 
@@ -177,7 +177,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
 
           <Panel
             title="Mascote"
-            description="Só o que o lobo em si revela: linhagem e treino."
+            description="Only what the wolf itself reveals: bloodline and training."
             padding="none"
           >
             {wolf && hunter.pet ? (
@@ -186,9 +186,9 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
                   <p className="truncate text-sm text-ink">{hunter.pet.name}</p>
                 </PetSheetHeader>
                 <List>
-                  <DataRow label="Sexo" value={wolf.label} />
+                  <DataRow label="Sex" value={wolf.label} />
                   <DataRow
-                    label="Nível"
+                    label="Level"
                     value={formatNumber(hunter.pet.level) + " / " + formatNumber(PET_MAX_LEVEL)}
                   />
                 </List>
@@ -200,14 +200,14 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
         </div>
 
         <div className="space-y-6 lg:col-span-2">
-          <Panel title="Combate" description="Cada linha diz de qual atributo ela sai." padding="none">
+          <Panel title="Combat" description="Each line says which attribute it comes from." padding="none">
             <List>
-              <DataRow label="Golpe (Força)" value={formatFraction(strength)} />
-              <DataRow label="Defesa (Resistência)" value={formatFraction(endurance)} />
-              <DataRow label="Esquiva (Agilidade)" value={stats.dodge + "%"} />
-              <DataRow label="Crítico (Instinto)" value={stats.critical + "%"} />
+              <DataRow label="Strike (Strength)" value={formatFraction(strength)} />
+              <DataRow label="Defense (Endurance)" value={formatFraction(endurance)} />
+              <DataRow label="Dodge (Agility)" value={stats.dodge + "%"} />
+              <DataRow label="Critical (Instinct)" value={stats.critical + "%"} />
               <DataRow
-                label="Dano do crítico"
+                label="Critical damage"
                 value={"×" + criticalMultiplierOf().toFixed(2).replace(".", ",")}
               />
             </List>

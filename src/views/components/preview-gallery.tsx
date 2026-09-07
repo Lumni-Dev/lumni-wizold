@@ -70,8 +70,8 @@ export function PreviewGallery({ shots }: { shots: readonly PreviewShot[] }) {
           />
         ))}
 
-        <Arrow action="previous" label="Tela anterior" side="left" onClick={() => step(-1)} />
-        <Arrow action="next" label="Próxima tela" side="right" onClick={() => step(1)} />
+        <Arrow action="previous" label="Previous screen" side="left" onClick={() => step(-1)} />
+        <Arrow action="next" label="Next screen" side="right" onClick={() => step(1)} />
       </div>
 
       <div className="space-y-1 border-b border-edge p-4">

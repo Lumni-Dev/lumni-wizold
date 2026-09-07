@@ -65,7 +65,7 @@ function Fighter({
       <div className="min-w-0 flex-1 space-y-2">
         <RowText title={name} label={side + " - NV. " + formatNumber(level)} />
         <Bar
-          label="Vida"
+          label="Health"
           current={left}
           maximum={maximum}
           tone={left > maximum / 2 ? "blood" : "ember"}
@@ -78,10 +78,10 @@ function Fighter({
 function DuelReport({ report }: { report: ArenaResolution }) {
   const { combat, hunter } = report;
   const t = useT();
-  const outcome = combat.victory ? "Vitória" : combat.retreated ? "Empate" : "Derrota";
+  const outcome = combat.victory ? "Victory" : combat.retreated ? "Draw" : "Defeat";
   return (
     <Panel
-      title="Último duelo"
+      title="Last duel"
       description={hunter.name + " (NV. " + formatNumber(hunter.level) + ")"}
       action={<Tag tone="neutral">{outcome}</Tag>}
       padding="none"
@@ -89,11 +89,11 @@ function DuelReport({ report }: { report: ArenaResolution }) {
       <div className="grid grid-cols-1 items-start border-b border-edge sm:grid-cols-2 sm:divide-x sm:divide-edge">
         <List>
           <DataRow
-            label={report.spoils < 0 ? "WCoins perdidas" : "WCoins tomadas"}
+            label={report.spoils < 0 ? "WCoins lost" : "WCoins taken"}
             value={(report.spoils < 0 ? "-" : "+") + formatNumber(Math.abs(report.spoils))}
           />
-          <DataRow label="Dano causado" value={formatNumber(combat.damageDealt)} />
-          <DataRow label="Dano recebido" value={formatNumber(combat.damageTaken)} />
+          <DataRow label="Damage dealt" value={formatNumber(combat.damageDealt)} />
+          <DataRow label="Damage taken" value={formatNumber(combat.damageTaken)} />
         </List>
         <div className="space-y-2 p-4">
           <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">O fosso</p>
@@ -102,12 +102,12 @@ function DuelReport({ report }: { report: ArenaResolution }) {
               combat.victory
                 ? hunter.name + " ficou no chão, e a bolsa é sua."
                 : combat.retreated
-                  ? "Os dois aguentaram até o fim e ninguém pôs o outro no chão."
+                  ? "Both held to the end and neither put the other on the ground."
                   : hunter.name + " levou a melhor. Você sai por baixo, mas sai.",
             )}
           </p>
           <p className="text-xs text-ink-faint">
-            {t("O fosso não paga experiência: aqui as WCoins só trocam de dono.")}
+            {t("The pit pays no experience: here WCoins only change hands.")}
           </p>
         </div>
       </div>
@@ -308,16 +308,16 @@ export function ArenaScreen() {
     <>
       <PageHeader
         title="Arena"
-        description="O fosso onde um lobisomem desafia outro. Mascote ativo e com fôlego desce junto, o seu e o do rival."
+        description="The pit where one werewolf challenges another. An active wolf with breath left goes down too, yours and the rival's."
         action={
           <div className="flex items-center gap-2">
             {pet ? (
               <Tag tone="neutral">
                 {canPetFight(pet)
-                  ? "Mascote acompanhando"
+                  ? "Companion along"
                   : isPetActive(pet)
-                    ? "Mascote sem energia"
-                    : "Mascote em repouso"}
+                    ? "Companion out of energy"
+                    : "Companion resting"}
               </Tag>
             ) : null}
             <Tag tone="neutral">
@@ -328,7 +328,7 @@ export function ArenaScreen() {
       />
 
       <Panel
-        title="O fosso"
+        title="The pit"
         description={
           "A arena só marca luta entre NV. " +
           formatNumber(view.band.start) +
@@ -352,12 +352,12 @@ export function ArenaScreen() {
         footer={
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span className="text-[11px] text-ink-faint">
-              {t(view.reason ?? "Escolha um adversário da sua faixa ou busque um ao acaso.")}
+              {t(view.reason ?? "Choose an opponent from your band or draw one at random.")}
             </span>
             <BodyGate
               open={!busy && view.charges.left > 0}
               requireFull
-              reason="Recupere-se antes do fosso."
+              reason="Recover before the pit."
             >
               <Tooltip label={view.reason}>
                 <Button
@@ -365,7 +365,7 @@ export function ArenaScreen() {
                   disabled={!view.canFight || busy || locked}
                   onClick={challengeDrawn}
                 >
-                  {busy ? "No fosso..." : waitLabel || "Buscar adversário"}
+                  {busy ? "In the pit..." : waitLabel || "Find an opponent"}
                 </Button>
               </Tooltip>
             </BodyGate>
@@ -383,7 +383,7 @@ export function ArenaScreen() {
 
       {fighting ? (
         <Panel
-          title="Duelo"
+          title="Duel"
           description={
             "Você contra " +
             fighting.hunter.name +
@@ -402,7 +402,7 @@ export function ArenaScreen() {
               gender={character.gender}
               name={character.name}
               level={character.level}
-              side="Você"
+              side="You"
               health={character.health}
               maximum={stats.maxHealth}
               lost={duelHealthLost}
@@ -411,7 +411,7 @@ export function ArenaScreen() {
               gender={fighting.hunter.gender}
               name={fighting.hunter.name}
               level={fighting.hunter.level}
-              side="Desafiado"
+              side="Challenged"
               health={duelLine ? duelLine.creatureHealth : fighting.maxHealth}
               maximum={fighting.maxHealth}
               lost={
@@ -422,14 +422,14 @@ export function ArenaScreen() {
 
           <div className="space-y-3 p-4">
             <Bar
-              label={approaching ? "No fosso..." : "Duelo"}
+              label={approaching ? "In the pit..." : "Duel"}
               current={approaching ? approachBeat : beat}
               maximum={approaching ? HUNT_APPROACH_TICKS : Math.max(1, script.length)}
               glows
             />
             {petAlong ? (
               <Bar
-                label="Mascote - Energia"
+                label="Companion - Energy"
                 current={petAlong.energy}
                 maximum={petMaxEnergy(petLevelOf(petAlong))}
                 tone="vigor"
@@ -464,17 +464,17 @@ export function ArenaScreen() {
 
       {view.rivals.length === 0 ? (
         <EmptyState
-          title={search ? "Ninguém com esse nome" : "Faixa vazia esta noite"}
+          title={search ? "No one by that name" : "Empty band tonight"}
           description={
             search
-              ? "A matilha é grande, mas não tanto. Tente outro pedaço do nome."
-              : "Ninguém da sua faixa no fosso agora. Peça um adversário: a arena procura o nível mais próximo."
+              ? "The pack is big, but not that big. Try another piece of the name."
+              : "No one from your band in the pit right now. Ask for an opponent: the arena finds the closest level."
           }
         />
       ) : (
         <Panel
-          title="Desafiantes"
-          description="Da luta mais justa para a mais desigual."
+          title="Challengers"
+          description="From the fairest fight to the most uneven."
           footer={
             pages > 1 ? (
               <Pagination page={currentPage} pages={pages} onChange={setPage} />
@@ -512,9 +512,9 @@ export function ArenaScreen() {
                           label: attribute.name,
                           value: formatFraction(rival.totalAttributes[attribute.key]),
                         })),
-                        { key: "health", label: "Vida", value: formatNumber(rival.maxHealth) },
+                        { key: "health", label: "Health", value: formatNumber(rival.maxHealth) },
                         { key: "dodge", label: "Esquiva", value: rival.dodge + "%" },
-                        { key: "critical", label: "Crítico", value: rival.critical + "%" },
+                        { key: "critical", label: "Critical", value: rival.critical + "%" },
                       ].map((cell) => (
                         <div key={cell.key} className="px-2 py-3 text-center">
                           <p className="truncate text-[10px] uppercase tracking-[0.16em] text-ink-faint">
@@ -531,7 +531,7 @@ export function ArenaScreen() {
                       open={inBand && !resting && !busy && view.charges.left > 0}
                       requireFull
                       fullWidth
-                      reason="Recupere-se antes do fosso."
+                      reason="Recover before the pit."
                     >
                       <Tooltip
                         block
@@ -557,10 +557,10 @@ export function ArenaScreen() {
                           onClick={() => challenge(hunter, rival)}
                         >
                           {!inBand
-                            ? "Fora da faixa"
+                            ? "Out of band"
                             : resting
-                              ? "Descansando"
-                              : waitLabel || "Desafiar"}
+                              ? "Resting"
+                              : waitLabel || "Challenge"}
                         </Button>
                       </Tooltip>
                     </BodyGate>
@@ -573,7 +573,7 @@ export function ArenaScreen() {
       )}
 
       <Panel
-        title="Últimas lutas"
+        title="Latest fights"
         description={
           "As " +
           ARENA_HISTORY_SIZE +
@@ -605,7 +605,7 @@ export function ArenaScreen() {
                         ? "Derrota para "
                         : "Empate com ") + line.rivalName
                   }
-                  description={(line.mine ? "Ataque seu" : "Ataque recebido") + " - " + formatDay(line.at)}
+                  description={(line.mine ? "Your attack" : "Attack received") + " - " + formatDay(line.at)}
                 />
                 <span className="flex shrink-0 items-center gap-2">
                   {lineage ? (

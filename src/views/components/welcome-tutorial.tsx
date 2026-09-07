@@ -62,7 +62,7 @@ export function WelcomeTutorial({
           playing={current === voice}
           loading={loading === voice}
           onClick={() => toggle(voice)}
-          label="Ouvir a apresentação"
+          label="Listen to the introduction"
         />
       </div>
     </Modal>

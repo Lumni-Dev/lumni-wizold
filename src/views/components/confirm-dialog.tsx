@@ -11,8 +11,8 @@ export function ConfirmDialog({
   description,
   children,
   detail,
-  confirmLabel = "Confirmar",
-  cancelLabel = "Cancelar",
+  confirmLabel = "Confirm",
+  cancelLabel = "Cancel",
   onConfirm,
   onCancel,
 }: {

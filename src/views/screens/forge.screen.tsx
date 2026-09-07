@@ -206,14 +206,14 @@ export function ForgeScreen() {
     <>
       <PageHeader
         title="Forja"
-        description="A bigorna não faz peça nova: ela bate de novo na que você já usa, e o que alimenta a marreta sai da rocha. Não dá para parar no meio de uma batida, mas entre uma e outra sobram três segundos para mandar parar."
+        description="The anvil makes nothing new: it strikes again the piece you already own, and what feeds the hammer comes out of the rock. You cannot stop mid-strike, but between one and the next there are three seconds to call it off."
       />
 
       <div className="space-y-6">
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
           <Panel
             title="Mina"
-            description="Escolha o veio e a picareta bate nele. Cada veio pede um nível de mineração, e só o pique abre o próximo."
+            description="Choose the vein and the pick strikes it. Each vein asks for a mining level, and only the pick opens the next."
             padding="none"
           >
             <List>
@@ -239,7 +239,7 @@ export function ForgeScreen() {
               </ListRow>
               <ListRow layout="column">
                 <Bar
-                  label={mining.dailyExhausted ? "Recursos da mina esgotados" : "Recursos da mina"}
+                  label={mining.dailyExhausted ? "Mine resources spent" : "Mine resources"}
                   tone="tide"
                   current={mining.dailyRemaining}
                   maximum={mining.dailyLimit}
@@ -254,7 +254,7 @@ export function ForgeScreen() {
               </ListRow>
               <ListRow layout="column">
                 <Bar
-                  label={activeOre ? "Minerando..." : "Minerar"}
+                  label={activeOre ? "Mining..." : "Mine"}
                   current={swing.id === activeOre ? swing.beat : 0}
                   maximum={swing.id === activeOre ? swing.max : MINING_TICKS_MAX}
                   glows={activeOre !== null}
@@ -268,19 +268,19 @@ export function ForgeScreen() {
                     {t(
                       activeOre
                         ? mineOpting
-                          ? "Segue sozinha..."
+                          ? "Runs on its own..."
                           : state.automation.mine
-                            ? "Minerando sem parar..."
-                            : "Minerando..."
+                            ? "Mining non-stop..."
+                            : "Mining..."
                         : waitingOre
-                          ? "Esperando recursos para voltar a minerar"
+                          ? "Waiting for resources to mine again"
                           : mining.dailyExhausted
                             ? "Recursos esgotados, voltam em " + formatCountdown(miningResetLeft)
                             : selectedEntry
                               ? selectedEntry.unlocked
                                 ? selectedEntry.ore.label
-                                : (selectedEntry.reason ?? "Veio bloqueado")
-                              : "Escolha um veio",
+                                : (selectedEntry.reason ?? "Vein locked")
+                              : "Choose a vein",
                     )}
                   </span>
                   <Button
@@ -289,13 +289,13 @@ export function ForgeScreen() {
                       activeOre ? !mineOpting : !selectedAvailable || activeItem !== null || locked
                     }
                     onClick={() => toggleMining(effectiveOre, selectedAvailable)}
-                    aria-label={activeOre ? "Parar de minerar" : "Minerar o veio escolhido"}
+                    aria-label={activeOre ? "Stop mining" : "Mine the chosen vein"}
                   >
                     {mineOpting
                       ? "Parar (" + cooldown + ")"
                       : activeOre
-                        ? "Minerando..."
-                        : waitLabel || "Minerar"}
+                        ? "Mining..."
+                        : waitLabel || "Mine"}
                   </Button>
                 </div>
               </ListRow>
@@ -344,7 +344,7 @@ export function ForgeScreen() {
 
           <div className="space-y-3">
             <Panel
-              title="Bigorna"
+              title="Anvil"
               description={
                 "Escolha uma peça em Disponíveis e ela entra na bigorna. Cada nível soma 0,3% dos atributos da peça original, então um set forte rende muito e uma peça barata sobe devagar, até +" +
                 formatNumber(MAX_ENHANCEMENT) +
@@ -355,8 +355,8 @@ export function ForgeScreen() {
               {!forgeEntry ? (
                 <div className="p-4">
                   <RowText
-                    title="Nada no inventário para forjar"
-                    description="Desequipe uma peça para bater nela na bigorna."
+                    title="Nothing in the bag to forge"
+                    description="Unequip a piece to strike it on the anvil."
                   />
                 </div>
               ) : (
@@ -383,7 +383,7 @@ export function ForgeScreen() {
                                 <>
                                   {" → " + formatFraction(attribute.nextExact)}
                                   <span className="text-ink-faint">
-                                    {" (+" + formatFraction(attribute.gain) + " " + t("por nível") + ")"}
+                                    {" (+" + formatFraction(attribute.gain) + " " + t("per level") + ")"}
                                   </span>
                                 </>
                               )}
@@ -391,8 +391,8 @@ export function ForgeScreen() {
                           ))}
                           {forgeEntry.level > 0 ? (
                             <p className="font-mono text-[10px]">
-                              {t("Já somou")} +{formatFraction(forgeEntry.exactBonus)}{" "}
-                              {t("de atributos com a forja")}
+                              {t("Already added")} +{formatFraction(forgeEntry.exactBonus)}{" "}
+                              {t("of attributes from the forge")}
                             </p>
                           ) : null}
                         </>
@@ -415,7 +415,7 @@ export function ForgeScreen() {
 
                   <ListRow layout="column">
                     <Bar
-                      label={forgeActive ? "Forjando..." : "Forjar"}
+                      label={forgeActive ? "Forging..." : "Forge"}
                       current={strike.id === forgeEntry.item.id ? strike.beat : 0}
                       maximum={FORGE_TICKS}
                       glows={forgeActive}
@@ -430,15 +430,15 @@ export function ForgeScreen() {
                         {t(
                           forgeActive
                             ? forgeOpting
-                              ? "Segue sozinho..."
+                              ? "Runs on its own..."
                               : state.automation.forge
-                                ? "Forjando sem parar..."
-                                : "Forjando..."
+                                ? "Forging non-stop..."
+                                : "Forging..."
                             : waitingItem === forgeEntry.item.id
-                              ? "Esperando fragmentos e WCoins para a próxima martelada"
+                              ? "Waiting for fragments and WCoins for the next strike"
                               : forgeEntry.fragment && forgeEntry.level < MAX_ENHANCEMENT
                                 ? "Forjar custa " + formatBronze(forgeEntry.bronzeCost)
-                                : (forgeEntry.reason ?? "Peça no teto"),
+                                : (forgeEntry.reason ?? "Piece at the cap"),
                         )}
                       </span>
                       <Button
@@ -449,13 +449,13 @@ export function ForgeScreen() {
                           forgeActive ? !forgeOpting : !forgeEntry.canForge || activeOre !== null || locked
                         }
                         onClick={() => toggleForge()}
-                        aria-label={forgeActive ? "Parar de forjar" : "Forjar a peça escolhida"}
+                        aria-label={forgeActive ? "Stop forging" : "Forge the chosen piece"}
                       >
                         {forgeOpting && forgeActive
                           ? "Parar (" + cooldown + ")"
                           : forgeActive
-                            ? "Forjando..."
-                            : waitLabel || "Forjar"}
+                            ? "Forging..."
+                            : waitLabel || "Forge"}
                       </Button>
                     </div>
                   </ListRow>
@@ -466,14 +466,14 @@ export function ForgeScreen() {
             <FilterRow>
               <FilterSelect
               accent
-                label="Espaço"
+                label="Slot"
                 value={category}
                 options={slotCategoryFilterOptions()}
                 onChange={pickCategory}
               />
               <FilterSelect
               accent
-                label="Conjunto"
+                label="Set"
                 value={set}
                 options={setFilterOptions()}
                 onChange={pickSet}
@@ -481,9 +481,9 @@ export function ForgeScreen() {
               <div className={FILTER_COLUMN}>
                 <Field
                   accent
-                  label="Busca"
-                  aria-label="Buscar peça pelo nome"
-                  placeholder="Nome da peça"
+                  label="Search"
+                  aria-label="Search piece by name"
+                  placeholder="Piece name"
                   value={search}
                   autoComplete="off"
                   onChange={(event) => pickSearch(event.target.value)}
@@ -492,20 +492,20 @@ export function ForgeScreen() {
             </FilterRow>
 
             <Panel
-              title="Disponíveis"
-              description="Escolha o que entra na bigorna. Só peças fora do corpo aparecem aqui."
+              title="Available"
+              description="Choose what goes on the anvil. Only pieces off the body appear here."
               padding="none"
             >
               {slots.length === 0 ? (
                 <div className="p-4">
                   <EmptyState
-                    title="Nada disponível"
-                    description="Desequipe uma peça para forjá-la."
+                    title="Nothing available"
+                    description="Unequip a piece to forge it."
                   />
                 </div>
               ) : filteredSlots.length === 0 ? (
                 <div className="p-4">
-                  <FilteredEmptyState description="Nenhuma peça do inventário combina com os filtros escolhidos." />
+                  <FilteredEmptyState description="No piece in the bag matches the chosen filters." />
                 </div>
               ) : (
                 <>
@@ -530,8 +530,8 @@ export function ForgeScreen() {
                                   row.fragment.name +
                                   " · " +
                                   formatBronze(row.bronzeCost)
-                                : (row.reason ?? "Pronta para forjar")
-                              : (row.reason ?? "Indisponível")
+                                : (row.reason ?? "Ready to forge")
+                              : (row.reason ?? "Unavailable")
                           }
                           trailing={
                             <>
@@ -577,8 +577,8 @@ export function ForgeScreen() {
 
       <ConfirmDialog
         open={confirming !== null}
-        title="Forjar"
-        description="A bigorna consome os fragmentos e as WCoins na hora, e marteladas não se desfazem."
+        title="Forge"
+        description="The anvil consumes the fragments and WCoins on the spot, and strikes cannot be undone."
         detail={
           confirming && confirming.fragment
             ? enhancedName(confirming.item.name, confirming.level) +
@@ -592,7 +592,7 @@ export function ForgeScreen() {
               formatBronze(confirming.bronzeCost)
             : undefined
         }
-        confirmLabel="Forjar"
+        confirmLabel="Forge"
         onCancel={() => setConfirmingKey(null)}
         onConfirm={() => {
           if (confirming && activeOre === null && activeItem === null) {

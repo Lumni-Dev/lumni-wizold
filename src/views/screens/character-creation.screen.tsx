@@ -39,7 +39,7 @@ export function CharacterCreationScreen() {
       return;
     }
     if (!gender) {
-      setError("Escolha a linhagem de Lumni ou a de Luna.");
+      setError("Choose Lumni's bloodline or Luna's.");
       return;
     }
 
@@ -87,7 +87,7 @@ export function CharacterCreationScreen() {
               value={name}
               onChange={(event) => setName(sanitizeName(event.target.value, NAME_MAX_LENGTH))}
               maxLength={NAME_MAX_LENGTH}
-              placeholder="Como a matilha vai te chamar"
+              placeholder="What the pack will call you"
               autoComplete="off"
             />
             <AiAuditNotice />

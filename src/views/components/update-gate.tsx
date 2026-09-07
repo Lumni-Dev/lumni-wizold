@@ -11,7 +11,7 @@ export function UpdateGate() {
   return (
     <Modal
       open={updateAvailable}
-      title="Atualização disponível"
+      title="Update available"
       onClose={applyUpdate}
       dismissible={false}
       footer={
@@ -25,8 +25,8 @@ export function UpdateGate() {
           Uma nova versão do jogo já está disponível.
         </p>
         <div className="divide-y divide-line rounded-md border border-line">
-          <DataRow label="Versão atual" value={"v" + GAME_VERSION} />
-          {updateVersion ? <DataRow label="Nova versão" value={"v" + updateVersion} /> : null}
+          <DataRow label="Current version" value={"v" + GAME_VERSION} />
+          {updateVersion ? <DataRow label="New version" value={"v" + updateVersion} /> : null}
         </div>
         <p className="text-xs leading-relaxed text-ink-faint">
           Ao atualizar, a página recarrega limpando o cache. Se você estiver caçando, treinando,

@@ -7,7 +7,7 @@ export function BanishedGate({ open, onClose }: { open: boolean; onClose: () => 
   return (
     <Modal
       open={open}
-      title="Conta banida"
+      title="Account banned"
       onClose={onClose}
       dismissible={false}
       footer={

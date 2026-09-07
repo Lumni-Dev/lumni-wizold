@@ -84,7 +84,7 @@ export function TrainingScreen() {
       />
 
       <Panel
-        title="Atributos"
+        title="Attributes"
         description={
           (state.automation.train
             ? "O treino repete sozinho até você mandar parar, e o teto de cada atributo é "
@@ -134,25 +134,25 @@ export function TrainingScreen() {
                 <CardBody>
                   <ul className="list-disc space-y-1 pl-4 text-xs leading-relaxed text-ink-soft">
                     <li>
-                      {t("Atualmente você tem")}{" "}
+                      {t("You currently have")}{" "}
                       <strong className="font-bold">{formatFraction(exactValue)}</strong>{" "}
-                      {t("pontos de")} {row?.name ?? exercise.name}
+                      {t("points of")} {row?.name ?? exercise.name}
                     </li>
                     <li>
                       <strong className="font-bold">+{formatFraction(summary.pointShare)}</strong>{" "}
-                      {t("ponto por sessão")}
+                      {t("point per session")}
                     </li>
                     <li>
                       <strong className="font-bold">+{formatNumber(summary.progress)}</strong>{" "}
-                      {t("de experiência por sessão")}
+                      {t("experience per session")}
                       {moon.phase.trainingBonus > 0
-                        ? " (+" + Math.round(moon.phase.trainingBonus * 100) + "% " + t("lua") + ")"
+                        ? " (+" + Math.round(moon.phase.trainingBonus * 100) + "% " + t("moon") + ")"
                         : ""}
                     </li>
                     <li>
-                      {t("Ponto fecha em cerca de")}{" "}
+                      {t("Point closes in about")}{" "}
                       <strong className="font-bold">{formatNumber(summary.sessions)}</strong>{" "}
-                      {t("sessões")}
+                      {t("sessions")}
                     </li>
                   </ul>
                 </CardBody>
@@ -190,12 +190,12 @@ export function TrainingScreen() {
                     {t(
                       active
                         ? opting
-                          ? "Segue sozinho..."
+                          ? "Runs on its own..."
                           : state.automation.train
-                            ? "Treinando sem parar..."
-                            : "Treinando..."
+                            ? "Training non-stop..."
+                            : "Training..."
                         : waitingExercise === exercise.id
-                          ? "Esperando para continuar"
+                          ? "Waiting to continue"
                           : (reason ?? ""),
                     )}
                   </span>
@@ -207,8 +207,8 @@ export function TrainingScreen() {
                     {opting
                       ? "Parar (" + cooldown + ")"
                       : active
-                        ? "Treinando..."
-                        : waitLabel || "Treinar"}
+                        ? "Training..."
+                        : waitLabel || "Train"}
                   </Button>
                 </CardFooter>
               </Card>
@@ -224,7 +224,7 @@ export function TrainingScreen() {
               <CardHeader art={<PetArtFill gender={petTraining.pet.gender} />}>
                 <RowText
                   title="Mascote"
-                  label="Treino do mascote"
+                  label="Companion training"
                   description={
                     <span className="font-mono text-[11px] text-ink">
                       NV. {formatNumber(petTraining.level)}
@@ -242,19 +242,19 @@ export function TrainingScreen() {
               <CardBody>
                 <ul className="list-disc space-y-1 pl-4 text-xs leading-relaxed text-ink-soft">
                   <li>
-                    <strong className="font-bold">+1</strong> {t("Força")},{" "}
-                    <strong className="font-bold">+1</strong> {t("Agilidade")}{" "}
-                    {t("e")} <strong className="font-bold">+1</strong> {t("Instinto")}{" "}
-                    {t("por nível")}
+                    <strong className="font-bold">+1</strong> {t("Strength")},{" "}
+                    <strong className="font-bold">+1</strong> {t("Agility")}{" "}
+                    {t("and")} <strong className="font-bold">+1</strong> {t("Instinct")}{" "}
+                    {t("per level")}
                   </li>
                   <li>
                     <strong className="font-bold">
                       +{formatFraction(petTraining.effort.progress / petTraining.needed)}
                     </strong>{" "}
-                    {t("de nível por treinamento")}
+                    {t("of a level per training")}
                   </li>
                   <li>
-                    {t("Treino por")}{" "}
+                    {t("Training for")}{" "}
                     <strong className="font-bold">{formatBronze(petTraining.cost)}</strong>
                   </li>
                 </ul>
@@ -293,10 +293,10 @@ export function TrainingScreen() {
                   {t(
                     petActive
                       ? cooldown !== null
-                        ? "Segue sozinho..."
+                        ? "Runs on its own..."
                         : state.automation.train
-                          ? "Treinando sem parar..."
-                          : "Treinando..."
+                          ? "Training non-stop..."
+                          : "Training..."
                       : (petTraining.reason ?? ""),
                   )}
                 </span>
@@ -308,8 +308,8 @@ export function TrainingScreen() {
                   {petActive && cooldown !== null
                     ? "Parar (" + cooldown + ")"
                     : petActive
-                      ? "Treinando..."
-                      : waitLabel || "Treinar"}
+                      ? "Training..."
+                      : waitLabel || "Train"}
                 </Button>
               </CardFooter>
             </Card>

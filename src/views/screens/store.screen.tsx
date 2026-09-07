@@ -35,9 +35,9 @@ interface HistoryView {
 }
 
 const STATUS_LABEL: Record<string, string> = {
-  opened: "Aguardando pagamento",
-  approved: "Aprovado",
-  expired: "Expirado",
+  opened: "Awaiting payment",
+  approved: "Approved",
+  expired: "Expired",
   refunded: "Devolvido",
 };
 
@@ -85,12 +85,12 @@ export function StoreScreen() {
     <>
       <PageHeader
         title="Wizold Store"
-        description="WCoins por dinheiro, para quem quer pular a espera. Nada aqui compra nível: experiência só a caça dá."
+        description="WCoins for money, for those who want to skip the wait. Nothing here buys levels: only the hunt gives experience."
       />
 
       <Panel
         title="VIP"
-        description="Libera todas as chaves de Automação nas configurações: a partida caça, treina, minera e forja sozinha, e se recupera sozinha. Assinatura mensal, cancele quando quiser."
+        description="Unlocks every Automation switch in the settings: the run hunts, trains, mines and forges on its own, and recovers on its own. Monthly subscription, cancel whenever you want."
         action={
           vip ? <Tag tone="light">Ativo até {formatDay(character.vipUntil ?? "")}</Tag> : undefined
         }
@@ -100,8 +100,8 @@ export function StoreScreen() {
               {subscribed
                 ? character.vipCanceling
                   ? "Ativo até " + formatDay(character.vipUntil ?? "") + ", sem renovar."
-                  : "Renova sozinho a cada mês. Cancele para parar a cobrança no Stripe."
-                : "O VIP entra assim que o pagamento confirma."}
+                  : "Renews on its own every month. Cancel to stop the charge on Stripe."
+                : "VIP starts as soon as the payment confirms."}
             </span>
             {subscribed ? (
               character.vipCanceling ? (
@@ -139,7 +139,7 @@ export function StoreScreen() {
           >
             <CardHeader>
               <PackIcon pack={pack} size="huge" />
-              <RowText title={pack.name} label="Pacote de WCoins" />
+              <RowText title={pack.name} label="WCoin pack" />
             </CardHeader>
 
             <CardBody>
@@ -147,8 +147,8 @@ export function StoreScreen() {
             </CardBody>
 
             <List className="border-t border-edge">
-              <DataRow label="Você recebe" value={formatBronze(bronze)} />
-              <DataRow label="Preço" value={formatReais(pack.priceCents)} />
+              <DataRow label="You receive" value={formatBronze(bronze)} />
+              <DataRow label="Price" value={formatReais(pack.priceCents)} />
             </List>
 
             <CardFooter>
@@ -162,12 +162,12 @@ export function StoreScreen() {
       </div>
 
       <Panel
-        title="Histórico de compras"
+        title="Purchase history"
         description={
           history && history.total > 0
             ? formatNumber(history.total) +
               (history.total === 1 ? " compra registrada." : " compras registradas.")
-            : "Cada pacote pago aparece aqui, com valor, data e status."
+            : "Every paid pack shows up here, with value, date and status."
         }
         padding="none"
         footer={
@@ -179,8 +179,8 @@ export function StoreScreen() {
         {history === null ? null : history.entries.length === 0 ? (
           <div className="p-4">
             <EmptyState
-              title="Nenhuma compra ainda"
-              description="A primeira compra de WCoins que você pagar abre esta lista."
+              title="No purchases yet"
+              description="The first WCoin purchase you pay for opens this list."
             />
           </div>
         ) : (
@@ -190,7 +190,7 @@ export function StoreScreen() {
                 <RowText
                   title={
                     entry.packId === "vip"
-                      ? "Assinatura VIP"
+                      ? "VIP subscription"
                       : (findPack(entry.packId)?.name ?? entry.packId)
                   }
                   description={formatDay(entry.at)}
@@ -211,9 +211,9 @@ export function StoreScreen() {
 
       <ConfirmDialog
         open={cancelingVip}
-        title="Cancelar assinatura VIP"
-        description="A cobrança mensal para de renovar no Stripe. O VIP continua ativo até o fim do período já pago, e dá para reativar antes disso."
-        confirmLabel="Cancele"
+        title="Cancel VIP subscription"
+        description="The monthly charge stops renewing on Stripe. VIP stays active until the end of the paid period, and can be reactivated before that."
+        confirmLabel="Cancel"
         onCancel={() => setCancelingVip(false)}
         onConfirm={async () => {
           await cancelVip();

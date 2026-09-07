@@ -16,7 +16,7 @@ export function TavernRoomNumber({
   return (
     <span className="inline-flex shrink-0 items-center gap-2">
       <span className={cn("font-mono text-ink", className)}>{mark}</span>
-      <CopyValue value={mark} noun="número da mesa" />
+      <CopyValue value={mark} noun="table number" />
     </span>
   );
 }

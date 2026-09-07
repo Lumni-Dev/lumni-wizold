@@ -23,16 +23,16 @@ export function ActivityLog({ entries }: { entries: LogEntry[] }) {
 
   return (
     <Panel
-      title="Diário"
-      description="Últimas 7 noites, em ordem."
+      title="Diary"
+      description="The last 7 nights, in order."
       padding="none"
       footer={pages > 1 ? <Pagination page={currentPage} pages={pages} onChange={setPage} /> : null}
     >
       {visible.length === 0 ? (
         <div className="p-4">
           <EmptyState
-            title="Nada registrado"
-            description="Treine, cace ou negocie para começar a escrever."
+            title="Nothing recorded"
+            description="Train, hunt or trade to start writing."
           />
         </div>
       ) : (

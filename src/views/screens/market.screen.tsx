@@ -47,8 +47,8 @@ const PAGE_SIZE = 8;
 type Tab = "buy" | "sell";
 
 const TABS: readonly { key: Tab; label: string }[] = [
-  { key: "buy", label: "Comprar" },
-  { key: "sell", label: "Vender" },
+  { key: "buy", label: "Buy" },
+  { key: "sell", label: "Sell" },
 ];
 
 export function MarketScreen() {
@@ -175,7 +175,7 @@ export function MarketScreen() {
     <>
       <PageHeader
         title="Mercado"
-        description="O ferreiro do vilarejo não pergunta de onde vem o material. Só contam as WCoins."
+        description="The village smith never asks where the goods come from. Only the WCoins count."
       />
 
       <ChipTabs
@@ -237,7 +237,7 @@ export function MarketScreen() {
                           disabled={!ofLineage || !levelAllowed || !affordable || petless}
                         >
                           {petless
-                            ? "Sem mascote"
+                            ? "No companion"
                             : ofLineage
                               ? "Comprar por " + formatBronze(priceOf(item))
                               : "Apenas " + lineageName(item)}
@@ -254,8 +254,8 @@ export function MarketScreen() {
         </>
       ) : sellables.length === 0 ? (
         <EmptyState
-          title="Nada para vender"
-          description="Volte de uma caçada com loot e tente de novo."
+          title="Nothing to sell"
+          description="Come back from a hunt with loot and try again."
         />
       ) : (
         <>
@@ -272,7 +272,7 @@ export function MarketScreen() {
           />
 
           {visibleSellables.length === 0 ? (
-            <FilteredEmptyState description="Nenhum item do inventário combina com a categoria escolhida." />
+            <FilteredEmptyState description="No item in the bag matches the chosen category." />
           ) : (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {sellablesOnPage.map(({ item, quantity, enhancement }) => (
@@ -281,7 +281,7 @@ export function MarketScreen() {
                   item={item}
                   quantity={quantity}
                   enhancement={enhancement}
-                  note="A recompra paga metade do preço de tabela."
+                  note="Buyback pays half the list price."
                   footer={
                     <div className="w-full">
                       <Button
@@ -307,12 +307,12 @@ export function MarketScreen() {
 
       <ConfirmDialog
         open={deal !== null}
-        title={deal?.kind === "sell" ? "Vender" : "Comprar"}
+        title={deal?.kind === "sell" ? "Sell" : "Buy"}
         description={
           deal
             ? deal.kind === "sell"
-              ? "O ferreiro paga metade da tabela e não devolve o item depois."
-              : "As WCoins saem na hora e o item vai direto para o inventário."
+              ? "The smith pays half the list and does not return the item afterwards."
+              : "The WCoins leave on the spot and the item goes straight to the bag."
             : ""
         }
         detail={
@@ -323,7 +323,7 @@ export function MarketScreen() {
               formatBronze(dealTotal)
             : null
         }
-        confirmLabel={deal?.kind === "sell" ? "Vender" : "Pagar " + formatBronze(dealTotal)}
+        confirmLabel={deal?.kind === "sell" ? "Sell" : "Pagar " + formatBronze(dealTotal)}
         onCancel={() => setDeal(null)}
         onConfirm={() => {
           if (!deal) return;

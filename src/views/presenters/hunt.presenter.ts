@@ -25,7 +25,7 @@ function closerOf(report: NarratedFight, prey: string): string {
   }
   if (hunterRetreated(report.combat)) {
     return pick([
-      "A luta se arrasta, e é hora de recuar.",
+      "The fight drags on, and it is time to fall back.",
       prey + " aguenta firme. Melhor voltar.",
     ]);
   }

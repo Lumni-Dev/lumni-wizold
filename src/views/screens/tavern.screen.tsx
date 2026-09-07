@@ -520,8 +520,8 @@ export function TavernScreen() {
       />
 
       <Panel
-        title="Alcance desta taverna"
-        description="Leia antes de combinar encontro com alguém."
+        title="Reach of this tavern"
+        description="Read before arranging to meet anyone."
         footer={
           radio.tracks.length > 0 ? (
             <div className="-m-4">
@@ -542,10 +542,10 @@ export function TavernScreen() {
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
         <div className="space-y-6">
           <Panel
-            title="Escolher mesa"
+            title="Choose a table"
             description={
               ownRoom
-                ? "Você já tem uma mesa aberta: feche a sua para abrir outra."
+                ? "You already have an open table: close yours to open another."
                 : "Sem senha, NV " +
                   OPEN_ROOM_MIN_LEVEL +
                   "+ ou VIP. Com senha, qualquer nível. Mesa reservada sempre com senha."
@@ -561,10 +561,10 @@ export function TavernScreen() {
             </div>
             <form onSubmit={submitRoom} className="space-y-3">
               <Field
-                label="Nome da mesa"
+                label="Table name"
                 value={roomName}
                 maxLength={ROOM_NAME_MAX_LENGTH}
-                placeholder="Mesa do canto"
+                placeholder="Corner table"
                 autoComplete="off"
                 disabled={Boolean(ownRoom)}
                 onChange={(event) =>
@@ -573,12 +573,12 @@ export function TavernScreen() {
               />
               <AiAuditNotice />
               <Field
-                label={hideName ? "Senha" : "Senha (opcional)"}
+                label={hideName ? "Senha" : "Password (optional)"}
                 type="password"
                 maxLength={60}
                 value={roomPassword}
                 placeholder={
-                  hideName ? "obrigatória na mesa reservada" : "deixe vazio para mesa aberta"
+                  hideName ? "required on the reserved table" : "deixe vazio para mesa aberta"
                 }
                 autoComplete="new-password"
                 disabled={Boolean(ownRoom)}
@@ -600,9 +600,9 @@ export function TavernScreen() {
                 block
                 label={
                   ownRoom
-                    ? "Feche a sua mesa antes de abrir outra"
+                    ? "Close your table before opening another"
                     : hideName && roomPassword.trim().length === 0
-                      ? "Mesa reservada precisa de senha."
+                      ? "A reserved table needs a password."
                       : roomPassword.trim().length === 0 && !mayOpenUnlocked
                         ? "Mesa sem senha é só a partir do NV " +
                           OPEN_ROOM_MIN_LEVEL +
@@ -623,7 +623,7 @@ export function TavernScreen() {
                     (roomPassword.trim().length === 0 && !mayOpenUnlocked)
                   }
                 >
-                  {ownRoom ? "Sua mesa: " + roomTitle(ownRoom.room, true) : "Escolher mesa"}
+                  {ownRoom ? "Sua mesa: " + roomTitle(ownRoom.room, true) : "Choose a table"}
                 </Button>
               </Tooltip>
             </form>
@@ -631,8 +631,8 @@ export function TavernScreen() {
 
           {invites.length > 0 ? (
             <Panel
-              title="Convites"
-              description="Quem chamou você para a matilha. Aceitar torna vocês companheiros e libera a mesa reservada."
+              title="Invites"
+              description="Those who called you to the pack. Accepting makes you mates and opens the reserved table."
               action={<Tag tone="light">{invites.length}</Tag>}
               padding="none"
             >
@@ -669,8 +669,8 @@ export function TavernScreen() {
           ) : null}
 
           <Panel
-            title="Matilha"
-            description="Companheiros de matilha. Chamar um abre uma mesa reservada só de vocês dois."
+            title="Pack"
+            description="Pack mates. Calling one opens a reserved table just for the two of you."
             action={
               <Tag tone="neutral">
                 {pack.length} de {MAX_PACK}
@@ -680,16 +680,16 @@ export function TavernScreen() {
           >
             <form onSubmit={submitNick} className="space-y-3 border-b border-edge p-4">
               <Field
-                label="Convidar pelo nick"
+                label="Invite by nick"
                 value={nick}
                 maxLength={NAME_MAX_LENGTH}
-                placeholder="O nick de quem você procura"
+                placeholder="The nick of the one you seek"
                 autoComplete="off"
-                hint="Quem está numa mesa agora responde primeiro, depois o quadro do ranking."
+                hint="Whoever sits at a table now answers first, then the ranking board."
                 onChange={(event) => setNick(sanitizeName(event.target.value, NAME_MAX_LENGTH))}
               />
               <AiAuditNotice />
-              <Tooltip block label={pack.length >= MAX_PACK ? "A matilha está cheia" : ""}>
+              <Tooltip block label={pack.length >= MAX_PACK ? "The pack is full" : ""}>
                 <Button
                   type="submit"
                   variant="primary"
@@ -705,8 +705,8 @@ export function TavernScreen() {
             {pack.length === 0 ? (
               <div className="p-4">
                 <EmptyState
-                  title="Matilha vazia"
-                  description="Convide alguém de dentro de uma mesa ou pelo nick: a matilha começa quando aceitarem."
+                  title="Empty pack"
+                  description="Invite someone from inside a table or by nick: the pack begins when they accept."
                 />
               </div>
             ) : (
@@ -762,14 +762,14 @@ export function TavernScreen() {
         <div className="space-y-6 lg:col-span-2">
           {rooms.length === 0 ? (
             <EmptyState
-              title="Nenhuma mesa aberta"
-              description="Abra a primeira e espere alguém puxar a cadeira."
+              title="No open tables"
+              description="Open the first one and wait for someone to pull up a chair."
             />
           ) : (
             <>
               <Field
                 accent
-                aria-label="Buscar mesa pelo nome ou número"
+                aria-label="Search table by name or number"
                 placeholder="Buscar mesa pelo nome ou #"
                 value={roomSearch}
                 maxLength={ROOM_NAME_MAX_LENGTH}
@@ -781,7 +781,7 @@ export function TavernScreen() {
               />
 
               {filteredRooms.length === 0 ? (
-                <FilteredEmptyState description="Nenhuma mesa combina com essa busca." />
+                <FilteredEmptyState description="No table matches that search." />
               ) : (
                 <>
                   <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -816,7 +816,7 @@ export function TavernScreen() {
                             ) : null}
                             {room.nameHidden ? <Tag tone="neutral">Reservada</Tag> : null}
                             <Tag tone={locked ? "neutral" : "faint"}>
-                              {locked ? "Com senha" : "Aberta"}
+                              {locked ? "Password" : "Open"}
                             </Tag>
                           </>
                         )}
@@ -836,7 +836,7 @@ export function TavernScreen() {
                         type="password"
                         maxLength={60}
                         aria-label={"Senha da mesa " + roomTitle(room, isMember)}
-                        placeholder="senha da mesa"
+                        placeholder="table password"
                         value={joinPasswords[room.id] ?? ""}
                         onChange={(event) =>
                           setJoinPasswords((current) => ({
@@ -878,7 +878,7 @@ export function TavernScreen() {
                         }
                         label={
                           seatedHere
-                            ? "Você já está sentado nesta mesa"
+                            ? "You are already sitting at this table"
                             : full && !isMember
                               ? "A mesa está cheia: " + MAX_ROOM_MEMBERS + " pessoas"
                               : ""
@@ -890,7 +890,7 @@ export function TavernScreen() {
                           disabled={seatedHere || (full && !isMember)}
                           onClick={() => open(room.id, joinPasswords[room.id] ?? "")}
                         >
-                          {seatedHere ? "Se sentou" : "Sentar"}
+                          {seatedHere ? "Sat down" : "Sit down"}
                         </Button>
                       </Tooltip>
                     </div>
@@ -968,14 +968,14 @@ export function TavernScreen() {
 
       <ConfirmDialog
         open={closingRoomId !== null}
-        title={closingRoom?.isPrivate ? "Fechar mesa reservada" : "Fechar mesa"}
+        title={closingRoom?.isPrivate ? "Close reserved table" : "Close table"}
         description={
           closingRoom?.isPrivate
-            ? "A mesa some para vocês dois e as mensagens se perdem. Chamar de novo abre outra, vazia."
-            : "A mesa sai do quadro para todo mundo e a conversa se perde. Abrir outra depois é de graça."
+            ? "The table vanishes for you both and the messages are lost. Calling again opens another, empty."
+            : "The table leaves the board for everyone and the talk is lost. Opening another later is free."
         }
         detail={closingRoom ? roomTitle(closingRoom.room, true) : undefined}
-        confirmLabel="Fechar"
+        confirmLabel="Close"
         onCancel={() => setClosingRoomId(null)}
         onConfirm={async () => {
           const roomId = closingRoomId;
@@ -995,10 +995,10 @@ export function TavernScreen() {
 
       <ConfirmDialog
         open={removing !== null}
-        title="Sair da matilha"
-        description="Vocês dois saem da matilha um do outro. Sem o laço não dá para abrir novas mesas reservadas entre vocês; convidar de novo recomeça."
+        title="Leave the pack"
+        description="You both leave each other's pack. Without the bond no new reserved tables can open between you; inviting again starts over."
         detail={removing?.name}
-        confirmLabel="Sair"
+        confirmLabel="Leave"
         onCancel={() => setRemoving(null)}
         onConfirm={async () => {
           if (removing) await removeFromPack(removing.id);

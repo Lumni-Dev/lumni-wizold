@@ -140,7 +140,7 @@ export function TavernRoomChatMembers({
   return (
     <div className="border-b border-edge px-4 py-3">
       <ul
-        aria-label="Na mesa"
+        aria-label="At the table"
         className="flex flex-nowrap items-center gap-2 overflow-x-auto pb-1"
       >
         {activeRoom.members.map((member) => {
@@ -296,12 +296,12 @@ export function TavernRoomChatComposer({
   return (
     <form onSubmit={onSubmit} className="space-y-2">
       <div className="flex items-center gap-2">
-        <Tooltip label={pingOn ? "Mutar notificação" : "Ativar notificação"}>
+        <Tooltip label={pingOn ? "Mute notification" : "Enable notification"}>
           <Button
             type="button"
             icon
             variant="outline"
-            aria-label={pingOn ? "Mutar notificação da mesa" : "Ativar notificação da mesa"}
+            aria-label={pingOn ? "Mute table notification" : "Enable table notification"}
             aria-pressed={pingOn}
             onClick={() => {
               const next = !pingOn;
@@ -315,7 +315,7 @@ export function TavernRoomChatComposer({
         <div className="relative min-w-0 flex-1">
           <Field
             aria-label="Mensagem"
-            placeholder="Diga alguma coisa"
+            placeholder="Say something"
             maxLength={MESSAGE_MAX_LENGTH}
             autoComplete="off"
             value={draft}

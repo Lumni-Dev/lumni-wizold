@@ -26,8 +26,8 @@ export function VitalActionButton({
       fullWidth={fullWidth}
       recovering={resting}
       beat={String(character.health)}
-      recoveringLabel="Recuperando-se..."
-      label="Recuperar-se"
+      recoveringLabel="Recovering..."
+      label="Recover"
       tooltip={
         resting
           ? "O corpo se recompõe a cada " +

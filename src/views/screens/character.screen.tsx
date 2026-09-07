@@ -91,7 +91,7 @@ export function CharacterScreen() {
     <>
       <PageHeader
         title="Personagem"
-        description="A ficha completa: quem você é, o que o corpo aguenta e como a fera responde."
+        description="The full sheet: who you are, what the body endures and how the beast answers."
         action={
           best ? (
             <Tag tone="light">
@@ -103,7 +103,7 @@ export function CharacterScreen() {
 
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-1">
-          <Panel title="Ficha" padding="none">
+          <Panel title="Sheet" padding="none">
             <GenderBanner gender={character.gender} />
             <div className="border-b border-edge px-4 py-3">
               <div className="min-w-0 space-y-1">
@@ -119,30 +119,30 @@ export function CharacterScreen() {
             </div>
 
             <List>
-              <DataRow label="Nível" value={"NV. " + formatNumber(character.level)} />
+              <DataRow label="Level" value={"NV. " + formatNumber(character.level)} />
               <DataRow label="WCoins" value={formatNumber(character.bronze)} />
               {character.createdAt ? (
-                <DataRow label="Criado" value={formatDate(character.createdAt)} />
+                <DataRow label="Created" value={formatDate(character.createdAt)} />
               ) : null}
             </List>
           </Panel>
 
-          <Panel title="Caçada" description="Caçadas, vitórias e derrotas na trilha." padding="none">
+          <Panel title="Hunt" description="Hunts, victories and defeats on the trail." padding="none">
             <List>
-              <DataRow label="Caçadas" value={formatNumber(character.hunts)} />
-              <DataRow label="Vitórias" value={formatNumber(character.wins)} />
-              <DataRow label="Derrotas" value={formatNumber(character.losses)} />
+              <DataRow label="Hunts" value={formatNumber(character.hunts)} />
+              <DataRow label="Victories" value={formatNumber(character.wins)} />
+              <DataRow label="Defeats" value={formatNumber(character.losses)} />
             </List>
           </Panel>
 
-          <Panel title="Arena" description="Duelos, vitórias e derrotas no fosso." padding="none">
+          <Panel title="Arena" description="Duels, victories and defeats in the pit." padding="none">
             <List>
               <DataRow
-                label="Duelos"
+                label="Duels"
                 value={formatNumber(character.arenaWins + character.arenaLosses)}
               />
-              <DataRow label="Vitórias" value={formatNumber(character.arenaWins)} />
-              <DataRow label="Derrotas" value={formatNumber(character.arenaLosses)} />
+              <DataRow label="Victories" value={formatNumber(character.arenaWins)} />
+              <DataRow label="Defeats" value={formatNumber(character.arenaLosses)} />
             </List>
           </Panel>
 
@@ -177,16 +177,16 @@ export function CharacterScreen() {
 
         <div className="space-y-6 lg:col-span-2">
           <Panel
-            title="Suprimentos"
-            description="A poção de vida recupera uma fatia da vida máxima na hora. Repousar faz o mesmo de graça, aos poucos."
+            title="Supplies"
+            description="The health potion restores a slice of max health at once. Resting does the same for free, little by little."
             action={<VitalActionButton size="small" />}
             padding="none"
           >
             {healthPotions.length === 0 ? (
               <div className="p-4">
                 <EmptyState
-                  title="Sem poção de vida"
-                  description="A poção de vida é vendida no mercado."
+                  title="No health potion"
+                  description="The health potion is sold at the market."
                 />
               </div>
             ) : (
@@ -199,7 +199,7 @@ export function CharacterScreen() {
                     description={
                       item.effect.healthMin !== undefined && item.effect.healthMax !== undefined
                         ? "Recupera entre " + item.effect.healthMin + " e " + item.effect.healthMax + " de vida"
-                        : "Recupera vida"
+                        : "Restores health"
                     }
                     action={
                       <Button
@@ -217,15 +217,15 @@ export function CharacterScreen() {
           </Panel>
 
           <Panel
-            title="Fúria"
-            description="Modo Fúria dá +10 em cada atributo enquanto durar. Na lua cheia o céu liga sozinho; fora dela, beba a poção."
+            title="Fury"
+            description="Fury Mode gives +10 to every attribute while it lasts. On the full moon the sky turns it on by itself; outside it, drink the potion."
             padding="none"
           >
             {furyPotions.length === 0 ? (
               <div className="p-4">
                 <EmptyState
-                  title="Sem poção de fúria"
-                  description="A poção de fúria é vendida no mercado."
+                  title="No fury potion"
+                  description="The fury potion is sold at the market."
                 />
               </div>
             ) : (
@@ -248,19 +248,19 @@ export function CharacterScreen() {
             )}
           </Panel>
 
-          <Panel title="Combate" description="Cada linha diz de qual atributo ela sai." padding="none">
+          <Panel title="Combat" description="Each line says which attribute it comes from." padding="none">
             <List>
-              <DataRow label="Golpe (Força)" value={formatFraction(strength)} />
-              <DataRow label="Defesa (Resistência)" value={formatFraction(endurance)} />
-              <DataRow label="Esquiva (Agilidade)" value={stats.dodge + "%"} />
-              <DataRow label="Crítico (Instinto)" value={stats.critical + "%"} />
+              <DataRow label="Strike (Strength)" value={formatFraction(strength)} />
+              <DataRow label="Defense (Endurance)" value={formatFraction(endurance)} />
+              <DataRow label="Dodge (Agility)" value={stats.dodge + "%"} />
+              <DataRow label="Critical (Instinct)" value={stats.critical + "%"} />
               <DataRow
-                label="Fúria do frasco (Vontade)"
+                label="Bottled fury (Willpower)"
                 value={"+" + Math.round(furyWillpowerBonus(willpower) * 100) + "%"}
               />
-              <DataRow label="Vida máxima" value={formatNumber(stats.maxHealth)} />
+              <DataRow label="Max health" value={formatNumber(stats.maxHealth)} />
               <DataRow
-                label="Dano do crítico"
+                label="Critical damage"
                 value={"×" + criticalMultiplierOf().toFixed(2).replace(".", ",")}
               />
             </List>

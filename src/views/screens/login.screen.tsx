@@ -74,18 +74,18 @@ declare global {
 }
 
 const MONTHS = [
-  "Janeiro",
-  "Fevereiro",
-  "Março",
-  "Abril",
-  "Maio",
-  "Junho",
-  "Julho",
-  "Agosto",
-  "Setembro",
-  "Outubro",
-  "Novembro",
-  "Dezembro",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 const two = (value: number) => String(value).padStart(2, "0");
 const MONTH_OPTIONS: SelectOption[] = MONTHS.map((name, index) => ({
@@ -255,13 +255,13 @@ export function LoginScreen() {
           >
             <div className="border-b border-edge px-4 py-3">
               <h1 className="landing-hero-shadow-text heading text-[11px] text-ink">
-                {twoFactor ? "Verificação" : "Entrar"}
+                {twoFactor ? "Verification" : "Entrar"}
               </h1>
               <p className="landing-hero-shadow-text mt-1 text-xs text-ink-faint">
                 {t(
                   twoFactor
-                    ? "Confirme o código enviado ao seu e-mail."
-                    : "A noite não cobra nada para começar.",
+                    ? "Confirm the code sent to your e-mail."
+                    : "The night charges nothing to begin.",
                 )}
               </p>
             </div>
@@ -274,7 +274,7 @@ export function LoginScreen() {
                     minutos.
                   </p>
                   <Field
-                    label="Código"
+                    label="Code"
                     numeric
                     maxLength={TWO_FACTOR_CODE_LENGTH}
                     value={twoFactorCode}
@@ -320,24 +320,24 @@ export function LoginScreen() {
               <div className="grid grid-cols-3 gap-2">
                 <Select
                   compact
-                  aria-label="Dia"
-                  placeholder="Dia"
+                  aria-label="Day"
+                  placeholder="Day"
                   value={birth.day}
                   options={dayOptions}
                   onChange={(day) => setBirthPart({ day })}
                 />
                 <Select
                   compact
-                  aria-label="Mês"
-                  placeholder="Mês"
+                  aria-label="Month"
+                  placeholder="Month"
                   value={birth.month}
                   options={MONTH_OPTIONS}
                   onChange={(month) => setBirthPart({ month })}
                 />
                 <Select
                   compact
-                  aria-label="Ano"
-                  placeholder="Ano"
+                  aria-label="Year"
+                  placeholder="Year"
                   value={birth.year}
                   options={YEAR_OPTIONS}
                   onChange={(year) => setBirthPart({ year })}

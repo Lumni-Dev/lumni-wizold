@@ -76,7 +76,7 @@ export function InventoryScreen() {
     <>
       <PageHeader
         title="Inventário"
-        description="Tudo que você carrega. Equipe, use ou venda o que só ocupa espaço."
+        description="Everything you carry. Equip, use or sell what only takes up space."
         action={
           <div className="flex items-center gap-2">
             <Tag tone="neutral">{formatNumber(totalItems)} itens</Tag>
@@ -85,8 +85,8 @@ export function InventoryScreen() {
       />
 
       <Panel
-        title="Equipado"
-        description="Sete espaços: capacete, colar, armadura, calças, botas, luvas e anel."
+        title="Equipped"
+        description="Seven slots: helmet, necklace, armor, pants, boots, claws and ring."
       >
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {EQUIPMENT_SLOTS.map((slot) => {
@@ -108,7 +108,7 @@ export function InventoryScreen() {
                 >
                   <RowText
                     label={SLOT_LABEL[slot]}
-                    title={item ? item.name : "Nada equipado"}
+                    title={item ? item.name : "Nothing equipped"}
                   />
                 </CardHeader>
 
@@ -170,10 +170,10 @@ export function InventoryScreen() {
 
       {visible.length === 0 ? (
         <EmptyState
-          title="Nada por aqui"
+          title="Nothing here"
           description={
             filter === "all"
-              ? "Cace criaturas ou compre no mercado para encher a mochila."
+              ? "Hunt creatures or buy at the market to fill the bag."
               : "Nenhum item de " +
                 (inventoryCategoryFilterOptions().find((option) => option.key === filter)?.label ??
                   "categoria").toLowerCase() +

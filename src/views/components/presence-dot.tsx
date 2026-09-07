@@ -13,8 +13,8 @@ const SIZES = {
 } as const;
 
 export const PRESENCE_LABELS: Record<PresenceStatus, string> = {
-  active: "Online na aba do jogo",
-  away: "Jogo aberto em segundo plano",
+  active: "Online in the game tab",
+  away: "Game open in the background",
   offline: "Offline",
 };
 

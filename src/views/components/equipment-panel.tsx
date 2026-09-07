@@ -42,7 +42,7 @@ export function EquipmentPanel({ gear, forge }: { gear: GearSlot[]; forge: numbe
             </span>
             <div className="flex min-w-0 grow items-center px-4 py-3">
               <div className="min-w-0 space-y-1">
-                <p className="truncate text-sm text-ink">{item ? item.name : "Nada equipado"}</p>
+                <p className="truncate text-sm text-ink">{item ? item.name : "Nothing equipped"}</p>
                 <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                   {SLOT_LABEL[slot]}
                 </p>

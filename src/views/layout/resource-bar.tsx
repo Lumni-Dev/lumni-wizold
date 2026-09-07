@@ -33,7 +33,7 @@ export function ResourceBar() {
                   Vida (Recuperando-se... <RestSeconds />)
                 </>
               ) : (
-                "Vida"
+                "Health"
               )
             }
             current={character.health}
@@ -50,7 +50,7 @@ export function ResourceBar() {
             }
           />
           <Bar
-            label="Baú"
+            label="Chest"
             current={character.bronze}
             maximum={BAU_LIMIT}
             tone="ember"

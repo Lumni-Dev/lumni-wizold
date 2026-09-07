@@ -66,7 +66,7 @@ function formatRemaining(ms: number): string {
 
 function expiryLine(listing: BazaarListing, now: number): string {
   const remaining = listingExpiresAt(listing) - now;
-  if (remaining <= 0) return "Expira a qualquer instante.";
+  if (remaining <= 0) return "Expires at any moment.";
   return "Expira em " + formatRemaining(remaining) + ".";
 }
 
@@ -165,7 +165,7 @@ export function BazaarScreen() {
     <>
       <PageHeader
         title="Bazar"
-        description="Onde o que saiu da bigorna troca de dono por dinheiro de verdade. Só peça forjada e fragmento entram: o que o mercado vende, o mercado resolve."
+        description="Where what left the anvil changes hands for real money. Only forged pieces and fragments enter: what the market sells, the market settles."
         action={
           <Button
             variant="primary"
@@ -179,7 +179,7 @@ export function BazaarScreen() {
       />
 
       <Panel
-        title="Alforje"
+        title="Saddlebag"
         description={
           "A bolsa de couro onde cai o dinheiro das suas vendas, já sem a parte da casa. O saque " +
           "sai a partir de " +
@@ -191,8 +191,8 @@ export function BazaarScreen() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span className="text-[11px] text-ink-faint">
               {state.wallet.cents >= MIN_WITHDRAW_CENTS
-                ? "Disponível para saque."
-                : "O saldo cresce quando um anúncio seu é vendido."}
+                ? "Available to withdraw."
+                : "The balance grows when a listing of yours sells."}
             </span>
             <Button
               variant="outline"
@@ -213,15 +213,15 @@ export function BazaarScreen() {
 
       {board.length === 0 ? (
         <EmptyState
-          title="Quadro vazio"
-          description="Nenhum anúncio no momento. Forje uma peça ou minere fragmentos e anuncie."
+          title="Empty board"
+          description="No listings right now. Forge a piece or mine fragments and announce."
         />
       ) : (
         <>
           <FilterRow>
             <FilterSelect
               accent
-              label="Categoria"
+              label="Category"
               value={category}
               options={slotCategoryFilterOptions({ includeMaterial: true })}
               onChange={setCategory}
@@ -229,7 +229,7 @@ export function BazaarScreen() {
             />
             <FilterSelect
               accent
-              label="Conjunto"
+              label="Set"
               value={set}
               options={setFilterOptions()}
               onChange={setSet}
@@ -238,9 +238,9 @@ export function BazaarScreen() {
             <div className={FILTER_COLUMN}>
               <Field
                 accent
-                label="Busca"
-                aria-label="Buscar anúncio pelo nome da peça"
-                placeholder="Nome da peça"
+                label="Search"
+                aria-label="Search listings by piece name"
+                placeholder="Piece name"
                 value={search}
                 autoComplete="off"
                 onChange={(event) => {
@@ -252,7 +252,7 @@ export function BazaarScreen() {
           </FilterRow>
 
           {filteredBoard.length === 0 ? (
-            <FilteredEmptyState description="Nenhum anúncio combina com a categoria escolhida." />
+            <FilteredEmptyState description="No listing matches the chosen category." />
           ) : (
             <>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -269,7 +269,7 @@ export function BazaarScreen() {
                           href={entry.mine ? "/character" : "/ranking/" + entry.listing.sellerId}
                           className="transition-colors hover:text-highlight"
                         >
-                          {entry.mine ? "Seu anúncio" : "por " + entry.listing.sellerName}
+                          {entry.mine ? "Your listing" : "por " + entry.listing.sellerName}
                         </Link>
                         {entry.mine
                           ? " - " +
@@ -278,7 +278,7 @@ export function BazaarScreen() {
                           : null}
                         <span className="block">
                           {entry.expired
-                            ? "Vencido: remova para recolher as peças."
+                            ? "Expired: remove it to collect the pieces."
                             : expiryLine(entry.listing, now)}
                         </span>
                       </>
@@ -299,7 +299,7 @@ export function BazaarScreen() {
                           }
                         >
                           {entry.mine
-                            ? "Remover"
+                            ? "Remove"
                             : "Comprar por " + formatReais(entry.listing.priceCents)}
                         </Button>
                       </div>
@@ -316,7 +316,7 @@ export function BazaarScreen() {
 
       <Modal
         open={flow?.kind === "announce"}
-        title="Anunciar"
+        title="Announce"
         onClose={() => setFlow(null)}
         footer={
           flow?.kind === "announce" && announcing ? (
@@ -379,7 +379,7 @@ export function BazaarScreen() {
               />
 
               <Field
-                label="Preço por unidade"
+                label="Price per unit"
                 placeholder="R$ 0,00"
                 inputMode="numeric"
                 className="font-mono"
@@ -414,8 +414,8 @@ export function BazaarScreen() {
           ) : sellable.length === 0 ? (
             <div className="p-4">
               <EmptyState
-                title="Nada elegível"
-                description="Forje uma peça que não esteja no corpo, ou minere fragmentos: é o que o bazar aceita."
+                title="Nothing eligible"
+                description="Forge a piece that is off the body, or mine fragments: that is what the bazaar accepts."
               />
             </div>
           ) : (
@@ -455,7 +455,7 @@ export function BazaarScreen() {
 
       <Modal
         open={flow?.kind === "buy"}
-        title="Comprar"
+        title="Buy"
         onClose={() => setFlow(null)}
         footer={
           flow?.kind === "buy" && buying ? (
@@ -513,12 +513,12 @@ export function BazaarScreen() {
 
       <PaymentModal
         open={flow?.kind === "withdraw"}
-        title="Solicitar saque"
+        title="Request withdrawal"
         mode="payout"
         amountCents={state.wallet.cents}
-        amountLabel="Disponível para saque"
-        confirmLabel="Solicitar"
-        note="O saque desta versão é de demonstração: o pedido fica registrado com estes dados e nada é transferido ainda."
+        amountLabel="Available to withdraw"
+        confirmLabel="Request"
+        note="Withdrawal in this version is a demonstration: the request is recorded with this data and nothing is transferred yet."
         onClose={() => setFlow(null)}
         onConfirm={(payer) =>
           requestWithdraw(payer.pixKey, payer.name, payer.cpf).then((ok) => {
@@ -529,9 +529,9 @@ export function BazaarScreen() {
 
       <ConfirmDialog
         open={cancelling !== null}
-        title="Remover anúncio"
-        description="As cópias voltam para a mochila e o lugar na fila de venda se perde."
-        confirmLabel="Remover"
+        title="Remove listing"
+        description="The copies return to the bag and the place in the sale queue is lost."
+        confirmLabel="Remove"
         onCancel={() => setCancelling(null)}
         onConfirm={async () => {
           if (cancelling) await cancelListing(cancelling);

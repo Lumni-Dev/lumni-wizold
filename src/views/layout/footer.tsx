@@ -43,7 +43,7 @@ export function Footer() {
           </div>
 
           <div className="flex flex-col items-start gap-4 sm:items-end">
-            <nav aria-label="Contato da Lumni" className="space-y-3 sm:text-right">
+            <nav aria-label="Lumni contact" className="space-y-3 sm:text-right">
               <h2 className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">Contato</h2>
               <ul className="space-y-2">
                 {COMPANY.channels.map((channel) => (

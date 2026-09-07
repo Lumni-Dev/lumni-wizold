@@ -25,8 +25,8 @@ export function HunterSearchField({
       accent={accent}
       label={label}
       className={className}
-      aria-label="Buscar caçador pelo nome"
-      placeholder="Buscar caçador pelo nome"
+      aria-label="Search hunter by name"
+      placeholder="Search hunter by name"
       value={value}
       maxLength={NAME_MAX_LENGTH}
       autoComplete="off"
