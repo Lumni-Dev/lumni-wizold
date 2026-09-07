@@ -84,6 +84,7 @@ export function useNarration(): Narration {
   return useMemo(() => ({ current, play, stop, toggle }), [current, play, stop, toggle]);
 }
 
-export function areaVoice(territoryId: string): string {
-  return "/assets/voice/area-" + territoryId + ".mp3?v=1";
+export function areaVoice(territoryId: string, locale: "pt" | "en" | "es" = "pt"): string {
+  const suffix = locale === "pt" ? "" : "." + locale;
+  return "/assets/voice/area-" + territoryId + suffix + ".mp3?v=1";
 }

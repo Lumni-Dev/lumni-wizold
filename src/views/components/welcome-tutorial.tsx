@@ -2,8 +2,9 @@
 
 import { useEffect } from "react";
 import { useGame } from "@/controllers/game.context";
+import { useLocale } from "@/controllers/use-locale";
 import { useNarration } from "@/controllers/use-narration";
-import { WELCOME_CHAPTER, WELCOME_PARAGRAPHS } from "@/models/data/lore";
+import { welcomePack } from "@/models/data/lore.i18n";
 import { Button } from "./button";
 import { Modal } from "./modal";
 import { NarrationButton } from "./narration-button";
@@ -19,12 +20,15 @@ export function WelcomeTutorial({
 }) {
   const { completeTutorial } = useGame();
   const { current, play, stop, toggle } = useNarration();
+  const locale = useLocale();
+  const welcome = welcomePack(locale);
+  const voice = welcome.voice;
 
   useEffect(() => {
     if (!open) return undefined;
-    play(WELCOME_CHAPTER.voice);
+    play(voice);
     return () => stop();
-  }, [open, play, stop]);
+  }, [open, play, stop, voice]);
 
   async function start() {
     if (persist) {
@@ -38,7 +42,7 @@ export function WelcomeTutorial({
   return (
     <Modal
       open={open}
-      title={WELCOME_CHAPTER.title}
+      title={welcome.title}
       onClose={onFinished}
       dismissible={false}
       className="max-w-lg"
@@ -49,14 +53,14 @@ export function WelcomeTutorial({
       }
     >
       <div className="space-y-3 p-4">
-        {WELCOME_PARAGRAPHS.map((paragraph) => (
+        {welcome.paragraphs.map((paragraph) => (
           <p key={paragraph} className="text-xs leading-relaxed text-ink-soft">
             {paragraph}
           </p>
         ))}
         <NarrationButton
-          playing={current === WELCOME_CHAPTER.voice}
-          onClick={() => toggle(WELCOME_CHAPTER.voice)}
+          playing={current === voice}
+          onClick={() => toggle(voice)}
           label="Ouvir a apresentação"
         />
       </div>

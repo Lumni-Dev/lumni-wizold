@@ -616,6 +616,8 @@ export const EN: Record<string, string> = {
   "Próxima tela": "Next screen",
   "Tela anterior": "Previous screen",
   "Ouvir a apresentação": "Listen to the introduction",
+  "Começar jogo": "Start the game",
+  "Bem-vindo": "Welcome",
 
   // Tavern extras
   "Se sentou": "Sat down",

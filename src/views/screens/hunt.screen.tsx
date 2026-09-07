@@ -12,7 +12,7 @@ import {
 } from "@/controllers/hunt.controller";
 import { ACTIVITY_WAIT_LABEL, useActivityLock } from "@/controllers/use-activity-lock";
 import { areaVoice, useNarration } from "@/controllers/use-narration";
-import { useT } from "@/controllers/use-locale";
+import { useLocale, useT } from "@/controllers/use-locale";
 import {
   emphasizeDamage,
   huntPreyView,
@@ -170,6 +170,7 @@ export function HuntScreen() {
   const waitLabel = locked ? ACTIVITY_WAIT_LABEL : "";
   const narration = useNarration();
   const t = useT();
+  const locale = useLocale();
   const { activity, runtime } = useVisibleActivity();
   const huntRt = runtime.hunt;
   const paused = activity?.paused === true;
@@ -418,8 +419,8 @@ export function HuntScreen() {
                       {t(territory.description)}
                     </p>
                     <NarrationButton
-                      playing={narration.current === areaVoice(territory.id)}
-                      onClick={() => narration.toggle(areaVoice(territory.id))}
+                      playing={narration.current === areaVoice(territory.id, locale)}
+                      onClick={() => narration.toggle(areaVoice(territory.id, locale))}
                       label={"Ouvir sobre " + territory.name}
                     />
                   </div>

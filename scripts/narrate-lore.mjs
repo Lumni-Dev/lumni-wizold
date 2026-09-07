@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -35,7 +35,9 @@ if (!key) {
   process.exit(1);
 }
 
-const args = process.argv.slice(2);
+const rawArgs = process.argv.slice(2);
+const missingOnly = rawArgs.includes("--missing");
+const args = rawArgs.filter((entry) => entry !== "--missing");
 const locale = args[0] === "en" || args[0] === "es" ? args[0] : "pt";
 
 function joinedStrings(source) {
@@ -63,6 +65,29 @@ if (locale !== "pt") {
       const name = set.names[index];
       if (name && text) chapters.push({ name: name + "." + locale, text });
     });
+  }
+
+  // The welcome speech lives as a paragraph list in lore.i18n.ts.
+  const welcome = i18n.match(new RegExp("const " + prefix + "_WELCOME[\\s\\S]*?\\n\\];"))?.[0] ?? "";
+  const welcomeText = Array.from(welcome.matchAll(/"((?:[^"\\]|\\.)*)"/g))
+    .map((match) => match[1])
+    .join(" ");
+  if (welcomeText) chapters.push({ name: "welcome." + locale, text: welcomeText });
+
+  // Area descriptions ride the display dictionary, keyed by the pt text.
+  const dict = readFileSync(join(ROOT, "src", "shared", "i18n", locale + ".ts"), "utf8");
+  const translations = new Map();
+  for (const match of dict.matchAll(/"((?:[^"\\]|\\.)*)":\s*\n?\s*"((?:[^"\\]|\\.)*)"/g)) {
+    translations.set(match[1], match[2]);
+  }
+  const AREAS = join(ROOT, "src", "models", "data", "areas");
+  for (const entry of readdirSync(AREAS)) {
+    if (!entry.endsWith(".ts") || entry === "index.ts" || entry === "types.ts") continue;
+    const source = readFileSync(join(AREAS, entry), "utf8");
+    const id = source.match(/id:\s*"([^"]+)"/)?.[1];
+    const description = source.match(/description:\s*"((?:[^"\\]|\\.)*)"/)?.[1];
+    const translated = description ? translations.get(description) : undefined;
+    if (id && translated) chapters.push({ name: "area-" + id + "." + locale, text: translated });
   }
 } else {
   const lore = readFileSync(join(ROOT, "src", "models", "data", "lore.ts"), "utf8");
@@ -108,6 +133,10 @@ if (wanted.length === 0) {
 const TMP = mkdtempSync(join(tmpdir(), "wizold-narrate-"));
 
 for (const chapter of wanted) {
+  if (missingOnly && existsSync(join(OUT, chapter.name + ".mp3"))) {
+    console.log(chapter.name.padEnd(10) + "já existe");
+    continue;
+  }
   const answer = await fetch(
     "https://api.elevenlabs.io/v1/text-to-speech/" + VOICE_ID + "?output_format=mp3_44100_128",
     {

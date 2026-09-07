@@ -4,6 +4,8 @@ import {
   LORE_COMPANIONS,
   LORE_COUPLE,
   LORE_PILLARS,
+  WELCOME_PARAGRAPHS,
+  WELCOME_VOICE,
   type LoreChapter,
   type LoreCompanion,
   type LorePillar,
@@ -220,6 +222,44 @@ const ES_PILLARS: readonly LorePillar[] = [
       "dos hombres lobo lo resuelven a mano.",
   },
 ];
+
+const EN_WELCOME: readonly string[] = [
+  "You crossed the door. This is your place in the night.",
+  "On the sheet you see the body, the fury and what Willpower holds. On the hunt, only the beast goes out: gather the fury, turn, and come back before the clock runs out. The yard trains what the level does not give. The mine and the forge pay for the metal. The market and the bazaar trade what you carry. The pit measures equals. The tavern is table and pack.",
+  "Before anything, open the Settings. There you turn the sound and the soundtrack on or off, and choose the music volume. There you decide whether the background lives in video or stays still, and how closed the screen's veil gets. There the Tavern can ring your device when the table speaks. And there are the automation keys: hunt, train, mine, forge, drink and care for the wolf without you standing over every lap.",
+  "Nothing turns on by itself. Every key is yours. When the night is set your way, the door no longer needs a guide.",
+];
+
+const ES_WELCOME: readonly string[] = [
+  "Cruzaste la puerta. Este es tu lugar en la noche.",
+  "En la ficha ves el cuerpo, la furia y lo que la Voluntad sostiene. En la caza solo sale la bestia: junta la furia, transfórmate y vuelve antes de que acabe el reloj. El patio entrena lo que el nivel no da. La mina y la forja pagan el metal. El mercado y el bazar cambian lo que llevas. El foso mide a iguales. La taberna es mesa y manada.",
+  "Antes de todo, abre la Configuración. Allí enciendes o cortas el sonido y la banda sonora, y eliges el volumen de la música. Allí decides si el fondo vive en video o queda quieto, y qué tan cerrado queda el velo de la pantalla. Allí la Taberna puede avisar en tu dispositivo cuando la mesa habla. Y allí están las llaves de la automatización: cazar, entrenar, minar, forjar, beber y cuidar del lobo sin que estés encima de cada vuelta.",
+  "Nada se enciende solo. Cada llave es tuya. Cuando la noche esté a tu manera, la puerta ya no necesita guía.",
+];
+
+export interface WelcomePack {
+  title: string;
+  paragraphs: readonly string[];
+  voice: string;
+}
+
+export function welcomePack(locale: Locale): WelcomePack {
+  if (locale === "en") {
+    return {
+      title: "Welcome",
+      paragraphs: EN_WELCOME,
+      voice: localizedVoice(WELCOME_VOICE, "en"),
+    };
+  }
+  if (locale === "es") {
+    return {
+      title: "Bienvenido",
+      paragraphs: ES_WELCOME,
+      voice: localizedVoice(WELCOME_VOICE, "es"),
+    };
+  }
+  return { title: "Bem-vindo", paragraphs: WELCOME_PARAGRAPHS, voice: WELCOME_VOICE };
+}
 
 const COUPLE_TITLES: Record<Exclude<Locale, "pt">, LoreCoupleText> = {
   en: {
