@@ -99,6 +99,11 @@ export function ActivityDock() {
       preyView.combat,
     );
     const monsterStatus = replaying ? "Atacando" : filling ? "Preparando" : "Aguardando";
+    const healthLost = replaying
+      ? script
+          .slice(0, Math.min(beat, script.length))
+          .reduce((sum, entry) => sum + (entry.blow === "theirs" ? (entry.damage ?? 0) : 0), 0)
+      : 0;
     const opting = cooldown !== null;
     const status = opting
       ? "Pode parar agora ou seguir para a próxima."
@@ -111,9 +116,11 @@ export function ActivityDock() {
     return {
       hunterCurrent: character?.health ?? 0,
       hunterMax: Math.max(1, stats?.maxHealth ?? 1),
+      healthLost,
       preyLabel: monsterStatus + " · " + (shownFoe?.name ?? "?"),
       preyCurrent: monsterCurrent,
       preyMax: monsterMax,
+      preyLost: Math.max(0, monsterMax - monsterCurrent),
       huntLabel: approach ? "Procurando criatura..." : "Caçando...",
       huntCurrent: cooldown !== null ? cooldown : approach ? approach.beat : beat,
       huntMax:
@@ -489,6 +496,11 @@ export function ActivityDock() {
                       current={huntView.hunterCurrent}
                       maximum={huntView.hunterMax}
                       tone="blood"
+                      delta={
+                        huntView.healthLost > 0
+                          ? "-" + formatNumber(huntView.healthLost)
+                          : undefined
+                      }
                     />
                   </ListRow>
                   <ListRow layout="column">
@@ -497,6 +509,9 @@ export function ActivityDock() {
                       current={huntView.preyCurrent}
                       maximum={huntView.preyMax}
                       tone="blood"
+                      delta={
+                        huntView.preyLost > 0 ? "-" + formatNumber(huntView.preyLost) : undefined
+                      }
                     />
                   </ListRow>
                   <ListRow layout="column">
