@@ -14,6 +14,7 @@ export function ResourceBar() {
   const { character, stats } = useGame();
   const { activity } = useVisibleActivity();
   const bronzeGained = useGained(character?.bronze ?? 0);
+  const healthLost = useGained(-(character?.health ?? 0));
   const experienceGained = useGained(
     character ? totalExperience(character.level, character.experience) : 0,
   );
@@ -40,7 +41,13 @@ export function ResourceBar() {
             glows={resting && character.health < stats.maxHealth}
             tone="blood"
             prominent
-            delta={resting ? <RestHealed /> : undefined}
+            delta={
+              resting ? (
+                <RestHealed />
+              ) : healthLost > 0 ? (
+                "-" + formatNumber(healthLost)
+              ) : undefined
+            }
           />
           <Bar
             label="Baú"
