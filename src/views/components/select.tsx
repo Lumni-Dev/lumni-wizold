@@ -2,6 +2,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { playClick } from "@/controllers/sound";
+import { useT } from "@/controllers/use-locale";
 import { CONTROL_HEIGHT, GLASS_CONTROL, GLASS_CONTROL_ACTIVE, GLASS_SECTION } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { ChipFrame } from "./chip";
@@ -47,6 +48,7 @@ export function Select({
 }: SelectProps) {
   const [open, setOpen] = useState(false);
   const [highlighted, setHighlighted] = useState(-1);
+  const t = useT();
   const rootRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const typedRef = useRef({ text: "", at: 0 });
@@ -136,7 +138,7 @@ export function Select({
     <div className={cn("block space-y-2", className)}>
       {label ? (
         <span className="block text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-          {label}
+          {t(label)}
         </span>
       ) : null}
 
@@ -162,7 +164,7 @@ export function Select({
                 disabled && "opacity-60",
               )}
             >
-              <span className="truncate">{selected ? selected.label : placeholder}</span>
+              <span className="truncate">{t(selected ? selected.label : placeholder)}</span>
               <ChevronDown
                 aria-hidden
                 className={cn(
@@ -192,7 +194,7 @@ export function Select({
               disabled && "opacity-60",
             )}
           >
-            <span className="truncate">{selected ? selected.label : placeholder}</span>
+            <span className="truncate">{t(selected ? selected.label : placeholder)}</span>
             <ChevronDown
               aria-hidden
               className={cn(
@@ -232,7 +234,7 @@ export function Select({
                     : "text-ink-soft hover:bg-surface-high/50 hover:text-ink",
                 )}
               >
-                {option.label}
+                {t(option.label)}
               </li>
             ))}
           </ul>

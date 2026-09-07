@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useGame } from "@/controllers/game.context";
 import { listForge, listMining } from "@/controllers/forge.controller";
 import { ACTIVITY_WAIT_LABEL, useActivityLock } from "@/controllers/use-activity-lock";
+import { useT } from "@/controllers/use-locale";
 import { useVisibleActivity } from "@/controllers/use-visible-activity";
 import type { Activity } from "@/models/entities/activity";
 import {
@@ -58,6 +59,7 @@ const FORGE_PAGE_SIZE = 5;
 
 export function ForgeScreen() {
   const { state, character, setActivity } = useGame();
+  const t = useT();
   const { locked } = useActivityLock();
   const waitLabel = locked ? ACTIVITY_WAIT_LABEL : "";
   const { activity, runtime } = useVisibleActivity();
@@ -247,7 +249,7 @@ export function ForgeScreen() {
                   deltaTone="tide"
                 />
                 <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                  {"Reseta às " + RESET_LABEL + ", faltam " + formatCountdown(miningResetLeft)}
+                  {t("Reseta às " + RESET_LABEL + ", faltam " + formatCountdown(miningResetLeft))}
                 </p>
               </ListRow>
               <ListRow layout="column">
@@ -263,21 +265,23 @@ export function ForgeScreen() {
               <ListRow layout="column">
                 <div className="flex items-center justify-between gap-3">
                   <span className="min-w-0 flex-1 truncate text-[11px] text-ink-faint">
-                    {activeOre
-                      ? mineOpting
-                        ? "Segue sozinha..."
-                        : state.automation.mine
-                          ? "Minerando sem parar..."
-                          : "Minerando..."
-                      : waitingOre
-                        ? "Esperando recursos para voltar a minerar"
-                        : mining.dailyExhausted
-                          ? "Recursos esgotados, voltam em " + formatCountdown(miningResetLeft)
-                          : selectedEntry
-                            ? selectedEntry.unlocked
-                              ? selectedEntry.ore.label
-                              : (selectedEntry.reason ?? "Veio bloqueado")
-                            : "Escolha um veio"}
+                    {t(
+                      activeOre
+                        ? mineOpting
+                          ? "Segue sozinha..."
+                          : state.automation.mine
+                            ? "Minerando sem parar..."
+                            : "Minerando..."
+                        : waitingOre
+                          ? "Esperando recursos para voltar a minerar"
+                          : mining.dailyExhausted
+                            ? "Recursos esgotados, voltam em " + formatCountdown(miningResetLeft)
+                            : selectedEntry
+                              ? selectedEntry.unlocked
+                                ? selectedEntry.ore.label
+                                : (selectedEntry.reason ?? "Veio bloqueado")
+                              : "Escolha um veio",
+                    )}
                   </span>
                   <Button
                     variant={activeOre ? "secondary" : selectedAvailable ? "primary" : "outline"}
@@ -372,14 +376,14 @@ export function ForgeScreen() {
                         <>
                           {forgeEntry.attributes.map((attribute) => (
                             <p key={attribute.key} className="font-mono text-ink-soft">
-                              {attribute.name} {formatFraction(attribute.exact)}
+                              {t(attribute.name)} {formatFraction(attribute.exact)}
                               {forgeEntry.level >= MAX_ENHANCEMENT ? (
                                 ""
                               ) : (
                                 <>
                                   {" → " + formatFraction(attribute.nextExact)}
                                   <span className="text-ink-faint">
-                                    {" (+" + formatFraction(attribute.gain) + " por nível)"}
+                                    {" (+" + formatFraction(attribute.gain) + " " + t("por nível") + ")"}
                                   </span>
                                 </>
                               )}
@@ -387,8 +391,8 @@ export function ForgeScreen() {
                           ))}
                           {forgeEntry.level > 0 ? (
                             <p className="font-mono text-[10px]">
-                              Já somou +{formatFraction(forgeEntry.exactBonus)} de atributos com a
-                              forja
+                              {t("Já somou")} +{formatFraction(forgeEntry.exactBonus)}{" "}
+                              {t("de atributos com a forja")}
                             </p>
                           ) : null}
                         </>
@@ -423,17 +427,19 @@ export function ForgeScreen() {
                   <ListRow layout="column">
                     <div className="flex items-center justify-between gap-3">
                       <span className="min-w-0 flex-1 truncate text-[11px] text-ink-faint">
-                        {forgeActive
-                          ? forgeOpting
-                            ? "Segue sozinho..."
-                            : state.automation.forge
-                              ? "Forjando sem parar..."
-                              : "Forjando..."
-                          : waitingItem === forgeEntry.item.id
-                            ? "Esperando fragmentos e WCoins para a próxima martelada"
-                            : forgeEntry.fragment && forgeEntry.level < MAX_ENHANCEMENT
-                              ? "Forjar custa " + formatBronze(forgeEntry.bronzeCost)
-                              : (forgeEntry.reason ?? "Peça no teto")}
+                        {t(
+                          forgeActive
+                            ? forgeOpting
+                              ? "Segue sozinho..."
+                              : state.automation.forge
+                                ? "Forjando sem parar..."
+                                : "Forjando..."
+                            : waitingItem === forgeEntry.item.id
+                              ? "Esperando fragmentos e WCoins para a próxima martelada"
+                              : forgeEntry.fragment && forgeEntry.level < MAX_ENHANCEMENT
+                                ? "Forjar custa " + formatBronze(forgeEntry.bronzeCost)
+                                : (forgeEntry.reason ?? "Peça no teto"),
+                        )}
                       </span>
                       <Button
                         variant={

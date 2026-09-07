@@ -2,11 +2,12 @@
 
 import { useEffect, type ReactNode } from "react";
 import { playSound } from "@/controllers/sound";
+import { useT } from "@/controllers/use-locale";
 import { cn } from "@/shared/utils/class-names";
 
 export function Modal({
   open,
-  title,
+  title: rawTitle,
   leading,
   onClose,
   action,
@@ -25,6 +26,9 @@ export function Modal({
   dismissible?: boolean;
   className?: string;
 }) {
+  const t = useT();
+  const title = t(rawTitle);
+
   useEffect(() => {
     if (!open) return undefined;
 

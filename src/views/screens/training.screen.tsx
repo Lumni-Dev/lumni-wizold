@@ -9,6 +9,7 @@ import {
   trainingSummary,
 } from "@/controllers/training.controller";
 import { ACTIVITY_WAIT_LABEL, useActivityLock } from "@/controllers/use-activity-lock";
+import { useT } from "@/controllers/use-locale";
 import { useVisibleActivity } from "@/controllers/use-visible-activity";
 import { petTotalTraining } from "@/models/rules/pet";
 import { totalExperience } from "@/models/rules/progression";
@@ -32,6 +33,7 @@ import { PageHeader } from "../layout/page-header";
 
 export function TrainingScreen() {
   const { state, character, stats, moon, setActivity } = useGame();
+  const t = useT();
   const { locked } = useActivityLock();
   const waitLabel = locked ? ACTIVITY_WAIT_LABEL : "";
   const { activity, runtime } = useVisibleActivity();
@@ -132,24 +134,25 @@ export function TrainingScreen() {
                 <CardBody>
                   <ul className="list-disc space-y-1 pl-4 text-xs leading-relaxed text-ink-soft">
                     <li>
-                      Atualmente você tem{" "}
-                      <strong className="font-bold">{formatFraction(exactValue)}</strong> pontos de{" "}
-                      {row?.name ?? exercise.name}
+                      {t("Atualmente você tem")}{" "}
+                      <strong className="font-bold">{formatFraction(exactValue)}</strong>{" "}
+                      {t("pontos de")} {row?.name ?? exercise.name}
                     </li>
                     <li>
                       <strong className="font-bold">+{formatFraction(summary.pointShare)}</strong>{" "}
-                      ponto por sessão
+                      {t("ponto por sessão")}
                     </li>
                     <li>
-                      <strong className="font-bold">+{formatNumber(summary.progress)}</strong> de
-                      experiência por sessão
+                      <strong className="font-bold">+{formatNumber(summary.progress)}</strong>{" "}
+                      {t("de experiência por sessão")}
                       {moon.phase.trainingBonus > 0
-                        ? " (+" + Math.round(moon.phase.trainingBonus * 100) + "% lua)"
+                        ? " (+" + Math.round(moon.phase.trainingBonus * 100) + "% " + t("lua") + ")"
                         : ""}
                     </li>
                     <li>
-                      Ponto fecha em cerca de{" "}
-                      <strong className="font-bold">{formatNumber(summary.sessions)}</strong> sessões
+                      {t("Ponto fecha em cerca de")}{" "}
+                      <strong className="font-bold">{formatNumber(summary.sessions)}</strong>{" "}
+                      {t("sessões")}
                     </li>
                   </ul>
                 </CardBody>
@@ -184,15 +187,17 @@ export function TrainingScreen() {
 
                 <CardFooter>
                   <span className="min-w-0 flex-1 truncate text-[11px] text-ink-faint">
-                    {active
-                      ? opting
-                        ? "Segue sozinho..."
-                        : state.automation.train
-                          ? "Treinando sem parar..."
-                          : "Treinando..."
-                      : waitingExercise === exercise.id
-                        ? "Esperando para continuar"
-                        : reason}
+                    {t(
+                      active
+                        ? opting
+                          ? "Segue sozinho..."
+                          : state.automation.train
+                            ? "Treinando sem parar..."
+                            : "Treinando..."
+                        : waitingExercise === exercise.id
+                          ? "Esperando para continuar"
+                          : (reason ?? ""),
+                    )}
                   </span>
                   <Button
                     variant={active ? "secondary" : ready ? "primary" : "outline"}
@@ -237,18 +242,19 @@ export function TrainingScreen() {
               <CardBody>
                 <ul className="list-disc space-y-1 pl-4 text-xs leading-relaxed text-ink-soft">
                   <li>
-                    <strong className="font-bold">+1</strong> Força,{" "}
-                    <strong className="font-bold">+1</strong> Agilidade e{" "}
-                    <strong className="font-bold">+1</strong> Instinto por nível
+                    <strong className="font-bold">+1</strong> {t("Força")},{" "}
+                    <strong className="font-bold">+1</strong> {t("Agilidade")}{" "}
+                    {t("e")} <strong className="font-bold">+1</strong> {t("Instinto")}{" "}
+                    {t("por nível")}
                   </li>
                   <li>
                     <strong className="font-bold">
                       +{formatFraction(petTraining.effort.progress / petTraining.needed)}
                     </strong>{" "}
-                    de nível por treinamento
+                    {t("de nível por treinamento")}
                   </li>
                   <li>
-                    Treino por{" "}
+                    {t("Treino por")}{" "}
                     <strong className="font-bold">{formatBronze(petTraining.cost)}</strong>
                   </li>
                 </ul>
@@ -284,13 +290,15 @@ export function TrainingScreen() {
 
               <CardFooter>
                 <span className="min-w-0 flex-1 truncate text-[11px] text-ink-faint">
-                  {petActive
-                    ? cooldown !== null
-                      ? "Segue sozinho..."
-                      : state.automation.train
-                        ? "Treinando sem parar..."
-                        : "Treinando..."
-                    : petTraining.reason}
+                  {t(
+                    petActive
+                      ? cooldown !== null
+                        ? "Segue sozinho..."
+                        : state.automation.train
+                          ? "Treinando sem parar..."
+                          : "Treinando..."
+                      : (petTraining.reason ?? ""),
+                  )}
                 </span>
                 <Button
                   variant={petActive ? "secondary" : petReady ? "primary" : "outline"}

@@ -76,6 +76,10 @@ export function Button({
       aria-busy={pending || undefined}
       onClick={press}
       {...rest}
+      aria-label={
+        typeof rest["aria-label"] === "string" ? t(rest["aria-label"]) : rest["aria-label"]
+      }
+      title={typeof rest.title === "string" ? t(rest.title) : rest.title}
     >
       {pending ? (
         <span className="absolute inset-0 flex items-center justify-center">

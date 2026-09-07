@@ -9,6 +9,7 @@ import { useGame } from "@/controllers/game.context";
 import { activityCardStore } from "@/controllers/activity-card.store";
 import { useVisibleActivity } from "@/controllers/use-visible-activity";
 import { petTrainingView } from "@/controllers/pet.controller";
+import { useT } from "@/controllers/use-locale";
 import { listAttributeProgress, listExercises } from "@/controllers/training.controller";
 import { dockRepository } from "@/models/repositories/dock.repository";
 import {
@@ -43,6 +44,7 @@ import { useShake } from "./use-shake";
 
 export function ActivityDock() {
   const pathname = usePathname();
+  const t = useT();
   const { state, character, stats, pet, setActivity } = useGame();
   const { activity: running, runtime: dockRuntime } = useVisibleActivity();
   const dock = dockRuntime.dock;
@@ -423,7 +425,7 @@ export function ActivityDock() {
             href={dock.href}
             className="min-w-0 flex-1 truncate text-[10px] uppercase tracking-[0.16em] text-ink"
           >
-            {dock.title}
+            {t(dock.title)}
           </Link>
           {minimized && dock.canStop ? (
             <Tooltip label="Parar">
@@ -456,7 +458,7 @@ export function ActivityDock() {
               {paused ? (
                 <>
                   <ListRow layout="column">
-                    <p className="text-xs text-ink-faint">{dock.detail}</p>
+                    <p className="text-xs text-ink-faint">{t(dock.detail)}</p>
                   </ListRow>
                   {pausedView?.kind === "hunt" ? (
                     <ListRow layout="column">
@@ -713,7 +715,9 @@ export function ActivityDock() {
             </List>
 
             <div className="flex flex-col gap-3 border-t border-edge px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-              <span className="min-w-0 text-[11px] text-ink-faint sm:flex-1 sm:truncate">{statusText}</span>
+              <span className="min-w-0 text-[11px] text-ink-faint sm:flex-1 sm:truncate">
+                {t(statusText)}
+              </span>
               <Button
                 variant={dock.canStop ? "secondary" : "outline"}
                 disabled={!dock.canStop}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useGame } from "@/controllers/game.context";
+import { useT } from "@/controllers/use-locale";
 import { GLASS_SECTION } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { ActivityDock } from "../components/activity-dock";
@@ -11,6 +12,7 @@ import { TavernAlertDock } from "../components/tavern-alert-dock";
 
 export function GameCorner() {
   const { notices, dismissNotice } = useGame();
+  const t = useT();
 
   return (
     <div
@@ -29,7 +31,9 @@ export function GameCorner() {
             <div className="flex items-center gap-2 border-b border-edge px-3 py-2">
               <SourceIcon source={line.source} className="shrink-0 text-ink-faint" />
               {line.dot ? <PresenceDot status={line.dot} /> : null}
-              <span className="heading min-w-0 flex-1 truncate text-[10px] text-ink">{line.source}</span>
+              <span className="heading min-w-0 flex-1 truncate text-[10px] text-ink">
+                {t(line.source)}
+              </span>
               <button
                 type="button"
                 onClick={() => dismissNotice(line.id)}
@@ -47,7 +51,7 @@ export function GameCorner() {
                 line.ok ? "text-ink" : "text-ink-soft",
               )}
             >
-              {line.text}
+              {t(line.text)}
             </p>
           </div>
           <CornerAccents />

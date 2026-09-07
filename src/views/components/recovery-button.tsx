@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useT } from "@/controllers/use-locale";
 import { Button } from "./button";
 import { RestSeconds } from "./rest-seconds";
 import { Tooltip } from "./tooltip";
@@ -23,6 +24,7 @@ export function RecoveryButton({
   size?: "small" | "medium";
   fullWidth?: boolean;
 }) {
+  const t = useT();
   const button = (
     <Button
       size={size}
@@ -32,7 +34,7 @@ export function RecoveryButton({
     >
       {recovering ? (
         <>
-          {recoveringLabel} <RestSeconds />
+          {t(recoveringLabel)} <RestSeconds />
         </>
       ) : (
         label

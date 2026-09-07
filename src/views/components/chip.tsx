@@ -75,6 +75,9 @@ export function Chip({ active = false, className, onClick, children, ...rest }: 
         aria-busy={waiting || undefined}
         onClick={press}
         {...rest}
+        aria-label={
+          typeof rest["aria-label"] === "string" ? t(rest["aria-label"]) : rest["aria-label"]
+        }
       >
         {waiting ? (
           <span className="absolute inset-0 flex items-center justify-center">

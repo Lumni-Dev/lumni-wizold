@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useGame } from "@/controllers/game.context";
+import { useT } from "@/controllers/use-locale";
 import { useVisibleActivity } from "@/controllers/use-visible-activity";
 import { MIN_HEALTH_RATIO_TO_ACT } from "@/shared/constants/game";
 import { RecoveryButton } from "./recovery-button";
@@ -20,6 +21,7 @@ export function BodyGate({
   children: ReactNode;
 }) {
   const { character, stats, setActivity, rest } = useGame();
+  const t = useT();
   const { activity } = useVisibleActivity();
   if (!character || !stats || !open) return <>{children}</>;
 
@@ -35,7 +37,7 @@ export function BodyGate({
       beat={String(character.health)}
       recoveringLabel="Recuperando-se..."
       label="Recuperar-se"
-      tooltip={requireFull ? reason : "Vida baixa demais. " + reason}
+      tooltip={requireFull ? t(reason) : t("Vida baixa demais.") + " " + t(reason)}
       onClick={activity?.kind === "rest" ? () => setActivity(null) : rest}
     />
   );

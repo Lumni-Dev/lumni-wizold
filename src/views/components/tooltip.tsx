@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { useT } from "@/controllers/use-locale";
 import { cn } from "@/shared/utils/class-names";
 
 const MAX_WIDTH = 240;
@@ -19,6 +20,7 @@ export function Tooltip({
   className?: string;
 }) {
   const [at, setAt] = useState<{ left: number; top: number } | null>(null);
+  const t = useT();
 
   if (!label) return <>{children}</>;
 
@@ -50,7 +52,7 @@ export function Tooltip({
                 "shadow-[0_12px_32px_-12px_rgba(0,0,0,0.95)]",
               )}
             >
-              {label}
+              {typeof label === "string" ? t(label) : label}
             </span>,
             document.body,
           )

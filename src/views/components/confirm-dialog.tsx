@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import { useT } from "@/controllers/use-locale";
 import { Button } from "./button";
 import { Modal } from "./modal";
 
@@ -26,6 +27,7 @@ export function ConfirmDialog({
   onCancel: () => void;
 }) {
   const [pending, setPending] = useState(false);
+  const t = useT();
 
   const confirm = () => {
     const outcome = onConfirm();
@@ -52,7 +54,7 @@ export function ConfirmDialog({
       }
     >
       <div className="space-y-3 p-4">
-        <p className="text-xs leading-relaxed text-ink-faint">{description}</p>
+        <p className="text-xs leading-relaxed text-ink-faint">{t(description)}</p>
         {children}
         {detail ? <p className="font-mono text-[11px] text-ink-soft">{detail}</p> : null}
       </div>

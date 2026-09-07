@@ -12,6 +12,7 @@ import {
 } from "@/controllers/hunt.controller";
 import { ACTIVITY_WAIT_LABEL, useActivityLock } from "@/controllers/use-activity-lock";
 import { areaVoice, useNarration } from "@/controllers/use-narration";
+import { useT } from "@/controllers/use-locale";
 import {
   emphasizeDamage,
   huntPreyView,
@@ -167,6 +168,7 @@ export function HuntScreen() {
   const { locked } = useActivityLock();
   const waitLabel = locked ? ACTIVITY_WAIT_LABEL : "";
   const narration = useNarration();
+  const t = useT();
   const { activity, runtime } = useVisibleActivity();
   const huntRt = runtime.hunt;
   const paused = activity?.paused === true;
@@ -500,17 +502,19 @@ export function HuntScreen() {
                   ) : null}
                   <div className="flex flex-wrap items-center justify-between gap-3 p-4">
                     <span className="text-[11px] text-ink-faint">
-                      {active
-                        ? opting
-                          ? "Pode parar agora ou seguir para a próxima."
-                          : state.automation.hunt
-                            ? "Caçando sem parar..."
-                            : "Caçando..."
-                        : recovering
-                          ? "O corpo descansa antes da próxima caçada."
-                          : waiting
-                          ? "Esperando o corpo para voltar a caçar"
-                          : (reason ?? "Trilha liberada")}
+                      {t(
+                        active
+                          ? opting
+                            ? "Pode parar agora ou seguir para a próxima."
+                            : state.automation.hunt
+                              ? "Caçando sem parar..."
+                              : "Caçando..."
+                          : recovering
+                            ? "O corpo descansa antes da próxima caçada."
+                            : waiting
+                              ? "Esperando o corpo para voltar a caçar"
+                              : (reason ?? "Trilha liberada"),
+                      )}
                     </span>
                     <Button
                       variant={active ? "secondary" : available ? "primary" : "outline"}

@@ -1,4 +1,7 @@
+"use client";
+
 import type { InputHTMLAttributes } from "react";
+import { useT } from "@/controllers/use-locale";
 import { CONTROL_HEIGHT, LOOSE_CONTROL_SURFACE } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { CornerAccents } from "./corner-accents";
@@ -22,11 +25,12 @@ export function Field({
   maxLength,
   ...rest
 }: FieldProps) {
+  const t = useT();
   return (
     <label className="block space-y-2">
       {label ? (
         <span className="block text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-          {label}
+          {t(label)}
         </span>
       ) : null}
       <span className="relative block">
@@ -38,6 +42,7 @@ export function Field({
             className,
           )}
           {...rest}
+          placeholder={rest.placeholder ? t(rest.placeholder) : rest.placeholder}
           maxLength={maxLength}
           type={numeric ? "text" : rest.type}
           inputMode={numeric ? "numeric" : rest.inputMode}
@@ -52,7 +57,7 @@ export function Field({
         />
         {accent ? <CornerAccents scale="icon" inside /> : null}
       </span>
-      {hint ? <span className="block text-[10px] text-ink-faint">{hint}</span> : null}
+      {hint ? <span className="block text-[10px] text-ink-faint">{t(hint)}</span> : null}
     </label>
   );
 }

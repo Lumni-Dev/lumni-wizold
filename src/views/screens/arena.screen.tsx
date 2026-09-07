@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { api } from "@/controllers/api.client";
 import { ACTIVITY_WAIT_LABEL, useActivityLock } from "@/controllers/use-activity-lock";
+import { useT } from "@/controllers/use-locale";
 import { useGame } from "@/controllers/game.context";
 import {
   describeArenaHistory,
@@ -76,6 +77,7 @@ function Fighter({
 }
 function DuelReport({ report }: { report: ArenaResolution }) {
   const { combat, hunter } = report;
+  const t = useT();
   const outcome = combat.victory ? "Vitória" : combat.retreated ? "Empate" : "Derrota";
   return (
     <Panel
@@ -96,14 +98,16 @@ function DuelReport({ report }: { report: ArenaResolution }) {
         <div className="space-y-2 p-4">
           <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">O fosso</p>
           <p className="text-xs leading-relaxed text-ink-faint">
-            {combat.victory
-              ? hunter.name + " ficou no chão, e a bolsa é sua."
-              : combat.retreated
-                ? "Os dois aguentaram até o fim e ninguém pôs o outro no chão."
-                : hunter.name + " levou a melhor. Você sai por baixo, mas sai."}
+            {t(
+              combat.victory
+                ? hunter.name + " ficou no chão, e a bolsa é sua."
+                : combat.retreated
+                  ? "Os dois aguentaram até o fim e ninguém pôs o outro no chão."
+                  : hunter.name + " levou a melhor. Você sai por baixo, mas sai.",
+            )}
           </p>
           <p className="text-xs text-ink-faint">
-            O fosso não paga experiência: aqui as WCoins só trocam de dono.
+            {t("O fosso não paga experiência: aqui as WCoins só trocam de dono.")}
           </p>
         </div>
       </div>
@@ -127,6 +131,7 @@ export function ArenaScreen() {
   const { state, character, stats, pet, moon, drawOpponent, challengeArena, sufferBlow, landArena } =
     useGame();
   const { locked } = useActivityLock();
+  const t = useT();
   const waitLabel = locked ? ACTIVITY_WAIT_LABEL : "";
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -347,7 +352,7 @@ export function ArenaScreen() {
         footer={
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span className="text-[11px] text-ink-faint">
-              {view.reason ?? "Escolha um adversário da sua faixa ou busque um ao acaso."}
+              {t(view.reason ?? "Escolha um adversário da sua faixa ou busque um ao acaso.")}
             </span>
             <BodyGate
               open={!busy && view.charges.left > 0}
