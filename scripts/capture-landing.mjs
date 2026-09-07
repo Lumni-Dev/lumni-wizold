@@ -14,10 +14,10 @@ const CAPTURE_AS = process.env.CAPTURE_AS ?? "";
 
 const SHOTS = [
   { key: "character", path: "/character", ready: "Personagem" },
-  { key: "hunt", path: "/hunt", ready: "Caça" },
+  { key: "hunt", path: "/hunt", ready: "Hunt" },
   { key: "training", path: "/training", ready: "Treinamento" },
   { key: "market", path: "/market", ready: "Mercado", mark: "Comprar", settle: 4000 },
-  { key: "forge", path: "/forge", ready: "Forja" },
+  { key: "forge", path: "/forge", ready: "Forge" },
   { key: "arena", path: "/arena", ready: "Arena" },
   { key: "tavern", path: "/tavern", ready: "Taverna" },
 ];

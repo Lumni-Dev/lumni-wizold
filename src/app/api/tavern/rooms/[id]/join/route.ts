@@ -29,7 +29,7 @@ export async function POST(
         );
       }
       if (!verifySecret(asText(body.password, 60).trim(), hash)) {
-        return NextResponse.json({ ok: false, message: "Senha incorreta.", data: null });
+        return NextResponse.json({ ok: false, message: "Wrong password.", data: null });
       }
     }
     const result = tavernController.joinRoom(state, roomId, context.identity, "");

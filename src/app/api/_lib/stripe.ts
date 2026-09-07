@@ -7,7 +7,7 @@ const live = process.env.VERCEL_ENV === "production";
 
 function secretKey(): string {
   const value = live ? process.env.STRIPE_LIVE_SECRET_KEY : process.env.STRIPE_TEST_SECRET_KEY;
-  if (!value) throw new Error("Chave secreta do Stripe ausente no ambiente.");
+  if (!value) throw new Error("Stripe secret key missing from the environment.");
   return value;
 }
 

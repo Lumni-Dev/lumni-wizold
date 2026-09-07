@@ -66,9 +66,9 @@ console.log("");
 console.log("requests:", total, "in", (wallMs / 1000).toFixed(1) + "s of game phase");
 console.log("game phase throughput:", ((total - 90) / (wallMs / 1000)).toFixed(1), "req/s");
 console.log(
-  "latência p50:",
+  "latency p50:",
   at(0.5) + "ms   p95:",
-  at(0.95) + "ms   máx:",
+  at(0.95) + "ms   max:",
   Math.round(sorted[sorted.length - 1]) + "ms",
 );
 console.log("5xx errors:", errors, "   429 in the deliberate burst:", burst429);

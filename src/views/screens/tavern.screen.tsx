@@ -574,7 +574,7 @@ export function TavernScreen() {
               />
               <AiAuditNotice />
               <Field
-                label={hideName ? "Senha" : "Password (optional)"}
+                label={hideName ? "Password" : "Password (optional)"}
                 type="password"
                 maxLength={60}
                 value={roomPassword}
@@ -771,7 +771,7 @@ export function TavernScreen() {
               <Field
                 accent
                 aria-label="Search table by name or number"
-                placeholder="Buscar mesa pelo nome ou #"
+                placeholder="Search table by name or #"
                 value={roomSearch}
                 maxLength={ROOM_NAME_MAX_LENGTH}
                 autoComplete="off"
@@ -813,7 +813,7 @@ export function TavernScreen() {
                         ) : (
                           <>
                             {room.ownerId === identity.id ? (
-                              <Tag tone="neutral">Sua mesa</Tag>
+                              <Tag tone="neutral">Your table</Tag>
                             ) : null}
                             {room.nameHidden ? <Tag tone="neutral">Reservada</Tag> : null}
                             <Tag tone={locked ? "neutral" : "faint"}>

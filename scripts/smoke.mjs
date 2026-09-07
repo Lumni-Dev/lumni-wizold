@@ -188,7 +188,7 @@ const roomId = room.payload?.data?.roomId;
 const spoke = await call("POST", "/api/tavern/rooms/" + roomId + "/messages", {
   text: "Uivo de teste",
 });
-check("fala registrada", spoke.payload?.ok === true);
+check("line recorded", spoke.payload?.ok === true);
 const linked = await call("POST", "/api/tavern/rooms/" + roomId + "/messages", {
   text: "vem ver https://exemplo.com",
 });
@@ -196,7 +196,7 @@ check("link at the table is refused", linked.payload?.ok === false, linked.paylo
 const tavern = (await call("POST", "/api/tavern")).payload?.data;
 const seat = tavern?.rooms?.find((entry) => entry.room.id === roomId);
 check(
-  "mesa listada com a fala",
+  "table listed with the line",
   seat?.room?.messages?.some((m) => m.text === "Uivo de teste") === true,
 );
 
@@ -233,7 +233,7 @@ const inviteId = inbox.payload?.data?.invites?.[0]?.id;
 check("the invitee sees the invite", Boolean(inviteId));
 const accepted = await call("POST", "/api/pack/invites/" + inviteId + "/accept");
 check(
-  "aceitar coloca o inviter na matilha de quem aceitou",
+  "accepting puts the inviter in the accepter's pack",
   accepted.payload?.ok === true && accepted.payload?.state?.pack?.some((m) => m.id === aId) === true,
   accepted.payload?.message,
 );
@@ -246,7 +246,7 @@ const dmAfter = await call("POST", "/api/tavern/direct", { otherId: mateId });
 check("DM within the pack opens", dmAfter.payload?.ok === true, dmAfter.payload?.message);
 const left = await call("DELETE", "/api/pack/" + mateId);
 check(
-  "sair da matilha tira o companheiro",
+  "leaving the pack removes the companion",
   left.payload?.ok === true && left.payload?.state?.pack?.some((m) => m.id === mateId) !== true,
   left.payload?.message,
 );
@@ -285,7 +285,7 @@ const movement = await rows(
   "select reason from wallet_movements where character_id = $1 order by id",
   [character?.id],
 );
-check("ledger tem o saldo inicial", movement[0]?.reason === "starting_balance");
+check("the ledger holds the starting balance", movement[0]?.reason === "starting_balance");
 const diary = await rows("select count(*)::int as n from log_entries where character_id = $1", [
   character?.id,
 ]);

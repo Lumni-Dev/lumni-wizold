@@ -4,7 +4,7 @@ import { privatePageMetadata } from "@/shared/seo/metadata";
 
 export const metadata: Metadata = privatePageMetadata({
   title: "Tavern",
-  description: "Mesas de chat ao vivo, convites de matilha e mensagens privadas entre companheiros.",
+  description: "Live chat tables, pack invites and private messages between companions.",
   path: "/tavern",
 });
 

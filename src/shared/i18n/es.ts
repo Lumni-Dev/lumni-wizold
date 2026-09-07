@@ -1322,4 +1322,8 @@ export const ES: Record<string, string> = {
   "Tables that do not wait for a refresh": "Mesas que no esperan refresh",
   "Two tables per row, a mug on every card and pagination when the hall passes eight. Open or locked rooms, live messages, pack invites and a notice when the chair lights up.": "Dos mesas por fila, una jarra en cada tarjeta y paginación cuando el salón pasa de ocho. Salas abiertas o cerradas, mensajes en vivo, invitaciones de manada y un aviso cuando la silla se enciende.",
   "All": "Todo",
+  "mine": "mina",
+  "Search table by name or #": "Buscar mesa por nombre o #",
+  "WCoin packs for real money to speed up training and equipment.": "Paquetes de WCoins por dinero real para acelerar entrenamiento y equipo.",
+  "Live chat tables, pack invites and private messages between companions.": "Mesas de chat en vivo, invitaciones de manada y mensajes privados entre compañeros.",
 };

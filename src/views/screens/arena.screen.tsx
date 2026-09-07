@@ -393,7 +393,7 @@ export function ArenaScreen() {
             formatBronze(arenaSpoilsRange(fighting.hunter.level).max) +
             "."
           }
-          action={<Tag tone="neutral">No fosso</Tag>}
+          action={<Tag tone="neutral">In the pit</Tag>}
           padding="none"
           className={cn(shaking && "card-shake")}
         >

@@ -157,7 +157,7 @@ sec("stats");
     const derived = stats.deriveStatsOf({ level, attributes: attrs }, entItem.emptyEquipment());
     const t = derived.totalAttributes;
     ok(
-      "saúde pela fórmula NV " + level,
+      "health by the formula LV " + level,
       derived.maxHealth ===
         Math.round(
           CONST.BASE_VITAL +
@@ -170,7 +170,7 @@ sec("stats");
       derived.dodge === clamp(Math.round((35 * t.agility) / (t.agility + 120)), 0, 35),
     );
     ok(
-      "crítico na curva NV " + level,
+      "critical on the curve LV " + level,
       derived.critical === clamp(Math.round(5 + (40 * t.instinct) / (t.instinct + 250)), 0, 45),
     );
     const sourceSum = (key) =>
@@ -188,7 +188,7 @@ sec("stats");
       entItem.emptyEquipment(),
     );
     ok(
-      "buff de fúria soma +" + CONST.FURY_ATTRIBUTE_BONUS + " em todos NV " + level,
+      "the fury buff adds +" + CONST.FURY_ATTRIBUTE_BONUS + " em todos NV " + level,
       ["strength", "agility", "endurance", "instinct", "willpower"].every(
         (key) => buffed.sources.fury[key] === CONST.FURY_ATTRIBUTE_BONUS,
       ),
@@ -208,7 +208,7 @@ sec("stats");
   setMoon("waning");
   for (const key of Object.keys(attrs)) {
     ok(
-      "lua cheia ativa fúria em " + key,
+      "the full moon turns fury on in " + key,
       underFull.sources.fury[key] === CONST.FURY_ATTRIBUTE_BONUS &&
         underFull.sources.moon[key] === 0 &&
         underFull.totalAttributes[key] ===
@@ -309,7 +309,7 @@ sec("combat");
   }
   ok("battery ran", fights === 2400, fights);
   ok(
-    "dano do crítico é fixo, sem depender da fúria",
+    "critical damage is fixed, not riding the fury",
     combat.criticalMultiplierOf() === 1.5 + CONST.CRITICAL_DAMAGE_BONUS,
   );
   const flags = {
@@ -321,15 +321,15 @@ sec("combat");
     petSpent: 0,
   };
   ok(
-    "vitória lê a bandeira",
+    "victory reads the flag",
     combat.hunterWon({ ...flags, victory: true, retreated: false }) === true,
   );
   ok(
-    "derrota viva não é recuo",
+    "a survived defeat is not a retreat",
     combat.hunterRetreated({ ...flags, victory: false, retreated: false }) === false,
   );
   ok(
-    "recuo lê a bandeira",
+    "retreat reads the flag",
     combat.hunterRetreated({ ...flags, victory: false, retreated: true }) === true,
   );
 }
@@ -341,11 +341,11 @@ sec("bands and prey");
   ok("last area ends at 1000", areas[areas.length - 1].maxLevel === 1000);
   for (let index = 0; index < areas.length; index += 1) {
     const area = areas[index];
-    ok("area " + area.id + " tem 100 níveis", area.maxLevel - area.minLevel + 1 === 100);
+    ok("area " + area.id + " has 100 levels", area.maxLevel - area.minLevel + 1 === 100);
     ok("area " + area.id + " tem 10 criaturas", area.creatures.length === 10);
     if (index > 0)
       ok(
-        "area " + area.id + " vem logo após a anterior",
+        "area " + area.id + " comes right after the previous one",
         area.minLevel === areas[index - 1].maxLevel + 1,
       );
   }
@@ -368,7 +368,7 @@ sec("bands and prey");
 
   for (const creature of creatures) {
     ok(
-      "números inteiros " + creature.id,
+      "integer numbers " + creature.id,
       [
         creature.health,
         creature.strength,
@@ -398,7 +398,7 @@ sec("bands and prey");
       ok("drop resolves for female " + drop.itemId, Boolean(items.findItem(female)));
       const dropped = items.findItem(items.itemIdFor(drop.itemId, "male"));
       ok(
-        "a caça não larga equipamento " + drop.itemId,
+        "the hunt drops no equipment " + drop.itemId,
         !entItem.EQUIPMENT_SLOTS.includes(dropped.category),
       );
     }
@@ -466,18 +466,18 @@ sec("cycle cadence");
       [...drawn].sort((a, b) => a - b).join(","),
     );
     ok(
-      cycle.name + " alcança as duas pontas",
+      cycle.name + " reaches both ends",
       drawn.has(cycle.min) && drawn.has(cycle.max),
     );
     ok(cycle.name + " tem faixa 3 a 7", cycle.min === 3 && cycle.max === 7);
     ok(
-      cycle.name + " mantém a média dos 5 passos antigos",
+      cycle.name + " keeps the old 5-step average",
       (cycle.min + cycle.max) / 2 === 5,
     );
   }
 
   ok(
-    "ciclo da mina anuncia a faixa em segundos",
+    "the mine cycle announces the range in seconds",
     CONST.MINING_CYCLE_MIN_MS === CONST.MINING_TICK_MS * (CONST.MINING_TICKS_MIN + 1) &&
       CONST.MINING_CYCLE_MAX_MS === CONST.MINING_TICK_MS * (CONST.MINING_TICKS_MAX + 1),
   );
@@ -487,29 +487,29 @@ sec("economy");
   for (const level of [1, 100, 340, 670, 1000]) {
     const trainedValue = Math.max(1, Math.round(level * 0.55));
     ok(
-      "sessão de treino é gratuita NV " + level,
+      "a training session is free LV " + level,
       training.trainingSessionCost(level, trainedValue) === 0,
     );
     if (trainedValue > 1) {
       ok(
-        "atributo mais alto exige mais sessões NV " + level,
+        "a higher attribute takes more sessions LV " + level,
         training.trainingSessionsPerPoint(trainedValue) >=
           training.trainingSessionsPerPoint(trainedValue - 1),
       );
     }
     for (const pack of packsData.STORE_PACKS) {
       ok(
-        "pacote " + pack.id + " NV " + level + " entrega o mesmo em qualquer nível",
+        "pacote " + pack.id + " NV " + level + " pays the same at any level",
         storeRules.packBronze(pack) === pack.bronze,
       );
     }
   }
   ok(
-    "três pacotes de valor fixo",
+    "three fixed-price packs",
     json(packsData.STORE_PACKS.map((pack) => pack.bronze)) === json([20000, 80000, 200000]),
   );
   ok(
-    "preços dos pacotes",
+    "pack prices",
     json(packsData.STORE_PACKS.map((pack) => pack.priceCents)) === json([490, 1990, 4990]),
   );
   const FLAT_PIECE_PRICE = {
@@ -521,17 +521,17 @@ sec("economy");
   };
   for (const definition of sets.EQUIPMENT_SETS) {
     ok(
-      "peça de " + definition.key + " custa " + FLAT_PIECE_PRICE[definition.key] + " fixo",
+      "piece of " + definition.key + " custa " + FLAT_PIECE_PRICE[definition.key] + " fixo",
       sets.piecePrice(definition) === FLAT_PIECE_PRICE[definition.key],
     );
     ok(
-      "conjunto " + definition.key + " vale sete peças",
+      "conjunto " + definition.key + " is worth seven pieces",
       sets.setTotalPrice(definition) ===
         entItem.EQUIPMENT_SLOTS.length * FLAT_PIECE_PRICE[definition.key],
     );
   }
   ok(
-    "toda peça à venda carrega o preço fixo do seu conjunto",
+    "every piece on sale carries its set's fixed price",
     sets.buildSetItems().every((item) => item.price === FLAT_PIECE_PRICE[item.set]),
   );
   let setsClimb = true;
@@ -548,12 +548,12 @@ sec("economy");
     const value = Math.round(level * 0.55);
     const sessions = training.trainingSessionsPerPoint(value);
     ok(
-      "treino sobe com a mesma curva do nível, atributo " + value,
+      "training climbs the level's own curve, attribute " + value,
       sessions === Math.ceil(progression.experienceForLevel(value) / (12 + 7 * value)),
       sessions,
     );
     ok(
-      "ponto de treino não custa bronze NV " + level,
+      "a training point costs no bronze LV " + level,
       training.trainingPointCost(level, value) === 0,
     );
   }
@@ -565,7 +565,7 @@ sec("progression");
 {
   for (const level of [1, 25, 500, 1000]) {
     ok(
-      "experiência exigida NV " + level,
+      "required experience LV " + level,
       progression.experienceForLevel(level) === 50 * (level * level - 3 * level + 4),
     );
   }
@@ -577,7 +577,7 @@ sec("progression");
     progression.experienceForLevel(5) + 50,
   );
   ok(
-    "cruzar o limiar sobe um nível",
+    "crossing the threshold climbs a level",
     crossing.levelsGained === 1 && crossing.character.level === 6,
   );
   ok("the excess becomes the next level's start", crossing.character.experience === 50);
@@ -586,7 +586,7 @@ sec("progression");
     progression.experienceForLevel(5) + progression.experienceForLevel(6) + 30,
   );
   ok(
-    "um ganho gordo sobe vários níveis carregando a sobra",
+    "one fat gain climbs several levels carrying the remainder",
     leaped.levelsGained === 2 && leaped.character.level === 7 && leaped.character.experience === 30,
   );
   const atCap = progression.applyExperience({ ...character, level: 1000, experience: 0 }, 99999999);
@@ -612,14 +612,14 @@ sec("progression");
   ok("progress zeroes at the point", raised.character.trainingProgress.strength === 0);
   const carry = progression.applyTrainingProgress(trainee, "strength", 11);
   ok(
-    "o excedente do treino vira o começo do próximo ponto",
+    "the training overflow starts the next point",
     carry.pointsGained === 1 &&
       carry.character.attributes.strength === 11 &&
       carry.character.trainingProgress.strength === 10,
   );
   const leapt = progression.applyTrainingProgress(trainee, "strength", need11 + 6);
   ok(
-    "um treino gordo sobe vários pontos carregando a sobra",
+    "one fat session climbs several points carrying the remainder",
     leapt.pointsGained === 2 &&
       leapt.character.attributes.strength === 12 &&
       leapt.character.trainingProgress.strength === 5,
@@ -630,7 +630,7 @@ sec("progression");
     999,
   );
   ok(
-    "atributo no teto não passa",
+    "an attribute at the cap does not pass",
     maxed.character.attributes.strength === 1000 && maxed.pointsGained === 0,
   );
   ok("cap zeroes progress", maxed.character.trainingProgress.strength === 0);
@@ -668,7 +668,7 @@ sec("arena");
     const range = arena.arenaSpoilsRange(level);
     const purse = species.huntPurse(level);
     ok(
-      "faixa de espólio 1,5..3 bolsas NV " + level,
+      "spoils range 1.5..3 purses LV " + level,
       range.min === Math.round(purse * 1.5) && range.max === Math.round(purse * 3),
     );
     for (const bag of [0, 10, range.max, 10000000]) {
@@ -676,7 +676,7 @@ sec("arena");
         const spoils = arena.arenaSpoils(level, bag, random);
         const shareCap = Math.round((bag * 25) / 100);
         if (!(isInt(spoils) && spoils >= 0 && spoils <= range.max && spoils <= shareCap)) {
-          ok("spoils within limits LV " + level + " bolsa " + bag, false, spoils);
+          ok("spoils within limits LV " + level + " purse " + bag, false, spoils);
           break;
         }
       }
@@ -687,16 +687,16 @@ sec("arena");
   const rival = benchHunter("pit-near", 5);
   const pit = [rival, benchHunter("pit-far", 500)];
   ok(
-    "fora da banda é recusado",
+    "outside the band is refused",
     arenaCtrl.resolveArena(inBand, pit, "pit-far", random).ok === false,
   );
   ok(
-    "desafiar a si mesmo é recusado",
+    "challenging yourself is refused",
     arenaCtrl.resolveArena(inBand, [...pit, { ...rival, id: inBand.character.id }], inBand.character.id, random).ok === false,
   );
   const cooling = { ...inBand, arenaDuels: { [rival.id]: new Date().toISOString() } };
   ok(
-    "descanso até as 06:00 é recusado",
+    "rest until 06:00 is refused",
     arenaCtrl.resolveArena(cooling, pit, rival.id, random).ok === false,
   );
   const drained = {
@@ -706,12 +706,12 @@ sec("arena");
     ),
   };
   ok(
-    "sem ataques do dia é recusado",
+    "without the day's attacks it is refused",
     arenaCtrl.resolveArena(drained, pit, rival.id, random).ok === false,
   );
   const bleeding = { ...inBand, character: { ...inBand.character, health: 1 } };
   ok(
-    "vida no chão é recusada",
+    "health on the floor is refused",
     arenaCtrl.resolveArena(bleeding, pit, rival.id, random).ok === false,
   );
   const wounded = {
@@ -719,7 +719,7 @@ sec("arena");
     character: { ...inBand.character, health: inBand.character.health - 1 },
   };
   ok(
-    "vida incompleta é recusada",
+    "incomplete health is refused",
     arenaCtrl.resolveArena(wounded, pit, rival.id, random).ok === false,
   );
   const duel = arenaCtrl.resolveArena(inBand, pit, rival.id, seededRandom(7));
@@ -729,7 +729,7 @@ sec("arena");
     const before = inBand.character;
     const after = landed.state.character;
     ok(
-      "bronze muda exatamente o espólio",
+      "bronze changes exactly the spoils",
       after.bronze === Math.max(0, before.bronze + duel.data.spoils),
     );
     ok("rival's stamp is recorded", typeof landed.state.arenaDuels[rival.id] === "string");
@@ -743,7 +743,7 @@ sec("arena");
     );
     ok("a draw moves no bronze", duel.data.combat.retreated ? duel.data.spoils === 0 : true);
     ok(
-      "experiência não vem do fosso",
+      "experience does not come from the pit",
       after.experience === before.experience && after.level === before.level,
     );
 
@@ -754,7 +754,7 @@ sec("arena");
     };
     const humbled = arenaCtrl.landArena(inBand, beaten, 0);
     ok(
-      "derrota conta uma perda no fosso",
+      "a defeat counts one loss in the pit",
       humbled.state.character.arenaLosses === inBand.character.arenaLosses + 1,
     );
   }
@@ -781,13 +781,13 @@ sec("arena");
   );
   ok("challenger's companion bites in the pit", packDuel.ok && packDuel.data.combat.petSpent > 0);
   ok(
-    "mascote do rival morde no fosso",
+    "the rival's companion bites in the pit",
     packDuel.ok && packDuel.data.combat.rounds.some((round) => round.text.includes("Brasa")),
   );
   if (packDuel.ok) {
     const packLanded = arenaCtrl.landArena(packState, packDuel.data, 0);
     ok(
-      "fôlego do mascote pousa no duelo",
+      "the companion's breath lands in the duel",
       packLanded.state.pet.energy ===
         clamp(100 - packDuel.data.combat.petSpent, 0, petRules.petMaxEnergy(1)),
     );
@@ -798,7 +798,7 @@ sec("arena");
   };
   const soloDuel = arenaCtrl.resolveArena(breathless, pit, rival.id, seededRandom(12));
   ok(
-    "lobo sem fôlego fica fora do fosso",
+    "a breathless wolf stays out of the pit",
     soloDuel.ok && soloDuel.data.combat.petSpent === 0 && soloDuel.data.combat.petBlows === 0,
   );
   const pitMemory = [
@@ -854,7 +854,7 @@ sec("hunt");
   const bleeding = { ...state, character: { ...state.character, health: 1 } };
   ok("hunts at 1 health", huntCtrl.resolveHunt(bleeding, "dew-woods", random).ok === true);
   ok(
-    "toda área é aberta: a faixa virou só sugestão",
+    "every area is open: the band became a suggestion",
     huntCtrl.resolveHunt(state, "white-clearing", random).ok === true,
   );
   ok("unknown territory refuses", huntCtrl.resolveHunt(state, "nada", random).ok === false);
@@ -862,7 +862,7 @@ sec("hunt");
   ok("valid hunt resolves", resolved.ok === true);
   const picked = huntCtrl.resolveHunt(state, "dew-woods", random, "young-bear");
   ok(
-    "a caçada enfrenta o bicho escolhido pelo id",
+    "the hunt faces the creature chosen by id",
     picked.ok === true && picked.data.creature.id === "young-bear",
   );
   const firstPrey = huntCtrl.resolveHunt(
@@ -873,7 +873,7 @@ sec("hunt");
   );
   const nextPrey = huntCtrl.resolveHunt(state, "village-field", seededRandom(12), "thief-fox");
   ok(
-    "a próxima caçada honra o id novo, não o da volta anterior",
+    "the next hunt honors the new id, not the previous lap's",
     firstPrey.ok &&
       nextPrey.ok &&
       firstPrey.data.creature.id === "field-rabbit" &&
@@ -881,7 +881,7 @@ sec("hunt");
   );
   const stray = huntCtrl.resolveHunt(state, "village-field", seededRandom(13), "young-bear");
   ok(
-    "um id de outra área cai na presa da trilha, não no forasteiro",
+    "another area's id falls to the trail's prey, not the outsider",
     stray.ok === true && stray.data.creature.id !== "young-bear",
   );
   const rabbit = { id: "field-rabbit", name: "Coelho-do-campo", health: 40 };
@@ -910,7 +910,7 @@ sec("hunt");
     selected: rabbit,
   });
   ok(
-    "sem troca o cartão guarda o mesmo bicho no chão",
+    "without a switch the card keeps the same creature on the ground",
     kept.foe && kept.foe.id === rabbit.id && kept.combat === fallen,
   );
   const swapped = huntPresenter.huntPreyView({
@@ -941,7 +941,7 @@ sec("hunt");
     };
     const humbledHunt = huntCtrl.landHunt(state, beaten, 0);
     ok(
-      "derrota na caçada conta uma perda",
+      "a hunt defeat counts one loss",
       humbledHunt.state.character.losses === state.character.losses + 1,
     );
 
@@ -957,13 +957,13 @@ sec("hunt");
         clamp(Math.max(1, before.health - resolved.data.healthLost), 0, derived.maxHealth),
     );
     ok(
-      "sangue já derramado não desconta duas vezes",
+      "blood already spilled is not charged twice",
       huntCtrl.landHunt(state, resolved.data, resolved.data.healthLost).state.character.health ===
         before.health,
     );
     for (const drop of resolved.data.drops) {
       ok(
-        "saque no inventário " + drop.itemId,
+        "withdrawal in the inventory " + drop.itemId,
         inventoryCtrl.countInInventory(landed.state.inventory, drop.itemId) >= drop.quantity,
       );
     }
@@ -990,12 +990,12 @@ sec("hunt");
   if (petHunt.ok && petHunt.data.combat.petSpent > 0) {
     const landed = huntCtrl.landHunt(withPet, petHunt.data, 0);
     ok(
-      "fôlego desce em uma subtração",
+      "breath drops in one subtraction",
       landed.state.pet.energy ===
         clamp(100 - petHunt.data.combat.petSpent, 0, petRules.petMaxEnergy(1)),
     );
     ok(
-      "o lobo que caça não aprende, só treina",
+      "the hunting wolf does not learn, only trains",
       landed.state.pet.trainingProgress === 0 && landed.state.pet.level === 1,
     );
   }
@@ -1005,13 +1005,13 @@ sec("hunt");
   };
   const shortHunt = huntCtrl.resolveHunt(shortWind, "village-field", seededRandom(6));
   ok(
-    "lobo sem fôlego fica fora da caçada",
+    "a breathless wolf stays out of the hunt",
     shortHunt.ok && shortHunt.data.combat.petSpent === 0 && shortHunt.data.combat.petBlows === 0,
   );
   if (shortHunt.ok) {
     const shortLanded = huntCtrl.landHunt(shortWind, shortHunt.data, 0);
     ok(
-      "lobo fora da luta não aprende",
+      "a wolf out of the fight does not learn",
       shortLanded.state.pet.trainingProgress === 0 && shortLanded.state.pet.level === 1,
     );
   }
@@ -1027,13 +1027,13 @@ sec("hunt");
   if (firstHunt.ok) {
     const afterOne = huntCtrl.landHunt(oneMore, firstHunt.data, 0);
     ok(
-      "a caçada esgota o fôlego do lobo",
+      "the hunt drains the wolf's breath",
       afterOne.state.pet.energy < CONST.PET_ENERGY_PER_HUNT + CONST.PET_ENERGY_PER_BLOW,
     );
     const rested = { ...afterOne.state, character: { ...afterOne.state.character, health: 100 } };
     const nextHunt = huntCtrl.resolveHunt(rested, "village-field", seededRandom(10));
     ok(
-      "no recomeço o lobo esgotado fica de fora",
+      "on the restart the drained wolf stays out",
       nextHunt.ok && nextHunt.data.combat.petSpent === 0 && nextHunt.data.combat.petBlows === 0,
     );
   }
@@ -1042,7 +1042,7 @@ sec("hunt");
   if (homeHunt.ok) {
     const landed = huntCtrl.landHunt(homePet, homeHunt.data, 0);
     ok(
-      "lobo em casa não gasta nem aprende",
+      "a wolf at home neither spends nor learns",
       landed.state.pet.energy === 100 && (landed.state.pet.trainingProgress ?? 0) === 0,
     );
   }
@@ -1067,7 +1067,7 @@ sec("training");
   ok("valid session trains", session.ok === true);
   if (session.ok) {
     ok(
-      "sessão não cobra bronze",
+      "a session charges no bronze",
       session.state.character.bronze === state.character.bronze,
     );
     const gained =
@@ -1076,12 +1076,12 @@ sec("training");
     ok("session yields progress", gained);
     const second = trainingCtrl.train(session.state, "trunk-punches");
     ok(
-      "a sessão seguinte também é grátis",
+      "the next session is also free",
       second.ok && second.state.character.bronze === session.state.character.bronze,
     );
   }
   ok(
-    "cada exercício treina um atributo",
+    "each exercise trains one attribute",
     json(exercisesData.EXERCISES.map((exercise) => exercise.attribute).sort()) ===
       json(["agility", "endurance", "instinct", "strength", "willpower"]),
   );
@@ -1103,7 +1103,7 @@ sec("training");
   if (petSession.ok) {
     const cost = petRules.petTrainingSessionCost(1, 100);
     ok(
-      "sessão do lobo cobra na hora",
+      "a wolf session charges on the spot",
       petSession.state.character.bronze === withPet.character.bronze - cost,
     );
     ok(
@@ -1130,18 +1130,18 @@ sec("companion");
   };
   const grown = petRules.growPet(growing, 30);
   ok(
-    "o excedente do treino do lobo vira o começo do próximo nível",
+    "the wolf training overflow starts the next level",
     grown.leveled && grown.pet.level === 6 && grown.pet.trainingProgress === 10,
   );
   ok(
-    "bônus começa em 5",
+    "the bonus starts at 5",
     json(petRules.petLevelBonus(1)) ===
       json({ strength: 5, agility: 5, endurance: 0, instinct: 5, willpower: 0 }),
   );
   ok("bonus adds 1 per level", petRules.petLevelBonus(10).strength === 14);
   const sleeping = { id: "p", name: "L", gender: "male", energy: 0, active: true, adoptedAt: "" };
   ok(
-    "sem fôlego não empresta nada",
+    "out of breath lends nothing",
     json(petRules.petBonus(sleeping)) ===
       json({ strength: 0, agility: 0, endurance: 0, instinct: 0, willpower: 0 }),
   );
@@ -1165,11 +1165,11 @@ sec("companion");
   }
   ok("rest fills in 10 minutes", ticks === 10, ticks);
   ok(
-    "gasto além do fôlego trava no zero",
+    "spending past the breath locks at zero",
     petRules.spendPetEnergy({ ...pet, energy: 3 }, 50).energy === 0,
   );
   ok(
-    "comida além do teto trava no teto",
+    "food past the cap locks at the cap",
     petRules.restPet({ ...pet, energy: 100 }, 9999).energy === petRules.petMaxEnergy(5),
   );
   const state = baseState({ level: 10 });
@@ -1177,11 +1177,11 @@ sec("companion");
   state.inventory = [...state.inventory, { itemId: "pet-ration", quantity: 2, enhancement: 0 }];
   const fed = petCtrl.feedPet(state, "pet-ration");
   ok(
-    "ração devolve um quarto do teto",
+    "a ration gives back a quarter of the cap",
     fed.ok && fed.state.pet.energy === 10 + Math.round(petRules.petMaxEnergy(5) * 0.25),
   );
   ok(
-    "ração sai da mochila",
+    "the ration leaves the bag",
     fed.ok && inventoryCtrl.countInInventory(fed.state.inventory, "pet-ration") === 1,
   );
   const whole = { ...state, pet: { ...state.pet, energy: petRules.petMaxEnergy(5) } };
@@ -1208,7 +1208,7 @@ sec("companion");
     "Neve",
   );
   ok(
-    "adoção cobra preço fixo",
+    "adoption charges a fixed price",
     adopt.ok &&
       adopt.state.character.bronze ===
         baseState({ level: adoptLevel }).character.bronze - CONST.PET_PRICE,
@@ -1216,7 +1216,7 @@ sec("companion");
   ok("second adoption refuses", petCtrl.adoptPet(adopt.state, "male", "Outro").ok === false);
   const released = petCtrl.releasePet(adopt.state);
   ok(
-    "soltar não devolve bronze",
+    "releasing returns no bronze",
     released.ok && released.state.character.bronze === adopt.state.character.bronze,
   );
 }
@@ -1234,7 +1234,7 @@ sec("forge and mine");
   const forged = forgeRules.enhancedEffect(claw, 100);
   const base = claw.effect.attributes.strength;
   ok(
-    "forja multiplica a peça (0,3% por nível, fracionado, sem arredondar)",
+    "the forge multiplies the piece (0.3% per level, fractional, unrounded)",
     Math.abs(forged.attributes.strength - base * (1 + 0.003 * 100)) < 1e-9,
   );
   ok("forge zero returns the pure effect", forgeRules.enhancedEffect(claw, 0) === claw.effect);
@@ -1248,11 +1248,11 @@ sec("forge and mine");
   const strikeFee = forgeRules.forgeBronzeCost(state.character.level, 4);
   const enhanced = forgeCtrl.enhance(state, "bronze-claw", 4, () => 0);
   ok(
-    "martelada certeira sobe um nível",
+    "a landed strike climbs one level",
     enhanced.ok && inventoryCtrl.countInInventory(enhanced.state.inventory, "bronze-claw", 5) === 1,
   );
   ok(
-    "martelada certeira consome a cópia antiga",
+    "a landed strike consumes the old copy",
     enhanced.ok && inventoryCtrl.countInInventory(enhanced.state.inventory, "bronze-claw", 4) === 0,
   );
   ok("successful strike answers raised", enhanced.ok && enhanced.data.raised === true);
@@ -1268,7 +1268,7 @@ sec("forge and mine");
   );
   const missed = forgeCtrl.enhance(state, "bronze-claw", 4, () => 0.99);
   ok(
-    "martelada falha mantém o nível",
+    "a missed strike keeps the level",
     missed.ok &&
       inventoryCtrl.countInInventory(missed.state.inventory, "bronze-claw", 4) === 1 &&
       missed.data.raised === false,
@@ -1280,7 +1280,7 @@ sec("forge and mine");
         fragmentStock - forgeRules.enhancementCost(5),
   );
   ok(
-    "martelada falha também paga o ferreiro",
+    "a missed strike also pays the smith",
     missed.ok && missed.state.character.bronze === state.character.bronze - strikeFee,
   );
   const broke = { ...state, character: { ...state.character, bronze: strikeFee - 1 } };
@@ -1289,7 +1289,7 @@ sec("forge and mine");
     forgeCtrl.enhance(broke, "bronze-claw", 4, () => 0).ok === false,
   );
   ok(
-    "a martelada encarece com a peça e com a banda",
+    "the strike gets pricier with the piece and the band",
     forgeRules.forgeBronzeCost(1, 5) > forgeRules.forgeBronzeCost(1, 4) &&
       forgeRules.forgeBronzeCost(500, 4) > forgeRules.forgeBronzeCost(1, 4),
   );
@@ -1301,15 +1301,15 @@ sec("forge and mine");
     ],
   };
   ok(
-    "fragmento de outro conjunto não serve",
+    "another set's fragment does not serve",
     forgeCtrl.enhance(wrongFragments, "bronze-claw", 4).ok === false,
   );
   ok(
-    "cópia fora da mochila não forja",
+    "a copy outside the bag does not forge",
     forgeCtrl.enhance(state, "bronze-claw", 7).ok === false,
   );
   ok(
-    "a bigorna lista a cópia da mochila",
+    "the anvil lists the bag copy",
     forgeCtrl
       .listForge(state)
       .some((piece) => piece.item.id === "bronze-claw" && piece.level === 4),
@@ -1329,11 +1329,11 @@ sec("forge and mine");
     );
   }
   ok(
-    "teto da mineração é o teto do personagem",
+    "the mining cap is the character's cap",
     oresData.MINING_MAX_LEVEL === CONST.MAX_CHARACTER_LEVEL,
   );
   ok(
-    "veia pede o nível de mineração da banda",
+    "a vein asks for the band's mining level",
     ores.map((ore) => ore.requiredLevel).join(",") === "1,201,401,601,801",
   );
   for (const ore of ores) {
@@ -1357,7 +1357,7 @@ sec("forge and mine");
   for (const ore of ores) {
     const [min, max] = YIELD_TABLE[ore.id];
     ok(
-      "vein " + ore.id + " rende de " + min + " a " + max + " por mineração",
+      "vein " + ore.id + " rende de " + min + " a " + max + " per mining",
       ore.minYield === min && ore.maxYield === max,
     );
   }
@@ -1374,15 +1374,15 @@ sec("forge and mine");
   const fresh = { ...baseState({ level: 1 }), mining: { level: 1, progress: 0, count: 0 } };
   const firstSwing = forgeCtrl.mine(fresh, "bronze-vein", seededRandom(1), noon);
   ok(
-    "uma mineração conta uma da cota",
+    "one mining counts one of the quota",
     firstSwing.ok && firstSwing.state.mining.count === 1,
   );
   ok(
-    "o reset é o mesmo instante para todos: 09:00 UTC (06:00 São Paulo)",
+    "the reset is the same instant for everyone: 09:00 UTC (06:00 São Paulo)",
     new Date(period).getUTCHours() === CONST.MINING_RESET_HOUR_UTC && noon - period < 24 * 60 * 60 * 1000,
   );
   ok(
-    "o próximo reset cai dentro de um dia",
+    "the next reset falls within a day",
     miningRules.miningResetsInMs(noon) > 0 &&
       miningRules.miningResetsInMs(noon) <= 24 * 60 * 60 * 1000,
   );
@@ -1405,7 +1405,7 @@ sec("forge and mine");
   };
   const reopened = forgeCtrl.mine(yesterday, "bronze-vein", seededRandom(3), noon);
   ok(
-    "passadas as 06:00, o período novo zera a cota",
+    "past 06:00, the new period zeroes the quota",
     reopened.ok && reopened.state.mining.count === 1,
   );
   const preserved = miningRules.applyMiningProgress(
@@ -1413,12 +1413,12 @@ sec("forge and mine");
     10,
   );
   ok(
-    "o progresso preserva o período e a cota do dia",
+    "progress keeps the day's period and quota",
     preserved.mining.count === 42 &&
       preserved.mining.windowStart === "2020-01-01T00:00:00.000Z",
   );
   ok(
-    "a listagem expõe a cota restante do dia",
+    "the listing exposes the day's remaining quota",
     forgeCtrl.listMining(fresh, noon).dailyRemaining === CONST.MINING_DAILY_MININGS &&
       forgeCtrl.listMining(spent, noon).dailyExhausted === true,
   );
@@ -1447,12 +1447,12 @@ sec("bazaar");
   ok("listing beyond the bag refuses", tooMany.ok === false);
   const announced = bazaarCtrl.announceListing(state, "bronze-fragment", 10, 500);
   ok(
-    "anúncio tira da mochila",
+    "a listing takes from the bag",
     announced.ok &&
       inventoryCtrl.countInInventory(announced.state.inventory, "bronze-fragment") === 20,
   );
   ok(
-    "anúncio cobra a taxa em bronze",
+    "a listing charges the fee in bronze",
     announced.ok &&
       announced.state.character.bronze ===
         state.character.bronze - bazaarRules.bazaarListingFee(state.character.level),
@@ -1473,7 +1473,7 @@ sec("bazaar");
     announcedAt: new Date(Date.now() - 8 * 86400000).toISOString(),
   };
   ok(
-    "anúncio vence em sete dias",
+    "a listing expires in seven days",
     entBazaar.isListingExpired(staleListing) === true &&
       entBazaar.isListingExpired(freshListing) === false,
   );
@@ -1495,7 +1495,7 @@ sec("bazaar");
       [],
     );
     ok(
-      "o dono ainda vê o próprio anúncio vencido",
+      "the owner still sees their expired listing",
       myShelf.length === 1 && myShelf[0].expired === true,
     );
     ok(
@@ -1530,18 +1530,18 @@ sec("bazaar");
   );
   ok("purchase remembers the listing", bought.ok && bought.state.bazaarPurchases[offer.id] === 1);
   ok(
-    "forja maior viaja com a peça",
+    "a higher forge travels with the piece",
     bought.ok &&
       inventoryCtrl.countInInventory(bought.state.inventory, "gold-claw", offer.enhancement) === 1,
   );
   ok(
-    "compra grava a insígnia do bazar",
+    "a purchase records the bazaar badge",
     bought.ok && bought.state.bazaarFinds.includes("gold-claw"),
   );
   ok("beyond the listing refuses", bazaarCtrl.purchaseListing(rich, offer, 3).ok === false);
   const low = baseState({ level: 1 });
   ok(
-    "compra respeita o nível",
+    "a purchase respects the level",
     goldClaw.minLevel > 1 && bazaarCtrl.purchaseListing(low, offer, 1).ok === false,
   );
   const poor = { ...state, wallet: { cents: 9999 } };
@@ -1582,12 +1582,12 @@ sec("moon");
   setMoon("new");
   ok("new moon pays 5% in the mine", moon.withMoonMiningBonus(100) === 105);
   ok(
-    "nova não paga caça nem treino",
+    "the new moon pays neither hunt nor training",
     moon.withMoonBonus(100) === 100 && moon.withMoonTrainingBonus(100) === 100,
   );
   setMoon("waning");
   ok(
-    "minguante não paga nada",
+    "the waning moon pays nothing",
     moon.withMoonBonus(100) === 100 &&
       moon.withMoonTrainingBonus(100) === 100 &&
       moon.withMoonMiningBonus(100) === 100,
@@ -1608,12 +1608,12 @@ sec("willpower stretches the fury");
   ok("each Willpower point never shortens the flask", strictly);
 
   ok(
-    "a curva não passa do dobro",
+    "the curve never passes double",
     moon.furyDurationMs(5, 10_000_000) < 2 * 5 * 60_000 &&
       moon.furyWillpowerBonus(10_000_000) < CONST.FURY_WILLPOWER_MAX_BONUS,
   );
   ok(
-    "a curva segue a família de esquiva e crítico",
+    "the curve follows the dodge and critical family",
     Math.abs(
       moon.furyWillpowerBonus(250) -
         CONST.FURY_WILLPOWER_MAX_BONUS / 2,
@@ -1678,16 +1678,16 @@ sec("inventory and market");
   const bought = marketCtrl.buyItem(state, "bronze-claw", 1);
   const clawPrice = items.findItem("bronze-claw").price;
   ok(
-    "compra desconta o preço",
+    "a purchase deducts the price",
     bought.ok && bought.state.character.bronze === state.character.bronze - clawPrice,
   );
   ok("duplicated piece now enters", marketCtrl.buyItem(state, "bronze-claw", 2).ok === true);
   ok(
-    "peça já na mochila agora entra",
+    "a piece already in the bag now enters",
     bought.ok && marketCtrl.buyItem(bought.state, "bronze-claw", 1).ok === true,
   );
   ok(
-    "poção compra em quantidade",
+    "potions buy in quantity",
     marketCtrl.buyItem(state, "health-potion-small", 3).ok === true,
   );
   const maleCoat = marketCtrl.buyItem(state, "bronze-armor-male", 1);
@@ -1704,32 +1704,32 @@ sec("inventory and market");
   ok("market respects the level", highSet.ok === false);
   ok("ration without a wolf refuses", marketCtrl.buyItem(state, "pet-ration", 1).ok === false);
   ok(
-    "poção pequena custa 50 WCoins",
+    "a small potion costs 50 WCoins",
     marketCtrl.marketPriceOf(items.findItem("health-potion-small"), 100) === 50,
   );
   ok(
-    "poção grande custa 300 WCoins",
+    "a large potion costs 300 WCoins",
     marketCtrl.marketPriceOf(items.findItem("health-potion-large"), 100) === 300,
   );
   ok(
-    "poção de fúria pequena custa 300 WCoins",
+    "a small fury potion costs 300 WCoins",
     marketCtrl.marketPriceOf(items.findItem("rage-potion-small"), 100) === 300,
   );
   ok(
-    "poção de fúria média custa 600 WCoins",
+    "a medium fury potion costs 600 WCoins",
     marketCtrl.marketPriceOf(items.findItem("rage-potion-medium"), 100) === 600,
   );
   ok(
-    "poção de fúria grande custa 900 WCoins",
+    "a large fury potion costs 900 WCoins",
     marketCtrl.marketPriceOf(items.findItem("rage-potion-large"), 100) === 900,
   );
   ok(
-    "ração custa uma caçada e meia",
+    "a ration costs a hunt and a half",
     marketCtrl.marketPriceOf(items.findItem("pet-ration"), 100) ===
       Math.max(1, Math.round(species.huntPurse(100) * 1.5)),
   );
   ok(
-    "equipamento mantém o preço fixo do catálogo",
+    "equipment keeps the catalog's fixed price",
     marketCtrl.marketPriceOf(items.findItem("bronze-claw"), 100) ===
       items.findItem("bronze-claw").price,
   );
@@ -1746,7 +1746,7 @@ sec("inventory and market");
   );
   const fur = items.findItem("rabbit-fur");
   ok(
-    "venda de drop paga metade mais o bônus de 5",
+    "a drop sale pays half plus the bonus of 5",
     sale.ok &&
       sale.state.character.bronze ===
         state.character.bronze + (Math.max(1, Math.round(fur.price * 0.5)) + 5) * 2,
@@ -1759,7 +1759,7 @@ sec("inventory and market");
   );
   const claw = items.findItem("bronze-claw");
   ok(
-    "peça forjada vende pelo preço normal, sem bônus de forja",
+    "a forged piece sells at the plain price, no forge bonus",
     forgedSale.ok &&
       forgedSale.state.character.bronze ===
         state.character.bronze + Math.max(1, Math.round(claw.price * 0.5)) &&
@@ -1781,7 +1781,7 @@ sec("inventory and market");
       dressed.state.equipment.claw.itemId === "bronze-claw",
   );
   ok(
-    "peça no corpo deixa comprar outra cópia",
+    "a piece on the body allows buying another copy",
     dressed.ok && marketCtrl.buyItem(dressed.state, "bronze-claw", 1).ok === true,
   );
   const spareState = dressed.ok
@@ -1795,7 +1795,7 @@ sec("inventory and market");
     : dressed.state;
   const swapped = inventoryCtrl.equipItem(spareState, "bronze-claw");
   ok(
-    "trocar pela mesma peça conserva",
+    "swapping for the same piece preserves",
     swapped.ok && inventoryCtrl.countInInventory(swapped.state.inventory, "bronze-claw") === 1,
   );
   const potion = inventoryCtrl.consumeItem(
@@ -1812,7 +1812,7 @@ sec("inventory and market");
   const derived = stats.deriveStats(state.character, state.equipment, null);
   const expectedGain = load("shared/utils/random.js").intBetween(150, 200, seededRandom(42));
   ok(
-    "poção cura faixa fixa",
+    "a potion heals a fixed range",
     healed.ok &&
       healed.state.character.health === Math.min(derived.maxHealth, 1 + expectedGain),
   );
@@ -1892,12 +1892,12 @@ sec("ranking");
   const searched = rankingCtrl.listRanking(state, roster, "level", 1, "Teste");
   ok("search finds the player", searched.total >= 1);
   ok(
-    "busca preserva a posição verdadeira",
+    "the search keeps the true position",
     searched.entries.find((entry) => entry.isPlayer)?.position === view.playerPosition,
   );
   const cut = rankingCtrl.listRanking(state, roster, "level", 1, "", "female");
   ok(
-    "corte por gênero filtra sem renumerar",
+    "the gender cut filters without renumbering",
     cut.entries.length > 0 &&
       cut.entries.every((entry) => entry.hunter.gender === "female") &&
       cut.entries.every(
@@ -1906,7 +1906,7 @@ sec("ranking");
   );
   const wolfBoard = entRanking.findBoard("pet");
   ok(
-    "quadro do mascote lê o nível do lobo",
+    "the companion board reads the wolf's level",
     wolfBoard.key === "pet" &&
       wolfBoard.value({
         ...roster[0],
@@ -1935,7 +1935,7 @@ sec("character");
   );
   ok("born with 200 bronze", run.character.bronze === CONST.STARTING_BRONZE);
   ok(
-    "nasce com dez poções de fúria pequena",
+    "starts with ten small fury potions",
     run.inventory.some(
       (slot) => slot.itemId === "rage-potion-small" && slot.quantity === 10,
     ),
@@ -1946,7 +1946,7 @@ sec("character");
   );
   ok("born at level 1", run.character.level === 1);
   ok(
-    "linhagem soma o bônus dela",
+    "the bloodline adds its bonus",
     run.character.attributes.agility === 18 && run.character.attributes.strength === 4,
   );
   const state = baseState({ level: 10 });
@@ -1961,7 +1961,7 @@ sec("character");
   const buffedStats = stats.deriveStats(drank.state.character, drank.state.equipment, null);
   const plainStats = stats.deriveStats(state.character, state.equipment, null);
   ok(
-    "o buff levanta a Força em " + CONST.FURY_ATTRIBUTE_BONUS,
+    "the buff lifts Strength by " + CONST.FURY_ATTRIBUTE_BONUS,
     buffedStats.totalAttributes.strength ===
       plainStats.totalAttributes.strength + CONST.FURY_ATTRIBUTE_BONUS,
   );
@@ -1977,7 +1977,7 @@ sec("character");
   ok("drinking again restarts the clock", recast.ok === true, recast.message);
   if (firstSip.ok && recast.ok) {
     ok(
-      "o novo prazo não fica atrás do anterior",
+      "the new deadline never falls behind the previous one",
       Date.parse(recast.state.character.furyUntil) >= Date.parse(firstSip.state.character.furyUntil),
     );
   }
@@ -1990,12 +1990,12 @@ sec("character");
     inventory: [{ itemId: "rage-potion-small", quantity: 1, enhancement: 0 }],
   };
   ok(
-    "prazo vencido não soma fúria",
+    "an expired deadline adds no fury",
     stats.deriveStats(expired.character, expired.equipment, null).sources.fury.strength === 0,
   );
   const revived = inventoryCtrl.consumeItem(expired, "rage-potion-small");
   ok(
-    "depois do prazo a fúria volta",
+    "after the deadline the fury returns",
     revived.ok === true && Date.parse(revived.state.character.furyUntil) > Date.now(),
     revived.message,
   );
@@ -2030,7 +2030,7 @@ sec("character");
     tick.ok && tick.state.character.health === Math.min(max, 50 + restHeal),
   );
   ok(
-    "a vontade acelera a recuperação",
+    "willpower speeds up recovery",
     characterCtrl.restRecoveryRatio(500) > characterCtrl.restRecoveryRatio(0) &&
       characterCtrl.restRecoveryRatio(0) === CONST.REST_HEALTH_RATIO,
   );
@@ -2054,12 +2054,12 @@ sec("automation");
   const floor = stats.deriveStats(low.character, low.equipment, null).maxHealth;
   low.character.health = Math.max(1, Math.floor(floor * 0.1));
   ok(
-    "ferido no chão não bebe sem a chave de poção",
+    "hurt on the floor does not drink without the potion switch",
     automationCtrl.nextAutomationStep(low, null) === null,
   );
   const bareFloor = { ...low, inventory: [] };
   ok(
-    "ferido no chão não repousa sem a chave de descanso",
+    "hurt on the floor does not rest without the rest switch",
     automationCtrl.nextAutomationStep(bareFloor, null) === null,
   );
   const withPotion = { ...low, automation: { ...low.automation, potion: true } };
@@ -2072,7 +2072,7 @@ sec("automation");
   };
   ok("without a potion, lies down", automationCtrl.nextAutomationStep(noFlask, null)?.kind === "rest");
   ok(
-    "treinando, o chão não interrompe",
+    "while training, the floor does not interrupt",
     automationCtrl.nextAutomationStep(noFlask, { kind: "train", id: "trunk-punches" }) === null,
   );
   const petState = baseState({ level: 10 });
@@ -2112,12 +2112,12 @@ sec("automation");
     automation: { ...petState.automation, petFeed: true },
   };
   ok(
-    "lobo sem fôlego come antes de zerar",
+    "a breathless wolf eats before hitting zero",
     automationCtrl.nextAutomationStep(shortPetState, null)?.kind === "feed",
   );
   const restKeyOnly = { ...petState, automation: { ...petState.automation, petRest: true } };
   ok(
-    "repouso do lobo não alimenta sem a chave de comida",
+    "wolf repose does not feed without the food switch",
     automationCtrl.nextAutomationStep(restKeyOnly, null) === null,
   );
   const restFeed = {
@@ -2125,7 +2125,7 @@ sec("automation");
     automation: { ...petState.automation, petRest: true, petFeed: true },
   };
   ok(
-    "com comida automática, ração vence a casinha",
+    "with automatic food, the ration beats the kennel",
     automationCtrl.nextAutomationStep(restFeed, null)?.kind === "feed",
   );
   const paused = baseState({ level: 10, form: "werewolf" });
@@ -2146,7 +2146,7 @@ sec("automation");
   };
   spentMine.automation = { ...spentMine.automation, mine: true };
   ok(
-    "mina esgotada não retoma",
+    "an exhausted mine does not resume",
     automationCtrl.nextAutomationStep(spentMine, { kind: "mine", id: "bronze-vein", paused: true }) ===
       null,
   );
@@ -2157,7 +2157,7 @@ sec("automation");
   };
   const furyStep = automationCtrl.nextAutomationStep(furyHunt, idle);
   ok(
-    "caçada pausada bebe fúria antes de retomar",
+    "a paused hunt drinks fury before resuming",
     furyStep?.kind === "potion" && furyStep.itemId === "rage-potion-small",
   );
   const furyAlone = {
@@ -2165,15 +2165,15 @@ sec("automation");
     automation: { ...resumed.automation, hunt: false, transform: true },
   };
   ok(
-    "fúria automática bebe sozinha na caçada",
+    "automatic fury drinks on its own during the hunt",
     automationCtrl.nextAutomationStep(furyAlone, idle)?.itemId === "rage-potion-small",
   );
   ok(
-    "fúria automática não bebe parado",
+    "automatic fury does not drink while idle",
     automationCtrl.nextAutomationStep(furyAlone, null) === null,
   );
   ok(
-    "caçada em curso também pede o frasco",
+    "an ongoing hunt also asks for the flask",
     automationCtrl.nextAutomationStep(furyAlone, { kind: "hunt", id: "village-field" })?.itemId ===
       "rage-potion-small",
   );
@@ -2185,7 +2185,7 @@ sec("automation");
     },
   };
   ok(
-    "com fúria ativa retoma a caçada",
+    "with fury on the hunt resumes",
     automationCtrl.nextAutomationStep(furyReady, idle)?.kind === "work",
   );
   const healThenFury = { ...low };
@@ -2204,12 +2204,12 @@ sec("automation");
     potion: true,
   };
   ok(
-    "no chão a vida vem antes da fúria",
+    "on the floor health comes before fury",
     automationCtrl.nextAutomationStep(healThenFury, idle)?.itemId === "health-potion-small",
   );
   const bothKeys = { ...low, automation: { ...low.automation, potion: true, rest: true } };
   ok(
-    "com frasco na mochila a poção vence o descanso",
+    "with a flask in the bag the potion beats rest",
     automationCtrl.nextAutomationStep(bothKeys, null)?.kind === "potion",
   );
   const floorTurn = {
@@ -2218,12 +2218,12 @@ sec("automation");
     automation: { ...low.automation, transform: true, potion: true },
   };
   ok(
-    "no chão a fúria espera, recupera antes",
+    "on the floor the fury waits, recover first",
     automationCtrl.nextAutomationStep(floorTurn, idle)?.kind === "potion" &&
       !automationCtrl.nextAutomationStep(floorTurn, idle)?.itemId?.startsWith("rage"),
   );
   ok(
-    "descansando não deita de novo",
+    "already resting does not lie down again",
     automationCtrl.nextAutomationStep(noFlask, { kind: "rest" }) === null,
   );
   const trainKeyed = baseState({ level: 10, form: "werewolf" });
@@ -2238,14 +2238,14 @@ sec("automation");
     wokenUp?.kind === "train" && wokenUp.id === "ice-bath",
   );
   ok(
-    "sem a chave o descanso não devolve nada",
+    "without the switch rest gives nothing back",
     automationCtrl.resumeAfterRest(baseState({ level: 10 }), {
       kind: "rest",
       resume: { kind: "train", id: "ice-bath" },
     }) === null,
   );
   ok(
-    "descanso sem lembrança não devolve nada",
+    "rest with no memory gives nothing back",
     automationCtrl.resumeAfterRest(trainKeyed, { kind: "rest" }) === null,
   );
 }
@@ -2259,7 +2259,7 @@ sec("tavern");
   ok("name with space refuses", bad.ok === false);
   const lowbie = { id: "novato", name: "Novato", level: 10 };
   ok(
-    "mesa sem senha exige o NV mínimo para abrir",
+    "a table without a password takes the minimum LV to open",
     tavernCtrl.createRoom(entTavern.emptyTavern(), lowbie, "Ninho", "").ok === false,
   );
   ok(
@@ -2268,7 +2268,7 @@ sec("tavern");
       true,
   );
   ok(
-    "com senha o novato abre em qualquer nível",
+    "with a password the novice opens at any level",
     tavernCtrl.createRoom(entTavern.emptyTavern(), lowbie, "Ninho", "chave").ok === true,
   );
   const opened = tavernCtrl.createRoom(tavern, me, "Fogueira", "");
@@ -2278,7 +2278,7 @@ sec("tavern");
   ok("name starts visible", tavernCtrl.findRoom(tavern, opened.roomId).nameHidden === false);
   ok("the owner is already seated", tavernCtrl.findRoom(tavern, opened.roomId).members.length === 1);
   ok(
-    "mesa sem senha exige o NV mínimo para entrar",
+    "a table without a password takes the minimum LV to enter",
     tavernCtrl.joinRoom(tavern, opened.roomId, lowbie, "").ok === false,
   );
   ok(
@@ -2298,7 +2298,7 @@ sec("tavern");
     ).state;
   }
   ok(
-    "a vigésima primeira cadeira não existe",
+    "the twenty-first chair does not exist",
     tavernCtrl.joinRoom(tavern, opened.roomId, { id: "sobra", name: "Sobra", level: 60 }, "").ok ===
       false,
   );
@@ -2323,7 +2323,7 @@ sec("tavern");
   );
   const longTalk = tavernCtrl.sendMessage(tavern, opened.roomId, other, "a".repeat(200));
   ok(
-    "fala é cortada em 150",
+    "a line is cut at 150",
     longTalk.ok &&
       tavernCtrl
         .findRoom(longTalk.state, opened.roomId)
@@ -2343,7 +2343,7 @@ sec("tavern");
         me.name + " went to get a drink.",
   );
   ok(
-    "de fora não se anuncia saída",
+    "from outside no away notice is written",
     tavernCtrl.announceAway(tavern, opened.roomId, { id: "fora", name: "Fora" }).ok === false,
   );
   const cameBack = tavernCtrl.joinRoom(tavern, opened.roomId, me, "");
@@ -2362,7 +2362,7 @@ sec("tavern");
     tavernCtrl.sendMessage(tavern, opened.roomId, me, "entra em www.exemplo.io").ok === false,
   );
   ok(
-    "domínio pelado recusa",
+    "a bare domain refuses",
     tavernCtrl.sendMessage(tavern, opened.roomId, me, "acessa exemplo.com agora").ok === false,
   );
   ok(
@@ -2392,7 +2392,7 @@ sec("tavern");
       true,
   );
   ok(
-    "site aleatório ainda recusa",
+    "a random site still refuses",
     tavernCtrl.sendMessage(tavern, opened.roomId, me, "spam em https://malicioso.net/x").ok === false,
   );
   {
@@ -2405,7 +2405,7 @@ sec("tavern");
       youtube.some((part) => part.kind === "link" && part.href === "https://youtube.com/watch?v=abc"),
     );
     ok(
-      "www ganha https e pontuação fica fora",
+      "www gains https and punctuation stays out",
       twitch.some((part) => part.kind === "link" && part.href === "https://www.twitch.tv/canal") &&
         twitch.some((part) => part.kind === "text" && part.value === "."),
     );
@@ -2416,7 +2416,7 @@ sec("tavern");
       ),
     );
     ok(
-      "site recusado não vira link",
+      "a refused site does not become a link",
       blocked.every((part) => part.kind === "text"),
     );
   }
@@ -2442,11 +2442,11 @@ sec("tavern");
     );
   }
   ok(
-    "fala com pontuação passa",
+    "a line with punctuation passes",
     tavernCtrl.sendMessage(tavern, opened.roomId, me, "Boa noite, matilha. Tudo bem?").ok === true,
   );
   ok(
-    "de fora não se fala",
+    "from outside nobody speaks",
     tavernCtrl.sendMessage(tavern, opened.roomId, { id: "fora", name: "Fora" }, "oi").ok === false,
   );
   {
@@ -2456,7 +2456,7 @@ sec("tavern");
     const locked = tavernCtrl.createRoom(vault, boss, "Trancada", "segredo");
     ok("table with password opens", locked.ok === true);
     ok(
-      "com senha o novato entra em qualquer nível",
+      "with a password the novice enters at any level",
       tavernCtrl.joinRoom(locked.state, locked.roomId, lowbie, "segredo").ok === true,
     );
     vault = tavernCtrl.sendMessage(locked.state, locked.roomId, boss, "conversa secreta").state;
@@ -2464,7 +2464,7 @@ sec("tavern");
       .listRooms(vault, nosy)
       .find((summary) => summary.room.id === locked.roomId);
     ok(
-      "estranho vê a mesa trancada mas não a conversa",
+      "a stranger sees the locked table but not the talk",
       Boolean(stranger) && stranger.locked === true && stranger.room.messages.length === 0,
     );
     ok("the board never hands the password hash", stranger.room.password === null);
@@ -2472,7 +2472,7 @@ sec("tavern");
       .listRooms(vault, boss)
       .find((summary) => summary.room.id === locked.roomId);
     ok(
-      "o dono lê a própria conversa sem o hash",
+      "the owner reads their own talk without the hash",
       owner.room.messages.length === 2 && owner.room.password === null,
     );
     const forged = tavernCtrl.leaveRoom(vault, locked.roomId, nosy);
@@ -2488,7 +2488,7 @@ sec("tavern");
       tavernCtrl.createRoom(entTavern.emptyTavern(), me, "Secreta", "", true).ok === false,
     );
     ok(
-      "VIP também não abre reservada sem senha",
+      "even VIP does not open a reserved table without a password",
       tavernCtrl.createRoom(
         entTavern.emptyTavern(),
         { ...lowbie, vip: true },
@@ -2502,7 +2502,7 @@ sec("tavern");
     ok("hidden table stays locked", tavernCtrl.findRoom(hide.state, hide.roomId).password !== null);
     const pair = tavernCtrl.createRoom(hide.state, other, "Clara", "");
     ok(
-      "segunda mesa é #2",
+      "the second table is #2",
       pair.ok && tavernCtrl.findRoom(pair.state, pair.roomId).number === 2,
     );
     const listed = tavernCtrl
@@ -2520,7 +2520,7 @@ sec("tavern");
       listed && entTavern.roomMatchesSearch(listed.room, false, "secreta") === false,
     );
     ok(
-      "de fora a busca pelo número acha",
+      "from outside the number search finds it",
       listed &&
         entTavern.roomMatchesSearch(listed.room, false, "#1") &&
         entTavern.roomMatchesSearch(listed.room, false, "1"),
@@ -2536,12 +2536,12 @@ sec("tavern");
     const closed = tavernCtrl.closeRoom(hide.state, hide.roomId, me);
     const again = tavernCtrl.createRoom(closed.state, me, "Nova", "");
     ok(
-      "número volta depois de fechar",
+      "the number returns after closing",
       again.ok && tavernCtrl.findRoom(again.state, again.roomId).number === 1,
     );
     ok("search accepts the #", sanitizeRoomSearch("#17", 40) === "#17");
     ok(
-      "número reusa o furo",
+      "the number reuses the gap",
       entTavern.nextRoomNumber([{ number: 1 }, { number: 3 }]) === 2,
     );
   }
@@ -2549,7 +2549,7 @@ sec("tavern");
   ok("reserved table opens", direct.ok === true);
   tavern = direct.state;
   ok(
-    "terceiro não vê a mesa reservada",
+    "a third does not see the reserved table",
     tavernCtrl.listRooms(tavern, third).every((summary) => summary.room.id !== direct.roomId),
   );
   ok(
@@ -2557,7 +2557,7 @@ sec("tavern");
     tavernCtrl.listRooms(tavern, other).some((summary) => summary.room.id === direct.roomId),
   );
   ok(
-    "terceiro não senta na reservada",
+    "a third does not sit at the reserved table",
     tavernCtrl.joinRoom(tavern, direct.roomId, third, "").ok === false,
   );
   const reopened = tavernCtrl.openDirect(tavern, me, other);
@@ -2577,7 +2577,7 @@ sec("tavern");
     const nicks = load("models/rules/tavern-nicks.js");
     ok("first seat takes color 0", nicks.claimNickColor([], 20) === 0);
     ok(
-      "o próximo pega a primeira livre",
+      "the next one takes the first free",
       nicks.claimNickColor([{ nickColor: 0 }, { nickColor: 2 }], 20) === 1,
     );
     ok("table of two only offers 0 and 1", nicks.claimNickColor([{ nickColor: 0 }], 2) === 1);
@@ -2623,13 +2623,13 @@ sec("tavern");
       room: { ...reserved.room, id: "open", privateFor: undefined },
     };
     ok(
-      "ping lê a fala do outro na reservada",
+      "the ping reads the other's line at the reserved table",
       tavernCtrl.latestSeatedChatAt([reserved], "a") === at,
     );
     ok("ping ignores own line", tavernCtrl.latestSeatedChatAt([reserved], "b") === "");
     ok("ping reads the line at the open table", tavernCtrl.latestSeatedChatAt([open], "a") === at);
     ok(
-      "ping ignora quem não senta",
+      "the ping ignores whoever is not seated",
       tavernCtrl.latestSeatedChatAt([{ ...reserved, isMember: false }], "a") === "",
     );
   }
@@ -2648,11 +2648,11 @@ sec("tavern");
       entActivity.describeDoing("Lumni", "idle") === "Lumni is idle",
     );
     ok(
-      "a própria caça vale na hora",
+      "your own hunt counts at once",
       entActivity.doingFor("eu", "eu", "hunt", {}) === "hunt",
     );
     ok(
-      "o outro lê o quadro",
+      "the other one reads the board",
       entActivity.doingFor("ela", "eu", "hunt", { ela: "mine" }) === "mine",
     );
   }
@@ -2713,15 +2713,15 @@ sec("pack");
   ok("deleting frees the slot", removed.ok && removed.state.pack.length === 0);
   const fresh = new Date().toISOString();
   ok(
-    "presença ativa recente fica verde",
+    "recent active presence shows green",
     presenceRules.resolvePresence("active", fresh) === "active",
   );
   ok(
-    "presença ausente recente fica vermelha",
+    "recent away presence shows red",
     presenceRules.resolvePresence("away", fresh) === "away",
   );
   ok(
-    "presença velha vira offline",
+    "old presence turns offline",
     presenceRules.resolvePresence(
       "active",
       new Date(Date.now() - presenceRules.PRESENCE_STALE_MS - 1).toISOString(),
@@ -2907,7 +2907,7 @@ sec("persistence");
   ok("old coat migrates in the bag", loaded.inventory[0].itemId === "bronze-armor-female");
   ok("old coat migrates on the body", loaded.equipment.armor?.itemId === "bronze-armor-female");
   ok(
-    "casaco antigo migra a forja pra cópia e pro corpo",
+    "an old coat carries its forge to the copy and the body",
     loaded.inventory[0].enhancement === 3 && loaded.equipment.armor?.enhancement === 3,
   );
   ok("old coat migrates in the bazaar", loaded.bazaarListings[0]?.itemId === "bronze-armor-female");
@@ -2975,15 +2975,15 @@ sec("persistence");
   );
   loaded = repo.load();
   ok(
-    "selo de arena podre é descartado",
+    "a rotten arena stamp is discarded",
     !("rival-2" in loaded.arenaDuels) && "rival-1" in loaded.arenaDuels,
   );
   ok(
-    "chave de automação sobrevive",
+    "the automation switch survives",
     loaded.automation.hunt === true && loaded.automation.petFeed === false,
   );
   ok(
-    "compra podre é descartada",
+    "a rotten purchase is discarded",
     loaded.bazaarPurchases.good === 2 && !("bad" in loaded.bazaarPurchases),
   );
   const canon = (value) =>
@@ -2996,7 +2996,7 @@ sec("persistence");
   put(json(roundtrip));
   const back = repo.load();
   ok(
-    "um save são atravessa inteiro",
+    "a sound save crosses whole",
     canon({ ...back, log: [] }) === canon({ ...roundtrip, log: [] }),
   );
   delete globalThis.window;

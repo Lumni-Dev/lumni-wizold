@@ -4,7 +4,7 @@ import { privatePageMetadata } from "@/shared/seo/metadata";
 
 export const metadata: Metadata = privatePageMetadata({
   title: "Wizold Store",
-  description: "Pacotes de WCoins por dinheiro real para acelerar treino e equipamento.",
+  description: "WCoin packs for real money to speed up training and equipment.",
   path: "/store",
 });
 

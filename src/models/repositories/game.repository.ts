@@ -90,7 +90,7 @@ function normalizePet(pet: Pet): Pet {
       : undefined;
   const normalized: Pet = {
     id: text(pet.id, generateId("pet")),
-    name: text(pet.name, "Lobo"),
+    name: text(pet.name, "Wolf"),
     gender: pet.gender === "female" ? "female" : "male",
     energy: 0,
     active: pet.active !== false,

@@ -426,7 +426,7 @@ export function WikiScreen() {
               pageItems.map((item) => (
                 <ListRow key={item.id} art={<ItemArtFill item={item} />}>
                   <RowText title={item.name} description={wikiItemDescription(item)} />
-                  <span className="shrink-0 font-mono text-[11px] text-ink-faint">mina</span>
+                  <span className="shrink-0 font-mono text-[11px] text-ink-faint">{t("mine")}</span>
                 </ListRow>
               ))
             }
