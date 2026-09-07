@@ -1330,4 +1330,6 @@ export const PT: Record<string, string> = {
   "Fill in the birth date.": "Preencha a data de nascimento.",
   "Welcome back.": "Bem-vindo de volta.",
   "Account with no known e-mail.": "Conta sem e-mail conhecido.",
+  "Reply": "Responder",
+  "New messages": "Mensagens novas",
 };

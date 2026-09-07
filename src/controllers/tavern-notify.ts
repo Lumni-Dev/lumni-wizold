@@ -1,7 +1,9 @@
 "use client";
 
+import { languageRepository } from "@/models/repositories/language.repository";
 import { tavernPushRepository } from "@/models/repositories/tavern-push.repository";
 import { TAVERN_MUG_PATH } from "@/shared/constants/site";
+import { translate } from "@/shared/i18n/dictionary";
 import { formatDay } from "@/shared/utils/format";
 import { api } from "./api.client";
 
@@ -133,9 +135,12 @@ export function notifyTavernMessageLocal(
   at: string,
 ): void {
   if (!tavernPushSupported() || Notification.permission !== "granted") return;
+  // The body is an English source string (never a player's line), so the
+  // exact dictionary resolves it to the device's language.
+  const locale = languageRepository.resolved();
   const title = authorName + " · " + roomName;
   const base: NotificationOptions = {
-    body: text + "\n" + formatDay(at),
+    body: translate(text, locale) + "\n" + formatDay(at),
     icon: TAVERN_MUG_PATH,
     tag: "tavern:" + roomName,
     requireInteraction: true,
@@ -148,7 +153,7 @@ export function notifyTavernMessageLocal(
           const rich: NotificationOptionsWithActions = {
             ...base,
             data: { url: "/tavern" },
-            actions: [{ action: "reply", title: "Responder" }],
+            actions: [{ action: "reply", title: translate("Reply", locale) }],
           };
           return registration.showNotification(title, rich);
         }
@@ -180,7 +185,7 @@ export function dismissTavernNotices(roomName?: string): void {
 
 export function testTavernPush(): void {
   notifyTavernMessageLocal(
-    "Tavern",
+    translate("Tavern", languageRepository.resolved()),
     "Wizold",
     "Test notification: if you can see this, it works.",
     new Date().toISOString(),

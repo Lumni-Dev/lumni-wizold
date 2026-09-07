@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { languageRepository } from "@/models/repositories/language.repository";
 import { tavernPushRepository } from "@/models/repositories/tavern-push.repository";
+import { translate } from "@/shared/i18n/dictionary";
 import { TAVERN_NOTICE_BODY } from "@/shared/constants/moderation";
 import { tavernUserStore } from "./tavern-user.store";
 import { clearTavernAlerts, pushTavernAlert } from "./tavern-alert.store";
@@ -99,7 +101,7 @@ export function useTavernAlert(watching: boolean) {
               id: item.at + ":" + item.roomName,
               roomName: item.roomName,
               authorName: item.authorName,
-              text: TAVERN_NOTICE_BODY,
+              text: translate(TAVERN_NOTICE_BODY, languageRepository.resolved()),
               at: item.at,
             });
           } else if (hidden && !tavernPushActive()) {
@@ -122,7 +124,8 @@ export function useTavernAlert(watching: boolean) {
   const baseRef = useRef<string | null>(null);
   useEffect(() => {
     if (!flashing) return;
-    const alert = "[" + shownUnread + "] Mensagens novas";
+    const alert =
+      "[" + shownUnread + "] " + translate("New messages", languageRepository.resolved());
     let showingAlert = false;
     const timer = window.setInterval(() => {
       showingAlert = !showingAlert;

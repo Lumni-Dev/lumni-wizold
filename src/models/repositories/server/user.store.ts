@@ -72,6 +72,21 @@ export async function userLocale(client: PoolClient, userId: string): Promise<Lo
   return detectLocale(found.rows[0]?.locale ?? null);
 }
 
+export async function userLocales(
+  client: PoolClient,
+  userIds: string[],
+): Promise<Map<string, Locale>> {
+  if (userIds.length === 0) return new Map();
+  const found = await client.query("select id, locale from users where id = any($1::text[])", [
+    userIds,
+  ]);
+  const map = new Map<string, Locale>();
+  for (const row of found.rows) {
+    map.set(String(row.id), detectLocale(row.locale ?? null));
+  }
+  return map;
+}
+
 export async function isTutorialDone(client: PoolClient, userId: string): Promise<boolean> {
   const found = await client.query("select tutorial from users where id = $1", [userId]);
   return found.rows[0]?.tutorial === true;

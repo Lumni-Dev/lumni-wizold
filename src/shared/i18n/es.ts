@@ -1331,4 +1331,6 @@ export const ES: Record<string, string> = {
   "Fill in the birth date.": "Completa la fecha de nacimiento.",
   "Welcome back.": "Bienvenido de vuelta.",
   "Account with no known e-mail.": "Cuenta sin correo conocido.",
+  "Reply": "Responder",
+  "New messages": "Mensajes nuevos",
 };

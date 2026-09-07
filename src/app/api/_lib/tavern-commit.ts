@@ -7,6 +7,8 @@ import {
   listPushSubscriptionsForUsers,
   userIdsForCharacters,
 } from "@/models/repositories/server/push.store";
+import { userLocales } from "@/models/repositories/server/user.store";
+import { translate } from "@/shared/i18n/dictionary";
 import { TAVERN_NOTICE_BODY } from "@/shared/constants/moderation";
 import { publishTavernRevision } from "./tavern-bus";
 import { bumpTavernRevision } from "./tavern-board";
@@ -60,16 +62,21 @@ async function notifyTavernMessagePush(
   const subscriptions = await listPushSubscriptionsForUsers(client, userIds);
   if (subscriptions.length === 0) return;
 
-  const payload = {
-    title: push.authorName + " · " + push.roomName,
-    body: TAVERN_NOTICE_BODY,
-    url: "/tavern",
-    roomName: push.roomName,
-    at: push.at,
-  };
+  // The notice speaks each receiver's stored language: the payload carries the
+  // localized body and the reply label, so the service worker stays dumb.
+  const locales = await userLocales(client, [...new Set(subscriptions.map((row) => row.userId))]);
 
   await Promise.all(
-    subscriptions.map(async ({ subscription }) => {
+    subscriptions.map(async ({ userId, subscription }) => {
+      const locale = locales.get(userId) ?? "en";
+      const payload = {
+        title: push.authorName + " · " + push.roomName,
+        body: translate(TAVERN_NOTICE_BODY, locale),
+        reply: translate("Reply", locale),
+        url: "/tavern",
+        roomName: push.roomName,
+        at: push.at,
+      };
       const ok = await sendWebPush(subscription, payload);
       if (!ok) await deletePushSubscriptionByEndpoint(client, subscription.endpoint);
     }),

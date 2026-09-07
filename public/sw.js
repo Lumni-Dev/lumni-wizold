@@ -1,5 +1,13 @@
 self.addEventListener("push", (event) => {
-  let payload = { title: "Wizold", body: "Nova mensagem na taverna.", url: "/tavern", roomName: "Taverna" };
+  // The payload arrives already localized to the receiver's stored language;
+  // these defaults only cover a payload-less push.
+  let payload = {
+    title: "Wizold",
+    body: "New message in the tavern.",
+    reply: "Reply",
+    url: "/tavern",
+    roomName: "Tavern",
+  };
   try {
     if (event.data) payload = { ...payload, ...event.data.json() };
   } catch {}
@@ -12,7 +20,7 @@ self.addEventListener("push", (event) => {
         tag: "tavern:" + payload.roomName,
         data: { url: payload.url || "/tavern" },
         requireInteraction: true,
-        actions: [{ action: "reply", title: "Responder" }],
+        actions: [{ action: "reply", title: payload.reply || "Reply" }],
       });
     }),
   );
