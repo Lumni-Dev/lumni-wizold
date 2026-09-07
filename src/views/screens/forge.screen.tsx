@@ -314,6 +314,7 @@ export function ForgeScreen() {
                     trailing={
                       <>
                         <span className="shrink-0 font-mono text-[11px] text-ink-faint">
+                          <GainDelta total={owned} className="mr-1 font-bold text-ember" />
                           x{formatNumber(owned)}
                         </span>
                         <span
@@ -401,6 +402,8 @@ export function ForgeScreen() {
                         tone="ember"
                         current={forgeEntry.owned}
                         maximum={forgeEntry.cost}
+                        delta={<GainDelta total={forgeEntry.owned} />}
+                        deltaTone="ember"
                       />
                     </ListRow>
                   ) : null}
