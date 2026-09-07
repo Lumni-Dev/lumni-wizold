@@ -828,8 +828,8 @@ export function TavernScreen() {
                     </div>
                   </CardHeader>
 
-                  <CardBody>
-                    {locked && !isMember ? (
+                  {locked && !isMember ? (
+                    <CardBody>
                       <Field
                         type="password"
                         maxLength={60}
@@ -848,8 +848,8 @@ export function TavernScreen() {
                           open(room.id, joinPasswords[room.id] ?? "");
                         }}
                       />
-                    ) : null}
-                  </CardBody>
+                    </CardBody>
+                  ) : null}
 
                   <CardFooter>
                     <div className="grid w-full grid-cols-2 gap-2">
