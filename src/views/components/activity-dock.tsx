@@ -16,11 +16,13 @@ import {
   huntSelectionSnapshot,
   subscribeHuntSelection,
 } from "@/models/repositories/hunt-selection.repository";
-import { canPetFight, petLevelOf, petMaxEnergy } from "@/models/rules/pet";
+import { canPetFight, petLevelOf, petMaxEnergy, petTotalTraining } from "@/models/rules/pet";
+import { totalExperience } from "@/models/rules/progression";
 import { huntPreyView, preyBarCurrent } from "../presenters/hunt.presenter";
 import {
   CYCLE_OPTOUT_SECS,
   FORGE_TICKS,
+  MAX_ATTRIBUTE_VALUE,
   MAX_ENHANCEMENT,
   PET_EXERCISE_ID,
 } from "@/shared/constants/game";
@@ -29,6 +31,7 @@ import { formatNumber } from "@/shared/utils/format";
 import { cn } from "@/shared/utils/class-names";
 import { ActionIcon, NavIcon } from "./app-icon";
 import { Bar } from "./bar";
+import { GainDelta } from "./gain-delta";
 import { RestHealed } from "./rest-healed";
 import { Button } from "./button";
 import { CornerAccents } from "./corner-accents";
@@ -157,6 +160,8 @@ export function ActivityDock() {
         progressLabel: "Mascote - Experiência (NV. " + formatNumber(petTraining.level) + "/1000)",
         progressCurrent: petTraining.progress,
         progressMax: petTraining.needed,
+        progressTotal: petTotalTraining(petTraining.level, petTraining.progress),
+        maxed: petTraining.maxed,
         sessionLabel: "Mascote - Treinamento",
         sessionCurrent: trainRt.beat,
         sessionMax: trainRt.max,
@@ -179,6 +184,8 @@ export function ActivityDock() {
       progressLabel: "Experiência (NV. " + formatNumber(row?.value ?? 0) + "/1000)",
       progressCurrent: row?.progress ?? 0,
       progressMax: row?.needed ?? 1,
+      progressTotal: totalExperience(row?.value ?? 0, row?.progress ?? 0),
+      maxed: (row?.value ?? 0) >= MAX_ATTRIBUTE_VALUE,
       sessionLabel: "Treinamento",
       sessionCurrent: trainRt.beat,
       sessionMax: trainRt.max,
@@ -200,9 +207,15 @@ export function ActivityDock() {
     const opting = cooldown !== null;
 
     return {
+      xpLabel: "Experiência (NV. " + formatNumber(mining.level) + "/1000)",
+      xpCurrent: mining.progress,
+      xpMax: mining.needed,
+      xpTotal: totalExperience(mining.level, mining.progress),
+      maxed: mining.maxed,
       dailyLabel: mining.dailyExhausted ? "Recursos da mina esgotados" : "Recursos da mina",
       dailyCurrent: mining.dailyRemaining,
       dailyMax: mining.dailyLimit,
+      dailySpent: mining.dailyLimit - mining.dailyRemaining,
       swingLabel: "Minerando...",
       swingCurrent: mineRt.beat,
       swingMax: mineRt.max,
@@ -571,6 +584,10 @@ export function ActivityDock() {
                       current={trainView.progressCurrent}
                       maximum={trainView.progressMax}
                       tone="experience"
+                      delta={
+                        trainView.maxed ? undefined : <GainDelta total={trainView.progressTotal} />
+                      }
+                      deltaTone="experience"
                       wraps
                     />
                   </ListRow>
@@ -593,10 +610,25 @@ export function ActivityDock() {
                 <>
                   <ListRow layout="column">
                     <Bar
+                      label={mineView.xpLabel}
+                      current={mineView.xpCurrent}
+                      maximum={mineView.xpMax}
+                      tone="experience"
+                      delta={
+                        mineView.maxed ? undefined : <GainDelta total={mineView.xpTotal} />
+                      }
+                      deltaTone="experience"
+                      wraps
+                    />
+                  </ListRow>
+                  <ListRow layout="column">
+                    <Bar
                       label={mineView.dailyLabel}
                       tone="tide"
                       current={mineView.dailyCurrent}
                       maximum={mineView.dailyMax}
+                      delta={<GainDelta total={mineView.dailySpent} sign="-" />}
+                      deltaTone="tide"
                     />
                   </ListRow>
                   <ListRow layout="column">
