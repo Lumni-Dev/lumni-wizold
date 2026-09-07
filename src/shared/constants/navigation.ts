@@ -6,57 +6,57 @@ export interface NavigationItem {
 }
 
 export const NAVIGATION: readonly NavigationItem[] = [
-  { href: "/character", label: "Personagem", code: "PS", description: "Ficha, atributos e forma" },
+  { href: "/character", label: "Character", code: "PS", description: "Sheet, attributes and form" },
   {
     href: "/inventory",
-    label: "Inventário",
+    label: "Inventory",
     code: "IV",
-    description: "Itens, equipamento e consumo",
+    description: "Items, equipment and consumables",
   },
-  { href: "/training", label: "Treinamento", code: "TR", description: "Evolução dos atributos" },
-  { href: "/hunt", label: "Caça", code: "CA", description: "Territórios e combate" },
-  { href: "/arena", label: "Arena", code: "AR", description: "Duelos contra outros lobisomens" },
+  { href: "/training", label: "Training", code: "TR", description: "Attribute progression" },
+  { href: "/hunt", label: "Hunt", code: "CA", description: "Territories and combat" },
+  { href: "/arena", label: "Arena", code: "AR", description: "Duels against other werewolves" },
 
-  { href: "/pet", label: "Mascote", code: "MS", description: "Seu lobo e os suprimentos dele" },
-  { href: "/market", label: "Mercado", code: "MC", description: "Compra e venda de itens" },
+  { href: "/pet", label: "Companion", code: "MS", description: "Your wolf and its supplies" },
+  { href: "/market", label: "Market", code: "MC", description: "Buy and sell items" },
   {
     href: "/forge",
-    label: "Forja",
+    label: "Forge",
     code: "FJ",
-    description: "Mineração e melhoria de equipamento",
+    description: "Mining and gear enhancement",
   },
   {
     href: "/bazaar",
-    label: "Bazar",
+    label: "Bazaar",
     code: "BZ",
-    description: "Troca de peças forjadas entre jogadores",
+    description: "Forged gear traded between players",
   },
   {
     href: "/tavern",
-    label: "Taverna",
+    label: "Tavern",
     code: "TV",
-    description: "Mesas de conversa entre jogadores",
+    description: "Chat tables between players",
   },
-  { href: "/ranking", label: "Ranking", code: "RK", description: "Os melhores de cada número" },
-  { href: "/wiki", label: "Wiki", code: "WK", description: "Regras, bestiário e catálogo" },
+  { href: "/ranking", label: "Ranking", code: "RK", description: "The best of every number" },
+  { href: "/wiki", label: "Wiki", code: "WK", description: "Rules, bestiary and catalog" },
 ] as const;
 
 export const STORE_LINK: NavigationItem = {
   href: "/store",
   label: "Wizold Store",
   code: "LS",
-  description: "Pacotes de bronze por dinheiro",
+  description: "WCoin packs for real money",
 };
 
 export const SETTINGS_LINK: NavigationItem = {
   href: "/settings",
-  label: "Configurações",
+  label: "Settings",
   code: "CF",
-  description: "Conta, nome e partida",
+  description: "Account, name and run",
 };
 
 export const TUTORIAL_LINK = {
-  label: "Como jogar",
+  label: "How to play",
   code: "TJ",
-  description: "A primeira noite, de novo",
+  description: "The first night, again",
 };

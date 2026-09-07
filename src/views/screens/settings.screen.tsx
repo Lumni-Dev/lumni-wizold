@@ -246,15 +246,15 @@ export function SettingsScreen() {
       <div className="space-y-6">
         {shows("idioma") ? (
           <Panel
-            title="Idioma"
-            description="Em que língua o jogo fala com você neste aparelho."
+            title="Language"
+            description="The language the game speaks to you on this device."
             padding="none"
           >
             <List>
               <ListRow layout="split">
                 <RowText
-                  title="Idioma"
-                  description="Automático segue o idioma do navegador. O que ainda não tem tradução aparece em português."
+                  title="Language"
+                  description="Automatic follows the browser language. The game is written in English and translated from it."
                 />
                 <div className="flex shrink-0 flex-wrap gap-2">
                   <Chip

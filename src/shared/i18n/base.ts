@@ -1,4 +1,8 @@
-export const EN: Record<string, string> = {
+// The bridge from the legacy Portuguese source strings to the English base
+// text. New code is written in English; whatever still speaks Portuguese in
+// the source resolves to English here first, and pt.ts/es.ts translate from
+// the English side.
+export const BASE: Record<string, string> = {
   // Navigation
   "Personagem": "Character",
   "Ficha, atributos e forma": "Sheet, attributes and form",
@@ -971,6 +975,7 @@ export const EN: Record<string, string> = {
   "Anel Lunar": "Lunar Ring",
   "Ouro": "Gold",
   "Diamante": "Diamond",
+  "Bronze": "Bronze",
 
   // Catalog: fragments, potions and supplies
   "Fragmento de Bronze": "Bronze Fragment",

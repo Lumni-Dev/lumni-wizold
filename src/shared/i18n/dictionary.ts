@@ -1,8 +1,7 @@
-import { EN } from "./en";
+import { BASE } from "./base";
 import { ES } from "./es";
+import { PT } from "./pt";
 import type { Locale } from "./locale";
-
-const MAPS: Record<Exclude<Locale, "pt">, Record<string, string>> = { en: EN, es: ES };
 
 interface PatternRule {
   pattern: RegExp;
@@ -10,8 +9,10 @@ interface PatternRule {
   es: string;
 }
 
-// Interpolated strings cannot match by exact key, so the common shapes are
-// translated by pattern, keeping the numbers where they are.
+// Legacy interpolated strings cannot match by exact key, so the common shapes
+// are translated by pattern, keeping the numbers where they are. These
+// patterns read the legacy Portuguese sources; strings born in English need no
+// rule for the English side and translate to pt/es by exact key.
 const RULES: readonly PatternRule[] = [
   {
     pattern: /^Experiência \(NV\. (.+)\)$/,
@@ -574,20 +575,36 @@ const RULES: readonly PatternRule[] = [
   { pattern: /^(.+) \+(\d+)$/, en: "$1 +$2", es: "$1 +$2" },
 ];
 
+// English is the base language. A source string may be legacy Portuguese
+// (resolved to English through BASE, or through the legacy RULES when it
+// carries numbers) or already English (new code), in which case pt/es come
+// straight from the English-keyed dictionaries.
 export function translate(text: string, locale: Locale, depth = 0): string {
-  if (locale === "pt") return text;
-  const direct = MAPS[locale][text];
-  if (direct !== undefined) return direct;
-  if (depth >= 3) return text;
-  for (const rule of RULES) {
-    const match = text.match(rule.pattern);
-    if (match) {
-      // Captures are translated on their own, so a rule like "$1 +$2" can
-      // carry an item name or another translated phrase through.
-      return rule[locale].replace(/\$(\d)/g, (_, index: string) =>
-        translate(match[Number(index)] ?? "", locale, depth + 1),
-      );
+  if (locale === "pt") {
+    // English-born strings translate here; legacy Portuguese passes through.
+    return PT[text] ?? text;
+  }
+
+  const english = BASE[text];
+  if (english !== undefined) {
+    if (locale === "en") return english;
+    return ES[english] ?? english;
+  }
+
+  if (depth < 3) {
+    for (const rule of RULES) {
+      const match = text.match(rule.pattern);
+      if (match) {
+        // Captures are translated on their own, so a rule like "$1 +$2" can
+        // carry an item name or another translated phrase through.
+        return rule[locale].replace(/\$(\d)/g, (_, index: string) =>
+          translate(match[Number(index)] ?? "", locale, depth + 1),
+        );
+      }
     }
   }
-  return text;
+
+  // Already English (new code): identity for en, exact lookup for es.
+  if (locale === "en") return text;
+  return ES[text] ?? text;
 }
