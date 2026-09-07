@@ -17,16 +17,16 @@ export function listPack(state: GameState): PackMate[] {
 
 export function addMate(state: GameState, person: TavernIdentity): Result<PackMate> {
   const character = state.character;
-  if (!character) return failure(state, "Nenhum personagem ativo.");
+  if (!character) return failure(state, "No active character.");
 
-  if (person.id === character.id) return failure(state, "Você já anda com você mesmo.");
+  if (person.id === character.id) return failure(state, "You already walk with yourself.");
   if (isInPack(state, person.id)) {
-    return failure(state, person.name + " já está na sua matilha.");
+    return failure(state, person.name + " is already in your pack.");
   }
   if (state.pack.length >= MAX_PACK) {
     return failure(
       state,
-      "A matilha já tem " + MAX_PACK + " nomes. Exclua um antes de guardar outro.",
+      "The pack already has " + MAX_PACK + " names. Remove one before keeping another.",
     );
   }
 
@@ -37,7 +37,7 @@ export function addMate(state: GameState, person: TavernIdentity): Result<PackMa
   };
 
   const next: GameState = { ...state, pack: [...state.pack, mate] };
-  const message = person.name + " entrou para a sua matilha.";
+  const message = person.name + " joined your pack.";
 
   return success(addLog(next, "character", message), message, mate);
 }
@@ -47,15 +47,15 @@ export function matchNick(
   candidates: readonly TavernIdentity[],
 ): TavernIdentity | string {
   const term = normalizeText(nick);
-  if (term.length === 0) return "Escreva o nick de alguém.";
+  if (term.length === 0) return "Write someone's nick.";
 
   const exact = candidates.find((person) => normalizeText(person.name) === term);
   if (exact) return exact;
 
   const partial = candidates.filter((person) => normalizeText(person.name).includes(term));
-  if (partial.length === 0) return "Ninguém com esse nick na taverna nem no quadro.";
+  if (partial.length === 0) return "No one with that nick in the tavern nor on the board.";
   if (partial.length > 1) {
-    return partial.length + " nomes com esse pedaço. Escreva o nick inteiro.";
+    return partial.length + " names with that piece. Write the whole nick.";
   }
 
   return partial[0];
@@ -63,10 +63,10 @@ export function matchNick(
 
 export function removeMate(state: GameState, id: string): Result {
   const mate = state.pack.find((current) => current.id === id);
-  if (!mate) return failure(state, "Esse nome não está na sua matilha.");
+  if (!mate) return failure(state, "That name is not in your pack.");
 
   const next: GameState = { ...state, pack: state.pack.filter((current) => current.id !== id) };
-  const message = mate.name + " saiu da sua matilha.";
+  const message = mate.name + " left your pack.";
 
   return success(addLog(next, "character", message), message);
 }

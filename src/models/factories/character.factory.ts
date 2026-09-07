@@ -54,7 +54,7 @@ export function createRun(name: string, gender: Gender): GameState {
   const opening: LogEntry = {
     id: generateId("log"),
     kind: "system",
-    message: character.name + " desperta com a marca da lua. A primeira noite começa agora.",
+    message: character.name + " wakes with the mark of the moon. The first night begins now.",
     date: new Date().toISOString(),
   };
 

@@ -15,18 +15,18 @@ export const GENDERS: readonly GenderDefinition[] = [
   {
     key: "male",
     label: "Lumni",
-    title: "Herdeiro da Presa",
-    description: "Linhagem que responde à lua com músculo e brutalidade direta.",
+    title: "Heir of the Prey",
+    description: "A bloodline that answers the moon with muscle and direct brutality.",
     bonus: { strength: 14, endurance: 14, willpower: 14 },
-    bonusLabel: "+14 Força, +14 Resistência, +14 Vontade",
+    bonusLabel: "+14 Strength, +14 Endurance, +14 Willpower",
   },
   {
     key: "female",
     label: "Luna",
-    title: "Herdeira da Lua",
-    description: "Linhagem que responde à lua com precisão, faro e silêncio.",
+    title: "Heiress of the Moon",
+    description: "A bloodline that answers the moon with precision, scent and silence.",
     bonus: { agility: 14, instinct: 14, willpower: 14 },
-    bonusLabel: "+14 Agilidade, +14 Instinto, +14 Vontade",
+    bonusLabel: "+14 Agility, +14 Instinct, +14 Willpower",
   },
 ] as const;
 

@@ -3,14 +3,14 @@
 import { useVisibleActivity } from "./use-visible-activity";
 
 const LABEL: Record<string, string> = {
-  hunt: "Caçada em andamento",
-  train: "Treino em andamento",
-  mine: "Mineração em andamento",
-  forge: "Forja em andamento",
-  rest: "Recuperação em andamento",
+  hunt: "Hunt in progress",
+  train: "Training in progress",
+  mine: "Mining in progress",
+  forge: "Forge in progress",
+  rest: "Recovery in progress",
 };
 
-export const ACTIVITY_WAIT_LABEL = "Aguarde...";
+export const ACTIVITY_WAIT_LABEL = "Wait...";
 
 export function useActivityLock(): { locked: boolean; reason: string } {
   const { activity, runtime } = useVisibleActivity();
@@ -19,6 +19,6 @@ export function useActivityLock(): { locked: boolean; reason: string } {
 
   return {
     locked: true,
-    reason: (LABEL[activity.kind] ?? "Atividade em andamento") + ": espere a volta terminar.",
+    reason: (LABEL[activity.kind] ?? "Activity in progress") + ": wait for the lap to finish.",
   };
 }

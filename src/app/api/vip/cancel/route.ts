@@ -7,16 +7,16 @@ export async function POST(request: Request) {
   return withGame(request, async (state) => {
     const subscriptionId = state.character?.vipSubscriptionId ?? "";
     if (subscriptionId === "") {
-      return failure(state, "Você não tem uma assinatura VIP ativa.");
+      return failure(state, "You have no active VIP subscription.");
     }
     try {
       const updated = await setSubscriptionCancel(subscriptionId, true);
       if (!updated || updated.cancelAtPeriodEnd !== true) {
-        return failure(state, "O Stripe não confirmou o cancelamento. Tente de novo.");
+        return failure(state, "Stripe did not confirm the cancellation. Try again.");
       }
     } catch (error) {
       console.error("[api] POST /api/vip/cancel", error);
-      return failure(state, "O Stripe não confirmou o cancelamento. Tente de novo.");
+      return failure(state, "Stripe did not confirm the cancellation. Try again.");
     }
     return setVipCanceling(state, true);
   });

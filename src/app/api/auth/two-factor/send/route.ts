@@ -20,7 +20,7 @@ export async function POST(request: Request) {
   const gate = rateLimit("2fa-setup:" + userId + ":" + action, 3, 600000);
   const gateShared = await rateLimitShared("2fa-setup:" + userId + ":" + action, 3, 600);
   if (!gate.allowed || !gateShared) {
-    return bad("Um código já foi enviado. Confira o e-mail antes de pedir outro.", 429);
+    return bad("A code was already sent. Check the e-mail before asking for another.", 429);
   }
 
   try {
@@ -40,26 +40,26 @@ export async function POST(request: Request) {
       return { to, code };
     });
 
-    if (payload === undefined) return bad("Sessão encerrada.", 401);
+    if (payload === undefined) return bad("Session ended.", 401);
     if (payload === null) return bad("Conta sem e-mail conhecido.", 404);
     if (payload === false) {
       return NextResponse.json({
         ok: false,
         message:
           action === "enable"
-            ? "A verificação já está ligada."
-            : "A verificação já está desligada.",
+            ? "Verification is already on."
+            : "Verification is already off.",
       });
     }
 
     await sendTwoFactorCodeEmail(payload.to, payload.code, action);
     return NextResponse.json({
       ok: true,
-      message: "Código enviado para o seu e-mail. Ele vale por 10 minutos.",
+      message: "Code sent to your e-mail. It is good for 10 minutes.",
       data: null,
     });
   } catch (error) {
     console.error("[api] POST /api/auth/two-factor/send", error);
-    return bad("O correio tropeçou. Tente de novo.", 500);
+    return bad("The mail stumbled. Try again.", 500);
   }
 }

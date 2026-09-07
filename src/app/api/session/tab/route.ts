@@ -13,10 +13,10 @@ export async function POST(request: Request) {
   const body = await readBody(request);
   const tabId = asText(body.tabId, 64).trim();
   const force = body.force === true;
-  if (!tabId) return bad("Aba inválida.", 400);
+  if (!tabId) return bad("Invalid tab.", 400);
   try {
     return await withTransaction(async (client) => {
-      if (!(await sessionIsLive(client, claims))) return bad("Sessão encerrada.", 401);
+      if (!(await sessionIsLive(client, claims))) return bad("Session ended.", 401);
       const found = await client.query(
         `select active_tab, extract(epoch from (now() - active_tab_at)) * 1000 as age
            from users where id = $1 for update`,
@@ -38,6 +38,6 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("[api] POST /api/session/tab", error);
-    return bad("O servidor tropeçou. Tente de novo.", 500);
+    return bad("The server stumbled. Try again.", 500);
   }
 }

@@ -13,43 +13,43 @@ export interface AttributeDefinition {
 export const ATTRIBUTES: readonly AttributeDefinition[] = [
   {
     key: "strength",
-    name: "Força",
-    code: "FOR",
-    description: "É o seu golpe. Quanto maior, mais vida cada ataque tira.",
+    name: "Strength",
+    code: "STR",
+    description: "It is your blow. The higher, the more health each attack takes.",
     effect:
-      "O dano de um golpe é Força x Força dividido por Força mais a Resistência do alvo. Treino, equipamento, mascote e Modo Fúria somam aqui.",
+      "The damage of a blow is Strength x Strength divided by Strength plus the target's Endurance. Training, equipment, companion and Fury Mode add here.",
   },
   {
     key: "agility",
-    name: "Agilidade",
+    name: "Agility",
     code: "AGI",
-    description: "Sua esquiva. Quanto maior, mais golpes passam sem te acertar.",
+    description: "Your dodge. The higher, the more blows pass without touching you.",
     effect:
-      "A esquiva é 35 x Agilidade dividido por Agilidade mais 120, então ela sobe rumo ao teto de 35% e cada ponto ainda vale alguma coisa. Quem tem mais Agilidade que o outro ataca primeiro.",
+      "Dodge is 35 x Agility divided by Agility plus 120, so it climbs toward the 35% ceiling and every point still buys something. Whoever has more Agility than the other attacks first.",
   },
   {
     key: "endurance",
-    name: "Resistência",
-    code: "RES",
-    description: "Sua defesa. Quanto maior, menos dói cada golpe do inimigo.",
+    name: "Endurance",
+    code: "END",
+    description: "Your defense. The higher, the less each enemy blow hurts.",
     effect:
-      "A Resistência entra na conta do dano que você sofre: quanto maior, menos cada golpe do inimigo tira. A vida máxima é fixa e não sobe com ela.",
+      "Endurance enters the count of the damage you take: the higher, the less each enemy blow removes. Maximum health is fixed and does not rise with it.",
   },
   {
     key: "instinct",
-    name: "Instinto",
+    name: "Instinct",
     code: "INS",
-    description: "Sua chance de crítico, o golpe que dói bem mais.",
+    description: "Your critical chance, the blow that hurts far more.",
     effect:
-      "O crítico é 5 mais 40 x Instinto dividido por Instinto mais 250, rumo ao teto de 45%. Um crítico multiplica o dano por 1,85, fixo.",
+      "The critical is 5 plus 40 x Instinct divided by Instinct plus 250, toward the 45% ceiling. A critical multiplies the damage by 1.85, fixed.",
   },
   {
     key: "willpower",
-    name: "Vontade",
-    code: "VON",
-    description: "Quanto tempo você segura a fera e quão rápido o corpo se refaz. Estica a poção de fúria e acelera a recuperação de vida.",
+    name: "Willpower",
+    code: "WIL",
+    description: "How long you hold the beast and how fast the body mends. It stretches the fury potion and speeds up health recovery.",
     effect:
-      "A poção de fúria dura o tempo do frasco multiplicado por 1 mais Vontade dividido por Vontade mais 250, rumo ao dobro: um frasco médio de 5 min passa de 6,4 min com 100 de Vontade e de 8,4 min com 550. A conta usa a Vontade da ficha inteira, então colar e anel também esticam o frasco. A fúria da lua cheia não muda, ela dura o que o céu manda. A Vontade também acelera Recuperar-se: o descanso devolve 5% da vida por vez sem Vontade e sobe rumo a 10%, com metade desse ganho já em 400 de Vontade, então quanto mais Vontade, menos tempo até o corpo ficar inteiro.",
+      "The fury potion lasts the flask's time multiplied by 1 plus Willpower divided by Willpower plus 250, toward double: a medium 5 min flask goes past 6.4 min with 100 Willpower and past 8.4 min with 550. The count reads the whole sheet's Willpower, so necklace and ring also stretch the flask. The full moon's fury does not change, it lasts what the sky says. Willpower also speeds up Recover: rest gives back 5% of health per tick with no Willpower and climbs toward 10%, with half that gain already at 400 Willpower, so the more Willpower, the less time until the body is whole.",
   },
 ] as const;
 

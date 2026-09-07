@@ -43,7 +43,7 @@ export function listExercises(state: GameState): AvailableExercise[] {
       cost: 0,
       affordable,
       maxed,
-      reason: maxed ? "Atributo no teto" : null,
+      reason: maxed ? "Attribute at the cap" : null,
     };
   });
 }
@@ -96,10 +96,10 @@ export interface TrainingReport {
 
 export function train(state: GameState, exerciseId: string): Result<TrainingReport> {
   const character = state.character;
-  if (!character) return failure(state, "Nenhum personagem ativo.");
+  if (!character) return failure(state, "No active character.");
 
   const exercise = findExercise(exerciseId);
-  if (!exercise) return failure(state, "Exercício desconhecido.");
+  if (!exercise) return failure(state, "Unknown exercise.");
 
   const effort = trainingEffort(character.attributes[exercise.attribute]);
 
@@ -107,7 +107,7 @@ export function train(state: GameState, exerciseId: string): Result<TrainingRepo
     const definition = findAttribute(exercise.attribute);
     return failure(
       state,
-      (definition?.name ?? "O atributo") + " já está no teto de " + MAX_ATTRIBUTE_VALUE + ".",
+      (definition?.name ?? "The attribute") + " is already at the cap of " + MAX_ATTRIBUTE_VALUE + ".",
     );
   }
 
@@ -123,12 +123,12 @@ export function train(state: GameState, exerciseId: string): Result<TrainingRepo
   const message =
     pointsGained > 0
       ? exercise.name +
-        " concluído. " +
-        (definition?.name ?? "Atributo") +
-        " subiu para " +
+        " complete. " +
+        (definition?.name ?? "Attribute") +
+        " rose to " +
         trained.attributes[exercise.attribute] +
         "."
-      : exercise.name + " concluído. O corpo registra o esforço.";
+      : exercise.name + " complete. The body records the effort.";
 
   next = addLog(next, "training", message);
 

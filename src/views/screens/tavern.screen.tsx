@@ -399,7 +399,7 @@ export function TavernScreen() {
       if (tavernChatStore.isOpenFor(roomId)) tavernChatStore.closeWindow();
       return;
     }
-    notify(result.message, result.ok, "Taverna");
+    notify(result.message, result.ok, "Tavern");
     if (!result.ok) {
       if (tavernChatStore.isOpenFor(roomId)) tavernChatStore.closeWindow();
       return;
@@ -412,7 +412,7 @@ export function TavernScreen() {
     const result = await leaveRoom(roomId);
     if (!result) return;
 
-    notify(result.message, result.ok, "Taverna");
+    notify(result.message, result.ok, "Tavern");
     if (result.ok) {
       playSound("door");
       markRoomRead(roomId);
@@ -427,7 +427,7 @@ export function TavernScreen() {
     try {
       const result = await createRoom(roomName, roomPassword, hideName);
       if (!result) return;
-      if (!result.ok) notify(result.message, false, "Taverna");
+      if (!result.ok) notify(result.message, false, "Tavern");
       if (result.ok) {
         setRoomName("");
         setRoomPassword("");
@@ -461,7 +461,7 @@ export function TavernScreen() {
     const result = await openDirect({ id: mate.id, name: mate.name });
     if (!result) return;
 
-    notify(result.message, result.ok, "Taverna");
+    notify(result.message, result.ok, "Tavern");
     if (result.ok && result.roomId) {
       playSound("door");
       showChatRoom(result.roomId);
@@ -492,7 +492,7 @@ export function TavernScreen() {
       setSentBeat((count) => count + 1);
       playSound("chat");
       setDraft("");
-    } else notify(result.message, false, "Taverna");
+    } else notify(result.message, false, "Tavern");
   }
 
   async function inviteMember(member: { id: string; name: string }) {
@@ -508,7 +508,7 @@ export function TavernScreen() {
   return (
     <>
       <PageHeader
-        title="Taverna"
+        title="Tavern"
         description={
           "Chat tables for up to " +
           MAX_ROOM_MEMBERS +
@@ -983,7 +983,7 @@ export function TavernScreen() {
           if (!roomId) return;
           setClosedRoomId(roomId);
           const result = await closeRoom(roomId);
-          if (result) notify(result.message, result.ok, "Taverna");
+          if (result) notify(result.message, result.ok, "Tavern");
           if (result?.ok) {
             playSound("door");
             if (tavernChatStore.isOpenFor(roomId)) tavernChatStore.closeWindow();

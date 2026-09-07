@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { marketPriceOf } from "@/controllers/market.controller";
 import { useGame } from "@/controllers/game.context";
+import { useT } from "@/controllers/use-locale";
 import { normalizeText } from "@/shared/utils/text";
 import { CREATURES } from "@/models/data/creatures";
 import { EQUIPMENT_SETS, pieceId, pieceName, piecePrice } from "@/models/data/equipment-sets";
@@ -87,12 +88,13 @@ const WIKI_POTIONS: readonly Item[] = itemsOfCategory("potion");
 
 function wikiItemDescription(item: Item): string {
   const effects = summarizeEffect(item);
-  const base = RARITY_LABEL[item.rarity] + ", NV. " + item.minLevel + "+";
+  const base = RARITY_LABEL[item.rarity] + ", LV. " + item.minLevel + "+";
   return effects.length > 0 ? base + " · " + effects.join(", ") : base;
 }
 
 export function WikiScreen() {
   const { character } = useGame();
+  const t = useT();
   const level = character?.level ?? 1;
   const [section, setSection] = useState("loop");
   const [search, setSearch] = useState("");
@@ -278,13 +280,18 @@ export function WikiScreen() {
               </List>
               <div className="space-y-2 border-t border-edge px-4 py-3">
                 <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                  Rendimento da sessão
+                  {t("Session yield")}
                 </p>
                 <ul className="space-y-1">
                   {[1, 170, 340, 670, 1000].map((value) => (
                     <li key={value} className="font-mono text-[11px] text-ink-soft">
-                      Atributo {formatNumber(value)}: +{formatNumber(trainingEffort(value).progress)}{" "}
-                      progresso por sessão
+                      {t("Attribute") +
+                        " " +
+                        formatNumber(value) +
+                        ": +" +
+                        formatNumber(trainingEffort(value).progress) +
+                        " " +
+                        t("progress per session")}
                     </li>
                   ))}
                 </ul>
@@ -311,7 +318,13 @@ export function WikiScreen() {
                       <p className="text-sm text-ink">{territory.name}</p>
                       <Tag tone="faint">{DANGER_LABEL[territory.danger]}</Tag>
                       <Tag tone="neutral">
-                        NV. {formatNumber(territory.minLevel)} a {formatNumber(territory.maxLevel)}
+                        {t("LV.") +
+                          " " +
+                          formatNumber(territory.minLevel) +
+                          " " +
+                          t("to") +
+                          " " +
+                          formatNumber(territory.maxLevel)}
                       </Tag>
                       <Tag tone="neutral">{SPECIES_LABEL[territory.species]}</Tag>
                     </div>
@@ -351,19 +364,37 @@ export function WikiScreen() {
                     description={
                       <>
                         <p className="font-mono leading-relaxed text-ink-soft">
-                          {formatNumber(creature.health)} vida · {formatNumber(creature.strength)} força ·{" "}
-                          {formatNumber(creature.endurance)} resistência ·{" "}
-                          {formatNumber(creature.agility)} agilidade
+                          {formatNumber(creature.health) +
+                            " " +
+                            t("health") +
+                            " · " +
+                            formatNumber(creature.strength) +
+                            " " +
+                            t("strength") +
+                            " · " +
+                            formatNumber(creature.endurance) +
+                            " " +
+                            t("endurance") +
+                            " · " +
+                            formatNumber(creature.agility) +
+                            " " +
+                            t("agility")}
                         </p>
                         <p className="font-mono">
-                          +{formatNumber(creature.experience)} exp · {formatNumber(creature.minBronze)} a{" "}
-                          {formatBronze(creature.maxBronze)}
+                          {"+" +
+                            formatNumber(creature.experience) +
+                            " exp · " +
+                            formatNumber(creature.minBronze) +
+                            " " +
+                            t("to") +
+                            " " +
+                            formatBronze(creature.maxBronze)}
                         </p>
                       </>
                     }
                   />
                   <span className="shrink-0 font-mono text-[11px] text-ink-faint">
-                    NV. {formatNumber(creature.level)}
+                    {t("LV.")} {formatNumber(creature.level)}
                   </span>
                 </ListRow>
               ))

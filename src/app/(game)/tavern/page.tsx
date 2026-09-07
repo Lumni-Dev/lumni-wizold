@@ -3,7 +3,7 @@ import { TavernScreen } from "@/views/screens/tavern.screen";
 import { privatePageMetadata } from "@/shared/seo/metadata";
 
 export const metadata: Metadata = privatePageMetadata({
-  title: "Taverna",
+  title: "Tavern",
   description: "Mesas de chat ao vivo, convites de matilha e mensagens privadas entre companheiros.",
   path: "/tavern",
 });

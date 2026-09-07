@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { api } from "@/controllers/api.client";
 import { useGame } from "@/controllers/game.context";
+import { useT } from "@/controllers/use-locale";
 import { isInPack } from "@/controllers/pack.controller";
 import { profileOf } from "@/controllers/ranking.controller";
 import { findGender } from "@/models/entities/character";
@@ -28,6 +29,7 @@ import { PageHeader } from "../layout/page-header";
 
 export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
   const { state, character, moon, invite } = useGame();
+  const t = useT();
   const [roster, setRoster] = useState<Hunter[] | null>(null);
 
   useEffect(() => {
@@ -85,17 +87,17 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
           <div className="flex flex-wrap items-center justify-end gap-2">
             {isPlayer ? (
               <Link href="/character">
-                <Button variant="secondary">Ficha completa</Button>
+                <Button variant="secondary">Full sheet</Button>
               </Link>
             ) : isInPack(state, hunter.id) ? (
-              <Tag tone="neutral">Na matilha</Tag>
+              <Tag tone="neutral">In the pack</Tag>
             ) : (
               <Button variant="secondary" onClick={() => invite({ id: hunter.id, name: hunter.name })}>
-                Convidar para matilha
+                Invite to the pack
               </Button>
             )}
             <Tag tone={isPlayer ? "light" : "neutral"}>
-              Melhor em {best.label} - {formatNumber(best.position)}º
+              {t("Best at") + " " + t(best.label) + " - " + formatNumber(best.position) + "º"}
             </Tag>
           </div>
         }
@@ -119,7 +121,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
             </div>
 
             <List>
-              <DataRow label="Level" value={"NV. " + formatNumber(hunter.level)} />
+              <DataRow label="Level" value={"LV. " + formatNumber(hunter.level)} />
               <DataRow label="WCoins" value={formatNumber(hunter.bronze)} />
               {hunter.createdAt ? (
                 <DataRow label="Created" value={formatDate(hunter.createdAt)} />
@@ -176,7 +178,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
           </Panel>
 
           <Panel
-            title="Mascote"
+            title="Companion"
             description="Only what the wolf itself reveals: bloodline and training."
             padding="none"
           >
@@ -194,7 +196,9 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
                 </List>
               </>
             ) : (
-              <p className="px-4 py-3 text-xs text-ink-faint">Caça sozinho, sem lobo no rastro.</p>
+              <p className="px-4 py-3 text-xs text-ink-faint">
+              {t("Hunts alone, no wolf on the trail.")}
+            </p>
             )}
           </Panel>
         </div>

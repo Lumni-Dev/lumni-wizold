@@ -17,22 +17,22 @@ export async function POST(request: Request) {
   if (refused) return refused;
 
   const pending = await twoFactorPendingClaims();
-  if (!pending) return bad("A verificação expirou. Entre de novo com o Google.", 401);
+  if (!pending) return bad("The verification expired. Enter again with Google.", 401);
 
   const gate = rateLimit("2fa-verify:" + pending.userId, 10, 600000);
   if (!gate.allowed) {
-    return bad("Muitas tentativas. Espere um pouco antes de tentar de novo.", 429);
+    return bad("Too many tries. Wait a bit before trying again.", 429);
   }
 
   const body = await readBody(request);
   const code = asText(body.code, 8).trim();
-  if (!code) return bad("Digite o código de oito dígitos.", 400);
+  if (!code) return bad("Type the eight-digit code.", 400);
 
   try {
     return await withTransaction(async (client) => {
       if (!(await sessionIsLive(client, pending))) {
         await dropTwoFactorPending();
-        return bad("A verificação expirou. Entre de novo com o Google.", 401);
+        return bad("The verification expired. Enter again with Google.", 401);
       }
 
       const checked = await verifyTwoFactorCode(client, pending.userId, code);
@@ -67,12 +67,12 @@ export async function POST(request: Request) {
 
       return NextResponse.json({
         ok: true,
-        message: "Porta aberta. Boa caçada.",
+        message: "Door open. Good hunting.",
         data: { hasCharacter: loaded !== null },
       });
     });
   } catch (error) {
     console.error("[api] POST /api/auth/two-factor/verify", error);
-    return bad("O servidor tropeçou. Tente de novo.", 500);
+    return bad("The server stumbled. Try again.", 500);
   }
 }

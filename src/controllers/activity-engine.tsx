@@ -112,7 +112,7 @@ function markHuntReadyIn(ms: number): void {
 }
 
 function territoryName(id: string): string {
-  return TERRITORIES.find((entry) => entry.id === id)?.name ?? "Caçada";
+  return TERRITORIES.find((entry) => entry.id === id)?.name ?? "Hunt";
 }
 
 function dockOf(
@@ -141,27 +141,27 @@ function restDock(activity: Activity): ActivityDockView {
   const resume = activity.resume?.kind;
   const back =
     resume === "hunt"
-      ? "volta à caça"
+      ? "back to the hunt"
       : resume === "train"
-        ? "volta ao treino"
+        ? "back to the training"
         : resume === "mine"
-          ? "volta à mina"
+          ? "back to the mine"
           : resume === "forge"
-            ? "volta à forja"
+            ? "back to the forge"
             : null;
   const after =
     resume === "hunt"
-      ? "A caça continua depois."
+      ? "The hunt continues after."
       : resume === "train"
-        ? "O treino continua depois."
+        ? "The training continues after."
         : resume === "mine"
-          ? "A mina continua depois."
+          ? "The mine continues after."
           : resume === "forge"
-            ? "A forja continua depois."
-            : "O corpo descansa.";
+            ? "The forge continues after."
+            : "The body rests.";
   return dockOf(
     "rest",
-    back ? "Recuperando-se · " + back : "Recuperando-se",
+    back ? "Recovering · " + back : "Recovering",
     after,
     0,
     1,
@@ -172,26 +172,26 @@ function restDock(activity: Activity): ActivityDockView {
 
 function placeholderDock(state: GameState, activity: Activity): ActivityDockView {
   if (activity.kind === "hunt") {
-    const name = activity.id ? territoryName(activity.id) : "Caçada";
-    return dockOf("hunt", "Caçando · " + name, "Rastreando a presa", 0, 1, null, false);
+    const name = activity.id ? territoryName(activity.id) : "Hunt";
+    return dockOf("hunt", "Hunting · " + name, "Tracking the prey", 0, 1, null, false);
   }
   if (activity.kind === "train") {
     const label =
       activity.id === PET_EXERCISE_ID
-        ? "Treino do lobo"
+        ? "Wolf training"
         : (listExercises(state).find((row) => row.exercise.id === activity.id)?.exercise.name ??
-          "Treino");
-    return dockOf("train", label, "Sessão em andamento", 0, 1, null, false);
+          "Training");
+    return dockOf("train", label, "Session under way", 0, 1, null, false);
   }
   if (activity.kind === "mine") {
-    const name = activity.id ? (findItem(activity.id)?.name ?? "Mina") : "Mina";
-    return dockOf("mine", "Minerando · " + name, "Golpe da picareta", 0, 1, null, false);
+    const name = activity.id ? (findItem(activity.id)?.name ?? "Mine") : "Mine";
+    return dockOf("mine", "Mining · " + name, "Pick strike", 0, 1, null, false);
   }
   if (activity.kind === "forge") {
     const name = activity.id
-      ? (findForgePiece(state, activity.id, activity.enhancement ?? 0)?.item.name ?? "Peça")
-      : "Peça";
-    return dockOf("forge", "Forjando · " + name, "Martelada em andamento", 0, 1, null, false);
+      ? (findForgePiece(state, activity.id, activity.enhancement ?? 0)?.item.name ?? "Piece")
+      : "Piece";
+    return dockOf("forge", "Forging · " + name, "Hammering under way", 0, 1, null, false);
   }
   return restDock(activity);
 }
@@ -201,30 +201,30 @@ function pausedDock(state: GameState, activity: Activity): ActivityDockView {
     activity.kind === "hunt" && activity.id
       ? territoryName(activity.id)
       : activity.kind === "mine" && activity.id
-        ? (findItem(activity.id)?.name ?? "Mina")
+        ? (findItem(activity.id)?.name ?? "Mine")
         : activity.kind === "forge" && activity.id
-          ? (findForgePiece(state, activity.id, activity.enhancement ?? 0)?.item.name ?? "Peça")
+          ? (findForgePiece(state, activity.id, activity.enhancement ?? 0)?.item.name ?? "Piece")
           : null;
   const titles: Record<ActivityDockView["kind"], string> = {
-    hunt: "Caçada pausada",
-    train: "Treino pausado",
-    mine: "Mina pausada",
-    forge: "Forja pausada",
-    rest: "Recuperando-se",
+    hunt: "Hunt paused",
+    train: "Training paused",
+    mine: "Mine paused",
+    forge: "Forge paused",
+    rest: "Recovering",
   };
   const details: Record<ActivityDockView["kind"], string> = {
-    hunt: "Esperando vida ou poção para continuar",
-    train: "Esperando WCoins para continuar",
-    mine: "Esperando recursos para voltar a minerar",
-    forge: "Esperando fragmentos e WCoins para a próxima martelada",
-    rest: "O corpo descansa.",
+    hunt: "Waiting for health or a potion to continue",
+    train: "Waiting for WCoins to continue",
+    mine: "Waiting for resources to mine again",
+    forge: "Waiting for fragments and WCoins for the next strike",
+    rest: "The body rests.",
   };
   const prefix = name ? name + " · " : "";
   const trainDetail =
     activity.kind === "train" && activity.id === PET_EXERCISE_ID
-      ? "Esperando WCoins para continuar"
+      ? "Waiting for WCoins to continue"
       : activity.kind === "train"
-        ? "Esperando para continuar"
+        ? "Waiting to continue"
         : details[activity.kind];
   return dockOf(activity.kind, prefix + titles[activity.kind], trainDetail, 0, 1, null, true);
 }
@@ -310,12 +310,12 @@ export function ActivityEngine() {
       const max = Math.max(1, script.length);
       const line = script[Math.min(beat, script.length) - 1];
       const detail = approaching
-        ? "Rastreando a presa"
+        ? "Tracking the prey"
         : pending && beat > 0 && line
           ? line.text.slice(0, 72) + (line.text.length > 72 ? "…" : "")
           : pending
-            ? "Preparando a emboscada"
-            : "Rastreando a presa";
+            ? "Preparing the ambush"
+            : "Tracking the prey";
       patchActivityRuntime({
         hunt: {
           territoryId: activeHunt,
@@ -328,7 +328,7 @@ export function ActivityEngine() {
         },
         dock: dockOf(
           "hunt",
-          "Caçando · " + territoryName(activeHunt),
+          "Hunting · " + territoryName(activeHunt),
           detail,
           approaching ? approachBeat : beat,
           approaching ? HUNT_APPROACH_TICKS : max,
@@ -471,28 +471,28 @@ export function ActivityEngine() {
               .join(", ");
             notifyRef.current(
               held.creature.name +
-                " abatido: +" +
+                " felled: +" +
                 formatNumber(held.bronze) +
-                " WCoins e +" +
+                " WCoins and +" +
                 formatNumber(held.experience) +
-                " de experiência." +
-                (spoils ? " Espólio: " + spoils + "." : "") +
-                (held.levelsGained > 0 ? " Você subiu de nível!" : ""),
+                " experience." +
+                (spoils ? " Spoils: " + spoils + "." : "") +
+                (held.levelsGained > 0 ? " You leveled up!" : ""),
               true,
-              "Caça",
+              "Hunt",
             );
           } else if (hunterRetreated(held.combat)) {
             notifyRef.current(
-              "A caçada com " + held.creature.name + " se arrastou e os dois recuaram.",
+              "The hunt with " + held.creature.name + " dragged on and both fell back.",
               true,
-              "Caça",
+              "Hunt",
             );
           } else {
             playSound("defeat");
             notifyRef.current(
-              held.creature.name + " levou a melhor: a caçada não pagou nada.",
+              held.creature.name + " got the better of it: the hunt paid nothing.",
               false,
-              "Caça",
+              "Hunt",
             );
           }
           if (!autoRef.current.hunt) {
@@ -551,12 +551,12 @@ export function ActivityEngine() {
       }
       const label =
         activeExercise === PET_EXERCISE_ID
-          ? "Treino do lobo"
+          ? "Wolf training"
           : (exercises.find((row) => row.exercise.id === activeExercise)?.exercise.name ??
-            "Treino");
+            "Training");
       patchRuntime({
         train: { id: activeExercise, beat, max: ticks, cooldown },
-        dock: dockOf("train", label, "Sessão em andamento", beat, ticks, cooldown),
+        dock: dockOf("train", label, "Session under way", beat, ticks, cooldown),
       });
     };
 
@@ -667,10 +667,10 @@ export function ActivityEngine() {
     let ticks = resolveMiningSwingTicks(activeOre, carry, activityRef.current);
 
     const push = (cooldown: number | null) => {
-      const name = findItem(activeOre)?.name ?? "Mina";
+      const name = findItem(activeOre)?.name ?? "Mine";
       patchActivityRuntime({
         mine: { id: activeOre, beat, max: ticks, cooldown },
-        dock: dockOf("mine", "Minerando · " + name, "Golpe da picareta", beat, ticks, cooldown),
+        dock: dockOf("mine", "Mining · " + name, "Pick strike", beat, ticks, cooldown),
       });
     };
 
@@ -785,8 +785,8 @@ export function ActivityEngine() {
         forge: { id: activeItem, beat, max: FORGE_TICKS, cooldown, level },
         dock: dockOf(
           "forge",
-          "Forjando · " + name,
-          "Nível +" + formatNumber(level) + " → +" + formatNumber(level + 1),
+          "Forging · " + name,
+          "Level +" + formatNumber(level) + " → +" + formatNumber(level + 1),
           beat,
           FORGE_TICKS,
           cooldown,
@@ -824,7 +824,7 @@ export function ActivityEngine() {
                 return;
               }
               if (landed) {
-                if (landed.message) notifyRef.current(landed.message, true, "Bigorna");
+                if (landed.message) notifyRef.current(landed.message, true, "Anvil");
                 playSound(landed.raised ? "point" : "denied");
                 if (landed.raised) {
                   level += 1;

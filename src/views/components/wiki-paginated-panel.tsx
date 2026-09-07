@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import { useT } from "@/controllers/use-locale";
 import { formatNumber } from "@/shared/utils/format";
 import { Button } from "./button";
 import { List } from "./list";
@@ -27,6 +28,7 @@ export function WikiPaginatedPanel<T>({
 }) {
   const [page, setPage] = useState(0);
   const totalPages = Math.max(1, Math.ceil(items.length / WIKI_PAGE_SIZE));
+  const t = useT();
   const safePage = Math.min(page, totalPages - 1);
   const slice = items.slice(safePage * WIKI_PAGE_SIZE, (safePage + 1) * WIKI_PAGE_SIZE);
 
@@ -43,8 +45,17 @@ export function WikiPaginatedPanel<T>({
           paginated ? (
             <div className="flex flex-wrap items-center justify-between gap-3">
               <span className="text-[11px] text-ink-faint">
-                Página {formatNumber(safePage + 1)} de {formatNumber(totalPages)} ·{" "}
-                {formatNumber(items.length)} no total
+                {t("Page") +
+                  " " +
+                  formatNumber(safePage + 1) +
+                  " " +
+                  t("of") +
+                  " " +
+                  formatNumber(totalPages) +
+                  " · " +
+                  formatNumber(items.length) +
+                  " " +
+                  t("in total")}
               </span>
               <div className="flex gap-2">
                 <Button
@@ -52,14 +63,14 @@ export function WikiPaginatedPanel<T>({
                   disabled={safePage === 0}
                   onClick={() => setPage(safePage - 1)}
                 >
-                  Anterior
+                  Previous
                 </Button>
                 <Button
                   variant="outline"
                   disabled={safePage >= totalPages - 1}
                   onClick={() => setPage(safePage + 1)}
                 >
-                  Próximo
+                  Next
                 </Button>
               </div>
             </div>

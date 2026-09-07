@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { useT } from "@/controllers/use-locale";
 import { seededRandom } from "@/shared/utils/random";
 
 const SIZE = 25;
@@ -35,6 +36,7 @@ function finderDark(x: number, y: number): boolean | null {
 }
 
 export function PixQr({ value }: { value: string }) {
+  const t = useT();
   const modules = useMemo(() => {
     const random = seededRandom(seedOf(value));
     const dark: { x: number; y: number }[] = [];
@@ -70,7 +72,7 @@ export function PixQr({ value }: { value: string }) {
           ))}
         </svg>
       </div>
-      <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">Pix de demonstração</p>
+      <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">{t("Demo Pix")}</p>
     </div>
   );
 }

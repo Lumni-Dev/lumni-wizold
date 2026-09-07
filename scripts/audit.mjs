@@ -2331,16 +2331,16 @@ sec("tavern");
   );
   const wentOut = tavernCtrl.leaveRoom(tavern, opened.roomId, { id: "x0", name: "Lobo0" });
   ok(
-    "sair de vez escreve saiu da mesa",
+    "leaving for good writes left the table",
     tavernCtrl.findRoom(wentOut.state, opened.roomId).messages.at(-1).text ===
-      "Lobo0 saiu da mesa.",
+      "Lobo0 left the table.",
   );
   const stepped = tavernCtrl.announceAway(tavern, opened.roomId, me);
   ok(
-    "fechar a janela vai buscar uma bebida",
+    "closing the window goes to get a drink",
     stepped.ok &&
       tavernCtrl.findRoom(stepped.state, opened.roomId).messages.at(-1).text ===
-        me.name + " foi buscar uma bebida.",
+        me.name + " went to get a drink.",
   );
   ok(
     "de fora não se anuncia saída",
@@ -2348,9 +2348,9 @@ sec("tavern");
   );
   const cameBack = tavernCtrl.joinRoom(tavern, opened.roomId, me, "");
   ok(
-    "retorno escreve na mesa",
+    "the return writes at the table",
     tavernCtrl.findRoom(cameBack.state, opened.roomId).messages.at(-1).text ===
-      me.name + " retornou à mesa.",
+      me.name + " returned to the table.",
   );
   ok("empty line refuses", tavernCtrl.sendMessage(tavern, opened.roomId, me, "   ").ok === false);
   ok(
@@ -2640,12 +2640,12 @@ sec("tavern");
     ok("old activity becomes idle", entActivity.resolveDoing("hunt", stale) === "idle");
     ok("no activity is idle", entActivity.resolveDoing(null, null) === "idle");
     ok(
-      "frase da caça",
-      entActivity.describeDoing("Luna", "hunt") === "Luna está caçando",
+      "the hunt phrase",
+      entActivity.describeDoing("Luna", "hunt") === "Luna is hunting",
     );
     ok(
-      "frase parado",
-      entActivity.describeDoing("Lumni", "idle") === "Lumni está parado",
+      "the idle phrase",
+      entActivity.describeDoing("Lumni", "idle") === "Lumni is idle",
     );
     ok(
       "a própria caça vale na hora",

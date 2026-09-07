@@ -60,22 +60,22 @@ const NAV_ICONS: Record<string, LucideIcon> = {
 };
 
 const SOURCE_ICONS: Record<string, LucideIcon> = {
-  Personagem: User,
-  Recuperação: Bed,
-  Caça: Swords,
+  Character: User,
+  Recovery: Bed,
+  Hunt: Swords,
   Arena: Shield,
-  Treino: Dumbbell,
-  Inventário: Backpack,
-  Mercado: Store,
-  Bazar: Coins,
-  Mina: Pickaxe,
-  Bigorna: Hammer,
-  Forja: Hammer,
-  Loja: ShoppingBag,
-  Mascote: PawPrint,
-  Taverna: Beer,
-  Matilha: Users,
-  Sistema: Settings,
+  Training: Dumbbell,
+  Inventory: Backpack,
+  Market: Store,
+  Bazaar: Coins,
+  Mine: Pickaxe,
+  Anvil: Hammer,
+  Forge: Hammer,
+  Store: ShoppingBag,
+  Companion: PawPrint,
+  Tavern: Beer,
+  Pack: Users,
+  System: Settings,
 };
 
 const ACTION_ICONS = {

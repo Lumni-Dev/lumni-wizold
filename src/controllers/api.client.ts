@@ -5,8 +5,8 @@ import { noteServerNow } from "@/shared/utils/server-clock";
 export function isTransientApiMessage(message: string): boolean {
   return (
     message === "" ||
-    message.startsWith("Sem conexão") ||
-    message === "O servidor não respondeu direito."
+    message.startsWith("No connection") ||
+    message === "The server did not answer properly."
   );
 }
 
@@ -54,8 +54,8 @@ export async function api<T = unknown>(
       message:
         payload?.message ??
         (response.status === 429
-          ? "Calma, lobo: muitas requisições. Respire um instante."
-          : "O servidor não respondeu direito."),
+          ? "Easy, wolf: too many requests. Breathe for a moment."
+          : "The server did not answer properly."),
       data: payload?.data ?? null,
       state: payload?.state ?? null,
       activity: payload && "activity" in payload ? (payload.activity ?? null) : undefined,
@@ -66,7 +66,7 @@ export async function api<T = unknown>(
     return {
       ok: false,
       status: 0,
-      message: "Sem conexão com o servidor. Verifique a rede e tente de novo.",
+      message: "No connection to the server. Check the network and try again.",
       data: null,
       state: null,
       activity: undefined,

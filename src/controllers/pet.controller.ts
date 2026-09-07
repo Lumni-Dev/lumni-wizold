@@ -29,17 +29,17 @@ import { addLog } from "./log.controller";
 
 export function adoptPet(state: GameState, gender: PetGender, name: string): Result {
   const character = state.character;
-  if (!character) return failure(state, "Nenhum personagem ativo.");
-  if (state.pet) return failure(state, "O mascote já anda com você.");
+  if (!character) return failure(state, "No active character.");
+  if (state.pet) return failure(state, "The companion already walks with you.");
 
   const problem = validateName(name);
   if (problem) return failure(state, problem);
   if (character.level < PET_MIN_LEVEL) {
-    return failure(state, "O lobo só caça ao lado de um NV " + PET_MIN_LEVEL + " ou mais.");
+    return failure(state, "The wolf only hunts beside a LV " + PET_MIN_LEVEL + " or higher.");
   }
   const price = petPrice(character.level);
   if (character.bronze < price) {
-    return failure(state, "Faltam " + formatBronze(price - character.bronze) + " para a adoção.");
+    return failure(state, formatBronze(price - character.bronze) + " short for the adoption.");
   }
 
   const pet: Pet = {
@@ -57,43 +57,43 @@ export function adoptPet(state: GameState, gender: PetGender, name: string): Res
     pet,
   });
 
-  const message = "O mascote agora caça com você. Treine para ele render na caçada.";
+  const message = "The companion now hunts with you. Train it so it earns its keep on the hunt.";
   return success(addLog(next, "character", message), message);
 }
 
 export function setPetActive(state: GameState, active: boolean): Result {
   const pet = state.pet;
-  if (!pet) return failure(state, "Você não tem mascote.");
+  if (!pet) return failure(state, "You have no companion.");
   if ((pet.active !== false) === active) {
-    return failure(state, "O mascote" + (active ? " já está na caçada." : " já está fora da caçada."));
+    return failure(state, "The companion" + (active ? " is already on the hunt." : " is already out of the hunt."));
   }
 
   const next: GameState = syncCharacter({ ...state, pet: { ...pet, active } });
   const message = active
-    ? "O mascote se levanta e volta a caçar com você."
-    : "O mascote fica de fora das próximas caçadas.";
+    ? "The companion gets up and hunts with you again."
+    : "The companion sits out the next hunts.";
 
   return success(addLog(next, "character", message), message);
 }
 
 export function renamePet(state: GameState, name: string): Result {
   const character = state.character;
-  if (!character) return failure(state, "Nenhum personagem ativo.");
+  if (!character) return failure(state, "No active character.");
 
   const pet = state.pet;
-  if (!pet) return failure(state, "Você não tem mascote para renomear.");
+  if (!pet) return failure(state, "You have no companion to rename.");
 
   const problem = validateName(name);
   if (problem) return failure(state, problem);
 
   const clean = capitalizeName(name);
-  if (clean === pet.name) return failure(state, "O mascote já responde por esse nome.");
+  if (clean === pet.name) return failure(state, "The companion already answers to that name.");
 
   const renamePrice = petRenamePrice(character.level);
   if (character.bronze < renamePrice) {
     return failure(
       state,
-      "A troca de nome custa " +
+      "The name change costs " +
         formatBronze(renamePrice) +
         " e faltam " +
         formatBronze(renamePrice - character.bronze) +
@@ -107,7 +107,7 @@ export function renamePet(state: GameState, name: string): Result {
     pet: { ...pet, name: clean },
   };
 
-  const message = "O mascote agora atende por " + clean + ".";
+  const message = "The companion now answers to " + clean + ".";
   return success(addLog(next, "character", message), message);
 }
 
@@ -143,27 +143,27 @@ export function petTrainingView(state: GameState): PetTrainingView | null {
     effort: { progress: petTrainingEffort(level) },
     affordable,
     maxed,
-    reason: maxed ? "Mascote no teto" : !affordable ? "WCoins insuficientes" : null,
+    reason: maxed ? "Companion at the cap" : !affordable ? "Not enough WCoins" : null,
   };
 }
 
 export function trainPet(state: GameState): Result<{ leveled: boolean }> {
   const character = state.character;
-  if (!character) return failure(state, "Nenhum personagem ativo.");
+  if (!character) return failure(state, "No active character.");
 
   const pet = state.pet;
-  if (!pet) return failure(state, "Você não tem mascote para treinar.");
+  if (!pet) return failure(state, "You have no companion to train.");
 
   const level = petLevelOf(pet);
   if (level >= PET_MAX_LEVEL) {
-    return failure(state, "O mascote já está no teto de NV. " + PET_MAX_LEVEL + ".");
+    return failure(state, "The companion is already at the LV. " + PET_MAX_LEVEL + ".");
   }
 
   const cost = petTrainingSessionCost(level, character.level);
   if (character.bronze < cost) {
     return failure(
       state,
-      "Cada treino é pago na hora: custa " +
+      "Each training is paid on the spot: it costs " +
         formatBronze(cost) +
         " e faltam " +
         formatBronze(cost - character.bronze) +
@@ -180,51 +180,51 @@ export function trainPet(state: GameState): Result<{ leveled: boolean }> {
   });
 
   const message = leveled
-    ? "O mascote termina a sessão maior do que entrou: NV. " + petLevelOf(grown) + "."
-    : "O mascote treina ao seu lado. O corpo dele registra o esforço.";
+    ? "The companion ends the session bigger than it entered: LV. " + petLevelOf(grown) + "."
+    : "The companion trains at your side. Its body records the effort.";
   return success(addLog(next, "training", message), message, { leveled });
 }
 
 export function restPetTick(state: GameState): Result<{ whole: boolean }> {
   const pet = state.pet;
-  if (!pet) return failure(state, "Você não tem mascote.");
-  if (isPetActive(pet)) return failure(state, "O mascote está na caçada, não em repouso.");
+  if (!pet) return failure(state, "You have no companion.");
+  if (isPetActive(pet)) return failure(state, "The companion is on the hunt, not at rest.");
   if (isPetWhole(pet)) return success(state, "", { whole: true });
 
   const rested = restPet(pet, petRestStep(pet));
   const whole = isPetWhole(rested);
-  const message = whole ? "O mascote está de pé, inteiro e pronto." : "";
+  const message = whole ? "The companion is up, whole and ready." : "";
 
   return success(syncCharacter({ ...state, pet: rested }), message, { whole });
 }
 
 export function releasePet(state: GameState): Result {
   const character = state.character;
-  if (!character) return failure(state, "Nenhum personagem ativo.");
+  if (!character) return failure(state, "No active character.");
 
   const pet = state.pet;
-  if (!pet) return failure(state, "Você não tem mascote para soltar.");
+  if (!pet) return failure(state, "You have no companion to release.");
 
   const next: GameState = syncCharacter({ ...state, pet: null });
 
-  const message = "O mascote foi solto e parte sem olhar para trás.";
+  const message = "The companion was released and leaves without looking back.";
   return success(addLog(next, "character", message), message);
 }
 
 export function feedPet(state: GameState, itemId: string): Result {
   const pet = state.pet;
-  if (!pet) return failure(state, "Você não tem mascote para cuidar.");
+  if (!pet) return failure(state, "You have no companion to care for.");
 
   const item = findItem(itemId);
-  if (!item) return failure(state, "Item desconhecido.");
-  if (!servesPet(item)) return failure(state, item.name + " não serve para o mascote.");
+  if (!item) return failure(state, "Unknown item.");
+  if (!servesPet(item)) return failure(state, item.name + " is no use to the companion.");
   if (countInInventory(state.inventory, itemId) <= 0) {
-    return failure(state, item.name + " não está no inventário.");
+    return failure(state, item.name + " is not in the bag.");
   }
 
   const energy = petRationOf(item, pet);
   if (energy <= 0 || isPetWhole(pet)) {
-    return failure(state, "O mascote não precisa disso agora.");
+    return failure(state, "The companion does not need that right now.");
   }
 
   const fed = restPet(pet, energy);
@@ -236,8 +236,8 @@ export function feedPet(state: GameState, itemId: string): Result {
 
   const woke = !isPetAwake(pet) && isPetAwake(fed);
   const message = woke
-    ? "O mascote se levanta e volta para a caçada."
-    : "O mascote aceita " + item.name.toLowerCase() + " e se recompõe.";
+    ? "The companion gets up and returns to the hunt."
+    : "The companion takes " + item.name.toLowerCase() + " and mends itself.";
 
   return success(addLog(next, "character", message), message);
 }

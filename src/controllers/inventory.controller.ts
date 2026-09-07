@@ -126,19 +126,19 @@ export function gainItems(
 
 export function equipItem(state: GameState, itemId: string, enhancement = 0): Result {
   const character = state.character;
-  if (!character) return failure(state, "Nenhum personagem ativo.");
+  if (!character) return failure(state, "No active character.");
 
   const item = findItem(itemId);
-  if (!item) return failure(state, "Item desconhecido.");
-  if (!isEquippable(item)) return failure(state, item.name + " não pode ser equipado.");
+  if (!item) return failure(state, "Unknown item.");
+  if (!isEquippable(item)) return failure(state, item.name + " cannot be equipped.");
   if (countInInventory(state.inventory, itemId, enhancement) <= 0) {
-    return failure(state, enhancedName(item.name, enhancement) + " não está no inventário.");
+    return failure(state, enhancedName(item.name, enhancement) + " is not in the bag.");
   }
   if (!servesLineage(item, character.gender)) {
-    return failure(state, item.name + " é peça de " + lineageName(item) + ".");
+    return failure(state, item.name + " is a piece for " + lineageName(item) + ".");
   }
   if (character.level < item.minLevel) {
-    return failure(state, item.name + " exige NV. " + item.minLevel + ".");
+    return failure(state, item.name + " demands LV. " + item.minLevel + ".");
   }
 
   const slot = item.category as EquipmentSlot;
@@ -158,13 +158,13 @@ export function equipItem(state: GameState, itemId: string, enhancement = 0): Re
   }
 
   const message =
-    enhancedName(item.name, enhancement) + " equipado em " + SLOT_LABEL[slot].toLowerCase() + ".";
+    enhancedName(item.name, enhancement) + " equipped on the " + SLOT_LABEL[slot].toLowerCase() + ".";
   return success(addLog(syncCharacter(next), "inventory", message), message);
 }
 
 export function unequipItem(state: GameState, slot: EquipmentSlot): Result {
   const piece = state.equipment[slot];
-  if (!piece) return failure(state, "Nada equipado em " + SLOT_LABEL[slot].toLowerCase() + ".");
+  if (!piece) return failure(state, "Nothing equipped on the " + SLOT_LABEL[slot].toLowerCase() + ".");
 
   const item = findItem(piece.itemId);
   const next: GameState = {
@@ -174,7 +174,7 @@ export function unequipItem(state: GameState, slot: EquipmentSlot): Result {
   };
 
   const message =
-    enhancedName(item?.name ?? "Item", piece.enhancement) + " guardado no inventário.";
+    enhancedName(item?.name ?? "Item", piece.enhancement) + " stored in the bag.";
   return success(addLog(syncCharacter(next), "inventory", message), message);
 }
 
@@ -184,20 +184,20 @@ export function consumeItem(
   random: Random = defaultRandom,
 ): Result {
   const character = state.character;
-  if (!character) return failure(state, "Nenhum personagem ativo.");
+  if (!character) return failure(state, "No active character.");
 
   const item = findItem(itemId);
-  if (!item) return failure(state, "Item desconhecido.");
+  if (!item) return failure(state, "Unknown item.");
   if (item.category === "pet") return feedPet(state, itemId);
-  if (item.category !== "potion") return failure(state, item.name + " não é consumível.");
+  if (item.category !== "potion") return failure(state, item.name + " is not consumable.");
   if (countInInventory(state.inventory, itemId) <= 0) {
-    return failure(state, item.name + " não está no inventário.");
+    return failure(state, item.name + " is not in the bag.");
   }
 
   const furyMinutes = item.effect.furyMinutes ?? 0;
   if (furyMinutes > 0) {
     if (isFullMoon()) {
-      return failure(state, "A lua cheia já mantém você em fúria.");
+      return failure(state, "The full moon already keeps you in fury.");
     }
     const derived = deriveStats(character, state.equipment, state.pet);
     const willpower = derived.totalAttributes.willpower - derived.sources.fury.willpower;
@@ -210,7 +210,7 @@ export function consumeItem(
     const next = updateCharacter(consumed, (current) => ({ ...current, furyUntil: until }));
     const message =
       item.name +
-      " consumida: +10 em todos os atributos por " +
+      " consumed: +10 to all attributes for " +
       formatFuryDuration(furyMinutes, furyWillpowerExtraMs(furyMinutes, willpower)) +
       ".";
     return success(addLog(syncCharacter(next), "inventory", message), message);
@@ -220,7 +220,7 @@ export function consumeItem(
   const healthGain = rollHealthPotionHeal(item, random);
 
   if (healthGain <= 0 || character.health >= stats.maxHealth) {
-    return failure(state, "Nada a recuperar com " + item.name + " agora.");
+    return failure(state, "Nothing to restore with " + item.name + " right now.");
   }
 
   const consumed: GameState = {
@@ -234,6 +234,6 @@ export function consumeItem(
     health: current.health + healed,
   }));
 
-  const message = item.name + " consumida: +" + healed + " vida.";
+  const message = item.name + " consumed: +" + healed + " health.";
   return success(addLog(syncCharacter(next), "inventory", message), message);
 }

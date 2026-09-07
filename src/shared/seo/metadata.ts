@@ -10,7 +10,7 @@ import {
 } from "@/shared/constants/site";
 
 export const SITE_DESCRIPTION =
-  "Crônica de Lumni e Luna: jogo de navegador gratuito de lobisomem. Caçe criaturas, treine atributos, forje equipamentos e dispute o ranking.";
+  "Chronicle of Lumni and Luna: a free werewolf browser game. Hunt creatures, train attributes, forge equipment and fight for the ranking.";
 
 export const ROBOTS_INDEX: Metadata["robots"] = { index: true, follow: true };
 export const ROBOTS_NOINDEX: Metadata["robots"] = { index: false, follow: false };
@@ -35,12 +35,12 @@ export function rootMetadata(): Metadata {
     description: SITE_DESCRIPTION,
     applicationName: GAME_NAME,
     keywords: [
-      "jogo de navegador",
-      "lobisomem",
-      "rpg online",
+      "browser game",
+      "werewolf",
+      "online rpg",
       "mmorpg",
-      "caçador",
-      "lua",
+      "hunter",
+      "moon",
       GAME_NAME,
       "Lumni",
       "Luna",
@@ -55,7 +55,7 @@ export function rootMetadata(): Metadata {
     },
     openGraph: {
       type: "website",
-      locale: "pt_BR",
+      locale: "en_US",
       url: SITE_URL,
       siteName: GAME_NAME,
       title: GAME_NAME,
@@ -93,7 +93,7 @@ export function pageMetadata(input: {
     alternates: { canonical: url },
     openGraph: {
       type: "website",
-      locale: "pt_BR",
+      locale: "en_US",
       url,
       siteName: GAME_NAME,
       title,

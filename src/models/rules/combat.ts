@@ -74,18 +74,18 @@ const PET_CRITICAL_CHANCE = 5;
 
 const CRITICAL_MULTIPLIER = 1.5;
 
-const CHARACTER_HIT_VERBS = [" acerta ", " morde ", " crava as garras em ", " golpeia "];
-const CHARACTER_CRIT_VERBS = [" rasga ", " despedaça ", " abre "];
-const CREATURE_HIT_VERBS = [" atinge ", " acerta ", " crava os dentes em "];
-const CREATURE_CRIT_VERBS = [" dilacera ", " rasga "];
-const PET_HIT_VERBS = [" morde ", " se lança sobre ", " rasga o flanco de "];
+const CHARACTER_HIT_VERBS = [" strikes ", " bites ", " sinks its claws into ", " batters "];
+const CHARACTER_CRIT_VERBS = [" tears into ", " shreds ", " rips open "];
+const CREATURE_HIT_VERBS = [" hits ", " strikes ", " sinks its teeth into "];
+const CREATURE_CRIT_VERBS = [" mauls ", " tears into "];
+const PET_HIT_VERBS = [" bites ", " lunges at ", " tears the flank of "];
 
 function creatureDodgeText(creatureName: string, characterName: string, random: Random): string {
   return pickOne(
     [
-      creatureName + " desvia do golpe de " + characterName + ".",
-      creatureName + " escapa por um fio das garras de " + characterName + ".",
-      "O bote de " + characterName + " passa raspando por " + creatureName + ".",
+      creatureName + " dodges the blow of " + characterName + ".",
+      creatureName + " escapes the claws of " + characterName + " by a hair.",
+      "The pounce of " + characterName + " grazes past " + creatureName + ".",
     ],
     random,
   );
@@ -94,9 +94,9 @@ function creatureDodgeText(creatureName: string, characterName: string, random: 
 function characterDodgeText(characterName: string, creatureName: string, random: Random): string {
   return pickOne(
     [
-      characterName + " escapa do bote de " + creatureName + ".",
-      characterName + " rola para longe do ataque de " + creatureName + ".",
-      "O golpe de " + creatureName + " corta só o vento.",
+      characterName + " escapes the pounce of " + creatureName + ".",
+      characterName + " rolls away from the attack of " + creatureName + ".",
+      "The blow of " + creatureName + " cuts only wind.",
     ],
     random,
   );
@@ -202,10 +202,9 @@ export function simulateCombat({
         characterName +
         pickOne(critical ? CHARACTER_CRIT_VERBS : CHARACTER_HIT_VERBS, random) +
         creature.name +
-        " causando " +
+        " dealing " +
         damage +
-        " de dano" +
-        (critical ? " crítico." : "."),
+        (critical ? " critical damage." : " damage."),
     });
   };
 
@@ -224,7 +223,7 @@ export function simulateCombat({
         dodged: true,
         characterHealth,
         creatureHealth,
-        text: creature.name + " se esquiva do bote de " + pet.name + ".",
+        text: creature.name + " sidesteps the pounce of " + pet.name + ".",
       });
       return;
     }
@@ -246,10 +245,9 @@ export function simulateCombat({
         pet.name +
         pickOne(PET_HIT_VERBS, random) +
         creature.name +
-        " causando " +
+        " dealing " +
         damage +
-        " de dano" +
-        (critical ? " crítico." : "."),
+        (critical ? " critical damage." : " damage."),
     });
   };
 
@@ -267,7 +265,7 @@ export function simulateCombat({
         dodged: true,
         characterHealth,
         creatureHealth,
-        text: characterName + " escapa do bote de " + foePet.name + ".",
+        text: characterName + " escapes the pounce of " + foePet.name + ".",
       });
       return;
     }
@@ -289,10 +287,9 @@ export function simulateCombat({
         foePet.name +
         pickOne(PET_HIT_VERBS, random) +
         characterName +
-        " causando " +
+        " dealing " +
         damage +
-        " de dano" +
-        (critical ? " crítico." : "."),
+        (critical ? " critical damage." : " damage."),
     });
   };
 
@@ -313,8 +310,8 @@ export function simulateCombat({
         characterHealth,
         creatureHealth,
         text: down
-          ? creature.name + " acerta " + pet.name + " em cheio, que sai da luta sem fôlego."
-          : creature.name + " investe contra " + pet.name + ", que gane e volta ao combate.",
+          ? creature.name + " hits " + pet.name + " square on, and it leaves the fight out of breath."
+          : creature.name + " charges at " + pet.name + ", which yelps and returns to the fight.",
       });
       return;
     }
@@ -350,10 +347,9 @@ export function simulateCombat({
         creature.name +
         pickOne(critical ? CREATURE_CRIT_VERBS : CREATURE_HIT_VERBS, random) +
         characterName +
-        " causando " +
+        " dealing " +
         damage +
-        " de dano" +
-        (critical ? " crítico." : "."),
+        (critical ? " critical damage." : " damage."),
     });
   };
 
@@ -372,7 +368,7 @@ export function simulateCombat({
         dodged: false,
         characterHealth,
         creatureHealth,
-        text: pet.name + " recua ofegante, sem fôlego para seguir na luta.",
+        text: pet.name + " falls back panting, no breath left to stay in the fight.",
       });
     }
 
@@ -387,7 +383,7 @@ export function simulateCombat({
         dodged: false,
         characterHealth,
         creatureHealth,
-        text: foePet.name + " recua ofegante, sem fôlego para seguir na luta.",
+        text: foePet.name + " falls back panting, no breath left to stay in the fight.",
       });
     }
 

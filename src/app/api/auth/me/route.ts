@@ -6,12 +6,12 @@ import { sessionClaims } from "../../_lib/session";
 
 export async function GET() {
   const claims = await sessionClaims();
-  if (!claims) return bad("Sem sessão.", 401);
+  if (!claims) return bad("No session.", 401);
   const userId = claims.userId;
 
   try {
     return await withTransaction(async (client) => {
-      if (!(await sessionIsLive(client, claims))) return bad("Sessão encerrada.", 401);
+      if (!(await sessionIsLive(client, claims))) return bad("Session ended.", 401);
       const found = await client.query(
         "select email, picture, two_factor_enabled, tutorial from users where id = $1",
         [userId],
@@ -32,6 +32,6 @@ export async function GET() {
     });
   } catch (error) {
     console.error("[api] GET /api/auth/me", error);
-    return bad("O servidor tropeçou. Tente de novo.", 500);
+    return bad("The server stumbled. Try again.", 500);
   }
 }

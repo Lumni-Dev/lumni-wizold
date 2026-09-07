@@ -15,54 +15,54 @@ export type AutomationKey = keyof Automation;
 export const AUTOMATIONS: readonly { key: AutomationKey; label: string; effect: string }[] = [
   {
     key: "hunt",
-    label: "Caçada automática",
+    label: "Automatic hunt",
     effect:
-      "Encadeia caçadas sozinho e volta a caçar quando o corpo estiver inteiro de novo. Desligado, cada clique caça uma vez.",
+      "Chains hunts on its own and returns to hunting when the body is whole again. Off, each click hunts once.",
   },
   {
     key: "train",
-    label: "Treino automático",
+    label: "Automatic training",
     effect:
-      "Repete o exercício sozinho e volta a ele quando o bronze der para pagar. Desligado, cada clique treina uma sessão.",
+      "Repeats the exercise on its own and returns to it when the bronze can pay. Off, each click trains one session.",
   },
   {
     key: "mine",
-    label: "Mineração automática",
+    label: "Automatic mining",
     effect:
-      "Repete o golpe na veia sozinho e volta a ela quando a picareta puder bater de novo. Desligado, cada clique rende uma vez.",
+      "Repeats the strike at the vein on its own and returns to it when the pick can swing again. Off, each click pays once.",
   },
   {
     key: "forge",
-    label: "Forja automática",
+    label: "Automatic forging",
     effect:
-      "Bate de novo na mesma peça assim que os fragmentos aparecerem. Desligado, cada clique sobe um nível e para.",
+      "Strikes the same piece again as soon as the fragments show up. Off, each click climbs one level and stops.",
   },
   {
     key: "rest",
-    label: "Descanso automático",
-    effect: "Deita sozinho quando a vida chega no chão, e levanta quando ela enche.",
+    label: "Automatic rest",
+    effect: "Lies down on its own when health hits the floor, and gets up when it fills.",
   },
   {
     key: "transform",
-    label: "Fúria automática",
+    label: "Automatic fury",
     effect:
-      "Bebe poção de fúria da mochila quando a fúria acaba, na caçada, mesmo sem a caçada automática. Na lua cheia o céu já mantém o Modo Fúria. Desligado, você bebe na mão.",
+      "Drinks a fury potion from the bag when the fury ends, on the hunt, even without the automatic hunt. On the full moon the sky already keeps Fury Mode on. Off, you drink by hand.",
   },
   {
     key: "potion",
-    label: "Poção automática",
-    effect: "Bebe poção de vida quando a vida chega no chão, se houver uma na mochila.",
+    label: "Automatic potion",
+    effect: "Drinks a health potion when health hits the floor, if the bag has one.",
   },
   {
     key: "petFeed",
-    label: "Alimento automático",
-    effect: "Dá comida ao lobo quando ele fica sem fôlego, se houver alguma na mochila.",
+    label: "Automatic food",
+    effect: "Feeds the wolf when it runs out of breath, if the bag has any.",
   },
   {
     key: "petRest",
-    label: "Repouso automático",
+    label: "Automatic repose",
     effect:
-      "Sem fôlego, dá comida ao lobo se houver na mochila, senão o manda repousar, e o chama de volta quando a energia enche.",
+      "Out of breath, feeds the wolf if the bag has food, otherwise sends it to rest, and calls it back when the energy fills.",
   },
 ];
 

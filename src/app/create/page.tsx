@@ -6,7 +6,7 @@ import { CharacterCreationScreen } from "@/views/screens/character-creation.scre
 
 export const metadata: Metadata = privatePageMetadata({
   title: "Criar personagem",
-  description: "Crie seu caçador e escolha a linhagem Lumni ou Luna.",
+  description: "Create your hunter and choose the Lumni or Luna bloodline.",
   path: "/create",
 });
 

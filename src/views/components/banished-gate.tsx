@@ -1,9 +1,11 @@
 "use client";
 
+import { useT } from "@/controllers/use-locale";
 import { Button } from "./button";
 import { Modal } from "./modal";
 
 export function BanishedGate({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const t = useT();
   return (
     <Modal
       open={open}
@@ -12,16 +14,16 @@ export function BanishedGate({ open, onClose }: { open: boolean; onClose: () => 
       dismissible={false}
       footer={
         <Button variant="primary" size="medium" fullWidth onClick={onClose}>
-          Entendi
+          Understood
         </Button>
       }
     >
       <div className="space-y-3 p-4">
         <p className="text-xs leading-relaxed text-ink-faint">
-          Esta conta foi banida por infringir as diretrizes da plataforma.
+          {t("This account was banned for infringing the platform's guidelines.")}
         </p>
         <p className="text-xs leading-relaxed text-ink-faint">
-          O acesso ao jogo está bloqueado e a sessão será encerrada.
+          {t("Access to the game is blocked and the session will be ended.")}
         </p>
       </div>
     </Modal>

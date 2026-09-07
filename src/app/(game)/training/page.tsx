@@ -3,8 +3,8 @@ import { TrainingScreen } from "@/views/screens/training.screen";
 import { privatePageMetadata } from "@/shared/seo/metadata";
 
 export const metadata: Metadata = privatePageMetadata({
-  title: "Treinamento",
-  description: "Treine Força, Resistência, Agilidade, Instinto e Vontade na forma de lobisomem.",
+  title: "Training",
+  description: "Train Strength, Endurance, Agility, Instinct and Willpower in werewolf form.",
   path: "/training",
 });
 

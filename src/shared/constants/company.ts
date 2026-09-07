@@ -8,8 +8,8 @@ export const COMPANY = {
   privacyUrl: "https://lumni.dev.br/privacy",
   termsUrl: "https://lumni.dev.br/terms",
   description:
-    "A Lumni desenvolve sistemas, automatiza processos e acopla engenheiros ao seu time. " +
-    "Do primeiro diagnóstico ao código rodando em produção.",
+    "Lumni builds systems, automates processes and attaches engineers to your team. " +
+    "From the first diagnosis to code running in production.",
   channels: [
     {
       kind: "mail" as const,

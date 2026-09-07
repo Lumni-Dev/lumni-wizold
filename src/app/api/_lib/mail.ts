@@ -3,7 +3,7 @@ import { SITE_EMAIL, SITE_URL, BRAND_LOGO_PNG_PATH } from "@/shared/constants/si
 
 const GAME_URL = SITE_URL;
 const GAME_NAME = "WIZOLD";
-const GAME_TAGLINE = "Crônica de Lumni e Luna";
+const GAME_TAGLINE = "Chronicle of Lumni and Luna";
 
 const BASE = "#070503";
 const SURFACE = "#130d09";
@@ -20,7 +20,7 @@ function transporter() {
   const port = Number(process.env.SMTP_PORT ?? 465);
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
-  if (!host || !user || !pass) throw new Error("SMTP ausente no ambiente.");
+  if (!host || !user || !pass) throw new Error("SMTP missing from the environment.");
   return createTransport({
     host,
     port,
@@ -45,7 +45,7 @@ function layout(
     )
     .join("");
   return (
-    '<!DOCTYPE html><html lang="pt-BR"><head>' +
+    '<!DOCTYPE html><html lang="en"><head>' +
     '<meta charset="utf-8" />' +
     '<meta name="viewport" content="width=device-width,initial-scale=1" />' +
     '<meta name="color-scheme" content="dark" />' +
@@ -101,8 +101,8 @@ function layout(
     '<div style="text-align:center;padding:20px 0;font-size:11px;line-height:1.7;color:' +
     INK_FAINT +
     ';">' +
-    "A partida vive no servidor de Wizold e te espera em qualquer navegador.<br/>" +
-    'Suporte: <a href="mailto:' +
+    "The run lives on the Wizold server and waits for you in any browser.<br/>" +
+    'Support: <a href="mailto:' +
     SITE_EMAIL +
     '" style="color:' +
     INK_SOFT +
@@ -127,17 +127,17 @@ async function deliver(to: string, subject: string, html: string, text: string):
 
 export async function sendWelcomeEmail(to: string): Promise<void> {
   const paragraphs = [
-    "A lua reparou em você. A sua conta acaba de nascer em <strong style=\"color:" +
+    "The moon noticed you. Your account was just born in <strong style=\"color:" +
       INK +
-      ';">Wizold</strong>, e a primeira noite não cobra nada para começar.',
-    "Crie o seu caçador, escolha um nome de uma palavra só e desça a serra: o treino paga o corpo, a caçada paga o treino, e a fúria decide o resto.",
-    "A partida fica guardada no servidor: feche o navegador quando quiser, a noite espera.",
+      ';">Wizold</strong>, and the first night charges nothing to begin.',
+    "Create your hunter, choose a one-word name and go down the ridge: training pays the body, the hunt pays the training, and the fury decides the rest.",
+    "The run is kept on the server: close the browser whenever you want, the night waits.",
   ];
   await deliver(
     to,
-    "A noite te esperava",
-    layout(paragraphs, "Entrar na caçada"),
-    "Sua conta nasceu em Wizold. Entre na caçada: " + GAME_URL,
+    "The night was waiting for you",
+    layout(paragraphs, "Enter the hunt"),
+    "Your account was born in Wizold. Enter the hunt: " + GAME_URL,
   );
 }
 
@@ -148,33 +148,33 @@ export async function sendPackInviteEmail(to: string, inviterName: string): Prom
       INK +
       ';">' +
       inviterName +
-      "</strong> chamou você para a matilha dele em Wizold.",
-    "A matilha corre junta: quem é da sua matilha pode abrir uma mesa reservada com você, e você com ele, o único jeito de conversar a dois na taverna.",
-    "O convite espera na Taverna, no quadro de Convites. É lá que você aceita ou recusa, com um clique.",
+      "</strong> invited you to their pack in Wizold.",
+    "The pack runs together: whoever is in your pack can open a reserved table with you, and you with them, the only way to talk one on one in the tavern.",
+    "The invite waits in the Tavern, on the Invites board. That is where you accept or decline, with one click.",
   ];
   await deliver(
     to,
-    inviterName + " chamou você para a matilha",
-    layout(paragraphs, "Aceitar na Taverna", tavern),
-    inviterName + " chamou você para a matilha em Wizold. Aceite na Taverna: " + tavern,
+    inviterName + " invited you to the pack",
+    layout(paragraphs, "Accept in the Tavern", tavern),
+    inviterName + " invited you to the pack in Wizold. Accept in the Tavern: " + tavern,
   );
 }
 
 export async function sendFarewellEmail(to: string, characterName: string): Promise<void> {
   const paragraphs = [
-    "A partida de <strong style=\"color:" +
+    "The run of <strong style=\"color:" +
       INK +
       ';">' +
       characterName +
-      "</strong> foi encerrada, e a conta foi apagada por inteiro do servidor: personagem, mochila, carteira, mesas e rastros.",
-    "Se a lua chamar de novo, a mesma porta abre uma conta nova, do primeiro uivo em diante.",
-    "Se a exclusão não foi você, escreva agora para o suporte.",
+      "</strong> was ended, and the account was fully erased from the server: character, bag, wallet, tables and traces.",
+    "If the moon calls again, the same door opens a new account, from the first howl onward.",
+    "If the deletion was not you, write to support right away.",
   ];
   await deliver(
     to,
-    "A partida de " + characterName + " foi encerrada",
-    layout(paragraphs, "Começar outra caçada"),
-    "A conta de " + characterName + " foi apagada de Wizold. Voltar: " + GAME_URL,
+    "The run of " + characterName + " was ended",
+    layout(paragraphs, "Start another hunt"),
+    "The account of " + characterName + " was erased from Wizold. Return: " + GAME_URL,
   );
 }
 
@@ -186,60 +186,60 @@ export async function sendDepartureNoticeEmail(
   const admin = process.env.SMTP_SENDER ?? process.env.SMTP_USER;
   if (!admin) return;
   const paragraphs = [
-    "Uma conta partiu de <strong style=\"color:" + INK + ';">Wizold</strong>.',
+    "An account departed from <strong style=\"color:" + INK + ';">Wizold</strong>.',
     "E-mail: <strong style=\"color:" +
       INK +
       ';">' +
       departedEmail +
-      "</strong><br/>Personagem: <strong style=\"color:" +
+      "</strong><br/>Character: <strong style=\"color:" +
       INK +
       ';">' +
       characterName +
-      "</strong> (NV. " +
+      "</strong> (LV. " +
       characterLevel +
-      ")<br/>Quando: " +
+      ")<br/>When: " +
       saoPauloStamp(new Date()),
-    "O registro também fica na tabela account_departures.",
+    "The record also lives in the account_departures table.",
   ];
   await deliver(
     admin,
-    "Uma conta partiu: " + characterName,
-    layout(paragraphs, "Abrir o jogo"),
-    "Conta excluída de Wizold: " + departedEmail + " (" + characterName + ").",
+    "An account departed: " + characterName,
+    layout(paragraphs, "Open the game"),
+    "Account deleted from Wizold: " + departedEmail + " (" + characterName + ").",
   );
 }
 
 function saoPauloStamp(when: Date): string {
-  const date = new Intl.DateTimeFormat("pt-BR", {
+  const date = new Intl.DateTimeFormat("en-GB", {
     timeZone: "America/Sao_Paulo",
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
   }).format(when);
-  const time = new Intl.DateTimeFormat("pt-BR", {
+  const time = new Intl.DateTimeFormat("en-GB", {
     timeZone: "America/Sao_Paulo",
     hour: "2-digit",
     minute: "2-digit",
   }).format(when);
-  return date + " às " + time;
+  return date + " at " + time;
 }
 
 export async function sendAccessEmail(to: string, when: Date): Promise<void> {
   const stamp = saoPauloStamp(when);
   const paragraphs = [
-    'Sua conta entrou em Wizold em <strong style="color:' +
+    'Your account entered Wizold at <strong style="color:' +
       INK +
       ';">' +
       stamp +
-      "</strong>, horário de São Paulo.",
-    "Se foi você, boa caçada: a noite está aberta.",
-    "Se você não reconhece este acesso, escreva agora para o suporte e a porta será trancada.",
+      "</strong>, São Paulo time.",
+    "If it was you, good hunting: the night is open.",
+    "If you do not recognize this access, write to support right away and the door will be locked.",
   ];
   await deliver(
     to,
-    "Novo acesso à sua conta",
-    layout(paragraphs, "Abrir o jogo"),
-    "Novo acesso à sua conta em Wizold: " + stamp + " (horário de São Paulo). " + GAME_URL,
+    "New access to your account",
+    layout(paragraphs, "Open the game"),
+    "New access to your account in Wizold: " + stamp + " (São Paulo time). " + GAME_URL,
   );
 }
 
@@ -266,38 +266,38 @@ export async function sendTwoFactorCodeEmail(
 
   const intro =
     reason === "login"
-      ? "Alguém acabou de bater na porta com a sua conta Google. Para entrar, confirme com este código:"
+      ? "Someone just knocked on the door with your Google account. To enter, confirm with this code:"
       : reason === "enable"
-        ? "Você pediu para ligar a verificação em duas etapas em Wizold. Confirme com este código:"
+        ? "You asked to turn on two-step verification in Wizold. Confirm with this code:"
         : reason === "disable"
-          ? "Você pediu para desligar a verificação em duas etapas em Wizold. Confirme com este código:"
-          : "Você pediu para excluir a sua conta em Wizold. Este é o código de confirmação:";
+          ? "You asked to turn off two-step verification in Wizold. Confirm with this code:"
+          : "You asked to delete your account in Wizold. This is the confirmation code:";
 
   const tail =
     reason === "login"
-      ? "Se não foi você, ignore esta carta e troque a senha da conta Google."
+      ? "If it was not you, ignore this letter and change your Google account password."
       : reason === "delete"
-        ? "Confirmando, a conta e tudo o que ela guarda somem do servidor para sempre."
-        : "Sem o código, nada muda.";
+        ? "Once confirmed, the account and everything it keeps vanish from the server for good."
+        : "Without the code, nothing changes.";
 
   const subject =
     reason === "login"
-      ? "Código para entrar: " + code
+      ? "Code to enter: " + code
       : reason === "enable"
-        ? "Código para ligar a verificação: " + code
+        ? "Code to turn verification on: " + code
         : reason === "disable"
-          ? "Código para desligar a verificação: " + code
-          : "Código para excluir a conta: " + code;
+          ? "Code to turn verification off: " + code
+          : "Code to delete the account: " + code;
 
-  const paragraphs = [intro, codeBlock, "Ele vale por 10 minutos.", tail];
+  const paragraphs = [intro, codeBlock, "It is good for 10 minutes.", tail];
   if (reason === "delete") {
-    paragraphs.push("Se não foi você, ignore esta carta: sem o código, nada acontece.");
+    paragraphs.push("If it was not you, ignore this letter: without the code, nothing happens.");
   }
 
   await deliver(
     to,
     subject,
-    layout(paragraphs, reason === "login" ? "Entrar na caçada" : "Voltar ao jogo"),
-    "Código Wizold: " + code + " (vale 10 minutos).",
+    layout(paragraphs, reason === "login" ? "Enter the hunt" : "Back to the game"),
+    "Wizold code: " + code + " (good for 10 minutes).",
   );
 }

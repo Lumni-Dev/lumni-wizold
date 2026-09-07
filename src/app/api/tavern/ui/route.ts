@@ -15,7 +15,7 @@ export async function PATCH(request: Request) {
     const y = finite(body.y) ?? 0;
 
     if (open && !roomId) {
-      return NextResponse.json({ ok: false, message: "Sala inválida.", data: null });
+      return NextResponse.json({ ok: false, message: "Invalid room.", data: null });
     }
 
     const ui = await saveTavernUi(client, identity.id, {

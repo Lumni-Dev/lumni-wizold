@@ -27,7 +27,7 @@ export async function PUT(request: Request) {
       return NextResponse.json({ ok: true, message: "", data: null, activity: null });
     }
     if (!isActivityKind(kind)) {
-      return NextResponse.json({ ok: false, message: "Atividade inválida.", data: null });
+      return NextResponse.json({ ok: false, message: "Invalid activity.", data: null });
     }
     const resume = readResume(body);
     await updateActivity(client, characterId, {

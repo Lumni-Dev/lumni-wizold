@@ -15,7 +15,7 @@ export async function POST(request: Request) {
   const gate = rateLimit("delcode:" + userId, 3, 600000);
   const gateShared = await rateLimitShared("delcode:" + userId, 3, 600);
   if (!gate.allowed || !gateShared) {
-    return bad("Um código já foi enviado. Confira o e-mail antes de pedir outro.", 429);
+    return bad("A code was already sent. Check the e-mail before asking for another.", 429);
   }
   try {
     const code = String(randomInt(0, 10000)).padStart(4, "0");
@@ -37,11 +37,11 @@ export async function POST(request: Request) {
     await sendDeletionCodeEmail(email, code);
     return NextResponse.json({
       ok: true,
-      message: "Código enviado para o seu e-mail. Ele vale por 10 minutos.",
+      message: "Code sent to your e-mail. It is good for 10 minutes.",
       data: null,
     });
   } catch (error) {
     console.error("[api] POST /api/characters/delete-code", error);
-    return bad("O correio tropeçou. Tente de novo.", 500);
+    return bad("The mail stumbled. Try again.", 500);
   }
 }

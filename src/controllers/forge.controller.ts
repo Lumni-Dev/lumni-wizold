@@ -66,7 +66,7 @@ export function listMining(state: GameState, now: number = Date.now()): MiningVi
       fragment: findItem(ore.fragmentId) as Item,
       owned: countInInventory(state.inventory, ore.fragmentId),
       unlocked,
-      reason: !unlocked ? "Requer mineração NV. " + ore.requiredLevel : null,
+      reason: !unlocked ? "Requires mining LV. " + ore.requiredLevel : null,
     };
   });
 
@@ -93,19 +93,19 @@ export function mine(
   now: number = Date.now(),
 ): Result<{ levelsGained: number }> {
   const character = state.character;
-  if (!character) return failure(state, "Nenhum personagem ativo.");
+  if (!character) return failure(state, "No active character.");
 
   const ore = findOre(oreId);
-  if (!ore) return failure(state, "Veio desconhecido.");
+  if (!ore) return failure(state, "Unknown vein.");
   if (state.mining.level < ore.requiredLevel) {
-    return failure(state, ore.label + " exige mineração NV. " + ore.requiredLevel + ".");
+    return failure(state, ore.label + " asks for mining LV. " + ore.requiredLevel + ".");
   }
 
   const rolled = rolloverMining(state.mining, now);
   if (rolled.count >= MINING_DAILY_MININGS) {
     return failure(
       state,
-      "Você já minerou o limite de hoje. A veia reabre em " + formatCooldown(miningResetsInMs(now)) + ".",
+      "You already mined today's limit. The vein reopens in " + formatCooldown(miningResetsInMs(now)) + ".",
     );
   }
 
@@ -128,13 +128,13 @@ export function mine(
   const atCeiling = rolled.level >= MINING_MAX_LEVEL;
   const haul =
     yielded +
-    " de " +
-    (fragment?.name ?? "fragmento") +
-    (atCeiling ? "" : " e " + effort + " de experiência de mineração");
+    " " +
+    (fragment?.name ?? "fragment") +
+    (atCeiling ? "" : " and " + effort + " mining experience");
   const message =
     levelsGained > 0
-      ? haul + ". A mineração subiu para " + mining.level + "."
-      : haul + (atCeiling ? " sai da rocha." : " saem da rocha.");
+      ? haul + ". Mining rose to " + mining.level + "."
+      : haul + (atCeiling ? " comes out of the rock." : " come out of the rock.");
 
   return success(addLog(next, "system", message), message, { levelsGained });
 }
@@ -214,9 +214,9 @@ export function listForge(state: GameState): ForgePiece[] {
       exactBonus,
       canForge: Boolean(fragment) && !maxed && owned >= cost && bronze >= bronzeCost,
       reason: maxed
-        ? "No teto de +" + MAX_ENHANCEMENT
+        ? "At the +" + MAX_ENHANCEMENT + " cap"
         : !fragment
-          ? "Esta peça não tem fragmento"
+          ? "This piece has no fragment"
           : null,
       attributes: ATTRIBUTES.filter(
         (definition) => (current.attributes?.[definition.key] ?? 0) > 0,
@@ -249,29 +249,29 @@ export function enhance(
   random: Random = defaultRandom,
 ): Result<{ raised: boolean }> {
   const character = state.character;
-  if (!character) return failure(state, "Nenhum personagem ativo.");
+  if (!character) return failure(state, "No active character.");
 
   const item = findItem(itemId);
-  if (!item || !isEquippable(item)) return failure(state, "Item desconhecido.");
+  if (!item || !isEquippable(item)) return failure(state, "Unknown item.");
 
   if (countInInventory(state.inventory, itemId, enhancement) < 1) {
-    return failure(state, enhancedName(item.name, enhancement) + " não está na mochila.");
+    return failure(state, enhancedName(item.name, enhancement) + " is not in the bag.");
   }
 
   const level = enhancement;
   if (level >= MAX_ENHANCEMENT) {
-    return failure(state, item.name + " já está no teto de +" + MAX_ENHANCEMENT + ".");
+    return failure(state, item.name + " is already at the +" + MAX_ENHANCEMENT + " cap.");
   }
 
   const fragment = fragmentOf(item);
-  if (!fragment) return failure(state, item.name + " não aceita forja.");
+  if (!fragment) return failure(state, item.name + " takes no forging.");
 
   const cost = enhancementCost(level + 1);
   const owned = countInInventory(state.inventory, fragment.id);
   if (owned < cost) {
     return failure(
       state,
-      "Faltam " + (cost - owned) + " " + fragment.name + " para o próximo nível.",
+      (cost - owned) + " " + fragment.name + " short of the next level.",
     );
   }
 
@@ -279,7 +279,7 @@ export function enhance(
   if (character.bronze < bronzeCost) {
     return failure(
       state,
-      "A martelada pede " + formatBronze(bronzeCost) + " e a bolsa não cobre.",
+      "The strike asks for " + formatBronze(bronzeCost) + " and the purse does not cover it.",
     );
   }
 
@@ -296,9 +296,9 @@ export function enhance(
   };
 
   const message = struck
-    ? item.name + " sai da bigorna em +" + (level + 1) + "."
-    : "A martelada falha e os fragmentos se perdem: " +
+    ? item.name + " leaves the anvil at +" + (level + 1) + "."
+    : "The strike fails and the fragments are lost: " +
       item.name +
-      (level > 0 ? " segue em +" + level + "." : " segue como estava.");
+      (level > 0 ? " stays at +" + level + "." : " stays as it was.");
   return success(addLog(next, "system", message), message, { raised: struck });
 }

@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { readFile, readdir, stat } from "node:fs/promises";
 import { join, parse } from "node:path";
+import { translate } from "@/shared/i18n/dictionary";
 import { EMPTY_ART, type ArtManifest } from "../entities/art";
 import { ATTRIBUTES } from "../entities/attribute";
 import { GENDERS } from "../entities/character";
@@ -131,6 +132,13 @@ function normalize(value: string): string {
     .replace(/^-|-$/g, "");
 }
 
+// Art files on disk keep the Portuguese names they were drawn under, while the
+// catalogs speak English. The pt dictionary is the alias table that keeps both
+// generations of file names matching the same entry.
+function inPt(value: string): string {
+  return normalize(translate(value, "pt"));
+}
+
 function folderSet(folder: string): string | null {
   const key = normalize(folder).replace(/-?set$/, "");
   return SET_ALIASES[key] ?? null;
@@ -209,7 +217,9 @@ function collectAttributes(files: FoundFile[]): Record<string, string> {
       (attribute) =>
         attribute.key === name ||
         normalize(attribute.name) === name ||
-        normalize(attribute.code) === name,
+        normalize(attribute.code) === name ||
+        inPt(attribute.name) === name ||
+        inPt(attribute.code) === name,
     );
     if (definition) art[definition.key] = file.url;
   }
@@ -226,7 +236,9 @@ function collectTerritories(files: FoundFile[]): Record<string, string> {
       (entry) =>
         entry.id === name ||
         normalize(entry.name) === name ||
-        normalize(entry.name).startsWith(name + "-"),
+        normalize(entry.name).startsWith(name + "-") ||
+        inPt(entry.name) === name ||
+        inPt(entry.name).startsWith(name + "-"),
     );
     if (territory) art[territory.id] = file.url;
   }
@@ -240,7 +252,10 @@ function collectGenders(files: FoundFile[]): Record<string, string> {
   for (const file of files) {
     const words = normalize(file.name).split("-");
     const definition = GENDERS.find(
-      (gender) => words.includes(gender.key) || words.includes(normalize(gender.label)),
+      (gender) =>
+        words.includes(gender.key) ||
+        words.includes(normalize(gender.label)) ||
+        words.includes(inPt(gender.label)),
     );
     if (definition) art[definition.key] = file.url;
   }
@@ -254,7 +269,10 @@ function collectPets(files: FoundFile[]): Record<string, string> {
   for (const file of files) {
     const words = normalize(file.name).split("-");
     const definition = PETS.find(
-      (pet) => words.includes(pet.key) || words.includes(normalize(pet.label)),
+      (pet) =>
+        words.includes(pet.key) ||
+        words.includes(normalize(pet.label)) ||
+        words.includes(inPt(pet.label)),
     );
     if (definition) art[definition.key] = file.url;
   }
@@ -267,7 +285,9 @@ function collectPacks(files: FoundFile[]): Record<string, string> {
 
   for (const file of files) {
     const name = normalize(file.name);
-    const pack = STORE_PACKS.find((entry) => entry.id === name || normalize(entry.name) === name);
+    const pack = STORE_PACKS.find(
+      (entry) => entry.id === name || normalize(entry.name) === name || inPt(entry.name) === name,
+    );
     if (pack) art[pack.id] = file.url;
   }
 

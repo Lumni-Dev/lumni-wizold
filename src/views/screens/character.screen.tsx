@@ -90,7 +90,7 @@ export function CharacterScreen() {
   return (
     <>
       <PageHeader
-        title="Personagem"
+        title="Character"
         description="The full sheet: who you are, what the body endures and how the beast answers."
         action={
           best ? (
@@ -119,7 +119,7 @@ export function CharacterScreen() {
             </div>
 
             <List>
-              <DataRow label="Level" value={"NV. " + formatNumber(character.level)} />
+              <DataRow label="Level" value={"LV. " + formatNumber(character.level)} />
               <DataRow label="WCoins" value={formatNumber(character.bronze)} />
               {character.createdAt ? (
                 <DataRow label="Created" value={formatDate(character.createdAt)} />

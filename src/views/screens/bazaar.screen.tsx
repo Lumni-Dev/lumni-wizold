@@ -23,6 +23,7 @@ import {
 import { ICON_FRAME_INSET } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
+import { useT } from "@/controllers/use-locale";
 import { normalizeText } from "@/shared/utils/text";
 import {
   matchesCategoryAndSet,
@@ -78,6 +79,7 @@ type Flow =
   | { kind: "withdraw"; pixKey: string };
 
 export function BazaarScreen() {
+  const t = useT();
   const {
     state,
     character,
@@ -164,7 +166,7 @@ export function BazaarScreen() {
   return (
     <>
       <PageHeader
-        title="Bazar"
+        title="Bazaar"
         description="Where what left the anvil changes hands for real money. Only forged pieces and fragments enter: what the market sells, the market settles."
         action={
           <Button
@@ -173,7 +175,7 @@ export function BazaarScreen() {
               setFlow({ kind: "announce", itemId: null, enhancement: 0, quantity: "1", price: "" })
             }
           >
-            Anunciar
+            Announce
           </Button>
         }
       />
@@ -199,15 +201,19 @@ export function BazaarScreen() {
               disabled={state.wallet.cents < MIN_WITHDRAW_CENTS}
               onClick={() => setFlow({ kind: "withdraw", pixKey: "" })}
             >
-              Solicitar saque
+              Request withdrawal
             </Button>
           </div>
         }
       >
         <p className="text-xs leading-relaxed text-ink-faint">
-          A casa fica com {FEE_LABEL} de cada venda e o resto entra aqui. O anúncio fica no quadro
-          até outro caçador pagar por ele no checkout do Stripe. O saque desta versão é de
-          demonstração: o pedido fica registrado e nada é transferido ainda.
+          {t("The house keeps") +
+            " " +
+            FEE_LABEL +
+            " " +
+            t(
+              "of every sale and the rest lands here. A listing stays on the board until another hunter pays for it at the Stripe checkout. This version's withdrawal is a demo: the order is recorded and nothing is transferred yet.",
+            )}
         </p>
       </Panel>
 
@@ -354,7 +360,7 @@ export function BazaarScreen() {
                   });
                 }}
               >
-                Anunciar
+                Announce
               </Button>
             </div>
           ) : undefined
@@ -392,22 +398,37 @@ export function BazaarScreen() {
               />
 
               <p className="text-xs leading-relaxed text-ink-faint">
-                Anunciar custa {formatBronze(listingFee)}, que não voltam no
-                cancelamento. A plataforma fica com {FEE_LABEL} da venda. O anúncio fica no quadro
-                até outro caçador pagar por ele: o preço é seu, e a espera também.
+                {t("Announcing costs") +
+                  " " +
+                  formatBronze(listingFee) +
+                  ", " +
+                  t("which does not come back on a cancel. The platform keeps") +
+                  " " +
+                  FEE_LABEL +
+                  " " +
+                  t(
+                    "of the sale. The listing stays on the board until another hunter pays for it: the price is yours, and so is the wait.",
+                  )}
               </p>
               {character.bronze < listingFee ? (
                 <p className="text-[11px] text-ink-faint">
-                  Faltam {formatBronze(listingFee - character.bronze)} para a taxa do
-                  anúncio.
+                  {t(formatBronze(listingFee - character.bronze) + " short for the listing fee.")}
                 </p>
               ) : null}
 
               {askedCents !== null && askedCents >= MIN_LISTING_CENTS ? (
                 <p className="font-mono text-[11px] text-ink-soft">
-                  {formatNumber(askedQuantity)} x {formatReais(askedCents)} - taxa{" "}
-                  {formatReais(feeOf(askedCents * askedQuantity))} - você recebe{" "}
-                  {formatReais(sellerNet(askedCents * askedQuantity))}
+                  {formatNumber(askedQuantity) +
+                    " x " +
+                    formatReais(askedCents) +
+                    " - " +
+                    t("fee") +
+                    " " +
+                    formatReais(feeOf(askedCents * askedQuantity)) +
+                    " - " +
+                    t("you receive") +
+                    " " +
+                    formatReais(sellerNet(askedCents * askedQuantity))}
                 </p>
               ) : null}
             </div>
@@ -444,7 +465,7 @@ export function BazaarScreen() {
                       })
                     }
                   >
-                    Anunciar
+                    Announce
                   </Button>
                 </ListRow>
               ))}
@@ -461,13 +482,13 @@ export function BazaarScreen() {
           flow?.kind === "buy" && buying ? (
             <div className="flex items-center justify-end gap-2">
               <Button variant="ghost" onClick={() => setFlow(null)}>
-                Cancelar
+                Cancel
               </Button>
               <Button
                 variant="primary"
                 onClick={() => purchaseListing(buying.listing.id, buyQuantity)}
               >
-                Pagar {formatReais(buyTotal)}
+                {t("Pay") + " " + formatReais(buyTotal)}
               </Button>
             </div>
           ) : undefined
@@ -481,10 +502,10 @@ export function BazaarScreen() {
                 title={buying.item.name}
                 description={
                   <>
-                    {"por " + buying.listing.sellerName}
+                    {t("by") + " " + buying.listing.sellerName}
                     {buying.listing.sellerHouse ? (
                       <span className="block">
-                        Anúncio da casa: quem vende é o próprio Wizold, não outro jogador.
+                        {t("House listing: the seller is Wizold itself, not another player.")}
                       </span>
                     ) : null}
                   </>
@@ -503,9 +524,9 @@ export function BazaarScreen() {
             ) : null}
 
             <p className="px-4 pb-4 text-xs leading-relaxed text-ink-faint">
-              O pagamento abre no checkout do Stripe. Assim que ele confirma, o item entra na sua
-              mochila com a insígnia do bazar e o vendedor recebe no Alforje, já sem a taxa da
-              casa.
+              {t(
+                "Payment opens in the Stripe checkout. As soon as it confirms, the item enters your bag with the bazaar badge and the seller receives in the Saddlebag, already net of the house fee.",
+              )}
             </p>
           </>
         ) : null}

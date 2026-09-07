@@ -270,8 +270,9 @@ export function LoginScreen() {
               {twoFactor ? (
                 <>
                   <p className="landing-hero-shadow-text text-xs leading-relaxed text-ink-faint">
-                    Enviamos um código de oito dígitos para o e-mail da conta. Ele vale por 10
-                    minutos.
+                    {t(
+                      "We sent an eight-digit code to the account's e-mail. It is good for 10 minutes.",
+                    )}
                   </p>
                   <Field
                     label="Code"
@@ -304,10 +305,10 @@ export function LoginScreen() {
                         })();
                       }}
                     >
-                      Confirmar
+                      Confirm
                     </Button>
                     <Button variant="outline" fullWidth onClick={() => resendTwoFactor()}>
-                      Reenviar código
+                      Resend code
                     </Button>
                   </div>
               </>
@@ -315,7 +316,7 @@ export function LoginScreen() {
               <>
                 <div className="space-y-2">
                   <p className="landing-hero-shadow-text text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                    Data de nascimento
+                    {t("Birth date")}
                   </p>
               <div className="grid grid-cols-3 gap-2">
                 <Select
@@ -366,7 +367,7 @@ export function LoginScreen() {
                       className="landing-hero-shadow-button pointer-events-none group-hover:brightness-110"
                     >
                       <GoogleMark />
-                      Entrar com Google
+                      {t("Enter with Google")}
                     </Button>
                     <div
                       ref={buttonHost}
@@ -379,13 +380,14 @@ export function LoginScreen() {
                 ) : (
                   <Button variant="primary" size="medium" fullWidth disabled>
                     <GoogleMark />
-                    Entrar com Google
+                    {t("Enter with Google")}
                   </Button>
                 )}
 
                 <p className="landing-hero-shadow-text text-xs leading-relaxed text-ink-faint">
-                  A porta é a conta Google: nada de senha nova para lembrar. Na primeira entrada a
-                  data de nascimento fica guardada, e nas seguintes basta o botão.
+                  {t(
+                    "The door is the Google account: no new password to remember. On the first entry the birth date is kept, and after that the button is enough.",
+                  )}
                 </p>
               </>
             )}

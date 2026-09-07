@@ -5,10 +5,10 @@ import { setPetRestCollectedAt } from "@/models/repositories/server/game.store";
 import { withGame } from "../../_lib/api";
 export async function POST(request: Request) {
   return withGame(request, async (state, _body, context) => {
-    if (!state.pet) return { ok: false, message: "Você não tem mascote.", state };
+    if (!state.pet) return { ok: false, message: "You have no companion.", state };
     const since = context.loaded.petRestCollectedAt;
     if (state.pet.active !== false || !since) {
-      return { ok: false, message: state.pet.name + " não está em repouso.", state };
+      return { ok: false, message: state.pet.name + " is not resting.", state };
     }
     const entitled = Math.floor((Date.now() - Date.parse(since)) / REST_TICK_MS);
     if (entitled <= 0) return success(state, "", { whole: false, ticks: 0 });
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     );
     return success(
       current,
-      whole && current.pet ? current.pet.name + " está de pé, inteiro e pronto." : "",
+      whole && current.pet ? current.pet.name + " is standing, whole and ready." : "",
       {
         whole,
         ticks,

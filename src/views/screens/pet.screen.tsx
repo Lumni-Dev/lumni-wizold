@@ -179,7 +179,7 @@ export function PetScreen() {
     return (
       <>
         <PageHeader
-          title="Mascote"
+          title="Companion"
           description="A wolf hunts better with company. Choose yours and give it a name that stays forever."
         />
         <Kennel bronze={character.bronze} level={character.level} />
@@ -203,7 +203,7 @@ export function PetScreen() {
   return (
     <>
       <PageHeader
-        title="Mascote"
+        title="Companion"
         description="When along, it joins the fight as its own attack turn, its attributes count as yours, and every hunt at your side earns it experience."
       />
 

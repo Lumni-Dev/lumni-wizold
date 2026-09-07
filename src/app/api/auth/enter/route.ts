@@ -17,7 +17,7 @@ export async function POST(request: Request) {
   const gate = rateLimit("enter:" + clientIp(request), 10, 300000);
   const gateShared = await rateLimitShared("enter:" + clientIp(request), 10, 300);
   if (!gate.allowed || !gateShared) {
-    const response = bad("Muitas tentativas. Espere um pouco antes de entrar de novo.", 429);
+    const response = bad("Too many tries. Wait a bit before entering again.", 429);
     response.headers.set("retry-after", "300");
     return response;
   }
@@ -33,11 +33,11 @@ export async function POST(request: Request) {
   };
   const age = ageOf(birth);
   if (isRealBirth(birth) && age !== null && age < MIN_AGE) {
-    return bad("A caçada é para maiores de " + MIN_AGE + " anos.", 403);
+    return bad("The hunt is for ages " + MIN_AGE + " and up.", 403);
   }
   const identity = await verifyGoogleCredential(credential);
   if (!identity) {
-    return bad("O Google não confirmou a entrada. Tente de novo.", 401);
+    return bad("Google did not confirm the entry. Try again.", 401);
   }
   try {
     return await withTransaction(async (client) => {
@@ -100,7 +100,7 @@ export async function POST(request: Request) {
         await attachTwoFactorPending(user.id, user.epoch);
         return NextResponse.json({
           ok: true,
-          message: "Código enviado para o seu e-mail.",
+          message: "Code sent to your e-mail.",
           data: {
             userId: user.id,
             hasCharacter: loaded !== null,
@@ -126,12 +126,12 @@ export async function POST(request: Request) {
       }
       return NextResponse.json({
         ok: true,
-        message: existing ? "Bem-vindo de volta." : "Conta criada. A caçada aguarda.",
+        message: existing ? "Bem-vindo de volta." : "Account created. The hunt awaits.",
         data: { userId: user.id, hasCharacter: loaded !== null, tutorial: user.tutorial },
       });
     });
   } catch (error) {
     console.error("[api] POST /api/auth/enter", error);
-    return bad("O servidor tropeçou. Tente de novo.", 500);
+    return bad("The server stumbled. Try again.", 500);
   }
 }

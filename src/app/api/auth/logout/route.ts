@@ -18,5 +18,5 @@ export async function POST(request: Request) {
     }
   }
   await dropSession();
-  return NextResponse.json({ ok: true, message: "Sessão encerrada.", data: null });
+  return NextResponse.json({ ok: true, message: "Session ended.", data: null });
 }

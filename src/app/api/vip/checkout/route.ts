@@ -6,12 +6,12 @@ import { withGame } from "../../_lib/api";
 export async function POST(request: Request) {
   return withGame(request, async (state, _body, context) => {
     if (state.character && hasVipSubscription(state.character)) {
-      return failure(state, "Você já tem uma assinatura VIP. Cancele ou reative na loja.");
+      return failure(state, "You already have a VIP subscription. Cancel or reactivate it in the store.");
     }
     const origin = new URL(request.url).origin;
     try {
       const session = await createSubscriptionSession({
-        name: "VIP Wizold - assinatura mensal",
+        name: "Wizold VIP - monthly subscription",
         amountCents: VIP_PRICE_CENTS,
         metadata: {
           kind: "vip",
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
         successUrl: origin + "/store?session_id={CHECKOUT_SESSION_ID}",
         cancelUrl: origin + "/store",
       });
-      if (!session.url) return failure(state, "O Stripe não abriu o checkout. Tente de novo.");
+      if (!session.url) return failure(state, "Stripe did not open the checkout. Try again.");
       await context.client.query(
         `insert into store_purchases (id, character_id, pack_id, price_cents, bronze_granted, status)
          values ($1, $2, 'vip', $3, 0, 'opened')
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
       return success(state, "", { url: session.url });
     } catch (error) {
       console.error("[api] POST /api/vip/checkout", error);
-      return failure(state, "O Stripe não abriu o checkout. Tente de novo.");
+      return failure(state, "Stripe did not open the checkout. Try again.");
     }
   });
 }

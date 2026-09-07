@@ -15,7 +15,7 @@ export const SPECIES_LABEL: Record<SpeciesKey, string> = {
   bear: "Ursos",
   human: "Humanos",
   vampire: "Vampiros",
-  unicorn: "Unicórnios",
+  unicorn: "Unicorns",
 };
 
 export interface CreatureDrop {

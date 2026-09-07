@@ -4,7 +4,7 @@ import { pageMetadata } from "@/shared/seo/metadata";
 
 export const metadata: Metadata = pageMetadata({
   title: "Entrar",
-  description: "Entre com Google e comece sua crônica de lobisomem no Wizold.",
+  description: "Enter with Google and begin your werewolf chronicle in Wizold.",
   path: "/login",
 });
 

@@ -103,13 +103,13 @@ export function isRoomFull(room: TavernRoom): boolean {
 export function validateRoomName(name: string): string | null {
   const clean = name.trim();
   if (clean.length < SOCIAL.roomNameMinLength) {
-    return "O nome da mesa precisa de pelo menos " + SOCIAL.roomNameMinLength + " letras.";
+    return "The table name needs at least " + SOCIAL.roomNameMinLength + " letters.";
   }
   if (clean.length > ROOM_NAME_MAX_LENGTH) {
-    return "O nome da mesa pode ter no máximo " + ROOM_NAME_MAX_LENGTH + " letras.";
+    return "The table name can have at most " + ROOM_NAME_MAX_LENGTH + " letters.";
   }
   if (!/^[\p{L}\p{M}\p{N}]+$/u.test(clean)) {
-    return "Só letras e números no nome da mesa, sem espaço nem sinais.";
+    return "Only letters and digits in the table name, no spaces and no signs.";
   }
   return null;
 }

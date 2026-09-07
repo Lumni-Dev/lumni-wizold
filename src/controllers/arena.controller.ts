@@ -68,7 +68,7 @@ export function listArena(
       hasHealth: false,
       ready: false,
       canFight: false,
-      reason: "Nenhum personagem ativo.",
+      reason: "No active character.",
     };
   }
   const band = arenaBand(character.level);
@@ -103,9 +103,9 @@ export function listArena(
     ready,
     canFight: ready,
     reason: !healthy
-      ? "Recupere-se antes do fosso: a arena só abre com o corpo inteiro."
+      ? "Recover before the pit: the arena only opens with a whole body."
       : charges.left === 0
-        ? "Os ataques do dia acabaram: o próximo volta em " +
+        ? "The day's attacks are spent: the next returns in " +
           formatCooldown(charges.returnsIn) +
           "."
         : null,
@@ -183,16 +183,16 @@ export function resolveArena(
   now = Date.now(),
 ): Result<ArenaResolution> {
   const character = state.character;
-  if (!character) return failure(state, "Nenhum personagem ativo.");
+  if (!character) return failure(state, "No active character.");
   const hunter = roster.find(
     (candidate) => candidate.id === hunterId && candidate.id !== character.id,
   );
-  if (!hunter) return failure(state, "Esse caçador não está no fosso.");
+  if (!hunter) return failure(state, "That hunter is not in the pit.");
   const charges = arenaCharges(state.arenaDuels, now);
   if (charges.left === 0) {
     return failure(
       state,
-      "Os ataques do dia acabaram: o próximo volta em " +
+      "The day's attacks are spent: the next returns in " +
         formatCooldown(charges.returnsIn) +
         ".",
     );
@@ -207,9 +207,9 @@ export function resolveArena(
   ) {
     return failure(
       state,
-      "A arena só marca luta entre NV. " +
+      "The arena only marks fights between LV. " +
         formatNumber(band.start) +
-        " e NV. " +
+        " and LV. " +
         formatNumber(band.end) +
         ".",
     );
@@ -218,12 +218,12 @@ export function resolveArena(
   if (resting > 0) {
     return failure(
       state,
-      hunter.name + " ainda se recupera do último duelo: faltam " + formatCooldown(resting) + ".",
+      hunter.name + " is still recovering from the last duel: " + formatCooldown(resting) + " left.",
     );
   }
   const stats = deriveStats(character, state.equipment, state.pet);
   if (character.health < stats.maxHealth) {
-    return failure(state, "Recupere-se antes do fosso: a arena só abre com o corpo inteiro.");
+    return failure(state, "Recover before the pit: the arena only opens with a whole body.");
   }
   const foe = arenaCombatant(hunter);
   const ally = canPetFight(state.pet) ? state.pet : null;
@@ -256,7 +256,7 @@ export function landArena(
   now = Date.now(),
 ): Result<ArenaResolution> {
   const character = state.character;
-  if (!character) return failure(state, "Nenhum personagem ativo.");
+  if (!character) return failure(state, "No active character.");
   const { combat, hunter, spoils } = resolution;
   const remainingLoss = Math.max(0, resolution.healthLost - Math.max(0, alreadyBled));
   const lost = !combat.victory && !combat.retreated;
@@ -280,16 +280,16 @@ export function landArena(
   next = syncCharacter(next);
   const message = combat.victory
     ? spoils > 0
-      ? hunter.name + " cai no fosso, e a bolsa vem junto: " + formatBronze(spoils) + "."
-      : hunter.name + " cai no fosso, mas desceu sem uma moeda no bolso."
+      ? hunter.name + " falls in the pit, and the purse comes along: " + formatBronze(spoils) + "."
+      : hunter.name + " falls in the pit, but went down without a coin in the pocket."
     : combat.retreated
-      ? "O duelo com " + hunter.name + " se arrastou e os dois recuaram. Ninguém levou nada."
+      ? "The duel with " + hunter.name + " dragged on and both fell back. Nobody took anything."
       : spoils < 0
         ? hunter.name +
-          " leva a melhor no fosso, e leva também " +
+          " gets the better of the pit, and also takes " +
           formatBronze(-spoils) +
-          " da sua bolsa."
-        : hunter.name + " leva a melhor no fosso. Sua bolsa estava vazia, e foi o que ele levou.";
+          " from your purse."
+        : hunter.name + " gets the better of the pit. Your purse was empty, and that is what they took.";
   next = addLog(next, "arena", message);
   return success<ArenaResolution>(next, message, resolution);
 }

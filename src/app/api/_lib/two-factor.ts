@@ -33,7 +33,7 @@ export async function verifyTwoFactorCode(
   code: string,
 ): Promise<{ ok: true } | { ok: false; message: string }> {
   if (!isTwoFactorCode(code)) {
-    return { ok: false, message: "O código tem oito dígitos." };
+    return { ok: false, message: "The code has eight digits." };
   }
 
   const found = await client.query(
@@ -42,12 +42,12 @@ export async function verifyTwoFactorCode(
     [userId],
   );
   const row = found.rows[0];
-  if (!row) return { ok: false, message: "Peça um código novo." };
+  if (!row) return { ok: false, message: "Ask for a new code." };
   if (new Date(String(row.expires_at)).getTime() < Date.now()) {
-    return { ok: false, message: "O código expirou. Peça outro." };
+    return { ok: false, message: "The code expired. Ask for another." };
   }
   if (Number(row.attempts) >= MAX_ATTEMPTS) {
-    return { ok: false, message: "Muitas tentativas erradas. Peça um código novo." };
+    return { ok: false, message: "Too many wrong tries. Ask for a new code." };
   }
 
   const wanted = Buffer.from(String(row.code_hash), "hex");
@@ -56,7 +56,7 @@ export async function verifyTwoFactorCode(
     await client.query("update two_factor_codes set attempts = attempts + 1 where user_id = $1", [
       userId,
     ]);
-    return { ok: false, message: "Código errado." };
+    return { ok: false, message: "Wrong code." };
   }
 
   await client.query("delete from two_factor_codes where user_id = $1", [userId]);

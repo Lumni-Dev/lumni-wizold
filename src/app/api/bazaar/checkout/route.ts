@@ -14,18 +14,18 @@ export async function POST(request: Request) {
     const listing = (await loadOthersListings(context.client, context.characterId)).find(
       (candidate) => candidate.id === listingId,
     );
-    if (!listing) return failure(state, "Esse anúncio já saiu do quadro.");
+    if (!listing) return failure(state, "That listing already left the board.");
     if (isListingExpired(listing)) {
       return failure(
         state,
-        "Esse anúncio venceu: o bazar guarda cada oferta por " + BAZAAR_LISTING_DAYS + " dias.",
+        "That listing expired: the bazaar keeps each offer for " + BAZAAR_LISTING_DAYS + " days.",
       );
     }
     if (quantity > listing.quantity) {
-      return failure(state, "Só restam " + listing.quantity + " nesse anúncio.");
+      return failure(state, "Only " + listing.quantity + " left in that listing.");
     }
     const item = findItem(listing.itemId);
-    if (!item) return failure(state, "Item desconhecido.");
+    if (!item) return failure(state, "Unknown item.");
     const level = state.character?.level ?? 1;
     if (isEquippable(item) && level < item.minLevel) {
       return failure(state, item.name + " exige NV. " + item.minLevel + ".");
@@ -49,11 +49,11 @@ export async function POST(request: Request) {
     };
     try {
       const session = await createCheckoutSession(order);
-      if (!session.url) return failure(state, "O Stripe não abriu o checkout. Tente de novo.");
+      if (!session.url) return failure(state, "Stripe did not open the checkout. Try again.");
       return success(state, "", { url: session.url });
     } catch (error) {
       console.error("[api] POST /api/bazaar/checkout", error);
-      return failure(state, "O Stripe não abriu o checkout. Tente de novo.");
+      return failure(state, "Stripe did not open the checkout. Try again.");
     }
   });
 }

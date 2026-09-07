@@ -7,12 +7,12 @@ export async function PUT(request: Request) {
   return withGame(request, (state, body) => {
     const key = asText(body.key, 20) as AutomationKey;
     if (!AUTOMATIONS.some((entry) => entry.key === key)) {
-      return failure(state, "Chave de automação desconhecida.");
+      return failure(state, "Unknown automation key.");
     }
 
     const on = body.on === true;
     if (on && !isVip(state.character, Date.now())) {
-      return failure(state, "A automação é um recurso VIP.");
+      return failure(state, "Automation is a VIP feature.");
     }
     const next = { ...state, automation: { ...state.automation, [key]: on } };
     return success(next, "", { key, on });

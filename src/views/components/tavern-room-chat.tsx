@@ -13,6 +13,7 @@ import { MAX_ROOM_MEMBERS, MESSAGE_MAX_LENGTH } from "@/models/entities/tavern";
 import { nickColorClass, nickColorOf } from "@/models/rules/tavern-nicks";
 import { CONTROL_HEIGHT } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
+import { useT } from "@/controllers/use-locale";
 import { formatTime } from "@/shared/utils/format";
 import { splitChatLinks } from "@/shared/utils/text";
 import { ActionIcon } from "./app-icon";
@@ -96,6 +97,7 @@ function ChatNick({
   level?: number;
   vip?: boolean;
 }) {
+  const t = useT();
   return (
     <span className="mr-2 inline-flex items-center gap-2">
       <span className="font-mono text-[10px] text-ink-faint">{formatTime(at)}</span>
@@ -108,7 +110,11 @@ function ChatNick({
         <MemberName href={href} name={name} className={className} />
       </Tooltip>
       {vip ? <VipBadge /> : null}
-      {level ? <span className="font-mono text-[10px] text-ink-faint">NV. {level}</span> : null}
+      {level ? (
+        <span className="font-mono text-[10px] text-ink-faint">
+          {t("LV.")} {level}
+        </span>
+      ) : null}
       <span className="text-ink-faint">:</span>
     </span>
   );
@@ -137,6 +143,7 @@ export function TavernRoomChatMembers({
   invitingMemberId: string | null;
   onInviteMember: (member: { id: string; name: string }) => void;
 }) {
+  const t = useT();
   return (
     <div className="border-b border-edge px-4 py-3">
       <ul
@@ -165,9 +172,13 @@ export function TavernRoomChatMembers({
                   />
                 </Tooltip>
                 {levels[member.id] ? (
-                  <span className="font-mono text-[10px] text-ink-faint">NV. {levels[member.id]}</span>
+                  <span className="font-mono text-[10px] text-ink-faint">
+                    {t("LV.")} {levels[member.id]}
+                  </span>
                 ) : null}
-                {kept && !yourself ? <span className="text-ink-faint">- na matilha</span> : null}
+                {kept && !yourself ? (
+                  <span className="text-ink-faint">{t("- in the pack")}</span>
+                ) : null}
               </Tag>
               {!yourself && !kept ? (
                 <Tooltip label={"Invite " + member.name + " to the pack"}>
@@ -212,6 +223,7 @@ export function TavernRoomChatMessages({
   messagesRef: RefObject<HTMLUListElement | null>;
   className?: string;
 }) {
+  const t = useT();
   return (
     <List ref={messagesRef} className={cn("select-text", className)}>
       {activeRoom.messages.map((message, index) => (
@@ -238,7 +250,9 @@ export function TavernRoomChatMessages({
             <span
               className={cn(message.authorId === "system" ? "text-ink-faint" : "text-ink-soft")}
             >
-              <ChatText text={message.text} />
+              <ChatText
+                text={message.authorId === "system" ? t(message.text) : message.text}
+              />
             </span>
           </p>
         </ListRow>

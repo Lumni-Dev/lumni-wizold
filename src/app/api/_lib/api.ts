@@ -53,12 +53,12 @@ export async function withSessionRead(
   if (!gate.allowed) return tooMany(gate.retryAfterMs);
   try {
     return await withReadOnly(async (client) => {
-      if (!(await sessionIsLive(client, claims))) return bad("Sessão encerrada.", 401);
+      if (!(await sessionIsLive(client, claims))) return bad("Session ended.", 401);
       return action(client, claims.userId);
     });
   } catch (error) {
     console.error("[api]", request.method, new URL(request.url).pathname, error);
-    return bad("O servidor tropeçou. Tente de novo.", 500);
+    return bad("The server stumbled. Try again.", 500);
   }
 }
 
@@ -74,18 +74,18 @@ export async function withActivityLock(
   if (!gate.allowed) return tooMany(gate.retryAfterMs);
   try {
     return await withTransaction(async (client) => {
-      if (!(await sessionIsLive(client, claims))) return bad("Sessão encerrada.", 401);
+      if (!(await sessionIsLive(client, claims))) return bad("Session ended.", 401);
       const found = await client.query<{ id: string }>(
         "select id from characters where user_id = $1 for update",
         [claims.userId],
       );
       const characterId = found.rows[0]?.id;
-      if (!characterId) return bad("Nenhum personagem ativo.", 404);
+      if (!characterId) return bad("No active character.", 404);
       return action(client, characterId);
     });
   } catch (error) {
     console.error("[api]", request.method, new URL(request.url).pathname, error);
-    return bad("O servidor tropeçou. Tente de novo.", 500);
+    return bad("The server stumbled. Try again.", 500);
   }
 }
 export interface ApiContext {
@@ -122,16 +122,16 @@ export function clientIp(request: Request): string {
   return forwarded.split(",")[0].trim() || "local";
 }
 function tooMany(retryAfterMs: number): NextResponse {
-  const response = bad("Calma, lobo: muitas requisições. Respire um instante.", 429);
+  const response = bad("Easy, wolf: too many requests. Breathe for a moment.", 429);
   response.headers.set("retry-after", String(Math.max(1, Math.ceil(retryAfterMs / 1000))));
   return response;
 }
 export function refuseAbuse(request: Request): NextResponse | null {
   if (request.method !== "GET" && request.method !== "HEAD" && request.headers.get("origin")) {
-    if (!originAllowed(request)) return bad("Origem não permitida.", 403);
+    if (!originAllowed(request)) return bad("Origin not allowed.", 403);
   }
   const length = Number(request.headers.get("content-length") ?? 0);
-  if (length > MAX_BODY_BYTES) return bad("Corpo da requisição grande demais.", 413);
+  if (length > MAX_BODY_BYTES) return bad("Request body too large.", 413);
   return null;
 }
 export async function readBody(request: Request): Promise<Record<string, unknown>> {
@@ -174,9 +174,9 @@ export async function withGame<T>(request: Request, action: GameAction<T>): Prom
   await syncServerMoon();
   try {
     return await withTransaction(async (client) => {
-      if (!(await sessionIsLive(client, claims))) return bad("Sessão encerrada.", 401);
+      if (!(await sessionIsLive(client, claims))) return bad("Session ended.", 401);
       const loaded = await loadGame(client, userId, request.method !== "GET");
-      if (!loaded) return bad("Nenhum personagem ativo.", 404);
+      if (!loaded) return bad("No active character.", 404);
       const baseline = syncCharacter(
         loaded.state,
       );
@@ -192,7 +192,7 @@ export async function withGame<T>(request: Request, action: GameAction<T>): Prom
     });
   } catch (error) {
     console.error("[api]", request.method, new URL(request.url).pathname, error);
-    return bad("O servidor tropeçou. Tente de novo.", 500);
+    return bad("The server stumbled. Try again.", 500);
   }
 }
 export interface TavernContext {
@@ -244,9 +244,9 @@ export async function withTavern(
   const body = await readBody(request);
   try {
     return await withTransaction(async (client) => {
-      if (!(await sessionIsLive(client, guarded))) return bad("Sessão encerrada.", 401);
+      if (!(await sessionIsLive(client, guarded))) return bad("Session ended.", 401);
       const identity = await tavernIdentity(client, guarded.userId);
-      if (!identity) return bad("Nenhum personagem ativo.", 404);
+      if (!identity) return bad("No active character.", 404);
       if (options.write) {
         await lockTavern(client);
         if (await pruneStale(client)) {
@@ -260,7 +260,7 @@ export async function withTavern(
     });
   } catch (error) {
     console.error("[api]", request.method, new URL(request.url).pathname, error);
-    return bad("O servidor tropeçou. Tente de novo.", 500);
+    return bad("The server stumbled. Try again.", 500);
   }
 }
 export async function withTavernRoom(
@@ -273,15 +273,15 @@ export async function withTavernRoom(
   const body = await readBody(request);
   try {
     return await withTransaction(async (client) => {
-      if (!(await sessionIsLive(client, guarded))) return bad("Sessão encerrada.", 401);
+      if (!(await sessionIsLive(client, guarded))) return bad("Session ended.", 401);
       const identity = await tavernIdentity(client, guarded.userId);
-      if (!identity) return bad("Nenhum personagem ativo.", 404);
+      if (!identity) return bad("No active character.", 404);
       const tavern = await loadRoomState(client, roomId, true);
       return action(tavern.state, body, { client, userId: guarded.userId, identity, tavern });
     });
   } catch (error) {
     console.error("[api]", request.method, new URL(request.url).pathname, error);
-    return bad("O servidor tropeçou. Tente de novo.", 500);
+    return bad("The server stumbled. Try again.", 500);
   }
 }
 export async function withIdentity(
@@ -292,13 +292,13 @@ export async function withIdentity(
   if (guarded instanceof NextResponse) return guarded;
   try {
     return await withTransaction(async (client) => {
-      if (!(await sessionIsLive(client, guarded))) return bad("Sessão encerrada.", 401);
+      if (!(await sessionIsLive(client, guarded))) return bad("Session ended.", 401);
       const identity = await tavernIdentity(client, guarded.userId);
-      if (!identity) return bad("Nenhum personagem ativo.", 404);
+      if (!identity) return bad("No active character.", 404);
       return action(identity, client);
     });
   } catch (error) {
     console.error("[api]", request.method, new URL(request.url).pathname, error);
-    return bad("O servidor tropeçou. Tente de novo.", 500);
+    return bad("The server stumbled. Try again.", 500);
   }
 }

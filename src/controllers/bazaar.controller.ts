@@ -84,27 +84,27 @@ export function announceListing(
   enhancement = 0,
 ): Result {
   const character = state.character;
-  if (!character) return failure(state, "Nenhum personagem ativo.");
+  if (!character) return failure(state, "No active character.");
 
   const item = findItem(itemId);
-  if (!item) return failure(state, "Item desconhecido.");
+  if (!item) return failure(state, "Unknown item.");
 
   const { tradable, reason } = checkTrade(item, enhancement);
-  if (!tradable) return failure(state, reason ?? item.name + " não entra no bazar.");
+  if (!tradable) return failure(state, reason ?? item.name + " does not enter the bazaar.");
 
-  if (!isValidQuantity(quantity)) return failure(state, "Quantidade inválida.");
+  if (!isValidQuantity(quantity)) return failure(state, "Invalid quantity.");
   if (countInInventory(state.inventory, itemId, enhancement) < quantity) {
-    return failure(state, "Você não tem " + quantity + " de " + item.name + " na mochila.");
+    return failure(state, "You do not have " + quantity + " of " + item.name + " in the bag.");
   }
 
   const cents = Math.round(priceCents);
   if (!Number.isFinite(cents) || cents < MIN_LISTING_CENTS) {
-    return failure(state, "O anúncio mínimo é " + formatReais(MIN_LISTING_CENTS) + ".");
+    return failure(state, "The minimum listing is " + formatReais(MIN_LISTING_CENTS) + ".");
   }
   if (cents > MAX_LISTING_CENTS) {
     return failure(
       state,
-      "O quadro não aceita anúncio acima de " + formatReais(MAX_LISTING_CENTS) + ".",
+      "The board takes no listing above " + formatReais(MAX_LISTING_CENTS) + ".",
     );
   }
 
@@ -112,9 +112,8 @@ export function announceListing(
   if (character.bronze < listingFee) {
     return failure(
       state,
-      "Faltam " +
-        formatBronze(listingFee - character.bronze) +
-        " para a taxa do anúncio.",
+      formatBronze(listingFee - character.bronze) +
+        " short for the listing fee.",
     );
   }
 
@@ -139,22 +138,22 @@ export function announceListing(
   const message =
     enhancedName(item.name, enhancement) +
     (quantity > 1 ? " x" + quantity : "") +
-    " anunciado por " +
+    " announced for " +
     formatReais(priceCents) +
-    (quantity > 1 ? " cada." : ".") +
-    " Taxa de " +
+    (quantity > 1 ? " each." : ".") +
+    " Fee of " +
     formatBronze(listingFee) +
-    " paga.";
+    " paid.";
 
   return success(addLog(next, "market", message), message);
 }
 
 export function cancelListing(state: GameState, listingId: string): Result {
   const listing = state.bazaarListings.find((candidate) => candidate.id === listingId);
-  if (!listing) return failure(state, "Esse anúncio não é seu ou já saiu do quadro.");
+  if (!listing) return failure(state, "That listing is not yours or already left the board.");
 
   const item = findItem(listing.itemId);
-  if (!item) return failure(state, "O catálogo não reconhece mais esse item.");
+  if (!item) return failure(state, "The catalog no longer knows that item.");
 
   const next: GameState = {
     ...state,
@@ -167,7 +166,7 @@ export function cancelListing(state: GameState, listingId: string): Result {
     ),
   };
 
-  const message = "Anúncio removido: " + (item?.name ?? listing.itemId) + " voltou para a mochila.";
+  const message = "Listing removed: " + (item?.name ?? listing.itemId) + " returned to the bag.";
 
   return success(addLog(next, "market", message), message);
 }
@@ -178,24 +177,24 @@ export function purchaseListing(
   quantity: number,
 ): Result<{ totalCents: number }> {
   const character = state.character;
-  if (!character) return failure(state, "Nenhum personagem ativo.");
+  if (!character) return failure(state, "No active character.");
 
   if (
     listing.sellerId === character.id ||
     state.bazaarListings.some((candidate) => candidate.id === listing.id)
   ) {
-    return failure(state, "O anúncio é seu: não dá para comprar de si mesmo.");
+    return failure(state, "The listing is yours: you cannot buy from yourself.");
   }
 
-  if (!isValidQuantity(quantity)) return failure(state, "Quantidade inválida.");
+  if (!isValidQuantity(quantity)) return failure(state, "Invalid quantity.");
   if (quantity > listing.quantity) {
-    return failure(state, "Só restam " + listing.quantity + " nesse anúncio.");
+    return failure(state, "Only " + listing.quantity + " left in that listing.");
   }
 
   const item = findItem(listing.itemId);
-  if (!item) return failure(state, "Item desconhecido.");
+  if (!item) return failure(state, "Unknown item.");
   if (isEquippable(item) && character.level < item.minLevel) {
-    return failure(state, item.name + " exige NV. " + item.minLevel + ".");
+    return failure(state, item.name + " demands LV. " + item.minLevel + ".");
   }
 
   const total = listing.priceCents * quantity;
@@ -214,9 +213,9 @@ export function purchaseListing(
   const message =
     enhancedName(item.name, listing.enhancement) +
     (quantity > 1 ? " x" + quantity : "") +
-    " chegou do bazar: " +
+    " arrived from the bazaar: " +
     formatReais(total) +
-    " pagos no checkout.";
+    " paid at checkout.";
 
   return success(addLog(next, "market", message), message, { totalCents: total });
 }
@@ -225,19 +224,19 @@ export function requestWithdraw(state: GameState, pixKey: string): Result {
   if (state.wallet.cents < MIN_WITHDRAW_CENTS) {
     return failure(
       state,
-      "O saque mínimo é " + formatReais(MIN_WITHDRAW_CENTS) + ": junte mais antes de pedir.",
+      "The minimum withdrawal is " + formatReais(MIN_WITHDRAW_CENTS) + ": gather more before asking.",
     );
   }
   if (pixKey.trim().length < 5) {
-    return failure(state, "Informe uma chave Pix válida.");
+    return failure(state, "Enter a valid Pix key.");
   }
 
   const amount = state.wallet.cents;
   const next: GameState = { ...state, wallet: { cents: 0 } };
   const message =
-    "Saque de " +
+    "Withdrawal of " +
     formatReais(amount) +
-    " solicitado: o pedido ficou registrado, e nesta versão nada é transferido ainda.";
+    " requested: the order was recorded, and in this version nothing is transferred yet.";
 
   return success(addLog(next, "market", message), message);
 }

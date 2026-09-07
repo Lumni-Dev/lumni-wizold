@@ -15,13 +15,13 @@ export interface LogEntry {
 }
 
 export const LOG_KIND_LABEL: Record<LogKind, string> = {
-  system: "Sistema",
-  character: "Personagem",
-  training: "Treino",
-  hunt: "Caça",
+  system: "System",
+  character: "Character",
+  training: "Training",
+  hunt: "Hunt",
   arena: "Arena",
-  market: "Mercado",
-  inventory: "Inventário",
+  market: "Market",
+  inventory: "Inventory",
 };
 
 const DIARY_DAYS = 7;

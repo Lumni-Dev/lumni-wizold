@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "@/controllers/api.client";
 import { useGame } from "@/controllers/game.context";
+import { useT } from "@/controllers/use-locale";
 import { listPacks } from "@/controllers/store.controller";
 import { findPack } from "@/models/data/store-packs";
 import { hasVipSubscription, isVip, VIP_PRICE_CENTS } from "@/models/rules/vip";
@@ -49,6 +50,7 @@ const STATUS_TONE: Record<string, "light" | "neutral" | "faint"> = {
 };
 
 export function StoreScreen() {
+  const t = useT();
   const { state, character, buyPack, buyVip, cancelVip, reactivateVip, confirmPayment } =
     useGame();
   const [now] = useState(() => Date.now());
@@ -106,26 +108,25 @@ export function StoreScreen() {
             {subscribed ? (
               character.vipCanceling ? (
                 <Button variant="primary" onClick={() => reactivateVip()}>
-                  Reative
+                  Reactivate
                 </Button>
               ) : (
                 <Button variant="outline" onClick={() => setCancelingVip(true)}>
-                  Cancele
+                  Cancel renewal
                 </Button>
               )
             ) : (
               <Button variant="primary" onClick={() => buyVip()}>
-                Ativar VIP por {formatReais(VIP_PRICE_CENTS)}/mês
+                {t("Enable VIP for") + " " + formatReais(VIP_PRICE_CENTS) + t("/month")}
               </Button>
             )}
           </div>
         }
       >
         <p className="text-xs leading-relaxed text-ink-soft">
-          Sem VIP, cada clique faz uma coisa só: uma caçada, um treino, um golpe na veia, uma
-          martelada. Com VIP, as chaves das configurações passam a repetir tudo sozinhas e a se
-          encadear. É conforto, não vantagem de números: o que a caça, o treino e a mina rendem
-          continua o mesmo.
+          {t(
+            "Without VIP, each click does one thing only: one hunt, one session, one strike at the vein, one hammer blow. With VIP, the switches in the settings repeat everything on their own and chain together. It is comfort, not a numbers advantage: what the hunt, the training and the mine pay stays the same.",
+          )}
         </p>
       </Panel>
 

@@ -3,8 +3,8 @@ import { MarketScreen } from "@/views/screens/market.screen";
 import { privatePageMetadata } from "@/shared/seo/metadata";
 
 export const metadata: Metadata = privatePageMetadata({
-  title: "Mercado",
-  description: "Compre conjuntos, poções e rações com WCoins no mercado do Wizold.",
+  title: "Market",
+  description: "Buy sets, potions and rations with WCoins at the Wizold market.",
   path: "/market",
 });
 

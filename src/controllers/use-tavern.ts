@@ -164,7 +164,7 @@ export function useTavern(activeRoomId: string | null) {
       ).then((answer) => {
         if (answer.ok) return;
         void refreshTavernBoard();
-        notify(answer.message, false, "Taverna");
+        notify(answer.message, false, "Tavern");
       });
       return Promise.resolve({ ok: true, message: "Mensagem enviada." });
     },

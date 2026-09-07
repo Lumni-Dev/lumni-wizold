@@ -41,7 +41,7 @@ export async function PATCH(request: Request) {
   return withGame(request, async (state, _body, context) => {
     const startedAt = context.loaded.activityStartedAt;
     if (!startedAt || context.loaded.activityKind !== "rest") {
-      return { ok: false, message: "Você não está repousando.", state };
+      return { ok: false, message: "You are not resting.", state };
     }
     const elapsed = Date.now() - Date.parse(startedAt);
     if (!Number.isFinite(elapsed)) {

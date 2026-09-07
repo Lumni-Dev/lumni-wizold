@@ -17,10 +17,10 @@ export function listPacks(_state: GameState): StoreOffer[] {
 
 export function purchasePack(state: GameState, packId: string): Result<StoreOffer> {
   const character = state.character;
-  if (!character) return failure(state, "Nenhum personagem ativo.");
+  if (!character) return failure(state, "No active character.");
 
   const pack = findPack(packId);
-  if (!pack) return failure(state, "Esse pacote não existe mais.");
+  if (!pack) return failure(state, "That pack no longer exists.");
 
   const bronze = packBronze(pack);
   const next = updateCharacter(state, (current) => ({
@@ -46,7 +46,7 @@ export function applyVipSubscription(
   canceling: boolean,
 ): Result<{ vipUntil: string }> {
   const character = state.character;
-  if (!character) return failure(state, "Nenhum personagem ativo.");
+  if (!character) return failure(state, "No active character.");
 
   const vipUntil = new Date(periodEndMs).toISOString();
   const next = updateCharacter(state, (current) => ({
@@ -56,22 +56,22 @@ export function applyVipSubscription(
     vipCanceling: canceling,
   }));
   const message = canceling
-    ? "Assinatura VIP ativa até o fim do período, sem renovar."
-    : "VIP ativo: a assinatura renova sozinha a cada mês.";
+    ? "VIP subscription active until the end of the period, not renewing."
+    : "VIP active: the subscription renews on its own every month.";
 
   return success(addLog(next, "character", message), message, { vipUntil });
 }
 
 export function setVipCanceling(state: GameState, canceling: boolean): Result {
   const character = state.character;
-  if (!character) return failure(state, "Nenhum personagem ativo.");
+  if (!character) return failure(state, "No active character.");
   if ((character.vipSubscriptionId ?? "") === "") {
-    return failure(state, "Você não tem uma assinatura VIP ativa.");
+    return failure(state, "You have no active VIP subscription.");
   }
 
   const next = updateCharacter(state, (current) => ({ ...current, vipCanceling: canceling }));
   const message = canceling
-    ? "Assinatura cancelada: o VIP vale até o fim do período pago e não renova."
+    ? "Subscription canceled: VIP lasts until the end of the paid period and does not renew."
     : "Assinatura reativada: o VIP volta a renovar sozinho.";
 
   return success(addLog(next, "character", message), message);
@@ -79,7 +79,7 @@ export function setVipCanceling(state: GameState, canceling: boolean): Result {
 
 export function endVipSubscription(state: GameState): Result {
   const character = state.character;
-  if (!character) return failure(state, "Nenhum personagem ativo.");
+  if (!character) return failure(state, "No active character.");
 
   const next = updateCharacter(state, (current) => ({
     ...current,

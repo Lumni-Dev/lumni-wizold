@@ -63,7 +63,7 @@ function Fighter({
     <div className={cn("flex items-center gap-3 p-4", ICON_FRAME_INSET)}>
       <GenderIcon gender={gender} size="large" />
       <div className="min-w-0 flex-1 space-y-2">
-        <RowText title={name} label={side + " - NV. " + formatNumber(level)} />
+        <RowText title={name} label={side + " - LV. " + formatNumber(level)} />
         <Bar
           label="Health"
           current={left}
@@ -82,7 +82,7 @@ function DuelReport({ report }: { report: ArenaResolution }) {
   return (
     <Panel
       title="Last duel"
-      description={hunter.name + " (NV. " + formatNumber(hunter.level) + ")"}
+      description={hunter.name + " (LV. " + formatNumber(hunter.level) + ")"}
       action={<Tag tone="neutral">{outcome}</Tag>}
       padding="none"
     >
@@ -498,7 +498,7 @@ export function ArenaScreen() {
                       }
                       label={
                         (hunter.gender === "male" ? "Lumni" : "Luna") +
-                        " - NV. " +
+                        " - LV. " +
                         formatNumber(hunter.level)
                       }
                     />

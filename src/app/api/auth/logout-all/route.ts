@@ -24,6 +24,6 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("[api] POST /api/auth/logout-all", error);
-    return bad("O servidor tropeçou. Tente de novo.", 500);
+    return bad("The server stumbled. Try again.", 500);
   }
 }

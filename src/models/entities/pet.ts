@@ -21,19 +21,19 @@ export interface PetDefinition {
 export const PETS: readonly PetDefinition[] = [
   {
     key: "male",
-    label: "Macho",
-    title: "Companheiro de Presa",
+    label: "Male",
+    title: "Companion of the Prey",
     description:
-      "Peito largo e passo pesado. Fica entre você e a criatura sem pedir licença, " +
-      "e aguenta a primeira investida no lugar do seu ombro.",
+      "Broad chest and heavy step. He stands between you and the creature without " +
+      "asking leave, and takes the first charge in place of your shoulder.",
   },
   {
     key: "female",
-    label: "Fêmea",
-    title: "Companheira de Presa",
+    label: "Female",
+    title: "Companion of the Moon",
     description:
-      "Magra, silenciosa, sempre três passos à frente. Encontra o rastro antes de " +
-      "você farejar e avisa quando alguma coisa observa de volta.",
+      "Lean, silent, always three steps ahead. She finds the trail before you catch " +
+      "the scent and warns you when something watches back.",
   },
 ];
 

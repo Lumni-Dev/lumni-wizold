@@ -100,7 +100,7 @@ function CombatReport({ report, lines }: { report: HuntReport; lines: NarrationL
   return (
     <Panel
       title="Last hunt"
-      description={territory.name + " - " + creature.name + " (NV. " + creature.level + ")"}
+      description={territory.name + " - " + creature.name + " (LV. " + creature.level + ")"}
       action={<Tag tone={hunterWon(combat) ? "light" : "neutral"}>{outcome}</Tag>}
       padding="none"
     >
@@ -121,9 +121,9 @@ function CombatReport({ report, lines }: { report: HuntReport; lines: NarrationL
           ) : null}
         </List>
         <div className="space-y-2 p-4">
-          <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">Loot</p>
+          <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">{t("Loot")}</p>
           {report.drops.length === 0 ? (
-            <p className="text-xs text-ink-faint">A carcaça não rendeu nada aproveitável.</p>
+            <p className="text-xs text-ink-faint">{t("The carcass yielded nothing usable.")}</p>
           ) : (
             <ul className="space-y-2">
               {report.drops.map((drop) => (
@@ -321,7 +321,7 @@ export function HuntScreen() {
   return (
     <>
       <PageHeader
-        title="Caça"
+        title="Hunt"
         description="The hunt runs on its own: each fight plays live and lands at the end. You cannot stop mid-fight, but between one and the next there are three seconds to call it off."
         action={
           pet ? (
@@ -536,7 +536,7 @@ export function HuntScreen() {
                 <div className="flex flex-col border-t border-edge md:border-t-0">
                   <div className="px-4 py-3">
                     <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                      Criaturas da área
+                      {t("Creatures of the area")}
                     </p>
                   </div>
                   <div data-hunt-list={territory.id} className="relative md:flex-1 md:min-h-0">
@@ -566,8 +566,13 @@ export function HuntScreen() {
                             description={
                               <>
                                 <span className="block font-mono">
-                                  NV. {formatNumber(creature.level)} a{" "}
-                                  {formatNumber(creature.level + 9)}
+                                  {t("LV.") +
+                                    " " +
+                                    formatNumber(creature.level) +
+                                    " " +
+                                    t("to") +
+                                    " " +
+                                    formatNumber(creature.level + 9)}
                                 </span>
                                 <span className="block font-mono">
                                   {formatNumber(
@@ -612,7 +617,7 @@ export function HuntScreen() {
           title="Hunting session"
           description="Everything this round has paid so far."
           action={
-            activeId ? <Tag tone="light">Em andamento</Tag> : <Tag tone="neutral">Parada</Tag>
+            activeId ? <Tag tone="light">Under way</Tag> : <Tag tone="neutral">Stopped</Tag>
           }
           padding="none"
         >
@@ -629,10 +634,10 @@ export function HuntScreen() {
             </List>
             <div className="space-y-2 p-4">
               <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                Loot acumulado
+                {t("Accumulated loot")}
               </p>
               {drops.length === 0 ? (
-                <p className="text-xs text-ink-faint">Nada aproveitável até agora.</p>
+                <p className="text-xs text-ink-faint">{t("Nothing usable so far.")}</p>
               ) : (
                 <ul className="space-y-2">
                   {drops.map(([itemId, drop]) => (

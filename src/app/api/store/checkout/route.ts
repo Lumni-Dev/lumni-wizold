@@ -6,7 +6,7 @@ import { asText, withGame } from "../../_lib/api";
 export async function POST(request: Request) {
   return withGame(request, async (state, body, context) => {
     const pack = findPack(asText(body.packId, 40));
-    if (!pack) return failure(state, "Esse pacote não existe mais.");
+    if (!pack) return failure(state, "That pack no longer exists.");
     const origin = new URL(request.url).origin;
     try {
       const session = await createCheckoutSession({
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
         successUrl: origin + "/store?session_id={CHECKOUT_SESSION_ID}",
         cancelUrl: origin + "/store",
       });
-      if (!session.url) return failure(state, "O Stripe não abriu o checkout. Tente de novo.");
+      if (!session.url) return failure(state, "Stripe did not open the checkout. Try again.");
       await context.client.query(
         `insert into store_purchases (id, character_id, pack_id, price_cents, bronze_granted, status)
          values ($1, $2, $3, $4, 0, 'opened')
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
       return success(state, "", { url: session.url });
     } catch (error) {
       console.error("[api] POST /api/store/checkout", error);
-      return failure(state, "O Stripe não abriu o checkout. Tente de novo.");
+      return failure(state, "Stripe did not open the checkout. Try again.");
     }
   });
 }

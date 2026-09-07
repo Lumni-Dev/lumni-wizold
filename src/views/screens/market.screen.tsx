@@ -174,7 +174,7 @@ export function MarketScreen() {
   return (
     <>
       <PageHeader
-        title="Mercado"
+        title="Market"
         description="The village smith never asks where the goods come from. Only the WCoins count."
       />
 

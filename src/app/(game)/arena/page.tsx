@@ -4,7 +4,7 @@ import { privatePageMetadata } from "@/shared/seo/metadata";
 
 export const metadata: Metadata = privatePageMetadata({
   title: "Arena",
-  description: "Desafie caçadores reais no fosso e dispute WCoins por vitória.",
+  description: "Challenge real hunters in the pit and fight for WCoins per victory.",
   path: "/arena",
 });
 

@@ -7,11 +7,11 @@ export async function POST(request: Request) {
   return withGame(request, async (state, _body, context) => {
     const roster = await cachedHunters(context.client);
     if (roster.length <= 1) {
-      return failure(state, "O fosso espera outros caçadores: por enquanto você é o único vivo.");
+      return failure(state, "The pit waits for other hunters: for now you are the only one alive.");
     }
     const opponent = arenaController.drawOpponent(state, roster);
     return opponent
       ? success(state, "", { hunterId: opponent.id, name: opponent.name })
-      : failure(state, "Ninguém descansado na sua faixa agora.");
+      : failure(state, "Nobody rested in your band right now.");
   });
 }

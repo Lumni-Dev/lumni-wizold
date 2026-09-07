@@ -32,37 +32,37 @@ const DAY_MS = 86_400_000;
 export const MOON_PHASES: readonly MoonPhase[] = [
   {
     key: "new",
-    label: "Lua Nova",
+    label: "New Moon",
     experienceBonus: 0,
     trainingBonus: 0,
     miningBonus: 0.05,
-    description: "Céu fechado. A fera dorme, e no escuro a rocha rende mais para quem minera.",
+    description: "Closed sky. The beast sleeps, and in the dark the rock pays more to whoever mines.",
   },
   {
     key: "waxing",
-    label: "Lua Crescente",
+    label: "Waxing Moon",
     experienceBonus: 0.05,
     trainingBonus: 0.05,
     miningBonus: 0,
     description:
-      "A lua engorda e o sangue começa a responder: é a fase que ensina mais rápido, na caça e no pátio.",
+      "The moon fattens and the blood starts to answer: it is the phase that teaches fastest, on the hunt and in the yard.",
   },
   {
     key: "full",
-    label: "Lua Cheia",
+    label: "Full Moon",
     experienceBonus: 0,
     trainingBonus: 0,
     miningBonus: 0,
     description:
-      "A noite da matilha: a lua cheia mantém o Modo Fúria ativo enquanto durar a fase.",
+      "The pack's night: the full moon keeps Fury Mode on while the phase lasts.",
   },
   {
     key: "waning",
-    label: "Lua Minguante",
+    label: "Waning Moon",
     experienceBonus: 0,
     trainingBonus: 0,
     miningBonus: 0,
-    description: "A lua se apaga e o corpo volta ao ritmo de antes, sem bônus algum.",
+    description: "The moon fades and the body returns to its old pace, with no bonus at all.",
   },
 ];
 

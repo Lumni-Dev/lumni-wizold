@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { useGame } from "@/controllers/game.context";
+import { useT } from "@/controllers/use-locale";
 import { validateName } from "@/controllers/character.controller";
 import { GENDERS, type Gender } from "@/models/entities/character";
 import { GAME_NAME, GAME_TAGLINE, NAME_MAX_LENGTH } from "@/shared/constants/game";
@@ -17,6 +18,7 @@ import { Tag } from "../components/tag";
 import { Toast } from "../layout/toast";
 
 export function CharacterCreationScreen() {
+  const t = useT();
   const { ready, authenticated, character, startRun } = useGame();
   const router = useRouter();
 
@@ -57,7 +59,7 @@ export function CharacterCreationScreen() {
   if (!ready || character) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p className="heading text-[11px] text-ink-faint">Carregando...</p>
+        <p className="heading text-[11px] text-ink-faint">{t("Loading...")}</p>
       </div>
     );
   }
@@ -73,7 +75,7 @@ export function CharacterCreationScreen() {
             {GAME_TAGLINE}
           </p>
           <p className="mx-auto max-w-md text-xs leading-relaxed text-ink-soft">
-            A marca já está na sua pele. Antes da primeira noite, diga quem você é.
+            {t("The mark is already on your skin. Before the first night, say who you are.")}
           </p>
         </header>
 
@@ -82,7 +84,7 @@ export function CharacterCreationScreen() {
           className="relative h-fit space-y-6 rounded-lg border border-edge bg-surface/80 p-4 md:p-8"
         >
           <fieldset className="space-y-2">
-            <legend className="heading text-[11px] text-ink">Nome</legend>
+            <legend className="heading text-[11px] text-ink">{t("Name")}</legend>
             <Field
               value={name}
               onChange={(event) => setName(sanitizeName(event.target.value, NAME_MAX_LENGTH))}
@@ -94,7 +96,7 @@ export function CharacterCreationScreen() {
           </fieldset>
 
           <fieldset className="space-y-2">
-            <legend className="heading text-[11px] text-ink">Linhagem</legend>
+            <legend className="heading text-[11px] text-ink">{t("Bloodline")}</legend>
             <div className="grid grid-cols-1 items-start gap-3 sm:grid-cols-2">
               {GENDERS.map((definition) => {
                 const chosen = gender === definition.key;
@@ -116,12 +118,12 @@ export function CharacterCreationScreen() {
                       <div>
                         <p className="text-sm text-ink">{definition.label}</p>
                         <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                          {definition.title}
+                          {t(definition.title)}
                         </p>
                       </div>
                     </div>
                     <p className="text-xs leading-relaxed text-ink-faint">
-                      {definition.description}
+                      {t(definition.description)}
                     </p>
                     <Tag tone="neutral">{definition.bonusLabel}</Tag>
                   </button>
@@ -129,7 +131,7 @@ export function CharacterCreationScreen() {
               })}
             </div>
             <p className="text-[11px] text-ink-faint">
-              A escolha define apenas a inclinação inicial. Todos os atributos continuam treináveis.
+              {t("The choice sets only the starting lean. Every attribute stays trainable.")}
             </p>
           </fieldset>
 
@@ -143,7 +145,7 @@ export function CharacterCreationScreen() {
             busy={creating}
             disabled={!gender || name.trim().length === 0}
           >
-            Começar a primeira noite
+            Start the first night
           </Button>
           <CornerAccents inside />
         </form>

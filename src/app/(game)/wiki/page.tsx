@@ -8,7 +8,7 @@ import { WikiScreen } from "@/views/screens/wiki.screen";
 export const metadata: Metadata = pageMetadata({
   title: "Wiki",
   description:
-    "Regras, números e catálogos do Wizold: combate, economia, forja, arena, taverna, lua e bestiário completo.",
+    "Rules, numbers and catalogs of Wizold: combat, economy, forge, arena, tavern, moon and the full bestiary.",
   path: "/wiki",
 });
 
@@ -23,7 +23,7 @@ export default function WikiPage() {
           url: SITE_URL + "/wiki",
           inLanguage: "pt-BR",
           description:
-            "Enciclopédia do Wizold com regras de combate, economia, forja, arena, taverna e bestiário.",
+            "The Wizold encyclopedia with rules of combat, economy, forge, arena, tavern and bestiary.",
           isPartOf: {
             "@type": "WebSite",
             name: GAME_NAME,

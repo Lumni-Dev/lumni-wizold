@@ -115,7 +115,7 @@ export function listTerritories(state: GameState): AvailableTerritory[] {
       prey: character ? (pickCreature(territory, character.level) ?? null) : null,
       unlocked,
       hasHealth,
-      reason: !hasHealth ? "Sem vida para caçar" : null,
+      reason: !hasHealth ? "No health to hunt" : null,
     };
   });
 }
@@ -144,17 +144,17 @@ export function resolveHunt(
   creatureId: string | null = null,
 ): Result<HuntResolution> {
   const character = state.character;
-  if (!character) return failure(state, "Nenhum personagem ativo.");
+  if (!character) return failure(state, "No active character.");
 
   const territory = findTerritory(territoryId);
-  if (!territory) return failure(state, "Território desconhecido.");
+  if (!territory) return failure(state, "Unknown territory.");
 
   if (character.health < 1) {
-    return failure(state, "Sem vida para caçar. Recupere-se ou use uma poção.");
+    return failure(state, "No health to hunt. Recover or use a potion.");
   }
 
   const creature = chosenCreature(territory, creatureId, character.level);
-  if (!creature) return failure(state, "A trilha não levou a nada.");
+  if (!creature) return failure(state, "The trail led to nothing.");
 
   const stats = deriveStats(character, state.equipment, state.pet);
   const petJoining = canPetFight(state.pet) ? state.pet : null;
@@ -189,7 +189,7 @@ export function landHunt(
   alreadyBled = 0,
 ): Result<HuntReport> {
   const character = state.character;
-  if (!character) return failure(state, "Nenhum personagem ativo.");
+  if (!character) return failure(state, "No active character.");
 
   const { combat, creature, territory, bronze, drops } = resolution;
   const remainingLoss = Math.max(0, resolution.healthLost - Math.max(0, alreadyBled));
@@ -227,26 +227,26 @@ export function landHunt(
   } = grantExperience(next, resolution.baseExperience);
   next = withExperience;
 
-  const loot = [formatBronze(bronze), formatNumber(granted) + " de experiência"]
+  const loot = [formatBronze(bronze), formatNumber(granted) + " experience"]
     .concat(drops.map((drop) => drop.name + " x" + drop.quantity))
     .join(", ");
 
   const message = hunterWon(combat)
-    ? creature.name + " caiu em " + territory.name + ". Conquistas: " + loot + "."
+    ? creature.name + " fell in " + territory.name + ". Spoils: " + loot + "."
     : hunterRetreated(combat)
-      ? "A luta contra " +
+      ? "The fight against " +
         creature.name +
-        " se arrastou e você recuou de " +
+        " dragged on and you fell back from " +
         territory.name +
-        ". Pelo esforço: " +
+        ". For the effort: " +
         formatNumber(granted) +
-        " de experiência."
+        " experience."
       : creature.name +
-        " venceu a disputa. Você escapou por pouco de " +
+        " won the contest. You barely escaped " +
         territory.name +
-        ". Pelo esforço: " +
+        ". For the effort: " +
         formatNumber(granted) +
-        " de experiência.";
+        " experience.";
 
   next = addLog(next, "hunt", message);
 

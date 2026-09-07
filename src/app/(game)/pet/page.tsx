@@ -3,8 +3,8 @@ import { PetScreen } from "@/views/screens/pet.screen";
 import { privatePageMetadata } from "@/shared/seo/metadata";
 
 export const metadata: Metadata = privatePageMetadata({
-  title: "Mascote",
-  description: "Adote, treine e leve seu lobo para a caça e a arena.",
+  title: "Companion",
+  description: "Adopt, train and take your wolf to the hunt and the arena.",
   path: "/pet",
 });
 

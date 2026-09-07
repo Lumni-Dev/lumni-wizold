@@ -48,7 +48,7 @@ export function WelcomeTutorial({
       className="max-w-lg"
       footer={
         <Button variant="primary" size="medium" fullWidth onClick={start}>
-          Começar jogo
+          Start game
         </Button>
       }
     >

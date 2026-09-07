@@ -75,53 +75,53 @@ export const EQUIPMENT_SET_KEYS: readonly EquipmentSet[] = [
 export const SET_LABEL: Record<EquipmentSet, string> = {
   bronze: "Bronze",
   silver: "Metal",
-  gold: "Ouro",
-  diamond: "Diamante",
+  gold: "Gold",
+  diamond: "Diamond",
   lunar: "Lunar",
 };
 
 export const POTION_SIZES: readonly PotionSize[] = ["small", "medium", "large"];
 
 export const SIZE_LABEL: Record<PotionSize, string> = {
-  small: "Pequena",
-  medium: "Média",
-  large: "Grande",
+  small: "Small",
+  medium: "Medium",
+  large: "Large",
 };
 
 export const SLOT_LABEL: Record<EquipmentSlot, string> = {
-  claw: "Luvas",
-  helmet: "Gorro",
-  armor: "Casaco",
-  pants: "Calças",
-  boots: "Botas",
-  ring: "Anel",
-  necklace: "Colar",
+  claw: "Gloves",
+  helmet: "Cap",
+  armor: "Coat",
+  pants: "Pants",
+  boots: "Boots",
+  ring: "Ring",
+  necklace: "Necklace",
 };
 
 export const CATEGORY_LABEL: Record<ItemCategory, string> = {
-  claw: "Luvas",
-  helmet: "Gorro",
-  armor: "Casaco",
-  pants: "Calças",
-  boots: "Botas",
-  ring: "Anel",
-  necklace: "Colar",
-  potion: "Poção",
+  claw: "Gloves",
+  helmet: "Cap",
+  armor: "Coat",
+  pants: "Pants",
+  boots: "Boots",
+  ring: "Ring",
+  necklace: "Necklace",
+  potion: "Potion",
   material: "Material",
-  pet: "Mascote",
+  pet: "Companion",
 };
 
 export const CATEGORY_PLURAL: Record<ItemCategory, string> = {
-  claw: "Luvas",
-  helmet: "Gorros",
-  armor: "Casacos",
-  pants: "Calças",
-  boots: "Botas",
-  ring: "Anéis",
-  necklace: "Colares",
-  potion: "Poções",
-  material: "Materiais",
-  pet: "Mascote",
+  claw: "Gloves",
+  helmet: "Caps",
+  armor: "Coats",
+  pants: "Pants",
+  boots: "Boots",
+  ring: "Rings",
+  necklace: "Necklaces",
+  potion: "Potions",
+  material: "Materials",
+  pet: "Companion",
 };
 
 export const ITEM_CATEGORIES: readonly ItemCategory[] = [
@@ -132,11 +132,11 @@ export const ITEM_CATEGORIES: readonly ItemCategory[] = [
 ];
 
 export const RARITY_LABEL: Record<Rarity, string> = {
-  common: "Comum",
-  uncommon: "Incomum",
-  rare: "Raro",
-  epic: "Épico",
-  legendary: "Lendário",
+  common: "Common",
+  uncommon: "Uncommon",
+  rare: "Rare",
+  epic: "Epic",
+  legendary: "Legendary",
 };
 
 export function emptyEquipment(): Equipment {

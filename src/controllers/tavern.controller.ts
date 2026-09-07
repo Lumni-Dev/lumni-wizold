@@ -112,26 +112,26 @@ export function createRoom(
 
   const open = password.trim().length === 0;
   if (hideName && open) {
-    return fail(state, "Mesa reservada precisa de senha.");
+    return fail(state, "A reserved table needs a password.");
   }
   if (open && !canOpenUnlockedRoom(identity)) {
     return fail(
       state,
-      "Abrir mesa sem senha é só a partir do NV " +
+      "Opening a table without a password takes LV " +
         OPEN_ROOM_MIN_LEVEL +
-        ", ou com VIP. Ponha uma senha para abrir em qualquer nível.",
+        ", or with VIP. Set a password to open at any level.",
     );
   }
 
   if (state.rooms.some((room) => !isPrivateTable(room) && room.ownerId === identity.id)) {
-    return fail(state, "Você já tem uma mesa aberta. Feche a sua antes de abrir outra.");
+    return fail(state, "You already have an open table. Close yours before opening another.");
   }
 
   const cleanName = name.trim();
   const taken = state.rooms.some(
     (room) => !isPrivateTable(room) && room.name.toLowerCase() === cleanName.toLowerCase(),
   );
-  if (taken) return fail(state, "Já existe uma mesa com esse nome.");
+  if (taken) return fail(state, "A table with that name already exists.");
 
   const now = new Date().toISOString();
   const room: TavernRoom = {
@@ -147,14 +147,14 @@ export function createRoom(
       {
         id: generateId("msg"),
         authorId: "system",
-        authorName: "Taverna",
-        text: identity.name + " abriu a mesa.",
+        authorName: "Tavern",
+        text: identity.name + " opened the table.",
         at: now,
       },
     ],
   };
 
-  return done({ ...state, rooms: [...state.rooms, room] }, "Mesa aberta.", room.id);
+  return done({ ...state, rooms: [...state.rooms, room] }, "Table opened.", room.id);
 }
 
 export function joinRoom(
@@ -164,10 +164,10 @@ export function joinRoom(
   password: string,
 ): TavernResult {
   const room = findRoom(state, roomId);
-  if (!room) return fail(state, "Essa mesa não existe mais.");
+  if (!room) return fail(state, "That table no longer exists.");
 
   if (isPrivateTable(room) && !(room.privateFor ?? []).includes(identity.id)) {
-    return fail(state, "Essa mesa está reservada.");
+    return fail(state, "That table is reserved.");
   }
 
   const already = room.members.some((member) => member.id === identity.id);
@@ -177,12 +177,12 @@ export function joinRoom(
       room.password === null &&
       (identity.level ?? 1) < OPEN_ROOM_MIN_LEVEL
     ) {
-      return fail(state, "Sentar em mesa aberta é só a partir do NV " + OPEN_ROOM_MIN_LEVEL + ".");
+      return fail(state, "Sitting at an open table takes LV " + OPEN_ROOM_MIN_LEVEL + ".");
     }
     if (isRoomFull(room))
-      return fail(state, "A mesa está cheia (" + MAX_ROOM_MEMBERS + " pessoas).");
+      return fail(state, "The table is full (" + MAX_ROOM_MEMBERS + " people).");
     if (room.password !== null && room.password !== password.trim()) {
-      return fail(state, "Senha incorreta.");
+      return fail(state, "Wrong password.");
     }
   }
 
@@ -198,15 +198,15 @@ export function joinRoom(
     {
       id: generateId("msg"),
       authorId: "system",
-      authorName: "Taverna",
-      text: identity.name + (already ? " retornou à mesa." : " entrou na mesa."),
+      authorName: "Tavern",
+      text: identity.name + (already ? " returned to the table." : " joined the table."),
       at: now,
     },
   ].slice(-MAX_ROOM_MESSAGES);
 
   return done(
     replaceRoom(state, { ...room, members, messages }),
-    already ? "Mesa aberta." : "Você entrou em " + room.name + ".",
+    already ? "Table opened." : "You joined " + room.name + ".",
     room.id,
   );
 }
@@ -217,16 +217,16 @@ export function leaveRoom(
   identity: TavernIdentity,
 ): TavernResult {
   const room = findRoom(state, roomId);
-  if (!room) return fail(state, "Essa mesa não existe mais.");
+  if (!room) return fail(state, "That table no longer exists.");
   if (!room.members.some((member) => member.id === identity.id)) {
-    return fail(state, "Você não está nessa mesa.");
+    return fail(state, "You are not at that table.");
   }
 
   const members = room.members.filter((member) => member.id !== identity.id);
   if (members.length === 0) {
     return done(
       { ...state, rooms: state.rooms.filter((current) => current.id !== roomId) },
-      "Você saiu e a mesa fechou.",
+      "You left and the table closed.",
     );
   }
 
@@ -236,15 +236,15 @@ export function leaveRoom(
     {
       id: generateId("msg"),
       authorId: "system",
-      authorName: "Taverna",
-      text: identity.name + " saiu da mesa.",
+      authorName: "Tavern",
+      text: identity.name + " left the table.",
       at: now,
     },
   ].slice(-MAX_ROOM_MESSAGES);
 
   return done(
     replaceRoom(state, { ...room, members, messages }),
-    "Você saiu de " + room.name + ".",
+    "You left " + room.name + ".",
   );
 }
 
@@ -254,17 +254,17 @@ export function closeRoom(
   identity: TavernIdentity,
 ): TavernResult {
   const room = findRoom(state, roomId);
-  if (!room) return fail(state, "Essa mesa não existe mais.");
+  if (!room) return fail(state, "That table no longer exists.");
 
   const owns = isPrivateTable(room)
     ? (room.privateFor ?? []).includes(identity.id)
     : room.ownerId === identity.id;
 
-  if (!owns) return fail(state, "Só quem abriu a mesa pode fechá-la.");
+  if (!owns) return fail(state, "Only whoever opened the table can close it.");
 
   return done(
     { ...state, rooms: state.rooms.filter((current) => current.id !== roomId) },
-    isPrivateTable(room) ? "A mesa reservada fechou." : room.name + " fechou.",
+    isPrivateTable(room) ? "The reserved table closed." : room.name + " closed.",
   );
 }
 
@@ -273,12 +273,12 @@ export function openDirect(
   identity: TavernIdentity,
   other: TavernIdentity,
 ): TavernResult {
-  if (other.id === identity.id) return fail(state, "Não dá para reservar mesa consigo mesmo.");
+  if (other.id === identity.id) return fail(state, "You cannot reserve a table with yourself.");
 
   const now = new Date().toISOString();
   const tableName = [identity.name, other.name]
     .sort((a, b) => a.localeCompare(b, "pt-BR"))
-    .join(" e ");
+    .join(" & ");
 
   const existing = state.rooms.find(
     (room) =>
@@ -300,7 +300,7 @@ export function openDirect(
 
     return done(
       replaceRoom(state, { ...existing, name: tableName, members }),
-      "Mesa com " + other.name + " aberta.",
+      "Table with " + other.name + " open.",
       existing.id,
     );
   }
@@ -319,8 +319,8 @@ export function openDirect(
       {
         id: generateId("msg"),
         authorId: "system",
-        authorName: "Taverna",
-        text: "Mesa reservada para " + identity.name + " e " + other.name + ".",
+        authorName: "Tavern",
+        text: "Table reserved for " + identity.name + " and " + other.name + ".",
         at: now,
       },
     ],
@@ -328,7 +328,7 @@ export function openDirect(
 
   return done(
     { ...state, rooms: [...state.rooms, room] },
-    "Mesa com " + other.name + " aberta.",
+    "Table with " + other.name + " open.",
     room.id,
   );
 }
@@ -339,9 +339,9 @@ export function announceAway(
   identity: TavernIdentity,
 ): TavernResult {
   const room = findRoom(state, roomId);
-  if (!room) return fail(state, "Essa mesa não existe mais.");
+  if (!room) return fail(state, "That table no longer exists.");
   if (!room.members.some((member) => member.id === identity.id)) {
-    return fail(state, "Você não está nessa mesa.");
+    return fail(state, "You are not at that table.");
   }
 
   const now = new Date().toISOString();
@@ -350,8 +350,8 @@ export function announceAway(
     {
       id: generateId("msg"),
       authorId: "system",
-      authorName: "Taverna",
-      text: identity.name + " foi buscar uma bebida.",
+      authorName: "Tavern",
+      text: identity.name + " went to get a drink.",
       at: now,
     },
   ].slice(-MAX_ROOM_MESSAGES);
@@ -366,15 +366,15 @@ export function sendMessage(
   text: string,
 ): TavernResult {
   const room = findRoom(state, roomId);
-  if (!room) return fail(state, "Essa mesa não existe mais.");
+  if (!room) return fail(state, "That table no longer exists.");
   if (!room.members.some((member) => member.id === identity.id)) {
-    return fail(state, "Entre na mesa antes de falar.");
+    return fail(state, "Join the table before speaking.");
   }
 
   const clean = text.trim().slice(0, MESSAGE_MAX_LENGTH);
-  if (clean.length === 0) return fail(state, "Escreva alguma coisa antes de enviar.");
+  if (clean.length === 0) return fail(state, "Write something before sending.");
   if (containsLink(clean)) {
-    return fail(state, "Esse link não é permitido na taverna.");
+    return fail(state, "That link is not allowed in the tavern.");
   }
 
   const cooldown = messageCooldownOf(room);
@@ -386,9 +386,9 @@ export function sendMessage(
     if (elapsed >= 0 && elapsed < cooldown) {
       return fail(
         state,
-        "Uma fala a cada " +
+        "One line every " +
           cooldown / 1000 +
-          " segundos: espere " +
+          " seconds: wait " +
           Math.ceil((cooldown - elapsed) / 1000) +
           "s.",
       );
@@ -411,7 +411,7 @@ export function sendMessage(
     member.id === identity.id ? { ...member, name: identity.name, lastSeen: now } : member,
   );
 
-  return done(replaceRoom(state, { ...room, members, messages }), "Mensagem enviada.", room.id);
+  return done(replaceRoom(state, { ...room, members, messages }), "Message sent.", room.id);
 }
 
 export function touchMember(

@@ -60,9 +60,9 @@ export function listOffers(state: GameState): MarketOffer[] {
         ofLineage,
         ownedQuantity: countInInventory(state.inventory, item.id, 0),
         reason: !ofLineage
-          ? "Apenas " + lineageName(item)
+          ? "Only " + lineageName(item)
           : !levelAllowed
-            ? "Requer NV. " + item.minLevel
+            ? "Requires LV. " + item.minLevel
             : !affordable
               ? "WCoins insuficientes"
               : null,
@@ -77,24 +77,24 @@ export function listSellables(state: GameState): DetailedSlot[] {
 
 export function buyItem(state: GameState, itemId: string, quantity = 1): Result {
   const character = state.character;
-  if (!character) return failure(state, "Nenhum personagem ativo.");
+  if (!character) return failure(state, "No active character.");
 
   const item = findItem(itemId);
-  if (!item) return failure(state, "Item desconhecido.");
-  if (!item.inMarket) return failure(state, item.name + " não é vendido aqui.");
-  if (!isValidQuantity(quantity)) return failure(state, "Quantidade inválida.");
+  if (!item) return failure(state, "Unknown item.");
+  if (!item.inMarket) return failure(state, item.name + " is not sold here.");
+  if (!isValidQuantity(quantity)) return failure(state, "Invalid quantity.");
   if (!servesLineage(item, character.gender)) {
-    return failure(state, item.name + " é peça de " + lineageName(item) + ".");
+    return failure(state, item.name + " is a piece for " + lineageName(item) + ".");
   }
   if (character.level < item.minLevel) {
-    return failure(state, item.name + " exige NV. " + item.minLevel + ".");
+    return failure(state, item.name + " demands LV. " + item.minLevel + ".");
   }
   if (item.category === "pet" && !state.pet) {
-    return failure(state, "Sem mascote para alimentar: adote um lobo antes.");
+    return failure(state, "No companion to feed: adopt a wolf first.");
   }
 
   const cost = marketPriceOf(item, character.level) * quantity;
-  if (character.bronze < cost) return failure(state, "WCoins insuficientes para " + item.name + ".");
+  if (character.bronze < cost) return failure(state, "Not enough WCoins for " + item.name + ".");
 
   const next: GameState = {
     ...state,
@@ -103,7 +103,7 @@ export function buyItem(state: GameState, itemId: string, quantity = 1): Result 
   };
 
   const message =
-    item.name + (quantity > 1 ? " x" + quantity : "") + " comprado por " + formatBronze(cost) + ".";
+    item.name + (quantity > 1 ? " x" + quantity : "") + " bought for " + formatBronze(cost) + ".";
   return success(addLog(next, "market", message), message);
 }
 
@@ -114,16 +114,16 @@ export function sellItem(
   enhancement = 0,
 ): Result {
   const character = state.character;
-  if (!character) return failure(state, "Nenhum personagem ativo.");
+  if (!character) return failure(state, "No active character.");
 
   const item = findItem(itemId);
-  if (!item) return failure(state, "Item desconhecido.");
-  if (!isValidQuantity(quantity)) return failure(state, "Quantidade inválida.");
+  if (!item) return failure(state, "Unknown item.");
+  if (!isValidQuantity(quantity)) return failure(state, "Invalid quantity.");
   if (isForgeMaterial(item)) {
-    return failure(state, "Fragmentos não se vendem por bronze: só a forja os aceita.");
+    return failure(state, "Fragments do not sell for WCoins: only the forge takes them.");
   }
   if (countInInventory(state.inventory, itemId, enhancement) < quantity) {
-    return failure(state, "Você não tem essa quantidade de " + item.name + ".");
+    return failure(state, "You do not have that many " + item.name + ".");
   }
 
   const gain = sellPrice(item, character.level) * quantity;
@@ -133,6 +133,6 @@ export function sellItem(
     inventory: removeFromInventory(state.inventory, itemId, quantity, enhancement),
   };
 
-  const message = item.name + " vendido por " + formatBronze(gain) + ".";
+  const message = item.name + " sold for " + formatBronze(gain) + ".";
   return success(addLog(next, "market", message), message);
 }

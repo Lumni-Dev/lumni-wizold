@@ -9,7 +9,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       "delete from pack_invites where id = $1 and to_id = $2",
       [inviteId, context.characterId],
     );
-    if (gone.rowCount === 0) return failure(state, "Esse convite não existe mais.");
-    return success(state, "Convite recusado.");
+    if (gone.rowCount === 0) return failure(state, "That invite no longer exists.");
+    return success(state, "Invite declined.");
   });
 }

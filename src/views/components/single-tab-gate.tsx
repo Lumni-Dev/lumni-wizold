@@ -2,10 +2,12 @@
 
 import { useEffect, useSyncExternalStore } from "react";
 import { singleTab } from "@/controllers/single-tab";
+import { useT } from "@/controllers/use-locale";
 import { Button } from "./button";
 import { Modal } from "./modal";
 
 export function SingleTabGate() {
+  const t = useT();
   useEffect(() => {
     singleTab.start();
   }, []);
@@ -23,18 +25,20 @@ export function SingleTabGate() {
       dismissible={false}
       footer={
         <Button variant="primary" size="medium" fullWidth onClick={() => singleTab.takeOver()}>
-          Jogar aqui
+          Play here
         </Button>
       }
     >
       <div className="space-y-3 p-4">
         <p className="text-xs leading-relaxed text-ink-faint">
-          O jogo já está aberto em outra janela ou aba, incluindo uma anônima. Para não bagunçar a
-          sua caçada, só uma janela pode ficar ativa por vez.
+          {t(
+            "The game is already open in another window or tab, including a private one. To keep your hunt tidy, only one window can stay active at a time.",
+          )}
         </p>
         <p className="text-xs leading-relaxed text-ink-faint">
-          Feche as outras, ou toque em Jogar aqui para trazer o jogo para esta janela; a outra passa
-          a mostrar este mesmo aviso.
+          {t(
+            "Close the others, or tap Play here to bring the game to this window; the other one starts showing this same notice.",
+          )}
         </p>
       </div>
     </Modal>

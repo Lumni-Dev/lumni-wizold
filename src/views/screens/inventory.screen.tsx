@@ -75,7 +75,7 @@ export function InventoryScreen() {
   return (
     <>
       <PageHeader
-        title="Inventário"
+        title="Inventory"
         description="Everything you carry. Equip, use or sell what only takes up space."
         action={
           <div className="flex items-center gap-2">

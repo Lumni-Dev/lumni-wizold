@@ -205,14 +205,14 @@ export function ForgeScreen() {
   return (
     <>
       <PageHeader
-        title="Forja"
+        title="Forge"
         description="The anvil makes nothing new: it strikes again the piece you already own, and what feeds the hammer comes out of the rock. You cannot stop mid-strike, but between one and the next there are three seconds to call it off."
       />
 
       <div className="space-y-6">
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
           <Panel
-            title="Mina"
+            title="Mine"
             description="Choose the vein and the pick strikes it. Each vein asks for a mining level, and only the pick opens the next."
             padding="none"
           >

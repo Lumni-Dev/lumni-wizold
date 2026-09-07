@@ -188,7 +188,7 @@ export function ActivityDock() {
       progressMax: row?.needed ?? 1,
       progressTotal: totalExperience(row?.value ?? 0, row?.progress ?? 0),
       maxed: (row?.value ?? 0) >= MAX_ATTRIBUTE_VALUE,
-      sessionLabel: "Treinamento",
+      sessionLabel: "Training",
       sessionCurrent: trainRt.beat,
       sessionMax: trainRt.max,
       glows: true,

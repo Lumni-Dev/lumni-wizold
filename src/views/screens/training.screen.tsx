@@ -73,7 +73,7 @@ export function TrainingScreen() {
   return (
     <>
       <PageHeader
-        title="Treinamento"
+        title="Training"
         description={
           "Training is free forever: one exercise per attribute, every full bar becomes a permanent +1. Each session draws " +
           TRAINING_TICKS_MIN +
@@ -119,12 +119,12 @@ export function TrainingScreen() {
                     label={exercise.name}
                     description={
                       <span className="font-mono text-[11px] text-ink">
-                        NV. {formatNumber(row?.value ?? 0)}
+                        {t("LV.")} {formatNumber(row?.value ?? 0)}
                         <span className="text-ink-faint">
                           {" / " + formatNumber(MAX_ATTRIBUTE_VALUE)}
                         </span>
                         {(row?.value ?? 0) >= MAX_ATTRIBUTE_VALUE ? (
-                          <span className="ml-1 text-[10px] text-ink-faint">teto</span>
+                          <span className="ml-1 text-[10px] text-ink-faint">{t("cap")}</span>
                         ) : null}
                       </span>
                     }
@@ -177,7 +177,7 @@ export function TrainingScreen() {
 
                 <div className="border-t border-edge px-4 py-3">
                   <Bar
-                    label="Treinamento"
+                    label="Training"
                     current={session.id === exercise.id ? session.beat : 0}
                     maximum={session.id === exercise.id ? session.max : TRAINING_TICKS_MAX}
                     glows={active}
@@ -223,11 +223,11 @@ export function TrainingScreen() {
             >
               <CardHeader art={<PetArtFill gender={petTraining.pet.gender} />}>
                 <RowText
-                  title="Mascote"
+                  title="Companion"
                   label="Companion training"
                   description={
                     <span className="font-mono text-[11px] text-ink">
-                      NV. {formatNumber(petTraining.level)}
+                      {t("LV.")} {formatNumber(petTraining.level)}
                       <span className="text-ink-faint">
                         {" / " + formatNumber(PET_MAX_LEVEL)}
                       </span>
@@ -280,7 +280,7 @@ export function TrainingScreen() {
 
               <div className="border-t border-edge px-4 py-3">
                 <Bar
-                  label="Treinamento"
+                  label="Training"
                   current={session.id === PET_EXERCISE_ID ? session.beat : 0}
                   maximum={session.id === PET_EXERCISE_ID ? session.max : TRAINING_TICKS_MAX}
                   glows={petActive}

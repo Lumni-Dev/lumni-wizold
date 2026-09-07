@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     let target: TavernIdentity;
     if (id) {
       const known = names.find((entry) => entry.id === id);
-      if (!known) return failure(state, "Esse caçador não está no registro.");
+      if (!known) return failure(state, "That hunter is not in the roster.");
       target = known;
     } else {
       const nick = asText(body.nick, 60);
@@ -27,9 +27,9 @@ export async function POST(request: Request) {
       target = found;
     }
 
-    if (target.id === context.characterId) return failure(state, "Você não convida a si mesmo.");
+    if (target.id === context.characterId) return failure(state, "You do not invite yourself.");
     if (packController.isInPack(state, target.id)) {
-      return failure(state, target.name + " já corre na sua matilha.");
+      return failure(state, target.name + " already runs in your pack.");
     }
 
     const inserted = await context.client.query(
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
       [generateId("inv"), context.characterId, target.id],
     );
     if (inserted.rowCount === 0) {
-      return failure(state, "Você já chamou " + target.name + " para a matilha.");
+      return failure(state, "You already invited " + target.name + " to the pack.");
     }
 
     const contact = await context.client.query(
@@ -46,16 +46,16 @@ export async function POST(request: Request) {
       [target.id],
     );
     const email = contact.rows[0]?.email;
-    const inviterName = state.character?.name ?? "Um caçador";
+    const inviterName = state.character?.name ?? "A hunter";
     if (email && !String(email).endsWith("@wizold.test")) {
       after(() =>
         sendPackInviteEmail(String(email), inviterName).catch((error) =>
-          console.error("[mail] convite de matilha", error),
+          console.error("[mail] pack invite", error),
         ),
       );
     }
 
-    return success(state, "Convite enviado a " + target.name + ".");
+    return success(state, "Invite sent to " + target.name + ".");
   });
 }
 

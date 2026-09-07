@@ -7,7 +7,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: GAME_NAME + ": " + GAME_TAGLINE,
     short_name: GAME_NAME,
     description:
-      "Jogo de navegador de lobisomem: caçada, treino, forja, arena e ranking de caçadores reais.",
+      "A werewolf browser game: hunting, training, forging, arena and a ranking of real hunters.",
     start_url: "/",
     scope: "/",
     display: "browser",

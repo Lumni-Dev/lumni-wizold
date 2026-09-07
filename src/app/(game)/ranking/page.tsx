@@ -5,7 +5,7 @@ import { pageMetadata } from "@/shared/seo/metadata";
 export const metadata: Metadata = pageMetadata({
   title: "Ranking",
   description:
-    "Quadros ao vivo do Wizold: nível, caçadas, arena, atributos, mascote e posição de cada caçador.",
+    "Live boards of Wizold: level, hunts, arena, attributes, companion and each hunter's position.",
   path: "/ranking",
 });
 

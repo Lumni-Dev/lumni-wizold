@@ -40,13 +40,13 @@ export function capitalizeName(name: string): string {
 export function validateName(name: string): string | null {
   const clean = name.trim();
   if (clean.length < NAME_MIN_LENGTH) {
-    return "O nick precisa de pelo menos " + NAME_MIN_LENGTH + " letras.";
+    return "The nick needs at least " + NAME_MIN_LENGTH + " letters.";
   }
   if (clean.length > NAME_MAX_LENGTH) {
-    return "O nick pode ter no máximo " + NAME_MAX_LENGTH + " letras.";
+    return "The nick can have at most " + NAME_MAX_LENGTH + " letters.";
   }
   if (!/^[\p{L}\p{M}\p{N}]+$/u.test(clean)) {
-    return "Um nick de jogo: só letras e números, sem espaço nem sinais.";
+    return "A game nick: letters and digits only, no spaces and no signs.";
   }
   return null;
 }
@@ -55,7 +55,7 @@ export function startRun(name: string, gender: Gender): Result {
   const problem = validateName(name);
   if (problem) return failure(initialState(), problem);
 
-  return success(createRun(capitalizeName(name), gender), "Personagem criado. A caçada aguarda.");
+  return success(createRun(capitalizeName(name), gender), "Character created. The hunt awaits.");
 }
 
 export function renameCost(_level: number): number {
@@ -72,19 +72,19 @@ export function renameDaysLeft(character: Character): number {
 
 export function renameCharacter(state: GameState, name: string): Result {
   const character = state.character;
-  if (!character) return failure(state, "Nenhum personagem ativo.");
+  if (!character) return failure(state, "No active character.");
 
   const problem = validateName(name);
   if (problem) return failure(state, problem);
 
   const clean = capitalizeName(name);
-  if (clean === character.name) return failure(state, "Esse já é o seu nome.");
+  if (clean === character.name) return failure(state, "That is already your name.");
 
   const daysLeft = renameDaysLeft(character);
   if (daysLeft > 0) {
     return failure(
       state,
-      "O nome só pode trocar de novo em " + daysLeft + (daysLeft > 1 ? " dias." : " dia."),
+      "The name can only change again in " + daysLeft + (daysLeft > 1 ? " days." : " day."),
     );
   }
 
@@ -92,11 +92,11 @@ export function renameCharacter(state: GameState, name: string): Result {
   if (character.bronze < cost) {
     return failure(
       state,
-      "A troca de nome custa " +
+      "The name change costs " +
         formatBronze(cost) +
-        " e faltam " +
+        " and you are " +
         formatBronze(cost - character.bronze) +
-        ".",
+        " short.",
     );
   }
 
@@ -106,7 +106,7 @@ export function renameCharacter(state: GameState, name: string): Result {
     bronze: current.bronze - cost,
     renamedAt: new Date().toISOString(),
   }));
-  const message = "A matilha agora responde por " + clean + ".";
+  const message = "The pack now answers to " + clean + ".";
   return success(addLog(next, "character", message), message);
 }
 
@@ -114,7 +114,7 @@ export { furyRemainingMs } from "@/models/rules/moon";
 
 export function sufferBlow(state: GameState, damage: number): Result {
   const character = state.character;
-  if (!character) return failure(state, "Nenhum personagem ativo.");
+  if (!character) return failure(state, "No active character.");
 
   const next = updateCharacter(state, (current) => ({
     ...current,
@@ -125,14 +125,14 @@ export function sufferBlow(state: GameState, damage: number): Result {
 
 export function startRest(state: GameState): Result {
   const character = state.character;
-  if (!character) return failure(state, "Nenhum personagem ativo.");
+  if (!character) return failure(state, "No active character.");
 
   const stats = deriveStats(character, state.equipment, state.pet);
   if (character.health >= stats.maxHealth) {
-    return failure(state, "Você já está inteiro.");
+    return failure(state, "You are already whole.");
   }
 
-  const message = "Você se recolhe. O corpo se regenera aos poucos.";
+  const message = "You settle down. The body mends little by little.";
   return success(addLog(state, "character", message), "");
 }
 
@@ -147,7 +147,7 @@ function restRecovery(maximum: number, willpower: number): number {
 
 export function restTick(state: GameState): Result<{ done: boolean; healed: number }> {
   const character = state.character;
-  if (!character) return failure(state, "Nenhum personagem ativo.");
+  if (!character) return failure(state, "No active character.");
 
   const stats = deriveStats(character, state.equipment, state.pet);
   const healthGained =
@@ -165,12 +165,12 @@ export function restTick(state: GameState): Result<{ done: boolean; healed: numb
   const done = Boolean(rested && rested.health >= stats.maxHealth);
 
   if (done) {
-    const message = "Recuperação completa: vida inteira.";
+    const message = "Recovery complete: full health.";
     return success(addLog(next, "character", message), message, { done, healed: healthGained });
   }
 
   if (healthGained <= 0) return success(next, "", { done: false, healed: 0 });
-  return success(next, "Você regenerou " + healthGained + " de vida.", {
+  return success(next, "You regenerated " + healthGained + " health.", {
     done: false,
     healed: healthGained,
   });
@@ -191,7 +191,7 @@ export function grantExperience(state: GameState, gain: number): ExperienceGrant
 
   const leveled = next.character;
   if (levelsGained > 0 && leveled) {
-    next = addLog(next, "character", "Nível " + leveled.level + " alcançado.");
+    next = addLog(next, "character", "Level " + leveled.level + " reached.");
   }
 
   return { state: next, levels: levelsGained, granted };

@@ -19,12 +19,12 @@ export type HunterDoing = ActivityKind | "idle";
 export const ACTIVITY_STALE_MS = 60000;
 
 export const DOING_VERBS: Record<HunterDoing, string> = {
-  hunt: "caçando",
-  train: "treinando",
-  mine: "minerando",
-  forge: "forjando",
-  rest: "repousando",
-  idle: "parado",
+  hunt: "hunting",
+  train: "training",
+  mine: "mining",
+  forge: "forging",
+  rest: "resting",
+  idle: "idle",
 };
 
 export function isActivityKind(value: string): value is ActivityKind {
@@ -38,7 +38,7 @@ export function resolveDoing(kind: string | null, at: string | null, now = Date.
 }
 
 export function describeDoing(name: string, doing: HunterDoing): string {
-  return name + " está " + DOING_VERBS[doing];
+  return name + " is " + DOING_VERBS[doing];
 }
 
 export function doingFor(

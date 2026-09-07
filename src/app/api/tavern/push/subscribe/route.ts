@@ -11,7 +11,7 @@ export async function POST(request: Request) {
   const claims = await sessionClaims();
   if (!claims) return bad("Entre para jogar.", 401);
   const gate = rateLimit("push-sub:" + claims.userId, 10, 60000);
-  if (!gate.allowed) return bad("Calma, lobo: muitas requisições. Respire um instante.", 429);
+  if (!gate.allowed) return bad("Easy, wolf: too many requests. Breathe for a moment.", 429);
 
   const body = await readBody(request);
   const endpoint = asText(body.endpoint, 2048);
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
       : {};
   const p256dh = asText(keys.p256dh, 256);
   const auth = asText(keys.auth, 128);
-  if (!endpoint || !p256dh || !auth) return bad("Inscrição inválida.", 400);
+  if (!endpoint || !p256dh || !auth) return bad("Invalid subscription.", 400);
 
   try {
     await withTransaction(async (client) => {
@@ -30,6 +30,6 @@ export async function POST(request: Request) {
     });
     return NextResponse.json({ ok: true, message: "", data: null });
   } catch {
-    return bad("Sessão encerrada.", 401);
+    return bad("Session ended.", 401);
   }
 }

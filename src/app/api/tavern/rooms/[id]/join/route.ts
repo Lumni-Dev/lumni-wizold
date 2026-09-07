@@ -24,7 +24,7 @@ export async function POST(
       const key = "tavern-pw:" + context.identity.id + ":" + roomId;
       if (!rateLimit(key, 6, 60000).allowed || !(await rateLimitShared(key, 6, 60))) {
         return NextResponse.json(
-          { ok: false, message: "Senha errada demais. Espere um minuto.", data: null },
+          { ok: false, message: "Too many wrong passwords. Wait a minute.", data: null },
           { status: 429 },
         );
       }

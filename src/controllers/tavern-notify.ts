@@ -180,9 +180,9 @@ export function dismissTavernNotices(roomName?: string): void {
 
 export function testTavernPush(): void {
   notifyTavernMessageLocal(
-    "Taverna",
+    "Tavern",
     "Wizold",
-    "Notificação de teste: se você está vendo isto, está funcionando.",
+    "Test notification: if you can see this, it works.",
     new Date().toISOString(),
   );
 }

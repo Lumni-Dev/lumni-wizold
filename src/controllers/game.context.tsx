@@ -571,7 +571,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       "POST",
       "/api/character/rest",
       { resume },
-      "Recuperação",
+      "Recovery",
       () => playSound("rest"),
     );
     if (!answer.ok) {
@@ -659,7 +659,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     const collect = () =>
       void act<{
         whole: boolean;
-      }>("POST", "/api/pet/rest-collect", undefined, "Mascote");
+      }>("POST", "/api/pet/rest-collect", undefined, "Companion");
     collect();
     const timer = window.setInterval(collect, REST_TICK_MS);
     return () => window.clearInterval(timer);
@@ -756,7 +756,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
               "POST",
               "/api/inventory/consume",
               { itemId: step.itemId },
-              "Inventário",
+              "Inventory",
               () => playSound("potion"),
             );
             if (furyMinutes > 0 && drank.ok) lastFuryDrinkRef.current = Date.now();
@@ -766,12 +766,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
             await beginRest();
             return;
           case "feed":
-            await act("POST", "/api/pet/feed", { itemId: step.itemId }, "Mascote", () =>
+            await act("POST", "/api/pet/feed", { itemId: step.itemId }, "Companion", () =>
               playSound("pet-eat"),
             );
             return;
           case "kennel":
-            await act("POST", "/api/pet/active", { active: step.active }, "Mascote", () =>
+            await act("POST", "/api/pet/active", { active: step.active }, "Companion", () =>
               playSound(step.active ? "pet-along" : "pet-rest"),
             );
             return;
@@ -800,9 +800,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
       const after = answer.state?.wallet.cents ?? before;
       if (answer.ok && after > before) {
         announce(
-          "O Alforje recebeu " + formatReais(after - before) + " de vendas no bazar.",
+          "The Saddlebag received " + formatReais(after - before) + " from bazaar sales.",
           true,
-          "Bazar",
+          "Bazaar",
         );
         playSound("sell");
       }
@@ -902,14 +902,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
         return answer.ok;
       },
       startRun: async (name, gender) => {
-        const answer = await act("POST", "/api/characters", { name, gender }, "Personagem", () =>
+        const answer = await act("POST", "/api/characters", { name, gender }, "Character", () =>
           playSound("transform"),
         );
         if (answer.ok) await request("POST", "/api/state");
         return answer.ok;
       },
       renameCharacter: async (name) => {
-        const answer = await act("POST", "/api/character/rename", { name }, "Personagem");
+        const answer = await act("POST", "/api/character/rename", { name }, "Character");
         return answer.ok;
       },
       requestDeleteCode: async () => {
@@ -960,7 +960,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
           const answer = await request<{ leveled: boolean }>("POST", "/api/training/pet");
           if (!answer.ok) {
             if (isTransientApiMessage(answer.message)) return "retry";
-            if (answer.message) announce(answer.message, false, "Treino");
+            if (answer.message) announce(answer.message, false, "Training");
             return null;
           }
           return { message: answer.message, raised: answer.data?.leveled === true };
@@ -970,7 +970,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         });
         if (!answer.ok) {
           if (isTransientApiMessage(answer.message)) return "retry";
-          if (answer.message) announce(answer.message, false, "Treino");
+          if (answer.message) announce(answer.message, false, "Training");
           return null;
         }
         return { message: answer.message, raised: answer.data?.attributeRaised === true };
@@ -996,7 +996,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         if (retryAfterMs !== null) {
           return { kind: "retry", retryAfterMs };
         }
-        if (answer.message) announce(answer.message, false, "Caça");
+        if (answer.message) announce(answer.message, false, "Hunt");
         return { kind: "stop" };
       },
       landHunt: () => {
@@ -1047,27 +1047,27 @@ export function GameProvider({ children }: { children: ReactNode }) {
         applyState(held.state, held.seq);
       },
       equipItem: async (itemId, enhancement = 0) => {
-        await act("POST", "/api/inventory/equip", { itemId, enhancement }, "Inventário", () =>
+        await act("POST", "/api/inventory/equip", { itemId, enhancement }, "Inventory", () =>
           playSound("equip"),
         );
       },
       unequipItem: async (slot) => {
-        await act("POST", "/api/inventory/unequip", { slot }, "Inventário", () =>
+        await act("POST", "/api/inventory/unequip", { slot }, "Inventory", () =>
           playSound("equip"),
         );
       },
       consumeItem: async (itemId) => {
-        await act("POST", "/api/inventory/consume", { itemId }, "Inventário", () =>
+        await act("POST", "/api/inventory/consume", { itemId }, "Inventory", () =>
           playSound(findItem(itemId)?.category === "pet" ? "pet-eat" : "potion"),
         );
       },
       buyItem: async (itemId, quantity = 1) => {
-        await act("POST", "/api/market/buy", { itemId, quantity }, "Mercado", () =>
+        await act("POST", "/api/market/buy", { itemId, quantity }, "Market", () =>
           playSound("buy"),
         );
       },
       sellItem: async (itemId, quantity = 1, enhancement = 0) => {
-        await act("POST", "/api/market/sell", { itemId, quantity, enhancement }, "Mercado", () =>
+        await act("POST", "/api/market/sell", { itemId, quantity, enhancement }, "Market", () =>
           playSound("sell"),
         );
       },
@@ -1076,20 +1076,20 @@ export function GameProvider({ children }: { children: ReactNode }) {
           "POST",
           "/api/bazaar/announce",
           { itemId, quantity, priceCents, enhancement },
-          "Bazar",
+          "Bazaar",
           () => playSound("ui"),
         );
         return answer.ok;
       },
       cancelListing: async (listingId) => {
-        await act("POST", "/api/bazaar/cancel", { listingId }, "Bazar", () => playSound("ui"));
+        await act("POST", "/api/bazaar/cancel", { listingId }, "Bazaar", () => playSound("ui"));
       },
       purchaseListing: async (listingId, quantity) => {
         const answer = await act<{ url: string }>(
           "POST",
           "/api/bazaar/checkout",
           { listingId, quantity },
-          "Bazar",
+          "Bazaar",
         );
         if (answer.ok && answer.data?.url) {
           window.location.assign(answer.data.url);
@@ -1102,13 +1102,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
           "POST",
           "/api/bazaar/withdraw",
           { pixKey, fullName, cpf },
-          "Bazar",
+          "Bazaar",
           () => playSound("sell"),
         );
         return answer.ok;
       },
       buyPack: async (packId) => {
-        const answer = await act<{ url: string }>("POST", "/api/store/checkout", { packId }, "Loja");
+        const answer = await act<{ url: string }>("POST", "/api/store/checkout", { packId }, "Store");
         if (answer.ok && answer.data?.url) {
           window.location.assign(answer.data.url);
           return true;
@@ -1116,7 +1116,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         return false;
       },
       buyVip: async () => {
-        const answer = await act<{ url: string }>("POST", "/api/vip/checkout", undefined, "Loja");
+        const answer = await act<{ url: string }>("POST", "/api/vip/checkout", undefined, "Store");
         if (answer.ok && answer.data?.url) {
           window.location.assign(answer.data.url);
           return true;
@@ -1124,11 +1124,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
         return false;
       },
       cancelVip: async () => {
-        const answer = await act("POST", "/api/vip/cancel", undefined, "Loja");
+        const answer = await act("POST", "/api/vip/cancel", undefined, "Store");
         return answer.ok;
       },
       reactivateVip: async () => {
-        const answer = await act("POST", "/api/vip/reactivate", undefined, "Loja");
+        const answer = await act("POST", "/api/vip/reactivate", undefined, "Store");
         return answer.ok;
       },
       confirmPayment: async (sessionId) => {
@@ -1143,10 +1143,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
         }>("POST", "/api/mine", { oreId });
         if (!answer.ok) {
           if (isTransientApiMessage(answer.message)) return "retry";
-          if (answer.message) announce(answer.message, false, "Mina");
+          if (answer.message) announce(answer.message, false, "Mine");
           return false;
         }
-        if (answer.message) announce(answer.message, true, "Mina");
+        if (answer.message) announce(answer.message, true, "Mine");
         if ((answer.data?.levelsGained ?? 0) > 0) playSound("vein", 220);
         return true;
       },
@@ -1157,19 +1157,19 @@ export function GameProvider({ children }: { children: ReactNode }) {
         });
         if (!answer.ok) {
           if (isTransientApiMessage(answer.message)) return "retry";
-          if (answer.message) announce(answer.message, false, "Bigorna");
+          if (answer.message) announce(answer.message, false, "Anvil");
           return null;
         }
         return { message: answer.message, raised: answer.data?.raised === true };
       },
       adoptPet: async (gender, name) => {
-        await act("POST", "/api/pet/adopt", { gender, name }, "Mascote", () => {
+        await act("POST", "/api/pet/adopt", { gender, name }, "Companion", () => {
           playSound("buy");
           playSound("howl", 240);
         });
       },
       releasePet: async () => {
-        await act("POST", "/api/pet/release", undefined, "Mascote", () => playSound("beast"));
+        await act("POST", "/api/pet/release", undefined, "Companion", () => playSound("beast"));
       },
       setAutomation: (key, on) => {
         const previous = stateRef.current.automation[key];
@@ -1193,7 +1193,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
               ...current,
               automation: { ...current.automation, [key]: previous },
             }));
-            announce(answer.message, false, "Automação");
+            announce(answer.message, false, "Automation");
           }
         });
       },
@@ -1202,13 +1202,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
           "POST",
           "/api/pack/invites",
           { id: person.id, name: person.name },
-          "Matilha",
+          "Pack",
           () => playSound("chat"),
         );
         return answer.ok;
       },
       inviteByNick: async (nick) => {
-        const answer = await act("POST", "/api/pack/invites", { nick }, "Matilha", () =>
+        const answer = await act("POST", "/api/pack/invites", { nick }, "Pack", () =>
           playSound("chat"),
         );
         return answer.ok;
@@ -1218,7 +1218,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
           "POST",
           "/api/pack/invites/" + encodeURIComponent(id) + "/accept",
           undefined,
-          "Matilha",
+          "Pack",
           () => playSound("chat"),
         );
         return answer.ok;
@@ -1228,7 +1228,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
           "POST",
           "/api/pack/invites/" + encodeURIComponent(id) + "/decline",
           undefined,
-          "Matilha",
+          "Pack",
           () => playSound("discard"),
         );
         return answer.ok;
@@ -1238,21 +1238,21 @@ export function GameProvider({ children }: { children: ReactNode }) {
         return answer.ok ? (answer.data?.invites ?? []) : null;
       },
       removeFromPack: async (id) => {
-        await act("DELETE", "/api/pack/" + encodeURIComponent(id), undefined, "Matilha", () =>
+        await act("DELETE", "/api/pack/" + encodeURIComponent(id), undefined, "Pack", () =>
           playSound("discard"),
         );
       },
       renamePet: async (name) => {
-        const answer = await act("POST", "/api/pet/rename", { name }, "Mascote", () =>
+        const answer = await act("POST", "/api/pet/rename", { name }, "Companion", () =>
           playSound("buy"),
         );
         return answer.ok;
       },
       feedPet: async (itemId) => {
-        await act("POST", "/api/pet/feed", { itemId }, "Mascote", () => playSound("pet-eat"));
+        await act("POST", "/api/pet/feed", { itemId }, "Companion", () => playSound("pet-eat"));
       },
       setPetActive: async (active) => {
-        await act("POST", "/api/pet/active", { active }, "Mascote", () =>
+        await act("POST", "/api/pet/active", { active }, "Companion", () =>
           playSound(active ? "pet-along" : "pet-rest"),
         );
       },

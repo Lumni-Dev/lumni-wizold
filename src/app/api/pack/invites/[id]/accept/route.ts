@@ -17,7 +17,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       [inviteId, context.characterId],
     );
     const invite = found.rows[0];
-    if (!invite) return failure(state, "Esse convite não existe mais.");
+    if (!invite) return failure(state, "That invite no longer exists.");
 
     const result = packController.addMate(state, {
       id: String(invite.from_id),

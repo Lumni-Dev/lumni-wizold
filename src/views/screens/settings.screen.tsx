@@ -10,7 +10,7 @@ import { isVip, VIP_PRICE_CENTS } from "@/models/rules/vip";
 import { useGame } from "@/controllers/game.context";
 import { playSoundPreview } from "@/controllers/sound";
 import { disableTavernPush, enableTavernPush, testTavernPush, webPushConfigured, tavernPushSupported } from "@/controllers/tavern-notify";
-import { useLanguageChoice } from "@/controllers/use-locale";
+import { useLanguageChoice, useT } from "@/controllers/use-locale";
 import { backgroundRepository } from "@/models/repositories/background.repository";
 import { languageRepository } from "@/models/repositories/language.repository";
 import { musicRepository } from "@/models/repositories/music.repository";
@@ -42,7 +42,7 @@ const SECTIONS: readonly { key: string; label: string }[] = [
   { key: "conta", label: "Account" },
   { key: "2fa", label: "Two-step" },
   { key: "nome", label: "Name" },
-  { key: "taverna", label: "Taverna" },
+  { key: "taverna", label: "Tavern" },
   { key: "radio", label: "W-Radio" },
   { key: "som", label: "Sound" },
   { key: "trilha", label: "Soundtrack" },
@@ -53,6 +53,7 @@ const SECTIONS: readonly { key: string; label: string }[] = [
 ];
 
 export function SettingsScreen() {
+  const t = useT();
   const {
     state,
     character,
@@ -261,7 +262,7 @@ export function SettingsScreen() {
                     active={languageChoice === "auto"}
                     onClick={() => languageRepository.setChoice("auto")}
                   >
-                    Automático
+                    Automatic
                   </Chip>
                   <Chip
                     active={languageChoice === "en"}
@@ -330,15 +331,15 @@ export function SettingsScreen() {
                 <div className="min-w-0">
                   <p className="truncate text-sm text-ink">Conectado com Google</p>
                   <p className="truncate font-mono text-[11px] text-ink-faint">
-                    {accountEmail ?? "carregando..."}
+                    {accountEmail ?? t("loading...")}
                   </p>
                 </div>
               </div>
             </div>
             <p className="p-4 text-xs leading-relaxed text-ink-faint">
-              A porta é a conta Google, e a partida vive no servidor: saia quando quiser, e o mesmo
-              botão de entrar devolve tudo como estava. Sair de todos os aparelhos derruba qualquer
-              sessão aberta em outro lugar na hora.
+              {t(
+                "The door is the Google account, and the run lives on the server: leave whenever you want, and the same enter button gives everything back as it was. Leaving every device drops any session open elsewhere at once.",
+              )}
             </p>
           </Panel>
         ) : null}
@@ -349,8 +350,9 @@ export function SettingsScreen() {
             padding="none"
             footer={
               <p className="text-xs leading-relaxed text-ink-faint">
-                Um código de oito dígitos no e-mail confirma cada entrada, além do Google. Com a
-                verificação ligada, a porta só abre depois que você digitar esse código.
+                {t(
+                  "An eight-digit code in the e-mail confirms each entry, on top of Google. With verification on, the door only opens after you type that code.",
+                )}
               </p>
             }
           >
@@ -370,7 +372,7 @@ export function SettingsScreen() {
                       });
                     }}
                   >
-                    Ativado
+                    On
                   </Chip>
                   <Chip
                     active={!twoFactorEnabled}
@@ -384,7 +386,7 @@ export function SettingsScreen() {
                       });
                     }}
                   >
-                    Desativado
+                    Off
                   </Chip>
                 </div>
               </ListRow>
@@ -438,8 +440,8 @@ export function SettingsScreen() {
 
         {shows("taverna") ? (
           <Panel
-            title="Taverna"
-            description="Avisos no desktop das mensagens das suas mesas: nome da mesa, quem falou, quando e o quê, com um botão para responder direto na taverna. Com Web Push ativo, chegam mesmo com o jogo fechado; sem ele, só enquanto uma aba do Wizold está aberta fora da taverna."
+            title="Tavern"
+            description="Desktop notices for your tables' messages: the table name, who spoke, when and what, with a button to answer straight in the tavern. With Web Push on, they arrive even with the game closed; without it, only while a Wizold tab is open outside the tavern."
             padding="none"
           >
             <List>
@@ -447,29 +449,31 @@ export function SettingsScreen() {
                 <RowText title="State" description="Table notices on this device." />
                 <div className="flex shrink-0 gap-2">
                   <Chip active={pushOn} onClick={() => choosePush(true)} disabled={!tavernPushSupported()}>
-                    Ativado
+                    On
                   </Chip>
                   <Chip active={!pushOn} onClick={() => choosePush(false)}>
-                    Desativado
+                    Off
                   </Chip>
                 </div>
               </ListRow>
               {!webPushConfigured() ? (
                 <ListRow layout="column">
                   <p className="text-[11px] leading-relaxed text-ink-faint">
-                    Web Push ainda não está configurado neste ambiente; avisos locais continuam
-                    funcionando com o jogo aberto.
+                    {t(
+                      "Web Push is not configured in this environment yet; local notices keep working while the game is open.",
+                    )}
                   </p>
                 </ListRow>
               ) : null}
               {pushOn ? (
                 <ListRow layout="column">
                   <Button variant="secondary" onClick={testTavernPush}>
-                    Testar notificação
+                    Test notification
                   </Button>
                   <p className="text-[11px] leading-relaxed text-ink-faint">
-                    Não apareceu? O navegador ou o Windows pode estar silenciando: confira o Foco
-                    assistido e as notificações do Chrome nas configurações do sistema.
+                    {t(
+                      "Did not show? The browser or Windows may be silencing it: check Focus assist and Chrome notifications in the system settings.",
+                    )}
                   </p>
                 </ListRow>
               ) : null}
@@ -521,10 +525,10 @@ export function SettingsScreen() {
                 <RowText title="State" description="On or off on this device." />
                 <div className="flex shrink-0 gap-2">
                   <Chip active={sound} onClick={() => chooseSound(true)}>
-                    Ativado
+                    On
                   </Chip>
                   <Chip active={!sound} onClick={() => chooseSound(false)}>
-                    Desativado
+                    Off
                   </Chip>
                 </div>
               </ListRow>
@@ -594,19 +598,19 @@ export function SettingsScreen() {
                   />
                   <div className="flex shrink-0 flex-wrap gap-2">
                     <Chip active={musicTrack === "1"} onClick={() => musicRepository.setTrack("1")}>
-                      Trilha 1
+                      Track 1
                     </Chip>
                     <Chip active={musicTrack === "2"} onClick={() => musicRepository.setTrack("2")}>
-                      Trilha 2
+                      Track 2
                     </Chip>
                     <Chip active={musicTrack === "3"} onClick={() => musicRepository.setTrack("3")}>
-                      Trilha 3
+                      Track 3
                     </Chip>
                     <Chip
                       active={musicTrack === "random"}
                       onClick={() => musicRepository.setTrack("random")}
                     >
-                      Aleatória
+                      Random
                     </Chip>
                   </div>
                 </ListRow>
@@ -634,9 +638,9 @@ export function SettingsScreen() {
                     }}
                   />
                   <p className="text-[11px] leading-relaxed text-ink-faint">
-                    A trilha começa em 75% e corre por baixo dos efeitos, que ficam por cima dela
-                    para o couro, as moedas e o rugido da virada continuarem se ouvindo. O volume
-                    vale na hora.
+                    {t(
+                      "The track starts at 75% and runs under the effects, which ride over it so the leather, the coins and the roar of the turning stay audible. The volume applies at once.",
+                    )}
                   </p>
                 </ListRow>
               ) : null}
@@ -655,10 +659,10 @@ export function SettingsScreen() {
                 <RowText title="State" description="On or off on this device." />
                 <div className="flex shrink-0 gap-2">
                   <Chip active={animatedBackground} onClick={() => backgroundRepository.setEnabled(true)}>
-                    Ativado
+                    On
                   </Chip>
                   <Chip active={!animatedBackground} onClick={() => backgroundRepository.setEnabled(false)}>
-                    Desativado
+                    Off
                   </Chip>
                 </div>
               </ListRow>
@@ -666,7 +670,7 @@ export function SettingsScreen() {
                 <ListRow layout="column">
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                      Escuridão
+                      {t("Darkness")}
                     </span>
                     <span className="font-mono text-[11px] text-ink">
                       {Math.round(backdropDarkness * 100)}%
@@ -685,8 +689,9 @@ export function SettingsScreen() {
                     }}
                   />
                   <p className="text-[11px] leading-relaxed text-ink-faint">
-                    A cortina na frente do vídeo: 0% mostra a noite crua e 100% fecha o pé da tela,
-                    padrão ao entrar. O efeito aparece aqui atrás na hora.
+                    {t(
+                      "The curtain in front of the video: 0% shows the raw night and 100% closes the foot of the screen, the default on entry. The effect shows back here at once.",
+                    )}
                   </p>
                 </ListRow>
               ) : null}
@@ -717,16 +722,16 @@ export function SettingsScreen() {
                       : "Active subscription, renews on " + formatDay(character.vipUntil ?? "") + "."}
                   </span>
                   <Button variant="outline" onClick={() => router.push("/store")}>
-                    Gerenciar na loja
+                    Manage in the store
                   </Button>
                 </div>
               ) : (
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <span className="text-[11px] text-ink-faint">
-                    A automação é um recurso VIP. Ative para ligar as chaves.
+                    {t("Automation is a VIP feature. Enable it to turn the switches on.")}
                   </span>
                   <Button variant="primary" onClick={() => buyVip()}>
-                    Ativar VIP por {formatReais(VIP_PRICE_CENTS)}/mês
+                    {t("Enable VIP for") + " " + formatReais(VIP_PRICE_CENTS) + t("/month")}
                   </Button>
                 </div>
               )
@@ -744,14 +749,14 @@ export function SettingsScreen() {
                       disabled={!vip}
                       onClick={() => setAutomation(entry.key, true)}
                     >
-                      Ativado
+                      On
                     </Chip>
                     <Chip
                       active={!state.automation[entry.key]}
                       disabled={!vip}
                       onClick={() => setAutomation(entry.key, false)}
                     >
-                      Desativado
+                      Off
                     </Chip>
                   </div>
                 </ListRow>
@@ -770,17 +775,15 @@ export function SettingsScreen() {
                   {clearing ? "Clearing and reloading..." : "The run on the server does not change"}
                 </span>
                 <Button variant="outline" busy={clearing} onClick={() => setConfirmingClear(true)}>
-                  Limpar cache
+                  Clear cache
                 </Button>
               </div>
             }
           >
             <p className="text-xs leading-relaxed text-ink-faint">
-              O navegador guarda cópias das imagens do jogo e as preferências deste aparelho: som,
-              volume, trilha, animação e escuridão do fundo, a data de nascimento lembrada na porta e o
-              trabalho em andamento. Limpar o cache
-              descarta essas cópias, baixa as imagens de novo do servidor e recarrega a página;
-              serve para quando alguma arte aparece errada ou desatualizada.
+              {t(
+                "The browser keeps copies of the game's images and this device's preferences: sound, volume, track, background animation and darkness, the birth date remembered at the door and the work under way. Clearing the cache discards those copies, downloads the images again from the server and reloads the page; it is for when some art shows wrong or outdated.",
+              )}
             </p>
           </Panel>
         ) : null}
@@ -792,7 +795,7 @@ export function SettingsScreen() {
             footer={
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <span className="text-[11px] text-ink-faint">
-                  {character.name} - NV. {formatNumber(character.level)}
+                  {character.name} - {t("LV.")} {formatNumber(character.level)}
                 </span>
                 <Button
                   variant="outline"
@@ -801,14 +804,15 @@ export function SettingsScreen() {
                     setDeleting("ask");
                   }}
                 >
-                  Excluir conta
+                  Delete account
                 </Button>
               </div>
             }
           >
             <p className="text-xs leading-relaxed text-ink-faint">
-              Personagem, inventário, forja, lobo, carteira e anúncios: tudo some de uma vez, e a
-              conta volta para a criação de personagem.
+              {t(
+                "Character, bag, forge, wolf, wallet and listings: everything vanishes at once, and the account returns to character creation.",
+              )}
             </p>
           </Panel>
         ) : null}
@@ -817,7 +821,7 @@ export function SettingsScreen() {
       <ConfirmDialog
         open={confirmingClear}
         title="Clear cache"
-        description="As imagens serão baixadas de novo e as preferências deste aparelho (som, volume, trilha, animação e escuridão do fundo, data de nascimento lembrada e trabalho em andamento) voltam ao padrão. A partida no servidor não é tocada."
+        description="The images will be downloaded again and this device's preferences (sound, volume, track, background animation and darkness, remembered birth date and work under way) return to the default. The run on the server is not touched."
         detail="The page reloads when done."
         confirmLabel="Clear"
         onCancel={() => setConfirmingClear(false)}
@@ -868,15 +872,15 @@ export function SettingsScreen() {
                 });
               }}
             >
-              Confirmar
+              Confirm
             </Button>
           </div>
         }
       >
         <div className="space-y-3 p-4">
           <p className="text-xs leading-relaxed text-ink-soft">
-            Digite o código de oito dígitos enviado para{" "}
-            <span className="text-ink">{accountEmail ?? "o seu e-mail"}</span>.
+            {t("Type the eight-digit code sent to")}{" "}
+            <span className="text-ink">{accountEmail ?? t("your e-mail")}</span>.
           </p>
           <Field
             label="Code"
@@ -899,7 +903,7 @@ export function SettingsScreen() {
           deleting === "ask" ? (
             <div className="flex items-center justify-end gap-2">
               <Button variant="ghost" onClick={() => setDeleting(null)}>
-                Cancelar
+                Cancel
               </Button>
               <Button
                 variant="primary"
@@ -909,13 +913,13 @@ export function SettingsScreen() {
                   })
                 }
               >
-                Enviar código
+                Send code
               </Button>
             </div>
           ) : (
             <div className="flex items-center justify-end gap-2">
               <Button variant="ghost" onClick={() => setDeleting(null)}>
-                Cancelar
+                Cancel
               </Button>
               <Button
                 variant="primary"
@@ -929,7 +933,7 @@ export function SettingsScreen() {
                   })
                 }
               >
-                Excluir tudo
+                Delete everything
               </Button>
             </div>
           )
@@ -937,14 +941,21 @@ export function SettingsScreen() {
       >
         <div className="space-y-3 p-4">
           <p className="text-xs leading-relaxed text-ink-soft">
-            {character.name} - NV. {formatNumber(character.level)}. A conta e tudo o que ela guarda
-            somem do servidor agora e para sempre: personagem, mochila, carteira, mesas e rastros.
-            Não há como recuperar.
+            {character.name +
+              " - " +
+              t("LV.") +
+              " " +
+              formatNumber(character.level) +
+              ". " +
+              t(
+                "The account and everything it keeps vanish from the server now and forever: character, bag, wallet, tables and traces. There is no way to recover.",
+              )}
           </p>
           {deleting === "ask" ? (
             <p className="text-xs leading-relaxed text-ink-faint">
-              Para confirmar, enviaremos um código de 4 dígitos ao e-mail da conta. Ele vale por 10
-              minutos.
+              {t(
+                "To confirm, we will send a 4-digit code to the account's e-mail. It is good for 10 minutes.",
+              )}
             </p>
           ) : (
             <Field

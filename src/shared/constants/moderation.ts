@@ -1,15 +1,15 @@
 export const AI_AUDIT_NOTICE =
-  "Nomes passam por auditoria de IA antes de entrar no jogo. Mensagens da taverna são auditadas depois do envio. A IA só recusa insulto, racismo e pedofilia; o resto passa.";
+  "Names pass an AI audit before entering the game. Tavern messages are audited after sending. The AI only refuses insult, racism and pedophilia; the rest passes.";
 
 export const AI_AUDIT_CHAT_NOTICE =
-  "Mensagens auditadas por IA, para evitar conteúdo impróprio.";
+  "Messages audited by AI, to avoid inappropriate content.";
 
 export const MODERATION_REFUSAL =
-  "O texto foi recusado pela auditoria de IA. Escolha outras palavras.";
+  "The text was refused by the AI audit. Choose other words.";
 
 export const MODERATION_UNAVAILABLE =
-  "A auditoria de IA está indisponível. Tente de novo em instantes.";
+  "The AI audit is unavailable. Try again in a moment.";
 
-export const CHAT_CENSORED_TEXT = "Conteúdo impróprio.";
+export const CHAT_CENSORED_TEXT = "Inappropriate content.";
 
-export const TAVERN_NOTICE_BODY = "Nova mensagem na mesa.";
+export const TAVERN_NOTICE_BODY = "New message at the table.";

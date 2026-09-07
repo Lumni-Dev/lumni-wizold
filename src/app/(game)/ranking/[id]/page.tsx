@@ -18,13 +18,13 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
         return pageMetadata({
           title: hunter.name,
           description:
-            "Ficha pública de " +
+            "Public sheet of " +
             hunter.name +
-            ", caçador " +
+            ", hunter " +
             lineage +
             " NV " +
             hunter.level +
-            " no Wizold: progresso, equipamento, mascote e posição nos quadros.",
+            " in Wizold: progress, equipment, companion and position on the boards.",
           path: "/ranking/" + id,
         });
       }
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
   return pageMetadata({
     title: "Perfil",
-    description: "Ficha pública de um caçador do Wizold.",
+    description: "Public sheet of a Wizold hunter.",
     path: "/ranking/" + id,
   });
 }

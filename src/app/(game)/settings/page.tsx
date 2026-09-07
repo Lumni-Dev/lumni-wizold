@@ -3,8 +3,8 @@ import { SettingsScreen } from "@/views/screens/settings.screen";
 import { privatePageMetadata } from "@/shared/seo/metadata";
 
 export const metadata: Metadata = privatePageMetadata({
-  title: "Configurações",
-  description: "Som, automação, notificações da taverna e conta do Wizold.",
+  title: "Settings",
+  description: "Sound, automation, tavern notifications and your Wizold account.",
   path: "/settings",
 });
 

@@ -7,7 +7,7 @@ import { PET } from "./tuning/pet";
 import { ECONOMY } from "../config/economy";
 
 export const GAME_NAME = "Wizold";
-export const GAME_TAGLINE = "Crônica de Lumni e Luna";
+export const GAME_TAGLINE = "Chronicle of Lumni and Luna";
 
 export const STORAGE_KEY = "lumni-wizold:state";
 export const STATE_VERSION = 1;

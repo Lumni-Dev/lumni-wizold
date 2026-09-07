@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     const blocked = await moderationRefusal(context.client, context.userId, name, "hunter_name");
     if (blocked) return failure(state, blocked);
     if (name && (await nameTaken(context.client, name, context.characterId))) {
-      return failure(state, "Esse nome já é de outro caçador. Escolha outro.");
+      return failure(state, "That name already belongs to another hunter. Choose another.");
     }
     return characterController.renameCharacter(state, name);
   });

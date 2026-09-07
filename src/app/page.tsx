@@ -11,7 +11,7 @@ export const metadata: Metadata = pageMetadata({
   title: GAME_NAME,
   description:
     GAME_TAGLINE +
-    ": jogo de navegador gratuito de lobisomem. Caçe criaturas sob a lua real, treine atributos, forje equipamentos e suba no ranking.",
+    ": a free werewolf browser game. Hunt creatures under the real moon, train attributes, forge equipment and climb the ranking.",
   path: "/",
 });
 

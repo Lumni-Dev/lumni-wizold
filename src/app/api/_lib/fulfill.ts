@@ -49,9 +49,9 @@ async function returnMoney(
       session.amount_total,
     ]);
     await recordWalletMovement(client, characterId, session.amount_total, "adjustment", session.id);
-    return "valor creditado no Alforje";
+    return "amount credited to the Saddlebag";
   }
-  return "procure o suporte para a devolução";
+  return "contact support for the refund";
 }
 
 export async function fulfillSession(
@@ -59,25 +59,25 @@ export async function fulfillSession(
   session: StripeSession,
 ): Promise<FulfillOutcome> {
   if (session.payment_status !== "paid") {
-    return { ok: false, message: "O pagamento ainda não foi confirmado pelo Stripe." };
+    return { ok: false, message: "The payment has not yet been confirmed by Stripe." };
   }
   const userId = session.metadata.userId ?? "";
   const characterId = session.metadata.characterId ?? "";
   if (!userId || !characterId) {
-    return { ok: false, message: "Sessão de pagamento sem dono conhecido." };
+    return { ok: false, message: "Payment session with no known owner." };
   }
 
   const loaded = await loadGame(client, userId, true);
   if (!loaded || loaded.characterId !== characterId) {
     if (!(await claim(client, session))) {
-      return { ok: true, message: "Pagamento já tratado." };
+      return { ok: true, message: "Payment already handled." };
     }
     if (session.payment_intent) await refundPayment(session.payment_intent);
-    return { ok: false, message: "A partida deste pagamento não existe mais: valor devolvido." };
+    return { ok: false, message: "The run behind this payment no longer exists: amount refunded." };
   }
 
   if (!(await claim(client, session))) {
-    return { ok: true, message: "Pagamento já creditado." };
+    return { ok: true, message: "Payment already credited." };
   }
 
   if (session.currency !== "brl") {
@@ -89,7 +89,7 @@ export async function fulfillSession(
     const pack = findPack(session.metadata.packId ?? "");
     if (!pack || session.amount_total !== pack.priceCents) {
       const returned = await returnMoney(client, session, characterId);
-      return { ok: false, message: "Pagamento não bate com o pacote: " + returned + "." };
+      return { ok: false, message: "The payment does not match the pack: " + returned + "." };
     }
     const result = storeController.purchasePack(loaded.state, pack.id);
     if (!result.ok || !result.data) {
@@ -115,7 +115,7 @@ export async function fulfillSession(
     const subscriptionId = session.subscription;
     if (!subscriptionId) {
       const returned = await returnMoney(client, session, characterId);
-      return { ok: false, message: "Assinatura VIP sem identificador: " + returned + "." };
+      return { ok: false, message: "VIP subscription without an identifier: " + returned + "." };
     }
     const subscription = await retrieveSubscription(subscriptionId);
     const periodEnd =
@@ -148,12 +148,12 @@ export async function fulfillSession(
       const returned = await returnMoney(client, session, characterId);
       return {
         ok: false,
-        message: "O anúncio saiu do quadro antes do pagamento chegar: " + returned + ".",
+        message: "The listing left the board before the payment arrived: " + returned + ".",
       };
     }
     if (session.amount_total !== listing.priceCents * quantity) {
       const returned = await returnMoney(client, session, characterId);
-      return { ok: false, message: "Pagamento não bate com o anúncio: " + returned + "." };
+      return { ok: false, message: "The payment does not match the listing: " + returned + "." };
     }
     const result = bazaarController.purchaseListing(loaded.state, listing, quantity);
     if (!result.ok || !result.data) {
@@ -172,19 +172,19 @@ export async function fulfillSession(
       generateId("log"),
       listing.sellerId,
       buyerName +
-        " levou " +
+        " took " +
         enhancedName(item?.name ?? listing.itemId, listing.enhancement) +
         (quantity > 1 ? " x" + quantity : "") +
-        " por " +
+        " for " +
         formatReais(total) +
-        ". No Alforje, já sem a taxa da casa: " +
+        ". In the Saddlebag, already net of the house fee: " +
         formatReais(net) +
         ".",
     );
     return { ok: true, message: result.message };
   }
 
-  return { ok: false, message: "Tipo de pagamento desconhecido." };
+  return { ok: false, message: "Unknown payment type." };
 }
 
 async function applySubscriptionState(
@@ -194,16 +194,16 @@ async function applySubscriptionState(
 ): Promise<FulfillOutcome> {
   const userId = subscription.metadata.userId ?? "";
   const characterId = subscription.metadata.characterId ?? "";
-  if (!userId || !characterId) return { ok: true, message: "Assinatura sem dono conhecido." };
+  if (!userId || !characterId) return { ok: true, message: "Subscription with no known owner." };
 
   const loaded = await loadGame(client, userId, true);
   if (!loaded || loaded.characterId !== characterId) {
-    return { ok: true, message: "Partida deste pagamento não encontrada." };
+    return { ok: true, message: "The run behind this payment was not found." };
   }
 
   if (ended) {
     if ((loaded.state.character?.vipSubscriptionId ?? "") !== subscription.id) {
-      return { ok: true, message: "Assinatura já substituída." };
+      return { ok: true, message: "Subscription already replaced." };
     }
     const result = storeController.endVipSubscription(loaded.state);
     if (!result.ok) return { ok: false, message: result.message };
@@ -231,7 +231,7 @@ export async function fulfillInvoice(
   subscriptionId: string,
 ): Promise<FulfillOutcome> {
   const subscription = await retrieveSubscription(subscriptionId);
-  if (!subscription) return { ok: false, message: "Assinatura não encontrada no Stripe." };
+  if (!subscription) return { ok: false, message: "Subscription not found on Stripe." };
   return applySubscriptionState(client, subscription, false);
 }
 

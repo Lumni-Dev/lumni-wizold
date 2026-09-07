@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       if (!other) {
         return NextResponse.json({
           ok: false,
-          message: "Esse caçador não passa pela taverna.",
+          message: "That hunter does not come by the tavern.",
           data: null,
         });
       }
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
         return NextResponse.json({
           ok: false,
           message:
-            "Mesa reservada é só entre a matilha. Convide " + other.name + " e espere aceitar.",
+            "A reserved table is only within the pack. Invite " + other.name + " and wait for the acceptance.",
           data: null,
         });
       }

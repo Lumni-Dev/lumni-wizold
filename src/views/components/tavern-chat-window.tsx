@@ -224,7 +224,7 @@ export function TavernChatWindow() {
       setSentBeat((count) => count + 1);
       playSound("chat");
       setDraft("");
-    } else notify(result.message, false, "Taverna");
+    } else notify(result.message, false, "Tavern");
   }
 
   async function inviteMember(member: { id: string; name: string }) {

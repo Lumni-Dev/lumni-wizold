@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { api } from "@/controllers/api.client";
 import { useGame } from "@/controllers/game.context";
+import { useT } from "@/controllers/use-locale";
 import { listRanking } from "@/controllers/ranking.controller";
 import type { Gender } from "@/models/entities/character";
 import { type Hunter, type RankingKey } from "@/models/entities/ranking";
@@ -28,6 +29,7 @@ import { PageHeader } from "../layout/page-header";
 
 export function RankingScreen() {
   const { state, character } = useGame();
+  const t = useT();
   const [key, setKey] = useState<RankingKey>("level");
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
@@ -94,7 +96,7 @@ export function RankingScreen() {
         />
         <FilterSelect
           accent
-          label="Personagem"
+          label="Character"
           value={gender}
           options={genderFilterOptions()}
           onChange={cutGender}
@@ -119,7 +121,7 @@ export function RankingScreen() {
           view.pages > 1 ? (
             <Pagination page={view.page} pages={view.pages} onChange={setPage}>
               {view.playerPage && view.playerPage !== view.page ? (
-                <Chip onClick={() => setPage(view.playerPage ?? 1)}>Minha posição</Chip>
+                <Chip onClick={() => setPage(view.playerPage ?? 1)}>My position</Chip>
               ) : null}
             </Pagination>
           ) : undefined
@@ -131,7 +133,7 @@ export function RankingScreen() {
             className="flex flex-col items-center justify-center gap-3 px-4 py-12"
           >
             <Spinner size="medium" />
-            <p className="heading text-[11px] text-ink-faint">Carregando...</p>
+            <p className="heading text-[11px] text-ink-faint">{t("Loading...")}</p>
           </div>
         ) : view.entries.length === 0 ? (
           <div className="p-4">
@@ -168,7 +170,7 @@ export function RankingScreen() {
                 </span>
                 {view.board.key === "level" ? null : (
                   <span className="hidden shrink-0 text-[10px] uppercase tracking-[0.16em] text-ink-faint sm:block">
-                    NV. {formatNumber(entry.hunter.level)}
+                    {t("LV.")} {formatNumber(entry.hunter.level)}
                   </span>
                 )}
                 <span className="w-20 shrink-0 text-right font-mono text-sm text-ink">
@@ -181,8 +183,9 @@ export function RankingScreen() {
       </Panel>
 
       <p className="text-xs leading-relaxed text-ink-faint">
-        O quadro inclui caçadores da casa, mantidos pelo Wizold para que o fosso tenha adversário e
-        os boards tenham régua.
+        {t(
+          "The board includes house hunters, kept by Wizold so the pit has rivals and the boards have a measure.",
+        )}
       </p>
     </>
   );

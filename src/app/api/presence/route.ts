@@ -8,7 +8,7 @@ export async function PATCH(request: Request) {
     const body = await readBody(request);
     const status = parsePresenceStatus(asText(body.status, 16));
     if (status !== "active" && status !== "away") {
-      return NextResponse.json({ ok: false, message: "Presença inválida.", data: null });
+      return NextResponse.json({ ok: false, message: "Invalid presence.", data: null });
     }
     await touchPresence(client, identity.id, status);
     return NextResponse.json({ ok: true, message: "", data: null });

@@ -33,10 +33,10 @@ export function checkTrade(item: Item, enhancement: number): TradeCheck {
   if (isForgeMaterial(item)) return { tradable: true, reason: null };
   if (enhancement > 0) return { tradable: true, reason: null };
   if (item.inMarket) {
-    return { tradable: false, reason: "O mercado vende igual: só peça forjada entra no bazar." };
+    return { tradable: false, reason: "The market sells the same: only forged pieces enter the bazaar." };
   }
 
-  return { tradable: false, reason: "Sem forja: leve à bigorna antes de anunciar." };
+  return { tradable: false, reason: "No forge on it: take it to the anvil before announcing." };
 }
 
 const SET_TIER: Record<EquipmentSet, number> = {
