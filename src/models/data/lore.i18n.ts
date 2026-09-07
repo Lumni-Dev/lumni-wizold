@@ -232,29 +232,29 @@ const COUPLE_TITLES: Record<Exclude<Locale, "pt">, LoreCoupleText> = {
   },
 };
 
-function englishVoice(voice: string): string {
-  return voice.replace(/\.mp3(\?v=\d+)?$/, ".en.mp3?v=1");
+function localizedVoice(voice: string, locale: Exclude<Locale, "pt">): string {
+  return voice.replace(/\.mp3(\?v=\d+)?$/, "." + locale + ".mp3?v=1");
 }
 
 function mergeChapters(
   translated: readonly { title: string; text: string }[],
-  voiced: boolean,
+  locale: Exclude<Locale, "pt">,
 ): readonly LoreChapter[] {
   return LORE_CHAPTERS.map((chapter, index) => ({
     ...chapter,
     ...(translated[index] ?? {}),
-    voice: voiced ? englishVoice(chapter.voice) : chapter.voice,
+    voice: localizedVoice(chapter.voice, locale),
   }));
 }
 
 function mergeCompanions(
   translated: readonly { title: string; text: string }[],
-  voiced: boolean,
+  locale: Exclude<Locale, "pt">,
 ): readonly LoreCompanion[] {
   return LORE_COMPANIONS.map((companion, index) => ({
     ...companion,
     ...(translated[index] ?? {}),
-    voice: voiced ? englishVoice(companion.voice) : companion.voice,
+    voice: localizedVoice(companion.voice, locale),
   }));
 }
 
@@ -262,16 +262,16 @@ export function lorePack(locale: Locale): LorePack {
   if (locale === "en") {
     return {
       couple: COUPLE_TITLES.en,
-      chapters: mergeChapters(EN_CHAPTERS, true),
-      companions: mergeCompanions(EN_COMPANIONS, true),
+      chapters: mergeChapters(EN_CHAPTERS, "en"),
+      companions: mergeCompanions(EN_COMPANIONS, "en"),
       pillars: EN_PILLARS,
     };
   }
   if (locale === "es") {
     return {
       couple: COUPLE_TITLES.es,
-      chapters: mergeChapters(ES_CHAPTERS, false),
-      companions: mergeCompanions(ES_COMPANIONS, false),
+      chapters: mergeChapters(ES_CHAPTERS, "es"),
+      companions: mergeCompanions(ES_COMPANIONS, "es"),
       pillars: ES_PILLARS,
     };
   }

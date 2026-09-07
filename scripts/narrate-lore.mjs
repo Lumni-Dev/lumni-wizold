@@ -36,7 +36,7 @@ if (!key) {
 }
 
 const args = process.argv.slice(2);
-const locale = args[0] === "en" ? "en" : "pt";
+const locale = args[0] === "en" || args[0] === "es" ? args[0] : "pt";
 
 function joinedStrings(source) {
   return Array.from(source.matchAll(/"((?:[^"\\]|\\.)*)"/g))
@@ -46,12 +46,13 @@ function joinedStrings(source) {
 
 const chapters = [];
 
-if (locale === "en") {
-  // English texts live in lore.i18n.ts; file order maps onto the pt voice names.
+if (locale !== "pt") {
+  // Translated texts live in lore.i18n.ts; file order maps onto the pt voice names.
+  const prefix = locale.toUpperCase();
   const i18n = readFileSync(join(ROOT, "src", "models", "data", "lore.i18n.ts"), "utf8");
   const sets = [
-    { constant: "EN_CHAPTERS", names: ["meeting", "turning", "choice", "pack"] },
-    { constant: "EN_COMPANIONS", names: ["guardian", "tracker"] },
+    { constant: prefix + "_CHAPTERS", names: ["meeting", "turning", "choice", "pack"] },
+    { constant: prefix + "_COMPANIONS", names: ["guardian", "tracker"] },
   ];
   for (const set of sets) {
     const body = i18n.match(new RegExp("const " + set.constant + "[\\s\\S]*?\\n\\];"))?.[0] ?? "";
@@ -60,7 +61,7 @@ if (locale === "en") {
     ).map((match) => joinedStrings(match[1]));
     texts.forEach((text, index) => {
       const name = set.names[index];
-      if (name && text) chapters.push({ name: name + ".en", text });
+      if (name && text) chapters.push({ name: name + "." + locale, text });
     });
   }
 } else {
@@ -93,9 +94,11 @@ if (chapters.length === 0) {
   process.exit(1);
 }
 
-const only = locale === "en" ? args[1] : args[0];
+const only = locale !== "pt" ? args[1] : args[0];
 const wanted = only
-  ? chapters.filter((chapter) => chapter.name === only || chapter.name === only + ".en")
+  ? chapters.filter(
+      (chapter) => chapter.name === only || chapter.name === only + "." + locale,
+    )
   : chapters;
 if (wanted.length === 0) {
   console.error("no chapter named " + only);
