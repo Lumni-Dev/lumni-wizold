@@ -661,6 +661,7 @@ export const ES: Record<string, string> = {
   "Escolha a linhagem de Lumni ou a de Luna.": "Elige el linaje de Lumni o el de Luna.",
 
   // Last sweep
+  "Assinante VIP": "Suscriptor VIP",
   "Buscar item pelo nome": "Buscar objeto por nombre",
   "Nome do item": "Nombre del objeto",
   "Espaços": "Espacios",

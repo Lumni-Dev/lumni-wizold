@@ -426,7 +426,9 @@ export function touchMember(
   return replaceRoom(state, {
     ...room,
     members: room.members.map((member) =>
-      member.id === identity.id ? { ...member, name: identity.name, lastSeen: now } : member,
+      member.id === identity.id
+        ? { ...member, name: identity.name, vip: identity.vip === true, lastSeen: now }
+        : member,
     ),
   });
 }

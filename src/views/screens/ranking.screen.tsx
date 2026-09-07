@@ -23,6 +23,7 @@ import { Pagination } from "../components/pagination";
 import { Panel } from "../components/panel";
 import { Spinner } from "../components/spinner";
 import { Tag } from "../components/tag";
+import { VipBadge } from "../components/vip-badge";
 import { PageHeader } from "../layout/page-header";
 
 export function RankingScreen() {
@@ -159,6 +160,7 @@ export function RankingScreen() {
                 >
                   {entry.hunter.name}
                 </Link>
+                {entry.hunter.vip ? <VipBadge /> : null}
                 <span className="hidden shrink-0 text-[10px] uppercase tracking-[0.16em] text-ink-faint sm:block">
                   {entry.hunter.gender === "male" ? "Lumni" : "Luna"}
                 </span>

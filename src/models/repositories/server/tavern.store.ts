@@ -27,6 +27,7 @@ type MemberRow = {
   joined_at: Date;
   last_seen: Date;
   nick_color?: number;
+  vip?: boolean;
 };
 
 type MessageRow = {
@@ -96,6 +97,7 @@ function membersOf(rows: MemberRow[], privateFor?: string[]): TavernMember[] {
       joinedAt: new Date(member.joined_at).toISOString(),
       lastSeen: new Date(member.last_seen).toISOString(),
       nickColor: member.nick_color,
+      vip: member.vip === true,
     })),
     nickColorCapacity({ privateFor }),
   );
@@ -154,7 +156,7 @@ export async function loadTavernStructure(
 
 export async function loadTavernMembers(client: PoolClient): Promise<MemberRow[]> {
   const members = await client.query<MemberRow>(
-    "select room_id, member_id, member_name, joined_at, last_seen, nick_color from tavern_members order by joined_at",
+    "select room_id, member_id, member_name, joined_at, last_seen, nick_color, vip from tavern_members order by joined_at",
   );
   return members.rows;
 }
@@ -275,9 +277,17 @@ async function saveRoom(
   await client.query("delete from tavern_members where room_id = $1", [room.id]);
   for (const member of room.members) {
     await client.query(
-      `insert into tavern_members (room_id, member_id, member_name, joined_at, last_seen, nick_color)
-       values ($1, $2, $3, $4, $5, $6)`,
-      [room.id, member.id, member.name, member.joinedAt, member.lastSeen, member.nickColor],
+      `insert into tavern_members (room_id, member_id, member_name, joined_at, last_seen, nick_color, vip)
+       values ($1, $2, $3, $4, $5, $6, $7)`,
+      [
+        room.id,
+        member.id,
+        member.name,
+        member.joinedAt,
+        member.lastSeen,
+        member.nickColor,
+        member.vip === true,
+      ],
     );
   }
   await client.query("delete from tavern_messages where room_id = $1", [room.id]);
@@ -314,11 +324,12 @@ export async function heartbeat(
   roomId: string,
   memberId: string,
   memberName: string,
+  memberVip: boolean,
 ): Promise<void> {
   await client.query(
-    `update tavern_members set last_seen = now(), member_name = $3
+    `update tavern_members set last_seen = now(), member_name = $3, vip = $4
      where room_id = $1 and member_id = $2`,
-    [roomId, memberId, memberName],
+    [roomId, memberId, memberName, memberVip],
   );
 }
 

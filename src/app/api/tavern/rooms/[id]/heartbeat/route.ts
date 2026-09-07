@@ -13,7 +13,7 @@ export async function POST(
 ) {
   const { id } = await params;
   return withIdentity(request, async (identity, client) => {
-    await heartbeat(client, id.slice(0, 80), identity.id, identity.name);
+    await heartbeat(client, id.slice(0, 80), identity.id, identity.name, identity.vip === true);
     return NextResponse.json({ ok: true, message: "", data: null });
   });
 }

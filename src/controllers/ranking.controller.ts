@@ -1,5 +1,6 @@
 import type { Gender } from "@/models/entities/character";
 import type { GameState } from "@/models/entities/game-state";
+import { isVip } from "@/models/rules/vip";
 import {
   findBoard,
   RANKING_BOARDS,
@@ -59,6 +60,7 @@ function playerAsHunter(state: GameState): Hunter | null {
       : null,
     equipment: state.equipment,
     npc: false,
+    vip: isVip(character, Date.now()),
     createdAt: character.createdAt,
     forge: EQUIPMENT_SLOTS.reduce(
       (total, slot) => total + (state.equipment[slot]?.enhancement ?? 0),

@@ -63,6 +63,7 @@ export function seatMember(
   return {
     id: identity.id,
     name: identity.name,
+    vip: identity.vip === true,
     joinedAt: now,
     lastSeen: now,
     nickColor: claimNickColor(seated, capacity),

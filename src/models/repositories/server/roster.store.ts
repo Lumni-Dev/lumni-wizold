@@ -62,6 +62,7 @@ export async function loadHunters(client: PoolClient): Promise<Hunter[]> {
       pet: petBy.get(row.id) ?? null,
       equipment,
       npc: row.is_npc === true,
+      vip: row.vip_until ? new Date(row.vip_until).getTime() > Date.now() : false,
       createdAt:
         row.created_at instanceof Date
           ? row.created_at.toISOString()

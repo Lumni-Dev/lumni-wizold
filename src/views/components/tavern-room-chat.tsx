@@ -24,6 +24,7 @@ import { List, ListRow } from "./list";
 import { PRESENCE_LABELS, PresenceDot } from "./presence-dot";
 import { Tag } from "./tag";
 import { Tooltip } from "./tooltip";
+import { VipBadge } from "./vip-badge";
 
 function MemberName({
   href,
@@ -84,6 +85,7 @@ function ChatNick({
   status,
   doing,
   level,
+  vip = false,
 }: {
   at: string;
   href: string | null;
@@ -92,6 +94,7 @@ function ChatNick({
   status?: PresenceStatus;
   doing: HunterDoing;
   level?: number;
+  vip?: boolean;
 }) {
   return (
     <span className="mr-2 inline-flex items-center gap-2">
@@ -104,6 +107,7 @@ function ChatNick({
       <Tooltip label={describeDoing(name, doing)}>
         <MemberName href={href} name={name} className={className} />
       </Tooltip>
+      {vip ? <VipBadge /> : null}
       {level ? <span className="font-mono text-[10px] text-ink-faint">NV. {level}</span> : null}
       <span className="text-ink-faint">:</span>
     </span>
@@ -160,6 +164,7 @@ export function TavernRoomChatMembers({
                     className={nickColorClass(member.nickColor)}
                   />
                 </Tooltip>
+                {member.vip ? <VipBadge /> : null}
                 {levels[member.id] ? (
                   <span className="font-mono text-[10px] text-ink-faint">NV. {levels[member.id]}</span>
                 ) : null}
@@ -226,6 +231,9 @@ export function TavernRoomChatMessages({
                 status={authorPresence(message.authorId, identityId, presence)}
                 doing={doingFor(message.authorId, identityId, mine, doing)}
                 level={levels[message.authorId]}
+                vip={activeRoom.members.some(
+                  (member) => member.id === message.authorId && member.vip === true,
+                )}
               />
             )}
             <span

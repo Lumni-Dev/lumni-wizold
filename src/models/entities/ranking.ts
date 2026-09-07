@@ -28,6 +28,7 @@ export interface Hunter {
   pet: HunterPet | null;
   equipment: Equipment;
   npc: boolean;
+  vip?: boolean;
   createdAt: string;
 }
 

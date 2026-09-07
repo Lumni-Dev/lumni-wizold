@@ -23,6 +23,7 @@ import { AttributesPanel } from "../components/attributes-panel";
 import { EquipmentPanel } from "../components/equipment-panel";
 import { Panel } from "../components/panel";
 import { Tag } from "../components/tag";
+import { VipBadge } from "../components/vip-badge";
 import { PageHeader } from "../layout/page-header";
 
 export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
@@ -82,6 +83,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
         }
         action={
           <div className="flex flex-wrap items-center justify-end gap-2">
+            {hunter.vip ? <VipBadge /> : null}
             {isPlayer ? (
               <Link href="/character">
                 <Button variant="secondary">Ficha completa</Button>

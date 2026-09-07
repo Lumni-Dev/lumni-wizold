@@ -16,7 +16,9 @@ import { formatDate, formatFraction, formatNumber } from "@/shared/utils/format"
 import { furyDurationCopy } from "../presenters/item.presenter";
 import { Button } from "../components/button";
 import { CopyNick } from "../components/copy-nick";
+import { isVip } from "@/models/rules/vip";
 import { Tag } from "../components/tag";
+import { VipBadge } from "../components/vip-badge";
 import { DataRow } from "../components/data-row";
 import { EmptyState } from "../components/empty-state";
 import { GenderBanner } from "../components/gender-icon";
@@ -33,6 +35,7 @@ import { PageHeader } from "../layout/page-header";
 export function CharacterScreen() {
   const { state, character, stats, consumeItem } = useGame();
   const [roster, setRoster] = useState<Hunter[] | null>(null);
+  const [now] = useState(() => Date.now());
 
   useEffect(() => {
     let alive = true;
@@ -106,6 +109,7 @@ export function CharacterScreen() {
               <div className="min-w-0 space-y-1">
                 <div className="flex items-center gap-2">
                   <p className="min-w-0 truncate text-sm text-ink">{character.name}</p>
+                  {isVip(character, now) ? <VipBadge /> : null}
                   <CopyNick name={character.name} />
                 </div>
                 <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
