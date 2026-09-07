@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState, type ButtonHTMLAttributes, type MouseEvent } from "react";
 import { playClick } from "@/controllers/sound";
+import { useT } from "@/controllers/use-locale";
 import { CONTROL_HEIGHT, CONTROL_HEIGHT_MEDIUM } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { Spinner } from "./spinner";
@@ -41,6 +42,7 @@ export function Button({
   ...rest
 }: ButtonProps) {
   const [waiting, setWaiting] = useState(false);
+  const t = useT();
   const aliveRef = useRef(true);
   useEffect(() => {
     aliveRef.current = true;
@@ -81,7 +83,7 @@ export function Button({
         </span>
       ) : null}
       <span className={cn("inline-flex items-center gap-2", pending && "invisible")}>
-        {children}
+        {typeof children === "string" ? t(children) : children}
       </span>
     </button>
   );

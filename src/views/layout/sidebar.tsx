@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { playSound } from "@/controllers/sound";
+import { useT } from "@/controllers/use-locale";
 import { GAME_TAGLINE } from "@/shared/constants/game";
 import { BRAND_ICON_PATH } from "@/shared/constants/site";
 import {
@@ -48,6 +49,7 @@ function NavLink({
   highlighted?: boolean;
   badge?: number;
 }) {
+  const t = useT();
   return (
     <Link
       href={item.href}
@@ -65,7 +67,7 @@ function NavLink({
         <NavIcon href={item.href} />
       </span>
       <span className="min-w-0 truncate px-3 text-[10px] uppercase tracking-[0.16em]">
-        {item.label}
+        {t(item.label)}
       </span>
       {badge > 0 ? (
         <span className="ml-auto mr-2 inline-flex h-4 min-w-4 shrink-0 items-center justify-center self-center rounded border border-ember bg-ember px-1 font-mono text-[10px] font-bold tracking-normal text-base">
@@ -77,6 +79,7 @@ function NavLink({
 }
 
 function TutorialButton({ active, onClick }: { active: boolean; onClick: () => void }) {
+  const t = useT();
   return (
     <button
       type="button"
@@ -98,7 +101,7 @@ function TutorialButton({ active, onClick }: { active: boolean; onClick: () => v
         <NavIcon href="tutorial" />
       </span>
       <span className="min-w-0 truncate px-3 text-[10px] uppercase tracking-[0.16em]">
-        {TUTORIAL_LINK.label}
+        {t(TUTORIAL_LINK.label)}
       </span>
     </button>
   );
@@ -156,6 +159,7 @@ export function MobileNavigation({
   onOpenTutorial: () => void;
 }) {
   const pathname = usePathname();
+  const t = useT();
   const links = [...NAVIGATION, STORE_LINK, SETTINGS_LINK];
   const trackRef = useRef<HTMLElement>(null);
 
@@ -180,7 +184,7 @@ export function MobileNavigation({
               aria-current={active ? "page" : undefined}
               className={chipClass(active)}
             >
-              {item.label}
+              {t(item.label)}
               {badge > 0 ? (
                 <span className="ml-1.5 inline-flex h-6 min-w-6 items-center justify-center rounded-md border border-ember bg-ember px-2 font-mono text-[10px] font-bold tracking-normal text-base">
                   {badge > 9 ? "9+" : badge}
@@ -209,7 +213,7 @@ export function MobileNavigation({
                 }}
                 className={chipClass(tutorialOpen)}
               >
-                {TUTORIAL_LINK.label}
+                {t(TUTORIAL_LINK.label)}
               </button>
             </ChipFrame>
           </span>

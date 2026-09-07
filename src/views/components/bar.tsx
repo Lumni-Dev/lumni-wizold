@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useT } from "@/controllers/use-locale";
 import { cn } from "@/shared/utils/class-names";
 import { formatNumber, percentage } from "@/shared/utils/format";
 
@@ -66,6 +67,7 @@ export function Bar({
   className,
 }: BarProps) {
   const target = percentage(current, maximum);
+  const t = useT();
   const [paint, setPaint] = useState<BarPaint>({ value: target, instant: false });
   const previous = useRef(target);
 
@@ -98,7 +100,7 @@ export function Bar({
             prominent ? "text-ink" : "text-ink-faint",
           )}
         >
-          {label}
+          {typeof label === "string" ? t(label) : label}
         </span>
         <span
           className={cn(

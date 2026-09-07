@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useT } from "@/controllers/use-locale";
 import { GLASS_SECTION } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { CornerAccents, MarkNested, useNested } from "./corner-accents";
@@ -32,6 +33,7 @@ export function Panel({
   className,
 }: PanelProps) {
   const nested = useNested();
+  const t = useT();
 
   return (
     <div id={id} className={cn("relative", height === "fill" ? "h-full" : "h-fit", className)}>
@@ -45,8 +47,8 @@ export function Panel({
         {title ? (
           <header className="flex items-center justify-between gap-3 border-b border-edge px-4 py-3">
             <div className="min-w-0 space-y-1">
-              <h2 className="heading text-[11px] text-ink">{title}</h2>
-              {description ? <p className="text-xs text-ink-faint">{description}</p> : null}
+              <h2 className="heading text-[11px] text-ink">{t(title)}</h2>
+              {description ? <p className="text-xs text-ink-faint">{t(description)}</p> : null}
             </div>
             {action ? <div className="shrink-0">{action}</div> : null}
           </header>

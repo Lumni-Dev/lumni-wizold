@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ButtonHTMLAttributes, type MouseEvent, type ReactNode } from "react";
 import { playClick } from "@/controllers/sound";
+import { useT } from "@/controllers/use-locale";
 import { CONTROL_HEIGHT, LOOSE_CONTROL_SURFACE, LOOSE_CONTROL_SURFACE_ACTIVE, LOOSE_CONTROL_SURFACE_HOVER } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { CornerAccents } from "./corner-accents";
@@ -41,6 +42,7 @@ interface ChipProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 export function Chip({ active = false, className, onClick, children, ...rest }: ChipProps) {
   const [waiting, setWaiting] = useState(false);
+  const t = useT();
   const aliveRef = useRef(true);
 
   useEffect(() => {
@@ -80,7 +82,7 @@ export function Chip({ active = false, className, onClick, children, ...rest }: 
           </span>
         ) : null}
         <span className={cn("inline-flex items-center gap-2", waiting && "invisible")}>
-          {children}
+          {typeof children === "string" ? t(children) : children}
         </span>
       </button>
     </ChipFrame>

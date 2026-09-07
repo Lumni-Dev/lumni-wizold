@@ -1,4 +1,7 @@
+"use client";
+
 import type { ReactNode } from "react";
+import { useT } from "@/controllers/use-locale";
 import { GLASS_CONTROL_ACTIVE } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 
@@ -19,6 +22,7 @@ export function Tag({
   tone?: TagTone;
   className?: string;
 }) {
+  const t = useT();
   return (
     <span
       className={cn(
@@ -27,7 +31,7 @@ export function Tag({
         className,
       )}
     >
-      {children}
+      {typeof children === "string" ? t(children) : children}
     </span>
   );
 }

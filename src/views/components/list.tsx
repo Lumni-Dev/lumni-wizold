@@ -1,4 +1,7 @@
+"use client";
+
 import type { ReactNode, Ref } from "react";
+import { useT } from "@/controllers/use-locale";
 import { ICON_FRAME_INSET } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 
@@ -98,14 +101,16 @@ export function RowText({
   title: ReactNode;
   description?: ReactNode;
 }) {
+  const t = useT();
+  const localized = (piece: ReactNode) => (typeof piece === "string" ? t(piece) : piece);
   return (
     <div className="min-w-0 flex-1 space-y-1">
       {label ? (
-        <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">{label}</p>
+        <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">{localized(label)}</p>
       ) : null}
-      <p className="truncate text-sm text-ink">{title}</p>
+      <p className="truncate text-sm text-ink">{localized(title)}</p>
       {description ? (
-        <div className="text-[11px] leading-relaxed text-ink-faint">{description}</div>
+        <div className="text-[11px] leading-relaxed text-ink-faint">{localized(description)}</div>
       ) : null}
     </div>
   );
