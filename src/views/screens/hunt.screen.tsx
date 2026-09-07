@@ -463,6 +463,7 @@ export function HuntScreen() {
                       current={approach ? approach.beat : onThis ? progress.beat : 0}
                       maximum={approach ? approach.max : Math.max(1, script.length)}
                       glows={active}
+                      hideValue={(approach ? approach.beat : onThis ? progress.beat : 0) === 0}
                       wraps
                     />
                   </div>

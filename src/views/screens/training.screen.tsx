@@ -178,6 +178,7 @@ export function TrainingScreen() {
                     current={session.id === exercise.id ? session.beat : 0}
                     maximum={session.id === exercise.id ? session.max : TRAINING_TICKS_MAX}
                     glows={active}
+                    hideValue={session.id !== exercise.id || session.beat === 0}
                   />
                 </div>
 
@@ -277,6 +278,7 @@ export function TrainingScreen() {
                   current={session.id === PET_EXERCISE_ID ? session.beat : 0}
                   maximum={session.id === PET_EXERCISE_ID ? session.max : TRAINING_TICKS_MAX}
                   glows={petActive}
+                  hideValue={session.id !== PET_EXERCISE_ID || session.beat === 0}
                 />
               </div>
 

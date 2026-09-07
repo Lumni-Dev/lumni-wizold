@@ -39,6 +39,7 @@ interface BarProps {
   unit?: string;
   delta?: ReactNode;
   deltaTone?: DeltaTone;
+  hideValue?: boolean;
   format?: (value: number) => string;
   className?: string;
 }
@@ -60,6 +61,7 @@ export function Bar({
   unit,
   delta,
   deltaTone = "blood",
+  hideValue = false,
   format = formatNumber,
   className,
 }: BarProps) {
@@ -98,12 +100,16 @@ export function Bar({
         >
           {label}
         </span>
-        <span className="shrink-0 font-mono text-[11px] text-ink-soft">
-          {delta ? <span className={cn("font-bold", DELTA_TEXTS[deltaTone])}>{delta} </span> : null}
-          {format(current)}
-          <span className="text-ink-faint">/{format(maximum)}</span>
-          {unit ? <span className="text-ink-faint"> {unit}</span> : null}
-        </span>
+        {hideValue ? null : (
+          <span className="shrink-0 font-mono text-[11px] text-ink-soft">
+            {delta ? (
+              <span className={cn("font-bold", DELTA_TEXTS[deltaTone])}>{delta} </span>
+            ) : null}
+            {format(current)}
+            <span className="text-ink-faint">/{format(maximum)}</span>
+            {unit ? <span className="text-ink-faint"> {unit}</span> : null}
+          </span>
+        )}
       </div>
       <div
         className="relative h-2 w-full overflow-hidden rounded-full border border-ember/45 bg-charcoal"

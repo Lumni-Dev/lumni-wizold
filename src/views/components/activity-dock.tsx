@@ -535,6 +535,7 @@ export function ActivityDock() {
                           : huntView.huntLabel
                       }
                       current={huntView.huntCurrent}
+                      hideValue={huntView.cooldown !== null || huntView.huntCurrent === 0}
                       maximum={huntView.huntMax}
                       glows={huntView.glows && huntView.cooldown === null}
                       wraps={huntView.wraps}
@@ -599,6 +600,7 @@ export function ActivityDock() {
                           : trainView.sessionLabel
                       }
                       current={trainView.sessionCurrent}
+                      hideValue={trainView.cooldown !== null || trainView.sessionCurrent === 0}
                       maximum={trainView.sessionMax}
                       glows={trainView.glows && trainView.cooldown === null}
                     />
@@ -639,6 +641,7 @@ export function ActivityDock() {
                           : mineView.swingLabel
                       }
                       current={mineView.swingCurrent}
+                      hideValue={mineView.cooldown !== null || mineView.swingCurrent === 0}
                       maximum={mineView.swingMax}
                       glows={mineView.glows && mineView.cooldown === null}
                       wraps
@@ -667,6 +670,7 @@ export function ActivityDock() {
                           : forgeView.strikeLabel
                       }
                       current={forgeView.strikeCurrent}
+                      hideValue={forgeView.cooldown !== null || forgeView.strikeCurrent === 0}
                       maximum={forgeView.strikeMax}
                       tone="ember"
                       glows={forgeView.glows && forgeView.cooldown === null}
@@ -698,6 +702,7 @@ export function ActivityDock() {
                   <Bar
                     label={dock.cooldown !== null ? "Parar em " + dock.cooldown + "s" : dock.detail}
                     current={dock.beat}
+                    hideValue={dock.cooldown !== null || dock.beat === 0}
                     maximum={dock.max}
                     tone={dock.tone}
                     glows={dock.cooldown === null && dock.beat > 0}

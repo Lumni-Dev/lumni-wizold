@@ -256,6 +256,7 @@ export function ForgeScreen() {
                   current={swing.id === activeOre ? swing.beat : 0}
                   maximum={swing.id === activeOre ? swing.max : MINING_TICKS_MAX}
                   glows={activeOre !== null}
+                  hideValue={swing.id !== activeOre || swing.beat === 0}
                   wraps
                 />
               </ListRow>
@@ -414,6 +415,7 @@ export function ForgeScreen() {
                       current={strike.id === forgeEntry.item.id ? strike.beat : 0}
                       maximum={FORGE_TICKS}
                       glows={forgeActive}
+                      hideValue={strike.id !== forgeEntry.item.id || strike.beat === 0}
                       wraps
                     />
                   </ListRow>
