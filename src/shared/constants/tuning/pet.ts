@@ -1,5 +1,5 @@
 export const PET = {
-  priceBronze: 50_000,
+  priceBronze: 100_000,
   renamePriceBronze: 25_000,
   baseBonus: 5,
   baseEnergy: 100,

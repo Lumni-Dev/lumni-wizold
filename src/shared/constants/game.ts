@@ -42,7 +42,7 @@ export const MIN_AGE = 18;
 export const NAME_MAX_LENGTH = 25;
 export const NAME_MIN_LENGTH = 3;
 
-export const PET_MIN_LEVEL = Math.floor(MAX_CHARACTER_LEVEL / 3);
+export const PET_MIN_LEVEL = 50;
 export const PET_MAX_LEVEL = LIMITS.petLevel;
 export const PET_EXERCISE_ID = "pet-training";
 export const PET_PRICE = PET.priceBronze;
