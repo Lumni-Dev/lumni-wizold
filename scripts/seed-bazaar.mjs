@@ -187,7 +187,7 @@ try {
 
   await client.query(APPLY ? "commit" : "rollback");
 
-  console.log(APPLY ? "gravado no banco" : "ensaio: nada gravado, rode com --apply");
+  console.log(APPLY ? "written to the database" : "dry run: nothing written, run with --apply");
   console.log("removidos:  " + gone.rowCount + " anuncios antigos");
   console.log("announced: " + announced + " listings from " + found.rowCount + " hunters");
   console.log("taxas:      " + spent.toLocaleString("pt-BR") + " WCoins pagos");

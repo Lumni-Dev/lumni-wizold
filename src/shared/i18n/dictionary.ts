@@ -5,8 +5,9 @@ import type { Locale } from "./locale";
 
 interface PatternRule {
   pattern: RegExp;
-  en: string;
+  en?: string;
   es: string;
+  pt?: string;
 }
 
 // Legacy interpolated strings cannot match by exact key, so the common shapes
@@ -579,10 +580,27 @@ const RULES: readonly PatternRule[] = [
 // (resolved to English through BASE, or through the legacy RULES when it
 // carries numbers) or already English (new code), in which case pt/es come
 // straight from the English-keyed dictionaries.
+function applyRule(template: string, match: RegExpMatchArray, locale: Locale, depth: number): string {
+  // Captures are translated on their own, so a rule like "$1 +$2" can carry
+  // an item name or another translated phrase through.
+  return template.replace(/\$(\d)/g, (_, index: string) =>
+    translate(match[Number(index)] ?? "", locale, depth + 1),
+  );
+}
+
 export function translate(text: string, locale: Locale, depth = 0): string {
   if (locale === "pt") {
     // English-born strings translate here; legacy Portuguese passes through.
-    return PT[text] ?? text;
+    const direct = PT[text];
+    if (direct !== undefined) return direct;
+    if (depth < 3) {
+      for (const rule of RULES) {
+        if (rule.pt === undefined) continue;
+        const match = text.match(rule.pattern);
+        if (match) return applyRule(rule.pt, match, locale, depth);
+      }
+    }
+    return text;
   }
 
   const english = BASE[text];
@@ -593,14 +611,10 @@ export function translate(text: string, locale: Locale, depth = 0): string {
 
   if (depth < 3) {
     for (const rule of RULES) {
+      const template = locale === "en" ? rule.en : rule.es;
+      if (template === undefined) continue;
       const match = text.match(rule.pattern);
-      if (match) {
-        // Captures are translated on their own, so a rule like "$1 +$2" can
-        // carry an item name or another translated phrase through.
-        return rule[locale].replace(/\$(\d)/g, (_, index: string) =>
-          translate(match[Number(index)] ?? "", locale, depth + 1),
-        );
-      }
+      if (match) return applyRule(template, match, locale, depth);
     }
   }
 

@@ -39,7 +39,7 @@ try {
 
   if (dry) {
     console.log("");
-    console.log("nada foi removido. rode com --apply para apagar de verdade.");
+    console.log("nothing was removed. run with --apply to really erase.");
   } else {
     const gone = await client.query(
       "delete from users where id in (select user_id from characters where is_npc) returning id",

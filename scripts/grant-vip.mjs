@@ -15,7 +15,7 @@ const name = process.argv[2];
 const years = Number(process.argv[3] ?? 1);
 
 if (!name || !Number.isInteger(years) || years <= 0) {
-  console.log("uso: node scripts/grant-vip.mjs <nome do personagem> <anos inteiros>");
+  console.log("usage: node scripts/grant-vip.mjs <character name> <whole years>");
   process.exit(1);
 }
 

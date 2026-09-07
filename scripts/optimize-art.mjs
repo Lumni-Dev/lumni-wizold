@@ -124,7 +124,7 @@ for (const folder of folders) {
 }
 
 if (!written) {
-  console.log("nada a converter");
+  console.log("nothing to convert");
 } else {
   console.log("");
   console.log(written + " arquivos: " + megabytes(before) + " -> " + megabytes(after));
