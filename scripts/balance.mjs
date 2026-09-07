@@ -233,15 +233,15 @@ function line(row) {
     "NV " + String(row.level).padStart(4),
     row.set.padEnd(9),
     row.prey.padEnd(8),
-    "forja " + String(row.forge).padStart(4),
-    "treino " + String(row.trained).padStart(4),
+    "forge " + String(row.forge).padStart(4),
+    "training " + String(row.trained).padStart(4),
     "FOR " + String(row.strength).padStart(6),
     "RES " + String(row.endurance).padStart(6),
-    "vida " + String(row.maxHealth).padStart(7),
-    "perda " + percent(row.lossRatio),
-    "derrota " + percent(row.defeatRatio),
-    "recuo " + percent(row.retreatRatio),
-    "rodadas " + row.rounds.toFixed(1).padStart(5),
+    "health " + String(row.maxHealth).padStart(7),
+    "loss " + percent(row.lossRatio),
+    "defeat " + percent(row.defeatRatio),
+    "retreat " + percent(row.retreatRatio),
+    "rounds " + row.rounds.toFixed(1).padStart(5),
   ].join("  ");
 }
 
@@ -250,9 +250,9 @@ if (Number.isFinite(single) && single > 0) {
   console.log(line(measure(single, 2000)));
   const night = session(single);
   console.log(
-    "  caçadas por noite " +
+    "  hunts per night " +
       night.hunts.toFixed(1) +
-      "   derrotas na sequência " +
+      "   defeats in the run " +
       (night.defeatRatio * 100).toFixed(1) +
       "%",
   );
@@ -266,16 +266,16 @@ if (Number.isFinite(single) && single > 0) {
     const night = session(Math.max(1, level), 120);
     console.log(
       line(row) +
-        "  noite " +
+        "  night " +
         night.hunts.toFixed(1).padStart(4) +
-        "  morte " +
+        "  death " +
         (night.defeatRatio * 100).toFixed(1).padStart(4) +
         "%",
     );
   }
 
   console.log("");
-  console.log("VERIFICAÇÃO: forja e mascote sustentam o modelo (último bicho do par)");
+  console.log("VERIFICATION: forge and companion hold the model (last creature of the pair)");
   const pct = (v) => (v * 100).toFixed(1).padStart(5) + "%";
   for (const level of [200, 400, 600, 800, 1000]) {
     const full = verify(level, "full");
@@ -284,28 +284,28 @@ if (Number.isFinite(single) && single > 0) {
     console.log(
       [
         "NV " + String(level).padStart(4),
-        "tudo p " + pct(full.perda) + " m " + pct(full.morte),
-        "| sem forja p " + pct(noForge.perda) + " m " + pct(noForge.morte),
-        "| sem pet p " + pct(noPet.perda) + " m " + pct(noPet.morte),
+        "full l " + pct(full.perda) + " d " + pct(full.morte),
+        "| no forge l " + pct(noForge.perda) + " d " + pct(noForge.morte),
+        "| no pet l " + pct(noPet.perda) + " d " + pct(noPet.morte),
       ].join("  "),
     );
   }
 
   console.log("");
-  console.log("ECONOMIA: o que uma caçada paga e o que ela compra");
+  console.log("ECONOMY: what one hunt pays and what it buys");
   for (const level of levels) {
     const at = Math.max(1, level);
     const money = economy(at);
     console.log(
       [
         "NV " + String(at).padStart(4),
-        "caçada " + Math.round(money.perHunt).toString().padStart(7),
+        "hunt " + Math.round(money.perHunt).toString().padStart(7),
         "(bronze " + Math.round(money.bronze).toString().padStart(6),
         "loot " + Math.round(money.loot).toString().padStart(6) + ")",
-        "conjunto " + Math.round(money.setPrice).toString().padStart(9),
-        "= " + money.huntsForSet.toFixed(0).padStart(5) + " caçadas",
-        "ponto " + Math.round(money.point).toString().padStart(7),
-        "= " + money.huntsPerPoint.toFixed(1).padStart(5) + " caçadas por ponto",
+        "set " + Math.round(money.setPrice).toString().padStart(9),
+        "= " + money.huntsForSet.toFixed(0).padStart(5) + " hunts",
+        "point " + Math.round(money.point).toString().padStart(7),
+        "= " + money.huntsPerPoint.toFixed(1).padStart(5) + " hunts per point",
       ].join("  "),
     );
   }

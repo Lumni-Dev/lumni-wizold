@@ -121,7 +121,7 @@ async function callModeration(text: string, context: ModerationContext): Promise
     };
     const content = body.choices?.[0]?.message?.content;
     if (typeof content !== "string") {
-      console.error("[moderation] resposta sem conteúdo");
+      console.error("[moderation] empty response");
       return null;
     }
 

@@ -58,7 +58,7 @@ if (!rows.length) {
     `select c.name, c.level from characters c where c.name ilike $1 order by c.name limit 10`,
     ["%" + name + "%"],
   );
-  console.log("nenhum personagem com esse nome exato.");
+  console.log("no character with that exact name.");
   if (near.length) console.log("parecidos: " + near.map((row) => row.name).join(", "));
 } else {
   console.log(JSON.stringify(rows, null, 2));

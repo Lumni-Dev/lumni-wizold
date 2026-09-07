@@ -755,7 +755,7 @@ function main() {
   for (const name of names) {
     const recipe = RECIPES[name];
     if (!recipe) {
-      console.error("Sem receita para " + name);
+      console.error("No recipe for " + name);
       process.exitCode = 1;
       continue;
     }

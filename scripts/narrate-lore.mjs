@@ -134,7 +134,7 @@ const TMP = mkdtempSync(join(tmpdir(), "wizold-narrate-"));
 
 for (const chapter of wanted) {
   if (missingOnly && existsSync(join(OUT, chapter.name + ".mp3"))) {
-    console.log(chapter.name.padEnd(10) + "já existe");
+    console.log(chapter.name.padEnd(10) + "already there");
     continue;
   }
   const answer = await fetch(

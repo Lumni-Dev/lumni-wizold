@@ -52,10 +52,10 @@ async function run() {
     const files = pendingOf(applied);
     if (command === "status") {
       for (const { file, applied: done } of files) {
-        console.log((done ? "aplicada " : "pendente ") + " " + file);
+        console.log((done ? "applied " : "pending ") + " " + file);
       }
       const missing = applied.difference(new Set(files.map((entry) => entry.file)));
-      for (const name of missing) console.log("aplicada, mas o arquivo sumiu: " + name);
+      for (const name of missing) console.log("applied, but the file is gone: " + name);
       return;
     }
     let count = 0;
@@ -67,17 +67,17 @@ async function run() {
         await client.query(sql);
         await client.query("insert into schema_migrations (name) values ($1)", [file]);
         await client.query("commit");
-        console.log("aplicada  " + file);
+        console.log("applied   " + file);
         count += 1;
       } catch (error) {
         await client.query("rollback");
-        console.error("falhou    " + file);
+        console.error("failed    " + file);
         console.error(String(error.message ?? error));
         process.exitCode = 1;
         return;
       }
     }
-    console.log(count === 0 ? "nada pendente" : count + " migração(ões) aplicada(s)");
+    console.log(count === 0 ? "nothing pending" : count + " migration(s) applied");
   } finally {
     await client.end();
   }

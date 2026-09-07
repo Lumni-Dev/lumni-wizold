@@ -327,5 +327,5 @@ const ghostEntries = await rows(
 check("bancada não deixa rastro de acesso", ghostEntries[0]?.n === 0);
 await client.end();
 console.log("");
-console.log(failures === 0 ? "SMOKE COMPLETO: tudo passou" : failures + " falha(s)");
+console.log(failures === 0 ? "SMOKE COMPLETE: everything passed" : failures + " failure(s)");
 process.exit(failures > 0 ? 1 : 0);

@@ -12,7 +12,7 @@ const VIDEO_EXTENSIONS = new Set([".mp4", ".mov", ".webm", ".mkv"]);
 
 const source = process.argv[2];
 if (!source) {
-  console.error("uso: node scripts/import-area-videos.mjs <pasta com os videos>");
+  console.error("usage: node scripts/import-area-videos.mjs <folder with the videos>");
   process.exit(1);
 }
 
@@ -44,7 +44,7 @@ for (const entry of readdirSync(source)) {
     (candidate) => candidate.id === key || candidate.name === key || candidate.name.startsWith(key + "-"),
   );
   if (!area) {
-    console.error("sem área para " + entry);
+    console.error("no area for " + entry);
     process.exitCode = 1;
     continue;
   }

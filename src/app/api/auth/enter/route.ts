@@ -94,7 +94,7 @@ export async function POST(request: Request) {
         await saveTwoFactorCode(client, user.id, code);
         after(() =>
           sendTwoFactorCodeEmail(identity.email, code, "login").catch((error) =>
-            console.error("[mail] código 2fa", error),
+            console.error("[mail] 2fa code", error),
           ),
         );
         await attachTwoFactorPending(user.id, user.epoch);

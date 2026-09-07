@@ -39,7 +39,7 @@ const { rows: before } = await client.query(
 );
 
 if (before.length !== 1) {
-  console.log(before.length === 0 ? "nenhum personagem com esse nome" : "mais de um personagem com esse nome");
+  console.log(before.length === 0 ? "no character with that name" : "more than one character with that name");
   await client.end();
   process.exit(1);
 }

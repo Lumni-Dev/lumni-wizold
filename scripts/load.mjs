@@ -46,7 +46,7 @@ async function playerRun(index) {
   await call(cookieBox, "GET", "/api/state");
   return cookieBox;
 }
-console.log(PLAYERS + " jogadores concorrentes, " + HUNTS + " caçadas cada, contra " + BASE);
+console.log(PLAYERS + " concurrent players, " + HUNTS + " hunts each, against " + BASE);
 const startedAt = performance.now();
 const boxes = await Promise.all(Array.from({ length: PLAYERS }, (_, index) => playerRun(index)));
 const wallMs = performance.now() - startedAt;
@@ -63,15 +63,15 @@ const at = (share) =>
   Math.round(sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * share))]);
 const total = latencies.length;
 console.log("");
-console.log("requisições:", total, "em", (wallMs / 1000).toFixed(1) + "s de fase de jogo");
-console.log("vazão da fase de jogo:", ((total - 90) / (wallMs / 1000)).toFixed(1), "req/s");
+console.log("requests:", total, "in", (wallMs / 1000).toFixed(1) + "s of game phase");
+console.log("game phase throughput:", ((total - 90) / (wallMs / 1000)).toFixed(1), "req/s");
 console.log(
   "latência p50:",
   at(0.5) + "ms   p95:",
   at(0.95) + "ms   máx:",
   Math.round(sorted[sorted.length - 1]) + "ms",
 );
-console.log("erros 5xx:", errors, "   429 na rajada proposital:", burst429);
+console.log("5xx errors:", errors, "   429 in the deliberate burst:", burst429);
 const require = createRequire(import.meta.url);
 const pg = require(join(ROOT, "node_modules/pg"));
 for (const line of readFileSync(join(ROOT, ".env.local"), "utf8").split(/\r?\n/)) {

@@ -189,7 +189,7 @@ try {
 
   console.log(APPLY ? "gravado no banco" : "ensaio: nada gravado, rode com --apply");
   console.log("removidos:  " + gone.rowCount + " anuncios antigos");
-  console.log("anunciados: " + announced + " anuncios de " + found.rowCount + " caçadores");
+  console.log("announced: " + announced + " listings from " + found.rowCount + " hunters");
   console.log("taxas:      " + spent.toLocaleString("pt-BR") + " WCoins pagos");
   console.log("");
   for (const line of board.slice(0, 8)) {

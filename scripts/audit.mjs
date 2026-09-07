@@ -3002,6 +3002,6 @@ sec("persistência");
   delete globalThis.window;
 }
 console.log("");
-console.log("verificações: " + checks + "   falhas: " + failures);
+console.log("checks: " + checks + "   failures: " + failures);
 for (const problem of problems) console.log("  ✘ " + problem);
 process.exit(failures > 0 ? 1 : 0);
