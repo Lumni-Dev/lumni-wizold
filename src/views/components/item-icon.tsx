@@ -105,7 +105,7 @@ export function EmptySlotArt({
   }
 
   return (
-    <span className="relative flex h-full w-full opacity-75">
+    <span className="relative flex h-full w-full opacity-40">
       <IconArt source={source} padded={false} fit="contain" zoom={false} />
     </span>
   );
