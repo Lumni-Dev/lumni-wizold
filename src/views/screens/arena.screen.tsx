@@ -703,7 +703,13 @@ export function ArenaScreen() {
                         },
                         { key: "critical", label: "Critical", value: formatFraction(rival.criticalExact) + " / " + CRITICAL_CHANCE_CAP + "%" },
                       ].map((cell) => (
-                        <div key={cell.key} className="px-2 py-3 text-center">
+                        <div
+                          key={cell.key}
+                          className={cn(
+                            "px-2 py-3 text-center",
+                            cell.key === "critical" && "border-r border-edge",
+                          )}
+                        >
                           <p className="truncate text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                             {t(cell.label)}
                           </p>
