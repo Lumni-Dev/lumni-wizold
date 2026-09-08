@@ -49,7 +49,7 @@ export const ATTRIBUTES: readonly AttributeDefinition[] = [
     code: "WIL",
     description: "How long you hold the beast and how fast the body mends. It stretches the fury potion and speeds up health recovery.",
     effect:
-      "The fury potion lasts the flask's time multiplied by 1 plus Willpower divided by Willpower plus 250, toward double: a medium 5 min flask goes past 6.4 min with 100 Willpower and past 8.4 min with 550. The count reads the whole sheet's Willpower, so necklace and ring also stretch the flask. The full moon's fury does not change, it lasts what the sky says. Willpower also speeds up Recover: rest gives back 5% of health per tick with no Willpower and climbs toward 10%, with half that gain already at 400 Willpower, so the more Willpower, the less time until the body is whole.",
+      "Willpower adds the same stretch to every fury flask, up to 5 minutes, with half of that already at 250 Willpower: a small 2.5 min flask goes past 3.9 min with 100 Willpower and past 5.9 min with 550, and a large flask gains the same extras on top of its base. The count reads the whole sheet's Willpower, so necklace and ring also stretch the flask. The full moon's fury does not change, it lasts what the sky says. Willpower also speeds up Recover: rest gives back 5% of health per tick with no Willpower and climbs toward 10%, with half that gain already at 400 Willpower, so the more Willpower, the less time until the body is whole.",
   },
 ] as const;
 

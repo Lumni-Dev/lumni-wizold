@@ -142,7 +142,7 @@ export function ArenaScreen() {
     consumeItem,
     notify,
   } = useGame();
-  const { locked } = useActivityLock();
+  const { locked, reason: lockReason } = useActivityLock();
   const t = useT();
   const waitLabel = locked ? ACTIVITY_WAIT_LABEL : "";
   const [search, setSearch] = useState("");
@@ -265,6 +265,9 @@ export function ArenaScreen() {
     };
   });
   useEffect(() => {
+    if (locked && autoRef.current) stopAuto(lockReason || undefined);
+  }, [locked, lockReason]);
+  useEffect(() => {
     return () => {
       autoRef.current = false;
       if (autoTimerRef.current) window.clearTimeout(autoTimerRef.current);
@@ -386,11 +389,12 @@ export function ArenaScreen() {
   const busy = fighting !== null;
   const petAlong = canPetFight(pet) ? pet : null;
   function challenge(hunter: Hunter, rival: DerivedStats) {
+    if (locked) return;
     armAutomation();
     beginDuel(hunter, rival.maxHealth);
   }
   async function challengeDrawn() {
-    if (fighting) return;
+    if (fighting || locked) return;
     const opponent = await drawOpponent();
     if (!opponent) return;
     const hunter = roster.find((entry) => entry.id === opponent.hunterId);
@@ -457,14 +461,18 @@ export function ArenaScreen() {
         footer={
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span className="text-[11px] text-ink-faint">
-              {t(view.reason ?? "Choose an opponent from your band or draw one at random.")}
+              {t(
+                lockReason ||
+                  view.reason ||
+                  "Choose an opponent from your band or draw one at random.",
+              )}
             </span>
             {autoRunning ? (
               <Button variant="primary" onClick={() => stopAuto()}>
                 Stop
               </Button>
             ) : (
-              <Tooltip label={view.reason}>
+              <Tooltip label={lockReason || view.reason}>
                 <Button
                   variant="primary"
                   disabled={!view.canFight || busy || locked}
@@ -646,7 +654,7 @@ export function ArenaScreen() {
                             ? "You two already dueled today: the next challenge to them reopens at 06:00. " +
                               formatCooldown(cooldownLeft) +
                               " left."
-                            : view.reason
+                            : lockReason || view.reason
                       }
                     >
                       <Button

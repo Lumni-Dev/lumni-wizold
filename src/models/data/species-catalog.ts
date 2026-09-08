@@ -58,8 +58,8 @@ export const SPECIES: readonly SpeciesDefinition[] = [
         id: "soft-fur",
         name: "Soft Fur",
         description:
-          "Serve de forro para bota e de nada mais. O vilarejo compra aos punhados sem " +
-          "perguntar quem arrancou, nem com que dentes.",
+          "Boot lining and nothing more. The village buys it by the handful without " +
+          "asking who tore it off, or with what teeth.",
         price: 1,
         rarity: "common",
         chance: 0.3,
@@ -115,8 +115,8 @@ export const SPECIES: readonly SpeciesDefinition[] = [
         id: "deer-hide",
         name: "Deer Hide",
         description:
-          "Fino, resistente, e ainda cheirando a mato molhado. Curtido direito, aguenta " +
-          "mais que couro de boi.",
+          "Thin, tough, and still smelling of wet brush. Tanned right, it takes " +
+          "more than ox leather.",
         price: 8,
         rarity: "uncommon",
         chance: 0.15,

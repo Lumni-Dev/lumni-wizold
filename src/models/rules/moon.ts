@@ -1,4 +1,8 @@
-import { FURY_WILLPOWER_MAX_BONUS, FURY_WILLPOWER_SCALE } from "@/shared/constants/game";
+import {
+  FURY_WILLPOWER_EXTRA_MINUTES,
+  FURY_WILLPOWER_MAX_BONUS,
+  FURY_WILLPOWER_SCALE,
+} from "@/shared/constants/game";
 
 export type MoonPhaseKey = "new" | "waxing" | "full" | "waning";
 
@@ -147,17 +151,20 @@ export function furyWillpowerBonus(willpower: number): number {
   return (FURY_WILLPOWER_MAX_BONUS * value) / (value + FURY_WILLPOWER_SCALE);
 }
 
+// The Willpower stretch is flat: the same extra time lands on every flask, no
+// matter its size, so a bigger potion buys more base and never a bigger bonus.
+// It caps at FURY_WILLPOWER_EXTRA_MINUTES, with half of that at the scale.
+export function furyWillpowerExtraMs(willpower: number): number {
+  const extraMs = FURY_WILLPOWER_EXTRA_MINUTES * 60_000 * furyWillpowerBonus(willpower);
+  return Math.floor(extraMs / 1000) * 1000;
+}
+
 export function furyDurationMs(minutes: number, willpower: number): number {
-  const baseMs = minutes * 60_000;
-  return Math.floor((baseMs + baseMs * furyWillpowerBonus(willpower)) / 1000) * 1000;
+  return minutes * 60_000 + furyWillpowerExtraMs(willpower);
 }
 
 export function furyDurationMinutes(minutes: number, willpower: number): number {
   return Math.round(furyDurationMs(minutes, willpower) / 6_000) / 10;
-}
-
-export function furyWillpowerExtraMs(minutes: number, willpower: number): number {
-  return Math.max(0, furyDurationMs(minutes, willpower) - minutes * 60_000);
 }
 
 export function potionFuryRemainingMs(character: FuryCarrier, now = Date.now()): number {

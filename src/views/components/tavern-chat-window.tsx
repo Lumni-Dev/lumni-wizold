@@ -19,6 +19,7 @@ import { listPack } from "@/controllers/pack.controller";
 import { usePackPresence } from "@/controllers/use-pack-presence";
 import { useTavernDoing } from "@/controllers/use-tavern-doing";
 import { useTavern } from "@/controllers/use-tavern";
+import { useT } from "@/controllers/use-locale";
 import type { PresenceStatus } from "@/models/entities/presence";
 import { tavernUserStore } from "@/controllers/tavern-user.store";
 import {
@@ -45,6 +46,7 @@ function clampPosition(x: number, y: number, width: number, height: number) {
 }
 
 export function TavernChatWindow() {
+  const t = useT();
   const isDesktop = useIsDesktop();
   const chat = useSyncExternalStore(
     tavernChatStore.subscribe,
@@ -300,7 +302,7 @@ export function TavernChatWindow() {
             <button
               type="button"
               onClick={closeChat}
-              aria-label={"Close chat of " + roomTitle(activeRoom, true)}
+              aria-label={t("Close chat of " + roomTitle(activeRoom, true))}
               className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-edge text-ink-faint transition-colors hover:border-edge-strong hover:text-ink"
             >
               <span aria-hidden="true" className="text-sm leading-none">

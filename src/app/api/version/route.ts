@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   const refused = refuseAbuse(request);
   if (refused) return refused;
   if (!rateLimit("version:" + clientIp(request), 60, 60000).allowed) {
-    return NextResponse.json({ ok: false, message: "Devagar." }, { status: 429 });
+    return NextResponse.json({ ok: false, message: "Slow down." }, { status: 429 });
   }
   return NextResponse.json(
     { version: GAME_VERSION },

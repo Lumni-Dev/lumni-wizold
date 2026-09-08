@@ -301,6 +301,7 @@ export function TavernRoomChatComposer({
   cooldownLeft: number;
   onSubmit: (event: FormEvent) => void;
 }) {
+  const t = useT();
   const pingOn = useSyncExternalStore(
     tavernPingRepository.subscribe,
     tavernPingRepository.enabled,
@@ -357,7 +358,7 @@ export function TavernRoomChatComposer({
                 <button
                   key={emoji}
                   type="button"
-                  aria-label={"Insert " + emoji}
+                  aria-label={t("Insert " + emoji)}
                   onClick={() =>
                     onDraftChange(
                       draft.length + emoji.length <= MESSAGE_MAX_LENGTH ? draft + emoji : draft,

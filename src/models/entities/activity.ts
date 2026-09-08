@@ -14,6 +14,26 @@ export interface Activity {
 export const ACTIVITY_KINDS: readonly ActivityKind[] = ["hunt", "train", "mine", "forge", "rest"];
 const KINDS: readonly string[] = ACTIVITY_KINDS;
 
+export type WorkActivityKind = Exclude<ActivityKind, "rest">;
+
+export const WORK_ACTIVITY_LABELS: Record<WorkActivityKind, string> = {
+  hunt: "Hunt in progress",
+  train: "Training in progress",
+  mine: "Mining in progress",
+  forge: "Forge in progress",
+};
+
+// Rest may be interrupted by the next job; hunt/train/mine/forge own the body
+// until the hunter stops them. Only one of those may run at a time.
+export function isWorkActivity(kind: string | null | undefined): kind is WorkActivityKind {
+  return kind === "hunt" || kind === "train" || kind === "mine" || kind === "forge";
+}
+
+export function workActivityBlockReason(activity: Activity | null | undefined): string | null {
+  if (!activity || !isWorkActivity(activity.kind)) return null;
+  return WORK_ACTIVITY_LABELS[activity.kind] + ": stop it before starting another.";
+}
+
 export type HunterDoing = ActivityKind | "idle";
 
 export const ACTIVITY_STALE_MS = 60000;

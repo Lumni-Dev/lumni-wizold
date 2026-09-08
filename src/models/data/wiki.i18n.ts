@@ -236,7 +236,7 @@ function ptTopics(): readonly WikiTopic[] {
         "Modo Fúria dá +" +
           FURY_ATTRIBUTE_BONUS +
           " em cada atributo enquanto durar; o ganho aparece na coluna Fúria da ficha e levanta dano, esquiva e crítico de uma vez. A barra de vida continua subindo só com o nível.",
-        "A poção de fúria não devolve vida. A duração vem pelo tamanho do frasco: pequena 2,5 minutos, média 5, grande 7,5. Beber de novo reinicia o relógio cheio.",
+        "A poção de fúria não devolve vida. A duração é o tamanho do frasco (pequena 2,5 minutos, média 5, grande 7,5) mais o mesmo estirão de Vontade em todo frasco, até 5 minutos, com metade disso já em 250 de Vontade. Beber de novo reinicia o relógio cheio.",
         "Na lua cheia o céu mantém o Modo Fúria ativo sozinho enquanto durar a fase; a poção fica desabilitada nesse período, porque o céu já faz esse trabalho.",
         "É um atalho pago para uma janela de força: guarde a poção para uma banda dura ou um duelo que você não quer perder, fora da lua cheia.",
       ],
@@ -288,7 +288,7 @@ function ptTopics(): readonly WikiTopic[] {
       summary: "Resolvido em rodadas, sem entrada do jogador durante a luta.",
       lines: [
         "Cinco números e só: Força, Agilidade, Resistência, Instinto e Vontade. Dano = Força² ÷ (Força + Resistência do alvo), com 10% de variação na Força.",
-        "A Vontade não entra na conta da luta: ela estica a poção de fúria e acelera a recuperação de vida fora do combate. A fúria é que soma +" +
+        "A Vontade não entra na conta da luta: ela estica a poção de fúria com o mesmo bônus fixo em todo frasco e acelera a recuperação de vida fora do combate. A fúria é que soma +" +
           FURY_ATTRIBUTE_BONUS +
           " em todos os atributos enquanto dura, e quanto mais Vontade, mais tempo cada frasco rende.",
         "Quem tem mais Agilidade começa. Esquiva e crítico sobem a vida toda sem teto: 35% e 45% no horizonte.",
@@ -645,7 +645,7 @@ function esTopics(): readonly WikiTopic[] {
         "El Modo Furia da +" +
           FURY_ATTRIBUTE_BONUS +
           " a cada atributo mientras dura; la ganancia aparece en la columna Furia de la ficha y levanta daño, esquiva y crítico a la vez. La barra de vida sigue subiendo solo con el nivel.",
-        "La poción de furia no devuelve vida. La duración viene del tamaño del frasco: pequeña 2,5 minutos, media 5, grande 7,5. Beber de nuevo reinicia el reloj lleno.",
+        "La poción de furia no devuelve vida. La duración es el tamaño del frasco (pequeña 2,5 minutos, media 5, grande 7,5) más el mismo tramo de Voluntad en cada frasco, hasta 5 minutos, con la mitad de eso ya a 250 de Voluntad. Beber de nuevo reinicia el reloj lleno.",
         "En luna llena el cielo mantiene el Modo Furia activo solo mientras dure la fase; la poción queda deshabilitada en ese período, porque el cielo ya hace ese trabajo.",
         "Es un atajo pagado hacia una ventana de fuerza: guarda la poción para una franja dura o un duelo que no quieres perder, fuera de la luna llena.",
       ],
@@ -697,7 +697,7 @@ function esTopics(): readonly WikiTopic[] {
       summary: "Resuelto en rondas, sin entrada del jugador durante la pelea.",
       lines: [
         "Cinco números y nada más: Fuerza, Agilidad, Resistencia, Instinto y Voluntad. Daño = Fuerza² ÷ (Fuerza + Resistencia del objetivo), con 10% de variación en la Fuerza.",
-        "La Voluntad no entra en la cuenta de la pelea: estira la poción de furia y acelera la recuperación de vida fuera del combate. La furia es la que suma +" +
+        "La Voluntad no entra en la cuenta de la pelea: estira la poción de furia con el mismo bono fijo en cada frasco y acelera la recuperación de vida fuera del combate. La furia es la que suma +" +
           FURY_ATTRIBUTE_BONUS +
           " a todos los atributos mientras dura, y a más Voluntad, más tiempo rinde cada frasco.",
         "Quien tiene más Agilidad empieza. Esquiva y crítico suben toda la vida sin techo: 35% y 45% en el horizonte.",

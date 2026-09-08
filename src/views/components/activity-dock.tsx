@@ -439,7 +439,7 @@ export function ActivityDock() {
               </button>
             </Tooltip>
           ) : null}
-          <Tooltip label={minimized ? "Maximizar" : "Minimizar"}>
+          <Tooltip label={minimized ? "Maximize activity" : "Minimize activity"}>
             <button
               type="button"
               onClick={() => dockRepository.setMinimized(!minimized)}

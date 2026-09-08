@@ -8,7 +8,7 @@ import { detailInventory } from "@/controllers/inventory.controller";
 import { profileOf } from "@/controllers/ranking.controller";
 import { restRecoveryRatio } from "@/controllers/character.controller";
 import { criticalMultiplierOf } from "@/models/rules/combat";
-import { furyWillpowerBonus } from "@/models/rules/moon";
+import { furyWillpowerExtraMs } from "@/models/rules/moon";
 import { REST_TICK_MS } from "@/shared/constants/game";
 import { findItem } from "@/models/data/items";
 import { EQUIPMENT_SLOTS } from "@/models/entities/item";
@@ -243,7 +243,7 @@ export function CharacterScreen() {
                     description={
                       "+" +
                       formatNumber(FURY.attributeBonus) +
-                      " em cada atributo por " +
+                      " to every attribute for " +
                       furyDurationCopy(item.effect.furyMinutes ?? 0, willpower)
                     }
                     action={<FuryUseButton onClick={() => consumeItem(item.id)} />}
@@ -264,7 +264,13 @@ export function CharacterScreen() {
               />
               <DataRow
                 label="Bottled fury (Willpower)"
-                value={"+" + formatFraction(furyWillpowerBonus(willpower) * 100) + "%"}
+                value={
+                  "+" +
+                  Math.floor(furyWillpowerExtraMs(willpower) / 60_000) +
+                  "m " +
+                  (Math.floor(furyWillpowerExtraMs(willpower) / 1000) % 60) +
+                  "s"
+                }
               />
               <DataRow label="Max health" value={formatNumber(stats.maxHealth)} />
               <DataRow

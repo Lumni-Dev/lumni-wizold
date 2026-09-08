@@ -677,7 +677,7 @@ export function TavernScreen() {
             description="Pack mates. Calling one opens a reserved table just for the two of you."
             action={
               <Tag tone="neutral">
-                {pack.length} de {MAX_PACK}
+                {pack.length + " of " + MAX_PACK}
               </Tag>
             }
             padding="none"

@@ -23,6 +23,7 @@ export const FURY_ATTRIBUTE_BONUS = FURY.attributeBonus;
 export const FURY_DURATION_MINUTES = FURY.durationMinutesBySize;
 export const FURY_WILLPOWER_MAX_BONUS = FURY.willpowerMaxBonus;
 export const FURY_WILLPOWER_SCALE = FURY.willpowerScale;
+export const FURY_WILLPOWER_EXTRA_MINUTES = FURY.willpowerExtraMinutes;
 export const BAU_LIMIT = VAULT.bronzeLimit;
 export const STARTING_BRONZE = ECONOMY.startingBronze;
 export const REST_TICK_MS = RECOVERY.tickSeconds * 1_000;

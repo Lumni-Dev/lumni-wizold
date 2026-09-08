@@ -1,13 +1,18 @@
 import { cachedHunters } from "../../_lib/roster-cache";
 import { recordArenaDuel } from "@/models/repositories/server/arena.store";
-import { interruptRest } from "@/models/repositories/server/game.store";
+import { interruptRest, readActivity } from "@/models/repositories/server/game.store";
 import { cooldownLeft, setCooldown } from "@/models/repositories/server/action-cooldown";
+import { workActivityBlockReason } from "@/models/entities/activity";
 import { failure } from "@/models/entities/result";
 import { HUNT_TICK_MS } from "@/shared/constants/game";
 import * as arenaController from "@/controllers/arena.controller";
 import { asText, withGame } from "../../_lib/api";
+
 export async function POST(request: Request) {
   return withGame(request, async (state, body, context) => {
+    const { activity } = await readActivity(context.client, context.characterId);
+    const blocked = workActivityBlockReason(activity);
+    if (blocked) return failure(state, blocked);
     if ((await cooldownLeft(context.client, context.characterId, "arena")) > 0) {
       return failure(state, "");
     }

@@ -7,7 +7,7 @@ export async function POST(request: Request) {
   const refused = refuseAbuse(request);
   if (refused) return refused;
   if (!rateLimit("moon:" + clientIp(request), 30, 60000).allowed) {
-    return NextResponse.json({ ok: false, message: "Devagar." }, { status: 429 });
+    return NextResponse.json({ ok: false, message: "Slow down." }, { status: 429 });
   }
   const moon = await serverMoon();
   return NextResponse.json(

@@ -103,7 +103,7 @@ export function formatFuryDuration(baseMinutes: number, extraMs: number): string
   const extraSeconds = Math.floor(Math.max(0, extraMs) / 1000);
   const base = formatMinutesLabel(baseMinutes);
   if (extraSeconds <= 0) return base;
-  return base + " (+" + extraSeconds + "s vontade)";
+  return base + " (+" + extraSeconds + "s of willpower)";
 }
 export function formatReais(cents: number): string {
   return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(

@@ -38,7 +38,7 @@ export function summarizeEffect(item: Item, enhancement = 0, willpower?: number)
     lines.push("+" + FURY_ATTRIBUTE_BONUS + " to all attributes");
     lines.push(formatMinutesLabel(effect.furyMinutes) + " long");
     if (willpower !== undefined) {
-      const extraSeconds = Math.floor(furyWillpowerExtraMs(effect.furyMinutes, willpower) / 1000);
+      const extraSeconds = Math.floor(furyWillpowerExtraMs(willpower) / 1000);
       if (extraSeconds > 0) lines.push("+" + extraSeconds + "s of willpower");
     }
   }
@@ -54,7 +54,7 @@ export function summarizeEffect(item: Item, enhancement = 0, willpower?: number)
 }
 
 export function furyDurationCopy(baseMinutes: number, willpower: number): string {
-  return formatFuryDuration(baseMinutes, furyWillpowerExtraMs(baseMinutes, willpower));
+  return formatFuryDuration(baseMinutes, furyWillpowerExtraMs(willpower));
 }
 
 // What one flask of the given size lasts for this sheet, Willpower stretch

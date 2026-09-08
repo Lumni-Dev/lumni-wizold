@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSyncExternalStore } from "react";
 import { dismissTavernAlert, tavernAlertStore } from "@/controllers/tavern-alert.store";
+import { useT } from "@/controllers/use-locale";
 import { tavernPushRepository } from "@/models/repositories/tavern-push.repository";
 import { formatDay } from "@/shared/utils/format";
 import { displayNick } from "@/shared/utils/text";
@@ -14,6 +15,7 @@ import { CornerAccents } from "./corner-accents";
 import { List, ListRow } from "./list";
 
 export function TavernAlertDock() {
+  const t = useT();
   const pathname = usePathname();
   const alertsOn = useSyncExternalStore(
     tavernPushRepository.subscribe,
@@ -33,7 +35,7 @@ export function TavernAlertDock() {
       {alerts.map((alert) => (
         <aside
           key={alert.id}
-          aria-label={"Message at table " + alert.roomName}
+          aria-label={t("Message at table " + alert.roomName)}
           className="toast-in pointer-events-auto relative w-full"
         >
           <div className={cn("overflow-hidden rounded-lg border border-edge shadow-[0_12px_32px_-12px_rgba(0,0,0,0.95)]", GLASS_SECTION)}>

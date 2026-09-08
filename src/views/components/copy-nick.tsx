@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useT } from "@/controllers/use-locale";
 import { cn } from "@/shared/utils/class-names";
 import { ActionIcon } from "./app-icon";
 import { Tooltip } from "./tooltip";
@@ -14,6 +15,7 @@ export function CopyValue({
   noun: string;
   className?: string;
 }) {
+  const t = useT();
   const [copied, setCopied] = useState(false);
 
   async function copy() {
@@ -29,7 +31,7 @@ export function CopyValue({
     <Tooltip label={copied ? noun + " copied" : "Copy " + noun}>
       <button
         type="button"
-        aria-label={"Copy the " + noun + " " + value}
+        aria-label={t("Copy the " + noun + " " + value)}
         onClick={copy}
         className={cn(
           "inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-edge text-ink-faint transition-colors hover:border-edge-strong hover:text-highlight",

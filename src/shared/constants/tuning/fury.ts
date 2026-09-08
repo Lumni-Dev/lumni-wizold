@@ -7,4 +7,7 @@ export const FURY = {
   },
   willpowerMaxBonus: 1,
   willpowerScale: 250,
+  // The Willpower stretch is flat: the same extra time lands on every flask,
+  // no matter its size. This is the ceiling of that stretch, in minutes.
+  willpowerExtraMinutes: 5,
 };

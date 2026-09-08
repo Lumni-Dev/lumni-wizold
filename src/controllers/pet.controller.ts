@@ -95,9 +95,9 @@ export function renamePet(state: GameState, name: string): Result {
       state,
       "The name change costs " +
         formatBronze(renamePrice) +
-        " e faltam " +
+        " and you are " +
         formatBronze(renamePrice - character.bronze) +
-        ".",
+        " short.",
     );
   }
 
@@ -165,9 +165,9 @@ export function trainPet(state: GameState): Result<{ leveled: boolean }> {
       state,
       "Each training is paid on the spot: it costs " +
         formatBronze(cost) +
-        " e faltam " +
+        " and you are " +
         formatBronze(cost - character.bronze) +
-        ".",
+        " short.",
     );
   }
 

@@ -211,7 +211,7 @@ export function consumeItem(
     const message =
       item.name +
       " consumed: +10 to all attributes for " +
-      formatFuryDuration(furyMinutes, furyWillpowerExtraMs(furyMinutes, willpower)) +
+      formatFuryDuration(furyMinutes, furyWillpowerExtraMs(willpower)) +
       ".";
     return success(addLog(syncCharacter(next), "inventory", message), message);
   }

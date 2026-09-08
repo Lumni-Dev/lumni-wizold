@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   const refused = refuseAbuse(request);
   if (refused) return refused;
   if (!rateLimit("radio:" + clientIp(request), 60, 60000).allowed) {
-    return NextResponse.json({ ok: false, message: "Devagar.", data: null }, { status: 429 });
+    return NextResponse.json({ ok: false, message: "Slow down.", data: null }, { status: 429 });
   }
   const tracks = await readRadioTracks();
   return NextResponse.json(

@@ -432,7 +432,7 @@ export function SettingsScreen() {
               >
                 {affordable
                   ? "Change for " + formatBronze(cost)
-                  : "Faltam " + formatBronze(cost - character.bronze)}
+                  : formatBronze(cost - character.bronze) + " short"}
               </Button>
             </form>
           </Panel>
