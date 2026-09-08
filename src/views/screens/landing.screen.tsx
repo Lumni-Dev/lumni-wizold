@@ -11,8 +11,8 @@ import { GAME_NAME, GAME_TAGLINE } from "@/shared/constants/game";
 import { BRAND_LOGO_WEBP_PATH } from "@/shared/constants/site";
 import { GLASS_SECTION, GLASS_SECTION_STRONG } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
+import { ArtImage } from "../components/art-image";
 import { CornerAccents } from "../components/corner-accents";
-import { GenderBanner } from "../components/gender-icon";
 import { PetLandingBanner } from "../components/pet-icon";
 import { CreatureCarousel } from "../components/creature-carousel";
 import { PreviewGallery } from "../components/preview-gallery";
@@ -103,23 +103,26 @@ export function LandingScreen() {
       <main className="relative z-10 mx-auto w-full max-w-5xl space-y-16 px-4 py-16 md:px-8 md:py-24">
         <section className="relative">
           <div className={cn("rounded-lg border border-edge", GLASS_SECTION)}>
-            <div className="grid grid-cols-1 border-b border-edge sm:grid-cols-2">
-              {(["male", "female"] as const).map((key) => (
-                <div
-                  key={key}
-                  className={cn(
-                    key === "female" && "border-t border-edge sm:border-l sm:border-t-0",
-                  )}
-                >
-                  <GenderBanner gender={key} />
-                  <div className="p-4">
+            <div className="border-b border-edge">
+              <div className="aspect-video w-full overflow-hidden p-4 md:p-5">
+                <ArtImage source="/assets/landing/lumni-luna.webp?v=1" fit="contain" />
+              </div>
+              <div className="grid grid-cols-1 border-t border-edge sm:grid-cols-2">
+                {(["male", "female"] as const).map((key) => (
+                  <div
+                    key={key}
+                    className={cn(
+                      "p-4",
+                      key === "female" && "border-t border-edge sm:border-l sm:border-t-0",
+                    )}
+                  >
                     <p className="text-sm text-ink">{lore.couple[key].name}</p>
                     <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                       {lore.couple[key].title}
                     </p>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2">
