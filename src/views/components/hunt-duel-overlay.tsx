@@ -152,7 +152,6 @@ export function HuntDuelOverlay({
             <GenderIcon gender={gender} size="large" className="art-soft-shadow" />
           </span>
         </span>
-        <span className="select-none text-lg font-mono text-ink/80">×</span>
         <span className={cn("inline-flex", preyShaking && preyPhase === "alive" && "card-shake")}>
           <span
             key={
