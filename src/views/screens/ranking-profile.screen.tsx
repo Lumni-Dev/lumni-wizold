@@ -95,13 +95,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
               <Link href="/character">
                 <Button variant="secondary">Full sheet</Button>
               </Link>
-            ) : isInPack(state, hunter.id) ? (
-              <Tag tone="neutral">In the pack</Tag>
-            ) : (
-              <Button variant="secondary" onClick={() => invite({ id: hunter.id, name: hunter.name })}>
-                Invite to the pack
-              </Button>
-            )}
+            ) : null}
             <Tag tone={isPlayer ? "light" : "neutral"}>
               {t("Best at " + best.label + " - " + formatNumber(best.position) + "º")}
             </Tag>
@@ -111,7 +105,26 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
 
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-1">
-          <Panel title="Sheet" padding="none">
+          <Panel
+            title="Sheet"
+            padding="none"
+            footer={
+              !isPlayer ? (
+                isInPack(state, hunter.id) ? (
+                  <Tag tone="neutral">In the pack</Tag>
+                ) : (
+                  <Button
+                    variant="secondary"
+                    size="medium"
+                    fullWidth
+                    onClick={() => invite({ id: hunter.id, name: hunter.name })}
+                  >
+                    Invite to the pack
+                  </Button>
+                )
+              ) : undefined
+            }
+          >
             <CardHeader art={<GenderArtFill gender={hunter.gender} />} artPadding="none">
               <div className="min-w-0 space-y-1">
                 <div className="flex items-center gap-2">
@@ -158,8 +171,10 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
             description={"Where they stand on every board, among " + formatNumber(boardSize) + "."}
             padding="none"
             footer={
-              <Link href="/ranking">
-                <Button variant="outline">Back to the ranking</Button>
+              <Link href="/ranking" className="block w-full">
+                <Button variant="outline" size="medium" fullWidth>
+                  Back to the ranking
+                </Button>
               </Link>
             }
           >
