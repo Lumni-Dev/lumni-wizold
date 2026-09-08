@@ -22,12 +22,15 @@ import { CRITICAL_CHANCE_CAP, DODGE_CHANCE_CAP, type DerivedStats } from "@/mode
 import { canPetFight, isPetActive, petLevelOf, petMaxEnergy } from "@/models/rules/pet";
 import { playSound } from "@/controllers/sound";
 import { HUNT_APPROACH_TICKS, HUNT_TICK_MS } from "@/shared/constants/game";
+import { ARENA_SCENE_PATH } from "@/shared/constants/site";
 import { ICON_FRAME_INSET } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { formatDay, formatFraction, formatNumber, formatBronze } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
 import { displayNick } from "@/shared/utils/text";
 import { emphasizeDamage, narrationOf, type NarrationLine } from "../presenters/hunt.presenter";
+import { ArenaDuelOverlay } from "../components/arena-duel-overlay";
+import { ArtImage } from "../components/art-image";
 import { Bar } from "../components/bar";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
 import { Button } from "../components/button";
@@ -158,6 +161,7 @@ export function ArenaScreen() {
   const [approachBeat, setApproachBeat] = useState(0);
   const [approaching, setApproaching] = useState(false);
   const [report, setReport] = useState<ArenaResolution | null>(null);
+  const [pending, setPending] = useState<ArenaResolution | null>(null);
   const [script, setScript] = useState<NarrationLine[]>([]);
   const [myJolt, setMyJolt] = useState(0);
   const [foeJolt, setFoeJolt] = useState(0);
@@ -195,6 +199,7 @@ export function ArenaScreen() {
     setBeat(0);
     setScript([]);
     setReport(null);
+    setPending(null);
     setFighting({ hunter, maxHealth });
   }
   function armAutomation() {
@@ -328,9 +333,11 @@ export function ArenaScreen() {
         requestingRef.current = false;
         if (!resolution) {
           setFighting(null);
+          setPending(null);
           return;
         }
         pendingRef.current = resolution;
+        setPending(resolution);
         bledRef.current = { last: characterRef.current?.health ?? 0, total: 0 };
         scriptRef.current = narrationOf({ foe: resolution.foe, combat: resolution.combat });
         setScript(scriptRef.current);
@@ -373,6 +380,7 @@ export function ArenaScreen() {
         window.clearInterval(timer);
         landRef.current();
         setReport(held);
+        setPending(null);
         if (held.combat.victory) playSound("victory");
         else if (!held.combat.retreated) playSound("defeat");
         setFighting(null);
@@ -515,6 +523,33 @@ export function ArenaScreen() {
           padding="none"
           className={cn(shaking && "card-shake")}
         >
+          <div className="relative aspect-video w-full overflow-hidden border-b border-edge">
+            <ArtImage source={ARENA_SCENE_PATH} />
+            <ArenaDuelOverlay
+              gender={character.gender}
+              rivalGender={fighting.hunter.gender}
+              rivalId={fighting.hunter.id}
+              beat={approaching ? approachBeat : beat}
+              blow={duelLine?.blow ?? null}
+              critical={duelLine?.critical ?? false}
+              fighting={!approaching && pending !== null}
+              approaching={approaching}
+              finale={
+                !approaching && script.length > 0 && beat >= script.length && pending !== null
+              }
+              outcome={
+                pending
+                  ? pending.combat.victory
+                    ? "win"
+                    : pending.combat.retreated
+                      ? "draw"
+                      : "loss"
+                  : null
+              }
+              rivalHealth={duelLine?.creatureHealth ?? fighting.maxHealth}
+            />
+          </div>
+
           <div className="grid grid-cols-1 divide-y divide-edge border-b border-edge sm:grid-cols-2 sm:divide-x sm:divide-y-0">
             <Fighter
               gender={character.gender}

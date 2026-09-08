@@ -17,3 +17,6 @@ export const BRAND_LOGO_PNG_PATH = "/assets/ui/logo.png?v=" + BRAND_ASSET_VERSIO
 export const TAVERN_MUG_VERSION = "3";
 export const TAVERN_MUG_PATH = "/assets/ui/tavern-mug.webp?v=" + TAVERN_MUG_VERSION;
 export const TAVERN_MUG_PNG_PATH = "/assets/ui/tavern-mug.png?v=" + TAVERN_MUG_VERSION;
+
+export const ARENA_SCENE_VERSION = "1";
+export const ARENA_SCENE_PATH = "/assets/ui/arena.webp?v=" + ARENA_SCENE_VERSION;
