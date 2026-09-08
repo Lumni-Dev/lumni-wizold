@@ -8,13 +8,14 @@ import {
   type AlchemyRow,
 } from "@/controllers/alchemy.controller";
 import { useT } from "@/controllers/use-locale";
+import type { GameState } from "@/models/entities/game-state";
 import { RARITY_LABEL } from "@/models/entities/item";
 import { formatNumber } from "@/shared/utils/format";
 import { Button } from "../components/button";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { DataRow } from "../components/data-row";
-import { ItemIcon } from "../components/item-icon";
+import { ItemBanner, ItemIcon, useItemArt } from "../components/item-icon";
 import { List, RowText } from "../components/list";
 import { Select } from "../components/select";
 import { Tag } from "../components/tag";
@@ -62,106 +63,17 @@ export function AlchemyScreen() {
       />
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-        {view.rows.map((row) => {
-          const { recipe, potion, unlocked } = row;
-          const chosen = pickOf(recipe.potionId);
-          const firstOptions = listBrewMaterials(state, recipe.first.rarity).filter(
-            (option) => option.item.id !== chosen.second,
-          );
-          const secondOptions = listBrewMaterials(state, recipe.second.rarity).filter(
-            (option) => option.item.id !== chosen.first,
-          );
-          const firstPick = firstOptions.find((option) => option.item.id === chosen.first);
-          const secondPick = secondOptions.find((option) => option.item.id === chosen.second);
-          const firstShort = firstPick !== undefined && firstPick.owned < recipe.first.quantity;
-          const secondShort = secondPick !== undefined && secondPick.owned < recipe.second.quantity;
-          const reason = !unlocked
-            ? "Requires LV. " + formatNumber(potion.minLevel)
-            : view.flasks < 1
-              ? "No empty flask in the bag: the market sells them."
-              : !firstPick || !secondPick
-                ? "Choose the two ingredients."
-                : firstShort || secondShort
-                  ? "You do not have that many " +
-                    (firstShort ? firstPick.item.name : secondPick.item.name) +
-                    "."
-                  : null;
-          return (
-            <Card key={recipe.potionId} height="fill">
-              <CardHeader art={<ItemIcon item={potion} />}>
-                <RowText
-                  title={potion.name}
-                  label={unlocked ? t(RARITY_LABEL[potion.rarity]) : "Requires LV. " + formatNumber(potion.minLevel)}
-                />
-              </CardHeader>
-
-              <CardBody padding="none">
-                <List>
-                  <DataRow label="Empty Flask" value="x1" />
-                  <DataRow
-                    label="First ingredient"
-                    value={"x" + recipe.first.quantity + " · " + t(RARITY_LABEL[recipe.first.rarity]) + "+"}
-                  />
-                  <DataRow
-                    label="Second ingredient"
-                    value={"x" + recipe.second.quantity + " · " + t(RARITY_LABEL[recipe.second.rarity]) + "+"}
-                  />
-                </List>
-                <div className="space-y-3 border-t border-edge p-4">
-                  <Select
-                    label={t("First ingredient")}
-                    placeholder={t("Choose a material")}
-                    value={chosen.first}
-                    disabled={!unlocked}
-                    options={firstOptions.map((option) => ({
-                      value: option.item.id,
-                      label: t(option.item.name) + " (x" + formatNumber(option.owned) + ")",
-                    }))}
-                    onChange={(value) => setPick(recipe.potionId, "first", value)}
-                    className="w-full"
-                  />
-                  <Select
-                    label={t("Second ingredient")}
-                    placeholder={t("Choose a material")}
-                    value={chosen.second}
-                    disabled={!unlocked}
-                    options={secondOptions.map((option) => ({
-                      value: option.item.id,
-                      label: t(option.item.name) + " (x" + formatNumber(option.owned) + ")",
-                    }))}
-                    onChange={(value) => setPick(recipe.potionId, "second", value)}
-                    className="w-full"
-                  />
-                  {firstOptions.length === 0 && secondOptions.length === 0 ? (
-                    <p className="text-xs text-ink-faint">
-                      {t("Nothing in the bag serves this potion yet: the hunt drops what the cauldron asks.")}
-                    </p>
-                  ) : null}
-                </div>
-              </CardBody>
-
-              <CardFooter className="w-full">
-                <Tooltip block className="w-full" label={reason}>
-                  <Button
-                    variant={reason === null ? "primary" : "outline"}
-                    fullWidth
-                    disabled={reason !== null}
-                    onClick={() => {
-                      if (!firstPick || !secondPick) return;
-                      setPending({
-                        row,
-                        firstName: firstPick.item.name,
-                        secondName: secondPick.item.name,
-                      });
-                    }}
-                  >
-                    Brew
-                  </Button>
-                </Tooltip>
-              </CardFooter>
-            </Card>
-          );
-        })}
+        {view.rows.map((row) => (
+          <RecipeCard
+            key={row.recipe.potionId}
+            row={row}
+            state={state}
+            flasks={view.flasks}
+            chosen={pickOf(row.recipe.potionId)}
+            onPick={(side, value) => setPick(row.recipe.potionId, side, value)}
+            onBrew={(firstName, secondName) => setPending({ row, firstName, secondName })}
+          />
+        ))}
       </div>
 
       <ConfirmDialog
@@ -195,5 +107,123 @@ export function AlchemyScreen() {
         }}
       />
     </>
+  );
+}
+
+function RecipeCard({
+  row,
+  state,
+  flasks,
+  chosen,
+  onPick,
+  onBrew,
+}: {
+  row: AlchemyRow;
+  state: GameState;
+  flasks: number;
+  chosen: Picks;
+  onPick: (side: keyof Picks, value: string) => void;
+  onBrew: (firstName: string, secondName: string) => void;
+}) {
+  const t = useT();
+  const { recipe, potion, unlocked } = row;
+  const drawn = Boolean(useItemArt(potion));
+  const firstOptions = listBrewMaterials(state, recipe.first.rarity).filter(
+    (option) => option.item.id !== chosen.second,
+  );
+  const secondOptions = listBrewMaterials(state, recipe.second.rarity).filter(
+    (option) => option.item.id !== chosen.first,
+  );
+  const firstPick = firstOptions.find((option) => option.item.id === chosen.first);
+  const secondPick = secondOptions.find((option) => option.item.id === chosen.second);
+  const firstShort = firstPick !== undefined && firstPick.owned < recipe.first.quantity;
+  const secondShort = secondPick !== undefined && secondPick.owned < recipe.second.quantity;
+  const reason = !unlocked
+    ? "Requires LV. " + formatNumber(potion.minLevel)
+    : flasks < 1
+      ? "No empty flask in the bag: the market sells them."
+      : !firstPick || !secondPick
+        ? "Choose the two ingredients."
+        : firstShort || secondShort
+          ? "You do not have that many " +
+            (firstShort ? firstPick.item.name : secondPick.item.name) +
+            "."
+          : null;
+  return (
+    <Card height="fill" interactive>
+      {drawn ? <ItemBanner item={potion} /> : null}
+      <CardHeader>
+        {drawn ? null : <ItemIcon item={potion} />}
+        <RowText
+          title={potion.name}
+          description={
+            unlocked
+              ? t(RARITY_LABEL[potion.rarity])
+              : "Requires LV. " + formatNumber(potion.minLevel)
+          }
+        />
+      </CardHeader>
+
+              <CardBody padding="none">
+                <List>
+                  <DataRow label="Empty Flask" value="x1" />
+                  <DataRow
+                    label="First ingredient"
+                    value={"x" + recipe.first.quantity + " · " + t(RARITY_LABEL[recipe.first.rarity]) + "+"}
+                  />
+                  <DataRow
+                    label="Second ingredient"
+                    value={"x" + recipe.second.quantity + " · " + t(RARITY_LABEL[recipe.second.rarity]) + "+"}
+                  />
+                </List>
+                <div className="space-y-3 border-t border-edge p-4">
+                  <Select
+                    label={t("First ingredient")}
+                    placeholder={t("Choose a material")}
+                    value={chosen.first}
+                    disabled={!unlocked}
+                    options={firstOptions.map((option) => ({
+                      value: option.item.id,
+                      label: t(option.item.name) + " (x" + formatNumber(option.owned) + ")",
+                    }))}
+                    onChange={(value) => onPick("first", value)}
+                    className="w-full"
+                  />
+                  <Select
+                    label={t("Second ingredient")}
+                    placeholder={t("Choose a material")}
+                    value={chosen.second}
+                    disabled={!unlocked}
+                    options={secondOptions.map((option) => ({
+                      value: option.item.id,
+                      label: t(option.item.name) + " (x" + formatNumber(option.owned) + ")",
+                    }))}
+                    onChange={(value) => onPick("second", value)}
+                    className="w-full"
+                  />
+                  {firstOptions.length === 0 && secondOptions.length === 0 ? (
+                    <p className="text-xs text-ink-faint">
+                      {t("Nothing in the bag serves this potion yet: the hunt drops what the cauldron asks.")}
+                    </p>
+                  ) : null}
+                </div>
+              </CardBody>
+
+              <CardFooter className="w-full">
+                <Tooltip block className="w-full" label={reason}>
+                  <Button
+                    variant={reason === null ? "primary" : "outline"}
+                    fullWidth
+                    disabled={reason !== null}
+                    onClick={() => {
+                      if (!firstPick || !secondPick) return;
+                      onBrew(firstPick.item.name, secondPick.item.name);
+                    }}
+                  >
+                    Brew
+                  </Button>
+                </Tooltip>
+              </CardFooter>
+            </Card>
   );
 }
