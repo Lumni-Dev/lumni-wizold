@@ -6,7 +6,7 @@ import { api } from "@/controllers/api.client";
 import { useArt } from "@/controllers/art.context";
 import { renameCost, renameDaysLeft } from "@/controllers/character.controller";
 import { AUTOMATIONS } from "@/models/entities/automation";
-import { isVip, VIP_PRICE_CENTS } from "@/models/rules/vip";
+import { hasVipSubscription, isVip, VIP_PRICE_CENTS, VIP_TRIAL_DAYS } from "@/models/rules/vip";
 import { useGame } from "@/controllers/game.context";
 import { playSoundPreview } from "@/controllers/sound";
 import { disableTavernPush, enableTavernPush, testTavernPush, webPushConfigured, tavernPushSupported } from "@/controllers/tavern-notify";
@@ -229,6 +229,7 @@ export function SettingsScreen() {
   const cost = renameCost(character.level);
   const affordable = character.bronze >= cost;
   const vip = isVip(character, now);
+  const subscribed = hasVipSubscription(character);
 
   function submitRename(event: FormEvent) {
     event.preventDefault();
@@ -702,7 +703,11 @@ export function SettingsScreen() {
         {shows("automacao") ? (
           <Panel
             title="Automation"
-            description="What the run does on its own. Each switch does one thing only, and they help each other: the hunt drinks, the potion runs out, the body rests, the hunt returns. A VIP feature."
+            description={
+              "What the run does on its own. Each switch does one thing only, and they help each other: the hunt drinks, the potion runs out, the body rests, the hunt returns. A VIP feature. New hunters get " +
+              VIP_TRIAL_DAYS +
+              " days free."
+            }
             action={
               vip ? (
                 <Tag tone="light">
@@ -717,9 +722,13 @@ export function SettingsScreen() {
               vip ? (
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <span className="text-[11px] text-ink-faint">
-                    {character.vipCanceling
-                      ? "VIP active until " + formatDay(character.vipUntil ?? "") + ", not renewing."
-                      : "Active subscription, renews on " + formatDay(character.vipUntil ?? "") + "."}
+                    {t(
+                      character.vipCanceling
+                        ? "VIP active until " + formatDay(character.vipUntil ?? "") + ", not renewing."
+                        : subscribed
+                          ? "Active subscription, renews on " + formatDay(character.vipUntil ?? "") + "."
+                          : "Free VIP until " + formatDay(character.vipUntil ?? "") + ".",
+                    )}
                   </span>
                   <Button variant="outline" onClick={() => router.push("/store")}>
                     Manage in the store
@@ -728,7 +737,9 @@ export function SettingsScreen() {
               ) : (
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <span className="text-[11px] text-ink-faint">
-                    {t("Automation is a VIP feature. Enable it to turn the switches on.")}
+                    {t("New hunters get " + VIP_TRIAL_DAYS + " days of VIP free.") +
+                      " " +
+                      t("Automation is a VIP feature. Enable it to turn the switches on.")}
                   </span>
                   <Button variant="primary" onClick={() => buyVip()}>
                     {t("Enable VIP for") + " " + formatReais(VIP_PRICE_CENTS) + t("/month")}

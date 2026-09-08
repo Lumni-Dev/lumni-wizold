@@ -93,6 +93,8 @@ export const ES: Record<string, string> = {
   "cap": "techo",
   "Update now": "Actualizar ahora",
   "Play free": "Jugar gratis",
+  "New hunters get 7 days of VIP free.": "Los cazadores nuevos ganan 7 días de VIP gratis.",
+  "Everything runs on its own while you watch, and nothing rises unless you say so. New hunters get 7 days of VIP free.": "Todo corre solo mientras miras, y nada sube sin que lo mandes. Los cazadores nuevos ganan 7 días de VIP gratis.",
   "Back to the hunt": "Volver a la cacería",
   "Name": "Nombre",
   "W-Radio": "W-Radio",
@@ -408,6 +410,8 @@ export const ES: Record<string, string> = {
   "Cancel VIP subscription": "Cancelar suscripción VIP",
   "Requires VIP": "Requiere VIP",
   "Unlocks every Automation switch in the settings: the run hunts, trains, mines and forges on its own, and recovers on its own. Monthly subscription, cancel whenever you want.": "Desbloquea todas las llaves de Automatización en la configuración: la partida caza, entrena, mina y forja sola, y se recupera sola. Suscripción mensual, cancela cuando quieras.",
+  "New hunters get 7 days of VIP free. Unlocks every Automation switch in the settings: the run hunts, trains, mines and forges on its own, and recovers on its own. Monthly subscription, cancel whenever you want.": "Los cazadores nuevos ganan 7 días de VIP gratis. Desbloquea todas las llaves de Automatización en la configuración: la partida caza, entrena, mina y forja sola, y se recupera sola. Suscripción mensual, cancela cuando quieras.",
+  "New hunters get 7 days of VIP free. VIP starts as soon as the payment confirms.": "Los cazadores nuevos ganan 7 días de VIP gratis. El VIP entra en cuanto se confirma el pago.",
   "The monthly charge stops renewing on Stripe. VIP stays active until the end of the paid period, and can be reactivated before that.": "El cobro mensual deja de renovarse en Stripe. El VIP sigue activo hasta el fin del período ya pagado, y se puede reactivar antes.",
   "Bestiary": "Bestiario",
   "Territories": "Territorios",
@@ -814,6 +818,7 @@ export const ES: Record<string, string> = {
   "Lumni contact": "Contacto de Lumni",
   "Rest": "Reposar",
   "What the run does on its own. Each switch does one thing only, and they help each other: the hunt drinks, the potion runs out, the body rests, the hunt returns. A VIP feature.": "Lo que la partida hace sola. Cada llave hace una sola cosa, y se ayudan entre sí: la cacería bebe, la poción se acaba, el cuerpo descansa, la cacería vuelve. Es un recurso VIP.",
+  "What the run does on its own. Each switch does one thing only, and they help each other: the hunt drinks, the potion runs out, the body rests, the hunt returns. A VIP feature. New hunters get 7 days free.": "Lo que la partida hace sola. Cada llave hace una sola cosa, y se ayudan entre sí: la cacería bebe, la poción se acaba, el cuerpo descansa, la cacería vuelve. Es un recurso VIP. Los cazadores nuevos ganan 7 días gratis.",
   "The radio volume. On and off, skipping tracks and seeing what plays live in the tavern player, and the radio only plays there. While the radio plays, the soundtrack and the game's effects stay silent.": "El volumen de la radio. Encender y apagar, saltar de pista y ver qué suena quedan en el reproductor de la taberna, y la radio solo suena allí. Mientras suena la radio, la banda sonora y los efectos del juego quedan en silencio.",
 
   // English-source additions: server messages, dock, entities (Stage C)

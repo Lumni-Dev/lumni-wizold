@@ -6,7 +6,7 @@ import { useGame } from "@/controllers/game.context";
 import { useT } from "@/controllers/use-locale";
 import { listPacks } from "@/controllers/store.controller";
 import { findPack } from "@/models/data/store-packs";
-import { hasVipSubscription, isVip, VIP_PRICE_CENTS } from "@/models/rules/vip";
+import { hasVipSubscription, isVip, VIP_PRICE_CENTS, VIP_TRIAL_DAYS } from "@/models/rules/vip";
 import { formatDay, formatNumber, formatReais, formatBronze } from "@/shared/utils/format";
 import { Button } from "../components/button";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
@@ -92,7 +92,11 @@ export function StoreScreen() {
 
       <Panel
         title="VIP"
-        description="Unlocks every Automation switch in the settings: the run hunts, trains, mines and forges on its own, and recovers on its own. Monthly subscription, cancel whenever you want."
+        description={
+          "New hunters get " +
+          VIP_TRIAL_DAYS +
+          " days of VIP free. Unlocks every Automation switch in the settings: the run hunts, trains, mines and forges on its own, and recovers on its own. Monthly subscription, cancel whenever you want."
+        }
         action={
           vip ? (
             <Tag tone="light">
@@ -103,11 +107,17 @@ export function StoreScreen() {
         footer={
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span className="text-[11px] text-ink-faint">
-              {subscribed
-                ? character.vipCanceling
-                  ? "VIP active until " + formatDay(character.vipUntil ?? "") + ", not renewing."
-                  : "Renews on its own every month. Cancel to stop the charge on Stripe."
-                : "VIP starts as soon as the payment confirms."}
+              {t(
+                subscribed
+                  ? character.vipCanceling
+                    ? "VIP active until " + formatDay(character.vipUntil ?? "") + ", not renewing."
+                    : "Renews on its own every month. Cancel to stop the charge on Stripe."
+                  : vip
+                    ? "Free VIP until " + formatDay(character.vipUntil ?? "") + "."
+                    : "New hunters get " +
+                      VIP_TRIAL_DAYS +
+                      " days of VIP free. VIP starts as soon as the payment confirms.",
+              )}
             </span>
             {subscribed ? (
               character.vipCanceling ? (

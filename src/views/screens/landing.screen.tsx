@@ -7,6 +7,7 @@ import { useLocale, useT } from "@/controllers/use-locale";
 import { sessionHint } from "@/models/repositories/session-hint.repository";
 import { lorePack } from "@/models/data/lore.i18n";
 import { PREVIEW_SHOTS } from "@/models/data/preview";
+import { VIP_TRIAL_DAYS } from "@/models/rules/vip";
 import { GAME_NAME, GAME_TAGLINE } from "@/shared/constants/game";
 import { BRAND_LOGO_WEBP_PATH } from "@/shared/constants/site";
 import { GLASS_SECTION, GLASS_SECTION_STRONG } from "@/shared/constants/ui";
@@ -90,12 +91,15 @@ export function LandingScreen() {
             )}
           </p>
 
-          <div className="flex flex-col items-center gap-4">
+          <div className="flex flex-col items-center gap-3">
             {hasRun ? (
               <LandingCtaButton href="/character" label={"Continue as " + character.name} />
             ) : (
               <LandingCtaButton href="/login" label={t("Play free")} />
             )}
+            <p className="landing-hero-shadow-text text-xs text-ink-faint">
+              {t("New hunters get " + VIP_TRIAL_DAYS + " days of VIP free.")}
+            </p>
           </div>
         </div>
       </header>
@@ -217,7 +221,11 @@ export function LandingScreen() {
           <div className="space-y-1 text-center">
             <h2 className="heading text-[11px] text-ink">{t("What the night asks")}</h2>
             <p className="text-xs text-ink-faint">
-              {t("Everything runs on its own while you watch, and nothing rises unless you say so.")}
+              {t(
+                "Everything runs on its own while you watch, and nothing rises unless you say so. New hunters get " +
+                  VIP_TRIAL_DAYS +
+                  " days of VIP free.",
+              )}
             </p>
           </div>
 
@@ -243,6 +251,9 @@ export function LandingScreen() {
             {t(
               "Choose a name, choose a bloodline and descend. The first night is the cheapest you will ever have.",
             )}
+          </p>
+          <p className="landing-hero-shadow-text text-xs text-ink-faint">
+            {t("New hunters get " + VIP_TRIAL_DAYS + " days of VIP free.")}
           </p>
           <LandingCtaButton
             href={hasRun ? "/character" : "/login"}
