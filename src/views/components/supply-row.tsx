@@ -19,6 +19,11 @@ export function SupplyRow({
 }) {
   return (
     <li className="flex items-stretch">
+      <span className="flex w-16 shrink-0 items-center justify-center overflow-hidden border-r border-edge p-2 sm:w-20">
+        <span className="relative aspect-square w-full overflow-hidden">
+          <ItemArtFill item={item} />
+        </span>
+      </span>
       <div
         className={cn(
           "flex min-w-0 grow flex-wrap items-center gap-3 px-4 py-3",
@@ -33,11 +38,6 @@ export function SupplyRow({
           {action}
         </span>
       </div>
-      <span className="flex w-16 shrink-0 items-center justify-center overflow-hidden border-l border-edge p-2 sm:w-20">
-        <span className="relative aspect-square w-full overflow-hidden">
-          <ItemArtFill item={item} />
-        </span>
-      </span>
     </li>
   );
 }
