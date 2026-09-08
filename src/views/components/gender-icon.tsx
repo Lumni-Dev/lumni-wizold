@@ -6,22 +6,24 @@ import { findGender, type Gender } from "@/models/entities/character";
 import { GLASS_SECTION } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { ArtImage } from "./art-image";
-import { IconArt, IconFrame, type IconSize } from "./icon-frame";
+import { IconArt, IconFrame, type FrameTone, type IconSize } from "./icon-frame";
 
 export function GenderIcon({
   gender,
   size = "large",
+  tone = "strong",
   className,
 }: {
   gender: Gender;
   size?: IconSize;
+  tone?: FrameTone;
   className?: string;
 }) {
   const art = useArt();
   const source = art.genders[gender];
 
   return (
-    <IconFrame size={size} tone="strong" className={className}>
+    <IconFrame size={size} tone={tone} className={className}>
       {source ? (
         <IconArt source={source} padded={false} fit="contain" />
       ) : (

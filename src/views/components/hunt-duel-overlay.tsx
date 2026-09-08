@@ -151,7 +151,7 @@ export function HuntDuelOverlay({
             }
             className={cn("inline-flex", hunterMotion)}
           >
-            <GenderIcon gender={gender} size="large" className="art-soft-shadow" />
+            <GenderIcon gender={gender} size="large" tone="glass" />
           </span>
           {slashSide === "theirs" ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -174,7 +174,7 @@ export function HuntDuelOverlay({
             }
             className={cn("inline-flex", preyMotion)}
           >
-            <CreatureIcon creature={shownFoe} size="large" tone="strong" className="art-soft-shadow" />
+            <CreatureIcon creature={shownFoe} size="large" tone="glass" />
           </span>
           {slashSide === "ours" ? (
             // eslint-disable-next-line @next/next/no-img-element
