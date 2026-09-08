@@ -226,7 +226,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
         <div className="space-y-6 lg:col-span-2">
           <AttributesPanel stats={stats} gender={hunter.gender} />
 
-          <EquipmentPanel gear={gear} forge={hunter.forge} />
+          <EquipmentPanel gear={gear} forge={hunter.forge} gender={hunter.gender} />
 
           <Panel title="Combat" description="Each line says which attribute it comes from." padding="none">
             <List>

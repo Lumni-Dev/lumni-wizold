@@ -6,6 +6,7 @@ import { EMPTY_ART, type ArtManifest } from "../entities/art";
 import { ATTRIBUTES } from "../entities/attribute";
 import { GENDERS } from "../entities/character";
 import { PETS } from "../entities/pet";
+import { EQUIPMENT_SLOTS } from "../entities/item";
 import { ITEMS } from "../data/items";
 import { STORE_PACKS } from "../data/store-packs";
 import { TERRITORIES } from "../data/territories";
@@ -19,6 +20,7 @@ const PET_ROOT = "pet";
 const GENDER_ROOT = "genders";
 const STORE_ROOT = "store";
 const CREATURE_ROOT = "creatures";
+const EMPTY_SLOT_ROOT = "empty-slots";
 
 const IMAGE_EXTENSIONS = new Set([".png", ".webp", ".gif", ".jpg", ".jpeg", ".svg", ".avif"]);
 const VIDEO_EXTENSIONS = new Set([".mp4", ".webm"]);
@@ -305,6 +307,22 @@ function collectCreatures(files: FoundFile[]): Record<string, string> {
   return art;
 }
 
+function collectEmptySlots(files: FoundFile[]): Record<string, string> {
+  const art: Record<string, string> = {};
+  const known = new Set<string>([
+    ...EQUIPMENT_SLOTS,
+    "armor-male",
+    "armor-female",
+  ]);
+
+  for (const file of files) {
+    const id = normalize(file.name);
+    if (known.has(id)) art[id] = file.url;
+  }
+
+  return art;
+}
+
 export async function scanArtManifestFromDisk(): Promise<ArtManifest> {
   const [
     itemFiles,
@@ -316,6 +334,7 @@ export async function scanArtManifestFromDisk(): Promise<ArtManifest> {
     petFiles,
     genderFiles,
     packFiles,
+    emptySlotFiles,
   ] = await Promise.all([
     walk(ITEM_ROOT),
     walk(HUNT_ROOT),
@@ -326,9 +345,10 @@ export async function scanArtManifestFromDisk(): Promise<ArtManifest> {
     walk(PET_ROOT),
     walk(GENDER_ROOT),
     walk(STORE_ROOT),
+    walk(EMPTY_SLOT_ROOT),
   ]);
 
-  const [items, hunt, huntVideos, attributes, training, creatures, pets, genders, packs] =
+  const [items, hunt, huntVideos, attributes, training, creatures, pets, genders, packs, emptySlots] =
     await Promise.all([
       resolve(itemFiles),
       resolve(huntFiles),
@@ -339,6 +359,7 @@ export async function scanArtManifestFromDisk(): Promise<ArtManifest> {
       resolve(petFiles),
       resolve(genderFiles),
       resolve(packFiles),
+      resolve(emptySlotFiles),
     ]);
 
   return {
@@ -351,6 +372,7 @@ export async function scanArtManifestFromDisk(): Promise<ArtManifest> {
     pets: collectPets(pets),
     genders: collectGenders(genders),
     packs: collectPacks(packs),
+    emptySlots: collectEmptySlots(emptySlots),
   };
 }
 

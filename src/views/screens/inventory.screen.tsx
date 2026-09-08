@@ -29,7 +29,7 @@ import { ItemFilterRow } from "../components/item-filter-row";
 import { Pagination } from "../components/pagination";
 import { ItemCard } from "../components/item-card";
 import { FuryUseButton } from "../components/fury-use-button";
-import { ItemArtFill } from "../components/item-icon";
+import { ItemArtFill, EmptySlotArt } from "../components/item-icon";
 import { RowText } from "../components/list";
 import { Tag } from "../components/tag";
 import { Panel } from "../components/panel";
@@ -104,7 +104,7 @@ export function InventoryScreen() {
                     item ? (
                       <ItemArtFill item={item} enhancement={piece?.enhancement ?? 0} />
                     ) : (
-                      <span aria-hidden className="h-full w-full" />
+                      <EmptySlotArt slot={slot} gender={character.gender} />
                     )
                   }
                 >

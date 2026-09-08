@@ -255,7 +255,7 @@ export function CharacterScreen() {
 
           <AttributesPanel stats={stats} gender={character.gender} />
 
-          <EquipmentPanel gear={gear} forge={forge} />
+          <EquipmentPanel gear={gear} forge={forge} gender={character.gender} />
 
           <Panel title="Combat" description="Each line says which attribute it comes from." padding="none">
             <List>

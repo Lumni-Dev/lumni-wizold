@@ -8,6 +8,7 @@ export interface ArtManifest {
   pets: Record<string, string>;
   genders: Record<string, string>;
   packs: Record<string, string>;
+  emptySlots: Record<string, string>;
 }
 
 export const EMPTY_ART: ArtManifest = {
@@ -20,4 +21,5 @@ export const EMPTY_ART: ArtManifest = {
   pets: {},
   genders: {},
   packs: {},
+  emptySlots: {},
 };

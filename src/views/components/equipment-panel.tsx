@@ -1,9 +1,10 @@
 import { useT } from "@/controllers/use-locale";
+import type { Gender } from "@/models/entities/character";
 import { SLOT_LABEL, type EquipmentSlot, type Item } from "@/models/entities/item";
 import { formatNumber } from "@/shared/utils/format";
 import { cn } from "@/shared/utils/class-names";
 import { summarizeEffect } from "../presenters/item.presenter";
-import { ItemArtFill } from "./item-icon";
+import { EmptySlotArt, ItemArtFill } from "./item-icon";
 import { Panel } from "./panel";
 
 export interface GearSlot {
@@ -12,7 +13,15 @@ export interface GearSlot {
   level: number;
 }
 
-export function EquipmentPanel({ gear, forge }: { gear: GearSlot[]; forge: number }) {
+export function EquipmentPanel({
+  gear,
+  forge,
+  gender = "male",
+}: {
+  gear: GearSlot[];
+  forge: number;
+  gender?: Gender;
+}) {
   const t = useT();
   return (
     <Panel
@@ -39,7 +48,7 @@ export function EquipmentPanel({ gear, forge }: { gear: GearSlot[]; forge: numbe
               {item ? (
                 <ItemArtFill item={item} enhancement={level} />
               ) : (
-                <span aria-hidden className="h-full w-full" />
+                <EmptySlotArt slot={slot} gender={gender} />
               )}
             </span>
             <div className="flex min-w-0 grow items-center px-4 py-3">

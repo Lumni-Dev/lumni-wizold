@@ -1,7 +1,8 @@
 "use client";
 
 import { useArt } from "@/controllers/art.context";
-import type { Item } from "@/models/entities/item";
+import type { Gender } from "@/models/entities/character";
+import type { EquipmentSlot, Item } from "@/models/entities/item";
 import { itemInitials } from "../presenters/item.presenter";
 import { ArtImage } from "./art-image";
 import { IconArt, IconFrame, type IconSize } from "./icon-frame";
@@ -84,6 +85,28 @@ export function ItemArtFill({ item, enhancement = 0 }: { item: Item; enhancement
           +{enhancement}
         </span>
       ) : null}
+    </span>
+  );
+}
+
+export function EmptySlotArt({
+  slot,
+  gender = "male",
+}: {
+  slot: EquipmentSlot;
+  gender?: Gender;
+}) {
+  const art = useArt();
+  const key = slot === "armor" ? "armor-" + gender : slot;
+  const source = art.emptySlots[key] ?? (slot === "armor" ? art.emptySlots["armor-male"] : undefined);
+
+  if (!source) {
+    return <span aria-hidden className="h-full w-full" />;
+  }
+
+  return (
+    <span className="relative flex h-full w-full">
+      <IconArt source={source} padded={false} fit="contain" zoom={false} />
     </span>
   );
 }

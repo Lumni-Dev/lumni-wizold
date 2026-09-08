@@ -16,6 +16,7 @@ const FOLDERS = [
   "pet",
   "genders",
   "store",
+  "empty-slots",
 ];
 
 const SOURCE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg"]);
@@ -28,6 +29,7 @@ const MAX_SIZE = {
   training: 512,
   genders: 512,
   pet: 1024,
+  "empty-slots": 512,
 };
 
 const DEFAULT_SIZE = 512;
