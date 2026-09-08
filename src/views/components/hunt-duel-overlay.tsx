@@ -140,7 +140,7 @@ export function HuntDuelOverlay({
       className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-gradient-to-t from-base/70 via-base/25 to-transparent"
     >
       <div className="relative flex items-center gap-3 px-3 sm:gap-4">
-        <span className={cn("inline-flex", hunterShaking && hunterPhase === "alive" && "card-shake")}>
+        <span className={cn("relative inline-flex", hunterShaking && hunterPhase === "alive" && "card-shake")}>
           <span
             key={
               hunterPhase === "enter"
@@ -153,8 +153,17 @@ export function HuntDuelOverlay({
           >
             <GenderIcon gender={gender} size="large" className="art-soft-shadow" />
           </span>
+          {slashSide === "theirs" ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={`slash-theirs-${beat}`}
+              src={CLAW_SLASH}
+              alt=""
+              className="absolute left-1/2 top-[8%] z-20 h-14 w-20 -translate-x-1/2 object-contain mix-blend-screen -scale-x-100 sm:h-16 sm:w-24"
+            />
+          ) : null}
         </span>
-        <span className={cn("inline-flex", preyShaking && preyPhase === "alive" && "card-shake")}>
+        <span className={cn("relative inline-flex", preyShaking && preyPhase === "alive" && "card-shake")}>
           <span
             key={
               preyPhase === "enter"
@@ -167,21 +176,16 @@ export function HuntDuelOverlay({
           >
             <CreatureIcon creature={shownFoe} size="large" tone="strong" className="art-soft-shadow" />
           </span>
+          {slashSide === "ours" ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={`slash-ours-${beat}`}
+              src={CLAW_SLASH}
+              alt=""
+              className="absolute left-1/2 top-[8%] z-20 h-14 w-20 -translate-x-1/2 object-contain mix-blend-screen sm:h-16 sm:w-24"
+            />
+          ) : null}
         </span>
-        {slashSide ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            key={`slash-${slashSide}-${beat}`}
-            src={CLAW_SLASH}
-            alt=""
-            className={cn(
-              "absolute top-1/2 z-20 h-28 w-44 -translate-y-1/2 object-contain mix-blend-screen sm:h-32 sm:w-52",
-              slashSide === "ours"
-                ? "left-[62%] -translate-x-1/2"
-                : "left-[38%] -translate-x-1/2 -scale-x-100",
-            )}
-          />
-        ) : null}
       </div>
     </div>
   );
