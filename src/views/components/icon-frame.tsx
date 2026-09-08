@@ -2,7 +2,6 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { artLoadedFromImg, isArtCached, markArtCached } from "@/shared/utils/art-cache";
-import { GLASS_SECTION } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { CornerAccents } from "./corner-accents";
 export type IconSize = "mini" | "small" | "medium" | "large" | "huge";
@@ -37,7 +36,9 @@ const TONES: Record<FrameTone, string> = {
   default: "slot-well border-edge text-ink-faint",
   strong: "slot-well-strong border-edge-strong text-ink-soft",
   empty: "border-edge bg-surface-high text-ink-faint",
-  glass: "border-edge " + GLASS_SECTION + " text-ink-faint",
+  // No full border and no backdrop-blur: hunt duel rides transforms, so the
+  // frame keeps only the corner accents and a flat glass fill.
+  glass: "border-transparent bg-surface/75 text-ink-faint",
 };
 export function IconFrame({
   size = "medium",
