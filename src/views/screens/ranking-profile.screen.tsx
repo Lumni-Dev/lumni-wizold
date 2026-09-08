@@ -125,7 +125,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
               ) : undefined
             }
           >
-            <CardHeader art={<GenderArtFill gender={hunter.gender} />} artPadding="none">
+            <CardHeader art={<GenderArtFill gender={hunter.gender} />}>
               <div className="min-w-0 space-y-1">
                 <div className="flex items-center gap-2">
                   <p className="min-w-0 truncate text-sm text-ink">{displayNick(hunter.name)}</p>

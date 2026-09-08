@@ -110,7 +110,7 @@ export function CharacterScreen() {
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-1">
           <Panel title="Sheet" padding="none">
-            <CardHeader art={<GenderArtFill gender={character.gender} />} artPadding="none">
+            <CardHeader art={<GenderArtFill gender={character.gender} />}>
               <div className="min-w-0 space-y-1">
                 <div className="flex items-center gap-2">
                   <p className="min-w-0 truncate text-sm text-ink">{displayNick(character.name)}</p>
