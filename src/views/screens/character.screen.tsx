@@ -25,7 +25,8 @@ import { Tag } from "../components/tag";
 import { VipBadge } from "../components/vip-badge";
 import { DataRow } from "../components/data-row";
 import { EmptyState } from "../components/empty-state";
-import { GenderBanner } from "../components/gender-icon";
+import { CardHeader } from "../components/card";
+import { GenderArtFill } from "../components/gender-icon";
 import { VitalActionButton } from "../components/vital-action-button";
 import { FuryUseButton } from "../components/fury-use-button";
 import { List, ListRow } from "../components/list";
@@ -109,8 +110,7 @@ export function CharacterScreen() {
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-1">
           <Panel title="Sheet" padding="none">
-            <GenderBanner gender={character.gender} />
-            <div className="border-b border-edge px-4 py-3">
+            <CardHeader art={<GenderArtFill gender={character.gender} />} artPadding="none">
               <div className="min-w-0 space-y-1">
                 <div className="flex items-center gap-2">
                   <p className="min-w-0 truncate text-sm text-ink">{displayNick(character.name)}</p>
@@ -121,7 +121,7 @@ export function CharacterScreen() {
                   {t(genderDefinition.label)}
                 </p>
               </div>
-            </div>
+            </CardHeader>
 
             <List>
               <DataRow label="Level" value={"LV. " + formatNumber(character.level)} />
