@@ -159,7 +159,7 @@ export function HuntDuelOverlay({
               key={`slash-theirs-${beat}`}
               src={CLAW_SLASH}
               alt=""
-              className="absolute left-1/2 top-1/2 z-20 h-14 w-20 -translate-x-1/2 -translate-y-1/2 object-contain mix-blend-screen -scale-x-100 -scale-y-100 sm:h-16 sm:w-24"
+              className="absolute left-1/2 top-1/2 z-20 h-14 w-20 -translate-x-1/2 -translate-y-1/2 -rotate-90 object-contain mix-blend-screen -scale-x-100 -scale-y-100 sm:h-16 sm:w-24"
             />
           ) : null}
         </span>
@@ -182,7 +182,7 @@ export function HuntDuelOverlay({
               key={`slash-ours-${beat}`}
               src={CLAW_SLASH}
               alt=""
-              className="absolute left-1/2 top-1/2 z-20 h-14 w-20 -translate-x-1/2 -translate-y-1/2 object-contain mix-blend-screen -scale-y-100 sm:h-16 sm:w-24"
+              className="absolute left-1/2 top-1/2 z-20 h-14 w-20 -translate-x-1/2 -translate-y-1/2 rotate-90 object-contain mix-blend-screen -scale-y-100 sm:h-16 sm:w-24"
             />
           ) : null}
         </span>
