@@ -16,7 +16,7 @@ import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { DataRow } from "../components/data-row";
 import { ItemBanner, ItemIcon, useItemArt } from "../components/item-icon";
-import { List, RowText } from "../components/list";
+import { List, ListRow, RowText } from "../components/list";
 import { Select } from "../components/select";
 import { Tag } from "../components/tag";
 import { Tooltip } from "../components/tooltip";
@@ -138,6 +138,22 @@ function RecipeCard({
   const secondPick = secondOptions.find((option) => option.item.id === chosen.second);
   const firstShort = firstPick !== undefined && firstPick.owned < recipe.first.quantity;
   const secondShort = secondPick !== undefined && secondPick.owned < recipe.second.quantity;
+  const slots = [
+    {
+      side: "first" as const,
+      label: "First ingredient",
+      ingredient: recipe.first,
+      options: firstOptions,
+      value: chosen.first,
+    },
+    {
+      side: "second" as const,
+      label: "Second ingredient",
+      ingredient: recipe.second,
+      options: secondOptions,
+      value: chosen.second,
+    },
+  ];
   const reason = !unlocked
     ? "Requires LV. " + formatNumber(potion.minLevel)
     : flasks < 1
@@ -164,61 +180,57 @@ function RecipeCard({
         />
       </CardHeader>
 
-              <CardBody padding="none">
-                <List>
-                  <DataRow label="Empty Flask" value="x1" />
-                  <DataRow
-                    label="First ingredient"
-                    value={"x" + recipe.first.quantity + " · " + t(RARITY_LABEL[recipe.first.rarity]) + "+"}
-                  />
-                  <DataRow
-                    label="Second ingredient"
-                    value={"x" + recipe.second.quantity + " · " + t(RARITY_LABEL[recipe.second.rarity]) + "+"}
-                  />
-                </List>
-                <div className="space-y-3 border-t border-edge p-4">
-                  <Select
-                    label={t("First ingredient")}
-                    placeholder={t("Choose a material")}
-                    value={chosen.first}
-                    disabled={!unlocked}
-                    options={firstOptions.map((option) => ({
-                      value: option.item.id,
-                      label: t(option.item.name) + " (x" + formatNumber(option.owned) + ")",
-                    }))}
-                    onChange={(value) => onPick("first", value)}
-                    className="w-full"
-                  />
-                  <Select
-                    label={t("Second ingredient")}
-                    placeholder={t("Choose a material")}
-                    value={chosen.second}
-                    disabled={!unlocked}
-                    options={secondOptions.map((option) => ({
-                      value: option.item.id,
-                      label: t(option.item.name) + " (x" + formatNumber(option.owned) + ")",
-                    }))}
-                    onChange={(value) => onPick("second", value)}
-                    className="w-full"
-                  />
+      <CardBody padding="none">
+        <List>
+          <DataRow label="Empty Flask" value="x1" />
+          {slots.map((slot) => (
+            <ListRow key={slot.side} layout="column">
+              <div className="w-full space-y-2">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                    {t(slot.label)}
+                  </span>
+                  <span className="shrink-0 font-mono text-[11px] text-ink-soft">
+                    {"x" +
+                      slot.ingredient.quantity +
+                      " · " +
+                      t(RARITY_LABEL[slot.ingredient.rarity]) +
+                      "+"}
+                  </span>
                 </div>
-              </CardBody>
+                <Select
+                  aria-label={t(slot.label)}
+                  placeholder={t("Choose a material")}
+                  value={slot.value}
+                  disabled={!unlocked}
+                  options={slot.options.map((option) => ({
+                    value: option.item.id,
+                    label: t(option.item.name) + " (x" + formatNumber(option.owned) + ")",
+                  }))}
+                  onChange={(value) => onPick(slot.side, value)}
+                  className="w-full"
+                />
+              </div>
+            </ListRow>
+          ))}
+        </List>
+      </CardBody>
 
-              <CardFooter className="w-full">
-                <Tooltip block className="w-full" label={reason}>
-                  <Button
-                    variant={reason === null ? "primary" : "outline"}
-                    fullWidth
-                    disabled={reason !== null}
-                    onClick={() => {
-                      if (!firstPick || !secondPick) return;
-                      onBrew(firstPick.item.name, secondPick.item.name);
-                    }}
-                  >
-                    Brew
-                  </Button>
-                </Tooltip>
-              </CardFooter>
-            </Card>
+      <CardFooter className="w-full">
+        <Tooltip block className="w-full" label={reason}>
+          <Button
+            variant={reason === null ? "primary" : "outline"}
+            fullWidth
+            disabled={reason !== null}
+            onClick={() => {
+              if (!firstPick || !secondPick) return;
+              onBrew(firstPick.item.name, secondPick.item.name);
+            }}
+          >
+            Brew
+          </Button>
+        </Tooltip>
+      </CardFooter>
+    </Card>
   );
 }
