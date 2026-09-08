@@ -216,7 +216,7 @@ export function Sidebar({
   return (
     <aside
       className={cn(
-        "sticky top-0 hidden h-screen shrink-0 flex-col border-r border-edge bg-surface/40 backdrop-blur transition-[width] duration-200 lg:flex",
+        "sticky top-2.5 my-2.5 ml-2.5 hidden h-[calc(100svh-1.25rem)] shrink-0 flex-col overflow-hidden rounded-lg border border-edge bg-surface/40 backdrop-blur transition-[width] duration-200 lg:flex",
         collapsed ? "w-14" : "w-56",
       )}
     >
@@ -283,7 +283,7 @@ export function MobileNavigation({
     <nav
       ref={trackRef}
       aria-label={t("Game pages")}
-      className="flex h-14 items-center gap-2 overflow-x-auto border-b border-edge bg-surface/40 px-3 backdrop-blur lg:hidden"
+      className="mx-2.5 mt-2.5 flex h-14 items-center gap-2 overflow-x-auto rounded-lg border border-edge bg-surface/40 px-3 backdrop-blur lg:hidden"
     >
       {links.map((item) => {
         const active = pathname === item.href;

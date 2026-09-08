@@ -70,7 +70,7 @@ export function GameFrame({ children }: { children: ReactNode }) {
           onOpenTutorial={() => setReviewTutorial(true)}
         />
         <div className="flex min-h-screen w-full min-w-0 flex-col">
-          <div className="sticky top-0 z-20">
+          <div className="sticky top-0 z-20 px-2.5 pt-2.5">
             <ResourceBar />
           </div>
           <MobileNavigation
@@ -78,7 +78,7 @@ export function GameFrame({ children }: { children: ReactNode }) {
             tutorialOpen={tutorialOpen}
             onOpenTutorial={() => setReviewTutorial(true)}
           />
-          <div className="border-b border-edge px-3 py-2 lg:hidden">
+          <div className="mx-2.5 mt-2.5 rounded-lg border border-edge bg-surface/40 px-3 py-2 lg:hidden">
             <MoonTracker />
           </div>
           <main className="mx-auto w-full max-w-6xl flex-1 space-y-6 p-4 md:p-8">{children}</main>

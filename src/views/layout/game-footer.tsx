@@ -8,7 +8,7 @@ import { GAME_VERSION } from "@/shared/constants/version";
 export function GameFooter() {
   const t = useT();
   return (
-    <footer className="mt-auto border-t border-edge bg-surface/40">
+    <footer className="mx-2.5 mb-2.5 mt-auto rounded-lg border border-edge bg-surface/40">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between md:px-8">
         <div className="flex min-w-0 items-center gap-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
