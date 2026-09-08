@@ -63,7 +63,7 @@ function Fighter({
   const left = Math.max(0, Math.round(health));
   return (
     <div className={cn("flex items-center gap-3 p-4", ICON_FRAME_INSET)}>
-      <GenderIcon gender={gender} size="large" />
+      <GenderIcon gender={gender} size="medium" />
       <div className="min-w-0 flex-1 space-y-2">
         <RowText title={name} label={side + " - LV. " + formatNumber(level)} />
         <Bar
@@ -600,7 +600,11 @@ export function ArenaScreen() {
               const resting = cooldownLeft > 0;
               return (
                 <Card key={hunter.id} height="fill">
-                  <CardHeader art={<GenderArtFill gender={hunter.gender} />} artPadding="none">
+                  <CardHeader
+                    art={<GenderArtFill gender={hunter.gender} />}
+                    artSize="small"
+                    artPadding="none"
+                  >
                     <RowText
                       title={
                         <Link
