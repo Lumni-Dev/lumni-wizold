@@ -1,5 +1,6 @@
 import { ATTRIBUTES } from "@/models/entities/attribute";
 import { CATEGORY_LABEL, type Item } from "@/models/entities/item";
+import { isForgeMaterial } from "@/models/rules/bazaar";
 import { enhancedEffect, exactEnhancedValue } from "@/models/rules/forge";
 import { furyWillpowerExtraMs } from "@/models/rules/moon";
 import { FURY_ATTRIBUTE_BONUS } from "@/shared/constants/game";
@@ -16,6 +17,13 @@ export function itemInitials(name: string): string {
 
 export function itemSubtitle(item: Item): string {
   return CATEGORY_LABEL[item.category];
+}
+
+// Rarity is the carcass's own word: it tells one spoil from another and it is
+// what the cauldron reads. Gear answers for its set, potions for what they
+// restore and mined fragments for their vein, so none of them wears it.
+export function showsRarity(item: Item): boolean {
+  return item.category === "material" && !isForgeMaterial(item);
 }
 
 function percent(ratio: number): string {

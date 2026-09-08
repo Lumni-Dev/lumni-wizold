@@ -43,7 +43,7 @@ import { ItemArtFill } from "../components/item-icon";
 import { WikiMasonry, WikiMasonryItem } from "../components/wiki-masonry";
 import { WikiPaginatedPanel } from "../components/wiki-paginated-panel";
 import { PageHeader } from "../layout/page-header";
-import { summarizeEffect } from "../presenters/item.presenter";
+import { showsRarity, summarizeEffect } from "../presenters/item.presenter";
 
 const FIXED_TABS: readonly { key: string; label: string }[] = [
   { key: "attributes", label: "Attributes" },
@@ -88,7 +88,9 @@ const WIKI_POTIONS: readonly Item[] = itemsOfCategory("potion");
 
 function wikiItemDescription(item: Item): string {
   const effects = summarizeEffect(item);
-  const base = RARITY_LABEL[item.rarity] + ", LV. " + item.minLevel + "+";
+  const base = showsRarity(item)
+    ? RARITY_LABEL[item.rarity] + ", LV. " + item.minLevel + "+"
+    : "LV. " + item.minLevel + "+";
   return effects.length > 0 ? base + " · " + effects.join(", ") : base;
 }
 
@@ -251,10 +253,7 @@ export function WikiScreen() {
                     <RowText
                       title={t(pieceName(definition, slot))}
                       description={
-                        t(SLOT_LABEL[slot]) +
-                        " · " +
-                        t(RARITY_LABEL[definition.rarity]) +
-                        (bonuses ? " · " + bonuses : "")
+                        t(SLOT_LABEL[slot]) + (bonuses ? " · " + bonuses : "")
                       }
                     />
                     <span className="shrink-0 font-mono text-[11px] text-ink-faint">

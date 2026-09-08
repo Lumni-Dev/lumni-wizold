@@ -17,6 +17,7 @@ import { ConfirmDialog } from "../components/confirm-dialog";
 import { DataRow } from "../components/data-row";
 import { ItemIcon } from "../components/item-icon";
 import { List, ListRow, RowText } from "../components/list";
+import { summarizeEffect } from "../presenters/item.presenter";
 import { Select } from "../components/select";
 import { Tag } from "../components/tag";
 import { Tooltip } from "../components/tooltip";
@@ -172,7 +173,9 @@ function RecipeCard({
           title={potion.name}
           description={
             unlocked
-              ? t(RARITY_LABEL[potion.rarity])
+              ? summarizeEffect(potion)
+                  .map((effect) => t(effect))
+                  .join(", ")
               : "Requires LV. " + formatNumber(potion.minLevel)
           }
         />

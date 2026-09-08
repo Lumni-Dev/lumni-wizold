@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { RARITY_LABEL, type Item } from "@/models/entities/item";
 import { useGame } from "@/controllers/game.context";
 import { useT } from "@/controllers/use-locale";
-import { itemSubtitle, summarizeEffect } from "../presenters/item.presenter";
+import { itemSubtitle, showsRarity, summarizeEffect } from "../presenters/item.presenter";
 import { Card, CardBody, CardFooter, CardHeader } from "./card";
 import { ItemBanner, ItemIcon, useItemArt } from "./item-icon";
 import { RowText } from "./list";
@@ -47,7 +47,11 @@ export function ItemCard({
         {drawn ? null : <ItemIcon item={item} enhancement={enhancement} />}
         <RowText
           title={item.name}
-          description={t(itemSubtitle(item)) + " · " + t(RARITY_LABEL[item.rarity])}
+          description={
+            showsRarity(item)
+              ? t(itemSubtitle(item)) + " · " + t(RARITY_LABEL[item.rarity])
+              : t(itemSubtitle(item))
+          }
         />
         {quantity && quantity > 1 ? (
           <span className="shrink-0 font-mono text-xs text-ink-soft">x{quantity}</span>
