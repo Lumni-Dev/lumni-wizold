@@ -57,11 +57,17 @@ export function furyDurationCopy(baseMinutes: number, willpower: number): string
   return formatFuryDuration(baseMinutes, furyWillpowerExtraMs(baseMinutes, willpower));
 }
 
-// What a medium flask lasts for this sheet, Willpower stretch included:
-// the combat panel's "Potion + 6m 24s" line on the character and profile pages.
-export function furyPotionClock(willpower: number): string {
-  const ms = furyDurationMs(FURY.durationMinutesBySize.medium, willpower);
+// What one flask of the given size lasts for this sheet, Willpower stretch
+// included: the combat panel's fury rows on the character and profile pages.
+// The willpower handed in must not carry the fury buff itself, mirroring
+// consumeItem, or a sheet read mid-fury would promise a longer clock than the
+// next flask actually delivers.
+export function furyPotionClock(
+  size: keyof typeof FURY.durationMinutesBySize,
+  willpower: number,
+): string {
+  const ms = furyDurationMs(FURY.durationMinutesBySize[size], willpower);
   const minutes = Math.floor(ms / 60_000);
   const seconds = Math.floor(ms / 1000) % 60;
-  return "Potion + " + minutes + "m " + seconds + "s";
+  return minutes + "m " + seconds + "s";
 }

@@ -270,7 +270,12 @@ export function CharacterScreen() {
                 value={
                   "+" +
                   formatNumber(
-                    Math.max(1, Math.ceil(stats.maxHealth * restRecoveryRatio(willpower))),
+                    Math.max(
+                      1,
+                      Math.ceil(
+                        stats.maxHealth * restRecoveryRatio(stats.totalAttributes.willpower),
+                      ),
+                    ),
                   ) +
                   " / " +
                   REST_TICK_MS / 1000 +
@@ -278,8 +283,16 @@ export function CharacterScreen() {
                 }
               />
               <DataRow
-                label="Fury duration (Willpower)"
-                value={furyPotionClock(willpower)}
+                label="Fury: small potion"
+                value={furyPotionClock("small", willpower)}
+              />
+              <DataRow
+                label="Fury: medium potion"
+                value={furyPotionClock("medium", willpower)}
+              />
+              <DataRow
+                label="Fury: large potion"
+                value={furyPotionClock("large", willpower)}
               />
               <DataRow
                 label="Critical damage"

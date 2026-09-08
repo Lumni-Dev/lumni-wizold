@@ -76,7 +76,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
   const genderDefinition = findGender(hunter.gender);
   const strength = stats.totalAttributes.strength;
   const endurance = stats.totalAttributes.endurance;
-  const willpower = stats.totalAttributes.willpower;
+  const willpower = stats.totalAttributes.willpower - stats.sources.fury.willpower;
 
   return (
     <>
@@ -223,7 +223,12 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
                 value={
                   "+" +
                   formatNumber(
-                    Math.max(1, Math.ceil(stats.maxHealth * restRecoveryRatio(willpower))),
+                    Math.max(
+                      1,
+                      Math.ceil(
+                        stats.maxHealth * restRecoveryRatio(stats.totalAttributes.willpower),
+                      ),
+                    ),
                   ) +
                   " / " +
                   REST_TICK_MS / 1000 +
@@ -231,8 +236,16 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
                 }
               />
               <DataRow
-                label="Fury duration (Willpower)"
-                value={furyPotionClock(willpower)}
+                label="Fury: small potion"
+                value={furyPotionClock("small", willpower)}
+              />
+              <DataRow
+                label="Fury: medium potion"
+                value={furyPotionClock("medium", willpower)}
+              />
+              <DataRow
+                label="Fury: large potion"
+                value={furyPotionClock("large", willpower)}
               />
               <DataRow
                 label="Critical damage"
