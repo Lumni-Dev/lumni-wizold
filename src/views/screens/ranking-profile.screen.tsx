@@ -209,6 +209,10 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
         </div>
 
         <div className="space-y-6 lg:col-span-2">
+          <AttributesPanel stats={stats} gender={hunter.gender} />
+
+          <EquipmentPanel gear={gear} forge={hunter.forge} />
+
           <Panel title="Combat" description="Each line says which attribute it comes from." padding="none">
             <List>
               <DataRow label="Strike (Strength)" value={formatFraction(strength)} />
@@ -263,10 +267,6 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
               />
             </List>
           </Panel>
-
-          <AttributesPanel stats={stats} gender={hunter.gender} />
-
-          <EquipmentPanel gear={gear} forge={hunter.forge} />
         </div>
       </div>
     </>

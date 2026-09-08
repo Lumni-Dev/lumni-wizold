@@ -253,6 +253,10 @@ export function CharacterScreen() {
             )}
           </Panel>
 
+          <AttributesPanel stats={stats} gender={character.gender} />
+
+          <EquipmentPanel gear={gear} forge={forge} />
+
           <Panel title="Combat" description="Each line says which attribute it comes from." padding="none">
             <List>
               <DataRow label="Strike (Strength)" value={formatFraction(strength)} />
@@ -307,10 +311,6 @@ export function CharacterScreen() {
               />
             </List>
           </Panel>
-
-          <AttributesPanel stats={stats} gender={character.gender} />
-
-          <EquipmentPanel gear={gear} forge={forge} />
         </div>
       </div>
 
