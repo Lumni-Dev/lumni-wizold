@@ -378,7 +378,7 @@ export function ForgeScreen() {
               <Panel
               title="Anvil"
               description={
-                "Choose a piece under Available and it goes on the anvil. Each level adds 0.3% of the original piece's attributes, so a strong set pays a lot and a cheap piece climbs slowly, up to +" +
+                "Choose a piece under Available pieces and it goes on the anvil. Each level adds 0.3% of the original piece's attributes, so a strong set pays a lot and a cheap piece climbs slowly, up to +" +
                 formatNumber(MAX_ENHANCEMENT) +
                 "."
               }
@@ -529,7 +529,7 @@ export function ForgeScreen() {
             </FilterRow>
 
             <Panel
-              title="Available"
+              title="Available pieces"
               description="Choose what goes on the anvil. Only pieces off the body appear here."
               padding="none"
             >

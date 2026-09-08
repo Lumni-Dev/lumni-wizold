@@ -134,8 +134,8 @@ export const BASE: Record<string, string> = {
   // Language panel
   "Em que língua o jogo fala com você neste aparelho.":
     "The language the game speaks to you on this device.",
-  "Automático segue o idioma do navegador. O que ainda não tem tradução aparece em português.":
-    "Automatic follows the browser language. Whatever has no translation yet shows in Portuguese.",
+  "Automático segue o idioma do navegador. O jogo é escrito em inglês e traduzido a partir dele.":
+    "Automatic follows the browser language. The game is written in English and translated from it.",
 
   // Landing
   "Crônica de Lumni e Luna": "Chronicle of Lumni and Luna",
@@ -213,10 +213,13 @@ export const BASE: Record<string, string> = {
   // Forge screen
   "Mina": "Mine",
   "Bigorna": "Anvil",
-  "Disponíveis": "Available",
+  "Disponíveis": "Available pieces",
   "Nada disponível": "Nothing available",
   "Nada no inventário para forjar": "Nothing in the bag to forge",
   "Desequipe uma peça para bater nela na bigorna.": "Unequip a piece to strike it on the anvil.",
+  "Peças disponíveis": "Available pieces",
+  "Piezas disponibles": "Available pieces",
+  "Disponibles": "Available pieces",
   "Desequipe uma peça para forjá-la.": "Unequip a piece to forge it.",
   "Escolha o que entra na bigorna. Só peças fora do corpo aparecem aqui.":
     "Choose what goes on the anvil. Only pieces off the body appear here.",

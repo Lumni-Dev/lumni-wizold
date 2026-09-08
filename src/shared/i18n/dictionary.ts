@@ -590,9 +590,9 @@ const RULES: readonly PatternRule[] = [
     es: "Los siete espacios, del yelmo al anillo, sumando +$1 de forja.",
   },
   {
-    pattern: /^Choose a piece under Available and it goes on the anvil\. Each level adds 0\.3% of the original piece's attributes, so a strong set pays a lot and a cheap piece climbs slowly, up to \+(\d[\d.,]*)\.$/,
-    pt: "Escolha uma peça em Disponíveis e ela entra na bigorna. Cada nível soma 0,3% dos atributos da peça original, então um set forte rende muito e uma peça barata sobe devagar, até +$1.",
-    es: "Elige una pieza en Disponibles y entra al yunque. Cada nivel suma 0,3% de los atributos de la pieza original, así que un conjunto fuerte rinde mucho y una pieza barata sube despacio, hasta +$1.",
+    pattern: /^Choose a piece under Available pieces and it goes on the anvil\. Each level adds 0\.3% of the original piece's attributes, so a strong set pays a lot and a cheap piece climbs slowly, up to \+(\d[\d.,]*)\.$/,
+    pt: "Escolha uma peça em Peças disponíveis e ela entra na bigorna. Cada nível soma 0,3% dos atributos da peça original, então um set forte rende muito e uma peça barata sobe devagar, até +$1.",
+    es: "Elige una pieza en Piezas disponibles y entra al yunque. Cada nivel suma 0,3% de los atributos de la pieza original, así que un conjunto fuerte rinde mucho y una pieza barata sube despacio, hasta +$1.",
   },
   {
     pattern: /^Quantity of (.+) to buy$/,
@@ -615,9 +615,9 @@ const RULES: readonly PatternRule[] = [
     es: "Ningún objeto de $1 por ahora.",
   },
   {
-    pattern: /^The name can change once every (\d+) days, and the change costs (.+) WCoins\.$/,
-    pt: "O nome pode mudar uma vez a cada $1 dias, e a troca custa $2 WCoins.",
-    es: "El nombre puede cambiar una vez cada $1 días, y el cambio cuesta $2 WCoins.",
+    pattern: /^The name can change once every (\d+) days, and the change costs (.+)\.$/,
+    pt: "O nome pode mudar uma vez a cada $1 dias, e a troca custa $2.",
+    es: "El nombre puede cambiar una vez cada $1 días, y el cambio cuesta $2.",
   },
   {
     pattern: /^The next change only in (\d+) days\.$/,
@@ -665,9 +665,9 @@ const RULES: readonly PatternRule[] = [
     es: "+$1 de energía",
   },
   {
-    pattern: /^The change costs (.+) WCoins on the spot\.$/,
-    pt: "A troca custa $1 WCoins na hora.",
-    es: "El cambio cuesta $1 WCoins al instante.",
+    pattern: /^The change costs (.+) on the spot\.$/,
+    pt: "A troca custa $1 na hora.",
+    es: "El cambio cuesta $1 al instante.",
   },
   { pattern: /^\+(\d+) health$/, pt: "+$1 vida", es: "+$1 de vida" },
   { pattern: /^\+(\d+) to (\d+) health$/, pt: "+$1 a $2 vida", es: "+$1 a $2 de vida" },

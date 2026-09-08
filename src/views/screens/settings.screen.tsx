@@ -402,7 +402,7 @@ export function SettingsScreen() {
               RENAME_COOLDOWN_DAYS +
               " days, and the change costs " +
               formatBronze(RENAME_PRICE) +
-              " WCoins."
+              "."
             }
           >
             <form onSubmit={submitRename} className="space-y-3">

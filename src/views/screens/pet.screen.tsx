@@ -333,7 +333,7 @@ export function PetScreen() {
           <Panel
             title="Companion name"
             description={
-              "The change costs " + formatBronze(PET_RENAME_PRICE) + " WCoins on the spot."
+              "The change costs " + formatBronze(PET_RENAME_PRICE) + " on the spot."
             }
           >
             <form

@@ -1,7 +1,7 @@
 import { ATTRIBUTES } from "@/models/entities/attribute";
 import { CATEGORY_LABEL, type Item } from "@/models/entities/item";
 import { enhancedEffect, exactEnhancedValue } from "@/models/rules/forge";
-import { furyDurationMs, furyWillpowerExtraMs } from "@/models/rules/moon";
+import { furyWillpowerExtraMs } from "@/models/rules/moon";
 import { FURY_ATTRIBUTE_BONUS } from "@/shared/constants/game";
 import { FURY } from "@/shared/constants/tuning/fury";
 import { formatFraction, formatFuryDuration, formatMinutesLabel } from "@/shared/utils/format";
@@ -57,17 +57,18 @@ export function furyDurationCopy(baseMinutes: number, willpower: number): string
   return formatFuryDuration(baseMinutes, furyWillpowerExtraMs(willpower));
 }
 
-// What one flask of the given size lasts for this sheet, Willpower stretch
-// included: the combat panel's fury rows on the character and profile pages.
-// The willpower handed in must not carry the fury buff itself, mirroring
-// consumeItem, or a sheet read mid-fury would promise a longer clock than the
-// next flask actually delivers.
+// What one flask of the given size lasts for this sheet: base clock plus the
+// Willpower stretch in seconds, the same shape the bag and the drink toast
+// already use. The combat panel's fury rows on the character and ranking
+// profile pages read this. The willpower handed in must not carry the fury
+// buff itself, mirroring consumeItem, or a sheet read mid-fury would promise
+// a longer clock than the next flask actually delivers.
 export function furyPotionClock(
   size: keyof typeof FURY.durationMinutesBySize,
   willpower: number,
 ): string {
-  const ms = furyDurationMs(FURY.durationMinutesBySize[size], willpower);
-  const minutes = Math.floor(ms / 60_000);
-  const seconds = Math.floor(ms / 1000) % 60;
-  return minutes + "m " + seconds + "s";
+  return formatFuryDuration(
+    FURY.durationMinutesBySize[size],
+    furyWillpowerExtraMs(willpower),
+  );
 }
