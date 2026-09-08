@@ -19,6 +19,7 @@ import { asideRepository } from "@/models/repositories/aside.repository";
 import { cn } from "@/shared/utils/class-names";
 import { CONTROL_HEIGHT } from "@/shared/constants/ui";
 import { chipClass, ChipFrame } from "../components/chip";
+import { CornerAccents } from "../components/corner-accents";
 import { MoonTracker } from "../components/moon-tracker";
 import { FuryModeTracker } from "../components/fury-mode-tracker";
 import { Tooltip } from "../components/tooltip";
@@ -216,10 +217,11 @@ export function Sidebar({
   return (
     <aside
       className={cn(
-        "sticky top-2.5 my-2.5 ml-2.5 hidden h-[calc(100svh-1.25rem)] shrink-0 flex-col overflow-hidden rounded-lg border border-edge bg-surface/40 backdrop-blur transition-[width] duration-200 lg:flex",
+        "sticky top-2.5 my-2.5 ml-2.5 hidden h-[calc(100svh-1.25rem)] shrink-0 transition-[width] duration-200 lg:block",
         collapsed ? "w-14" : "w-56",
       )}
     >
+      <div className="flex h-full w-full flex-col overflow-hidden rounded-lg border border-edge bg-surface/40 backdrop-blur">
       <Brand collapsed={collapsed} />
 
       <nav className="flex-1 overflow-y-auto" aria-label={t("Game pages")}>
@@ -256,6 +258,8 @@ export function Sidebar({
         />
         <CollapseButton collapsed={collapsed} />
       </div>
+      </div>
+      <CornerAccents />
     </aside>
   );
 }
@@ -280,10 +284,11 @@ export function MobileNavigation({
   }, [pathname]);
 
   return (
+    <div className="relative mx-4 mt-2.5 lg:hidden">
     <nav
       ref={trackRef}
       aria-label={t("Game pages")}
-      className="mx-2.5 mt-2.5 flex h-14 items-center gap-2 overflow-x-auto rounded-lg border border-edge bg-surface/40 px-3 backdrop-blur lg:hidden"
+      className="flex h-14 items-center gap-2 overflow-x-auto rounded-lg border border-edge bg-surface/40 px-3 backdrop-blur"
     >
       {links.map((item) => {
         const active = pathname === item.href;
@@ -331,5 +336,7 @@ export function MobileNavigation({
         );
       })}
     </nav>
+    <CornerAccents />
+    </div>
   );
 }
