@@ -90,8 +90,8 @@
         color-mix(in oklab, var(--color-ember) 8%, transparent) 100%
       ),
       url("/assets/ui/background.jpg?v=2");
-    background-size: auto, cover;
-    background-position: center top, center top;
+    background-size: auto, auto, cover;
+    background-position: center top, center top, center top;
     background-repeat: no-repeat;
   }
 
