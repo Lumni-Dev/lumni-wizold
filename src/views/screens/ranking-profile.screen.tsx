@@ -12,7 +12,7 @@ import type { Hunter } from "@/models/entities/ranking";
 import { findPet } from "@/models/entities/pet";
 import { restRecoveryRatio } from "@/controllers/character.controller";
 import { criticalMultiplierOf, EXTRA_STRIKE_CAP, extraStrikeChanceExact } from "@/models/rules/combat";
-import { CRITICAL_CHANCE_CAP } from "@/models/rules/stats";
+import { CRITICAL_CHANCE_CAP, DODGE_CHANCE_CAP } from "@/models/rules/stats";
 import { PET_MAX_LEVEL, REST_TICK_MS } from "@/shared/constants/game";
 import { furyPotionClock } from "../presenters/item.presenter";
 import { formatDate, formatFraction, formatNumber } from "@/shared/utils/format";
@@ -213,7 +213,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
             <List>
               <DataRow label="Strike (Strength)" value={formatFraction(strength)} />
               <DataRow label="Defense (Endurance)" value={formatFraction(endurance)} />
-              <DataRow label="Dodge (Agility)" value={formatFraction(stats.dodgeExact) + "%"} />
+              <DataRow label="Dodge (Agility)" value={formatFraction(stats.dodgeExact) + " / " + DODGE_CHANCE_CAP + "%"} />
               <DataRow
                 label="Extra strike (Agility)"
                 value={

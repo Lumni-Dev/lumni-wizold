@@ -8,7 +8,7 @@ import { detailInventory } from "@/controllers/inventory.controller";
 import { profileOf } from "@/controllers/ranking.controller";
 import { restRecoveryRatio } from "@/controllers/character.controller";
 import { criticalMultiplierOf, EXTRA_STRIKE_CAP, extraStrikeChanceExact } from "@/models/rules/combat";
-import { CRITICAL_CHANCE_CAP } from "@/models/rules/stats";
+import { CRITICAL_CHANCE_CAP, DODGE_CHANCE_CAP } from "@/models/rules/stats";
 import { REST_TICK_MS } from "@/shared/constants/game";
 import { findItem } from "@/models/data/items";
 import { EQUIPMENT_SLOTS } from "@/models/entities/item";
@@ -257,7 +257,7 @@ export function CharacterScreen() {
             <List>
               <DataRow label="Strike (Strength)" value={formatFraction(strength)} />
               <DataRow label="Defense (Endurance)" value={formatFraction(endurance)} />
-              <DataRow label="Dodge (Agility)" value={formatFraction(stats.dodgeExact) + "%"} />
+              <DataRow label="Dodge (Agility)" value={formatFraction(stats.dodgeExact) + " / " + DODGE_CHANCE_CAP + "%"} />
               <DataRow
                 label="Extra strike (Agility)"
                 value={

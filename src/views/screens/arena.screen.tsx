@@ -18,7 +18,7 @@ import type { Hunter } from "@/models/entities/ranking";
 import { findItem } from "@/models/data/items";
 import { ARENA_DAILY_ATTACKS, arenaCharges, arenaSpoilsRange, arenaStats } from "@/models/rules/arena";
 import { extraStrikeChanceExact, EXTRA_STRIKE_CAP } from "@/models/rules/combat";
-import { CRITICAL_CHANCE_CAP, type DerivedStats } from "@/models/rules/stats";
+import { CRITICAL_CHANCE_CAP, DODGE_CHANCE_CAP, type DerivedStats } from "@/models/rules/stats";
 import { canPetFight, isPetActive, petLevelOf, petMaxEnergy } from "@/models/rules/pet";
 import { playSound } from "@/controllers/sound";
 import { HUNT_APPROACH_TICKS, HUNT_TICK_MS } from "@/shared/constants/game";
@@ -627,7 +627,7 @@ export function ArenaScreen() {
                           value: formatFraction(rival.totalAttributes[attribute.key]),
                         })),
                         { key: "health", label: "Health", value: formatNumber(rival.maxHealth) },
-                        { key: "dodge", label: "Dodge", value: rival.dodge + "%" },
+                        { key: "dodge", label: "Dodge", value: formatFraction(rival.dodgeExact) + " / " + DODGE_CHANCE_CAP + "%" },
                         {
                           key: "extra",
                           label: "Extra strike",
