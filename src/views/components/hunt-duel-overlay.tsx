@@ -16,7 +16,7 @@ export function HuntDuelOverlay({
   fighting,
 }: {
   gender: Gender;
-  foe: Creature;
+  foe: Pick<Creature, "id" | "name">;
   beat: number;
   blow: "ours" | "pet" | "theirs" | null;
   critical: boolean;

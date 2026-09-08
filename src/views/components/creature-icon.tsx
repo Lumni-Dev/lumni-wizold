@@ -21,7 +21,7 @@ export function CreatureIcon({
   className,
   priority = false,
 }: {
-  creature: Creature;
+  creature: Pick<Creature, "id" | "name">;
   size?: IconSize;
   inset?: string;
   tone?: FrameTone;
