@@ -247,12 +247,7 @@ export function WikiScreen() {
                 return (
                   <ListRow key={id} art={<ItemArtFill item={item} />}>
                     <RowText
-                      title={
-                        <>
-                          {t(pieceName(definition, slot))}
-                          <span className="text-ink-faint"> · {t(definition.label)}</span>
-                        </>
-                      }
+                      title={t(pieceName(definition, slot))}
                       description={
                         SLOT_LABEL[slot] + (bonuses ? " · " + bonuses : "")
                       }

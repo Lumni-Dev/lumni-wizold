@@ -1341,6 +1341,18 @@ const RULES: readonly PatternRule[] = [
   { pattern: /^The name can only change again in (\d+) days\.$/, en: "The name can only change again in $1 days.", pt: "O nome só pode trocar de novo em $1 dias.", es: "El nombre solo puede cambiar de nuevo en $1 días." },
   { pattern: /^The name can only change again in (\d+) day\.$/, en: "The name can only change again in $1 day.", pt: "O nome só pode trocar de novo em $1 dia.", es: "El nombre solo puede cambiar de nuevo en $1 día." },
   { pattern: /^The name change costs (.+) and you are (.+) short\.$/, en: "The name change costs $1 and you are $2 short.", pt: "A troca de nome custa $1 e faltam $2.", es: "El cambio de nombre cuesta $1 y te faltan $2." },
+  {
+    pattern: /^The pack now answers to (.+)\.$/,
+    en: "The pack now answers to $1.",
+    pt: "A matilha agora responde por $1.",
+    es: "La manada ahora responde por $1.",
+  },
+  {
+    pattern: /^The companion now answers to (.+)\.$/,
+    en: "The companion now answers to $1.",
+    pt: "O mascote agora atende por $1.",
+    es: "El compañero ahora atiende por $1.",
+  },
   { pattern: /^Level (\d+) reached\.$/, en: "Level $1 reached.", pt: "Nível $1 alcançado.", es: "Nivel $1 alcanzado." },
   { pattern: /^Nível (\d+) alcançado\.$/, en: "Level $1 reached.", es: "Nivel $1 alcanzado." },
   { pattern: /^You regenerated (\d+) health\.$/, en: "You regenerated $1 health.", pt: "Você regenerou $1 de vida.", es: "Regeneraste $1 de vida." },
