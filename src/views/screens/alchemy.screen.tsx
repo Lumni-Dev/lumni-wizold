@@ -169,12 +169,7 @@ export function AlchemyScreen() {
                   <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                     {t("Empty Flask")}
                   </span>
-                  <span
-                    className={cn(
-                      "shrink-0 font-mono text-[11px]",
-                      view.flasks < 1 ? "text-ember" : "text-ink-soft",
-                    )}
-                  >
+                  <span className="shrink-0 font-mono text-[11px] text-ink-soft">
                     {formatNumber(view.flasks) + " / 1"}
                   </span>
                 </div>
