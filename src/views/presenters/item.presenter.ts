@@ -47,7 +47,7 @@ export function summarizeEffect(item: Item, enhancement = 0, willpower?: number)
     const base = item.effect.attributes?.[definition.key];
     if (!base) continue;
     const value = enhancement > 0 ? exactEnhancedValue(base, enhancement) : base;
-    lines.push("+" + formatFraction(value) + " " + definition.code);
+    lines.push("+" + formatFraction(value) + " " + definition.name);
   }
 
   return lines;

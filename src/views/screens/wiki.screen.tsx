@@ -243,13 +243,15 @@ export function WikiScreen() {
               pageItems.map(({ id, definition, slot }) => {
                 const item = findItem(id);
                 if (!item) return null;
-                const bonuses = summarizeEffect(item).join(", ");
+                const bonuses = summarizeEffect(item)
+                  .map((line) => t(line))
+                  .join(", ");
                 return (
                   <ListRow key={id} art={<ItemArtFill item={item} />}>
                     <RowText
                       title={t(pieceName(definition, slot))}
                       description={
-                        SLOT_LABEL[slot] + (bonuses ? " · " + bonuses : "")
+                        t(SLOT_LABEL[slot]) + (bonuses ? " · " + bonuses : "")
                       }
                     />
                     <span className="shrink-0 font-mono text-[11px] text-ink-faint">

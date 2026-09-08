@@ -685,6 +685,12 @@ const RULES: readonly PatternRule[] = [
   { pattern: /^(\d[\dms ]*) long$/, pt: "$1 de duração", es: "$1 de duración" },
   { pattern: /^\+(\d+)s of willpower$/, pt: "+$1s de vontade", es: "+$1s de voluntad" },
   {
+    pattern: /^\+([\d.]+) (Strength|Agility|Endurance|Instinct|Willpower)$/,
+    en: "+$1 $2",
+    pt: "+$1 $2",
+    es: "+$1 $2",
+  },
+  {
     pattern: /^(.+) \(\+(\d+)s of willpower\)$/,
     en: "$1 (+$2s of willpower)",
     pt: "$1 (+$2s de vontade)",
