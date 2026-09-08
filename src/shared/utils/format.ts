@@ -100,10 +100,10 @@ export function formatMinutesLabel(minutes: number): string {
 }
 
 export function formatFuryDuration(baseMinutes: number, extraMs: number): string {
-  const extraSeconds = Math.floor(Math.max(0, extraMs) / 1000);
+  const stretch = Math.max(0, Math.floor(extraMs));
   const base = formatMinutesLabel(baseMinutes);
-  if (extraSeconds <= 0) return base;
-  return base + " (+" + extraSeconds + "s of willpower)";
+  if (stretch < 1000) return base;
+  return base + " (+" + formatFuryClock(stretch) + " of willpower)";
 }
 export function formatReais(cents: number): string {
   return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(

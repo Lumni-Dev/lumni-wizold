@@ -4,7 +4,7 @@ import { enhancedEffect, exactEnhancedValue } from "@/models/rules/forge";
 import { furyWillpowerExtraMs } from "@/models/rules/moon";
 import { FURY_ATTRIBUTE_BONUS } from "@/shared/constants/game";
 import { FURY } from "@/shared/constants/tuning/fury";
-import { formatFraction, formatFuryDuration, formatMinutesLabel } from "@/shared/utils/format";
+import { formatFraction, formatFuryClock, formatFuryDuration, formatMinutesLabel } from "@/shared/utils/format";
 
 export function itemInitials(name: string): string {
   const words = name.split(" ").filter((word) => word.length > 2);
@@ -38,8 +38,8 @@ export function summarizeEffect(item: Item, enhancement = 0, willpower?: number)
     lines.push("+" + FURY_ATTRIBUTE_BONUS + " to all attributes");
     lines.push(formatMinutesLabel(effect.furyMinutes) + " long");
     if (willpower !== undefined) {
-      const extraSeconds = Math.floor(furyWillpowerExtraMs(willpower) / 1000);
-      if (extraSeconds > 0) lines.push("+" + extraSeconds + "s of willpower");
+      const stretch = furyWillpowerExtraMs(willpower);
+      if (stretch >= 1000) lines.push("+" + formatFuryClock(stretch) + " of willpower");
     }
   }
 
