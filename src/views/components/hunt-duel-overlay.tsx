@@ -12,6 +12,7 @@ type SidePhase = "alive" | "dying" | "gone" | "enter";
 
 const ENTER_MS = 550;
 const DIE_MS = 500;
+const CLAW_SLASH = "/assets/effects/claw-slash.gif?v=1";
 
 export function HuntDuelOverlay({
   gender,
@@ -42,6 +43,7 @@ export function HuntDuelOverlay({
   const preyHit = critical && oursStrike ? beat : 0;
   const hunterShaking = useShake(hunterHit);
   const preyShaking = useShake(preyHit);
+  const slashSide = oursStrike ? "ours" : theirsStrike ? "theirs" : null;
 
   const [hunterPhase, setHunterPhase] = useState<SidePhase>("alive");
   const [preyPhase, setPreyPhase] = useState<SidePhase>("alive");
@@ -137,7 +139,7 @@ export function HuntDuelOverlay({
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-gradient-to-t from-base/70 via-base/25 to-transparent"
     >
-      <div className="flex items-center gap-3 px-3 sm:gap-4">
+      <div className="relative flex items-center gap-3 px-3 sm:gap-4">
         <span className={cn("inline-flex", hunterShaking && hunterPhase === "alive" && "card-shake")}>
           <span
             key={
@@ -166,6 +168,20 @@ export function HuntDuelOverlay({
             <CreatureIcon creature={shownFoe} size="large" tone="strong" className="art-soft-shadow" />
           </span>
         </span>
+        {slashSide ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            key={`slash-${slashSide}-${beat}`}
+            src={CLAW_SLASH}
+            alt=""
+            className={cn(
+              "absolute top-1/2 z-20 h-28 w-44 -translate-y-1/2 object-contain mix-blend-screen sm:h-32 sm:w-52",
+              slashSide === "ours"
+                ? "left-[62%] -translate-x-1/2"
+                : "left-[38%] -translate-x-1/2 -scale-x-100",
+            )}
+          />
+        ) : null}
       </div>
     </div>
   );
