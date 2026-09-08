@@ -2,12 +2,13 @@ import { findGender, type Gender } from "../entities/character";
 import type { Item } from "../entities/item";
 import { buildSetItems } from "./equipment-sets";
 import { ALL_MATERIALS } from "./items/materials";
-import { POTIONS, PET_SUPPLIES } from "./consumables";
+import { EMPTY_FLASK, POTIONS, PET_SUPPLIES } from "./consumables";
 import { FRAGMENTS } from "./items/fragments";
 
 export const ITEMS: readonly Item[] = [
   ...buildSetItems(),
   ...POTIONS,
+  EMPTY_FLASK,
   ...PET_SUPPLIES,
   ...FRAGMENTS,
   ...ALL_MATERIALS,

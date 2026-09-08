@@ -126,6 +126,7 @@ interface GameContextValue {
   consumeItem: (itemId: string) => Promise<void>;
   buyItem: (itemId: string, quantity?: number) => Promise<void>;
   sellItem: (itemId: string, quantity?: number, enhancement?: number) => Promise<void>;
+  brewPotion: (potionId: string, first: string, second: string) => Promise<void>;
   announceListing: (
     itemId: string,
     quantity: number,
@@ -1081,6 +1082,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
       sellItem: async (itemId, quantity = 1, enhancement = 0) => {
         await act("POST", "/api/market/sell", { itemId, quantity, enhancement }, "Market", () =>
           playSound("sell"),
+        );
+      },
+      brewPotion: async (potionId, first, second) => {
+        await act("POST", "/api/alchemy", { potionId, first, second }, "Alchemy", () =>
+          playSound("potion"),
         );
       },
       announceListing: async (itemId, quantity, priceCents, enhancement = 0) => {

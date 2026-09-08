@@ -467,6 +467,27 @@ export const ES: Record<string, string> = {
   "Game pages": "Páginas del juego",
   "Collapse menu": "Plegar menú",
   "Expand menu": "Expandir menú",
+  "Alchemy": "Alquimia",
+  "Potions brewed from the hunt's spoils": "Pociones fabricadas con los despojos de la caza",
+  "The cauldron turns the hunt's spoils into the market's own potions: one empty flask, two different ingredients, and the size decides how rich they must be. Brewing always costs less than the shelf, that is the pay for hunting the parts.":
+    "El caldero convierte los despojos de la caza en las mismas pociones del mercado: un frasco vacío, dos ingredientes diferentes, y el tamaño decide qué tan ricos deben ser. Fabricar siempre cuesta menos que el estante, esa es la paga por cazar las partes.",
+  "Empty Flask": "Frasco Vacío",
+  "Clear glass and a cork stopper. On its own it holds nothing but air; over the cauldron it is the difference between a potion and a puddle.":
+    "Vidrio claro y tapón de corcho. Solo no guarda más que aire; sobre el caldero es la diferencia entre una poción y un charco.",
+  "First ingredient": "Primer ingrediente",
+  "Second ingredient": "Segundo ingrediente",
+  "Choose a material": "Elige un material",
+  "Choose the two ingredients.": "Elige los dos ingredientes.",
+  "Nothing in the bag serves this potion yet: the hunt drops what the cauldron asks.":
+    "Nada en la bolsa sirve para esta poción todavía: la caza suelta lo que pide el caldero.",
+  "Brew": "Fabricar",
+  "The cauldron spends the flask and the ingredients on the spot, and the potion goes straight to the bag.":
+    "El caldero gasta el frasco y los ingredientes al momento, y la poción va directa a la bolsa.",
+  "That potion is not brewed here.": "Esa poción no se fabrica aquí.",
+  "The cauldron asks two different ingredients.": "El caldero pide dos ingredientes diferentes.",
+  "That ingredient does not serve the cauldron.": "Ese ingrediente no sirve al caldero.",
+  "That ingredient is too plain for this potion.": "Ese ingrediente es demasiado simple para esta poción.",
+  "No empty flask in the bag: the market sells them.": "Ningún frasco vacío en la bolsa: el mercado los vende.",
   "Close notice": "Cerrar aviso",
   "Activity in progress": "Actividad en curso",
   "Maximize activity": "Maximizar actividad",

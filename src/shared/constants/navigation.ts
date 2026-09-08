@@ -26,6 +26,12 @@ export const NAVIGATION: readonly NavigationItem[] = [
     description: "Mining and gear enhancement",
   },
   {
+    href: "/alchemy",
+    label: "Alchemy",
+    code: "AQ",
+    description: "Potions brewed from the hunt's spoils",
+  },
+  {
     href: "/bazaar",
     label: "Bazaar",
     code: "BZ",
