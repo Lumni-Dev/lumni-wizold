@@ -1,4 +1,7 @@
 {
   "regions": ["gru1"],
-  "crons": [{ "path": "/api/cron/mining-reset", "schedule": "0 9 * * *" }]
+  "crons": [
+    { "path": "/api/cron/mining-reset", "schedule": "0 9 * * *" },
+    { "path": "/api/cron/vip-expire", "schedule": "0 9 * * *" }
+  ]
 }

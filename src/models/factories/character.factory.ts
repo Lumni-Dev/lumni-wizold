@@ -9,6 +9,7 @@ import type { GameState } from "../entities/game-state";
 import { findGender, type Character, type Gender } from "../entities/character";
 import type { LogEntry } from "../entities/log-entry";
 import { deriveStats } from "../rules/stats";
+import { withVipTrial } from "../rules/vip";
 
 const STARTING_ATTRIBUTES: Attributes = {
   strength: BASE_ATTRIBUTE_VALUE,
@@ -46,7 +47,7 @@ function createCharacter(name: string, gender: Gender): Character {
   };
 
   const stats = deriveStats(base, emptyEquipment());
-  return { ...base, health: stats.maxHealth };
+  return withVipTrial({ ...base, health: stats.maxHealth });
 }
 
 export function createRun(name: string, gender: Gender): GameState {
@@ -55,6 +56,12 @@ export function createRun(name: string, gender: Gender): GameState {
     id: generateId("log"),
     kind: "system",
     message: character.name + " wakes with the mark of the moon. The first night begins now.",
+    date: new Date().toISOString(),
+  };
+  const trial: LogEntry = {
+    id: generateId("log"),
+    kind: "system",
+    message: "Seven days of VIP open with the first night.",
     date: new Date().toISOString(),
   };
 
@@ -72,6 +79,6 @@ export function createRun(name: string, gender: Gender): GameState {
     wallet: initialWallet(),
     inventory: STARTING_INVENTORY.map((slot) => ({ ...slot })),
     equipment: emptyEquipment(),
-    log: [opening],
+    log: [opening, trial],
   };
 }

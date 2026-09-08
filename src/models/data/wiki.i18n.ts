@@ -64,7 +64,7 @@ import { experienceForLevel } from "../rules/progression";
 import { MOON_PHASES, SYNODIC_MONTH_DAYS } from "../rules/moon";
 import { miningNeeded } from "../rules/mining";
 import { criticalMultiplierOf } from "../rules/combat";
-import { VIP_DAYS, VIP_PRICE_CENTS } from "../rules/vip";
+import { VIP_DAYS, VIP_PRICE_CENTS, VIP_TRIAL_DAYS } from "../rules/vip";
 import { formatBronze, formatReais } from "@/shared/utils/format";
 import { EQUIPMENT_SETS, piecePrice } from "./equipment-sets";
 import { EQUIPMENT_SLOTS } from "../entities/item";
@@ -545,6 +545,9 @@ function ptTopics(): readonly WikiTopic[] {
       title: "VIP",
       summary: "Assinatura mensal que libera a automação.",
       lines: [
+        "Um caçador novo recebe " +
+          VIP_TRIAL_DAYS +
+          " dias de VIP grátis na primeira noite.",
         "Custa " +
           formatReais(VIP_PRICE_CENTS) +
           " por mês e mantém o VIP por " +
@@ -954,6 +957,9 @@ function esTopics(): readonly WikiTopic[] {
       title: "VIP",
       summary: "Una suscripción mensual que desbloquea la automatización.",
       lines: [
+        "Un cazador nuevo recibe " +
+          VIP_TRIAL_DAYS +
+          " días de VIP gratis en la primera noche.",
         "Cuesta " +
           formatReais(VIP_PRICE_CENTS) +
           " por mes y mantiene el VIP por " +

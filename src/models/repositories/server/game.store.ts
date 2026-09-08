@@ -650,8 +650,8 @@ export async function insertNewGame(
     `insert into characters
        (id, user_id, name, gender, form, level, experience, health, rage, bronze,
         strength, agility, endurance, instinct, willpower,
-        mining_level, mining_progress, created_at)
-     values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)`,
+        mining_level, mining_progress, created_at, vip_until)
+     values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)`,
     [
       character.id,
       userId,
@@ -671,6 +671,7 @@ export async function insertNewGame(
       state.mining.level,
       state.mining.progress,
       character.createdAt,
+      character.vipUntil ?? null,
     ],
   );
   await client.query(

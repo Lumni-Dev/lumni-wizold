@@ -457,6 +457,7 @@ export const PT: Record<string, string> = {
   "VIP subscription": "Assinatura VIP",
   "Every paid pack shows up here, with value, date and status.": "Cada pacote pago aparece aqui, com valor, data e status.",
   "VIP starts as soon as the payment confirms.": "O VIP entra assim que o pagamento confirma.",
+  "Seven days of VIP open with the first night.": "Sete dias de VIP abrem com a primeira noite.",
   "Renews on its own every month. Cancel to stop the charge on Stripe.": "Renova sozinho a cada mês. Cancele para parar a cobrança no Stripe.",
   "Approved": "Aprovado",
   "Expired": "Expirado",

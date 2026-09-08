@@ -62,7 +62,7 @@ import { MOON_PHASES, SYNODIC_MONTH_DAYS } from "../rules/moon";
 import { FURY_ATTRIBUTE_BONUS } from "@/shared/constants/game";
 import { miningNeeded } from "../rules/mining";
 import { criticalMultiplierOf } from "../rules/combat";
-import { VIP_DAYS, VIP_PRICE_CENTS } from "../rules/vip";
+import { VIP_DAYS, VIP_PRICE_CENTS, VIP_TRIAL_DAYS } from "../rules/vip";
 import { formatBronze, formatReais } from "@/shared/utils/format";
 import { EQUIPMENT_SETS, piecePrice } from "./equipment-sets";
 import { EQUIPMENT_SLOTS } from "../entities/item";
@@ -507,6 +507,9 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     title: "VIP",
     summary: "A monthly subscription that unlocks automation.",
     lines: [
+      "A new hunter receives " +
+        VIP_TRIAL_DAYS +
+        " days of VIP free with the first night.",
       "It costs " +
         formatReais(VIP_PRICE_CENTS) +
         " per month and keeps VIP for " +
