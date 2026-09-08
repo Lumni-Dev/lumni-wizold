@@ -57,10 +57,8 @@ function NavLink({
       aria-current={active ? "page" : undefined}
       onClick={() => playSound("ui")}
       className={cn(
-        "relative flex " + CONTROL_HEIGHT + " items-center rounded-md border transition-colors",
-        active
-          ? "border-edge-strong bg-surface-high"
-          : "border-edge hover:border-edge-strong hover:bg-surface/70",
+        "relative flex " + CONTROL_HEIGHT + " items-center border-b border-edge transition-colors",
+        active ? "bg-surface-high" : "hover:bg-surface/70",
         highlighted ? "text-ember" : active ? "text-ink" : "text-ink-soft hover:text-ink",
       )}
     >
@@ -90,10 +88,10 @@ function TutorialButton({ active, onClick }: { active: boolean; onClick: () => v
       }}
       aria-pressed={active}
       className={cn(
-        "relative flex w-full " + CONTROL_HEIGHT + " items-center rounded-md border transition-colors",
+        "relative flex w-full " + CONTROL_HEIGHT + " items-center border-b border-edge transition-colors",
         active
-          ? "border-edge-strong bg-surface-high text-ink"
-          : "border-edge text-ink-soft hover:border-edge-strong hover:bg-surface/70 hover:text-ink",
+          ? "bg-surface-high text-ink"
+          : "text-ink-soft hover:bg-surface/70 hover:text-ink",
       )}
     >
       <span
@@ -124,8 +122,8 @@ export function Sidebar({
     <aside className="sticky top-0 hidden h-screen w-56 shrink-0 flex-col border-r border-edge bg-surface/40 backdrop-blur lg:flex">
       <Brand />
 
-      <nav className="flex-1 overflow-y-auto p-3" aria-label={t("Game pages")}>
-        <ul className="space-y-3">
+      <nav className="flex-1 overflow-y-auto" aria-label={t("Game pages")}>
+        <ul>
           {NAVIGATION.map((item) => (
             <li key={item.href}>
               <NavLink
@@ -141,9 +139,9 @@ export function Sidebar({
         </ul>
       </nav>
 
-      <div className="space-y-3 border-t border-edge p-3">
-        <MoonTracker />
-        <FuryModeTracker />
+      <div className="border-t border-edge">
+        <MoonTracker flush />
+        <FuryModeTracker flush />
         <NavLink item={STORE_LINK} active={pathname === STORE_LINK.href} highlighted />
         <NavLink item={SETTINGS_LINK} active={pathname === SETTINGS_LINK.href} />
       </div>

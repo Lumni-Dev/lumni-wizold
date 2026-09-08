@@ -4,9 +4,10 @@ import { Moon } from "lucide-react";
 import { useGame } from "@/controllers/game.context";
 import { useT } from "@/controllers/use-locale";
 import { FURY_ATTRIBUTE_BONUS } from "@/shared/constants/game";
+import { cn } from "@/shared/utils/class-names";
 import { Tooltip } from "./tooltip";
 
-export function MoonTracker() {
+export function MoonTracker({ flush = false }: { flush?: boolean }) {
   const { moon } = useGame();
   const t = useT();
 
@@ -23,7 +24,12 @@ export function MoonTracker() {
 
   return (
     <Tooltip block label={t(moon.phase.description)}>
-      <div className="relative flex items-stretch rounded-md border border-edge bg-surface/70">
+      <div
+        className={cn(
+          "relative flex items-stretch",
+          flush ? "border-b border-edge" : "rounded-md border border-edge bg-surface/70",
+        )}
+      >
         <span className="flex w-8 shrink-0 items-center justify-center border-r border-edge">
           <Moon aria-hidden strokeWidth={1.75} className="h-4 w-4 text-ink-soft" />
         </span>

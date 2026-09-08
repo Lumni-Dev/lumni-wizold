@@ -6,13 +6,13 @@ import { formatFuryClock } from "@/shared/utils/format";
 import { FuryRingFrame } from "./fury-ring-frame";
 import { useFuryClock } from "./use-fury-clock";
 
-export function FuryModeTracker() {
+export function FuryModeTracker({ flush = false }: { flush?: boolean }) {
   const { character, remaining, active, furyUntil } = useFuryClock();
   const t = useT();
 
   if (!character || !active) return null;
 
-  return (
+  const frame = (
     <FuryRingFrame
       className="block w-full"
       contentAlign="start"
@@ -32,4 +32,9 @@ export function FuryModeTracker() {
       </div>
     </FuryRingFrame>
   );
+
+  // The ring keeps its own frame; flush only gives it a divided cell with air,
+  // rendered here so an inactive fury never leaves an empty bordered strip.
+  if (!flush) return frame;
+  return <div className="border-b border-edge p-3">{frame}</div>;
 }
