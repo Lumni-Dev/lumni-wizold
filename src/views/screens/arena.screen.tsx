@@ -46,6 +46,7 @@ import { Tooltip } from "../components/tooltip";
 import { useShake } from "../components/use-shake";
 import { PageHeader } from "../layout/page-header";
 const PAGE_SIZE = 9;
+const FINALE_HOLD_MS = 1200;
 function Fighter({
   gender,
   name,
@@ -181,6 +182,8 @@ export function ArenaScreen() {
   const rosterRef = useRef(roster);
   const autoRef = useRef(false);
   const autoTimerRef = useRef(0);
+  const finaleTimerRef = useRef(0);
+  const landedRef = useRef(false);
   const drawRef = useRef(drawOpponent);
   const consumeRef = useRef(consumeItem);
   const notifyRef = useRef(notify);
@@ -188,11 +191,15 @@ export function ArenaScreen() {
   // goes through this ref to reach the freshest closure (fighting already null).
   const continueAutoRef = useRef<() => Promise<void>>(async () => {});
   function beginDuel(hunter: Hunter, maxHealth: number) {
-    if (fighting) return;
     if (autoTimerRef.current) {
       window.clearTimeout(autoTimerRef.current);
       autoTimerRef.current = 0;
     }
+    if (finaleTimerRef.current) {
+      window.clearTimeout(finaleTimerRef.current);
+      finaleTimerRef.current = 0;
+    }
+    landedRef.current = false;
     beatRef.current = 0;
     pendingRef.current = null;
     scriptRef.current = [];
@@ -213,6 +220,12 @@ export function ArenaScreen() {
     if (autoTimerRef.current) {
       window.clearTimeout(autoTimerRef.current);
       autoTimerRef.current = 0;
+    }
+    // A landed duel held on screen for the automatic chain has nobody left to
+    // close it once the chain stops, so the stop is what folds the scene.
+    if (landedRef.current && !pendingRef.current) {
+      setPending(null);
+      setFighting(null);
     }
     if (message) notifyRef.current(message, true, "Arena");
   }
@@ -281,6 +294,7 @@ export function ArenaScreen() {
     return () => {
       autoRef.current = false;
       if (autoTimerRef.current) window.clearTimeout(autoTimerRef.current);
+      if (finaleTimerRef.current) window.clearTimeout(finaleTimerRef.current);
     };
   }, []);
   useEffect(() => {
@@ -378,14 +392,23 @@ export function ArenaScreen() {
         const held = pendingRef.current;
         pendingRef.current = null;
         window.clearInterval(timer);
+        landedRef.current = true;
         landRef.current();
         setReport(held);
-        setPending(null);
         if (held.combat.victory) playSound("victory");
         else if (!held.combat.retreated) playSound("defeat");
-        setFighting(null);
+        // The scene is not folded on the landing tick: `pending` stays so the
+        // finale renders and the fallen side fades out like in the hunt. The
+        // automatic chain keeps the panel up until the next rival enters it;
+        // a manual duel holds it just long enough for the fade, then closes.
         if (autoRef.current) {
           autoTimerRef.current = window.setTimeout(() => void continueAutoRef.current(), 3000);
+        } else {
+          finaleTimerRef.current = window.setTimeout(() => {
+            finaleTimerRef.current = 0;
+            setPending(null);
+            setFighting(null);
+          }, FINALE_HOLD_MS);
         }
       }
     }, HUNT_TICK_MS);
@@ -402,7 +425,7 @@ export function ArenaScreen() {
   const busy = fighting !== null;
   const petAlong = canPetFight(pet) ? pet : null;
   function challenge(hunter: Hunter, rival: DerivedStats) {
-    if (locked) return;
+    if (locked || fighting) return;
     armAutomation();
     beginDuel(hunter, rival.maxHealth);
   }
@@ -579,6 +602,8 @@ export function ArenaScreen() {
               current={approaching ? approachBeat : beat}
               maximum={approaching ? HUNT_APPROACH_TICKS : Math.max(1, script.length)}
               glows
+              hideValue={(approaching ? approachBeat : beat) === 0}
+              wraps
             />
             {petAlong ? (
               <Bar
