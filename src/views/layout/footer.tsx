@@ -20,7 +20,7 @@ export function Footer({ compact = false }: { compact?: boolean }) {
         <p className="text-[11px] text-ink-faint">
           {COMPANY.legalName} · CNPJ {COMPANY.taxId}
         </p>
-        <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+        <p className="text-[10px] text-ink-faint">
           © {year} {COMPANY.name}. {t("All rights reserved.")}
         </p>
         <nav
