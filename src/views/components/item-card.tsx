@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import type { Item } from "@/models/entities/item";
 import { useGame } from "@/controllers/game.context";
+import { useT } from "@/controllers/use-locale";
 import { itemSubtitle, summarizeEffect } from "../presenters/item.presenter";
 import { Card, CardBody, CardFooter, CardHeader } from "./card";
 import { ItemBanner, ItemIcon, useItemArt } from "./item-icon";
@@ -30,6 +31,7 @@ export function ItemCard({
   fromBazaar = false,
   height = "fill",
 }: ItemCardProps) {
+  const t = useT();
   const { stats } = useGame();
   const willpower = stats
     ? stats.totalAttributes.willpower - stats.sources.fury.willpower
@@ -50,7 +52,7 @@ export function ItemCard({
       </CardHeader>
 
       <CardBody>
-        <p className="grow text-xs leading-relaxed text-ink-faint">{item.description}</p>
+        <p className="grow text-xs leading-relaxed text-ink-faint">{t(item.description)}</p>
 
         {effects.length > 0 || fromBazaar ? (
           <ul className="flex flex-wrap gap-2">

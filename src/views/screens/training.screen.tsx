@@ -173,7 +173,7 @@ export function TrainingScreen() {
                     <li>
                       {t("You currently have")}{" "}
                       <strong className="font-bold">{formatFraction(exactValue)}</strong>{" "}
-                      {t("points of")} {row?.name ?? exercise.name}
+                      {t("points of")} {t(row?.name ?? exercise.name)}
                     </li>
                     <li>
                       <strong className="font-bold">+{formatFraction(summary.pointShare)}</strong>{" "}

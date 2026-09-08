@@ -156,7 +156,7 @@ export function trainPet(state: GameState): Result<{ leveled: boolean }> {
 
   const level = petLevelOf(pet);
   if (level >= PET_MAX_LEVEL) {
-    return failure(state, "The companion is already at the LV. " + PET_MAX_LEVEL + ".");
+    return failure(state, "The companion is already at the LV. " + PET_MAX_LEVEL + " cap.");
   }
 
   const cost = petTrainingSessionCost(level, character.level);

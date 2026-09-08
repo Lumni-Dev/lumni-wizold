@@ -101,7 +101,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
               </Button>
             )}
             <Tag tone={isPlayer ? "light" : "neutral"}>
-              {t("Best at") + " " + t(best.label) + " - " + formatNumber(best.position) + "º"}
+              {t("Best at " + best.label + " - " + formatNumber(best.position) + "º")}
             </Tag>
           </div>
         }
@@ -119,7 +119,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
                   <CopyNick name={hunter.name} />
                 </div>
                 <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                  {genderDefinition.label}
+                  {t(genderDefinition.label)}
                 </p>
               </div>
             </div>
@@ -166,7 +166,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
               {positions.map((position) => (
                 <ListRow key={position.key} className="justify-between">
                   <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                    {position.label}
+                    {t(position.label)}
                   </span>
                   <span className="flex items-center gap-3">
                     <span className="font-mono text-[11px] text-ink-faint">

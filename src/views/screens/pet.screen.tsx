@@ -72,18 +72,18 @@ function Kennel({ bronze, level }: { bronze: number; level: number }) {
               </CardHeader>
 
               <CardBody>
-                <p className="text-xs leading-relaxed text-ink-faint">{definition.description}</p>
+                <p className="text-xs leading-relaxed text-ink-faint">{t(definition.description)}</p>
               </CardBody>
 
               <CardFooter>
                 <span className="text-[11px] text-ink-faint">
-                  {chosen ? "Escolhido" : "Available"}
+                  {chosen ? "Chosen" : "Available"}
                 </span>
                 <Button
                   variant={chosen ? "secondary" : "outline"}
                   onClick={() => setGender(definition.key)}
                 >
-                  {chosen ? "Escolhido" : "Escolher"}
+                  {chosen ? "Chosen" : "Choose"}
                 </Button>
               </CardFooter>
             </Card>

@@ -80,8 +80,11 @@ export function RankingScreen() {
         action={
           view.playerPosition ? (
             <Tag tone="neutral">
-              {view.board.label} - {formatNumber(view.playerPosition)}º de{" "}
-              {formatNumber(view.boardSize)}
+              {view.board.label +
+                " - " +
+                formatNumber(view.playerPosition) +
+                " of " +
+                formatNumber(view.boardSize)}
             </Tag>
           ) : null
         }

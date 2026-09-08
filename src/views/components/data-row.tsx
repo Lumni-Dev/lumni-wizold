@@ -9,7 +9,9 @@ export function DataRow({ label, value }: { label: string; value: ReactNode }) {
   return (
     <ListRow className="justify-between">
       <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">{t(label)}</span>
-      <span className="font-mono text-sm text-ink">{value}</span>
+      <span className="font-mono text-sm text-ink">
+        {typeof value === "string" ? t(value) : value}
+      </span>
     </ListRow>
   );
 }

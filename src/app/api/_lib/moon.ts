@@ -59,9 +59,9 @@ export async function serverMoon(): Promise<MoonState> {
       day: "2-digit",
     }).format(new Date());
     const entry = entries.find((day) => day.date === today);
-    if (!entry) throw new Error("dia atual ausente na resposta");
+    if (!entry) throw new Error("current day missing from the response");
     const age = parseNumber(entry.moon_age);
-    if (age === null) throw new Error("idade da lua ausente");
+    if (age === null) throw new Error("moon age missing from the response");
     const wrapped = ((age % SYNODIC_MONTH_DAYS) + SYNODIC_MONTH_DAYS) % SYNODIC_MONTH_DAYS;
     const named = entry.phase ? PHASE_BY_NAME[entry.phase.trim().toLowerCase()] : undefined;
     const illumination = parseNumber(entry.illumination);

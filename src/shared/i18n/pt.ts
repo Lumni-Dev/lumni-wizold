@@ -964,7 +964,7 @@ export const PT: Record<string, string> = {
   "Male": "Macho",
   "Female": "Fêmea",
   "Companion of the Prey": "Companheiro de Presa",
-  "Companion of the Moon": "Companheira de Presa",
+  "Companion of the Moon": "Companheira da Lua",
   "Broad chest and heavy step. He stands between you and the creature without asking leave, and takes the first charge in place of your shoulder.": "Peito largo e passo pesado. Fica entre você e a criatura sem pedir licença, e aguenta a primeira investida no lugar do seu ombro.",
   "Lean, silent, always three steps ahead. She finds the trail before you catch the scent and warns you when something watches back.": "Magra, silenciosa, sempre três passos à frente. Encontra o rastro antes de você farejar e avisa quando alguma coisa observa de volta.",
   "Gloves": "Luvas",
@@ -1430,4 +1430,6 @@ export const PT: Record<string, string> = {
   "contact support for the refund": "fale com o suporte para o reembolso",
   "each": "cada",
   "Paused": "Pausado",
+  "Chosen": "Escolhido",
+  "Choose": "Escolher",
 };

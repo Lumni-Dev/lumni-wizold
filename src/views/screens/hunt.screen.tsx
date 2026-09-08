@@ -128,7 +128,7 @@ function CombatReport({ report, lines }: { report: HuntReport; lines: NarrationL
             <ul className="space-y-2">
               {report.drops.map((drop) => (
                 <li key={drop.itemId} className="flex items-center justify-between gap-2 text-xs">
-                  <span className="text-ink-soft">{drop.name}</span>
+                  <span className="text-ink-soft">{t(drop.name)}</span>
                   <span className="font-mono text-ink-faint">x{drop.quantity}</span>
                 </li>
               ))}
@@ -642,7 +642,7 @@ export function HuntScreen() {
                 <ul className="space-y-2">
                   {drops.map(([itemId, drop]) => (
                     <li key={itemId} className="flex items-center justify-between gap-2 text-xs">
-                      <span className="text-ink-soft">{drop.name}</span>
+                      <span className="text-ink-soft">{t(drop.name)}</span>
                       <span className="font-mono text-ink-faint">
                         x{formatNumber(drop.quantity)}
                       </span>

@@ -502,7 +502,7 @@ export function ArenaScreen() {
             displayNick(fighting.hunter.name) +
             ". At stake, a piece of the fallen one's purse: " +
             formatNumber(arenaSpoilsRange(fighting.hunter.level).min) +
-            " a " +
+            " to " +
             formatBronze(arenaSpoilsRange(fighting.hunter.level).max) +
             "."
           }
@@ -631,7 +631,7 @@ export function ArenaScreen() {
                       ].map((cell) => (
                         <div key={cell.key} className="px-2 py-3 text-center">
                           <p className="truncate text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                            {cell.label}
+                            {t(cell.label)}
                           </p>
                           <p className="mt-1 font-mono text-[11px] text-ink">{cell.value}</p>
                         </div>

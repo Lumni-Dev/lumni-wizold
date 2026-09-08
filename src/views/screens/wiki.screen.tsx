@@ -249,8 +249,8 @@ export function WikiScreen() {
                     <RowText
                       title={
                         <>
-                          {pieceName(definition, slot)}
-                          <span className="text-ink-faint"> · {definition.label}</span>
+                          {t(pieceName(definition, slot))}
+                          <span className="text-ink-faint"> · {t(definition.label)}</span>
                         </>
                       }
                       description={
@@ -325,26 +325,23 @@ export function WikiScreen() {
                     layout="column"
                   >
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-sm text-ink">{territory.name}</p>
+                      <p className="text-sm text-ink">{t(territory.name)}</p>
                       <Tag tone="faint">{DANGER_LABEL[territory.danger]}</Tag>
                       <Tag tone="neutral">
-                        {t("LV.") +
-                          " " +
+                        {"LV. " +
                           formatNumber(territory.minLevel) +
-                          " " +
-                          t("to") +
-                          " " +
+                          " to " +
                           formatNumber(territory.maxLevel)}
                       </Tag>
                       <Tag tone="neutral">{SPECIES_LABEL[territory.species]}</Tag>
                     </div>
-                    <p className="text-xs text-ink-faint">{territory.description}</p>
+                    <p className="text-xs text-ink-faint">{t(territory.description)}</p>
                     <p className="text-[11px] text-ink-soft">
                       {territory.creatures
-                        .map(
-                          (creatureId) =>
-                            CREATURES.find((creature) => creature.id === creatureId)?.name,
-                        )
+                        .map((creatureId) => {
+                          const creature = CREATURES.find((row) => row.id === creatureId);
+                          return creature ? t(creature.name) : null;
+                        })
                         .filter(Boolean)
                         .join(", ")}
                     </p>
@@ -373,6 +370,7 @@ export function WikiScreen() {
                     label={SPECIES_LABEL[creature.species]}
                     description={
                       <>
+                        <p className="leading-relaxed text-ink-faint">{t(creature.description)}</p>
                         <p className="font-mono leading-relaxed text-ink-soft">
                           {formatNumber(creature.health) +
                             " " +

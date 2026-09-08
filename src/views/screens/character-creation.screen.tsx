@@ -116,7 +116,7 @@ export function CharacterCreationScreen() {
                     <div className="flex items-center gap-3">
                       <GenderIcon gender={definition.key} size="large" />
                       <div>
-                        <p className="text-sm text-ink">{definition.label}</p>
+                        <p className="text-sm text-ink">{t(definition.label)}</p>
                         <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                           {t(definition.title)}
                         </p>

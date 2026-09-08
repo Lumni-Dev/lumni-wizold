@@ -148,7 +148,7 @@ export function StoreScreen() {
             </CardHeader>
 
             <CardBody>
-              <p className="text-xs leading-relaxed text-ink-soft">{pack.description}</p>
+              <p className="text-xs leading-relaxed text-ink-soft">{t(pack.description)}</p>
             </CardBody>
 
             <List className="border-t border-edge">
