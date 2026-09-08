@@ -32,15 +32,23 @@ export function List({
 }
 
 type RowPadding = "text" | "art" | "none";
+type ArtSize = "default" | "compact";
+
+const ART_CELL: Record<ArtSize, string> = {
+  default: "flex aspect-square w-28 shrink-0 overflow-hidden border-r border-edge p-3",
+  compact: "flex aspect-square w-24 shrink-0 overflow-hidden border-r border-edge p-2",
+};
 
 export function ListRow({
   art,
+  artSize = "default",
   children,
   layout = "row",
   padding = "text",
   className,
 }: {
   art?: ReactNode;
+  artSize?: ArtSize;
   children: ReactNode;
   layout?: RowLayout;
   padding?: RowPadding;
@@ -60,9 +68,7 @@ export function ListRow({
   if (art) {
     return (
       <li className="flex items-stretch">
-        <span className="flex aspect-square w-28 shrink-0 overflow-hidden border-r border-edge p-3">
-          {art}
-        </span>
+        <span className={ART_CELL[artSize]}>{art}</span>
         <div
           className={cn(
             "min-w-0 grow",
@@ -138,6 +144,7 @@ export function ArtRow({
 
 export function ArtRowButton({
   art,
+  artSize = "default",
   divided = false,
   title,
   description,
@@ -148,6 +155,7 @@ export function ArtRowButton({
   className,
 }: {
   art: ReactNode;
+  artSize?: ArtSize;
   divided?: boolean;
   title: ReactNode;
   description?: ReactNode;
@@ -172,9 +180,7 @@ export function ArtRowButton({
             className,
           )}
         >
-          <span className="flex aspect-square w-28 shrink-0 overflow-hidden border-r border-edge p-3">
-            {art}
-          </span>
+          <span className={ART_CELL[artSize]}>{art}</span>
           <span className="flex min-w-0 grow items-center px-4 py-3">
             <RowText title={title} description={description} />
           </span>

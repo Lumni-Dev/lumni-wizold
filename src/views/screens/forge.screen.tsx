@@ -362,6 +362,7 @@ export function ForgeScreen() {
               ) : (
                 <List>
                   <ListRow
+                    artSize="compact"
                     art={
                       <span
                         className={cn(
@@ -520,6 +521,7 @@ export function ForgeScreen() {
                         <ArtRowButton
                           key={key}
                           divided
+                          artSize="compact"
                           art={<ItemArtFill item={row.item} enhancement={row.level} />}
                           title={row.item.name}
                           description={

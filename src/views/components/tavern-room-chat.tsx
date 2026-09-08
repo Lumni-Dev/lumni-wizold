@@ -147,7 +147,7 @@ export function TavernRoomChatMembers({
   return (
     <div className="border-b border-edge px-4 py-3">
       <ul
-        aria-label="At the table"
+        aria-label={t("At the table")}
         className="flex flex-nowrap items-center gap-2 overflow-x-auto pb-1"
       >
         {activeRoom.members.map((member) => {
@@ -187,7 +187,7 @@ export function TavernRoomChatMembers({
                     variant="secondary"
                     busy={invitingMemberId === member.id}
                     disabled={invitingMemberId !== null && invitingMemberId !== member.id}
-                    aria-label={"Invite " + member.name + " to the pack"}
+                    aria-label={t("Invite " + member.name + " to the pack")}
                     onClick={() => onInviteMember(member)}
                   >
                     <ActionIcon action="keep" />
@@ -316,7 +316,7 @@ export function TavernRoomChatComposer({
             type="button"
             icon
             variant="outline"
-            aria-label={pingOn ? "Mute table notification" : "Enable table notification"}
+            aria-label={t(pingOn ? "Mute table notification" : "Enable table notification")}
             aria-pressed={pingOn}
             onClick={() => {
               const next = !pingOn;
@@ -329,7 +329,7 @@ export function TavernRoomChatComposer({
         </Tooltip>
         <div className="relative min-w-0 flex-1">
           <Field
-            aria-label="Message"
+            aria-label={t("Message")}
             placeholder="Say something"
             maxLength={MESSAGE_MAX_LENGTH}
             autoComplete="off"
@@ -377,7 +377,7 @@ export function TavernRoomChatComposer({
             type="button"
             icon
             variant="outline"
-            aria-label="Emojis"
+            aria-label={t("Emojis")}
             aria-expanded={emojiOpen}
             onClick={() => {
               if (!emojiOpen) onEmojiRectChange(emojiRef.current?.getBoundingClientRect() ?? null);
@@ -388,7 +388,7 @@ export function TavernRoomChatComposer({
           </Button>
         </div>
         <Button type="submit" variant="primary" disabled={draft.trim().length === 0 || cooldownLeft > 0}>
-          {cooldownLeft > 0 ? Math.ceil(cooldownLeft / 1000) : "Falar"}
+          {cooldownLeft > 0 ? Math.ceil(cooldownLeft / 1000) : "Speak"}
         </Button>
       </div>
       <AiAuditNotice text={AI_AUDIT_CHAT_NOTICE} />

@@ -1464,6 +1464,7 @@ const RULES: readonly PatternRule[] = [
   },
   { pattern: /^Stop \((\d+)\)$/, en: "Stop ($1)", pt: "Parar ($1)", es: "Parar ($1)" },
   { pattern: /^Stop in (\d+)s$/, en: "Stop in $1s", pt: "Parar em $1s", es: "Parar en $1s" },
+  { pattern: /^Public sheet of (.+), hunter (.+) NV (.+) in Wizold: progress, equipment, companion and position on the boards\.$/, en: "Public sheet of $1, hunter $2 NV $3 in Wizold: progress, equipment, companion and position on the boards.", pt: "Ficha pública de $1, caçador $2 NV $3 em Wizold: progresso, equipamento, mascote e posição nos quadros.", es: "Ficha pública de $1, cazador $2 NV $3 en Wizold: progreso, equipo, compañero y posición en los tableros." },
   { pattern: /^Accept (.+)$/, en: "Accept $1", pt: "Aceitar $1", es: "Aceptar $1" },
   { pattern: /^Decline (.+)$/, en: "Decline $1", pt: "Recusar $1", es: "Rechazar $1" },
   { pattern: /^Talk to (.+)$/, en: "Talk to $1", pt: "Falar com $1", es: "Hablar con $1" },

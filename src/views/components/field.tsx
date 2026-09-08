@@ -42,6 +42,9 @@ export function Field({
             className,
           )}
           {...rest}
+          aria-label={
+            typeof rest["aria-label"] === "string" ? t(rest["aria-label"]) : rest["aria-label"]
+          }
           placeholder={rest.placeholder ? t(rest.placeholder) : rest.placeholder}
           maxLength={maxLength}
           type={numeric ? "text" : rest.type}

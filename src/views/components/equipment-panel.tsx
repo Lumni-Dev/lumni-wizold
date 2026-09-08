@@ -1,3 +1,4 @@
+import { useT } from "@/controllers/use-locale";
 import { SLOT_LABEL, type EquipmentSlot, type Item } from "@/models/entities/item";
 import { formatNumber } from "@/shared/utils/format";
 import { cn } from "@/shared/utils/class-names";
@@ -12,6 +13,7 @@ export interface GearSlot {
 }
 
 export function EquipmentPanel({ gear, forge }: { gear: GearSlot[]; forge: number }) {
+  const t = useT();
   return (
     <Panel
       title="Equipment"
@@ -42,13 +44,17 @@ export function EquipmentPanel({ gear, forge }: { gear: GearSlot[]; forge: numbe
             </span>
             <div className="flex min-w-0 grow items-center px-4 py-3">
               <div className="min-w-0 space-y-1">
-                <p className="truncate text-sm text-ink">{item ? item.name : "Nothing equipped"}</p>
+                <p className="truncate text-sm text-ink">
+                  {item ? t(item.name) : t("Nothing equipped")}
+                </p>
                 <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                  {SLOT_LABEL[slot]}
+                  {t(SLOT_LABEL[slot])}
                 </p>
                 {item ? (
                   <p className="font-mono text-[11px] text-ink-soft">
-                    {summarizeEffect(item, level).join(" · ")}
+                    {summarizeEffect(item, level)
+                      .map((line) => t(line))
+                      .join(" · ")}
                   </p>
                 ) : null}
               </div>

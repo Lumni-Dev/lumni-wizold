@@ -19,7 +19,7 @@ export function Footer() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={BRAND_ICON_PATH} alt={GAME_NAME} className="h-8 w-8 shrink-0 rounded-md" />
             <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-              {GAME_TAGLINE}
+              {t(GAME_TAGLINE)}
             </p>
           </div>
           <p className="text-[11px] leading-relaxed text-ink-faint">
@@ -47,7 +47,7 @@ export function Footer() {
           </div>
 
           <div className="flex flex-col items-start gap-4 sm:items-end">
-            <nav aria-label="Lumni contact" className="space-y-3 sm:text-right">
+            <nav aria-label={t("Lumni contact")} className="space-y-3 sm:text-right">
               <h2 className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                 {t("Contact")}
               </h2>
@@ -71,7 +71,7 @@ export function Footer() {
               </ul>
             </nav>
 
-            <nav aria-label="Legal" className="flex flex-wrap items-center gap-4 sm:justify-end">
+            <nav aria-label={t("Legal")} className="flex flex-wrap items-center gap-4 sm:justify-end">
               <a
                 href={COMPANY.privacyUrl}
                 target="_blank"

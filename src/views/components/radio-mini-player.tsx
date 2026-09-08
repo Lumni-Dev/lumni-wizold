@@ -4,12 +4,14 @@ import { Pause, Play, SkipForward } from "lucide-react";
 import { useEffect, useSyncExternalStore } from "react";
 import { radioStore } from "@/controllers/radio.store";
 import { playSound } from "@/controllers/sound";
+import { useT } from "@/controllers/use-locale";
 import { radioRepository } from "@/models/repositories/radio.repository";
 import { Tooltip } from "./tooltip";
 
 const CELL = "flex w-12 shrink-0 items-center justify-center self-stretch text-ink-faint transition-colors hover:text-ink";
 
 export function RadioMiniPlayer() {
+  const t = useT();
   const enabled = useSyncExternalStore(
     radioRepository.subscribe,
     radioRepository.enabled,
@@ -61,7 +63,7 @@ export function RadioMiniPlayer() {
               playSound("ui");
               radioStore.next();
             }}
-            aria-label="Next song"
+            aria-label={t("Next song")}
             className={CELL + " border-l border-edge"}
           >
             <SkipForward aria-hidden strokeWidth={1.75} className="h-4 w-4" />

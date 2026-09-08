@@ -491,7 +491,7 @@ export function SettingsScreen() {
               <ListRow layout="column">
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                    Volume
+                    {t("Volume")}
                   </span>
                   <span className="font-mono text-[11px] text-ink">
                     {Math.round(radioVolume * 100)}%
@@ -503,7 +503,7 @@ export function SettingsScreen() {
                   max={100}
                   step={1}
                   value={Math.round(radioVolume * 100)}
-                  aria-label="Radio volume"
+                  aria-label={t("Radio volume")}
                   className="volume-slider w-full"
                   onChange={(event) => {
                     radioRepository.setVolume(Number(event.target.value) / 100);
@@ -535,7 +535,7 @@ export function SettingsScreen() {
               {sound ? (
                 <ListRow layout="column">
                   <div className="flex items-center justify-between gap-3">
-                    <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">Volume</span>
+                    <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">{t("Volume")}</span>
                     <span className="font-mono text-[11px] text-ink">{Math.round(volume * 100)}%</span>
                   </div>
                   <input
@@ -544,7 +544,7 @@ export function SettingsScreen() {
                     max={100}
                     step={1}
                     value={Math.round(volume * 100)}
-                    aria-label="Sound volume"
+                    aria-label={t("Sound volume")}
                     className="volume-slider w-full"
                     onPointerDown={(event) => {
                       volumeDragging.current = true;
@@ -619,7 +619,7 @@ export function SettingsScreen() {
                 <ListRow layout="column">
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                      Volume
+                      {t("Volume")}
                     </span>
                     <span className="font-mono text-[11px] text-ink">
                       {Math.round(musicVolume * 100)}%
@@ -631,7 +631,7 @@ export function SettingsScreen() {
                     max={100}
                     step={1}
                     value={Math.round(musicVolume * 100)}
-                    aria-label="Soundtrack volume"
+                    aria-label={t("Soundtrack volume")}
                     className="volume-slider w-full"
                     onChange={(event) => {
                       musicRepository.setVolume(Number(event.target.value) / 100);
@@ -682,7 +682,7 @@ export function SettingsScreen() {
                     max={100}
                     step={1}
                     value={Math.round(backdropDarkness * 100)}
-                    aria-label="Darkness of the animated background"
+                    aria-label={t("Darkness of the animated background")}
                     className="volume-slider w-full"
                     onChange={(event) => {
                       backgroundRepository.setDarkness(Number(event.target.value) / 100);

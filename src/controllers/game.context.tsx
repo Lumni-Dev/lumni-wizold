@@ -849,7 +849,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
           birth,
         });
         if (!answer.ok) {
-          announce(answer.message, false, "Conta");
+          announce(answer.message, false, "Account");
           return null;
         }
         if (answer.data?.banished) {
@@ -858,7 +858,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         }
         if (typeof answer.data?.tutorial === "boolean") setTutorial(answer.data.tutorial);
         if (answer.data?.needsTwoFactor) {
-          announce(answer.message, true, "Conta");
+          announce(answer.message, true, "Account");
           return {
             hasCharacter: answer.data.hasCharacter === true,
             needsTwoFactor: true,
@@ -867,7 +867,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         await request("POST", "/api/state");
         setAuthenticated(true);
         markSession();
-        announce(answer.message, true, "Conta");
+        announce(answer.message, true, "Account");
         return { hasCharacter: answer.data?.hasCharacter === true };
       },
       verifyTwoFactor: async (code) => {
@@ -875,30 +875,30 @@ export function GameProvider({ children }: { children: ReactNode }) {
           code,
         });
         if (!answer.ok) {
-          announce(answer.message, false, "Conta");
+          announce(answer.message, false, "Account");
           return null;
         }
         await request("POST", "/api/state");
         setAuthenticated(true);
         markSession();
-        announce(answer.message, true, "Conta");
+        announce(answer.message, true, "Account");
         return { hasCharacter: answer.data?.hasCharacter === true };
       },
       resendTwoFactor: async () => {
         const answer = await api("POST", "/api/auth/two-factor/resend");
-        announce(answer.message, answer.ok, "Conta");
+        announce(answer.message, answer.ok, "Account");
         return answer.ok;
       },
       sendTwoFactorCode: async (action) => {
-        const answer = await act("POST", "/api/auth/two-factor/send", { action }, "Conta");
+        const answer = await act("POST", "/api/auth/two-factor/send", { action }, "Account");
         return answer.ok;
       },
       enableTwoFactor: async (code) => {
-        const answer = await act("POST", "/api/auth/two-factor/enable", { code }, "Conta");
+        const answer = await act("POST", "/api/auth/two-factor/enable", { code }, "Account");
         return answer.ok;
       },
       disableTwoFactor: async (code) => {
-        const answer = await act("POST", "/api/auth/two-factor/disable", { code }, "Conta");
+        const answer = await act("POST", "/api/auth/two-factor/disable", { code }, "Account");
         return answer.ok;
       },
       startRun: async (name, gender) => {
@@ -913,7 +913,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         return answer.ok;
       },
       requestDeleteCode: async () => {
-        const answer = await act("POST", "/api/characters/delete-code", undefined, "Conta");
+        const answer = await act("POST", "/api/characters/delete-code", undefined, "Account");
         return answer.ok;
       },
       logout: async () => {
@@ -940,7 +940,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       },
       deleteRun: async (code) => {
         const answer = await api("DELETE", "/api/characters", { code });
-        announce(answer.message, answer.ok, "Conta");
+        announce(answer.message, answer.ok, "Account");
         if (answer.ok) {
           applyState(initialState(), ++mintRef.current);
           setActivity(null);

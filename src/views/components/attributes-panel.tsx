@@ -1,3 +1,4 @@
+import { useT } from "@/controllers/use-locale";
 import { ATTRIBUTES, type Attributes } from "@/models/entities/attribute";
 import { findGender, type Gender } from "@/models/entities/character";
 import type { DerivedStats } from "@/models/rules/stats";
@@ -19,6 +20,7 @@ export function AttributesPanel({
   stats: DerivedStats;
   gender: Gender;
 }) {
+  const t = useT();
   const genderBonus = findGender(gender).bonus;
 
   return (
@@ -62,7 +64,7 @@ export function AttributesPanel({
                     )}
                   >
                     <p className="truncate text-[10px] uppercase tracking-normal text-ink-faint">
-                      {cell.label}
+                      {t(cell.label)}
                     </p>
                     <p
                       className={cn(

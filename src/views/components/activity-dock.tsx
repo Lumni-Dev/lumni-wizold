@@ -406,7 +406,7 @@ export function ActivityDock() {
         : runningLabel;
 
   return (
-    <aside aria-label="Activity in progress" className="pointer-events-auto relative w-full">
+    <aside aria-label={t("Activity in progress")} className="pointer-events-auto relative w-full">
       <div
         className={cn(
           "overflow-hidden rounded-lg border border-edge shadow-[0_12px_32px_-12px_rgba(0,0,0,0.95)]",

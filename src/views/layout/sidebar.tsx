@@ -117,12 +117,13 @@ export function Sidebar({
   onOpenTutorial: () => void;
 }) {
   const pathname = usePathname();
+  const t = useT();
 
   return (
     <aside className="sticky top-0 hidden h-screen w-56 shrink-0 flex-col border-r border-edge bg-surface/40 backdrop-blur lg:flex">
       <Brand />
 
-      <nav className="flex-1 overflow-y-auto p-3" aria-label="Game pages">
+      <nav className="flex-1 overflow-y-auto p-3" aria-label={t("Game pages")}>
         <ul className="space-y-3">
           {NAVIGATION.map((item) => (
             <li key={item.href}>
@@ -171,7 +172,7 @@ export function MobileNavigation({
   return (
     <nav
       ref={trackRef}
-      aria-label="Game pages"
+      aria-label={t("Game pages")}
       className="flex h-14 items-center gap-2 overflow-x-auto border-b border-edge bg-surface/40 px-3 backdrop-blur lg:hidden"
     >
       {links.map((item) => {

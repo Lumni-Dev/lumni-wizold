@@ -97,7 +97,7 @@ function DuelReport({ report }: { report: ArenaResolution }) {
           <DataRow label="Damage taken" value={formatNumber(combat.damageTaken)} />
         </List>
         <div className="space-y-2 p-4">
-          <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">The pit</p>
+          <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">{t("The pit")}</p>
           <p className="text-xs leading-relaxed text-ink-faint">
             {t(
               combat.victory
