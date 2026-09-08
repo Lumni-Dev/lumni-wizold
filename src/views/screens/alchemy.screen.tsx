@@ -10,6 +10,7 @@ import {
 import { useT } from "@/controllers/use-locale";
 import type { GameState } from "@/models/entities/game-state";
 import { RARITY_LABEL } from "@/models/entities/item";
+import { cn } from "@/shared/utils/class-names";
 import { formatNumber } from "@/shared/utils/format";
 import { Button } from "../components/button";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
@@ -182,7 +183,14 @@ function RecipeCard({
 
       <CardBody padding="none">
         <List>
-          <DataRow label="Empty Flask" value="x1" />
+          <DataRow
+            label="Empty Flask"
+            value={
+              <span className={cn(flasks < 1 && "text-ember")}>
+                {formatNumber(flasks) + " / 1"}
+              </span>
+            }
+          />
           {slots.map((slot) => (
             <ListRow key={slot.side} layout="column">
               <div className="w-full space-y-2">
