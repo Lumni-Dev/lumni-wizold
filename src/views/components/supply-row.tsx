@@ -33,8 +33,10 @@ export function SupplyRow({
           {action}
         </span>
       </div>
-      <span className="flex aspect-square w-16 shrink-0 overflow-hidden border-l border-edge p-2 sm:w-20">
-        <ItemArtFill item={item} />
+      <span className="flex w-16 shrink-0 items-center justify-center overflow-hidden border-l border-edge p-2 sm:w-20">
+        <span className="relative aspect-square w-full overflow-hidden">
+          <ItemArtFill item={item} />
+        </span>
       </span>
     </li>
   );

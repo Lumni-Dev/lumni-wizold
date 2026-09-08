@@ -26,7 +26,7 @@ const MAX_SIZE = {
   hunt: 1080,
   attributes: 512,
   training: 512,
-  genders: 1024,
+  genders: 512,
   pet: 1024,
 };
 

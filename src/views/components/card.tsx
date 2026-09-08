@@ -79,13 +79,13 @@ export function CardHeader({
       <div className={cn("flex items-stretch", tone !== "empty" && "border-b border-edge")}>
         <span
           className={cn(
-            "flex aspect-square shrink-0 overflow-hidden border-r border-edge",
+            "flex shrink-0 items-center justify-center overflow-hidden border-r border-edge",
             tone === "empty" && "border-dashed",
             artSize === "small" ? "w-16 sm:w-20" : "w-20 sm:w-28",
             artPadding === "default" && (artSize === "small" ? "p-2" : "p-3"),
           )}
         >
-          {art}
+          <span className="relative aspect-square w-full overflow-hidden">{art}</span>
         </span>
         <div className={cn("flex min-w-0 grow items-center gap-3 px-4 py-3", ICON_FRAME_INSET, className)}>
           {children}
