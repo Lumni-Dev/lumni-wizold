@@ -552,6 +552,46 @@ button:not(:disabled) {
   opacity: 0.92;
 }
 
+/* The fury row in the aside wears the ring's palette on its words instead of
+   a border: the ember hot spot sweeps across the name the way it circled the
+   frame, and the icon breathes between the same two stops. */
+@keyframes fury-glow-sweep {
+  from {
+    background-position: 200% 50%;
+  }
+  to {
+    background-position: 0% 50%;
+  }
+}
+
+@utility fury-glow-text {
+  background-image: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--color-ember) 42%, var(--color-edge)),
+    var(--color-ember) 50%,
+    color-mix(in oklab, var(--color-ember) 42%, var(--color-edge))
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: fury-glow-sweep 2.4s linear infinite;
+}
+
+@keyframes fury-glow-pulse {
+  0%,
+  100% {
+    color: var(--color-ember);
+  }
+  50% {
+    color: color-mix(in oklab, var(--color-ember) 42%, var(--color-edge));
+  }
+}
+
+@utility fury-glow-icon {
+  animation: fury-glow-pulse 2.4s ease-in-out infinite;
+}
+
 .landing-hero-shadow-text {
   text-shadow:
     0 1px 8px color-mix(in oklab, var(--color-base) 62%, transparent),

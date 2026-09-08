@@ -141,7 +141,7 @@ export function Sidebar({
 
       <div className="border-t border-edge">
         <MoonTracker flush />
-        <FuryModeTracker flush />
+        <FuryModeTracker />
         <NavLink item={STORE_LINK} active={pathname === STORE_LINK.href} highlighted />
         <NavLink item={SETTINGS_LINK} active={pathname === SETTINGS_LINK.href} />
       </div>
