@@ -1408,13 +1408,13 @@ const RULES: readonly PatternRule[] = [
     es: "$1: párala antes de empezar otra.",
   },
   {
-    pattern: /^(.+?)( strikes | bites | sinks its claws into | sinks its teeth into | batters | tears the flank of | tears into | shreds | rips open | hits | mauls | lunges at )(.+) dealing (\d+) critical damage\.$/,
+    pattern: /^(.+?)( strikes | strikes again | bites | sinks its claws into | sinks its teeth into | batters | tears the flank of | tears into | shreds | rips open | hits | hits again | mauls | lunges at | flashes a second blow at | lunges twice into | lunges a second time at )(.+) dealing (\d+) critical damage\.$/,
     en: "$1$2$3 dealing $4 critical damage.",
     pt: "$1$2$3 causando $4 de dano crítico.",
     es: "$1$2$3 causando $4 de daño crítico.",
   },
   {
-    pattern: /^(.+?)( strikes | bites | sinks its claws into | sinks its teeth into | batters | tears the flank of | tears into | shreds | rips open | hits | mauls | lunges at )(.+) dealing (\d+) damage\.$/,
+    pattern: /^(.+?)( strikes | strikes again | bites | sinks its claws into | sinks its teeth into | batters | tears the flank of | tears into | shreds | rips open | hits | hits again | mauls | lunges at | flashes a second blow at | lunges twice into | lunges a second time at )(.+) dealing (\d+) damage\.$/,
     en: "$1$2$3 dealing $4 damage.",
     pt: "$1$2$3 causando $4 de dano.",
     es: "$1$2$3 causando $4 de daño.",

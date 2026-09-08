@@ -31,6 +31,8 @@ export interface CombatRound {
   characterHealth: number;
   creatureHealth: number;
   text: string;
+  /** Second blow in the same cycle, paid by agility. */
+  extraStrike?: boolean;
 }
 
 export interface CombatOutcome {
@@ -74,10 +76,28 @@ const PET_CRITICAL_CHANCE = 5;
 
 const CRITICAL_MULTIPLIER = 1.5;
 
+/** Hard ceiling (%) so a NV 1000 glass cannon never doubles almost every cycle. */
+export const EXTRA_STRIKE_CAP = 12;
+
+/**
+ * Chance (%) of one extra blow in the same cycle.
+ * Soft absolute term (AGI still helps vs equals) plus lead over the foe;
+ * both asymptote under EXTRA_STRIKE_CAP.
+ */
+export function extraStrikeChance(attackerAgi: number, defenderAgi: number): number {
+  const agi = Math.max(0, attackerAgi);
+  const lead = Math.max(0, agi - Math.max(0, defenderAgi));
+  const absolute = (3 * agi) / (agi + 400);
+  const relative = (10 * lead) / (lead + 180);
+  return clamp(Math.round(absolute + relative), 0, EXTRA_STRIKE_CAP);
+}
+
 const CHARACTER_HIT_VERBS = [" strikes ", " bites ", " sinks its claws into ", " batters "];
 const CHARACTER_CRIT_VERBS = [" tears into ", " shreds ", " rips open "];
+const CHARACTER_EXTRA_VERBS = [" strikes again ", " flashes a second blow at ", " lunges twice into "];
 const CREATURE_HIT_VERBS = [" hits ", " strikes ", " sinks its teeth into "];
 const CREATURE_CRIT_VERBS = [" mauls ", " tears into "];
+const CREATURE_EXTRA_VERBS = [" strikes again ", " hits again ", " lunges a second time at "];
 const PET_HIT_VERBS = [" bites ", " lunges at ", " tears the flank of "];
 
 function creatureDodgeText(creatureName: string, characterName: string, random: Random): string {
@@ -144,6 +164,7 @@ export function simulateCombat({
 
   const strength = stats.totalAttributes.strength;
   const endurance = stats.totalAttributes.endurance;
+  const agility = stats.totalAttributes.agility;
   const petStrength = Math.max(1, Math.round(strength * PET_ATTACK_RATIO));
   let petBlows = 0;
   let petFighting =
@@ -161,9 +182,11 @@ export function simulateCombat({
   const foePetCanBite = () =>
     foePetFighting && foePet !== null && foePetSpent + PET_ENERGY_PER_BLOW <= foePet.energy;
 
-  const characterStarts = stats.totalAttributes.agility >= creature.agility;
+  const characterStarts = agility >= creature.agility;
+  const hunterExtraChance = extraStrikeChance(agility, creature.agility);
+  const creatureExtraChance = extraStrikeChance(creature.agility, agility);
 
-  const characterBlow = () => {
+  const characterBlow = (extra = false) => {
     index += 1;
     if (chance(creatureDodge(creature) / 100, random)) {
       rounds.push({
@@ -174,12 +197,13 @@ export function simulateCombat({
         dodged: true,
         characterHealth,
         creatureHealth,
+        extraStrike: extra || undefined,
         text: creatureDodgeText(creature.name, characterName, random),
       });
       return;
     }
 
-    const critical = chance(criticalChance / 100, random);
+    const critical = !extra && chance(criticalChance / 100, random);
     const damage = calculateDamage(
       strength,
       creature.endurance,
@@ -190,6 +214,10 @@ export function simulateCombat({
     creatureHealth = Math.max(0, creatureHealth - damage);
     damageDealt += damage;
 
+    const verb = extra
+      ? pickOne(CHARACTER_EXTRA_VERBS, random)
+      : pickOne(critical ? CHARACTER_CRIT_VERBS : CHARACTER_HIT_VERBS, random);
+
     rounds.push({
       index,
       author: "character",
@@ -198,9 +226,10 @@ export function simulateCombat({
       dodged: false,
       characterHealth,
       creatureHealth,
+      extraStrike: extra || undefined,
       text:
         characterName +
-        pickOne(critical ? CHARACTER_CRIT_VERBS : CHARACTER_HIT_VERBS, random) +
+        verb +
         creature.name +
         " dealing " +
         damage +
@@ -293,10 +322,10 @@ export function simulateCombat({
     });
   };
 
-  const creatureBlow = () => {
+  const creatureBlow = (extra = false) => {
     index += 1;
 
-    if (petFighting && pet && chance(PET_TARGET_CHANCE, random)) {
+    if (!extra && petFighting && pet && chance(PET_TARGET_CHANCE, random)) {
       petSpent += PET_BITE_ENERGY;
       const down = petSpent >= pet.energy;
       if (down) petFighting = false;
@@ -325,15 +354,20 @@ export function simulateCombat({
         dodged: true,
         characterHealth,
         creatureHealth,
+        extraStrike: extra || undefined,
         text: characterDodgeText(characterName, creature.name, random),
       });
       return;
     }
 
-    const critical = chance(CREATURE_CRITICAL_CHANCE, random);
+    const critical = !extra && chance(CREATURE_CRITICAL_CHANCE, random);
     const damage = calculateDamage(creature.strength, endurance, critical, random);
     characterHealth = Math.max(0, characterHealth - damage);
     damageTaken += damage;
+
+    const verb = extra
+      ? pickOne(CREATURE_EXTRA_VERBS, random)
+      : pickOne(critical ? CREATURE_CRIT_VERBS : CREATURE_HIT_VERBS, random);
 
     rounds.push({
       index,
@@ -343,14 +377,25 @@ export function simulateCombat({
       dodged: false,
       characterHealth,
       creatureHealth,
+      extraStrike: extra || undefined,
       text:
         creature.name +
-        pickOne(critical ? CREATURE_CRIT_VERBS : CREATURE_HIT_VERBS, random) +
+        verb +
         characterName +
         " dealing " +
         damage +
         (critical ? " critical damage." : " damage."),
     });
+  };
+
+  const maybeHunterExtra = () => {
+    if (creatureHealth <= 0) return;
+    if (chance(hunterExtraChance / 100, random)) characterBlow(true);
+  };
+
+  const maybeCreatureExtra = () => {
+    if (characterHealth <= 0 || creatureHealth <= 0) return;
+    if (chance(creatureExtraChance / 100, random)) creatureBlow(true);
   };
 
   let cycles = 0;
@@ -389,13 +434,21 @@ export function simulateCombat({
 
     if (characterStarts) {
       characterBlow();
+      maybeHunterExtra();
       if (creatureHealth > 0 && petCanBite()) petBlow();
-      if (creatureHealth > 0) creatureBlow();
+      if (creatureHealth > 0) {
+        creatureBlow();
+        maybeCreatureExtra();
+      }
       if (characterHealth > 0 && creatureHealth > 0 && foePetCanBite()) foePetBlow();
     } else {
       creatureBlow();
+      maybeCreatureExtra();
       if (characterHealth > 0 && foePetCanBite()) foePetBlow();
-      if (characterHealth > 0) characterBlow();
+      if (characterHealth > 0) {
+        characterBlow();
+        maybeHunterExtra();
+      }
       if (characterHealth > 0 && creatureHealth > 0 && petCanBite()) petBlow();
     }
   }

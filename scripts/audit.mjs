@@ -312,6 +312,23 @@ sec("combat");
     "critical damage is fixed, not riding the fury",
     combat.criticalMultiplierOf() === 1.5 + CONST.CRITICAL_DAMAGE_BONUS,
   );
+  ok(
+    "extra strike equal AGI stays near zero",
+    combat.extraStrikeChance(100, 100) <= 2,
+  );
+  ok(
+    "extra strike at the top band stays under the hard ceiling",
+    combat.extraStrikeChance(1000, 0) <= combat.EXTRA_STRIKE_CAP &&
+      combat.EXTRA_STRIKE_CAP === 12,
+  );
+  ok(
+    "extra strike grows with the AGI lead",
+    combat.extraStrikeChance(200, 50) > combat.extraStrikeChance(200, 200),
+  );
+  ok(
+    "extra strike never exceeds the cap at absurd leads",
+    combat.extraStrikeChance(100000, 0) === combat.EXTRA_STRIKE_CAP,
+  );
   const flags = {
     rounds: [],
     finalHealth: 10,
