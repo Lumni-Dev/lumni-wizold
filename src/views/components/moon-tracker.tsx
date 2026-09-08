@@ -7,7 +7,13 @@ import { FURY_ATTRIBUTE_BONUS } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
 import { Tooltip } from "./tooltip";
 
-export function MoonTracker({ flush = false }: { flush?: boolean }) {
+export function MoonTracker({
+  flush = false,
+  iconOnly = false,
+}: {
+  flush?: boolean;
+  iconOnly?: boolean;
+}) {
   const { moon } = useGame();
   const t = useT();
 
@@ -21,6 +27,16 @@ export function MoonTracker({ flush = false }: { flush?: boolean }) {
   if (miningBonus > 0) perks.push(t("+" + miningBonus + "% in mining"));
   if (furyBonus > 0) perks.push(t("Fury Mode: +" + furyBonus + " to all attributes"));
   const bonusLine = perks.length > 0 ? perks.join(" · ") : t("No bonus this phase");
+
+  if (iconOnly) {
+    return (
+      <Tooltip block label={t(moon.phase.label) + ": " + bonusLine}>
+        <div className="flex h-8 items-center justify-center border-b border-edge">
+          <Moon aria-hidden strokeWidth={1.75} className="h-4 w-4 text-ink-soft" />
+        </div>
+      </Tooltip>
+    );
+  }
 
   return (
     <Tooltip block label={t(moon.phase.description)}>

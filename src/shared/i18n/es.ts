@@ -465,6 +465,8 @@ export const ES: Record<string, string> = {
   "One window at a time": "Una ventana a la vez",
   "Notices and activity": "Avisos y actividad",
   "Game pages": "Páginas del juego",
+  "Collapse menu": "Plegar menú",
+  "Expand menu": "Expandir menú",
   "Close notice": "Cerrar aviso",
   "Activity in progress": "Actividad en curso",
   "Maximize activity": "Maximizar actividad",

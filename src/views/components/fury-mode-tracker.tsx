@@ -3,13 +3,24 @@
 import { Flame } from "lucide-react";
 import { useT } from "@/controllers/use-locale";
 import { formatFuryClock } from "@/shared/utils/format";
+import { Tooltip } from "./tooltip";
 import { useFuryClock } from "./use-fury-clock";
 
-export function FuryModeTracker() {
+export function FuryModeTracker({ iconOnly = false }: { iconOnly?: boolean }) {
   const { character, remaining, active } = useFuryClock();
   const t = useT();
 
   if (!character || !active) return null;
+
+  if (iconOnly) {
+    return (
+      <Tooltip block label={t("Fury Mode") + ": " + formatFuryClock(remaining)}>
+        <div className="flex h-8 items-center justify-center border-b border-edge">
+          <Flame aria-hidden strokeWidth={1.75} className="fury-glow-icon h-4 w-4" />
+        </div>
+      </Tooltip>
+    );
+  }
 
   return (
     <div className="flex items-stretch border-b border-edge">

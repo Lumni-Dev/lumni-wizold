@@ -567,9 +567,11 @@ button:not(:disabled) {
 @utility fury-glow-text {
   background-image: linear-gradient(
     90deg,
-    color-mix(in oklab, var(--color-ember) 42%, var(--color-edge)),
-    var(--color-ember) 50%,
-    color-mix(in oklab, var(--color-ember) 42%, var(--color-edge))
+    var(--color-ember),
+    var(--color-ember) 35%,
+    var(--color-ink) 50%,
+    var(--color-ember) 65%,
+    var(--color-ember)
   );
   background-size: 200% 100%;
   -webkit-background-clip: text;
@@ -584,7 +586,7 @@ button:not(:disabled) {
     color: var(--color-ember);
   }
   50% {
-    color: color-mix(in oklab, var(--color-ember) 42%, var(--color-edge));
+    color: var(--color-ink);
   }
 }
 

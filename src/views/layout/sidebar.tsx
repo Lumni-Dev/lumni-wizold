@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { playSound } from "@/controllers/sound";
 import { useT } from "@/controllers/use-locale";
 import { GAME_TAGLINE } from "@/shared/constants/game";
@@ -14,27 +15,34 @@ import {
   TUTORIAL_LINK,
   type NavigationItem,
 } from "@/shared/constants/navigation";
+import { asideRepository } from "@/models/repositories/aside.repository";
 import { cn } from "@/shared/utils/class-names";
 import { CONTROL_HEIGHT } from "@/shared/constants/ui";
 import { chipClass, ChipFrame } from "../components/chip";
 import { MoonTracker } from "../components/moon-tracker";
 import { FuryModeTracker } from "../components/fury-mode-tracker";
+import { Tooltip } from "../components/tooltip";
 import { NavIcon } from "../components/app-icon";
 
-function Brand() {
+function Brand({ collapsed }: { collapsed: boolean }) {
   const t = useT();
   return (
     <Link
       href="/character"
-      className="flex h-[74px] items-center gap-3 border-b border-edge px-3"
+      className={cn(
+        "flex h-[74px] items-center gap-3 border-b border-edge",
+        collapsed ? "justify-center px-0" : "px-3",
+      )}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={BRAND_ICON_PATH} alt="" className="h-10 w-10 shrink-0 rounded-md" />
-      <div className="min-w-0 flex-1 text-left">
-        <p className="text-[10px] uppercase leading-relaxed tracking-[0.16em] text-ink-faint">
-          {t(GAME_TAGLINE)}
-        </p>
-      </div>
+      {collapsed ? null : (
+        <div className="min-w-0 flex-1 text-left">
+          <p className="text-[10px] uppercase leading-relaxed tracking-[0.16em] text-ink-faint">
+            {t(GAME_TAGLINE)}
+          </p>
+        </div>
+      )}
     </Link>
   );
 }
@@ -42,19 +50,22 @@ function Brand() {
 function NavLink({
   item,
   active,
+  collapsed,
   highlighted = false,
   badge = 0,
 }: {
   item: NavigationItem;
   active: boolean;
+  collapsed: boolean;
   highlighted?: boolean;
   badge?: number;
 }) {
   const t = useT();
-  return (
+  const link = (
     <Link
       href={item.href}
       aria-current={active ? "page" : undefined}
+      aria-label={collapsed ? t(item.label) : undefined}
       onClick={() => playSound("ui")}
       className={cn(
         "relative flex " + CONTROL_HEIGHT + " items-center border-b border-edge transition-colors",
@@ -62,24 +73,49 @@ function NavLink({
         highlighted ? "text-ember" : active ? "text-ink" : "text-ink-soft hover:text-ink",
       )}
     >
-      <span className={"flex " + CONTROL_HEIGHT + " w-8 shrink-0 items-center justify-center border-r border-edge"}>
+      <span
+        className={cn(
+          "flex " + CONTROL_HEIGHT + " shrink-0 items-center justify-center",
+          collapsed ? "w-full" : "w-8 border-r border-edge",
+        )}
+      >
         <NavIcon href={item.href} />
       </span>
-      <span className="min-w-0 truncate px-3 text-[10px] uppercase tracking-[0.16em]">
-        {t(item.label)}
-      </span>
-      {badge > 0 ? (
-        <span className="ml-auto mr-2 inline-flex h-4 min-w-4 shrink-0 items-center justify-center self-center rounded border border-ember/70 bg-ember px-1 font-mono text-[10px] font-bold tracking-normal text-base">
-          {badge > 9 ? "9+" : badge}
+      {collapsed ? null : (
+        <span className="min-w-0 truncate px-3 text-[10px] uppercase tracking-[0.16em]">
+          {t(item.label)}
         </span>
+      )}
+      {badge > 0 ? (
+        collapsed ? (
+          <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-ember" />
+        ) : (
+          <span className="ml-auto mr-2 inline-flex h-4 min-w-4 shrink-0 items-center justify-center self-center rounded border border-ember/70 bg-ember px-1 font-mono text-[10px] font-bold tracking-normal text-base">
+            {badge > 9 ? "9+" : badge}
+          </span>
+        )
       ) : null}
     </Link>
   );
+  if (!collapsed) return link;
+  return (
+    <Tooltip block label={t(item.label)}>
+      {link}
+    </Tooltip>
+  );
 }
 
-function TutorialButton({ active, onClick }: { active: boolean; onClick: () => void }) {
+function TutorialButton({
+  active,
+  collapsed,
+  onClick,
+}: {
+  active: boolean;
+  collapsed: boolean;
+  onClick: () => void;
+}) {
   const t = useT();
-  return (
+  const button = (
     <button
       type="button"
       onClick={() => {
@@ -87,6 +123,7 @@ function TutorialButton({ active, onClick }: { active: boolean; onClick: () => v
         onClick();
       }}
       aria-pressed={active}
+      aria-label={collapsed ? t(TUTORIAL_LINK.label) : undefined}
       className={cn(
         "relative flex w-full " + CONTROL_HEIGHT + " items-center border-b border-edge transition-colors",
         active
@@ -95,14 +132,67 @@ function TutorialButton({ active, onClick }: { active: boolean; onClick: () => v
       )}
     >
       <span
-        className={"flex " + CONTROL_HEIGHT + " w-8 shrink-0 items-center justify-center border-r border-edge"}
+        className={cn(
+          "flex " + CONTROL_HEIGHT + " shrink-0 items-center justify-center",
+          collapsed ? "w-full" : "w-8 border-r border-edge",
+        )}
       >
         <NavIcon href="tutorial" />
       </span>
-      <span className="min-w-0 truncate px-3 text-[10px] uppercase tracking-[0.16em]">
-        {t(TUTORIAL_LINK.label)}
-      </span>
+      {collapsed ? null : (
+        <span className="min-w-0 truncate px-3 text-[10px] uppercase tracking-[0.16em]">
+          {t(TUTORIAL_LINK.label)}
+        </span>
+      )}
     </button>
+  );
+  if (!collapsed) return button;
+  return (
+    <Tooltip block label={t(TUTORIAL_LINK.label)}>
+      {button}
+    </Tooltip>
+  );
+}
+
+function CollapseButton({ collapsed }: { collapsed: boolean }) {
+  const t = useT();
+  const label = collapsed ? "Expand menu" : "Collapse menu";
+  const button = (
+    <button
+      type="button"
+      onClick={() => {
+        playSound("ui");
+        asideRepository.setCollapsed(!collapsed);
+      }}
+      aria-label={t(label)}
+      className={cn(
+        "relative flex w-full " + CONTROL_HEIGHT + " items-center border-b border-edge text-ink-soft transition-colors hover:bg-surface/70 hover:text-ink",
+      )}
+    >
+      <span
+        className={cn(
+          "flex " + CONTROL_HEIGHT + " shrink-0 items-center justify-center",
+          collapsed ? "w-full" : "w-8 border-r border-edge",
+        )}
+      >
+        {collapsed ? (
+          <ChevronRight aria-hidden strokeWidth={1.75} className="h-4 w-4" />
+        ) : (
+          <ChevronLeft aria-hidden strokeWidth={1.75} className="h-4 w-4" />
+        )}
+      </span>
+      {collapsed ? null : (
+        <span className="min-w-0 truncate px-3 text-[10px] uppercase tracking-[0.16em]">
+          {t(label)}
+        </span>
+      )}
+    </button>
+  );
+  if (!collapsed) return button;
+  return (
+    <Tooltip block label={t(label)}>
+      {button}
+    </Tooltip>
   );
 }
 
@@ -117,10 +207,20 @@ export function Sidebar({
 }) {
   const pathname = usePathname();
   const t = useT();
+  const collapsed = useSyncExternalStore(
+    asideRepository.subscribe,
+    asideRepository.collapsed,
+    asideRepository.serverSnapshot,
+  );
 
   return (
-    <aside className="sticky top-0 hidden h-screen w-56 shrink-0 flex-col border-r border-edge bg-surface/40 backdrop-blur lg:flex">
-      <Brand />
+    <aside
+      className={cn(
+        "sticky top-0 hidden h-screen shrink-0 flex-col border-r border-edge bg-surface/40 backdrop-blur transition-[width] duration-200 lg:flex",
+        collapsed ? "w-14" : "w-56",
+      )}
+    >
+      <Brand collapsed={collapsed} />
 
       <nav className="flex-1 overflow-y-auto" aria-label={t("Game pages")}>
         <ul>
@@ -129,21 +229,32 @@ export function Sidebar({
               <NavLink
                 item={item}
                 active={pathname === item.href}
+                collapsed={collapsed}
                 badge={item.href === "/tavern" ? tavernUnread : 0}
               />
             </li>
           ))}
           <li>
-            <TutorialButton active={tutorialOpen} onClick={onOpenTutorial} />
+            <TutorialButton active={tutorialOpen} collapsed={collapsed} onClick={onOpenTutorial} />
           </li>
         </ul>
       </nav>
 
       <div className="border-t border-edge">
-        <MoonTracker flush />
-        <FuryModeTracker />
-        <NavLink item={STORE_LINK} active={pathname === STORE_LINK.href} highlighted />
-        <NavLink item={SETTINGS_LINK} active={pathname === SETTINGS_LINK.href} />
+        <MoonTracker flush iconOnly={collapsed} />
+        <FuryModeTracker iconOnly={collapsed} />
+        <NavLink
+          item={STORE_LINK}
+          active={pathname === STORE_LINK.href}
+          collapsed={collapsed}
+          highlighted
+        />
+        <NavLink
+          item={SETTINGS_LINK}
+          active={pathname === SETTINGS_LINK.href}
+          collapsed={collapsed}
+        />
+        <CollapseButton collapsed={collapsed} />
       </div>
     </aside>
   );
