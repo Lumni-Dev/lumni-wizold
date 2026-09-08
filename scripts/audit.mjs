@@ -1613,8 +1613,8 @@ sec("willpower stretches the fury");
   ok("each Willpower point never shortens the flask", strictly);
 
   ok(
-    "the curve never passes double",
-    moon.furyDurationMs(5, 10_000_000) < 2 * 5 * 60_000 &&
+    "the Willpower stretch never passes its ceiling",
+    moon.furyWillpowerExtraMs(10_000_000) < CONST.FURY_WILLPOWER_EXTRA_MINUTES * 60_000 &&
       moon.furyWillpowerBonus(10_000_000) < CONST.FURY_WILLPOWER_MAX_BONUS,
   );
   ok(
@@ -1624,12 +1624,17 @@ sec("willpower stretches the fury");
         CONST.FURY_WILLPOWER_MAX_BONUS / 2,
     ) < 1e-9,
   );
+  ok("half the stretch already at the scale", moon.furyWillpowerExtraMs(250) === 150_000);
   ok("100 Willpower yields 6.4 min on the medium flask", moon.furyDurationMinutes(5, 100) === 6.4);
   ok("550 Willpower yields 8.4 min on the medium flask", moon.furyDurationMinutes(5, 550) === 8.4);
-  ok("without Willpower the extra is zero", moon.furyWillpowerExtraMs(2.5, 0) === 0);
+  ok("100 Willpower yields 3.9 min on the small flask", moon.furyDurationMinutes(2.5, 100) === 3.9);
+  ok("550 Willpower yields 5.9 min on the small flask", moon.furyDurationMinutes(2.5, 550) === 5.9);
+  ok("without Willpower the extra is zero", moon.furyWillpowerExtraMs(0) === 0);
   ok(
-    "100 de Vontade no frasco pequeno soma 42s inteiros",
-    moon.furyWillpowerExtraMs(2.5, 100) === 42_000,
+    "100 Willpower adds the same 85s to every flask",
+    moon.furyWillpowerExtraMs(100) === 85_000 &&
+      moon.furyDurationMs(2.5, 100) - 2.5 * 60_000 === 85_000 &&
+      moon.furyDurationMs(7.5, 100) - 7.5 * 60_000 === 85_000,
   );
 
   const plain = baseState({ level: 10 });
@@ -1644,7 +1649,7 @@ sec("willpower stretches the fury");
   if (drunk.ok) {
     const left = Date.parse(drunk.state.character.furyUntil) - Date.now();
     ok(
-      "prazo gravado bate com a regra",
+      "recorded deadline matches the rule",
       Math.abs(left - moon.furyDurationMs(5, 250)) < 2_000,
       String(left) + " vs " + moon.furyDurationMs(5, 250),
     );
