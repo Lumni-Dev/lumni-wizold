@@ -25,12 +25,18 @@ import { FuryModeTracker } from "../components/fury-mode-tracker";
 import { Tooltip } from "../components/tooltip";
 import { NavIcon } from "../components/app-icon";
 
+// The active page wears the primary button's own skin, ember fill and all, so
+// the menu answers with the same colour the game uses for "this is the action".
 function asideRow(active: boolean, collapsed: boolean, highlighted = false): string {
   return cn(
     "relative flex " + CONTROL_HEIGHT + " w-full items-center rounded-md transition-colors",
     collapsed ? "justify-center" : "gap-3 px-2.5",
-    active ? "bg-surface-high" : "hover:bg-surface/70",
-    highlighted ? "text-ember" : active ? "text-ink" : "text-ink-soft hover:text-ink",
+    active
+      ? "bg-ember text-base shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)] hover:brightness-110"
+      : cn(
+          "hover:bg-surface/70",
+          highlighted ? "text-ember" : "text-ink-soft hover:text-ink",
+        ),
   );
 }
 
@@ -91,9 +97,19 @@ function NavLink({
       )}
       {badge > 0 ? (
         collapsed ? (
-          <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-ember" />
+          <span
+            className={cn(
+              "absolute right-1 top-1 h-1.5 w-1.5 rounded-full",
+              active ? "bg-base" : "bg-ember",
+            )}
+          />
         ) : (
-          <span className="ml-auto inline-flex h-4 min-w-4 shrink-0 items-center justify-center self-center rounded border border-ember/70 bg-ember px-1 font-mono text-[10px] font-bold tracking-normal text-base">
+          <span
+            className={cn(
+              "ml-auto inline-flex h-4 min-w-4 shrink-0 items-center justify-center self-center rounded border px-1 font-mono text-[10px] font-bold tracking-normal",
+              active ? "border-base/70 bg-base text-ember" : "border-ember/70 bg-ember text-base",
+            )}
+          >
             {badge > 9 ? "9+" : badge}
           </span>
         )
