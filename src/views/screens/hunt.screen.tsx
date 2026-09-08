@@ -203,6 +203,10 @@ export function HuntScreen() {
   const [lapJolt, setLapJolt] = useState(0);
   const shaking = useShake(preyJolt + lapJolt);
   const lastReportRef = useRef<HuntReport | null>(null);
+  const keptHealthRef = useRef<string | null>(null);
+  const healthFocusId = activeId ?? waitingId ?? restHuntId;
+  if (healthFocusId) keptHealthRef.current = healthFocusId;
+  const keptHealthId = healthFocusId ?? keptHealthRef.current;
   const territories = useMemo(() => listTerritories(state), [state]);
   const areaTabs = useMemo(
     () => [
@@ -448,7 +452,8 @@ export function HuntScreen() {
                       label={"Hear about " + territory.name}
                     />
                   </div>
-                  {stats && (active || waiting || recovering) ? (
+                  {stats &&
+                  (active || waiting || recovering || keptHealthId === territory.id) ? (
                     <div className="px-4 py-3">
                       <Bar
                         label={
