@@ -20,7 +20,7 @@ export function FuryModeTracker() {
       animationKey={furyUntil || "sky"}
     >
       <div className="flex w-full items-stretch">
-        <span className="flex w-8 shrink-0 items-center justify-center self-stretch">
+        <span className="flex w-8 shrink-0 items-center justify-center self-stretch border-r border-edge">
           <Flame aria-hidden strokeWidth={1.75} className="h-4 w-4 text-ember" />
         </span>
         <div className="min-w-0 flex-1 px-3 py-2">

@@ -118,7 +118,7 @@ export function Bar({
         </span>
       </div>
       <div
-        className="relative h-2 w-full overflow-hidden rounded-full border-0 bg-charcoal"
+        className="relative h-2 w-full overflow-hidden rounded-full border border-ember/30 bg-charcoal"
       >
         <div
           className={cn(

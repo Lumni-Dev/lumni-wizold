@@ -17,12 +17,12 @@ export const FURY_RING_INNER_RADIUS = "rounded-[calc(var(--radius-md)-2px)]";
 export const GLASS_CONTROL_ACTIVE = "bg-surface-high/50 backdrop-blur";
 
 export const LOOSE_CONTROL_SURFACE =
-  "border border-transparent bg-surface/70 backdrop-blur transition-colors";
+  "border border-edge bg-surface/70 backdrop-blur transition-colors";
 
 export const LOOSE_CONTROL_SURFACE_ACTIVE =
-  "border-transparent bg-surface-high/60 backdrop-blur text-ink";
+  "border-edge-strong bg-surface-high/50 backdrop-blur text-ink";
 
 export const LOOSE_CONTROL_SURFACE_HOVER =
-  "hover:bg-surface-high/50 hover:text-ink";
+  "hover:border-edge-strong hover:bg-surface-high/50 hover:text-ink";
 
 export const ICON_FRAME_INSET = "[&_[data-icon-frame]]:!m-0";

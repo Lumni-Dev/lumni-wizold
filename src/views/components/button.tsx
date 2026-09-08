@@ -16,11 +16,11 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 const VARIANTS: Record<ButtonVariant, string> = {
   primary:
-    "border border-ember/70 bg-ember text-base " +
+    "border border-ember bg-ember text-base " +
     "shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)] hover:brightness-110",
-  secondary: "border border-transparent bg-surface-high text-ink hover:bg-surface-top",
-  ghost: "border border-transparent text-ink-soft hover:bg-surface-high hover:text-ink",
-  outline: "border border-transparent bg-surface/50 text-ink-soft hover:bg-surface-high hover:text-ink",
+  secondary: "border border-edge bg-surface-high text-ink hover:border-edge-strong hover:bg-surface-top",
+  ghost: "border border-edge text-ink-soft hover:border-edge-strong hover:bg-surface-high hover:text-ink",
+  outline: "border border-edge text-ink-soft hover:border-edge-strong hover:bg-surface-high hover:text-ink",
 };
 const SIZES: Record<ButtonSize, string> = {
   small: CONTROL_HEIGHT + " px-3 text-[11px]",

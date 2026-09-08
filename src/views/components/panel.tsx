@@ -39,13 +39,13 @@ export function Panel({
     <div id={id} className={cn("relative", height === "fill" ? "h-full" : "h-fit", className)}>
       <section
         className={cn(
-          "overflow-hidden rounded-lg border border-transparent " + GLASS_SECTION,
+          "overflow-hidden rounded-lg border border-edge " + GLASS_SECTION,
           "shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset]",
           height === "fill" && "flex h-full flex-col",
         )}
       >
         {title ? (
-          <header className="flex items-center justify-between gap-3 bg-base/20 px-4 py-3">
+          <header className="flex items-center justify-between gap-3 border-b border-edge px-4 py-3">
             <div className="min-w-0 space-y-1">
               <h2 className="heading text-[11px] text-ink">{t(title)}</h2>
               {description ? <p className="text-xs text-ink-faint">{t(description)}</p> : null}
@@ -56,7 +56,7 @@ export function Panel({
         <div className={cn(padding === "normal" && "p-4", height === "fill" && "flex-1")}>
           <MarkNested>{children}</MarkNested>
         </div>
-        {footer ? <div className="bg-base/25 p-4">{footer}</div> : null}
+        {footer ? <div className="border-t border-edge p-4">{footer}</div> : null}
       </section>
       {nested ? null : <CornerAccents />}
     </div>
