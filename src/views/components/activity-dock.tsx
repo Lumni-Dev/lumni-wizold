@@ -385,7 +385,7 @@ export function ActivityDock() {
     dock.detail;
 
   const runningLabel = paused
-    ? "Pausado"
+    ? "Paused"
     : huntView
     ? "Hunting..."
     : trainView
@@ -432,7 +432,7 @@ export function ActivityDock() {
               <button
                 type="button"
                 onClick={stop}
-                aria-label="Stop activity"
+                aria-label={t("Stop activity")}
                 className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-edge text-ink-faint transition-colors hover:border-edge-strong hover:text-ink"
               >
                 <ActionIcon action="stop" />
@@ -443,7 +443,7 @@ export function ActivityDock() {
             <button
               type="button"
               onClick={() => dockRepository.setMinimized(!minimized)}
-              aria-label={minimized ? "Maximize activity" : "Minimize activity"}
+              aria-label={t(minimized ? "Maximize activity" : "Minimize activity")}
               aria-expanded={!minimized}
               className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-edge text-ink-faint transition-colors hover:border-edge-strong hover:text-ink"
             >

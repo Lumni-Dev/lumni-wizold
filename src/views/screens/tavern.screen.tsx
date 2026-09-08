@@ -828,7 +828,7 @@ export function TavernScreen() {
                           {memberCount +
                             " / " +
                             (isPrivate ? 2 : MAX_ROOM_MEMBERS) +
-                            (memberCount === 1 ? " pessoa" : " pessoas")}
+                            (memberCount === 1 ? " person" : " people")}
                         </Tag>
                       </div>
                     </div>

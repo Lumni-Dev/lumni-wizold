@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { activityCardStore } from "@/controllers/activity-card.store";
 import { useGame } from "@/controllers/game.context";
 import { listForge, listMining } from "@/controllers/forge.controller";
 import { ACTIVITY_WAIT_LABEL, useActivityLock } from "@/controllers/use-activity-lock";
@@ -202,6 +203,34 @@ export function ForgeScreen() {
     setForgePage(1);
   }
 
+  // Same deal as hunt and training: while the running panel is scrolled out of
+  // sight, the floating dock steps in; back on screen, the dock stands down.
+  const focusCard =
+    activity?.kind === "mine" ? "mine" : activity?.kind === "forge" ? "forge" : null;
+  useEffect(() => {
+    if (!focusCard) {
+      activityCardStore.set(true);
+      return;
+    }
+    const target = document.querySelector('[data-forge-card="' + focusCard + '"]');
+    if (!target) {
+      activityCardStore.set(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry) activityCardStore.set(entry.isIntersecting);
+      },
+      { threshold: 0 },
+    );
+    observer.observe(target);
+    return () => {
+      observer.disconnect();
+      activityCardStore.set(true);
+    };
+  }, [focusCard]);
+
   return (
     <>
       <PageHeader
@@ -211,11 +240,12 @@ export function ForgeScreen() {
 
       <div className="space-y-6">
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
-          <Panel
-            title="Mine"
-            description="Choose the vein and the pick strikes it. Each vein asks for a mining level, and only the pick opens the next."
-            padding="none"
-          >
+          <div data-forge-card="mine">
+            <Panel
+              title="Mine"
+              description="Choose the vein and the pick strikes it. Each vein asks for a mining level, and only the pick opens the next."
+              padding="none"
+            >
             <List>
               <ListRow layout="column">
                 <Bar
@@ -340,10 +370,12 @@ export function ForgeScreen() {
                 );
               })}
             </List>
-          </Panel>
+            </Panel>
+          </div>
 
           <div className="space-y-3">
-            <Panel
+            <div data-forge-card="forge">
+              <Panel
               title="Anvil"
               description={
                 "Choose a piece under Available and it goes on the anvil. Each level adds 0.3% of the original piece's attributes, so a strong set pays a lot and a cheap piece climbs slowly, up to +" +
@@ -466,6 +498,7 @@ export function ForgeScreen() {
                 </List>
               )}
             </Panel>
+            </div>
 
             <FilterRow>
               <FilterSelect
@@ -586,11 +619,11 @@ export function ForgeScreen() {
             ? enhancedName(confirming.item.name, confirming.level) +
               " → +" +
               formatNumber(confirming.level + 1) +
-              " - custa " +
+              " - costs " +
               formatNumber(confirming.cost) +
               " " +
               confirming.fragment.name +
-              " e " +
+              " and " +
               formatBronze(confirming.bronzeCost)
             : undefined
         }

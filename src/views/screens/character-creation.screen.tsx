@@ -72,7 +72,7 @@ export function CharacterCreationScreen() {
             {GAME_NAME}
           </p>
           <p className="mt-2 text-[11px] uppercase tracking-[0.24em] text-ink-faint">
-            {GAME_TAGLINE}
+            {t(GAME_TAGLINE)}
           </p>
           <p className="mx-auto max-w-md text-xs leading-relaxed text-ink-soft">
             {t("The mark is already on your skin. Before the first night, say who you are.")}

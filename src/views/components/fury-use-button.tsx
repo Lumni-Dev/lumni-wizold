@@ -1,6 +1,7 @@
 "use client";
 
 import { playClick } from "@/controllers/sound";
+import { useT } from "@/controllers/use-locale";
 import { CONTROL_HEIGHT } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { formatFuryClock } from "@/shared/utils/format";
@@ -16,6 +17,7 @@ export function FuryUseButton({
   onClick: () => void;
   fullWidth?: boolean;
 }) {
+  const t = useT();
   const { remaining, active, sky, furyUntil } = useFuryClock();
 
   if (!active) {
@@ -39,7 +41,7 @@ export function FuryUseButton({
         contentAlign="center"
         disabled={sky}
         aria-disabled={sky || undefined}
-        aria-label={sky ? label : "Drink and restart the fury"}
+        aria-label={t(sky ? label : "Drink and restart the fury")}
         onClick={() => {
           if (sky) return;
           playClick();
@@ -54,7 +56,7 @@ export function FuryUseButton({
         fillClassName={cn("h-full", fullWidth ? "w-full" : "min-w-[4.5rem]")}
       >
         <span className="px-3 font-mono text-[11px] text-ink">
-          {sky ? "Lua" : formatFuryClock(remaining)}
+          {sky ? t("Moon") : formatFuryClock(remaining)}
         </span>
       </FuryRingFrame>
     </Tooltip>

@@ -275,17 +275,17 @@ export function BazaarScreen() {
                           href={entry.mine ? "/character" : "/ranking/" + entry.listing.sellerId}
                           className="transition-colors hover:text-highlight"
                         >
-                          {entry.mine ? "Your listing" : "por " + entry.listing.sellerName}
+                          {entry.mine ? t("Your listing") : t("by " + entry.listing.sellerName)}
                         </Link>
                         {entry.mine
                           ? " - " +
                             formatReais(entry.listing.priceCents) +
-                            (entry.available > 1 ? " cada" : "")
+                            (entry.available > 1 ? " " + t("each") : "")
                           : null}
                         <span className="block">
                           {entry.expired
-                            ? "Expired: remove it to collect the pieces."
-                            : expiryLine(entry.listing, now)}
+                            ? t("Expired: remove it to collect the pieces.")
+                            : t(expiryLine(entry.listing, now))}
                         </span>
                       </>
                     }

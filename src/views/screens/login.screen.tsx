@@ -255,7 +255,7 @@ export function LoginScreen() {
           >
             <div className="border-b border-edge px-4 py-3">
               <h1 className="landing-hero-shadow-text heading text-[11px] text-ink">
-                {twoFactor ? "Verification" : "Entrar"}
+                {twoFactor ? t("Verification") : t("Enter")}
               </h1>
               <p className="landing-hero-shadow-text mt-1 text-xs text-ink-faint">
                 {t(

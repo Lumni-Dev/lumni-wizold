@@ -706,7 +706,7 @@ export function SettingsScreen() {
             action={
               vip ? (
                 <Tag tone="light">
-                  {formatNumber(active)} de {AUTOMATIONS.length} ativadas
+                  {formatNumber(active) + " of " + AUTOMATIONS.length + " on"}
                 </Tag>
               ) : (
                 <Tag tone="neutral">Requires VIP</Tag>

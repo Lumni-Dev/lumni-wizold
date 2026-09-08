@@ -22,6 +22,7 @@ import { FuryModeTracker } from "../components/fury-mode-tracker";
 import { NavIcon } from "../components/app-icon";
 
 function Brand() {
+  const t = useT();
   return (
     <Link
       href="/character"
@@ -31,7 +32,7 @@ function Brand() {
       <img src={BRAND_ICON_PATH} alt="" className="h-10 w-10 shrink-0 rounded-md" />
       <div className="min-w-0 flex-1 text-left">
         <p className="text-[10px] uppercase leading-relaxed tracking-[0.16em] text-ink-faint">
-          {GAME_TAGLINE}
+          {t(GAME_TAGLINE)}
         </p>
       </div>
     </Link>

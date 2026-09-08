@@ -56,7 +56,11 @@ export function ConfirmDialog({
       <div className="space-y-3 p-4">
         <p className="text-xs leading-relaxed text-ink-faint">{t(description)}</p>
         {children}
-        {detail ? <p className="font-mono text-[11px] text-ink-soft">{detail}</p> : null}
+        {detail ? (
+          <p className="font-mono text-[11px] text-ink-soft">
+            {typeof detail === "string" ? t(detail) : detail}
+          </p>
+        ) : null}
       </div>
     </Modal>
   );

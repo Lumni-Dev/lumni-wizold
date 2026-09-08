@@ -178,7 +178,7 @@ export function InventoryScreen() {
               ? "Hunt creatures or buy at the market to fill the bag."
               : "No items of " +
                 (inventoryCategoryFilterOptions().find((option) => option.key === filter)?.label ??
-                  "categoria").toLowerCase() +
+                  "category").toLowerCase() +
                 " right now."
           }
         />

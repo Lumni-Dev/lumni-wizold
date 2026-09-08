@@ -41,7 +41,7 @@ async function returnMoney(
   characterId: string | null,
 ): Promise<string> {
   if (session.payment_intent && (await refundPayment(session.payment_intent))) {
-    return "valor devolvido";
+    return "amount refunded";
   }
   if (characterId && session.amount_total && session.amount_total > 0) {
     await client.query("update wallets set cents = cents + $2 where character_id = $1", [
@@ -82,7 +82,7 @@ export async function fulfillSession(
 
   if (session.currency !== "brl") {
     const returned = await returnMoney(client, session, characterId);
-    return { ok: false, message: "Pagamento em moeda estranha ao jogo: " + returned + "." };
+    return { ok: false, message: "Payment in a currency foreign to the game: " + returned + "." };
   }
 
   if (session.metadata.kind === "store") {

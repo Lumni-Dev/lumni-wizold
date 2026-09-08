@@ -30,9 +30,9 @@ export function purchasePack(state: GameState, packId: string): Result<StoreOffe
 
   const message =
     pack.name +
-    " creditado: " +
+    " credited: " +
     formatBronze(bronze) +
-    " por " +
+    " for " +
     formatReais(pack.priceCents) +
     ".";
 

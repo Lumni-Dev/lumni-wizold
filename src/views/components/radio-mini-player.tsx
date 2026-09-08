@@ -41,7 +41,7 @@ export function RadioMiniPlayer() {
             playSound("ui");
             radioRepository.setEnabled(!enabled);
           }}
-          aria-label={enabled ? "Pause the radio" : "Play the radio"}
+          aria-label={enabled ? t("Pause the radio") : t("Play the radio")}
           className={CELL + " border-r border-edge"}
         >
           {enabled ? (
@@ -51,9 +51,9 @@ export function RadioMiniPlayer() {
           )}
         </button>
         <div className="min-w-0 flex-1 px-3 py-2">
-          <p className="truncate text-[10px] uppercase tracking-[0.16em] text-ink-faint">W-Radio</p>
+          <p className="truncate text-[10px] uppercase tracking-[0.16em] text-ink-faint">{t("W-Radio")}</p>
           <p className="truncate font-mono text-[11px] text-ink">
-            {enabled ? (current?.name ?? "...") : "Desligado"}
+            {enabled ? (current?.name ?? "...") : t("Off")}
           </p>
         </div>
         {enabled ? (

@@ -19,11 +19,12 @@ function Arrow({
   side: "left" | "right";
   onClick: () => void;
 }) {
+  const t = useT();
   return (
     <button
       type="button"
       onClick={onClick}
-      aria-label={label}
+      aria-label={t(label)}
       className={cn(
         "absolute top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md",
         "border border-edge bg-surface/80 text-ink-faint transition-colors",

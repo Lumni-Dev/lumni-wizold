@@ -39,7 +39,7 @@ const STATUS_LABEL: Record<string, string> = {
   opened: "Awaiting payment",
   approved: "Approved",
   expired: "Expired",
-  refunded: "Devolvido",
+  refunded: "Refunded",
 };
 
 const STATUS_TONE: Record<string, "light" | "neutral" | "faint"> = {

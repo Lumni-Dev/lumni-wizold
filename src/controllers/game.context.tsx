@@ -1132,7 +1132,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         return answer.ok;
       },
       confirmPayment: async (sessionId) => {
-        const answer = await act("POST", "/api/stripe/confirm", { sessionId }, "Pagamento", () =>
+        const answer = await act("POST", "/api/stripe/confirm", { sessionId }, "Payment", () =>
           playSound("buy"),
         );
         return answer.ok;

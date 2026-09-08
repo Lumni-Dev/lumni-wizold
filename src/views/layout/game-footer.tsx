@@ -13,7 +13,7 @@ export function GameFooter() {
         <div className="flex min-w-0 items-center gap-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={BRAND_ICON_PATH} alt={GAME_NAME} className="h-6 w-6 shrink-0 rounded-md" />
-          <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">{GAME_TAGLINE}</p>
+          <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">{t(GAME_TAGLINE)}</p>
         </div>
 
         <div className="space-y-1 sm:text-right">

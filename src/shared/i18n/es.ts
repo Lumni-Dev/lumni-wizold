@@ -1423,4 +1423,11 @@ export const ES: Record<string, string> = {
   "The Wizold encyclopedia with rules of combat, economy, forge, arena, tavern and bestiary.": "La enciclopedia Wizold con reglas de combate, economía, forja, arena, taberna y bestiario.",
   "A werewolf browser game: hunting, training, forging, arena and a ranking of real hunters.": "Un juego de hombre lobo en el navegador: caza, entrenamiento, forja, arena y una clasificación de cazadores reales.",
   "Lumni builds systems, automates processes and attaches engineers to your team. From the first diagnosis to code running in production.": "Lumni construye sistemas, automatiza procesos y suma ingenieros a tu equipo. Del primer diagnóstico al código en producción.",
+  "Offline": "Desconectado",
+  "Payment": "Pago",
+  "amount refunded": "importe devuelto",
+  "amount credited to the Saddlebag": "importe acreditado en la Alforja",
+  "contact support for the refund": "contacta con soporte para el reembolso",
+  "each": "cada",
+  "Paused": "Pausado",
 };

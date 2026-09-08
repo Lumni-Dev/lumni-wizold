@@ -154,7 +154,7 @@ export function Select({
               aria-activedescendant={
                 open && highlighted >= 0 ? baseId + "-" + highlighted : undefined
               }
-              aria-label={ariaLabel ?? label ?? placeholder}
+              aria-label={t(ariaLabel ?? label ?? placeholder)}
               disabled={disabled}
               onClick={() => (open ? setOpen(false) : show())}
               onKeyDown={onKeyDown}
@@ -184,7 +184,7 @@ export function Select({
             aria-activedescendant={
               open && highlighted >= 0 ? baseId + "-" + highlighted : undefined
             }
-            aria-label={ariaLabel ?? label ?? placeholder}
+            aria-label={t(ariaLabel ?? label ?? placeholder)}
             disabled={disabled}
             onClick={() => (open ? setOpen(false) : show())}
             onKeyDown={onKeyDown}
