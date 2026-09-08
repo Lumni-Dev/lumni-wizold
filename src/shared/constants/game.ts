@@ -37,7 +37,6 @@ export const AUTOMATION_TICK_MS = 2000;
 export const HUNT_TICK_MS = 700;
 export const HUNT_APPROACH_TICKS = 3;
 export const CYCLE_OPTOUT_SECS = 3;
-export const MAX_COMBAT_ROUNDS = 24;
 export const CRITICAL_DAMAGE_BONUS = 0.35;
 export const MIN_AGE = 18;
 export const NAME_MAX_LENGTH = 25;
@@ -77,5 +76,5 @@ export const FORGE_TICKS = 5;
 export const FORGE_BASE_MS = 5000;
 export const FORGE_MS_PER_LEVEL = 10;
 export const ACTIVITY_BEAT_MAX =
-  MAX_COMBAT_ROUNDS + TRAINING_TICKS_MAX + MINING_TICKS_MAX + FORGE_TICKS + 8;
+  256 + TRAINING_TICKS_MAX + MINING_TICKS_MAX + FORGE_TICKS + 8;
 export const ACTIVITY_LAPS_MAX = TRAINING_TICKS_MAX;

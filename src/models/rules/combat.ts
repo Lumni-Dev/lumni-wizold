@@ -1,6 +1,5 @@
 import {
   CRITICAL_DAMAGE_BONUS,
-  MAX_COMBAT_ROUNDS,
   PET_ATTACK_RATIO,
   PET_ENERGY_PER_BLOW,
   PET_BITE_ENERGY,
@@ -402,10 +401,7 @@ export function simulateCombat({
     if (chance(creatureExtraChance / 100, random)) creatureBlow(true);
   };
 
-  let cycles = 0;
-  while (characterHealth > 0 && creatureHealth > 0 && cycles < MAX_COMBAT_ROUNDS) {
-    cycles += 1;
-
+  while (characterHealth > 0 && creatureHealth > 0) {
     if (petFighting && pet && !petCanBite()) {
       petFighting = false;
       index += 1;

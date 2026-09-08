@@ -224,7 +224,7 @@ function ptTopics(): readonly WikiTopic[] {
         "Zerou a vida na caçada, você escapa com 1 de vida e registra uma derrota.",
         "Com menos de 1 de vida, o chão recusa caçada: Recuperar-se ou use uma poção.",
         "O fosso abre para qualquer corpo vivo: dá para descer ferido, e perder sangrando é o risco que você escolheu correr.",
-        "Luta que se arrasta até o teto de rodadas termina em recuo: a caçada conta, mas ninguém vence nem perde.",
+        "Luta corre até um dos lados cair: não há teto de rodadas nem recuo pelo relógio.",
       ],
     },
     {
@@ -292,7 +292,7 @@ function ptTopics(): readonly WikiTopic[] {
           FURY_ATTRIBUTE_BONUS +
           " em todos os atributos enquanto dura, e quanto mais Vontade, mais tempo cada frasco rende.",
         "Quem tem mais Agilidade começa. A esquiva sobe rumo a 35% e o crítico rumo a 45%. Uma vantagem de Agilidade pode render um segundo golpe no mesmo ciclo, com teto de 12%.",
-        "Crítico multiplica por " + critical("pt") + ", fixo. Luta trava em 24 rodadas: recuo, sem vencedor.",
+        "Crítico multiplica por " + critical("pt") + ", fixo. A luta corre até um dos lados cair.",
       ],
     },
     {
@@ -446,7 +446,7 @@ function ptTopics(): readonly WikiTopic[] {
           Math.round(ARENA_SPOILS_MAX_SHARE * 100) +
           "% do que o perdedor carrega, então quem está duro paga pouco.",
         "Perder custa a mesma coisa: sai da sua bolsa e vai para a dele, e você deixa o fosso com 1 de vida.",
-        "Duelo que chega ao teto de rodadas termina empatado: ninguém leva WCoins e ninguém marca ponto.",
+        "Duelo corre até um dos lados cair: não há empate por teto de rodadas.",
         "Os duelos ganhos têm quadro próprio no ranking.",
       ],
     },
@@ -636,7 +636,7 @@ function esTopics(): readonly WikiTopic[] {
         "Si la vida llega a cero en la cacería, escapas con 1 de vida y registras una derrota.",
         "Con menos de 1 de vida, el suelo rechaza la cacería: Recupérate o usa una poción.",
         "El foso abre para cualquier cuerpo vivo: puedes bajar herido, y perder desangrado es el riesgo que elegiste correr.",
-        "Una pelea que se arrastra hasta el techo de rondas termina en retirada: la cacería cuenta, pero nadie gana ni pierde.",
+        "La pelea corre hasta que un lado cae: no hay techo de rondas ni retirada por el reloj.",
       ],
     },
     {
@@ -704,7 +704,7 @@ function esTopics(): readonly WikiTopic[] {
           FURY_ATTRIBUTE_BONUS +
           " a todos los atributos mientras dura, y a más Voluntad, más tiempo rinde cada frasco.",
         "Quien tiene más Agilidad empieza. La esquiva sube hacia el 35% y el crítico hacia el 45%. Una ventaja de Agilidad puede dar un segundo golpe en el mismo ciclo, con tope del 12%.",
-        "El crítico multiplica por " + critical("es") + ", fijo. La pelea se traba a las 24 rondas: retirada, sin ganador.",
+        "El crítico multiplica por " + critical("es") + ", fijo. La pelea corre hasta que un lado cae.",
       ],
     },
     {
@@ -858,7 +858,7 @@ function esTopics(): readonly WikiTopic[] {
           Math.round(ARENA_SPOILS_MAX_SHARE * 100) +
           "% de lo que carga el perdedor, así que quien está sin nada paga poco.",
         "Perder cuesta lo mismo: sale de tu bolsa y va a la suya, y dejas el foso con 1 de vida.",
-        "Un duelo que llega al techo de rondas termina empatado: nadie se lleva WCoins y nadie anota.",
+        "Un duelo corre hasta que un lado cae: no hay empate por techo de rondas.",
         "Los duelos ganados tienen su propio tablero en la clasificación.",
       ],
     },

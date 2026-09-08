@@ -180,7 +180,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "Hit zero health on the hunt and you escape with 1 health and record a defeat.",
       "Below 1 health the ground refuses the hunt: Recover or drink a potion.",
       "The pit opens for any living body: you may descend wounded, and losing bled out is the risk you chose to take.",
-      "A fight that drags to the round cap ends in retreat: the hunt counts, but nobody wins or loses.",
+      "A fight runs until one side falls: there is no round cap and no retreat by the clock.",
     ],
   },
   {
@@ -252,7 +252,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "Whoever has more Agility starts. Dodge climbs toward 35% and critical toward 45%. A lead in Agility can land a second blow in the same cycle, capped at 12%.",
       "A critical multiplies by " +
         criticalMultiplierOf().toFixed(2) +
-        ", fixed. A fight locks at 24 rounds: retreat, no winner.",
+        ", fixed. A fight runs until one side falls.",
     ],
   },
   {
@@ -408,7 +408,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         Math.round(ARENA_SPOILS_MAX_SHARE * 100) +
         "% of what the loser carries, so the broke pay little.",
       "Losing costs the same: it leaves your purse and enters theirs, and you leave the pit with 1 health.",
-      "A duel that reaches the round cap ends in a draw: nobody takes WCoins and nobody scores.",
+      "A duel runs until one side falls: there is no round-cap draw.",
       "Duels won have their own board in the ranking.",
     ],
   },
