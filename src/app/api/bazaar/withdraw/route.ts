@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     const pixKey = asText(body.pixKey, 120).trim();
     const fullName = asText(body.fullName, 120).trim();
     const cpf = asText(body.cpf, 20).trim();
-    if (!isFullName(fullName)) return failure(state, "Escreva o nome completo do titular.");
+    if (!isFullName(fullName)) return failure(state, "Write the holder's full name.");
     if (!isValidCpf(cpf)) return failure(state, "Invalid CPF.");
     const amount = state.wallet.cents;
     const result = bazaarController.requestWithdraw(state, pixKey);

@@ -645,7 +645,7 @@ export async function insertNewGame(
   state: GameState,
 ): Promise<void> {
   const character = state.character;
-  if (!character) throw new Error("Estado sem personagem.");
+  if (!character) throw new Error("State without a character.");
   await client.query(
     `insert into characters
        (id, user_id, name, gender, form, level, experience, health, rage, bronze,

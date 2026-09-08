@@ -56,7 +56,7 @@ export function ItemCard({
           <ul className="flex flex-wrap gap-2">
             {fromBazaar ? (
               <li>
-                <Tag tone="light">Bazar</Tag>
+                <Tag tone="light">Bazaar</Tag>
               </li>
             ) : null}
             {effects.map((effect, index) => (

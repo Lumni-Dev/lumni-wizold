@@ -205,7 +205,7 @@ export function HuntScreen() {
   const territories = useMemo(() => listTerritories(state), [state]);
   const areaTabs = useMemo(
     () => [
-      { key: "all", label: "Todas" },
+      { key: "all", label: "All" },
       ...territories.map(({ territory }) => ({ key: territory.id, label: territory.name })),
     ],
     [territories],
@@ -431,7 +431,7 @@ export function HuntScreen() {
                         label={
                           recovering ? (
                             <>
-                              Vida (Recuperando-se... <RestSeconds />)
+                              {t("Health")} ({t("Recovering...")} <RestSeconds />)
                             </>
                           ) : (
                             "Health"

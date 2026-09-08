@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "@/controllers/api.client";
 import { useGame } from "@/controllers/game.context";
+import { useT } from "@/controllers/use-locale";
 import { detailInventory } from "@/controllers/inventory.controller";
 import { profileOf } from "@/controllers/ranking.controller";
 import { restRecoveryRatio } from "@/controllers/character.controller";
@@ -37,6 +38,7 @@ import { PageHeader } from "../layout/page-header";
 
 export function CharacterScreen() {
   const { state, character, stats, consumeItem } = useGame();
+  const t = useT();
   const [roster, setRoster] = useState<Hunter[] | null>(null);
   const [now] = useState(() => Date.now());
 
@@ -98,7 +100,7 @@ export function CharacterScreen() {
         action={
           best ? (
             <Tag tone="light">
-              Melhor em {best.label} - {formatNumber(best.position)}º
+              {t("Best at") + " " + t(best.label) + " - " + formatNumber(best.position) + "º"}
             </Tag>
           ) : undefined
         }
@@ -210,7 +212,7 @@ export function CharacterScreen() {
                         disabled={healthFull}
                         onClick={() => consumeItem(item.id)}
                       >
-                        Beber
+                        Drink
                       </Button>
                     }
                   />

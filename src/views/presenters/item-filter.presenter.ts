@@ -25,7 +25,7 @@ export type SizeFilter = PotionSize | "all";
 
 export function inventoryCategoryFilterOptions(): FilterOption<CategoryFilter>[] {
   return [
-    { key: "all", label: "Tudo" },
+    { key: "all", label: "All" },
     ...ITEM_CATEGORIES.map((category) => ({
       key: category,
       label: CATEGORY_PLURAL[category],
@@ -37,7 +37,7 @@ export function marketCategoryFilterOptions(opts?: {
   includeMaterial?: boolean;
 }): FilterOption<CategoryFilter>[] {
   return [
-    { key: "all", label: "Tudo" },
+    { key: "all", label: "All" },
     ...ITEM_CATEGORIES.filter(
       (category) => opts?.includeMaterial === true || category !== "material",
     ).map((category) => ({
@@ -51,7 +51,7 @@ export function slotCategoryFilterOptions(opts?: {
   includeMaterial?: boolean;
 }): FilterOption<CategoryFilter>[] {
   const entries: FilterOption<CategoryFilter>[] = [
-    { key: "all", label: "Tudo" },
+    { key: "all", label: "All" },
   ];
   if (opts?.includeMaterial) {
     entries.push({ key: "material", label: CATEGORY_PLURAL.material });
@@ -68,18 +68,18 @@ export function setFilterOptions(opts?: { marketOnly?: boolean }): FilterOption<
         EQUIPMENT_SETS.some((definition) => definition.key === key && definition.inMarket),
       )
     : EQUIPMENT_SET_KEYS;
-  return [{ key: "all", label: "Todos" }, ...keys.map((key) => ({ key, label: SET_LABEL[key] }))];
+  return [{ key: "all", label: "All" }, ...keys.map((key) => ({ key, label: SET_LABEL[key] }))];
 }
 
 export function potionSizeFilterOptions(): FilterOption<SizeFilter>[] {
   return [
-    { key: "all", label: "Todas" },
+    { key: "all", label: "All" },
     ...POTION_SIZES.map((key) => ({ key, label: SIZE_LABEL[key] })),
   ];
 }
 
 export function genderFilterOptions(): FilterOption<Gender | "all">[] {
-  return [{ key: "all", label: "Todos" }, ...GENDERS.map((entry) => ({ key: entry.key, label: entry.label }))];
+  return [{ key: "all", label: "All" }, ...GENDERS.map((entry) => ({ key: entry.key, label: entry.label }))];
 }
 
 export function rankingBoardFilterOptions(): FilterOption<RankingKey>[] {

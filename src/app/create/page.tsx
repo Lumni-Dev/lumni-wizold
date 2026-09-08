@@ -5,7 +5,7 @@ import { privatePageMetadata } from "@/shared/seo/metadata";
 import { CharacterCreationScreen } from "@/views/screens/character-creation.screen";
 
 export const metadata: Metadata = privatePageMetadata({
-  title: "Criar personagem",
+  title: "Create character",
   description: "Create your hunter and choose the Lumni or Luna bloodline.",
   path: "/create",
 });

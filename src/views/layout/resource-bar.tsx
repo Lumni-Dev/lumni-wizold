@@ -1,6 +1,7 @@
 "use client";
 
 import { useGame } from "@/controllers/game.context";
+import { useT } from "@/controllers/use-locale";
 import { useVisibleActivity } from "@/controllers/use-visible-activity";
 import { totalExperience } from "@/models/rules/progression";
 import { BAU_LIMIT } from "@/shared/constants/game";
@@ -12,6 +13,7 @@ import { useGained } from "../components/use-gained";
 
 export function ResourceBar() {
   const { character, stats } = useGame();
+  const t = useT();
   const { activity } = useVisibleActivity();
   const bronzeGained = useGained(character?.bronze ?? 0);
   const healthLost = useGained(-(character?.health ?? 0));
@@ -30,7 +32,7 @@ export function ResourceBar() {
             label={
               resting ? (
                 <>
-                  Vida (Recuperando-se... <RestSeconds />)
+                  {t("Health")} ({t("Recovering...")} <RestSeconds />)
                 </>
               ) : (
                 "Health"

@@ -3,7 +3,7 @@ import type { Creature } from "../types";
 export const scarletKnight: Creature = {
   id: "scarlet-knight",
   name: "Scarlet Knight",
-  description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
+  description: "Territorial and slow to give up. One blow is enough to crack a rib.",
   species: "bear",
   level: 831,
   health: 210374,

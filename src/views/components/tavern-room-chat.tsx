@@ -328,7 +328,7 @@ export function TavernRoomChatComposer({
         </Tooltip>
         <div className="relative min-w-0 flex-1">
           <Field
-            aria-label="Mensagem"
+            aria-label="Message"
             placeholder="Say something"
             maxLength={MESSAGE_MAX_LENGTH}
             autoComplete="off"

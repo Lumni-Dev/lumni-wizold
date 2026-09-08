@@ -3,7 +3,7 @@ import type { Creature } from "../types";
 export const stoneGolem: Creature = {
   id: "stone-golem",
   name: "Stone Golem",
-  description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
+  description: "Territorial and slow to give up. One blow is enough to crack a rib.",
   species: "bear",
   level: 571,
   health: 22392,

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useGame } from "@/controllers/game.context";
+import { useT } from "@/controllers/use-locale";
 import { detailInventory } from "@/controllers/inventory.controller";
 import { findItem } from "@/models/data/items";
 import {
@@ -40,6 +41,7 @@ const PAGE_SIZE = 8;
 export function InventoryScreen() {
   const router = useRouter();
   const { state, character, equipItem, unequipItem, consumeItem } = useGame();
+  const t = useT();
   const [filter, setFilter] = useState<CategoryFilter>("all");
   const [set, setSet] = useState<SetFilter>("all");
   const [size, setSize] = useState<SizeFilter>("all");
@@ -128,7 +130,7 @@ export function InventoryScreen() {
 
                 {item ? (
                   <CardFooter>
-                    <span className="text-[11px] text-ink-faint">Equipado</span>
+                    <span className="text-[11px] text-ink-faint">{t("Equipped")}</span>
                     <Button
                       variant="primary"
                       onClick={() => unequipItem(slot)}
@@ -201,7 +203,7 @@ export function InventoryScreen() {
                     )
                   }
                 >
-                  Vender
+                  Sell
                 </Button>,
               );
             }
@@ -214,7 +216,7 @@ export function InventoryScreen() {
                   fullWidth
                   onClick={() => router.push("/bazaar")}
                 >
-                  Bazar
+                  Bazaar
                 </Button>,
                 <Button
                   key="forge"
@@ -222,7 +224,7 @@ export function InventoryScreen() {
                   fullWidth
                   onClick={() => router.push("/forge")}
                 >
-                  Forjar
+                  Forge
                 </Button>,
               );
             }
@@ -236,7 +238,7 @@ export function InventoryScreen() {
                   onClick={() => handleEquip(item.id, item.category, enhancement)}
                   disabled={levelTooLow}
                 >
-                  Equipar
+                  Equip
                 </Button>,
               );
             }
@@ -252,7 +254,7 @@ export function InventoryScreen() {
                     fullWidth
                     onClick={() => consumeItem(item.id)}
                   >
-                    {item.category === "pet" ? "Alimentar" : "Beber"}
+                    {item.category === "pet" ? "Feed" : "Drink"}
                   </Button>
                 ),
               );

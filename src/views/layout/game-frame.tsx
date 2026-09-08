@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
 import { useGame } from "@/controllers/game.context";
+import { useT } from "@/controllers/use-locale";
 import { usePackAlert } from "@/controllers/use-pack-alert";
 import { usePrivateChatPing } from "@/controllers/use-private-chat-ping";
 import { useTavernAlert } from "@/controllers/use-tavern-alert";
@@ -20,10 +21,11 @@ import { MobileNavigation, Sidebar } from "./sidebar";
 import { ResourceBar } from "./resource-bar";
 
 function Loading() {
+  const t = useT();
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-3 text-ink-faint">
       <Spinner size="medium" />
-      <p className="heading text-[11px]">Carregando...</p>
+      <p className="heading text-[11px]">{t("Loading...")}</p>
     </div>
   );
 }

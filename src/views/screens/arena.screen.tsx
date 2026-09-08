@@ -683,7 +683,7 @@ export function ArenaScreen() {
       >
         {pastDuels.length === 0 ? (
           <p className="px-4 py-3 text-xs text-ink-faint">
-            Nenhum duelo registrado ainda: o fosso espera.
+            {t("No duel recorded yet: the pit waits.")}
           </p>
         ) : (
           <List>

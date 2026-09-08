@@ -3,7 +3,7 @@ import type { Creature } from "../types";
 export const caveDragon: Creature = {
   id: "cave-dragon",
   name: "Cave Dragon",
-  description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
+  description: "Territorial and slow to give up. One blow is enough to crack a rib.",
   species: "bear",
   level: 791,
   health: 110226,

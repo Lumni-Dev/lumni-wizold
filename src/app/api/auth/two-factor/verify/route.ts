@@ -40,7 +40,7 @@ export async function POST(request: Request) {
 
       const found = await client.query("select email from users where id = $1", [pending.userId]);
       const email = found.rows[0]?.email as string | undefined;
-      if (!email) return bad("Conta sem e-mail conhecido.", 404);
+      if (!email) return bad("Account with no known e-mail.", 404);
 
       const loaded = await loadGame(client, pending.userId, false);
       if (!email.endsWith("@wizold.test")) {

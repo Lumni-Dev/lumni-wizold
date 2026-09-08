@@ -222,11 +222,14 @@ export function TavernScreen() {
   );
 
   useEffect(() => {
-    document.title = totalUnread > 0 ? "Wizold - Taverna [" + totalUnread + "]" : "Wizold - Taverna";
+    document.title =
+      totalUnread > 0
+        ? t("Wizold - Tavern") + " [" + totalUnread + "]"
+        : t("Wizold - Tavern");
     return () => {
-      document.title = "Wizold - Taverna";
+      document.title = t("Wizold - Tavern");
     };
-  }, [totalUnread]);
+  }, [totalUnread, t]);
 
   const heardRef = useRef<string | null>(null);
   useEffect(() => {
@@ -590,7 +593,7 @@ export function TavernScreen() {
                 disabled={Boolean(ownRoom)}
                 onClick={() => setHideName((current) => !current)}
               >
-                Mesa reservada
+                Reserved table
               </Chip>
               {hideName ? (
                 <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
@@ -698,7 +701,7 @@ export function TavernScreen() {
                   busy={inviting}
                   disabled={nick.trim().length === 0 || pack.length >= MAX_PACK || inviting}
                 >
-                  Convidar para a matilha
+                  Invite to the pack
                 </Button>
               </Tooltip>
             </form>
@@ -804,18 +807,18 @@ export function TavernScreen() {
                         {isMember || !room.nameHidden ? (
                           <h3 className="min-w-0 truncate text-sm text-ink">{room.name}</h3>
                         ) : (
-                          <h3 className="min-w-0 truncate text-sm text-ink-faint">Reservada</h3>
+                          <h3 className="min-w-0 truncate text-sm text-ink-faint">{t("Reserved")}</h3>
                         )}
                       </div>
                       <div className="flex flex-wrap items-center gap-2">
                         {isPrivate ? (
-                          <Tag tone="neutral">Reservada</Tag>
+                          <Tag tone="neutral">Reserved</Tag>
                         ) : (
                           <>
                             {room.ownerId === identity.id ? (
                               <Tag tone="neutral">Your table</Tag>
                             ) : null}
-                            {room.nameHidden ? <Tag tone="neutral">Reservada</Tag> : null}
+                            {room.nameHidden ? <Tag tone="neutral">Reserved</Tag> : null}
                             <Tag tone={locked ? "neutral" : "faint"}>
                               {locked ? "Password" : "Open"}
                             </Tag>
@@ -863,11 +866,11 @@ export function TavernScreen() {
                           busy={stillClosing === room.id}
                           onClick={() => setClosingRoomId(room.id)}
                         >
-                          Fechar mesa
+                          Close table
                         </Button>
                       ) : isMember ? (
                         <Button variant="ghost" fullWidth onClick={() => leave(room.id)}>
-                          Sair
+                          Leave
                         </Button>
                       ) : null}
                       <Tooltip

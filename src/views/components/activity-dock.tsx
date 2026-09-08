@@ -299,7 +299,7 @@ export function ActivityDock() {
       return {
         kind: "train" as const,
         progress: {
-          label: "Progresso",
+          label: "Progress",
           current: row?.progress ?? 0,
           maximum: row?.needed ?? 1,
         },
@@ -687,7 +687,7 @@ export function ActivityDock() {
                   <Bar
                     label={
                       <>
-                        Vida (Recuperando-se... <RestSeconds />)
+                        {t("Health")} ({t("Recovering...")} <RestSeconds />)
                       </>
                     }
                     current={restView.healthCurrent}

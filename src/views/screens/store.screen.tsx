@@ -94,7 +94,11 @@ export function StoreScreen() {
         title="VIP"
         description="Unlocks every Automation switch in the settings: the run hunts, trains, mines and forges on its own, and recovers on its own. Monthly subscription, cancel whenever you want."
         action={
-          vip ? <Tag tone="light">Active until {formatDay(character.vipUntil ?? "")}</Tag> : undefined
+          vip ? (
+            <Tag tone="light">
+              {t("Active until") + " " + formatDay(character.vipUntil ?? "")}
+            </Tag>
+          ) : undefined
         }
         footer={
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -155,7 +159,7 @@ export function StoreScreen() {
             <CardFooter>
               <span />
               <Button variant="primary" onClick={() => buyPack(pack.id)}>
-                Comprar
+                Buy
               </Button>
             </CardFooter>
           </Card>

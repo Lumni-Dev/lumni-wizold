@@ -166,7 +166,7 @@ export function useTavern(activeRoomId: string | null) {
         void refreshTavernBoard();
         notify(answer.message, false, "Tavern");
       });
-      return Promise.resolve({ ok: true, message: "Mensagem enviada." });
+      return Promise.resolve({ ok: true, message: "Message sent." });
     },
     announceAway: (roomId: string) =>
       perform("POST", "/api/tavern/rooms/" + encodeURIComponent(roomId) + "/away"),

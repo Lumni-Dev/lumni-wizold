@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     await dropSession();
     return NextResponse.json({
       ok: true,
-      message: "Todos os aparelhos foram desconectados.",
+      message: "Every device was signed out.",
       data: null,
     });
   } catch (error) {

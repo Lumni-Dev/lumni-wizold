@@ -268,7 +268,7 @@ export function PetScreen() {
                 </span>
                 {active ? (
                   <Button variant="secondary" onClick={() => setPetActive(false)}>
-                    Repousar
+                    Rest
                   </Button>
                 ) : (
                   <RecoveryButton
@@ -321,7 +321,7 @@ export function PetScreen() {
                     description={"+" + formatNumber(petRationOf(item, pet)) + " energy"}
                     action={
                       <Button variant="primary" onClick={() => feedPet(item.id)}>
-                        Alimentar
+                        Feed
                       </Button>
                     }
                   />
@@ -375,7 +375,7 @@ export function PetScreen() {
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <span className="text-[11px] text-ink-faint">{t("Releasing pays nothing.")}</span>
                 <Button variant="outline" onClick={() => setConfirmingRelease(true)}>
-                  Soltar
+                  Release
                 </Button>
               </div>
             }

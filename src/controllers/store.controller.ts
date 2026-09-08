@@ -72,7 +72,7 @@ export function setVipCanceling(state: GameState, canceling: boolean): Result {
   const next = updateCharacter(state, (current) => ({ ...current, vipCanceling: canceling }));
   const message = canceling
     ? "Subscription canceled: VIP lasts until the end of the paid period and does not renew."
-    : "Assinatura reativada: o VIP volta a renovar sozinho.";
+    : "Subscription reactivated: VIP renews on its own again.";
 
   return success(addLog(next, "character", message), message);
 }
@@ -87,7 +87,7 @@ export function endVipSubscription(state: GameState): Result {
     vipCanceling: false,
   }));
   return success(
-    addLog(next, "character", "Assinatura VIP encerrada."),
-    "Assinatura VIP encerrada.",
+    addLog(next, "character", "VIP subscription ended."),
+    "VIP subscription ended.",
   );
 }

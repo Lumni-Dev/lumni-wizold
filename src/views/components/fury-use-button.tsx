@@ -21,7 +21,7 @@ export function FuryUseButton({
   if (!active) {
     return (
       <Button variant="primary" fullWidth={fullWidth} onClick={onClick}>
-        Beber
+        Drink
       </Button>
     );
   }

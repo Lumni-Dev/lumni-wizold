@@ -69,7 +69,7 @@ export function PaymentModal({
       footer={
         <div className="flex items-center justify-end gap-2">
           <Button variant="ghost" onClick={close}>
-            Cancelar
+            Cancel
           </Button>
           <Button variant="primary" disabled={!ready} onClick={confirm}>
             {confirmLabel}

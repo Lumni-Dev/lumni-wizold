@@ -14,7 +14,7 @@ export interface GearSlot {
 export function EquipmentPanel({ gear, forge }: { gear: GearSlot[]; forge: number }) {
   return (
     <Panel
-      title="Equipamento"
+      title="Equipment"
       description={
         "The seven slots, helm to ring, adding +" + formatNumber(forge) + " of forge."
       }

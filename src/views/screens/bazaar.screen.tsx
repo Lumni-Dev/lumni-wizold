@@ -339,7 +339,7 @@ export function BazaarScreen() {
                   })
                 }
               >
-                Voltar
+                Back
               </Button>
               <Button
                 variant="primary"

@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   }
 
   return pageMetadata({
-    title: "Perfil",
+    title: "Profile",
     description: "Public sheet of a Wizold hunter.",
     path: "/ranking/" + id,
   });

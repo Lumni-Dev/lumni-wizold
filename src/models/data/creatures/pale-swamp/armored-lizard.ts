@@ -3,7 +3,7 @@ import type { Creature } from "../types";
 export const armoredLizard: Creature = {
   id: "armored-lizard",
   name: "Armored Lizard",
-  description: "Territoriais e lentos para desistir. Uma pancada basta para quebrar costela.",
+  description: "Territorial and slow to give up. One blow is enough to crack a rib.",
   species: "bear",
   level: 341,
   health: 3825,

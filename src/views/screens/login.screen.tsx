@@ -221,7 +221,7 @@ export function LoginScreen() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-3 text-ink-faint">
         <Spinner size="medium" />
-        <p className="heading text-[11px]">Carregando...</p>
+        <p className="heading text-[11px]">{t("Loading...")}</p>
       </div>
     );
   }
@@ -400,7 +400,7 @@ export function LoginScreen() {
               href="/"
               className="landing-hero-shadow-text text-[11px] uppercase tracking-[0.16em] text-ink-faint transition-colors hover:text-ink"
             >
-              Voltar para a lenda
+              {t("Back to the legend")}
             </Link>
           </div>
         </div>

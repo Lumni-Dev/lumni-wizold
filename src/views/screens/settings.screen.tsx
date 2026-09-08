@@ -37,7 +37,7 @@ import { Tag } from "../components/tag";
 import { PageHeader } from "../layout/page-header";
 
 const SECTIONS: readonly { key: string; label: string }[] = [
-  { key: "all", label: "Tudo" },
+  { key: "all", label: "All" },
   { key: "idioma", label: "Language" },
   { key: "conta", label: "Account" },
   { key: "2fa", label: "Two-step" },
@@ -304,7 +304,7 @@ export function SettingsScreen() {
                     })
                   }
                 >
-                  Sair da conta
+                  Sign out
                 </Button>
                 <Button
                   variant="outline"
@@ -314,7 +314,7 @@ export function SettingsScreen() {
                     })
                   }
                 >
-                  Sair de todos os aparelhos
+                  Sign out of every device
                 </Button>
               </div>
             }
@@ -329,7 +329,7 @@ export function SettingsScreen() {
               </span>
               <div className="flex min-w-0 grow items-center px-4 py-3">
                 <div className="min-w-0">
-                  <p className="truncate text-sm text-ink">Conectado com Google</p>
+                  <p className="truncate text-sm text-ink">{t("Connected with Google")}</p>
                   <p className="truncate font-mono text-[11px] text-ink-faint">
                     {accountEmail ?? t("loading...")}
                   </p>
@@ -431,7 +431,7 @@ export function SettingsScreen() {
                 disabled={!canRename || !affordable || newName.trim().length === 0}
               >
                 {affordable
-                  ? "Alterar por " + formatBronze(cost)
+                  ? "Change for " + formatBronze(cost)
                   : "Faltam " + formatBronze(cost - character.bronze)}
               </Button>
             </form>
@@ -583,10 +583,10 @@ export function SettingsScreen() {
                 <RowText title="State" description="On or off on this device." />
                 <div className="flex shrink-0 gap-2">
                   <Chip active={music} onClick={() => chooseMusic(true)}>
-                    Ativada
+                    Enabled
                   </Chip>
                   <Chip active={!music} onClick={() => chooseMusic(false)}>
-                    Desativada
+                    Disabled
                   </Chip>
                 </div>
               </ListRow>
@@ -709,7 +709,7 @@ export function SettingsScreen() {
                   {formatNumber(active)} de {AUTOMATIONS.length} ativadas
                 </Tag>
               ) : (
-                <Tag tone="neutral">Requer VIP</Tag>
+                <Tag tone="neutral">Requires VIP</Tag>
               )
             }
             padding="none"
@@ -857,7 +857,7 @@ export function SettingsScreen() {
         footer={
           <div className="flex items-center justify-end gap-2">
             <Button variant="ghost" onClick={() => setTwoFactorSetup(null)}>
-              Cancelar
+              Cancel
             </Button>
             <Button
               variant="primary"

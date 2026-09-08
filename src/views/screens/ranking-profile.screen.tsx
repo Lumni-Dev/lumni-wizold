@@ -63,7 +63,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
         />
         <div>
           <Link href="/ranking">
-            <Button variant="outline">Voltar ao ranking</Button>
+            <Button variant="outline">Back to the ranking</Button>
           </Link>
         </div>
       </>
@@ -158,7 +158,7 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
             padding="none"
             footer={
               <Link href="/ranking">
-                <Button variant="outline">Voltar ao ranking</Button>
+                <Button variant="outline">Back to the ranking</Button>
               </Link>
             }
           >

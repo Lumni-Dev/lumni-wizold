@@ -37,7 +37,7 @@ export function AttributesPanel({
             { label: "Training", value: plus(lent(stats.sources.trained) - natural), sum: false },
             { label: "Equip.", value: plus(lent(stats.sources.equipment)), sum: false },
             { label: "Companion", value: plus(lent(stats.sources.pet)), sum: false },
-            { label: "Lua", value: plus(lent(stats.sources.moon)), sum: false },
+            { label: "Moon", value: plus(lent(stats.sources.moon)), sum: false },
             { label: "Fury", value: plus(lent(stats.sources.fury)), sum: false },
             { label: "Total", value: formatFraction(total), sum: true },
           ];

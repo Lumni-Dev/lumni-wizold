@@ -8,7 +8,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   const inviteId = id.slice(0, 80);
   return withGame(request, async (state, _body, context) => {
     const me = state.character;
-    if (!me) return failure(state, "Nenhum personagem ativo.");
+    if (!me) return failure(state, "No active character.");
 
     const found = await context.client.query(
       `select i.from_id, c.name as from_name from pack_invites i

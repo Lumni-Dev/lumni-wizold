@@ -64,7 +64,7 @@ export function listOffers(state: GameState): MarketOffer[] {
           : !levelAllowed
             ? "Requires LV. " + item.minLevel
             : !affordable
-              ? "WCoins insuficientes"
+              ? "Not enough WCoins"
               : null,
       };
     })

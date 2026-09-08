@@ -26,10 +26,10 @@ export function CopyValue({
   }
 
   return (
-    <Tooltip label={copied ? noun + " copiado" : "Copiar " + noun}>
+    <Tooltip label={copied ? noun + " copied" : "Copy " + noun}>
       <button
         type="button"
-        aria-label={"Copiar o " + noun + " " + value}
+        aria-label={"Copy the " + noun + " " + value}
         onClick={copy}
         className={cn(
           "inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-edge text-ink-faint transition-colors hover:border-edge-strong hover:text-highlight",

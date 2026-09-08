@@ -19,9 +19,9 @@ export function QuantityField({
   return (
     <Field
       numeric
-      label="Quantidade"
+      label="Quantity"
       hint={hint}
-      aria-label={ariaLabel ?? "Quantidade"}
+      aria-label={ariaLabel ?? "Quantity"}
       maxLength={10}
       className={cn("font-mono", className)}
       value={value}

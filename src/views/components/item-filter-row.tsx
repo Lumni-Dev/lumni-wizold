@@ -51,7 +51,7 @@ export function ItemFilterRow({
       {isPet ? null : isPotion ? (
         <FilterSelect
         accent
-          label="Tamanho"
+          label="Size"
           value={size}
           options={potionSizeFilterOptions()}
           onChange={onSizeChange}
