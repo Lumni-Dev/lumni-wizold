@@ -34,7 +34,7 @@ import { Button } from "../components/button";
 import { DataRow } from "../components/data-row";
 import { EmptyState } from "../components/empty-state";
 import { HunterSearchField } from "../components/hunter-search-field";
-import { GenderArtFill, GenderIcon } from "../components/gender-icon";
+import { GenderArtFill } from "../components/gender-icon";
 import { List, ListRow, RowText } from "../components/list";
 import { Pagination } from "../components/pagination";
 import { Panel } from "../components/panel";
@@ -62,9 +62,13 @@ function Fighter({
 }) {
   const left = Math.max(0, Math.round(health));
   return (
-    <div className={cn("flex items-center gap-3 p-4", ICON_FRAME_INSET)}>
-      <GenderIcon gender={gender} size="medium" />
-      <div className="min-w-0 flex-1 space-y-2">
+    <div className="flex items-stretch">
+      <span className="flex w-20 shrink-0 items-center justify-center overflow-hidden border-r border-edge p-3 sm:w-28">
+        <span className="relative aspect-square w-full overflow-hidden">
+          <GenderArtFill gender={gender} />
+        </span>
+      </span>
+      <div className={cn("min-w-0 flex-1 space-y-2 px-4 py-3", ICON_FRAME_INSET)}>
         <RowText title={name} label={side + " - LV. " + formatNumber(level)} />
         <Bar
           label="Health"
