@@ -15,7 +15,7 @@ import { Button } from "../components/button";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { DataRow } from "../components/data-row";
-import { ItemBanner, ItemIcon, useItemArt } from "../components/item-icon";
+import { ItemIcon } from "../components/item-icon";
 import { List, ListRow, RowText } from "../components/list";
 import { Select } from "../components/select";
 import { Tag } from "../components/tag";
@@ -127,7 +127,6 @@ function RecipeCard({
 }) {
   const t = useT();
   const { recipe, potion, unlocked } = row;
-  const drawn = Boolean(useItemArt(potion));
   const firstOptions = listBrewMaterials(state, recipe.first.rarity).filter(
     (option) => option.item.id !== chosen.second,
   );
@@ -167,9 +166,8 @@ function RecipeCard({
           : null;
   return (
     <Card height="fill" interactive>
-      {drawn ? <ItemBanner item={potion} /> : null}
       <CardHeader>
-        {drawn ? null : <ItemIcon item={potion} />}
+        <ItemIcon item={potion} />
         <RowText
           title={potion.name}
           description={
