@@ -52,7 +52,10 @@ export function PreviewGallery({ shots }: { shots: readonly PreviewShot[] }) {
     setIndex((current) => (current + amount + shots.length) % shots.length);
   return (
     <div
-      className={cn("relative rounded-lg border border-edge", GLASS_SECTION)}
+      className={cn(
+        "landing-hero-shadow-button relative rounded-lg border border-edge",
+        GLASS_SECTION,
+      )}
       onMouseEnter={() => setHeld(true)}
       onMouseLeave={() => setHeld(false)}
       onFocus={() => setHeld(true)}

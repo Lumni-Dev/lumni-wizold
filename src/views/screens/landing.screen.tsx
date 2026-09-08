@@ -102,7 +102,7 @@ export function LandingScreen() {
 
       <main className="relative z-10 mx-auto w-full max-w-5xl space-y-16 px-4 py-16 md:px-8 md:py-24">
         <section className="relative">
-          <div className={cn("rounded-lg border border-edge", GLASS_SECTION)}>
+          <div className={cn("landing-hero-shadow-button rounded-lg border border-edge", GLASS_SECTION)}>
             <div className="border-b border-edge">
               <div className="aspect-video w-full overflow-hidden">
                 <ArtImage source="/assets/landing/lumni-luna.webp?v=1" fit="cover" />
@@ -179,7 +179,12 @@ export function LandingScreen() {
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             {lore.companions.map((companion) => (
               <div key={companion.gender} className="relative">
-                <article className={cn("rounded-lg border border-edge", GLASS_SECTION)}>
+                <article
+                  className={cn(
+                    "landing-hero-shadow-button rounded-lg border border-edge",
+                    GLASS_SECTION,
+                  )}
+                >
                   <PetLandingBanner gender={companion.gender} />
                   <div className="space-y-3 p-6 md:p-8">
                     <h3 className="heading text-[11px] text-ink">{companion.title}</h3>
@@ -220,7 +225,10 @@ export function LandingScreen() {
             {lore.pillars.map((pillar) => (
               <article
                 key={pillar.title}
-                className={cn("relative rounded-lg border border-edge p-4", GLASS_SECTION_STRONG)}
+                className={cn(
+                  "landing-hero-shadow-button relative rounded-lg border border-edge p-4",
+                  GLASS_SECTION_STRONG,
+                )}
               >
                 <h3 className="heading text-[11px] text-ink">{pillar.title}</h3>
                 <p className="mt-2 text-xs leading-relaxed text-ink-soft">{pillar.text}</p>
