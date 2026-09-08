@@ -218,14 +218,14 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
                 label="Extra strike (Agility)"
                 value={
                   formatFraction(extraStrikeChanceExact(stats.totalAttributes.agility, 0)) +
-                  "/" +
+                  " / " +
                   EXTRA_STRIKE_CAP +
                   "%"
                 }
               />
               <DataRow
                 label="Critical (Instinct)"
-                value={formatFraction(stats.criticalExact) + "/" + CRITICAL_CHANCE_CAP + "%"}
+                value={formatFraction(stats.criticalExact) + " / " + CRITICAL_CHANCE_CAP + "%"}
               />
               <DataRow
                 label="Critical damage"

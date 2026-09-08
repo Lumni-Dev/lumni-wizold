@@ -633,11 +633,11 @@ export function ArenaScreen() {
                           label: "Extra strike",
                           value:
                             formatFraction(extraStrikeChanceExact(rival.totalAttributes.agility, 0)) +
-                            "/" +
+                            " / " +
                             EXTRA_STRIKE_CAP +
                             "%",
                         },
-                        { key: "critical", label: "Critical", value: formatFraction(rival.criticalExact) + "/" + CRITICAL_CHANCE_CAP + "%" },
+                        { key: "critical", label: "Critical", value: formatFraction(rival.criticalExact) + " / " + CRITICAL_CHANCE_CAP + "%" },
                       ].map((cell) => (
                         <div key={cell.key} className="px-2 py-3 text-center">
                           <p className="truncate text-[10px] uppercase tracking-[0.16em] text-ink-faint">
