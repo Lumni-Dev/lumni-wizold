@@ -474,6 +474,16 @@ export const PT: Record<string, string> = {
   "Empty Flask": "Frasco Vazio",
   "Clear glass and a cork stopper. On its own it holds nothing but air; over the cauldron it is the difference between a potion and a puddle.":
     "Vidro claro e rolha de cortiça. Sozinho não guarda nada além de ar; sobre o caldeirão é a diferença entre uma poção e uma poça.",
+  "Cauldron": "Caldeirão",
+  "Choose a potion under Recipes and it goes on the fire. Pick two different ingredients from the bag: any material at the asked rarity or above serves.":
+    "Escolha uma poção em Receitas e ela vai ao fogo. Escolha dois ingredientes diferentes do alforje: qualquer material na raridade pedida ou acima serve.",
+  "Recipes": "Receitas",
+  "What the cauldron knows. The market sells the same potions, always dearer than brewing them.":
+    "O que o caldeirão conhece. O mercado vende as mesmas poções, sempre mais caras do que fabricá-las.",
+  "Nothing to brew": "Nada para fabricar",
+  "The cauldron waits for a recipe.": "O caldeirão espera por uma receita.",
+  "No potion to brew.": "Nenhuma poção para fabricar.",
+  "Ready to brew": "Pronto para fabricar",
   "First ingredient": "Primeiro ingrediente",
   "Second ingredient": "Segundo ingrediente",
   "Choose a material": "Escolha um material",
