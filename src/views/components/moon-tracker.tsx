@@ -31,8 +31,24 @@ export function MoonTracker({
   if (iconOnly) {
     return (
       <Tooltip block label={t(moon.phase.label) + ": " + bonusLine}>
-        <div className="flex h-8 items-center justify-center border-b border-edge">
-          <Moon aria-hidden strokeWidth={1.75} className="h-4 w-4 text-ink-soft" />
+        <div className="flex h-8 items-center justify-center rounded-md text-ink-soft transition-colors hover:bg-surface/70">
+          <Moon aria-hidden strokeWidth={1.75} className="h-4 w-4" />
+        </div>
+      </Tooltip>
+    );
+  }
+
+  if (flush) {
+    return (
+      <Tooltip block label={t(moon.phase.description)}>
+        <div className="flex items-center gap-3 rounded-md px-2.5 py-2 transition-colors hover:bg-surface/70">
+          <Moon aria-hidden strokeWidth={1.75} className="h-4 w-4 shrink-0 text-ink-soft" />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[10px] uppercase tracking-[0.16em] text-ink">
+              {t(moon.phase.label)}
+            </p>
+            <p className="truncate text-[10px] text-ink-faint">{bonusLine}</p>
+          </div>
         </div>
       </Tooltip>
     );
@@ -40,12 +56,7 @@ export function MoonTracker({
 
   return (
     <Tooltip block label={t(moon.phase.description)}>
-      <div
-        className={cn(
-          "relative flex items-stretch",
-          flush ? "border-b border-edge" : "rounded-md border border-edge bg-surface/70",
-        )}
-      >
+      <div className={cn("relative flex items-stretch rounded-md border border-edge bg-surface/70")}>
         <span className="flex w-8 shrink-0 items-center justify-center border-r border-edge">
           <Moon aria-hidden strokeWidth={1.75} className="h-4 w-4 text-ink-soft" />
         </span>

@@ -15,7 +15,7 @@ export function FuryModeTracker({ iconOnly = false }: { iconOnly?: boolean }) {
   if (iconOnly) {
     return (
       <Tooltip block label={t("Fury Mode") + ": " + formatFuryClock(remaining)}>
-        <div className="flex h-8 items-center justify-center border-b border-edge">
+        <div className="flex h-8 items-center justify-center rounded-md transition-colors hover:bg-surface/70">
           <Flame aria-hidden strokeWidth={1.75} className="fury-glow-icon h-4 w-4" />
         </div>
       </Tooltip>
@@ -23,11 +23,9 @@ export function FuryModeTracker({ iconOnly = false }: { iconOnly?: boolean }) {
   }
 
   return (
-    <div className="flex items-stretch border-b border-edge">
-      <span className="flex w-8 shrink-0 items-center justify-center border-r border-edge">
-        <Flame aria-hidden strokeWidth={1.75} className="fury-glow-icon h-4 w-4" />
-      </span>
-      <div className="min-w-0 flex-1 px-3 py-2">
+    <div className="flex items-center gap-3 rounded-md px-2.5 py-2 transition-colors hover:bg-surface/70">
+      <Flame aria-hidden strokeWidth={1.75} className="fury-glow-icon h-4 w-4 shrink-0" />
+      <div className="min-w-0 flex-1">
         <p className="fury-glow-text truncate text-[10px] uppercase tracking-[0.16em]">
           {t("Fury Mode")}
         </p>

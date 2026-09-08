@@ -25,14 +25,23 @@ import { FuryModeTracker } from "../components/fury-mode-tracker";
 import { Tooltip } from "../components/tooltip";
 import { NavIcon } from "../components/app-icon";
 
+function asideRow(active: boolean, collapsed: boolean, highlighted = false): string {
+  return cn(
+    "relative flex " + CONTROL_HEIGHT + " w-full items-center rounded-md transition-colors",
+    collapsed ? "justify-center" : "gap-3 px-2.5",
+    active ? "bg-surface-high" : "hover:bg-surface/70",
+    highlighted ? "text-ember" : active ? "text-ink" : "text-ink-soft hover:text-ink",
+  );
+}
+
 function Brand({ collapsed }: { collapsed: boolean }) {
   const t = useT();
   return (
     <Link
       href="/character"
       className={cn(
-        "flex h-[74px] items-center gap-3 border-b border-edge",
-        collapsed ? "justify-center px-0" : "px-3",
+        "flex h-[74px] shrink-0 items-center gap-3",
+        collapsed ? "justify-center px-0" : "px-4",
       )}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -68,22 +77,11 @@ function NavLink({
       aria-current={active ? "page" : undefined}
       aria-label={collapsed ? t(item.label) : undefined}
       onClick={() => playSound("ui")}
-      className={cn(
-        "relative flex " + CONTROL_HEIGHT + " items-center border-b border-edge transition-colors",
-        active ? "bg-surface-high" : "hover:bg-surface/70",
-        highlighted ? "text-ember" : active ? "text-ink" : "text-ink-soft hover:text-ink",
-      )}
+      className={asideRow(active, collapsed, highlighted)}
     >
-      <span
-        className={cn(
-          "flex " + CONTROL_HEIGHT + " shrink-0 items-center justify-center",
-          collapsed ? "w-full" : "w-8 border-r border-edge",
-        )}
-      >
-        <NavIcon href={item.href} />
-      </span>
+      <NavIcon href={item.href} className="shrink-0" />
       {collapsed ? null : (
-        <span className="min-w-0 truncate px-3 text-[10px] uppercase tracking-[0.16em]">
+        <span className="min-w-0 truncate text-[10px] uppercase tracking-[0.16em]">
           {t(item.label)}
         </span>
       )}
@@ -91,7 +89,7 @@ function NavLink({
         collapsed ? (
           <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-ember" />
         ) : (
-          <span className="ml-auto mr-2 inline-flex h-4 min-w-4 shrink-0 items-center justify-center self-center rounded border border-ember/70 bg-ember px-1 font-mono text-[10px] font-bold tracking-normal text-base">
+          <span className="ml-auto inline-flex h-4 min-w-4 shrink-0 items-center justify-center self-center rounded border border-ember/70 bg-ember px-1 font-mono text-[10px] font-bold tracking-normal text-base">
             {badge > 9 ? "9+" : badge}
           </span>
         )
@@ -125,23 +123,11 @@ function TutorialButton({
       }}
       aria-pressed={active}
       aria-label={collapsed ? t(TUTORIAL_LINK.label) : undefined}
-      className={cn(
-        "relative flex w-full " + CONTROL_HEIGHT + " items-center border-b border-edge transition-colors",
-        active
-          ? "bg-surface-high text-ink"
-          : "text-ink-soft hover:bg-surface/70 hover:text-ink",
-      )}
+      className={asideRow(active, collapsed)}
     >
-      <span
-        className={cn(
-          "flex " + CONTROL_HEIGHT + " shrink-0 items-center justify-center",
-          collapsed ? "w-full" : "w-8 border-r border-edge",
-        )}
-      >
-        <NavIcon href="tutorial" />
-      </span>
+      <NavIcon href="tutorial" className="shrink-0" />
       {collapsed ? null : (
-        <span className="min-w-0 truncate px-3 text-[10px] uppercase tracking-[0.16em]">
+        <span className="min-w-0 truncate text-[10px] uppercase tracking-[0.16em]">
           {t(TUTORIAL_LINK.label)}
         </span>
       )}
@@ -166,24 +152,15 @@ function CollapseButton({ collapsed }: { collapsed: boolean }) {
         asideRepository.setCollapsed(!collapsed);
       }}
       aria-label={t(label)}
-      className={cn(
-        "relative flex w-full " + CONTROL_HEIGHT + " items-center border-b border-edge text-ink-soft transition-colors hover:bg-surface/70 hover:text-ink",
-      )}
+      className={asideRow(false, collapsed)}
     >
-      <span
-        className={cn(
-          "flex " + CONTROL_HEIGHT + " shrink-0 items-center justify-center",
-          collapsed ? "w-full" : "w-8 border-r border-edge",
-        )}
-      >
-        {collapsed ? (
-          <ChevronRight aria-hidden strokeWidth={1.75} className="h-4 w-4" />
-        ) : (
-          <ChevronLeft aria-hidden strokeWidth={1.75} className="h-4 w-4" />
-        )}
-      </span>
+      {collapsed ? (
+        <ChevronRight aria-hidden strokeWidth={1.75} className="h-4 w-4 shrink-0" />
+      ) : (
+        <ChevronLeft aria-hidden strokeWidth={1.75} className="h-4 w-4 shrink-0" />
+      )}
       {collapsed ? null : (
-        <span className="min-w-0 truncate px-3 text-[10px] uppercase tracking-[0.16em]">
+        <span className="min-w-0 truncate text-[10px] uppercase tracking-[0.16em]">
           {t(label)}
         </span>
       )}
@@ -224,8 +201,8 @@ export function Sidebar({
       <div className="flex h-full w-full flex-col overflow-hidden rounded-lg border border-edge bg-surface/40 backdrop-blur">
       <Brand collapsed={collapsed} />
 
-      <nav className="flex-1 overflow-y-auto" aria-label={t("Game pages")}>
-        <ul>
+      <nav className="flex-1 overflow-y-auto p-3 pt-0" aria-label={t("Game pages")}>
+        <ul className="space-y-1">
           {NAVIGATION.map((item) => (
             <li key={item.href}>
               <NavLink
@@ -242,7 +219,7 @@ export function Sidebar({
         </ul>
       </nav>
 
-      <div className="border-t border-edge">
+      <div className="space-y-1 border-t border-edge p-3">
         <MoonTracker flush iconOnly={collapsed} />
         <FuryModeTracker iconOnly={collapsed} />
         <NavLink
