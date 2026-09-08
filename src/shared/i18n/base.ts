@@ -378,6 +378,8 @@ export const BASE: Record<string, string> = {
   "Golpe (Força)": "Strike (Strength)",
   "Defesa (Resistência)": "Defense (Endurance)",
   "Esquiva (Agilidade)": "Dodge (Agility)",
+  "Golpe extra (Agilidade)": "Extra strike (Agility)",
+  "Golpe extra": "Extra strike",
   "Crítico (Instinto)": "Critical (Instinct)",
   "Fúria do frasco (Vontade)": "Bottled fury (Willpower)",
   "Dano do crítico": "Critical damage",

@@ -17,6 +17,7 @@ import type { Gender } from "@/models/entities/character";
 import type { Hunter } from "@/models/entities/ranking";
 import { findItem } from "@/models/data/items";
 import { ARENA_DAILY_ATTACKS, arenaCharges, arenaSpoilsRange, arenaStats } from "@/models/rules/arena";
+import { extraStrikeChance } from "@/models/rules/combat";
 import type { DerivedStats } from "@/models/rules/stats";
 import { canPetFight, isPetActive, petLevelOf, petMaxEnergy } from "@/models/rules/pet";
 import { playSound } from "@/controllers/sound";
@@ -627,6 +628,11 @@ export function ArenaScreen() {
                         })),
                         { key: "health", label: "Health", value: formatNumber(rival.maxHealth) },
                         { key: "dodge", label: "Dodge", value: rival.dodge + "%" },
+                        {
+                          key: "extra",
+                          label: "Extra strike",
+                          value: t("up to") + " " + extraStrikeChance(rival.totalAttributes.agility, 0) + "%",
+                        },
                         { key: "critical", label: "Critical", value: rival.critical + "%" },
                       ].map((cell) => (
                         <div key={cell.key} className="px-2 py-3 text-center">

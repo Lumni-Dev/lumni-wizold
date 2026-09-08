@@ -7,7 +7,7 @@ import { useT } from "@/controllers/use-locale";
 import { detailInventory } from "@/controllers/inventory.controller";
 import { profileOf } from "@/controllers/ranking.controller";
 import { restRecoveryRatio } from "@/controllers/character.controller";
-import { criticalMultiplierOf } from "@/models/rules/combat";
+import { criticalMultiplierOf, extraStrikeChance } from "@/models/rules/combat";
 import { furyWillpowerExtraMs } from "@/models/rules/moon";
 import { REST_TICK_MS } from "@/shared/constants/game";
 import { findItem } from "@/models/data/items";
@@ -258,6 +258,15 @@ export function CharacterScreen() {
               <DataRow label="Strike (Strength)" value={formatFraction(strength)} />
               <DataRow label="Defense (Endurance)" value={formatFraction(endurance)} />
               <DataRow label="Dodge (Agility)" value={formatFraction(stats.dodgeExact) + "%"} />
+              <DataRow
+                label="Extra strike (Agility)"
+                value={
+                  <>
+                    {t("up to")}{" "}
+                    {formatNumber(extraStrikeChance(stats.totalAttributes.agility, 0))}%
+                  </>
+                }
+              />
               <DataRow
                 label="Critical (Instinct)"
                 value={formatFraction(stats.criticalExact) + "%"}

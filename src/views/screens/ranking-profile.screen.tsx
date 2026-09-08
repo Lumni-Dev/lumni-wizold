@@ -11,7 +11,7 @@ import { findGender } from "@/models/entities/character";
 import type { Hunter } from "@/models/entities/ranking";
 import { findPet } from "@/models/entities/pet";
 import { restRecoveryRatio } from "@/controllers/character.controller";
-import { criticalMultiplierOf } from "@/models/rules/combat";
+import { criticalMultiplierOf, extraStrikeChance } from "@/models/rules/combat";
 import { PET_MAX_LEVEL, REST_TICK_MS } from "@/shared/constants/game";
 import { furyPotionClock } from "../presenters/item.presenter";
 import { formatDate, formatFraction, formatNumber } from "@/shared/utils/format";
@@ -213,6 +213,15 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
               <DataRow label="Strike (Strength)" value={formatFraction(strength)} />
               <DataRow label="Defense (Endurance)" value={formatFraction(endurance)} />
               <DataRow label="Dodge (Agility)" value={formatFraction(stats.dodgeExact) + "%"} />
+              <DataRow
+                label="Extra strike (Agility)"
+                value={
+                  <>
+                    {t("up to")}{" "}
+                    {formatNumber(extraStrikeChance(stats.totalAttributes.agility, 0))}%
+                  </>
+                }
+              />
               <DataRow
                 label="Critical (Instinct)"
                 value={formatFraction(stats.criticalExact) + "%"}
