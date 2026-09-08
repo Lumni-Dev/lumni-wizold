@@ -115,6 +115,22 @@ function nearestByLevel(pit: readonly Hunter[], level: number, amount: number): 
     .sort((first, second) => Math.abs(first.level - level) - Math.abs(second.level - level))
     .slice(0, amount);
 }
+function restedAt(state: GameState, now: number): (hunter: Hunter) => boolean {
+  return (hunter) => arenaCooldownLeft(state.arenaDuels[hunter.id], now) === 0;
+}
+// The pit never closes: the band is tried first, and only when nobody in it is
+// rested does the draw open to the nearest rested hunters, stronger included.
+// Rested is filtered before nearest, so a wall of resting neighbours never
+// hides an available rival one step further out. resolveArena accepts exactly
+// this pool, so what the draw hands over is never refused at the gate.
+function arenaFallbackPool(
+  state: GameState,
+  pit: readonly Hunter[],
+  level: number,
+  now: number,
+): Hunter[] {
+  return nearestByLevel(pit.filter(restedAt(state, now)), level, 5);
+}
 export function drawOpponent(
   state: GameState,
   roster: readonly Hunter[],
@@ -124,10 +140,11 @@ export function drawOpponent(
   const character = state.character;
   if (!character) return null;
   const pit = roster.filter((hunter) => hunter.id !== character.id);
-  const rested = (hunter: Hunter) => arenaCooldownLeft(state.arenaDuels[hunter.id], now) === 0;
+  const rested = restedAt(state, now);
   const band = arenaBand(character.level);
   const inBand = pit.filter((hunter) => isInBand(band, hunter.level) && rested(hunter));
-  const pool = inBand.length > 0 ? inBand : nearestByLevel(pit, character.level, 5).filter(rested);
+  const pool =
+    inBand.length > 0 ? inBand : arenaFallbackPool(state, pit, character.level, now);
   return pool.length > 0 ? pickOne(pool, random) : null;
 }
 export interface ArenaHistoryLine {
@@ -198,8 +215,11 @@ export function resolveArena(
   }
   const band = arenaBand(character.level);
   const pit = roster.filter((candidate) => candidate.id !== character.id);
-  const bandHasRivals = pit.some((candidate) => isInBand(band, candidate.level));
-  const nearest = bandHasRivals ? [] : nearestByLevel(pit, character.level, 5);
+  const rested = restedAt(state, now);
+  const bandHasRested = pit.some(
+    (candidate) => isInBand(band, candidate.level) && rested(candidate),
+  );
+  const nearest = bandHasRested ? [] : arenaFallbackPool(state, pit, character.level, now);
   if (
     !isInBand(band, hunter.level) &&
     !nearest.some((candidate) => candidate.id === hunter.id)

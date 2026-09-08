@@ -17,6 +17,6 @@ export async function POST(request: Request) {
     const opponent = arenaController.drawOpponent(state, roster);
     return opponent
       ? success(state, "", { hunterId: opponent.id, name: opponent.name })
-      : failure(state, "Nobody rested in your band right now.");
+      : failure(state, "Nobody rested right now: everyone left is recovering from a duel.");
   });
 }

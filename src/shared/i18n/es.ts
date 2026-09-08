@@ -829,7 +829,8 @@ export const ES: Record<string, string> = {
   "Wrong code.": "Código incorrecto.",
   "Invalid activity.": "Actividad inválida.",
   "The pit waits for other hunters: for now you are the only one alive.": "El foso espera a otros cazadores: por ahora eres el único vivo.",
-  "Nobody rested in your band right now.": "Nadie descansado en tu franja ahora.",
+  "Nobody rested right now: everyone left is recovering from a duel.":
+    "Nadie descansado ahora: quien queda aún se recupera de un duelo.",
   "Google did not confirm the entry. Try again.": "Google no confirmó la entrada. Inténtalo de nuevo.",
   "Code sent to your e-mail.": "Código enviado a tu correo.",
   "No session.": "Sin sesión.",
