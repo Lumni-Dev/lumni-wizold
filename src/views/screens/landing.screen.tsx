@@ -104,8 +104,8 @@ export function LandingScreen() {
         <section className="relative">
           <div className={cn("rounded-lg border border-edge", GLASS_SECTION)}>
             <div className="border-b border-edge">
-              <div className="aspect-video w-full overflow-hidden p-4 md:p-5">
-                <ArtImage source="/assets/landing/lumni-luna.webp?v=1" fit="contain" />
+              <div className="aspect-video w-full overflow-hidden">
+                <ArtImage source="/assets/landing/lumni-luna.webp?v=1" fit="cover" />
               </div>
               <div className="grid grid-cols-1 border-t border-edge sm:grid-cols-2">
                 {(["male", "female"] as const).map((key) => (

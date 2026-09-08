@@ -415,6 +415,18 @@ export function HuntScreen() {
                           blow={line?.blow ?? null}
                           critical={line?.critical ?? false}
                           fighting={replaying}
+                          approaching={Boolean(approach)}
+                          finale={replaying && script.length > 0 && progress.beat >= script.length}
+                          outcome={
+                            replaying && pending
+                              ? hunterWon(pending.combat)
+                                ? "win"
+                                : hunterRetreated(pending.combat)
+                                  ? "draw"
+                                  : "loss"
+                              : null
+                          }
+                          creatureHealth={line?.creatureHealth ?? null}
                         />
                       ) : null}
                     </div>
