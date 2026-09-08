@@ -150,7 +150,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "To chain hunts, training, mine or forge without touching anything, turn on VIP automation in the settings. Every area has ten creatures with fixed numbers: you get stronger, they do not.",
       "A critical blow multiplies the damage by " +
         criticalMultiplierOf().toFixed(2) +
-        ", fixed; Instinct raises the critical chance and Agility the dodge chance.",
+        ", fixed; Instinct raises the critical chance and Agility the dodge chance and the chance of a second blow.",
       "Train to accumulate attribute progress; equip what serves, sell what is left and go back to hunting.",
       "The bars count what changes on the spot, beside the value: experience gained in purple, WCoins and fragments in amber, health lost in red and the mine's spent breath in blue. Each notice sums the moment's gains and fades on its own right after.",
       "At the forge, mine fragments and strike the piece that sits in the bag, off the body, to raise it from +1 onward. At the kennel, adopt a wolf: it adds attributes while it stands. The ranking shows where you are among the hunters.",
@@ -191,7 +191,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "There is no transformation: you hunt, train and duel straight away, as you are.",
       "Fury Mode gives +" +
         FURY_ATTRIBUTE_BONUS +
-        " to each attribute while it lasts; the gain shows in the sheet's Fury column and lifts damage, dodge and critical at once. The health bar still rises only with the level.",
+        " to each attribute while it lasts; the gain shows in the sheet's Fury column and lifts damage, dodge, critical and the chance of a second blow at once. The health bar still rises only with the level.",
       "The fury potion gives no health back. Duration is the flask's size (small 2.5 minutes, medium 5, large 7.5) plus the same Willpower stretch on every flask, up to 5 minutes, with half of that already at 250 Willpower. Drinking again restarts the clock full.",
       "On the full moon the sky keeps Fury Mode on by itself while the phase lasts; the potion is disabled during that window, because the sky is already doing that work.",
       "It is a paid shortcut to a window of strength: save the potion for a hard band or a duel you do not want to lose, outside the full moon.",
@@ -249,7 +249,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "Willpower does not enter the fight's math: it stretches the fury potion by the same flat bonus on every flask and speeds up health recovery outside combat. Fury is what adds +" +
         FURY_ATTRIBUTE_BONUS +
         " to every attribute while it lasts, and the more Willpower, the longer each flask runs.",
-      "Whoever has more Agility starts. Dodge and critical climb for the whole run without a cap: 35% and 45% on the horizon.",
+      "Whoever has more Agility starts. Dodge climbs toward 35% and critical toward 45%. A lead in Agility can land a second blow in the same cycle, capped at 12%.",
       "A critical multiplies by " +
         criticalMultiplierOf().toFixed(2) +
         ", fixed. A fight locks at 24 rounds: retreat, no winner.",

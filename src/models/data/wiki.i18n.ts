@@ -194,7 +194,7 @@ function ptTopics(): readonly WikiTopic[] {
           STARTING_BRONZE +
           " WCoins, dez poções de vida e dez poções de fúria pequena. Escolha um território e, na lista, a presa: a barra enche como \"Procurando criatura...\" e só no último batimento a luta é decidida no servidor; depois o replay conta golpe a golpe como \"Caçando...\". Parar na aproximação cancela; parar no replay aplica o resultado. Trocar de criatura no meio da caçada não muda a luta em curso, só a próxima volta.",
         "Para encadear caçadas, treino, mina ou forja sem tocar em nada, ative a automação VIP nas configurações. Cada área tem dez criaturas de números fixos: você fica mais forte, elas não.",
-        "O golpe crítico multiplica o dano por " + critical("pt") + ", fixo; Instinto sobe a chance de crítico e Agilidade, a de esquiva.",
+        "O golpe crítico multiplica o dano por " + critical("pt") + ", fixo; Instinto sobe a chance de crítico e Agilidade, a de esquiva e a de um segundo golpe.",
         "Treine para acumular progresso de atributo; equipe o que serve, venda o que sobra e volte a caçar.",
         "As barras contam o que muda na hora, ao lado do valor: experiência ganha em roxo, WCoins e fragmentos em âmbar, vida perdida em vermelho e o fôlego gasto da mina em azul. Cada aviso soma os ganhos do momento e se apaga sozinho em seguida.",
         "Na forja, minere fragmentos e bata na peça que está na mochila, fora do corpo, para levantá-la de +1 em diante. No canil, adote um lobo: ele soma atributos enquanto estiver de pé. O ranking mostra onde você está entre os caçadores.",
@@ -235,7 +235,7 @@ function ptTopics(): readonly WikiTopic[] {
         "Não existe transformação: você caça, treina e duela direto, do jeito que está.",
         "Modo Fúria dá +" +
           FURY_ATTRIBUTE_BONUS +
-          " em cada atributo enquanto durar; o ganho aparece na coluna Fúria da ficha e levanta dano, esquiva e crítico de uma vez. A barra de vida continua subindo só com o nível.",
+          " em cada atributo enquanto durar; o ganho aparece na coluna Fúria da ficha e levanta dano, esquiva, crítico e a chance de um segundo golpe de uma vez. A barra de vida continua subindo só com o nível.",
         "A poção de fúria não devolve vida. A duração é o tamanho do frasco (pequena 2,5 minutos, média 5, grande 7,5) mais o mesmo estirão de Vontade em todo frasco, até 5 minutos, com metade disso já em 250 de Vontade. Beber de novo reinicia o relógio cheio.",
         "Na lua cheia o céu mantém o Modo Fúria ativo sozinho enquanto durar a fase; a poção fica desabilitada nesse período, porque o céu já faz esse trabalho.",
         "É um atalho pago para uma janela de força: guarde a poção para uma banda dura ou um duelo que você não quer perder, fora da lua cheia.",
@@ -291,7 +291,7 @@ function ptTopics(): readonly WikiTopic[] {
         "A Vontade não entra na conta da luta: ela estica a poção de fúria com o mesmo bônus fixo em todo frasco e acelera a recuperação de vida fora do combate. A fúria é que soma +" +
           FURY_ATTRIBUTE_BONUS +
           " em todos os atributos enquanto dura, e quanto mais Vontade, mais tempo cada frasco rende.",
-        "Quem tem mais Agilidade começa. Esquiva e crítico sobem a vida toda sem teto: 35% e 45% no horizonte.",
+        "Quem tem mais Agilidade começa. A esquiva sobe rumo a 35% e o crítico rumo a 45%. Uma vantagem de Agilidade pode render um segundo golpe no mesmo ciclo, com teto de 12%.",
         "Crítico multiplica por " + critical("pt") + ", fixo. Luta trava em 24 rodadas: recuo, sem vencedor.",
       ],
     },
@@ -603,7 +603,7 @@ function esTopics(): readonly WikiTopic[] {
           STARTING_BRONZE +
           " WCoins, diez pociones de vida y diez pociones de furia pequeñas. Elige un territorio y, en la lista, la presa: la barra se llena como \"Buscando criatura...\" y solo en el último latido la pelea se decide en el servidor; después el replay la cuenta golpe a golpe como \"Cazando...\". Parar en la aproximación cancela; parar en el replay aplica el resultado. Cambiar de criatura a mitad de la cacería no cambia la pelea en curso, solo la próxima vuelta.",
         "Para encadenar cacerías, entrenamiento, mina o forja sin tocar nada, activa la automatización VIP en la configuración. Cada área tiene diez criaturas de números fijos: tú te haces más fuerte, ellas no.",
-        "El golpe crítico multiplica el daño por " + critical("es") + ", fijo; Instinto sube la probabilidad de crítico y Agilidad, la de esquiva.",
+        "El golpe crítico multiplica el daño por " + critical("es") + ", fijo; Instinto sube la probabilidad de crítico y Agilidad, la de esquiva y la de un segundo golpe.",
         "Entrena para acumular progreso de atributo; equipa lo que sirve, vende lo que sobra y vuelve a cazar.",
         "Las barras cuentan lo que cambia al momento, junto al valor: experiencia ganada en morado, WCoins y fragmentos en ámbar, vida perdida en rojo y el aliento gastado de la mina en azul. Cada aviso suma las ganancias del momento y se apaga solo enseguida.",
         "En la forja, mina fragmentos y golpea la pieza que está en la mochila, fuera del cuerpo, para subirla de +1 en adelante. En la perrera, adopta un lobo: suma atributos mientras esté en pie. La clasificación muestra dónde estás entre los cazadores.",
@@ -644,7 +644,7 @@ function esTopics(): readonly WikiTopic[] {
         "No existe transformación: cazas, entrenas y duelas directo, tal como estás.",
         "El Modo Furia da +" +
           FURY_ATTRIBUTE_BONUS +
-          " a cada atributo mientras dura; la ganancia aparece en la columna Furia de la ficha y levanta daño, esquiva y crítico a la vez. La barra de vida sigue subiendo solo con el nivel.",
+          " a cada atributo mientras dura; la ganancia aparece en la columna Furia de la ficha y levanta daño, esquiva, crítico y la probabilidad de un segundo golpe a la vez. La barra de vida sigue subiendo solo con el nivel.",
         "La poción de furia no devuelve vida. La duración es el tamaño del frasco (pequeña 2,5 minutos, media 5, grande 7,5) más el mismo tramo de Voluntad en cada frasco, hasta 5 minutos, con la mitad de eso ya a 250 de Voluntad. Beber de nuevo reinicia el reloj lleno.",
         "En luna llena el cielo mantiene el Modo Furia activo solo mientras dure la fase; la poción queda deshabilitada en ese período, porque el cielo ya hace ese trabajo.",
         "Es un atajo pagado hacia una ventana de fuerza: guarda la poción para una franja dura o un duelo que no quieres perder, fuera de la luna llena.",
@@ -700,7 +700,7 @@ function esTopics(): readonly WikiTopic[] {
         "La Voluntad no entra en la cuenta de la pelea: estira la poción de furia con el mismo bono fijo en cada frasco y acelera la recuperación de vida fuera del combate. La furia es la que suma +" +
           FURY_ATTRIBUTE_BONUS +
           " a todos los atributos mientras dura, y a más Voluntad, más tiempo rinde cada frasco.",
-        "Quien tiene más Agilidad empieza. Esquiva y crítico suben toda la vida sin techo: 35% y 45% en el horizonte.",
+        "Quien tiene más Agilidad empieza. La esquiva sube hacia el 35% y el crítico hacia el 45%. Una ventaja de Agilidad puede dar un segundo golpe en el mismo ciclo, con tope del 12%.",
         "El crítico multiplica por " + critical("es") + ", fijo. La pelea se traba a las 24 rondas: retirada, sin ganador.",
       ],
     },

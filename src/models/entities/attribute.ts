@@ -23,9 +23,10 @@ export const ATTRIBUTES: readonly AttributeDefinition[] = [
     key: "agility",
     name: "Agility",
     code: "AGI",
-    description: "Your dodge. The higher, the more blows pass without touching you.",
+    description:
+      "Your dodge and your pace. The higher, the more blows miss you, and the more often you strike twice in one cycle.",
     effect:
-      "Dodge is 35 x Agility divided by Agility plus 120, so it climbs toward the 35% ceiling and every point still buys something. Whoever has more Agility than the other attacks first.",
+      "Dodge is 35 x Agility divided by Agility plus 120, so it climbs toward the 35% ceiling and every point still buys something. Whoever has more Agility than the other attacks first. A lead in Agility can land a second blow in the same cycle, soft under a 12% ceiling, so even at level 1000 it never doubles almost every turn.",
   },
   {
     key: "endurance",
