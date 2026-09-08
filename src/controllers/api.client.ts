@@ -29,6 +29,7 @@ export async function api<T = unknown>(
   try {
     const response = await fetch(path, {
       method,
+      cache: "no-store",
       headers: {
         "x-game-version": GAME_VERSION,
         "x-game-locale": languageRepository.resolved(),

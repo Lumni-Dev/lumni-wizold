@@ -393,17 +393,29 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const applyUpdate = useCallback(() => {
     flushBeforeUnload();
     if (activitySync.isOwner()) activitySync.release();
-    const reload = () => window.location.reload();
+    const go = () => {
+      // Soft reload keeps a cached HTML/JS shell and can reopen the gate
+      // against a stale /api/version. Bust the document URL so the next load
+      // fetches the new build for real.
+      const url = new URL(window.location.href);
+      url.searchParams.set("_", String(Date.now()));
+      window.location.replace(url.toString());
+    };
+    const fallback = window.setTimeout(go, 2000);
     try {
       if (typeof caches !== "undefined") {
         void caches
           .keys()
           .then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
-          .then(reload, reload);
+          .finally(() => {
+            window.clearTimeout(fallback);
+            go();
+          });
         return;
       }
     } catch {}
-    reload();
+    window.clearTimeout(fallback);
+    go();
   }, [flushBeforeUnload]);
   const syncProgress = useCallback(
     (patch: { beat: number; cooldownUntil?: string | null; laps?: number }) => {

@@ -11,6 +11,6 @@ export async function GET(request: Request) {
   }
   return NextResponse.json(
     { version: GAME_VERSION },
-    { headers: { "Cache-Control": "public, max-age=60" } },
+    { headers: { "Cache-Control": "no-store, max-age=0" } },
   );
 }
