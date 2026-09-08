@@ -361,15 +361,18 @@ export function ForgeScreen() {
                 </div>
               ) : (
                 <List>
-                  <ListRow padding="art">
-                    <span
-                      className={cn(
-                        "flex aspect-square w-20 shrink-0 overflow-hidden rounded-md border border-edge p-1.5",
-                        forgeActive && forgeShake && "card-shake",
-                      )}
-                    >
-                      <ItemArtFill item={forgeEntry.item} enhancement={forgeEntry.level} />
-                    </span>
+                  <ListRow
+                    art={
+                      <span
+                        className={cn(
+                          "flex h-full w-full",
+                          forgeActive && forgeShake && "card-shake",
+                        )}
+                      >
+                        <ItemArtFill item={forgeEntry.item} enhancement={forgeEntry.level} />
+                      </span>
+                    }
+                  >
                     <RowText
                       title={forgeEntry.item.name}
                       description={
@@ -516,11 +519,8 @@ export function ForgeScreen() {
                       return (
                         <ArtRowButton
                           key={key}
-                          art={
-                            <span className="flex aspect-square w-16 shrink-0 overflow-hidden rounded-md border border-edge p-1.5">
-                              <ItemArtFill item={row.item} enhancement={row.level} />
-                            </span>
-                          }
+                          divided
+                          art={<ItemArtFill item={row.item} enhancement={row.level} />}
                           title={row.item.name}
                           description={
                             row.canForge
