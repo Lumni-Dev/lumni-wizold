@@ -62,11 +62,13 @@ export function Card({
 export function CardHeader({
   art,
   artSize = "default",
+  artPadding = "default",
   children,
   className,
 }: {
   art?: ReactNode;
   artSize?: "default" | "small";
+  artPadding?: "default" | "none";
   children: ReactNode;
   className?: string;
 }) {
@@ -79,7 +81,8 @@ export function CardHeader({
           className={cn(
             "flex aspect-square shrink-0 overflow-hidden border-r border-edge",
             tone === "empty" && "border-dashed",
-            artSize === "small" ? "w-16 p-2 sm:w-20" : "w-20 p-3 sm:w-28",
+            artSize === "small" ? "w-16 sm:w-20" : "w-20 sm:w-28",
+            artPadding === "default" && (artSize === "small" ? "p-2" : "p-3"),
           )}
         >
           {art}

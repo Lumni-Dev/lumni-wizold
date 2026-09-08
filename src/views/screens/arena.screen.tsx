@@ -600,7 +600,7 @@ export function ArenaScreen() {
               const resting = cooldownLeft > 0;
               return (
                 <Card key={hunter.id} height="fill">
-                  <CardHeader art={<GenderArtFill gender={hunter.gender} />}>
+                  <CardHeader art={<GenderArtFill gender={hunter.gender} />} artPadding="none">
                     <RowText
                       title={
                         <Link

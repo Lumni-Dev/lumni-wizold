@@ -42,11 +42,13 @@ const TONES: Record<FrameTone, string> = {
 export function IconFrame({
   size = "medium",
   tone = "default",
+  pad = true,
   className,
   children,
 }: {
   size?: IconSize;
   tone?: FrameTone;
+  pad?: boolean;
   className?: string;
   children?: ReactNode;
 }) {
@@ -58,7 +60,8 @@ export function IconFrame({
     >
       <span
         className={cn(
-          "relative flex h-full w-full items-center justify-center overflow-visible rounded-md border p-1.5 font-mono",
+          "relative flex h-full w-full items-center justify-center rounded-md border font-mono",
+          pad ? "overflow-visible p-1.5" : "overflow-hidden",
           ICON_TEXT[size],
           TONES[tone],
         )}
