@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import type { Item } from "@/models/entities/item";
+import { RARITY_LABEL, type Item } from "@/models/entities/item";
 import { useGame } from "@/controllers/game.context";
 import { useT } from "@/controllers/use-locale";
 import { itemSubtitle, summarizeEffect } from "../presenters/item.presenter";
@@ -45,7 +45,10 @@ export function ItemCard({
 
       <CardHeader>
         {drawn ? null : <ItemIcon item={item} enhancement={enhancement} />}
-        <RowText title={item.name} description={itemSubtitle(item)} />
+        <RowText
+          title={item.name}
+          description={t(itemSubtitle(item)) + " · " + t(RARITY_LABEL[item.rarity])}
+        />
         {quantity && quantity > 1 ? (
           <span className="shrink-0 font-mono text-xs text-ink-soft">x{quantity}</span>
         ) : null}

@@ -251,7 +251,10 @@ export function WikiScreen() {
                     <RowText
                       title={t(pieceName(definition, slot))}
                       description={
-                        t(SLOT_LABEL[slot]) + (bonuses ? " · " + bonuses : "")
+                        t(SLOT_LABEL[slot]) +
+                        " · " +
+                        t(RARITY_LABEL[definition.rarity]) +
+                        (bonuses ? " · " + bonuses : "")
                       }
                     />
                     <span className="shrink-0 font-mono text-[11px] text-ink-faint">
