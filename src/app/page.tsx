@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
-import { ArtProvider } from "@/controllers/art.context";
-import { readArtManifest } from "@/models/repositories/art.repository";
 import { GAME_NAME, GAME_TAGLINE } from "@/shared/constants/game";
 import { OG_IMAGE_PATH, SITE_URL } from "@/shared/constants/site";
 import { JsonLd } from "@/shared/seo/json-ld";
 import { pageMetadata, SITE_DESCRIPTION } from "@/shared/seo/metadata";
-import { LandingScreen } from "@/views/screens/landing.screen";
+import { LoginScreen } from "@/views/screens/login.screen";
 
 export const metadata: Metadata = pageMetadata({
   title: GAME_NAME,
@@ -15,9 +13,7 @@ export const metadata: Metadata = pageMetadata({
   path: "/",
 });
 
-export default async function HomePage() {
-  const art = await readArtManifest();
-
+export default function HomePage() {
   return (
     <>
       <JsonLd
@@ -59,9 +55,7 @@ export default async function HomePage() {
           ],
         }}
       />
-      <ArtProvider manifest={art}>
-        <LandingScreen />
-      </ArtProvider>
+      <LoginScreen />
     </>
   );
 }

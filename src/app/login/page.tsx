@@ -1,13 +1,5 @@
-import type { Metadata } from "next";
-import { LoginScreen } from "@/views/screens/login.screen";
-import { pageMetadata } from "@/shared/seo/metadata";
-
-export const metadata: Metadata = pageMetadata({
-  title: "Enter",
-  description: "Enter with Google and begin your werewolf chronicle in Wizold.",
-  path: "/login",
-});
+import { permanentRedirect } from "next/navigation";
 
 export default function LoginPage() {
-  return <LoginScreen />;
+  permanentRedirect("/");
 }

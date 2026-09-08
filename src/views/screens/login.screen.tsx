@@ -1,5 +1,4 @@
 "use client";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useGame } from "@/controllers/game.context";
@@ -8,7 +7,7 @@ import { useT } from "@/controllers/use-locale";
 import { loadBirth, saveBirth } from "@/models/repositories/birth.repository";
 import { GAME_NAME, MIN_AGE } from "@/shared/constants/game";
 import { TWO_FACTOR_CODE_LENGTH } from "@/shared/constants/auth";
-import { BRAND_ICON_PATH } from "@/shared/constants/site";
+import { BRAND_LOGO_WEBP_PATH } from "@/shared/constants/site";
 import { GLASS_SECTION } from "@/shared/constants/ui";
 import { ageOf, EMPTY_BIRTH, isRealBirth } from "@/shared/utils/birth";
 import { cn } from "@/shared/utils/class-names";
@@ -16,10 +15,12 @@ import { BanishedGate } from "../components/banished-gate";
 import { Button } from "../components/button";
 import { CornerAccents } from "../components/corner-accents";
 import { Field } from "../components/field";
+import { LanguageSwitch } from "../components/language-switch";
 import { LiveBackdrop } from "../components/live-backdrop";
 import { LandingMusic } from "../components/game-music";
 import { Select, type SelectOption } from "../components/select";
 import { Spinner } from "../components/spinner";
+import { Footer } from "../layout/footer";
 
 function GoogleMark() {
   return (
@@ -231,20 +232,18 @@ export function LoginScreen() {
       <LiveBackdrop />
       <LandingMusic />
       <BanishedGate open={banished} onClose={() => setBanished(false)} />
+      <div className="absolute right-4 top-4 z-20">
+        <LanguageSwitch />
+      </div>
       <main className="relative z-10 flex min-h-screen items-center justify-center p-4 md:p-8">
         <div className="w-full max-w-md space-y-6">
           <header className="text-center">
-            <Link
-              href="/"
-              className="mx-auto block w-fit transition-opacity hover:opacity-90"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={BRAND_ICON_PATH}
-                alt={GAME_NAME}
-                className="landing-hero-shadow-logo h-28 w-28 shrink-0 rounded-md"
-              />
-            </Link>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={BRAND_LOGO_WEBP_PATH}
+              alt={GAME_NAME}
+              className="landing-hero-shadow-logo mx-auto w-56 max-w-full md:w-72"
+            />
           </header>
 
           <div
@@ -311,98 +310,91 @@ export function LoginScreen() {
                       Resend code
                     </Button>
                   </div>
-              </>
-            ) : (
-              <>
-                <div className="space-y-2">
-                  <p className="landing-hero-shadow-text text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                    {t("Birth date")}
-                  </p>
-              <div className="grid grid-cols-3 gap-2">
-                <Select
-                  compact
-                  aria-label="Day"
-                  placeholder="Day"
-                  value={birth.day}
-                  options={dayOptions}
-                  onChange={(day) => setBirthPart({ day })}
-                />
-                <Select
-                  compact
-                  aria-label="Month"
-                  placeholder="Month"
-                  value={birth.month}
-                  options={MONTH_OPTIONS}
-                  onChange={(month) => setBirthPart({ month })}
-                />
-                <Select
-                  compact
-                  aria-label="Year"
-                  placeholder="Year"
-                  value={birth.year}
-                  options={YEAR_OPTIONS}
-                  onChange={(year) => setBirthPart({ year })}
-                />
-              </div>
-                  <p className="landing-hero-shadow-text text-[11px] leading-relaxed text-ink-faint">
-                    {t(
-                      complete && !oldEnough
-                        ? "The hunt is for ages " + MIN_AGE + " and up."
-                        : "The game is for ages " +
-                            MIN_AGE +
-                            " and up: there is blood on the hunt, player duels, open chat tables and purchases with real money.",
-                    )}
-                  </p>
-                </div>
+                </>
+              ) : (
+                <>
+                  <div className="space-y-2">
+                    <p className="landing-hero-shadow-text text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                      {t("Birth date")}
+                    </p>
+                    <div className="grid grid-cols-3 gap-2">
+                      <Select
+                        compact
+                        aria-label="Day"
+                        placeholder="Day"
+                        value={birth.day}
+                        options={dayOptions}
+                        onChange={(day) => setBirthPart({ day })}
+                      />
+                      <Select
+                        compact
+                        aria-label="Month"
+                        placeholder="Month"
+                        value={birth.month}
+                        options={MONTH_OPTIONS}
+                        onChange={(month) => setBirthPart({ month })}
+                      />
+                      <Select
+                        compact
+                        aria-label="Year"
+                        placeholder="Year"
+                        value={birth.year}
+                        options={YEAR_OPTIONS}
+                        onChange={(year) => setBirthPart({ year })}
+                      />
+                    </div>
+                    <p className="landing-hero-shadow-text text-[11px] leading-relaxed text-ink-faint">
+                      {t(
+                        complete && !oldEnough
+                          ? "The hunt is for ages " + MIN_AGE + " and up."
+                          : "The game is for ages " +
+                              MIN_AGE +
+                              " and up: there is blood on the hunt, player duels, open chat tables and purchases with real money.",
+                      )}
+                    </p>
+                  </div>
 
-                {oldEnough && GOOGLE_CLIENT_ID ? (
-                  <div className="group relative">
-                    <Button
-                      variant="primary"
-                      size="medium"
-                      fullWidth
-                      busy={entering}
-                      aria-hidden
-                      tabIndex={-1}
-                      className="landing-hero-shadow-button pointer-events-none group-hover:brightness-110"
-                    >
+                  {oldEnough && GOOGLE_CLIENT_ID ? (
+                    <div className="group relative">
+                      <Button
+                        variant="primary"
+                        size="medium"
+                        fullWidth
+                        busy={entering}
+                        aria-hidden
+                        tabIndex={-1}
+                        className="landing-hero-shadow-button pointer-events-none group-hover:brightness-110"
+                      >
+                        <GoogleMark />
+                        {t("Enter with Google")}
+                      </Button>
+                      <div
+                        ref={buttonHost}
+                        className={cn(
+                          "absolute inset-0 flex items-center justify-center overflow-hidden opacity-0",
+                          entering && "pointer-events-none",
+                        )}
+                      />
+                    </div>
+                  ) : (
+                    <Button variant="primary" size="medium" fullWidth disabled>
                       <GoogleMark />
                       {t("Enter with Google")}
                     </Button>
-                    <div
-                      ref={buttonHost}
-                      className={cn(
-                        "absolute inset-0 flex items-center justify-center overflow-hidden opacity-0",
-                        entering && "pointer-events-none",
-                      )}
-                    />
-                  </div>
-                ) : (
-                  <Button variant="primary" size="medium" fullWidth disabled>
-                    <GoogleMark />
-                    {t("Enter with Google")}
-                  </Button>
-                )}
-
-                <p className="landing-hero-shadow-text text-xs leading-relaxed text-ink-faint">
-                  {t(
-                    "The door is the Google account: no new password to remember. On the first entry the birth date is kept, and after that the button is enough.",
                   )}
-                </p>
-              </>
-            )}
+
+                  <p className="landing-hero-shadow-text text-xs leading-relaxed text-ink-faint">
+                    {t(
+                      "The door is the Google account: no new password to remember. On the first entry the birth date is kept, and after that the button is enough.",
+                    )}
+                  </p>
+                </>
+              )}
             </div>
             <CornerAccents inside />
           </div>
 
-          <div className="flex items-center justify-center">
-            <Link
-              href="/"
-              className="landing-hero-shadow-text text-[11px] uppercase tracking-[0.16em] text-ink-faint transition-colors hover:text-ink"
-            >
-              {t("Back to the legend")}
-            </Link>
-          </div>
+          <Footer compact />
         </div>
       </main>
     </div>

@@ -107,8 +107,6 @@ export const BASE: Record<string, string> = {
   "Experiência": "Experience",
   "teto": "cap",
   "Atualizar agora": "Update now",
-  "Jogar grátis": "Play free",
-  "Voltar para a caçada": "Back to the hunt",
 
   // Settings sections
   "Nome": "Name",
@@ -137,24 +135,8 @@ export const BASE: Record<string, string> = {
   "Automático segue o idioma do navegador. O jogo é escrito em inglês e traduzido a partir dele.":
     "Automatic follows the browser language. The game is written in English and translated from it.",
 
-  // Landing
+  // Brand
   "Crônica de Lumni e Luna": "Chronicle of Lumni and Luna",
-  "Dois se encontraram numa noite de lua cheia e desceram a serra sendo outra coisa. A matilha que eles começaram ainda caça, e a lua que decide o preço de cada noite é a que está no céu agora, lá fora.":
-    "Two met on a full-moon night and came down the ridge as something else. The pack they started still hunts, and the moon that sets the price of every night is the one in the sky right now, outside.",
-  "O que espera lá fora": "What waits out there",
-  "Cem criaturas divididas em dez áreas, da primeira presa do campo ao que mora no abismo.":
-    "A hundred creatures across ten areas, from the field's first prey to what dwells in the abyss.",
-  "O lobo que anda junto": "The wolf that walks along",
-  "Ninguém caça sozinho. Duas linhagens chegaram à matilha, cada uma do seu jeito.":
-    "No one hunts alone. Two bloodlines reached the pack, each in its own way.",
-  "Por dentro do jogo": "Inside the game",
-  "Sete telas da mesma noite, do jeito que elas aparecem no navegador.":
-    "Seven screens of the same night, the way they appear in the browser.",
-  "O que a noite pede": "What the night asks",
-  "Tudo roda sozinho enquanto você olha, e nada sobe sem você mandar.":
-    "Everything runs on its own while you watch, and nothing rises unless you say so.",
-  "Escolha um nome, escolha uma linhagem e desça. A primeira noite é a mais barata que você vai ter.":
-    "Choose a name, choose a bloodline and descend. The first night is the cheapest you will ever have.",
 
   // Statuses and shared lines
   "Segue sozinho...": "Runs on its own...",

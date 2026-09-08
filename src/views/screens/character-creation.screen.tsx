@@ -29,7 +29,7 @@ export function CharacterCreationScreen() {
 
   useEffect(() => {
     if (ready && character) router.replace("/character");
-    if (ready && !authenticated) router.replace("/login");
+    if (ready && !authenticated) router.replace("/");
   }, [ready, authenticated, character, router]);
 
   function submit(event: FormEvent) {

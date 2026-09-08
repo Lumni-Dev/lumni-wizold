@@ -49,7 +49,7 @@ export function GameFrame({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!ready || character) return;
-    router.replace(authenticated ? "/create" : "/login");
+    router.replace(authenticated ? "/create" : "/");
   }, [ready, authenticated, character, router]);
 
   useEffect(() => {

@@ -11,19 +11,6 @@ import { IconArt, IconFrame, type IconSize } from "./icon-frame";
 const PET_ART_SCALE = "scale-[1.28] origin-center";
 const PET_ART_IMAGE_CLASS = "[&_img]:origin-center [&_img]:scale-[1.28]";
 
-export function PetLandingBanner({ gender }: { gender: PetGender }) {
-  const art = useArt();
-  const source = art.pets[gender];
-
-  if (!source) return null;
-
-  return (
-    <div className="aspect-square w-full border-b border-edge p-5">
-      <ArtImage source={source} fit="contain" />
-    </div>
-  );
-}
-
 export function PetPortrait({ gender }: { gender: PetGender }) {
   const art = useArt();
   const source = art.pets[gender];

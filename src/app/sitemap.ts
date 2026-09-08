@@ -6,7 +6,6 @@ import { SITE_URL } from "@/shared/constants/site";
 const PUBLIC_ROUTES: readonly { path: string; priority: number; changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"] }[] =
   [
     { path: "", priority: 1, changeFrequency: "weekly" },
-    { path: "/login", priority: 0.7, changeFrequency: "monthly" },
     { path: "/wiki", priority: 0.9, changeFrequency: "weekly" },
     { path: "/ranking", priority: 0.9, changeFrequency: "daily" },
   ];
