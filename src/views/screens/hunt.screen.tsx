@@ -29,6 +29,7 @@ import { backgroundRepository } from "@/models/repositories/background.repositor
 import { ArtImage } from "../components/art-image";
 import { ArtVideo } from "../components/art-video";
 import { ChipTabs } from "../components/chip-tabs";
+import { HuntDuelOverlay } from "../components/hunt-duel-overlay";
 import { NarrationButton } from "../components/narration-button";
 import { CreatureArtFill } from "../components/creature-icon";
 import {
@@ -397,7 +398,7 @@ export function HuntScreen() {
               <div className="grid grid-cols-1 md:grid-cols-2 md:divide-x md:divide-edge">
                 <div className="flex flex-col divide-y divide-edge">
                   {art.territories[territory.id] ? (
-                    <div className="aspect-video w-full overflow-hidden">
+                    <div className="relative aspect-video w-full overflow-hidden">
                       {animatedArt && art.territoryVideos[territory.id] ? (
                         <ArtVideo
                           source={art.territoryVideos[territory.id]}
@@ -406,6 +407,16 @@ export function HuntScreen() {
                       ) : (
                         <ArtImage source={art.territories[territory.id]} />
                       )}
+                      {onThis && shownFoe ? (
+                        <HuntDuelOverlay
+                          gender={character.gender}
+                          foe={shownFoe}
+                          beat={progress.beat}
+                          blow={line?.blow ?? null}
+                          critical={line?.critical ?? false}
+                          fighting={replaying}
+                        />
+                      ) : null}
                     </div>
                   ) : null}
                   <div className="p-4">
