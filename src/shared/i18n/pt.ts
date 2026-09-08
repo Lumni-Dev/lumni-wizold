@@ -478,8 +478,6 @@ export const PT: Record<string, string> = {
   "Second ingredient": "Segundo ingrediente",
   "Choose a material": "Escolha um material",
   "Choose the two ingredients.": "Escolha os dois ingredientes.",
-  "Nothing in the bag serves this potion yet: the hunt drops what the cauldron asks.":
-    "Nada no alforje serve para esta poção ainda: a caça derruba o que o caldeirão pede.",
   "Brew": "Fabricar",
   "The cauldron spends the flask and the ingredients on the spot, and the potion goes straight to the bag.":
     "O caldeirão gasta o frasco e os ingredientes na hora, e a poção vai direto para o alforje.",

@@ -201,11 +201,6 @@ function RecipeCard({
                     onChange={(value) => onPick("second", value)}
                     className="w-full"
                   />
-                  {firstOptions.length === 0 && secondOptions.length === 0 ? (
-                    <p className="text-xs text-ink-faint">
-                      {t("Nothing in the bag serves this potion yet: the hunt drops what the cauldron asks.")}
-                    </p>
-                  ) : null}
                 </div>
               </CardBody>
 
