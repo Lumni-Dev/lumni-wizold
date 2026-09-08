@@ -184,6 +184,8 @@ export function ArenaScreen() {
   const autoTimerRef = useRef(0);
   const finaleTimerRef = useRef(0);
   const landedRef = useRef(false);
+  const duelRef = useRef<HTMLDivElement>(null);
+  const scrollToDuelRef = useRef(false);
   const drawRef = useRef(drawOpponent);
   const consumeRef = useRef(consumeItem);
   const notifyRef = useRef(notify);
@@ -325,6 +327,11 @@ export function ArenaScreen() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const view = useMemo(() => listArena(state, roster, search), [state, roster, search, moon]);
   useEffect(() => {
+    if (!fighting || !scrollToDuelRef.current) return;
+    scrollToDuelRef.current = false;
+    duelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [fighting]);
+  useEffect(() => {
     if (!fighting) return;
     const target = fighting.hunter.id;
     let alive = true;
@@ -427,6 +434,7 @@ export function ArenaScreen() {
   function challenge(hunter: Hunter, rival: DerivedStats) {
     if (locked || fighting) return;
     armAutomation();
+    scrollToDuelRef.current = true;
     beginDuel(hunter, rival.maxHealth);
   }
   async function challengeDrawn() {
@@ -436,6 +444,7 @@ export function ArenaScreen() {
     const hunter = roster.find((entry) => entry.id === opponent.hunterId);
     if (!hunter) return;
     armAutomation();
+    scrollToDuelRef.current = true;
     beginDuel(hunter, arenaStats(hunter).maxHealth);
   }
   const currentPage = clampPage(page, view.rivals.length, PAGE_SIZE);
@@ -531,6 +540,7 @@ export function ArenaScreen() {
       </Panel>
 
       {fighting ? (
+        <div ref={duelRef} className="scroll-mt-16">
         <Panel
           title="Duel"
           description={
@@ -546,7 +556,7 @@ export function ArenaScreen() {
           padding="none"
           className={cn(shaking && "card-shake")}
         >
-          <div className="relative aspect-video w-full overflow-hidden border-b border-edge">
+          <div className="relative aspect-[21/9] w-full overflow-hidden border-b border-edge">
             <ArtImage source={ARENA_SCENE_PATH} />
             <ArenaDuelOverlay
               gender={character.gender}
@@ -636,6 +646,7 @@ export function ArenaScreen() {
             ) : null}
           </div>
         </Panel>
+        </div>
       ) : null}
 
       {report ? <DuelReport report={report} /> : null}
