@@ -17,8 +17,8 @@ import type { Gender } from "@/models/entities/character";
 import type { Hunter } from "@/models/entities/ranking";
 import { findItem } from "@/models/data/items";
 import { ARENA_DAILY_ATTACKS, arenaCharges, arenaSpoilsRange, arenaStats } from "@/models/rules/arena";
-import { extraStrikeChance } from "@/models/rules/combat";
-import type { DerivedStats } from "@/models/rules/stats";
+import { extraStrikeChanceExact, EXTRA_STRIKE_CAP } from "@/models/rules/combat";
+import { CRITICAL_CHANCE_CAP, type DerivedStats } from "@/models/rules/stats";
 import { canPetFight, isPetActive, petLevelOf, petMaxEnergy } from "@/models/rules/pet";
 import { playSound } from "@/controllers/sound";
 import { HUNT_APPROACH_TICKS, HUNT_TICK_MS } from "@/shared/constants/game";
@@ -631,9 +631,13 @@ export function ArenaScreen() {
                         {
                           key: "extra",
                           label: "Extra strike",
-                          value: t("up to") + " " + extraStrikeChance(rival.totalAttributes.agility, 0) + "%",
+                          value:
+                            formatFraction(extraStrikeChanceExact(rival.totalAttributes.agility, 0)) +
+                            "/" +
+                            EXTRA_STRIKE_CAP +
+                            "%",
                         },
-                        { key: "critical", label: "Critical", value: rival.critical + "%" },
+                        { key: "critical", label: "Critical", value: formatFraction(rival.criticalExact) + "/" + CRITICAL_CHANCE_CAP + "%" },
                       ].map((cell) => (
                         <div key={cell.key} className="px-2 py-3 text-center">
                           <p className="truncate text-[10px] uppercase tracking-[0.16em] text-ink-faint">

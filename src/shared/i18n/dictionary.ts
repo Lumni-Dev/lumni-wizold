@@ -1557,6 +1557,8 @@ const RULES: readonly PatternRule[] = [
   { pattern: /^VIP active until (.+), not renewing\.$/, en: "VIP active until $1, not renewing.", pt: "VIP ativo até $1, sem renovar.", es: "VIP activo hasta $1, sin renovar." },
   { pattern: /^Active subscription, renews on (.+)\.$/, en: "Active subscription, renews on $1.", pt: "Assinatura ativa, renova em $1.", es: "Suscripción activa, se renueva el $1." },
   { pattern: /^Free VIP until (.+)\.$/, en: "Free VIP until $1.", pt: "VIP grátis até $1.", es: "VIP gratis hasta $1." },
+  { pattern: /^VIP is already active until (.+)\.$/, en: "VIP is already active until $1.", pt: "O VIP já está ativo até $1.", es: "El VIP ya está activo hasta $1." },
+  { pattern: /^VIP active until (.+)\.$/, en: "VIP active until $1.", pt: "VIP ativo até $1.", es: "VIP activo hasta $1." },
   { pattern: /^(.+) closed\.$/, en: "$1 closed.", pt: "$1 fechou.", es: "$1 se cerró." },
   { pattern: /^(.+) · (.+)$/, en: "$1 · $2", pt: "$1 · $2", es: "$1 · $2" },
   { pattern: /^You can pay for (.+)\.$/, en: "You can pay for $1.", pt: "Você consegue pagar por $1.", es: "Puedes pagar $1." },

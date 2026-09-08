@@ -884,6 +884,7 @@ export const PT: Record<string, string> = {
   "You have no active VIP subscription.": "Você não tem uma assinatura VIP ativa.",
   "Stripe did not confirm the cancellation. Try again.": "O Stripe não confirmou o cancelamento. Tente de novo.",
   "You already have a VIP subscription. Cancel or reactivate it in the store.": "Você já tem uma assinatura VIP. Cancele ou reative na loja.",
+  "VIP is already active.": "O VIP já está ativo.",
   "Stripe did not confirm the reactivation. Try again.": "O Stripe não confirmou a reativação. Tente de novo.",
   "The hunt continues after.": "A caça continua depois.",
   "The training continues after.": "O treino continua depois.",

@@ -11,7 +11,8 @@ import { findGender } from "@/models/entities/character";
 import type { Hunter } from "@/models/entities/ranking";
 import { findPet } from "@/models/entities/pet";
 import { restRecoveryRatio } from "@/controllers/character.controller";
-import { criticalMultiplierOf, extraStrikeChance } from "@/models/rules/combat";
+import { criticalMultiplierOf, EXTRA_STRIKE_CAP, extraStrikeChanceExact } from "@/models/rules/combat";
+import { CRITICAL_CHANCE_CAP } from "@/models/rules/stats";
 import { PET_MAX_LEVEL, REST_TICK_MS } from "@/shared/constants/game";
 import { furyPotionClock } from "../presenters/item.presenter";
 import { formatDate, formatFraction, formatNumber } from "@/shared/utils/format";
@@ -216,15 +217,19 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
               <DataRow
                 label="Extra strike (Agility)"
                 value={
-                  <>
-                    {t("up to")}{" "}
-                    {formatNumber(extraStrikeChance(stats.totalAttributes.agility, 0))}%
-                  </>
+                  formatFraction(extraStrikeChanceExact(stats.totalAttributes.agility, 0)) +
+                  "/" +
+                  EXTRA_STRIKE_CAP +
+                  "%"
                 }
               />
               <DataRow
                 label="Critical (Instinct)"
-                value={formatFraction(stats.criticalExact) + "%"}
+                value={formatFraction(stats.criticalExact) + "/" + CRITICAL_CHANCE_CAP + "%"}
+              />
+              <DataRow
+                label="Critical damage"
+                value={"×" + criticalMultiplierOf().toFixed(2)}
               />
               <DataRow label="Max health" value={formatNumber(stats.maxHealth)} />
               <DataRow
@@ -255,10 +260,6 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
               <DataRow
                 label="Fury: large potion"
                 value={furyPotionClock("large", willpower)}
-              />
-              <DataRow
-                label="Critical damage"
-                value={"×" + criticalMultiplierOf().toFixed(2)}
               />
             </List>
           </Panel>

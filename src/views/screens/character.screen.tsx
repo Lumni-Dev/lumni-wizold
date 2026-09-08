@@ -7,8 +7,8 @@ import { useT } from "@/controllers/use-locale";
 import { detailInventory } from "@/controllers/inventory.controller";
 import { profileOf } from "@/controllers/ranking.controller";
 import { restRecoveryRatio } from "@/controllers/character.controller";
-import { criticalMultiplierOf, extraStrikeChance } from "@/models/rules/combat";
-import { furyWillpowerExtraMs } from "@/models/rules/moon";
+import { criticalMultiplierOf, EXTRA_STRIKE_CAP, extraStrikeChanceExact } from "@/models/rules/combat";
+import { CRITICAL_CHANCE_CAP } from "@/models/rules/stats";
 import { REST_TICK_MS } from "@/shared/constants/game";
 import { findItem } from "@/models/data/items";
 import { EQUIPMENT_SLOTS } from "@/models/entities/item";
@@ -261,25 +261,19 @@ export function CharacterScreen() {
               <DataRow
                 label="Extra strike (Agility)"
                 value={
-                  <>
-                    {t("up to")}{" "}
-                    {formatNumber(extraStrikeChance(stats.totalAttributes.agility, 0))}%
-                  </>
+                  formatFraction(extraStrikeChanceExact(stats.totalAttributes.agility, 0)) +
+                  "/" +
+                  EXTRA_STRIKE_CAP +
+                  "%"
                 }
               />
               <DataRow
                 label="Critical (Instinct)"
-                value={formatFraction(stats.criticalExact) + "%"}
+                value={formatFraction(stats.criticalExact) + "/" + CRITICAL_CHANCE_CAP + "%"}
               />
               <DataRow
-                label="Bottled fury (Willpower)"
-                value={
-                  "+" +
-                  Math.floor(furyWillpowerExtraMs(willpower) / 60_000) +
-                  "m " +
-                  (Math.floor(furyWillpowerExtraMs(willpower) / 1000) % 60) +
-                  "s"
-                }
+                label="Critical damage"
+                value={"×" + criticalMultiplierOf().toFixed(2)}
               />
               <DataRow label="Max health" value={formatNumber(stats.maxHealth)} />
               <DataRow
@@ -310,10 +304,6 @@ export function CharacterScreen() {
               <DataRow
                 label="Fury: large potion"
                 value={furyPotionClock("large", willpower)}
-              />
-              <DataRow
-                label="Critical damage"
-                value={"×" + criticalMultiplierOf().toFixed(2)}
               />
             </List>
           </Panel>

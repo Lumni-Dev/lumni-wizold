@@ -1,5 +1,5 @@
 import { failure, success } from "@/models/entities/result";
-import { hasVipSubscription, VIP_PRICE_CENTS } from "@/models/rules/vip";
+import { hasVipSubscription, isVip, VIP_PRICE_CENTS } from "@/models/rules/vip";
 import { createSubscriptionSession } from "../../_lib/stripe";
 import { withGame } from "../../_lib/api";
 
@@ -7,6 +7,9 @@ export async function POST(request: Request) {
   return withGame(request, async (state, _body, context) => {
     if (state.character && hasVipSubscription(state.character)) {
       return failure(state, "You already have a VIP subscription. Cancel or reactivate it in the store.");
+    }
+    if (state.character && isVip(state.character, Date.now())) {
+      return failure(state, "VIP is already active.");
     }
     const origin = new URL(request.url).origin;
     try {

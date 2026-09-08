@@ -84,12 +84,16 @@ export const EXTRA_STRIKE_CAP = 12;
  * Soft absolute term (AGI still helps vs equals) plus lead over the foe;
  * both asymptote under EXTRA_STRIKE_CAP.
  */
-export function extraStrikeChance(attackerAgi: number, defenderAgi: number): number {
+export function extraStrikeChanceExact(attackerAgi: number, defenderAgi: number): number {
   const agi = Math.max(0, attackerAgi);
   const lead = Math.max(0, agi - Math.max(0, defenderAgi));
   const absolute = (3 * agi) / (agi + 400);
   const relative = (10 * lead) / (lead + 180);
-  return clamp(Math.round(absolute + relative), 0, EXTRA_STRIKE_CAP);
+  return clamp(absolute + relative, 0, EXTRA_STRIKE_CAP);
+}
+
+export function extraStrikeChance(attackerAgi: number, defenderAgi: number): number {
+  return Math.round(extraStrikeChanceExact(attackerAgi, defenderAgi));
 }
 
 const CHARACTER_HIT_VERBS = [" strikes ", " bites ", " sinks its claws into ", " batters "];

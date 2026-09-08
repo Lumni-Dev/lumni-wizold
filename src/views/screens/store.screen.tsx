@@ -18,6 +18,7 @@ import { List, ListRow, RowText } from "../components/list";
 import { Pagination } from "../components/pagination";
 import { Panel } from "../components/panel";
 import { Tag } from "../components/tag";
+import { Tooltip } from "../components/tooltip";
 import { PageHeader } from "../layout/page-header";
 
 interface HistoryEntry {
@@ -113,7 +114,7 @@ export function StoreScreen() {
                     ? "VIP active until " + formatDay(character.vipUntil ?? "") + ", not renewing."
                     : "Renews on its own every month. Cancel to stop the charge on Stripe."
                   : vip
-                    ? "Free VIP until " + formatDay(character.vipUntil ?? "") + "."
+                    ? "VIP active until " + formatDay(character.vipUntil ?? "") + "."
                     : "New hunters get " +
                       VIP_TRIAL_DAYS +
                       " days of VIP free. VIP starts as soon as the payment confirms.",
@@ -130,9 +131,17 @@ export function StoreScreen() {
                 </Button>
               )
             ) : (
-              <Button variant="primary" onClick={() => buyVip()}>
-                {t("Enable VIP for") + " " + formatReais(VIP_PRICE_CENTS) + t("/month")}
-              </Button>
+              <Tooltip
+                label={
+                  vip
+                    ? "VIP is already active until " + formatDay(character.vipUntil ?? "") + "."
+                    : undefined
+                }
+              >
+                <Button variant="primary" disabled={vip} onClick={() => buyVip()}>
+                  {t("Enable VIP for") + " " + formatReais(VIP_PRICE_CENTS) + t("/month")}
+                </Button>
+              </Tooltip>
             )}
           </div>
         }

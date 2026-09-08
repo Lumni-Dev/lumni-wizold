@@ -727,7 +727,7 @@ export function SettingsScreen() {
                         ? "VIP active until " + formatDay(character.vipUntil ?? "") + ", not renewing."
                         : subscribed
                           ? "Active subscription, renews on " + formatDay(character.vipUntil ?? "") + "."
-                          : "Free VIP until " + formatDay(character.vipUntil ?? "") + ".",
+                          : "VIP active until " + formatDay(character.vipUntil ?? "") + ".",
                     )}
                   </span>
                   <Button variant="outline" onClick={() => router.push("/store")}>

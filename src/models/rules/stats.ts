@@ -39,12 +39,18 @@ export interface DerivedStats {
   experienceNeeded: number;
 }
 
+/** Asymptotic ceiling of dodge chance (%). */
+export const DODGE_CHANCE_CAP = 35;
+
+/** Asymptotic ceiling of critical chance (%): base 5 + soft 40. */
+export const CRITICAL_CHANCE_CAP = 45;
+
 function dodgeExactOf(agility: number): number {
-  return clamp((35 * agility) / (agility + 120), 0, 35);
+  return clamp((35 * agility) / (agility + 120), 0, DODGE_CHANCE_CAP);
 }
 
 function criticalExactOf(instinct: number): number {
-  return clamp(5 + (40 * instinct) / (instinct + 250), 0, 45);
+  return clamp(5 + (40 * instinct) / (instinct + 250), 0, CRITICAL_CHANCE_CAP);
 }
 
 function dodgeOf(agility: number): number {
