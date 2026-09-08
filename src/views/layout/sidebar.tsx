@@ -45,7 +45,11 @@ function Brand({ collapsed }: { collapsed: boolean }) {
       )}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={BRAND_ICON_PATH} alt="" className="h-10 w-10 shrink-0 rounded-md" />
+      <img
+        src={BRAND_ICON_PATH}
+        alt=""
+        className={cn("shrink-0 rounded-md", collapsed ? "h-4 w-4" : "h-10 w-10")}
+      />
       {collapsed ? null : (
         <div className="min-w-0 flex-1 text-left">
           <p className="text-[10px] uppercase leading-relaxed tracking-[0.16em] text-ink-faint">
