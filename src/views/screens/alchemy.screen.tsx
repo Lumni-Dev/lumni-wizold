@@ -15,7 +15,7 @@ import { Button } from "../components/button";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { DataRow } from "../components/data-row";
-import { ItemIcon } from "../components/item-icon";
+import { ItemArtFill } from "../components/item-icon";
 import { List, ListRow, RowText } from "../components/list";
 import { summarizeEffect } from "../presenters/item.presenter";
 import { Select } from "../components/select";
@@ -167,8 +167,7 @@ function RecipeCard({
           : null;
   return (
     <Card height="fill" interactive>
-      <CardHeader>
-        <ItemIcon item={potion} />
+      <CardHeader art={<ItemArtFill item={potion} />} artSize="small">
         <RowText
           title={potion.name}
           description={

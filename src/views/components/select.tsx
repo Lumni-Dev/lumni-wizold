@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { ChevronDown } from "lucide-react";
 import { playClick } from "@/controllers/sound";
 import { useT } from "@/controllers/use-locale";
@@ -34,6 +35,32 @@ interface SelectProps {
   "aria-label"?: string;
 }
 const TYPE_RESET_MS = 800;
+const LIST_MAX_HEIGHT = 224;
+const LIST_GAP = 4;
+const LIST_EDGE = 8;
+
+interface TriggerBox {
+  left: number;
+  top: number;
+  bottom: number;
+  width: number;
+}
+
+// The list opens downward while the room below fits it, and flips above the
+// field when the field sits near the foot of the screen.
+function listPosition(box: TriggerBox): React.CSSProperties {
+  const below = window.innerHeight - box.bottom - LIST_GAP - LIST_EDGE;
+  const above = box.top - LIST_GAP - LIST_EDGE;
+  const flip = below < Math.min(LIST_MAX_HEIGHT, above);
+  return {
+    left: box.left,
+    width: box.width,
+    maxHeight: Math.max(96, Math.min(LIST_MAX_HEIGHT, flip ? above : below)),
+    ...(flip
+      ? { bottom: window.innerHeight - box.top + LIST_GAP }
+      : { top: box.bottom + LIST_GAP }),
+  };
+}
 export function Select({
   label,
   placeholder,
@@ -55,10 +82,40 @@ export function Select({
   const baseId = useId();
   const selectedIndex = options.findIndex((option) => option.value === value);
   const selected = selectedIndex >= 0 ? options[selectedIndex] : null;
+  const [box, setBox] = useState<TriggerBox | null>(null);
+  // The list is teleported to the body: a card or a panel clips its own
+  // overflow, which used to swallow the options whole. Same reason the tooltip
+  // and the art zoom ride a portal.
+  const measure = useCallback(() => {
+    const node = rootRef.current;
+    if (!node) return;
+    const rect = node.getBoundingClientRect();
+    setBox({ left: rect.left, top: rect.top, bottom: rect.bottom, width: rect.width });
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!open) return;
+    measure();
+  }, [open, measure]);
+
+  useEffect(() => {
+    if (!open) return;
+    const update = () => measure();
+    window.addEventListener("scroll", update, true);
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update, true);
+      window.removeEventListener("resize", update);
+    };
+  }, [open, measure]);
+
   useEffect(() => {
     if (!open) return;
     const close = (event: MouseEvent) => {
-      if (rootRef.current && !rootRef.current.contains(event.target as Node)) setOpen(false);
+      const target = event.target as Node;
+      if (rootRef.current?.contains(target)) return;
+      if (listRef.current?.contains(target)) return;
+      setOpen(false);
     };
     document.addEventListener("mousedown", close);
     return () => document.removeEventListener("mousedown", close);
@@ -205,40 +262,44 @@ export function Select({
           </button>
         )}
 
-        {open ? (
-          <ul
-            ref={listRef}
-            id={baseId + "-list"}
-            role="listbox"
-            className={cn(
-              "absolute inset-x-0 top-full z-40 mt-1 max-h-56 overflow-y-auto rounded-md",
-              "border border-edge " + GLASS_SECTION + " py-1",
-              "shadow-[0_24px_60px_-20px_rgba(0,0,0,0.95)]",
-            )}
-          >
-            {options.map((option, index) => (
-              <li
-                key={option.value}
-                id={baseId + "-" + index}
-                data-index={index}
-                role="option"
-                aria-selected={option.value === value}
-                onMouseEnter={() => setHighlighted(index)}
-                onMouseDown={(event) => event.preventDefault()}
-                onClick={() => pick(index)}
+        {open && box
+          ? createPortal(
+              <ul
+                ref={listRef}
+                id={baseId + "-list"}
+                role="listbox"
+                style={listPosition(box)}
                 className={cn(
-                  "flex " + CONTROL_HEIGHT + " cursor-pointer items-center px-4",
-                  "text-[10px] uppercase tracking-[0.16em] transition-colors",
-                  index === highlighted || option.value === value
-                    ? GLASS_CONTROL_ACTIVE + " text-ink"
-                    : "text-ink-soft hover:bg-surface-high/50 hover:text-ink",
+                  "fixed z-40 overflow-y-auto rounded-md",
+                  "border border-edge " + GLASS_SECTION + " py-1",
+                  "shadow-[0_24px_60px_-20px_rgba(0,0,0,0.95)]",
                 )}
               >
-                {t(option.label)}
-              </li>
-            ))}
-          </ul>
-        ) : null}
+                {options.map((option, index) => (
+                  <li
+                    key={option.value}
+                    id={baseId + "-" + index}
+                    data-index={index}
+                    role="option"
+                    aria-selected={option.value === value}
+                    onMouseEnter={() => setHighlighted(index)}
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => pick(index)}
+                    className={cn(
+                      "flex " + CONTROL_HEIGHT + " cursor-pointer items-center px-4",
+                      "text-[10px] uppercase tracking-[0.16em] transition-colors",
+                      index === highlighted || option.value === value
+                        ? GLASS_CONTROL_ACTIVE + " text-ink"
+                        : "text-ink-soft hover:bg-surface-high/50 hover:text-ink",
+                    )}
+                  >
+                    {t(option.label)}
+                  </li>
+                ))}
+              </ul>,
+              document.body,
+            )
+          : null}
       </div>
     </div>
   );
