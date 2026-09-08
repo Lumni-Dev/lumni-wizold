@@ -2,7 +2,6 @@
 
 import { useT } from "@/controllers/use-locale";
 import { COMPANY } from "@/shared/constants/company";
-import { ActionIcon } from "../components/app-icon";
 
 export function Footer({ compact = false }: { compact?: boolean }) {
   const t = useT();
@@ -23,26 +22,6 @@ export function Footer({ compact = false }: { compact?: boolean }) {
         <p className="text-[10px] text-ink-faint">
           © {year} {COMPANY.name}. {t("All rights reserved.")}
         </p>
-        <nav
-          aria-label={t("Lumni contact")}
-          className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2"
-        >
-          {COMPANY.channels.map((channel) => (
-            <a
-              key={channel.kind}
-              href={channel.href}
-              target="_blank"
-              rel="noreferrer"
-              className="group inline-flex items-center gap-2 text-[11px] text-ink-soft transition-colors hover:text-ink"
-            >
-              <ActionIcon
-                action={channel.kind}
-                className="text-ink-faint transition-colors group-hover:text-ink"
-              />
-              {channel.value}
-            </a>
-          ))}
-        </nav>
         <nav aria-label={t("Legal")} className="flex flex-wrap items-center justify-center gap-4">
           <a
             href={COMPANY.privacyUrl}
