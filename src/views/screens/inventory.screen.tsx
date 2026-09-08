@@ -186,7 +186,10 @@ export function InventoryScreen() {
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {onPage.map(({ item, quantity, enhancement }) => {
             const levelTooLow = character.level < item.minLevel;
-            const consumable = item.category === "potion" || item.category === "pet";
+            // A flask on the potion shelf that names no kind restores nothing:
+            // it is the vessel the cauldron fills, so it offers the cauldron.
+            const vessel = item.category === "potion" && item.potion === undefined;
+            const consumable = (item.category === "potion" && !vessel) || item.category === "pet";
             const sellable = !isForgeMaterial(item);
             const fragment = !sellable;
             const actions: ReactNode[] = [];
@@ -239,6 +242,19 @@ export function InventoryScreen() {
                   disabled={levelTooLow}
                 >
                   Equip
+                </Button>,
+              );
+            }
+
+            if (vessel) {
+              actions.push(
+                <Button
+                  key="brew"
+                  variant="primary"
+                  fullWidth
+                  onClick={() => router.push("/alchemy")}
+                >
+                  Brew
                 </Button>,
               );
             }
