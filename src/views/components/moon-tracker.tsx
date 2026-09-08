@@ -23,8 +23,8 @@ export function MoonTracker() {
 
   return (
     <Tooltip block label={t(moon.phase.description)}>
-      <div className="relative flex items-stretch rounded-md border border-edge bg-surface/70">
-        <span className="flex w-8 shrink-0 items-center justify-center border-r border-edge">
+      <div className="relative flex items-stretch rounded-md bg-surface/70">
+        <span className="flex w-8 shrink-0 items-center justify-center">
           <Moon aria-hidden strokeWidth={1.75} className="h-4 w-4 text-ink-soft" />
         </span>
         <div className="min-w-0 flex-1 px-3 py-2">

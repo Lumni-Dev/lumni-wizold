@@ -25,9 +25,9 @@ interface CardProps {
 }
 
 const TONES: Record<CardTone, string> = {
-  default: "border-edge " + GLASS_SECTION,
-  highlighted: "border-edge-strong " + GLASS_SECTION_STRONG,
-  empty: "border-dashed border-edge " + GLASS_SECTION,
+  default: "border-transparent " + GLASS_SECTION,
+  highlighted: "border-edge/40 " + GLASS_SECTION_STRONG,
+  empty: "border-dashed border-edge/50 " + GLASS_SECTION,
 };
 
 export function Card({
@@ -47,7 +47,7 @@ export function Card({
           "group flex h-full overflow-hidden rounded-lg border transition-colors",
           layout === "row" ? "flex-row" : "flex-col",
           TONES[tone],
-          interactive && tone === "default" && "hover:border-edge-strong",
+          interactive && tone === "default" && "hover:border-edge/35",
         )}
       >
         <CardToneContext.Provider value={tone}>
@@ -76,11 +76,10 @@ export function CardHeader({
 
   if (art) {
     return (
-      <div className={cn("flex items-stretch", tone !== "empty" && "border-b border-edge")}>
+      <div className={cn("flex items-stretch", tone !== "empty" && "bg-base/20")}>
         <span
           className={cn(
-            "flex shrink-0 items-center justify-center overflow-hidden border-r border-edge",
-            tone === "empty" && "border-dashed",
+            "flex shrink-0 items-center justify-center overflow-hidden",
             artSize === "small" ? "w-16 sm:w-20" : "w-20 sm:w-28",
             artPadding === "default" && (artSize === "small" ? "p-2" : "p-3"),
           )}
@@ -99,7 +98,7 @@ export function CardHeader({
       className={cn(
         "flex items-center gap-3 p-4",
         ICON_FRAME_INSET,
-        tone !== "empty" && "border-b border-edge",
+        tone !== "empty" && "bg-base/20",
         className,
       )}
     >
@@ -109,16 +108,8 @@ export function CardHeader({
 }
 
 export function CardArt({ children, className }: { children: ReactNode; className?: string }) {
-  const tone = useCardTone();
-
   return (
-    <div
-      className={cn(
-        "flex w-2/5 shrink-0 items-center justify-center overflow-hidden",
-        tone !== "empty" && "border-r border-edge",
-        className,
-      )}
-    >
+    <div className={cn("flex w-2/5 shrink-0 items-center justify-center overflow-hidden", className)}>
       {children}
     </div>
   );
@@ -160,7 +151,7 @@ export function CardFooter({ children, className }: { children: ReactNode; class
     <div
       className={cn(
         "mt-auto flex min-h-16 flex-wrap items-center justify-between gap-3 p-4",
-        tone === "empty" ? "border-t border-dashed border-edge" : "border-t border-edge",
+        tone === "empty" ? "bg-base/10" : "bg-base/25",
         className,
       )}
     >

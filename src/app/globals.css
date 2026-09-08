@@ -7,8 +7,8 @@
   --color-surface: #130d09;
   --color-surface-high: #1b1310;
   --color-surface-top: #231a14;
-  --color-edge: #2e2118;
-  --color-edge-strong: #47321f;
+  --color-edge: color-mix(in oklab, #2e2118 52%, transparent);
+  --color-edge-strong: color-mix(in oklab, #47321f 68%, transparent);
   --color-ink: #f0e9e2;
   --color-ink-soft: #ac9c8d;
   --color-ink-faint: #79695a;

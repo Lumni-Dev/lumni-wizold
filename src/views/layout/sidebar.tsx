@@ -26,7 +26,7 @@ function Brand() {
   return (
     <Link
       href="/character"
-      className="flex h-[74px] items-center gap-3 border-b border-edge px-3"
+      className="flex h-[74px] items-center gap-3 px-3"
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={BRAND_ICON_PATH} alt="" className="h-10 w-10 shrink-0 rounded-md" />
@@ -57,21 +57,19 @@ function NavLink({
       aria-current={active ? "page" : undefined}
       onClick={() => playSound("ui")}
       className={cn(
-        "relative flex " + CONTROL_HEIGHT + " items-center rounded-md border transition-colors",
-        active
-          ? "border-edge-strong bg-surface-high"
-          : "border-edge hover:border-edge-strong hover:bg-surface/70",
+        "relative flex " + CONTROL_HEIGHT + " items-center rounded-md border border-transparent transition-colors",
+        active ? "bg-surface-high" : "hover:bg-surface/70",
         highlighted ? "text-ember" : active ? "text-ink" : "text-ink-soft hover:text-ink",
       )}
     >
-      <span className={"flex " + CONTROL_HEIGHT + " w-8 shrink-0 items-center justify-center border-r border-edge"}>
+      <span className={"flex " + CONTROL_HEIGHT + " w-8 shrink-0 items-center justify-center"}>
         <NavIcon href={item.href} />
       </span>
       <span className="min-w-0 truncate px-3 text-[10px] uppercase tracking-[0.16em]">
         {t(item.label)}
       </span>
       {badge > 0 ? (
-        <span className="ml-auto mr-2 inline-flex h-4 min-w-4 shrink-0 items-center justify-center self-center rounded border border-ember bg-ember px-1 font-mono text-[10px] font-bold tracking-normal text-base">
+        <span className="ml-auto mr-2 inline-flex h-4 min-w-4 shrink-0 items-center justify-center self-center rounded bg-ember px-1 font-mono text-[10px] font-bold tracking-normal text-base">
           {badge > 9 ? "9+" : badge}
         </span>
       ) : null}
@@ -90,14 +88,14 @@ function TutorialButton({ active, onClick }: { active: boolean; onClick: () => v
       }}
       aria-pressed={active}
       className={cn(
-        "relative flex w-full " + CONTROL_HEIGHT + " items-center rounded-md border transition-colors",
+        "relative flex w-full " + CONTROL_HEIGHT + " items-center rounded-md border border-transparent transition-colors",
         active
-          ? "border-edge-strong bg-surface-high text-ink"
-          : "border-edge text-ink-soft hover:border-edge-strong hover:bg-surface/70 hover:text-ink",
+          ? "bg-surface-high text-ink"
+          : "text-ink-soft hover:bg-surface/70 hover:text-ink",
       )}
     >
       <span
-        className={"flex " + CONTROL_HEIGHT + " w-8 shrink-0 items-center justify-center border-r border-edge"}
+        className={"flex " + CONTROL_HEIGHT + " w-8 shrink-0 items-center justify-center"}
       >
         <NavIcon href="tutorial" />
       </span>
@@ -121,7 +119,7 @@ export function Sidebar({
   const t = useT();
 
   return (
-    <aside className="sticky top-0 hidden h-screen w-56 shrink-0 flex-col border-r border-edge bg-surface/40 backdrop-blur lg:flex">
+    <aside className="sticky top-0 hidden h-screen w-56 shrink-0 flex-col border-r border-edge/30 bg-surface/40 backdrop-blur lg:flex">
       <Brand />
 
       <nav className="flex-1 overflow-y-auto p-3" aria-label={t("Game pages")}>
@@ -141,7 +139,7 @@ export function Sidebar({
         </ul>
       </nav>
 
-      <div className="space-y-3 border-t border-edge p-3">
+      <div className="space-y-3 border-t border-edge/30 p-3">
         <MoonTracker />
         <FuryModeTracker />
         <NavLink item={STORE_LINK} active={pathname === STORE_LINK.href} highlighted />
@@ -174,7 +172,7 @@ export function MobileNavigation({
     <nav
       ref={trackRef}
       aria-label={t("Game pages")}
-      className="flex h-14 items-center gap-2 overflow-x-auto border-b border-edge bg-surface/40 px-3 backdrop-blur lg:hidden"
+      className="flex h-14 items-center gap-2 overflow-x-auto border-b border-edge/30 bg-surface/40 px-3 backdrop-blur lg:hidden"
     >
       {links.map((item) => {
         const active = pathname === item.href;

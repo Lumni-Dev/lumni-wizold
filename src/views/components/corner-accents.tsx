@@ -64,7 +64,7 @@ export function CornerAccents({
           key={key}
           aria-hidden="true"
           className={cn(
-            "pointer-events-none absolute border-ember",
+            "pointer-events-none absolute border-ember/40",
             SIZES[scale],
             spot,
             OFFSETS[inside ? "inside" : "outside"][key],

@@ -25,7 +25,7 @@ export function List({
   className?: string;
 }) {
   return (
-    <ul ref={ref} className={cn("divide-y divide-edge", className)}>
+    <ul ref={ref} className={cn("divide-y divide-edge/35", className)}>
       {children}
     </ul>
   );
@@ -35,8 +35,8 @@ type RowPadding = "text" | "art" | "none";
 type ArtSize = "default" | "compact";
 
 const ART_CELL: Record<ArtSize, string> = {
-  default: "flex aspect-square w-28 shrink-0 overflow-hidden border-r border-edge p-3",
-  compact: "flex aspect-square w-24 shrink-0 overflow-hidden border-r border-edge p-2",
+  default: "flex aspect-square w-28 shrink-0 overflow-hidden p-3",
+  compact: "flex aspect-square w-24 shrink-0 overflow-hidden p-2",
 };
 
 export function ListRow({

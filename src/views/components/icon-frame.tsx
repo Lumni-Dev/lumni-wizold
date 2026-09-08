@@ -33,9 +33,9 @@ const ICON_TEXT: Record<IconSize, string> = {
 };
 export type FrameTone = "default" | "strong" | "empty" | "glass";
 const TONES: Record<FrameTone, string> = {
-  default: "slot-well border-edge text-ink-faint",
-  strong: "slot-well-strong border-edge-strong text-ink-soft",
-  empty: "border-edge bg-surface-high text-ink-faint",
+  default: "slot-well border-transparent text-ink-faint",
+  strong: "slot-well-strong border-transparent text-ink-soft",
+  empty: "border-transparent bg-surface-high text-ink-faint",
   // No full border and no backdrop-blur: hunt duel rides transforms, so the
   // frame keeps only the corner accents and a flat glass fill.
   glass: "border-transparent bg-surface/75 text-ink-faint",
