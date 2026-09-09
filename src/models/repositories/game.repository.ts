@@ -83,6 +83,9 @@ function normalizeCharacter(character: Character): Character {
     createdAt: text(character.createdAt, new Date().toISOString()),
     renamedAt: stamp(character.renamedAt),
     furyUntil: stamp(character.furyUntil),
+    vipUntil: stamp(character.vipUntil),
+    vipSubscriptionId: stamp(character.vipSubscriptionId),
+    vipCanceling: character.vipCanceling === true ? true : undefined,
   };
 }
 function normalizePet(pet: Pet): Pet {
