@@ -238,7 +238,7 @@ export function AlchemyScreen() {
                   },
                 ].map((spend) => (
                   <div key={spend.key} className="flex items-stretch">
-                    <span className="flex w-12 shrink-0 items-center justify-center overflow-hidden border-r border-edge p-2 sm:w-16">
+                    <span className="flex w-16 shrink-0 items-center justify-center overflow-hidden border-r border-edge p-2 sm:w-20">
                       <span className="relative aspect-square w-full overflow-hidden">
                         {spend.item ? <ItemArtFill item={spend.item} /> : null}
                       </span>
