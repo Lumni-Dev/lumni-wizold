@@ -2,6 +2,7 @@ import type { Locale } from "@/shared/i18n/locale";
 import { translate } from "@/shared/i18n/dictionary";
 import { healthPerLevelFor, VITALS } from "@/shared/constants/tuning/vitals";
 import {
+  ALCHEMY_TICKS,
   ENHANCEMENT_STEP,
   FORGE_BRONZE_RATIO,
   FORGE_SUCCESS_RATIO,
@@ -56,6 +57,10 @@ import {
   ARENA_SPOILS_MIN_SHARE,
 } from "../rules/arena";
 import { MINING_MAX_LEVEL, ORES } from "./ores";
+import { ALCHEMY_MAX_LEVEL, ALCHEMY_RECIPES, SCROLL_PRICE_RATIO, scrollIdFor } from "./alchemy";
+import { alchemyNeeded } from "../rules/alchemy";
+import { findItem } from "./items";
+import { RARITY_LABEL } from "../entities/item";
 import { RANKING_BOARDS } from "../entities/ranking";
 import { BAZAAR_FEE_RATIO, BAZAAR_LISTING_HUNTS, MIN_WITHDRAW_CENTS } from "../rules/bazaar";
 import { BAZAAR_LISTING_DAYS, initialWallet } from "../entities/bazaar";
@@ -142,6 +147,55 @@ function oreLinesFor(locale: Locale): string[] {
       ore.maxYield +
       (locale === "pt" ? " por mineração." : " por minería."),
   );
+}
+
+function ritualLinesFor(locale: Locale): string[] {
+  return ALCHEMY_RECIPES.map((recipe) => {
+    const potion = findItem(recipe.potionId);
+    const scroll = findItem(scrollIdFor(recipe.potionId));
+    const name = scroll ? translate(scroll.name, locale) : recipe.potionId;
+    const makes = potion ? translate(potion.name, locale) : recipe.potionId;
+    const first = translate(RARITY_LABEL[recipe.first.rarity], locale);
+    const second = translate(RARITY_LABEL[recipe.second.rarity], locale);
+    if (locale === "pt") {
+      return (
+        name +
+        ": alquimia NV. " +
+        recipe.requiredLevel +
+        ", " +
+        recipe.first.quantity +
+        " " +
+        first +
+        "+ e " +
+        recipe.second.quantity +
+        " " +
+        second +
+        "+, paga " +
+        recipe.xp +
+        " de experiência de alquimia, faz " +
+        makes +
+        "."
+      );
+    }
+    return (
+      name +
+      ": alquimia NV. " +
+      recipe.requiredLevel +
+      ", " +
+      recipe.first.quantity +
+      " " +
+      first +
+      "+ y " +
+      recipe.second.quantity +
+      " " +
+      second +
+      "+, paga " +
+      recipe.xp +
+      " de experiencia de alquimia, hace " +
+      makes +
+      "."
+    );
+  });
 }
 
 function boardLineFor(locale: Locale): string {
@@ -367,6 +421,31 @@ function ptTopics(): readonly WikiTopic[] {
         "O teto é +" +
           MAX_ENHANCEMENT +
           ", e o nível fica com a peça: forjada na mochila, ela leva o ganho quando volta ao corpo.",
+      ],
+    },
+    {
+      id: "alchemy",
+      title: "Alquimia",
+      summary: "O caldeirão enche frascos com o que a caça deixa para trás.",
+      lines: [
+        "Cada fabricação gasta um Frasco Vazio, um pergaminho daquela poção e dois materiais DIFERENTES, e entrega uma poção. Qualquer material na raridade pedida ou acima serve, então cada banda alimenta o caldeirão com o que ela mesma derruba.",
+        "O frasco e os pergaminhos são vendidos no mercado, em Instrumentos: o frasco tem preço fixo, e um pergaminho custa " +
+          Math.round(SCROLL_PRICE_RATIO * 100) +
+          "% da poção que ele faz. Com os materiais, fabricar sai por 77% a 85% do que aquela poção custa na prateleira: econômico, nunca de graça.",
+        "O que abre um ritual é o nível de alquimia, nunca o do personagem, e o mercado não exige nível nenhum: compre o pergaminho quando quiser, quem espera é o caldeirão.",
+        ...ritualLinesFor("pt"),
+        "A escada vai de 1 a " +
+          ALCHEMY_MAX_LEVEL +
+          ", pedindo " +
+          alchemyNeeded(1) +
+          " de experiência no nível 1, " +
+          alchemyNeeded(100) +
+          " no 100 e " +
+          alchemyNeeded(1000) +
+          " no teto. É uma reta própria, não a curva do personagem: uma fabricação paga o que o ritual dela paga, então os mil níveis inteiros medem cerca de 9.100 fabricações.",
+        "O caldeirão ocupa a única vaga de trabalho, como a caça ou a bigorna: toca " +
+          ALCHEMY_TICKS +
+          " batidas e só cobra os ingredientes na última, então parar no meio da barra não custa nada e guarda a batida para a próxima vez. Com a alquimia automática ligada ele enche um frasco atrás do outro.",
       ],
     },
     {
@@ -779,6 +858,31 @@ function esTopics(): readonly WikiTopic[] {
         "El techo es +" +
           MAX_ENHANCEMENT +
           ", y el nivel se queda con la pieza: forjada en la mochila, lleva la ganancia cuando vuelve al cuerpo.",
+      ],
+    },
+    {
+      id: "alchemy",
+      title: "Alquimia",
+      summary: "El caldero llena frascos con lo que la caza deja atrás.",
+      lines: [
+        "Cada fabricación gasta un Frasco Vacío, un pergamino de esa poción y dos materiales DIFERENTES, y entrega una poción. Cualquier material en la rareza pedida o superior sirve, así que cada franja alimenta el caldero con lo que ella misma suelta.",
+        "El frasco y los pergaminos se venden en el mercado, en Instrumentos: el frasco tiene precio fijo, y un pergamino cuesta el " +
+          Math.round(SCROLL_PRICE_RATIO * 100) +
+          "% de la poción que hace. Con los materiales, fabricar sale por el 77% al 85% de lo que esa poción cuesta en el estante: económico, nunca gratis.",
+        "Lo que abre un ritual es el nivel de alquimia, nunca el del personaje, y el mercado no pide nivel alguno: compra el pergamino cuando quieras, quien espera es el caldero.",
+        ...ritualLinesFor("es"),
+        "La escalera va de 1 a " +
+          ALCHEMY_MAX_LEVEL +
+          ", pidiendo " +
+          alchemyNeeded(1) +
+          " de experiencia en el nivel 1, " +
+          alchemyNeeded(100) +
+          " en el 100 y " +
+          alchemyNeeded(1000) +
+          " en el techo. Es una recta propia, no la curva del personaje: una fabricación paga lo que paga su ritual, así que los mil niveles enteros miden cerca de 9.100 fabricaciones.",
+        "El caldero ocupa la única plaza de trabajo, como la caza o el yunque: toca " +
+          ALCHEMY_TICKS +
+          " tiempos y solo cobra los ingredientes en el último, así que parar a mitad de barra no cuesta nada y guarda el tiempo para la próxima vez. Con la alquimia automática encendida llena un frasco tras otro.",
       ],
     },
     {

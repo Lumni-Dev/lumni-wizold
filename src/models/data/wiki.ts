@@ -1,5 +1,6 @@
 import { healthPerLevelFor, VITALS } from "@/shared/constants/tuning/vitals";
 import {
+  ALCHEMY_TICKS,
   ENHANCEMENT_STEP,
   FORGE_BRONZE_RATIO,
   FORGE_SUCCESS_RATIO,
@@ -53,6 +54,10 @@ import {
   ARENA_SPOILS_MIN_SHARE,
 } from "../rules/arena";
 import { MINING_MAX_LEVEL, ORES } from "./ores";
+import { ALCHEMY_MAX_LEVEL, ALCHEMY_RECIPES, SCROLL_PRICE_RATIO, scrollIdFor } from "./alchemy";
+import { alchemyNeeded } from "../rules/alchemy";
+import { findItem } from "./items";
+import { RARITY_LABEL } from "../entities/item";
 import { RANKING_BOARDS } from "../entities/ranking";
 import { BAZAAR_FEE_RATIO, BAZAAR_LISTING_HUNTS, MIN_WITHDRAW_CENTS } from "../rules/bazaar";
 import { BAZAAR_LISTING_DAYS, initialWallet } from "../entities/bazaar";
@@ -111,6 +116,31 @@ function oreLines(): string[] {
       ore.maxYield +
       " per mining.",
   );
+}
+
+function ritualLines(): string[] {
+  return ALCHEMY_RECIPES.map((recipe) => {
+    const potion = findItem(recipe.potionId);
+    const scroll = findItem(scrollIdFor(recipe.potionId));
+    return (
+      (scroll?.name ?? recipe.potionId) +
+      ": alchemy LV. " +
+      recipe.requiredLevel +
+      ", " +
+      recipe.first.quantity +
+      " " +
+      RARITY_LABEL[recipe.first.rarity] +
+      "+ and " +
+      recipe.second.quantity +
+      " " +
+      RARITY_LABEL[recipe.second.rarity] +
+      "+, pays " +
+      recipe.xp +
+      " alchemy experience, makes " +
+      (potion?.name ?? recipe.potionId) +
+      "."
+    );
+  });
 }
 
 function boardLine(): string {
@@ -329,6 +359,31 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
       "The cap is +" +
         MAX_ENHANCEMENT +
         ", and the level stays with the piece: forged in the bag, it carries the gain when it returns to the body.",
+    ],
+  },
+  {
+    id: "alchemy",
+    title: "Alchemy",
+    summary: "The cauldron fills flasks with what the hunt leaves behind.",
+    lines: [
+      "Every brew spends one Empty Flask, one scroll of that very potion and two DIFFERENT materials, and hands over one potion. Any material at the asked rarity or above serves, so every band feeds the cauldron with its own drops.",
+      "The flask and the scrolls are sold at the market under Instruments: the flask is flat, and a scroll costs " +
+        Math.round(SCROLL_PRICE_RATIO * 100) +
+        "% of the potion it makes. With the materials, a brew lands at 77% to 85% of what that potion costs on the shelf: thrifty, never free.",
+      "What opens a ritual is alchemy level, never the character's, and the market never asks for it: buy the scroll whenever you like, the cauldron is what waits.",
+      ...ritualLines(),
+      "The ladder climbs from 1 to " +
+        ALCHEMY_MAX_LEVEL +
+        ", asking " +
+        alchemyNeeded(1) +
+        " experience at level 1, " +
+        alchemyNeeded(100) +
+        " at 100 and " +
+        alchemyNeeded(1000) +
+        " at the cap. It is a straight line of its own, not the character's curve: a brew pays what its ritual pays, so the whole thousand measures about 9.100 brews.",
+      "The cauldron takes the one job slot, like the hunt or the anvil: it plays " +
+        ALCHEMY_TICKS +
+        " beats and only calls for the ingredients on the last one, so stopping mid-bar costs nothing and keeps the beat for the next time. With automatic alchemy on it fills one flask after another.",
     ],
   },
   {
