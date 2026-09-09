@@ -15,7 +15,6 @@ import {
   type BrewPicks,
 } from "@/models/repositories/alchemy-selection.repository";
 import { ALCHEMY_TICKS } from "@/shared/constants/game";
-import { ICON_FRAME_INSET } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { formatNumber } from "@/shared/utils/format";
 import { Bar } from "../components/bar";
@@ -24,7 +23,6 @@ import { Card } from "../components/card";
 import { ItemArtFill } from "../components/item-icon";
 import { EMPTY_FLASK } from "@/models/data/consumables";
 import { ArtRowButton, List, RowText } from "../components/list";
-import { summarizeEffect } from "../presenters/item.presenter";
 import { Select } from "../components/select";
 import { PageHeader } from "../layout/page-header";
 
@@ -223,32 +221,6 @@ export function AlchemyScreen() {
                         ? "Brewing..."
                         : waitLabel || "Brew"}
                   </Button>
-                </div>
-
-                <div className="flex items-stretch">
-                  <span className="flex w-20 shrink-0 items-center justify-center overflow-hidden border-r border-edge p-3 sm:w-28">
-                    <span className="relative aspect-square w-full overflow-hidden">
-                      <ItemArtFill item={chosenRow.potion} />
-                    </span>
-                  </span>
-                  <div
-                    className={cn(
-                      "flex min-w-0 grow items-center gap-3 px-4 py-3",
-                      ICON_FRAME_INSET,
-                    )}
-                  >
-                    <RowText
-                      title={chosenRow.potion.name}
-                      description={
-                        chosenRow.unlocked
-                          ? summarizeEffect(chosenRow.potion)
-                              .map((effect) => t(effect))
-                              .join(", ")
-                          : "Requires alchemy LV. " +
-                            formatNumber(chosenRow.recipe.requiredLevel)
-                      }
-                    />
-                  </div>
                 </div>
 
                 {[
