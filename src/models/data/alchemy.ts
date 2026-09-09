@@ -1,3 +1,4 @@
+import { MAX_CHARACTER_LEVEL } from "@/shared/constants/game";
 import type { PotionKind, PotionSize, Rarity } from "../entities/item";
 
 // Alchemy turns the hunt's spoils into the market's own potions. Every brew
@@ -54,7 +55,7 @@ export const ALCHEMY_RECIPES: readonly AlchemyRecipe[] = [
     potionId: "rage-potion-small",
     kind: "rage",
     size: "small",
-    requiredLevel: 5,
+    requiredLevel: 101,
     first: { rarity: "uncommon", quantity: 4 },
     second: { rarity: "uncommon", quantity: 3 },
   },
@@ -62,7 +63,7 @@ export const ALCHEMY_RECIPES: readonly AlchemyRecipe[] = [
     potionId: "health-potion-medium",
     kind: "health",
     size: "medium",
-    requiredLevel: 15,
+    requiredLevel: 301,
     first: { rarity: "uncommon", quantity: 2 },
     second: { rarity: "uncommon", quantity: 1 },
   },
@@ -70,7 +71,7 @@ export const ALCHEMY_RECIPES: readonly AlchemyRecipe[] = [
     potionId: "rage-potion-medium",
     kind: "rage",
     size: "medium",
-    requiredLevel: 25,
+    requiredLevel: 501,
     first: { rarity: "rare", quantity: 2 },
     second: { rarity: "rare", quantity: 2 },
   },
@@ -78,7 +79,7 @@ export const ALCHEMY_RECIPES: readonly AlchemyRecipe[] = [
     potionId: "health-potion-large",
     kind: "health",
     size: "large",
-    requiredLevel: 40,
+    requiredLevel: 701,
     first: { rarity: "rare", quantity: 1 },
     second: { rarity: "rare", quantity: 1 },
   },
@@ -86,18 +87,16 @@ export const ALCHEMY_RECIPES: readonly AlchemyRecipe[] = [
     potionId: "rage-potion-large",
     kind: "rage",
     size: "large",
-    requiredLevel: 60,
+    requiredLevel: 901,
     first: { rarity: "epic", quantity: 1 },
     second: { rarity: "rare", quantity: 2 },
   },
 ];
 
-// The ceiling is the deepest ritual: past it there is nothing left to open,
-// which is why it is read off the table instead of written by hand.
-export const ALCHEMY_MAX_LEVEL = ALCHEMY_RECIPES.reduce(
-  (deepest, recipe) => Math.max(deepest, recipe.requiredLevel),
-  1,
-);
+// The cauldron climbs the whole ladder the mine climbs, and its rituals open
+// along it the way the veins do: one at the foot and the rest spread to the
+// last band, so alchemy is a run of its own, not an afternoon.
+export const ALCHEMY_MAX_LEVEL = MAX_CHARACTER_LEVEL;
 
 // Every recipe is written on a scroll the market sells, spent with the flask
 // at each brew: the ritual is the parchment, and buying it is what opens the
