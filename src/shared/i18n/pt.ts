@@ -534,6 +534,8 @@ export const PT: Record<string, string> = {
   "Activity in progress": "Atividade em andamento",
   "Maximize activity": "Maximizar atividade",
   "Minimize activity": "Minimizar atividade",
+  "Open chat": "Abrir chat",
+  "Close chat": "Fechar chat",
   "Stop activity": "Parar atividade",
   "The body rests.": "O corpo descansa.",
   "Companion - Progress": "Mascote - Progresso",

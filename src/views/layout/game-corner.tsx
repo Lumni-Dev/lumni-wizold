@@ -9,6 +9,7 @@ import { SourceIcon } from "../components/app-icon";
 import { CornerAccents } from "../components/corner-accents";
 import { PresenceDot } from "../components/presence-dot";
 import { TavernAlertDock } from "../components/tavern-alert-dock";
+import { TavernChatDock } from "../components/tavern-chat-dock";
 
 export function GameCorner() {
   const { notices, dismissNotice } = useGame();
@@ -58,6 +59,7 @@ export function GameCorner() {
         </div>
       ))}
       <TavernAlertDock />
+      <TavernChatDock />
       <ActivityDock />
     </div>
   );

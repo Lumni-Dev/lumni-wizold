@@ -55,8 +55,13 @@ export function AlchemyScreen() {
   const opting = activeId !== null && cooldown !== null;
 
   const view = listAlchemy(state);
+  // A running cauldron holds the page on what it is brewing; otherwise the
+  // player's own pick leads, and only with no pick does a paused job lead.
+  // Without that order a click on another scroll changed nothing while a brew
+  // sat paused, and the row stayed unlit.
+  const focused = activeId ?? (selected || waitingId || "");
   const chosenRow =
-    view.rows.find((row) => row.recipe.potionId === (activeId ?? waitingId ?? selected)) ??
+    view.rows.find((row) => row.recipe.potionId === focused) ??
     view.rows.find((row) => row.unlocked) ??
     view.rows[0] ??
     null;

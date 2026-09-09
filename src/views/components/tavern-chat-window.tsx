@@ -27,6 +27,8 @@ import {
   type TavernSentMap,
 } from "@/models/repositories/tavern-sent.repository";
 import { messageCooldownOf, roomTitle } from "@/models/entities/tavern";
+import { chatDockRepository } from "@/models/repositories/chat-dock.repository";
+import { ActionIcon } from "./app-icon";
 import { CornerAccents } from "./corner-accents";
 import { TavernRoomNumber } from "./tavern-room-number";
 import {
@@ -52,6 +54,11 @@ export function TavernChatWindow() {
     tavernChatStore.subscribe,
     tavernChatStore.snapshot,
     tavernChatStore.serverSnapshot,
+  );
+  const minimized = useSyncExternalStore(
+    chatDockRepository.subscribe,
+    chatDockRepository.minimized,
+    chatDockRepository.serverSnapshot,
   );
   const { state, character, notify, invite, activity } = useGame();
   const { identity, rooms, ready, activeRoom, sendMessage, announceAway } = useTavern(
@@ -211,7 +218,11 @@ export function TavernChatWindow() {
     return () => window.removeEventListener("resize", clamp);
   }, [chat.open, chat.x, chat.y]);
 
-  if (!isDesktop || !chat.open || !chat.roomId || !activeRoom || !identity) return null;
+  // Folded into the corner the window steps aside, but the seat stays taken:
+  // TavernChatDock is what holds the table while it is down there.
+  if (!isDesktop || !chat.open || !chat.roomId || !activeRoom || !identity || minimized) {
+    return null;
+  }
 
   const profileHref = (memberId: string): string | null =>
     memberId === identity.id ? "/character" : "/ranking/" + memberId;
@@ -299,6 +310,14 @@ export function TavernChatWindow() {
             <kbd className="hidden h-6 select-none items-center rounded-md border border-edge px-1.5 font-mono text-[10px] tracking-[0.1em] text-ink-faint sm:inline-flex">
               ESC
             </kbd>
+            <button
+              type="button"
+              onClick={() => chatDockRepository.setMinimized(true)}
+              aria-label={t("Minimize chat of " + roomTitle(activeRoom, true))}
+              className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-edge text-ink-faint transition-colors hover:border-edge-strong hover:text-ink"
+            >
+              <ActionIcon action="collapse" />
+            </button>
             <button
               type="button"
               onClick={closeChat}

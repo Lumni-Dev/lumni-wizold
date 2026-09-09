@@ -40,6 +40,7 @@ import { AiAuditNotice } from "../components/ai-audit-notice";
 import { Button } from "../components/button";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
 import { Chip } from "../components/chip";
+import { chatDockRepository } from "@/models/repositories/chat-dock.repository";
 import { TavernMugArt } from "../components/tavern-mug-art";
 import { TavernRoomNumber } from "../components/tavern-room-number";
 import { ConfirmDialog } from "../components/confirm-dialog";
@@ -387,6 +388,9 @@ export function TavernScreen() {
   const roomsOnPage = pageOf(filteredRooms, currentPage, PAGE_SIZE);
 
   function showChatRoom(roomId: string) {
+    // Asking for a table always brings the window back up, even if the last
+    // one was folded into the corner.
+    chatDockRepository.setMinimized(false);
     const previous = tavernChatStore.openRoom(roomId);
     if (previous) {
       markRoomRead(previous);
