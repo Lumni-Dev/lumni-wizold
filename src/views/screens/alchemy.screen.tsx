@@ -6,7 +6,6 @@ import { listAlchemy, listBrewMaterials } from "@/controllers/alchemy.controller
 import { ACTIVITY_WAIT_LABEL, useActivityLock } from "@/controllers/use-activity-lock";
 import { useVisibleActivity } from "@/controllers/use-visible-activity";
 import { useT } from "@/controllers/use-locale";
-import { RARITY_LABEL } from "@/models/entities/item";
 import {
   brewPicksServerSnapshot,
   brewPicksSnapshot,
@@ -290,7 +289,6 @@ export function AlchemyScreen() {
                         {slot.picked
                           ? formatNumber(slot.picked.owned) + " / " + slot.ingredient.quantity
                           : "x" + slot.ingredient.quantity}
-                        {" · " + t(RARITY_LABEL[slot.ingredient.rarity]) + "+"}
                       </span>
                     </div>
                     <div
