@@ -34,12 +34,15 @@ export async function GET(request: Request) {
     let automation = 0;
     if (ids.length > 0) {
       const cleared = await client.query(
+        // `arena` is the retired switch's column: nothing reads it any more,
+        // and zeroing it here clears whatever a run left behind.
         `update automation_settings
             set hunt = false,
                 arena = false,
                 train = false,
                 mine = false,
                 forge = false,
+                alchemy = false,
                 rest = false,
                 transform = false,
                 potion = false,

@@ -252,7 +252,6 @@ export async function loadGame(
     wallet: walletValue,
     automation: fillAutomation({
       hunt: automationRow.hunt,
-      arena: automationRow.arena,
       alchemy: automationRow.alchemy,
       train: automationRow.train,
       mine: automationRow.mine,
@@ -534,14 +533,16 @@ async function saveAutomation(
   after: GameState,
 ): Promise<void> {
   await client.query(
+    // The `arena` column of migration 0052 survives the switch it was made for:
+    // the pit takes no automation any more, so nothing reads or writes it.
     `insert into automation_settings
        (character_id, hunt, train, mine, forge, rest, transform, potion, pet_feed, pet_rest,
-        arena, alchemy)
-     values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+        alchemy)
+     values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
      on conflict (character_id) do update set
        hunt = $2, train = $3, mine = $4, forge = $5, rest = $6,
        transform = $7, potion = $8, pet_feed = $9, pet_rest = $10,
-       arena = $11, alchemy = $12`,
+       alchemy = $11`,
     [
       characterId,
       after.automation.hunt,
@@ -553,7 +554,6 @@ async function saveAutomation(
       after.automation.potion,
       after.automation.petFeed,
       after.automation.petRest,
-      after.automation.arena,
       after.automation.alchemy,
     ],
   );

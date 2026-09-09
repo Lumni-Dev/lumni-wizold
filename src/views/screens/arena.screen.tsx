@@ -15,8 +15,7 @@ import { ARENA_HISTORY_SIZE, type ArenaHistoryEntry } from "@/models/entities/ar
 import { ATTRIBUTES } from "@/models/entities/attribute";
 import type { Gender } from "@/models/entities/character";
 import type { Hunter } from "@/models/entities/ranking";
-import { findItem } from "@/models/data/items";
-import { ARENA_DAILY_ATTACKS, arenaCharges, arenaSpoilsRange, arenaStats } from "@/models/rules/arena";
+import { ARENA_DAILY_ATTACKS, arenaSpoilsRange, arenaStats } from "@/models/rules/arena";
 import { extraStrikeChanceExact, EXTRA_STRIKE_CAP } from "@/models/rules/combat";
 import { CRITICAL_CHANCE_CAP, DODGE_CHANCE_CAP, type DerivedStats } from "@/models/rules/stats";
 import { canPetFight, isPetActive, petLevelOf, petMaxEnergy } from "@/models/rules/pet";
@@ -148,8 +147,6 @@ export function ArenaScreen() {
     challengeArena,
     sufferBlow,
     landArena,
-    consumeItem,
-    notify,
   } = useGame();
   const { locked, reason: lockReason } = useActivityLock();
   const t = useT();
@@ -167,7 +164,6 @@ export function ArenaScreen() {
   const [myJolt, setMyJolt] = useState(0);
   const [foeJolt, setFoeJolt] = useState(0);
   const shaking = useShake(myJolt + foeJolt);
-  const [autoRunning, setAutoRunning] = useState(false);
   const beatRef = useRef(0);
   const scriptRef = useRef<NarrationLine[]>([]);
   const pendingRef = useRef<ArenaResolution | null>(null);
@@ -180,28 +176,15 @@ export function ArenaScreen() {
   const stateRef = useRef(state);
   const statsRef = useRef(stats);
   const rosterRef = useRef(roster);
-  const autoRef = useRef(false);
-  const autoTimerRef = useRef(0);
   const finaleTimerRef = useRef(0);
-  const landedRef = useRef(false);
   const duelRef = useRef<HTMLDivElement>(null);
   const scrollToDuelRef = useRef(false);
   const drawRef = useRef(drawOpponent);
-  const consumeRef = useRef(consumeItem);
-  const notifyRef = useRef(notify);
-  // The landing effect closes over an old render, so the continuation always
-  // goes through this ref to reach the freshest closure (fighting already null).
-  const continueAutoRef = useRef<() => Promise<void>>(async () => {});
   function beginDuel(hunter: Hunter, maxHealth: number) {
-    if (autoTimerRef.current) {
-      window.clearTimeout(autoTimerRef.current);
-      autoTimerRef.current = 0;
-    }
     if (finaleTimerRef.current) {
       window.clearTimeout(finaleTimerRef.current);
       finaleTimerRef.current = 0;
     }
-    landedRef.current = false;
     beatRef.current = 0;
     pendingRef.current = null;
     scriptRef.current = [];
@@ -210,26 +193,6 @@ export function ArenaScreen() {
     setReport(null);
     setPending(null);
     setFighting({ hunter, maxHealth });
-  }
-  function armAutomation() {
-    if (!state.automation.arena || autoRef.current) return;
-    autoRef.current = true;
-    setAutoRunning(true);
-  }
-  function stopAuto(message?: string) {
-    autoRef.current = false;
-    setAutoRunning(false);
-    if (autoTimerRef.current) {
-      window.clearTimeout(autoTimerRef.current);
-      autoTimerRef.current = 0;
-    }
-    // A landed duel held on screen for the automatic chain has nobody left to
-    // close it once the chain stops, so the stop is what folds the scene.
-    if (landedRef.current && !pendingRef.current) {
-      setPending(null);
-      setFighting(null);
-    }
-    if (message) notifyRef.current(message, true, "Arena");
   }
   useEffect(() => {
     characterRef.current = character;
@@ -240,62 +203,9 @@ export function ArenaScreen() {
     statsRef.current = stats;
     rosterRef.current = roster;
     drawRef.current = drawOpponent;
-    consumeRef.current = consumeItem;
-    notifyRef.current = notify;
-    // The screen owns this loop, like the old job loops did: after each landed
-    // duel it tops the body up with health potions while the bag has them,
-    // then draws the next rested rival and books again, wounded or not, until
-    // the day's attacks or the rivals run out. Descending bled is allowed on
-    // purpose: the pit opens for any living body, and losing while hurt is the
-    // realistic price. It lives here so every firing runs the freshest closure.
-    continueAutoRef.current = async () => {
-      autoTimerRef.current = 0;
-      if (!autoRef.current) return;
-      if (!stateRef.current.automation.arena) {
-        stopAuto();
-        return;
-      }
-      const charges = arenaCharges(stateRef.current.arenaDuels, Date.now());
-      if (charges.left === 0) {
-        stopAuto("The automatic arena stopped: the day's attacks are spent.");
-        return;
-      }
-      for (let guard = 0; guard < 40; guard += 1) {
-        const body = stateRef.current.character;
-        const maximum = statsRef.current?.maxHealth ?? 0;
-        if (!body || !autoRef.current) return;
-        if (body.health >= maximum) break;
-        const flask = stateRef.current.inventory
-          .filter((entry) => findItem(entry.itemId)?.potion === "health")
-          .sort(
-            (first, second) =>
-              (findItem(first.itemId)?.effect.healthMax ?? 0) -
-              (findItem(second.itemId)?.effect.healthMax ?? 0),
-          )[0];
-        if (!flask) break;
-        await consumeRef.current(flask.itemId);
-        await new Promise((resolve) => window.setTimeout(resolve, 250));
-      }
-      if (!stateRef.current.character || !autoRef.current) return;
-      const opponent = await drawRef.current();
-      if (!autoRef.current) return;
-      const hunter = opponent
-        ? rosterRef.current.find((entry) => entry.id === opponent.hunterId)
-        : undefined;
-      if (!hunter) {
-        stopAuto("The automatic arena stopped: nobody left to challenge.");
-        return;
-      }
-      beginDuel(hunter, arenaStats(hunter).maxHealth);
-    };
   });
   useEffect(() => {
-    if (locked && autoRef.current) stopAuto(lockReason || undefined);
-  }, [locked, lockReason]);
-  useEffect(() => {
     return () => {
-      autoRef.current = false;
-      if (autoTimerRef.current) window.clearTimeout(autoTimerRef.current);
       if (finaleTimerRef.current) window.clearTimeout(finaleTimerRef.current);
     };
   }, []);
@@ -399,24 +309,18 @@ export function ArenaScreen() {
         const held = pendingRef.current;
         pendingRef.current = null;
         window.clearInterval(timer);
-        landedRef.current = true;
         landRef.current();
         setReport(held);
         if (held.combat.victory) playSound("victory");
         else if (!held.combat.retreated) playSound("defeat");
         // The scene is not folded on the landing tick: `pending` stays so the
-        // finale renders and the fallen side fades out like in the hunt. The
-        // automatic chain keeps the panel up until the next rival enters it;
-        // a manual duel holds it just long enough for the fade, then closes.
-        if (autoRef.current) {
-          autoTimerRef.current = window.setTimeout(() => void continueAutoRef.current(), 3000);
-        } else {
-          finaleTimerRef.current = window.setTimeout(() => {
-            finaleTimerRef.current = 0;
-            setPending(null);
-            setFighting(null);
-          }, FINALE_HOLD_MS);
-        }
+        // finale renders and the fallen side fades out like in the hunt, then
+        // the hold closes it.
+        finaleTimerRef.current = window.setTimeout(() => {
+          finaleTimerRef.current = 0;
+          setPending(null);
+          setFighting(null);
+        }, FINALE_HOLD_MS);
       }
     }, HUNT_TICK_MS);
     return () => {
@@ -433,7 +337,6 @@ export function ArenaScreen() {
   const petAlong = canPetFight(pet) ? pet : null;
   function challenge(hunter: Hunter, rival: DerivedStats) {
     if (locked || fighting) return;
-    armAutomation();
     scrollToDuelRef.current = true;
     beginDuel(hunter, rival.maxHealth);
   }
@@ -443,7 +346,6 @@ export function ArenaScreen() {
     if (!opponent) return;
     const hunter = roster.find((entry) => entry.id === opponent.hunterId);
     if (!hunter) return;
-    armAutomation();
     scrollToDuelRef.current = true;
     beginDuel(hunter, arenaStats(hunter).maxHealth);
   }
@@ -512,21 +414,15 @@ export function ArenaScreen() {
                   "Choose an opponent from your band or draw one at random.",
               )}
             </span>
-            {autoRunning ? (
-              <Button variant="primary" onClick={() => stopAuto()}>
-                Stop
+            <Tooltip label={lockReason || view.reason}>
+              <Button
+                variant="primary"
+                disabled={!view.canFight || busy || locked}
+                onClick={challengeDrawn}
+              >
+                {busy ? "In the pit..." : waitLabel || "Find an opponent"}
               </Button>
-            ) : (
-              <Tooltip label={lockReason || view.reason}>
-                <Button
-                  variant="primary"
-                  disabled={!view.canFight || busy || locked}
-                  onClick={challengeDrawn}
-                >
-                  {busy ? "In the pit..." : waitLabel || "Find an opponent"}
-                </Button>
-              </Tooltip>
-            )}
+            </Tooltip>
           </div>
         }
       >
@@ -751,9 +647,7 @@ export function ArenaScreen() {
                       <Button
                         variant={inBand && !resting ? "primary" : "outline"}
                         fullWidth
-                        disabled={
-                          !inBand || resting || !view.canFight || busy || locked || autoRunning
-                        }
+                        disabled={!inBand || resting || !view.canFight || busy || locked}
                         onClick={() => challenge(hunter, rival)}
                       >
                         {!inBand
