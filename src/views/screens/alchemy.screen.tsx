@@ -22,7 +22,8 @@ import { formatNumber } from "@/shared/utils/format";
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
 import { Card } from "../components/card";
-import { ItemArtFill } from "../components/item-icon";
+import { ItemArtFill, ItemIcon } from "../components/item-icon";
+import { EMPTY_FLASK } from "@/models/data/consumables";
 import { ArtRowButton, List, RowText } from "../components/list";
 import { summarizeEffect } from "../presenters/item.presenter";
 import { Select } from "../components/select";
@@ -193,8 +194,9 @@ export function AlchemyScreen() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between gap-3 px-4 py-3">
-                  <span className="min-w-0 truncate text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                <div className="flex items-center gap-3 px-4 py-3">
+                  {chosenRow.scroll ? <ItemIcon item={chosenRow.scroll} size="mini" /> : null}
+                  <span className="min-w-0 flex-1 truncate text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                     {t(chosenRow.scroll?.name ?? "Scroll")}
                   </span>
                   <span className="shrink-0 font-mono text-[11px] text-ink-soft">
@@ -202,8 +204,9 @@ export function AlchemyScreen() {
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between gap-3 px-4 py-3">
-                  <span className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                <div className="flex items-center gap-3 px-4 py-3">
+                  <ItemIcon item={EMPTY_FLASK} size="mini" />
+                  <span className="min-w-0 flex-1 truncate text-[10px] uppercase tracking-[0.16em] text-ink-faint">
                     {t("Empty Flask")}
                   </span>
                   <span className="shrink-0 font-mono text-[11px] text-ink-soft">
@@ -302,7 +305,7 @@ export function AlchemyScreen() {
                       key={row.recipe.potionId}
                       divided
                       artSize="compact"
-                      art={<ItemArtFill item={row.potion} />}
+                      art={<ItemArtFill item={row.scroll ?? row.potion} />}
                       title={
                         <span className={cn(isSelected ? "text-ember" : undefined)}>
                           {t(row.scroll?.name ?? row.potion.name)}
