@@ -7,7 +7,7 @@ import {
   scrollIdFor,
   type AlchemyRecipe,
 } from "@/models/data/alchemy";
-import { alchemyEffort, alchemyNeeded, applyAlchemyProgress } from "@/models/rules/alchemy";
+import { alchemyNeeded, applyAlchemyProgress } from "@/models/rules/alchemy";
 import { findItem } from "@/models/data/items";
 import type { GameState } from "@/models/entities/game-state";
 import type { Item, Rarity } from "@/models/entities/item";
@@ -31,9 +31,6 @@ export interface AlchemyView {
   progress: number;
   needed: number;
   maxLevel: number;
-  // What one landed brew pays the ladder. It answers to the brewer's level,
-  // not to the ritual, exactly as a mining strike does.
-  effort: number;
 }
 
 export function listAlchemy(state: GameState): AlchemyView {
@@ -58,7 +55,6 @@ export function listAlchemy(state: GameState): AlchemyView {
     progress: state.alchemy.progress,
     needed: alchemyNeeded(level),
     maxLevel: ALCHEMY_MAX_LEVEL,
-    effort: alchemyEffort(level),
   };
 }
 
@@ -146,7 +142,7 @@ export function brewPotion(
   inventory = removeFromInventory(inventory, secondId, recipe.second.quantity, 0);
   inventory = addToInventory(inventory, potionId, 1, 0);
 
-  const climbed = applyAlchemyProgress(state.alchemy, alchemyEffort(state.alchemy.level));
+  const climbed = applyAlchemyProgress(state.alchemy, recipe.xp);
   const next: GameState = { ...state, inventory, alchemy: climbed.alchemy };
   const message =
     potion.name +

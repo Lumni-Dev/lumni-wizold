@@ -38,6 +38,9 @@ export interface AlchemyRecipe {
   // fury line always sits a step above its health twin: it is the flask a
   // long endgame never stops needing.
   requiredLevel: number;
+  // What one landed brew pays the ladder. A deeper ritual pays more, which is
+  // what keeps the climb even while the levels ask for more.
+  xp: number;
   first: AlchemyIngredient;
   second: AlchemyIngredient;
 }
@@ -48,7 +51,8 @@ export const ALCHEMY_RECIPES: readonly AlchemyRecipe[] = [
     kind: "health",
     size: "small",
     requiredLevel: 1,
-    first: { rarity: "common", quantity: 2 },
+    xp: 20,
+    first: { rarity: "common", quantity: 1 },
     second: { rarity: "common", quantity: 1 },
   },
   {
@@ -56,6 +60,7 @@ export const ALCHEMY_RECIPES: readonly AlchemyRecipe[] = [
     kind: "rage",
     size: "small",
     requiredLevel: 101,
+    xp: 60,
     first: { rarity: "uncommon", quantity: 4 },
     second: { rarity: "uncommon", quantity: 3 },
   },
@@ -64,6 +69,7 @@ export const ALCHEMY_RECIPES: readonly AlchemyRecipe[] = [
     kind: "health",
     size: "medium",
     requiredLevel: 301,
+    xp: 150,
     first: { rarity: "uncommon", quantity: 2 },
     second: { rarity: "uncommon", quantity: 1 },
   },
@@ -72,6 +78,7 @@ export const ALCHEMY_RECIPES: readonly AlchemyRecipe[] = [
     kind: "rage",
     size: "medium",
     requiredLevel: 501,
+    xp: 320,
     first: { rarity: "rare", quantity: 2 },
     second: { rarity: "rare", quantity: 2 },
   },
@@ -80,6 +87,7 @@ export const ALCHEMY_RECIPES: readonly AlchemyRecipe[] = [
     kind: "health",
     size: "large",
     requiredLevel: 701,
+    xp: 600,
     first: { rarity: "rare", quantity: 1 },
     second: { rarity: "rare", quantity: 1 },
   },
@@ -88,6 +96,7 @@ export const ALCHEMY_RECIPES: readonly AlchemyRecipe[] = [
     kind: "rage",
     size: "large",
     requiredLevel: 901,
+    xp: 1000,
     first: { rarity: "epic", quantity: 1 },
     second: { rarity: "rare", quantity: 2 },
   },
@@ -100,8 +109,13 @@ export const ALCHEMY_MAX_LEVEL = MAX_CHARACTER_LEVEL;
 
 // Every recipe is written on a scroll the market sells, spent with the flask
 // at each brew: the ritual is the parchment, and buying it is what opens the
-// potion to the cauldron.
-export const SCROLL_PRICE = 10;
+// potion to the cauldron. A scroll is priced off the potion it makes, a tenth
+// of the shelf, so a deeper ritual costs what it is worth and the parchment
+// follows the potion for good, instead of a flat price the last bands would
+// not feel. With the flask and the materials it leads to a brew at 77% to 85%
+// of what the same potion costs on the shelf: brewing is always the thrifty
+// path, and never a free one.
+export const SCROLL_PRICE_RATIO = 0.1;
 
 export function scrollIdFor(potionId: string): string {
   return "scroll-" + potionId;

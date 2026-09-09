@@ -1,4 +1,4 @@
-import { ALCHEMY_RECIPES, SCROLL_PRICE, scrollIdFor } from "../alchemy";
+import { ALCHEMY_RECIPES, SCROLL_PRICE_RATIO, scrollIdFor } from "../alchemy";
 import { SIZE_LABEL, type Item } from "../../entities/item";
 import { POTIONS } from "./potions";
 
@@ -16,7 +16,7 @@ export const SCROLLS: readonly Item[] = ALCHEMY_RECIPES.map((recipe) => {
       "The ritual written by a hand long gone: what goes into the cauldron, in what measure, and in what order. The parchment burns with the brew.",
     category: "tool" as const,
     rarity: "common" as const,
-    price: SCROLL_PRICE,
+    price: Math.max(1, Math.round((potion?.price ?? 100) * SCROLL_PRICE_RATIO)),
     minLevel: potion?.minLevel ?? 1,
     stackable: true,
     inMarket: true,
