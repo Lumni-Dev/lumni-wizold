@@ -44,6 +44,7 @@ export function AlchemyScreen() {
     brewPicksServerSnapshot,
   );
   const [selected, setSelected] = useState("");
+  const [flash, setFlash] = useState(0);
 
   if (!character) return null;
 
@@ -116,6 +117,7 @@ export function AlchemyScreen() {
             options: firstOptions,
             value: chosen.first,
             picked: firstPick,
+            short: !firstPick || firstShort,
           },
           {
             side: "second" as const,
@@ -124,15 +126,30 @@ export function AlchemyScreen() {
             options: secondOptions,
             value: chosen.second,
             picked: secondPick,
+            short: !secondPick || secondShort,
           },
         ];
+  // What the cauldron itself cannot give: the level, the scroll, the flask or
+  // another job holding the slot. A missing ingredient is not one of these,
+  // the button stays alive and points at the field instead.
+  const blocked =
+    !chosenRow ||
+    !chosenRow.unlocked ||
+    chosenRow.scrolls < 1 ||
+    view.flasks < 1 ||
+    locked;
+  const missingPicks = slots.some((slot) => slot.short);
 
   function toggleBrew() {
     if (running) {
       if (cooldown !== null) setActivity(null);
       return;
     }
-    if (reason !== null || locked || !chosenRow) return;
+    if (blocked || !chosenRow) return;
+    if (missingPicks) {
+      setFlash((count) => count + 1);
+      return;
+    }
     setActivity({ kind: "alchemy", id: chosenRow.recipe.potionId });
   }
 
@@ -168,6 +185,44 @@ export function AlchemyScreen() {
 
             {chosenRow ? (
               <>
+                <div className="px-4 py-3">
+                  <Bar
+                    label={running ? "Brewing..." : "Brew"}
+                    current={running && cycle ? cycle.beat : 0}
+                    maximum={ALCHEMY_TICKS}
+                    glows={running}
+                    hideValue={!running || !cycle || cycle.beat === 0}
+                    wraps
+                  />
+                </div>
+
+                <div className="flex flex-wrap items-center justify-between gap-3 p-4">
+                  <span className="min-w-[8rem] flex-1 text-[11px] text-ink-faint">
+                    {t(
+                      running
+                        ? opting
+                          ? "You can stop now or fill the next flask."
+                          : state.automation.alchemy
+                            ? "Brewing non-stop..."
+                            : "Brewing..."
+                        : waiting
+                          ? "Waiting for a flask and the ingredients"
+                          : (reason ?? "Ready to brew"),
+                    )}
+                  </span>
+                  <Button
+                    variant={running ? "secondary" : blocked ? "outline" : "primary"}
+                    onClick={toggleBrew}
+                    disabled={running ? !opting : blocked}
+                  >
+                    {opting
+                      ? "Stop (" + cooldown + ")"
+                      : running
+                        ? "Brewing..."
+                        : waitLabel || "Brew"}
+                  </Button>
+                </div>
+
                 <div className="flex items-stretch">
                   <span className="flex w-20 shrink-0 items-center justify-center overflow-hidden border-r border-edge p-3 sm:w-28">
                     <span className="relative aspect-square w-full overflow-hidden">
@@ -227,58 +282,26 @@ export function AlchemyScreen() {
                         {" · " + t(RARITY_LABEL[slot.ingredient.rarity]) + "+"}
                       </span>
                     </div>
-                    <Select
-                      aria-label={t(slot.label)}
-                      placeholder={t("Choose a material")}
-                      value={slot.value}
-                      disabled={!chosenRow.unlocked || running}
-                      options={slot.options.map((option) => ({
-                        value: option.item.id,
-                        label: t(option.item.name) + " (x" + formatNumber(option.owned) + ")",
-                      }))}
-                      onChange={(value) => setPick(slot.side, value)}
-                      className="w-full"
-                    />
+                    <div
+                      key={slot.short && flash > 0 ? "flash-" + flash : "field"}
+                      className={cn(slot.short && flash > 0 && "field-flash")}
+                    >
+                      <Select
+                        aria-label={t(slot.label)}
+                        placeholder={t("Choose a material")}
+                        value={slot.value}
+                        disabled={!chosenRow.unlocked || running}
+                        options={slot.options.map((option) => ({
+                          value: option.item.id,
+                          label: t(option.item.name) + " (x" + formatNumber(option.owned) + ")",
+                        }))}
+                        onChange={(value) => setPick(slot.side, value)}
+                        className="w-full"
+                      />
+                    </div>
                   </div>
                 ))}
 
-                <div className="px-4 py-3">
-                  <Bar
-                    label={running ? "Brewing..." : "Brew"}
-                    current={running && cycle ? cycle.beat : 0}
-                    maximum={ALCHEMY_TICKS}
-                    glows={running}
-                    hideValue={!running || !cycle || cycle.beat === 0}
-                    wraps
-                  />
-                </div>
-
-                <div className="mt-auto flex flex-wrap items-center justify-between gap-3 p-4">
-                  <span className="min-w-[8rem] flex-1 text-[11px] text-ink-faint">
-                    {t(
-                      running
-                        ? opting
-                          ? "You can stop now or fill the next flask."
-                          : state.automation.alchemy
-                            ? "Brewing non-stop..."
-                            : "Brewing..."
-                        : waiting
-                          ? "Waiting for a flask and the ingredients"
-                          : (reason ?? "Ready to brew"),
-                    )}
-                  </span>
-                  <Button
-                    variant={running ? "secondary" : reason === null ? "primary" : "outline"}
-                    onClick={toggleBrew}
-                    disabled={running ? !opting : reason !== null || locked}
-                  >
-                    {opting
-                      ? "Stop (" + cooldown + ")"
-                      : running
-                        ? "Brewing..."
-                        : waitLabel || "Brew"}
-                  </Button>
-                </div>
               </>
             ) : (
               <div className="p-4">

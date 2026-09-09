@@ -552,6 +552,25 @@ button:not(:disabled) {
   opacity: 0.92;
 }
 
+/* A field the action is waiting on answers with its own edge: the ember ring
+   pulses twice around it, which is how the cauldron points at the ingredient
+   nobody chose. */
+@keyframes field-flash {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+  30%,
+  70% {
+    box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-ember) 72%, transparent);
+  }
+}
+
+@utility field-flash {
+  border-radius: var(--radius-md);
+  animation: field-flash 620ms ease-in-out 2;
+}
+
 /* The fury row in the aside wears the ring's palette on its words instead of
    a border: the ember hot spot sweeps across the name the way it circled the
    frame, and the icon breathes between the same two stops. */
