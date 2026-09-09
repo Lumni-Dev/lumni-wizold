@@ -344,7 +344,7 @@ export function AlchemyScreen() {
                       title={row.scroll?.name ?? row.potion.name}
                       description={
                         row.unlocked
-                          ? "+" + formatNumber(row.recipe.xp) + " alchemy experience"
+                          ? "+" + formatNumber(view.effort) + " alchemy experience"
                           : "Requires alchemy LV. " + formatNumber(row.recipe.requiredLevel)
                       }
                       trailing={

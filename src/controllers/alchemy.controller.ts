@@ -7,7 +7,12 @@ import {
   scrollIdFor,
   type AlchemyRecipe,
 } from "@/models/data/alchemy";
-import { alchemyNeeded, applyAlchemyProgress, settleAlchemy } from "@/models/rules/alchemy";
+import {
+  alchemyEffort,
+  alchemyNeeded,
+  applyAlchemyProgress,
+  settleAlchemy,
+} from "@/models/rules/alchemy";
 import { findItem } from "@/models/data/items";
 import type { GameState } from "@/models/entities/game-state";
 import type { Item, Rarity } from "@/models/entities/item";
@@ -31,6 +36,9 @@ export interface AlchemyView {
   progress: number;
   needed: number;
   maxLevel: number;
+  // What one landed brew pays the ladder. It answers to the cauldron's level,
+  // exactly as a mining strike answers to the mine's.
+  effort: number;
 }
 
 // The view reads a settled ladder, so a run whose progress outgrew its level
@@ -66,6 +74,7 @@ export function listAlchemy(state: GameState): AlchemyView {
     progress: settled.progress,
     needed: alchemyNeeded(level),
     maxLevel: ALCHEMY_MAX_LEVEL,
+    effort: alchemyEffort(level),
   };
 }
 
@@ -153,7 +162,8 @@ export function brewPotion(
   inventory = removeFromInventory(inventory, secondId, recipe.second.quantity, 0);
   inventory = addToInventory(inventory, potionId, 1, 0);
 
-  const climbed = applyAlchemyProgress(state.alchemy, recipe.xp);
+  const settledLadder = settleAlchemy(state.alchemy);
+  const climbed = applyAlchemyProgress(settledLadder, alchemyEffort(settledLadder.level));
   const next: GameState = { ...state, inventory, alchemy: climbed.alchemy };
   const message =
     potion.name +

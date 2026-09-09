@@ -134,9 +134,7 @@ function ritualLines(): string[] {
       recipe.second.quantity +
       " " +
       RARITY_LABEL[recipe.second.rarity] +
-      "+, pays " +
-      recipe.xp +
-      " alchemy experience, makes " +
+      "+, makes " +
       (potion?.name ?? recipe.potionId) +
       "."
     );
@@ -372,15 +370,15 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         "% of the potion it makes. With the materials, a brew lands at 77% to 85% of what that potion costs on the shelf: thrifty, never free.",
       "What opens a ritual is alchemy level, never the character's, and the market never asks for it: buy the scroll whenever you like, the cauldron is what waits.",
       ...ritualLines(),
-      "The ladder climbs from 1 to " +
+      "Alchemy starts at 1 and goes to " +
         ALCHEMY_MAX_LEVEL +
-        ", asking " +
+        ", the same cap as the character and the mine: everything that evolves climbs the same curve. The next level asks " +
         alchemyNeeded(1) +
-        " experience at level 1, " +
+        " progress at level 1, " +
         alchemyNeeded(100) +
         " at 100 and " +
         alchemyNeeded(1000) +
-        " at the cap. It is a straight line of its own, not the character's curve: a brew pays what its ritual pays, so the whole thousand measures about 9.100 brews.",
+        " at the cap, and each landed brew pays what that level pays, exactly as a mining strike does.",
       "The cauldron takes the one job slot, like the hunt or the anvil: it plays " +
         ALCHEMY_TICKS +
         " beats and only calls for the ingredients on the last one, so stopping mid-bar costs nothing and keeps the beat for the next time. With automatic alchemy on it fills one flask after another.",

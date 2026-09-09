@@ -14,12 +14,12 @@ import type { PotionKind, PotionSize, Rarity } from "../entities/item";
 // market price of the potion, which is the reward for hunting instead of
 // paying, without ever making the shelf pointless:
 //
-//   health small   2+1 common    ~45 vs  50  (90%)
-//   health medium  2+1 uncommon  ~105 vs 150 (70%)
-//   health large   1+1 rare      ~225 vs 300 (75%)
-//   rage small     4+3 uncommon  ~225 vs 300 (75%)
-//   rage medium    2+2 rare      ~435 vs 600 (72%)
-//   rage large     1 epic + 2 rare ~605 vs 900 (67%)
+//   health small   1+1 common      40 vs  50  (80%)
+//   health medium  2+1 uncommon   120 vs 150  (80%)
+//   health large   1+1 rare       255 vs 300  (85%)
+//   rage small     4+3 uncommon   255 vs 300  (85%)
+//   rage medium    2+2 rare       495 vs 600  (82%)
+//   rage large     1 epic + 2 rare 695 vs 900  (77%)
 //
 // The fury line is the endgame sink on purpose: only the beast hunts, so the
 // rage flask is the consumable a long run never stops needing, and its large
@@ -38,9 +38,6 @@ export interface AlchemyRecipe {
   // fury line always sits a step above its health twin: it is the flask a
   // long endgame never stops needing.
   requiredLevel: number;
-  // What one landed brew pays the ladder. A deeper ritual pays more, which is
-  // what keeps the climb even while the levels ask for more.
-  xp: number;
   first: AlchemyIngredient;
   second: AlchemyIngredient;
 }
@@ -51,7 +48,6 @@ export const ALCHEMY_RECIPES: readonly AlchemyRecipe[] = [
     kind: "health",
     size: "small",
     requiredLevel: 1,
-    xp: 20,
     first: { rarity: "common", quantity: 1 },
     second: { rarity: "common", quantity: 1 },
   },
@@ -60,7 +56,6 @@ export const ALCHEMY_RECIPES: readonly AlchemyRecipe[] = [
     kind: "rage",
     size: "small",
     requiredLevel: 101,
-    xp: 60,
     first: { rarity: "uncommon", quantity: 4 },
     second: { rarity: "uncommon", quantity: 3 },
   },
@@ -69,7 +64,6 @@ export const ALCHEMY_RECIPES: readonly AlchemyRecipe[] = [
     kind: "health",
     size: "medium",
     requiredLevel: 301,
-    xp: 150,
     first: { rarity: "uncommon", quantity: 2 },
     second: { rarity: "uncommon", quantity: 1 },
   },
@@ -78,7 +72,6 @@ export const ALCHEMY_RECIPES: readonly AlchemyRecipe[] = [
     kind: "rage",
     size: "medium",
     requiredLevel: 501,
-    xp: 320,
     first: { rarity: "rare", quantity: 2 },
     second: { rarity: "rare", quantity: 2 },
   },
@@ -87,7 +80,6 @@ export const ALCHEMY_RECIPES: readonly AlchemyRecipe[] = [
     kind: "health",
     size: "large",
     requiredLevel: 701,
-    xp: 600,
     first: { rarity: "rare", quantity: 1 },
     second: { rarity: "rare", quantity: 1 },
   },
@@ -96,7 +88,6 @@ export const ALCHEMY_RECIPES: readonly AlchemyRecipe[] = [
     kind: "rage",
     size: "large",
     requiredLevel: 901,
-    xp: 1000,
     first: { rarity: "epic", quantity: 1 },
     second: { rarity: "rare", quantity: 2 },
   },

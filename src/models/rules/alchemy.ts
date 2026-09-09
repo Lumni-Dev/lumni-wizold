@@ -1,19 +1,16 @@
+import { levelRequirement, levelYield } from "@/shared/constants/tuning";
 import { ALCHEMY_MAX_LEVEL } from "../data/alchemy";
 import type { AlchemyState } from "../entities/alchemy";
 
-// The cauldron cannot borrow the hunter's curve. That one is cubic because a
-// carcass pays more every band; a brew pays what its ritual pays and nothing
-// else, so the same curve asked 3.5 million brews for the thousandth level,
-// which is 200 days of bars. The ladder is its own straight line instead:
-// what a level costs grows by a fixed step, and the rituals opening along the
-// way (20 xp at the foot, 1000 at the last) keep the climb even. Measured end
-// to end that is about 9.100 brews, some 13 hours of bars plus the hunts that
-// feed them, for a profession that spans the whole thousand.
-export const ALCHEMY_XP_BASE = 30;
-export const ALCHEMY_XP_PER_LEVEL = 4;
-
+// The cauldron climbs exactly what the mine climbs, which is the character's
+// own experience curve: everything that evolves in this game asks the same
+// ladder, and a brew pays what a level of it pays.
 export function alchemyNeeded(level: number): number {
-  return ALCHEMY_XP_BASE + ALCHEMY_XP_PER_LEVEL * level;
+  return levelRequirement(level);
+}
+
+export function alchemyEffort(level: number): number {
+  return levelYield(level);
 }
 
 export interface AlchemyOutcome {
@@ -21,9 +18,8 @@ export interface AlchemyOutcome {
   levelsGained: number;
 }
 
-// A ladder holding more progress than its level asks settles on the next read.
-// A save written under an older curve is exactly that: the bar would sit past
-// its own end (92 of 38) until the next brew happened to collect it.
+// A ladder holding more progress than its level asks settles on the next read,
+// so a save banked against another curve never leaves the bar past its own end.
 export function settleAlchemy(alchemy: AlchemyState): AlchemyState {
   return applyAlchemyProgress(alchemy, 0).alchemy;
 }

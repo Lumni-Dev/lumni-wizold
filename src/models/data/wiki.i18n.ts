@@ -170,9 +170,7 @@ function ritualLinesFor(locale: Locale): string[] {
         recipe.second.quantity +
         " " +
         second +
-        "+, paga " +
-        recipe.xp +
-        " de experiência de alquimia, faz " +
+        "+, faz " +
         makes +
         "."
       );
@@ -189,9 +187,7 @@ function ritualLinesFor(locale: Locale): string[] {
       recipe.second.quantity +
       " " +
       second +
-      "+, paga " +
-      recipe.xp +
-      " de experiencia de alquimia, hace " +
+      "+, hace " +
       makes +
       "."
     );
@@ -434,15 +430,15 @@ function ptTopics(): readonly WikiTopic[] {
           "% da poção que ele faz. Com os materiais, fabricar sai por 77% a 85% do que aquela poção custa na prateleira: econômico, nunca de graça.",
         "O que abre um ritual é o nível de alquimia, nunca o do personagem, e o mercado não exige nível nenhum: compre o pergaminho quando quiser, quem espera é o caldeirão.",
         ...ritualLinesFor("pt"),
-        "A escada vai de 1 a " +
+        "A alquimia começa em 1 e vai até " +
           ALCHEMY_MAX_LEVEL +
-          ", pedindo " +
+          ", o mesmo teto do personagem e da mina: tudo que evolui sobe a mesma curva. O próximo nível pede " +
           alchemyNeeded(1) +
-          " de experiência no nível 1, " +
+          " de progresso no nível 1, " +
           alchemyNeeded(100) +
           " no 100 e " +
           alchemyNeeded(1000) +
-          " no teto. É uma reta própria, não a curva do personagem: uma fabricação paga o que o ritual dela paga, então os mil níveis inteiros medem cerca de 9.100 fabricações.",
+          " no teto, e cada fabricação paga o que aquele nível paga, igual a uma mineração.",
         "O caldeirão ocupa a única vaga de trabalho, como a caça ou a bigorna: toca " +
           ALCHEMY_TICKS +
           " batidas e só cobra os ingredientes na última, então parar no meio da barra não custa nada e guarda a batida para a próxima vez. Com a alquimia automática ligada ele enche um frasco atrás do outro.",
@@ -871,15 +867,15 @@ function esTopics(): readonly WikiTopic[] {
           "% de la poción que hace. Con los materiales, fabricar sale por el 77% al 85% de lo que esa poción cuesta en el estante: económico, nunca gratis.",
         "Lo que abre un ritual es el nivel de alquimia, nunca el del personaje, y el mercado no pide nivel alguno: compra el pergamino cuando quieras, quien espera es el caldero.",
         ...ritualLinesFor("es"),
-        "La escalera va de 1 a " +
+        "La alquimia empieza en 1 y llega a " +
           ALCHEMY_MAX_LEVEL +
-          ", pidiendo " +
+          ", el mismo techo del personaje y de la mina: todo lo que evoluciona sube la misma curva. El siguiente nivel pide " +
           alchemyNeeded(1) +
-          " de experiencia en el nivel 1, " +
+          " de progreso en el nivel 1, " +
           alchemyNeeded(100) +
           " en el 100 y " +
           alchemyNeeded(1000) +
-          " en el techo. Es una recta propia, no la curva del personaje: una fabricación paga lo que paga su ritual, así que los mil niveles enteros miden cerca de 9.100 fabricaciones.",
+          " en el techo, y cada fabricación paga lo que paga ese nivel, igual que un minado.",
         "El caldero ocupa la única plaza de trabajo, como la caza o el yunque: toca " +
           ALCHEMY_TICKS +
           " tiempos y solo cobra los ingredientes en el último, así que parar a mitad de barra no cuesta nada y guarda el tiempo para la próxima vez. Con la alquimia automática encendida llena un frasco tras otro.",
