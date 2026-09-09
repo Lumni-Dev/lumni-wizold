@@ -7,7 +7,7 @@ import {
   scrollIdFor,
   type AlchemyRecipe,
 } from "@/models/data/alchemy";
-import { alchemyNeeded, applyAlchemyProgress } from "@/models/rules/alchemy";
+import { alchemyNeeded, applyAlchemyProgress, settleAlchemy } from "@/models/rules/alchemy";
 import { findItem } from "@/models/data/items";
 import type { GameState } from "@/models/entities/game-state";
 import type { Item, Rarity } from "@/models/entities/item";
@@ -33,8 +33,19 @@ export interface AlchemyView {
   maxLevel: number;
 }
 
+// The view reads a settled ladder, so a run whose progress outgrew its level
+// shows the level it truly stands at instead of a bar past its own end.
+export function settleAlchemyState(state: GameState): GameState {
+  const settled = settleAlchemy(state.alchemy);
+  if (settled.level === state.alchemy.level && settled.progress === state.alchemy.progress) {
+    return state;
+  }
+  return { ...state, alchemy: settled };
+}
+
 export function listAlchemy(state: GameState): AlchemyView {
-  const level = state.alchemy.level;
+  const settled = settleAlchemy(state.alchemy);
+  const level = settled.level;
   const rows: AlchemyRow[] = [];
   for (const recipe of ALCHEMY_RECIPES) {
     const potion = findItem(recipe.potionId);
@@ -52,7 +63,7 @@ export function listAlchemy(state: GameState): AlchemyView {
     rows,
     flasks: countInInventory(state.inventory, EMPTY_FLASK_ID, 0),
     level,
-    progress: state.alchemy.progress,
+    progress: settled.progress,
     needed: alchemyNeeded(level),
     maxLevel: ALCHEMY_MAX_LEVEL,
   };
@@ -115,7 +126,7 @@ export function brewPotion(
   const potion = findItem(potionId);
   if (!recipe || !potion) return failure(state, "That potion is not brewed here.");
   // The cauldron answers to its own ladder, never to the hunter's level.
-  if (state.alchemy.level < recipe.requiredLevel) {
+  if (settleAlchemy(state.alchemy).level < recipe.requiredLevel) {
     return failure(state, potion.name + " demands alchemy LV. " + recipe.requiredLevel + ".");
   }
   if (firstId === secondId) {

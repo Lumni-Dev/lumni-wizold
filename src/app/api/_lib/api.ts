@@ -6,6 +6,7 @@ import type { Result } from "@/models/entities/result";
 import type { TavernIdentity, TavernState } from "@/models/entities/tavern";
 import { isVip } from "@/models/rules/vip";
 import { syncCharacter } from "@/controllers/character.controller";
+import { settleAlchemyState } from "@/controllers/alchemy.controller";
 import { withTransaction, withReadOnly } from "@/models/repositories/server/database";
 import { loadGame, readActivity, saveGame, type LoadedGame } from "@/models/repositories/server/game.store";
 import {
@@ -199,9 +200,10 @@ export async function withGame<T>(request: Request, action: GameAction<T>): Prom
       if (!(await sessionIsLive(client, claims))) return bad("Session ended.", 401);
       const loaded = await loadGame(client, userId, request.method !== "GET");
       if (!loaded) return bad("No active character.", 404);
-      const baseline = syncCharacter(
-        loaded.state,
-      );
+      // The alchemy ladder settles here for the same reason the fury clock
+      // does: a save written under an older curve must not keep a bar past
+      // its own end until the next brew happens to collect it.
+      const baseline = settleAlchemyState(syncCharacter(loaded.state));
       const context: ApiContext = { client, userId, characterId: loaded.characterId, loaded };
       const result = await action(baseline, body, context);
       if (request.method !== "GET") {

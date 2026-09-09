@@ -21,6 +21,13 @@ export interface AlchemyOutcome {
   levelsGained: number;
 }
 
+// A ladder holding more progress than its level asks settles on the next read.
+// A save written under an older curve is exactly that: the bar would sit past
+// its own end (92 of 38) until the next brew happened to collect it.
+export function settleAlchemy(alchemy: AlchemyState): AlchemyState {
+  return applyAlchemyProgress(alchemy, 0).alchemy;
+}
+
 export function applyAlchemyProgress(alchemy: AlchemyState, gain: number): AlchemyOutcome {
   let level = alchemy.level;
   let progress = alchemy.progress + Math.max(0, Math.round(gain));
