@@ -800,7 +800,7 @@ export function TavernScreen() {
                   interactive={!full || isMember}
                   tone={isPrivate || room.ownerId === identity.id ? "highlighted" : "default"}
                 >
-                  <CardHeader art={<TavernMugArt unread={unread} seated={seatedHere} />}>
+                  <CardHeader art={<TavernMugArt unread={unread} />}>
                     <div className="min-w-0 flex-1 space-y-2">
                       <div className="flex min-w-0 items-center gap-2">
                         <TavernRoomNumber number={room.number} className="text-sm shrink-0" />

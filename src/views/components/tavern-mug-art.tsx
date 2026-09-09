@@ -1,23 +1,11 @@
 "use client";
 
 import { TAVERN_MUG_PATH } from "@/shared/constants/site";
-import { cn } from "@/shared/utils/class-names";
 import { IconArt } from "./icon-frame";
 
-export function TavernMugArt({
-  unread = 0,
-  seated = false,
-}: {
-  unread?: number;
-  seated?: boolean;
-}) {
+export function TavernMugArt({ unread = 0 }: { unread?: number }) {
   return (
-    <span
-      className={cn(
-        "relative flex h-full w-full items-center justify-center",
-        seated && "drop-shadow-[0_0_14px_rgba(224,141,53,0.5)]",
-      )}
-    >
+    <span className="relative flex h-full w-full items-center justify-center">
       <IconArt
         source={TAVERN_MUG_PATH}
         fit="contain"

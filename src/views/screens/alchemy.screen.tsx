@@ -22,7 +22,7 @@ import { formatNumber } from "@/shared/utils/format";
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
 import { Card } from "../components/card";
-import { ItemArtFill, ItemIcon } from "../components/item-icon";
+import { ItemArtFill } from "../components/item-icon";
 import { EMPTY_FLASK } from "@/models/data/consumables";
 import { ArtRowButton, List, RowText } from "../components/list";
 import { summarizeEffect } from "../presenters/item.presenter";
@@ -249,25 +249,36 @@ export function AlchemyScreen() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 px-4 py-3">
-                  {chosenRow.scroll ? <ItemIcon item={chosenRow.scroll} size="mini" /> : null}
-                  <span className="min-w-0 flex-1 truncate text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                    {t(chosenRow.scroll?.name ?? "Scroll")}
-                  </span>
-                  <span className="shrink-0 font-mono text-[11px] text-ink-soft">
-                    {formatNumber(chosenRow.scrolls) + " / 1"}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-3 px-4 py-3">
-                  <ItemIcon item={EMPTY_FLASK} size="mini" />
-                  <span className="min-w-0 flex-1 truncate text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                    {t("Empty Flask")}
-                  </span>
-                  <span className="shrink-0 font-mono text-[11px] text-ink-soft">
-                    {formatNumber(view.flasks) + " / 1"}
-                  </span>
-                </div>
+                {[
+                  {
+                    key: "scroll",
+                    item: chosenRow.scroll,
+                    label: chosenRow.scroll?.name ?? "Scroll",
+                    owned: chosenRow.scrolls,
+                  },
+                  {
+                    key: "flask",
+                    item: EMPTY_FLASK,
+                    label: "Empty Flask",
+                    owned: view.flasks,
+                  },
+                ].map((spend) => (
+                  <div key={spend.key} className="flex items-stretch">
+                    <span className="flex w-12 shrink-0 items-center justify-center overflow-hidden border-r border-edge p-2 sm:w-16">
+                      <span className="relative aspect-square w-full overflow-hidden">
+                        {spend.item ? <ItemArtFill item={spend.item} /> : null}
+                      </span>
+                    </span>
+                    <div className="flex min-w-0 grow items-center gap-3 px-4 py-3">
+                      <span className="min-w-0 flex-1 truncate text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                        {t(spend.label)}
+                      </span>
+                      <span className="shrink-0 font-mono text-[11px] text-ink-soft">
+                        {formatNumber(spend.owned) + " / 1"}
+                      </span>
+                    </div>
+                  </div>
+                ))}
 
                 {slots.map((slot) => (
                   <div key={slot.side} className="space-y-2 px-4 py-3">
