@@ -53,6 +53,7 @@ export interface ActivityRuntimeSnapshot {
   train: CycleRuntime | null;
   mine: CycleRuntime | null;
   forge: ForgeRuntime | null;
+  alchemy: CycleRuntime | null;
   lastHuntReport: HuntReport | null;
   restNextAt: number | null;
   restHealed: { amount: number; at: number } | null;
@@ -62,6 +63,7 @@ export function activityHref(kind: ActivityKind): string {
   if (kind === "hunt") return "/hunt";
   if (kind === "train") return "/training";
   if (kind === "mine" || kind === "forge") return "/forge";
+  if (kind === "alchemy") return "/alchemy";
   return "/character";
 }
 
@@ -70,6 +72,7 @@ export function activityTone(kind: ActivityKind): ActivityBarTone {
   if (kind === "train") return "ember";
   if (kind === "mine") return "ember";
   if (kind === "forge") return "ember";
+  if (kind === "alchemy") return "ember";
   return "blood";
 }
 
@@ -79,6 +82,7 @@ const EMPTY: ActivityRuntimeSnapshot = {
   train: null,
   mine: null,
   forge: null,
+  alchemy: null,
   lastHuntReport: null,
   restNextAt: null,
   restHealed: null,
@@ -107,6 +111,7 @@ export function clearActivityRuntime(): void {
     snapshot.train === null &&
     snapshot.mine === null &&
     snapshot.forge === null &&
+    snapshot.alchemy === null &&
     snapshot.lastHuntReport === null &&
     snapshot.restNextAt === null &&
     snapshot.restHealed === null

@@ -9,6 +9,7 @@ import {
   type HuntReport,
 } from "@/controllers/hunt.controller";
 import { listExercises } from "@/controllers/training.controller";
+import { loadBrewPicks } from "@/models/repositories/alchemy-selection.repository";
 import { loadHuntSelection } from "@/models/repositories/hunt-selection.repository";
 import type { Activity } from "@/models/entities/activity";
 import type { GameState } from "@/models/entities/game-state";
@@ -19,6 +20,8 @@ import { miningSwingTicks } from "@/models/rules/mining";
 import { isVip } from "@/models/rules/vip";
 import { trainingSessionTicks } from "@/models/rules/training";
 import {
+  ALCHEMY_TICKS,
+  ALCHEMY_TICK_MS,
   CYCLE_OPTOUT_SECS,
   FORGE_TICKS,
   HUNT_APPROACH_TICKS,
@@ -148,7 +151,9 @@ function restDock(activity: Activity): ActivityDockView {
           ? "back to the mine"
           : resume === "forge"
             ? "back to the forge"
-            : null;
+            : resume === "alchemy"
+              ? "back to the cauldron"
+              : null;
   const after =
     resume === "hunt"
       ? "The hunt continues after."
@@ -158,7 +163,9 @@ function restDock(activity: Activity): ActivityDockView {
           ? "The mine continues after."
           : resume === "forge"
             ? "The forge continues after."
-            : "The body rests.";
+            : resume === "alchemy"
+              ? "The cauldron continues after."
+              : "The body rests.";
   return dockOf(
     "rest",
     back ? "Recovering · " + back : "Recovering",
@@ -193,6 +200,10 @@ function placeholderDock(state: GameState, activity: Activity): ActivityDockView
       : "Piece";
     return dockOf("forge", "Forging · " + name, "Hammering under way", 0, 1, null, false);
   }
+  if (activity.kind === "alchemy") {
+    const name = activity.id ? (findItem(activity.id)?.name ?? "Potion") : "Potion";
+    return dockOf("alchemy", "Brewing · " + name, "The cauldron works", 0, 1, null, false);
+  }
   return restDock(activity);
 }
 
@@ -204,12 +215,15 @@ function pausedDock(state: GameState, activity: Activity): ActivityDockView {
         ? (findItem(activity.id)?.name ?? "Mine")
         : activity.kind === "forge" && activity.id
           ? (findForgePiece(state, activity.id, activity.enhancement ?? 0)?.item.name ?? "Piece")
-          : null;
+          : activity.kind === "alchemy" && activity.id
+            ? (findItem(activity.id)?.name ?? "Potion")
+            : null;
   const titles: Record<ActivityDockView["kind"], string> = {
     hunt: "Hunt paused",
     train: "Training paused",
     mine: "Mine paused",
     forge: "Forge paused",
+    alchemy: "Cauldron paused",
     rest: "Recovering",
   };
   const details: Record<ActivityDockView["kind"], string> = {
@@ -217,6 +231,7 @@ function pausedDock(state: GameState, activity: Activity): ActivityDockView {
     train: "Waiting for WCoins to continue",
     mine: "Waiting for resources to mine again",
     forge: "Waiting for fragments and WCoins for the next strike",
+    alchemy: "Waiting for a flask and the ingredients",
     rest: "The body rests.",
   };
   const prefix = name ? name + " · " : "";
@@ -246,6 +261,7 @@ export function ActivityEngine() {
     train,
     mine,
     enhance,
+    brewPotion,
     notify,
   } = useGame();
 
@@ -258,6 +274,7 @@ export function ActivityEngine() {
   const trainRef = useRef(train);
   const mineRef = useRef(mine);
   const enhanceRef = useRef(enhance);
+  const brewRef = useRef(brewPotion);
   const notifyRef = useRef(notify);
   const setActivityRef = useRef(setActivity);
   const syncProgressRef = useRef(syncProgress);
@@ -275,6 +292,7 @@ export function ActivityEngine() {
     trainRef.current = train;
     mineRef.current = mine;
     enhanceRef.current = enhance;
+    brewRef.current = brewPotion;
     notifyRef.current = notify;
     setActivityRef.current = setActivity;
     syncProgressRef.current = syncProgress;
@@ -885,6 +903,126 @@ export function ActivityEngine() {
     };
   }, [ready, runsEngine, activity?.kind, activity?.id, activity?.paused]);
 
+  // The cauldron runs the same resolve-at-end lap the anvil runs: the earlier
+  // beats are theatre, the last one is the single server call that spends the
+  // flask and the ingredients and mints the potion.
+  useEffect(() => {
+    if (!ready || !runsEngine) return;
+    const paused = activity?.paused === true;
+    const activePotion =
+      activity?.kind === "alchemy" && !paused && activity.id ? activity.id : null;
+
+    if (!activePotion) {
+      patchRuntime({ alchemy: null });
+      return;
+    }
+
+    let alive = true;
+    let stopBar: (() => void) | null = null;
+    let retryTimer = 0;
+    let coolTimer = 0;
+    let carry =
+      activityRef.current?.kind === "alchemy" && activityRef.current.id === activePotion
+        ? (activityRef.current.beat ?? 0)
+        : 0;
+    let beat = 0;
+
+    const push = (cooldown: number | null) => {
+      const name = findItem(activePotion)?.name ?? "Potion";
+      patchActivityRuntime({
+        alchemy: { id: activePotion, beat, max: ALCHEMY_TICKS, cooldown },
+        dock: dockOf(
+          "alchemy",
+          "Brewing · " + name,
+          "The cauldron works",
+          beat,
+          ALCHEMY_TICKS,
+          cooldown,
+        ),
+      });
+    };
+
+    const startCooldown = (left = CYCLE_OPTOUT_SECS) => {
+      const until = new Date(Date.now() + left * 1000).toISOString();
+      syncProgressRef.current({ beat: 0, cooldownUntil: until });
+      push(left);
+      if (coolTimer) window.clearInterval(coolTimer);
+      coolTimer = window.setInterval(() => {
+        const remaining = cooldownLeft({ cooldownUntil: until } as Activity);
+        if (remaining <= 0) {
+          window.clearInterval(coolTimer);
+          coolTimer = 0;
+          startBar();
+        } else {
+          push(remaining);
+        }
+      }, 250);
+    };
+
+    const startBar = () => {
+      beat = Math.min(carry, Math.max(0, ALCHEMY_TICKS - 1));
+      carry = 0;
+      syncProgressRef.current({ beat, cooldownUntil: null });
+      push(null);
+      stopBar?.();
+      stopBar = createDriftLoop({
+        periodMs: ALCHEMY_TICK_MS,
+        catchUp: false,
+        alive: () => alive,
+        ready: () => true,
+        onTick: () => {
+          beat += 1;
+          syncProgressRef.current({ beat, cooldownUntil: null });
+          push(null);
+          if (beat < ALCHEMY_TICKS) return;
+          stopBar?.();
+          stopBar = null;
+          const settle = () => {
+            const picks = loadBrewPicks()[activePotion];
+            if (!picks) {
+              setActivityRef.current(null);
+              return;
+            }
+            void brewRef.current(activePotion, picks.first, picks.second).then((landed) => {
+              if (!alive) return;
+              if (landed === "retry") {
+                retryTimer = window.setTimeout(settle, 400);
+                return;
+              }
+              beat = 0;
+              syncProgressRef.current({ beat: 0, cooldownUntil: null });
+              if (!landed) {
+                setActivityRef.current(
+                  autoRef.current.alchemy
+                    ? { kind: "alchemy", id: activePotion, paused: true }
+                    : null,
+                );
+                return;
+              }
+              if (landed.message) notifyRef.current(landed.message, true, "Alchemy");
+              if (!autoRef.current.alchemy) {
+                setActivityRef.current(null);
+                return;
+              }
+              startCooldown(CYCLE_OPTOUT_SECS);
+            });
+          };
+          settle();
+        },
+      });
+    };
+
+    const resume = cooldownLeft(activityRef.current);
+    if (resume > 0) startCooldown(resume);
+    else startBar();
+    return () => {
+      alive = false;
+      stopBar?.();
+      if (retryTimer) window.clearTimeout(retryTimer);
+      if (coolTimer) window.clearInterval(coolTimer);
+    };
+  }, [ready, runsEngine, activity?.kind, activity?.id, activity?.paused]);
+
   useEffect(() => {
     if (!ready || !runsEngine) return;
     if (!activity) {
@@ -897,6 +1035,7 @@ export function ActivityEngine() {
         train: null,
         mine: null,
         forge: null,
+        alchemy: null,
         dock: restDock(activity),
       });
       return;
@@ -907,6 +1046,7 @@ export function ActivityEngine() {
         train: null,
         mine: null,
         forge: null,
+        alchemy: null,
         dock: pausedDock(stateRef.current, activity),
       });
       return;

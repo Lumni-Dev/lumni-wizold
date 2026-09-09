@@ -126,7 +126,11 @@ interface GameContextValue {
   consumeItem: (itemId: string) => Promise<void>;
   buyItem: (itemId: string, quantity?: number) => Promise<void>;
   sellItem: (itemId: string, quantity?: number, enhancement?: number) => Promise<void>;
-  brewPotion: (potionId: string, first: string, second: string) => Promise<void>;
+  brewPotion: (
+    potionId: string,
+    first: string,
+    second: string,
+  ) => Promise<{ message: string } | "retry" | null>;
   announceListing: (
     itemId: string,
     quantity: number,
@@ -1085,9 +1089,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
         );
       },
       brewPotion: async (potionId, first, second) => {
-        await act("POST", "/api/alchemy", { potionId, first, second }, "Alchemy", () =>
-          playSound("potion"),
-        );
+        const answer = await request("POST", "/api/alchemy", { potionId, first, second });
+        if (!answer.ok) {
+          if (isTransientApiMessage(answer.message)) return "retry";
+          if (answer.message) announce(answer.message, false, "Alchemy");
+          return null;
+        }
+        playSound("potion");
+        return { message: answer.message };
       },
       announceListing: async (itemId, quantity, priceCents, enhancement = 0) => {
         const answer = await act(

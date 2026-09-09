@@ -1,20 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { useGame } from "@/controllers/game.context";
 import {
   listAlchemy,
   listBrewMaterials,
   type AlchemyRow,
 } from "@/controllers/alchemy.controller";
+import { ACTIVITY_WAIT_LABEL, useActivityLock } from "@/controllers/use-activity-lock";
+import { useVisibleActivity } from "@/controllers/use-visible-activity";
 import { useT } from "@/controllers/use-locale";
 import { RARITY_LABEL } from "@/models/entities/item";
+import {
+  brewPicksServerSnapshot,
+  brewPicksSnapshot,
+  loadBrewPicks,
+  saveBrewPicks,
+  subscribeBrewPicks,
+  type BrewPicks,
+} from "@/models/repositories/alchemy-selection.repository";
+import { ALCHEMY_TICKS } from "@/shared/constants/game";
 import { ICON_FRAME_INSET } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { formatNumber } from "@/shared/utils/format";
+import { Bar } from "../components/bar";
 import { Button } from "../components/button";
 import { Card } from "../components/card";
-import { ConfirmDialog } from "../components/confirm-dialog";
 import { ItemArtFill } from "../components/item-icon";
 import { ArtRowButton, List, RowText } from "../components/list";
 import { summarizeEffect } from "../presenters/item.presenter";
@@ -22,18 +33,7 @@ import { Select } from "../components/select";
 import { Tag } from "../components/tag";
 import { PageHeader } from "../layout/page-header";
 
-interface Picks {
-  first: string;
-  second: string;
-}
-
-interface PendingBrew {
-  row: AlchemyRow;
-  firstName: string;
-  secondName: string;
-}
-
-const EMPTY_PICKS: Picks = { first: "", second: "" };
+const EMPTY_PICKS: BrewPicks = { first: "", second: "" };
 
 function requirementLine(row: AlchemyRow, t: (text: string) => string): string {
   const { first, second } = row.recipe;
@@ -51,28 +51,44 @@ function requirementLine(row: AlchemyRow, t: (text: string) => string): string {
 }
 
 export function AlchemyScreen() {
-  const { state, character, brewPotion } = useGame();
+  const { state, character, setActivity } = useGame();
   const t = useT();
-  const [picks, setPicks] = useState<Record<string, Picks>>({});
+  const { locked } = useActivityLock();
+  const waitLabel = locked ? ACTIVITY_WAIT_LABEL : "";
+  const { activity, runtime } = useVisibleActivity();
+  const picks = useSyncExternalStore(
+    subscribeBrewPicks,
+    brewPicksSnapshot,
+    brewPicksServerSnapshot,
+  );
   const [selected, setSelected] = useState("");
-  const [pending, setPending] = useState<PendingBrew | null>(null);
 
   if (!character) return null;
 
+  const paused = activity?.paused === true;
+  const activeId = activity?.kind === "alchemy" && !paused ? (activity.id ?? null) : null;
+  const waitingId = activity?.kind === "alchemy" && paused ? (activity.id ?? null) : null;
+  const cycle = runtime.alchemy;
+  const cooldown = cycle && activeId === cycle.id ? cycle.cooldown : null;
+  const opting = activeId !== null && cooldown !== null;
+
   const view = listAlchemy(state);
   const chosenRow =
-    view.rows.find((row) => row.recipe.potionId === selected) ??
+    view.rows.find((row) => row.recipe.potionId === (activeId ?? waitingId ?? selected)) ??
     view.rows.find((row) => row.unlocked) ??
     view.rows[0] ??
     null;
   const potionId = chosenRow?.recipe.potionId ?? "";
   const chosen = picks[potionId] ?? EMPTY_PICKS;
+  const running = activeId === potionId;
+  const waiting = waitingId === potionId;
 
-  function setPick(side: keyof Picks, value: string) {
-    setPicks((current) => ({
+  function setPick(side: keyof BrewPicks, value: string) {
+    const current = loadBrewPicks();
+    saveBrewPicks({
       ...current,
       [potionId]: { ...(current[potionId] ?? EMPTY_PICKS), [side]: value },
-    }));
+    });
   }
 
   const recipe = chosenRow?.recipe ?? null;
@@ -127,6 +143,15 @@ export function AlchemyScreen() {
           },
         ];
 
+  function toggleBrew() {
+    if (running) {
+      if (cooldown !== null) setActivity(null);
+      return;
+    }
+    if (reason !== null || locked || !chosenRow) return;
+    setActivity({ kind: "alchemy", id: chosenRow.recipe.potionId });
+  }
+
   return (
     <>
       <PageHeader
@@ -135,7 +160,7 @@ export function AlchemyScreen() {
         action={<Tag tone="neutral">{"Empty flasks: " + formatNumber(view.flasks)}</Tag>}
       />
 
-      <Card height="content">
+      <Card height="content" tone={running || waiting ? "highlighted" : "default"}>
         <div className="grid grid-cols-1 md:grid-cols-2 md:divide-x md:divide-edge">
           <div className="flex flex-col divide-y divide-edge">
             {chosenRow ? (
@@ -191,7 +216,7 @@ export function AlchemyScreen() {
                       aria-label={t(slot.label)}
                       placeholder={t("Choose a material")}
                       value={slot.value}
-                      disabled={!chosenRow.unlocked}
+                      disabled={!chosenRow.unlocked || running}
                       options={slot.options.map((option) => ({
                         value: option.item.id,
                         label: t(option.item.name) + " (x" + formatNumber(option.owned) + ")",
@@ -202,23 +227,41 @@ export function AlchemyScreen() {
                   </div>
                 ))}
 
+                <div className="px-4 py-3">
+                  <Bar
+                    label={running ? "Brewing..." : "Brew"}
+                    current={running && cycle ? cycle.beat : 0}
+                    maximum={ALCHEMY_TICKS}
+                    glows={running}
+                    hideValue={!running || !cycle || cycle.beat === 0}
+                    wraps
+                  />
+                </div>
+
                 <div className="mt-auto flex flex-wrap items-center justify-between gap-3 p-4">
                   <span className="min-w-[8rem] flex-1 text-[11px] text-ink-faint">
-                    {t(reason ?? "Ready to brew")}
+                    {t(
+                      running
+                        ? opting
+                          ? "You can stop now or fill the next flask."
+                          : state.automation.alchemy
+                            ? "Brewing non-stop..."
+                            : "Brewing..."
+                        : waiting
+                          ? "Waiting for a flask and the ingredients"
+                          : (reason ?? "Ready to brew"),
+                    )}
                   </span>
                   <Button
-                    variant={reason === null ? "primary" : "outline"}
-                    disabled={reason !== null}
-                    onClick={() => {
-                      if (!chosenRow || !firstPick || !secondPick) return;
-                      setPending({
-                        row: chosenRow,
-                        firstName: firstPick.item.name,
-                        secondName: secondPick.item.name,
-                      });
-                    }}
+                    variant={running ? "secondary" : reason === null ? "primary" : "outline"}
+                    onClick={toggleBrew}
+                    disabled={running ? !opting : reason !== null || locked}
                   >
-                    Brew
+                    {opting
+                      ? "Stop (" + cooldown + ")"
+                      : running
+                        ? "Brewing..."
+                        : waitLabel || "Brew"}
                   </Button>
                 </div>
               </>
@@ -266,6 +309,7 @@ export function AlchemyScreen() {
                         </span>
                       }
                       pressed={isSelected}
+                      disabled={activeId !== null}
                       onClick={() => setSelected(row.recipe.potionId)}
                     />
                   );
@@ -275,34 +319,6 @@ export function AlchemyScreen() {
           </div>
         </div>
       </Card>
-
-      <ConfirmDialog
-        open={pending !== null}
-        title="Brew"
-        description="The cauldron spends the flask and the ingredients on the spot, and the potion goes straight to the bag."
-        detail={
-          pending
-            ? t(pending.row.potion.name) +
-              " - " +
-              t(pending.firstName) +
-              " x" +
-              pending.row.recipe.first.quantity +
-              ", " +
-              t(pending.secondName) +
-              " x" +
-              pending.row.recipe.second.quantity
-            : null
-        }
-        confirmLabel="Brew"
-        onCancel={() => setPending(null)}
-        onConfirm={() => {
-          if (!pending) return;
-          const current = pending;
-          const chosenPicks = picks[current.row.recipe.potionId] ?? EMPTY_PICKS;
-          setPending(null);
-          void brewPotion(current.row.recipe.potionId, chosenPicks.first, chosenPicks.second);
-        }}
-      />
     </>
   );
 }

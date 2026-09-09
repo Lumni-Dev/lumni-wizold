@@ -4,6 +4,7 @@ export interface Automation {
   train: boolean;
   mine: boolean;
   forge: boolean;
+  alchemy: boolean;
   rest: boolean;
   transform: boolean;
   potion: boolean;
@@ -45,6 +46,12 @@ export const AUTOMATIONS: readonly { key: AutomationKey; label: string; effect: 
       "Strikes the same piece again as soon as the fragments show up. Off, each click climbs one level and stops.",
   },
   {
+    key: "alchemy",
+    label: "Automatic alchemy",
+    effect:
+      "Brews the same potion again while the bag holds flasks and ingredients. Off, each click fills one flask and stops.",
+  },
+  {
     key: "rest",
     label: "Automatic rest",
     effect: "Lies down on its own when health hits the floor, and gets up when it fills.",
@@ -80,6 +87,7 @@ export function noAutomation(): Automation {
     train: false,
     mine: false,
     forge: false,
+    alchemy: false,
     rest: false,
     transform: false,
     potion: false,

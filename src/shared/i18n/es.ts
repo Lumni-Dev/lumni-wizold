@@ -475,6 +475,20 @@ export const ES: Record<string, string> = {
   "Clear glass and a cork stopper. On its own it holds nothing but air; over the cauldron it is the difference between a potion and a puddle.":
     "Vidrio claro y tapón de corcho. Solo no guarda más que aire; sobre el caldero es la diferencia entre una poción y un charco.",
   "Cauldron": "Caldero",
+  "Brewing": "Fabricando",
+  "Brewing...": "Fabricando...",
+  "Brewing non-stop...": "Fabricando sin parar...",
+  "The cauldron works": "El caldero trabaja",
+  "Cauldron paused": "Caldero pausado",
+  "Cauldron in progress": "Caldero en marcha",
+  "Waiting for a flask and the ingredients": "Esperando un frasco y los ingredientes",
+  "You can stop now or fill the next flask.": "Puedes parar ahora o llenar el próximo frasco.",
+  "back to the cauldron": "vuelve al caldero",
+  "The cauldron continues after.": "El caldero continúa después.",
+  "brewing": "fabricando",
+  "Automatic alchemy": "Alquimia automática",
+  "Brews the same potion again while the bag holds flasks and ingredients. Off, each click fills one flask and stops.":
+    "Fabrica la misma poción otra vez mientras la bolsa tenga frascos e ingredientes. Apagado, cada clic llena un frasco y para.",
   "Choose a potion under Recipes and it goes on the fire. Pick two different ingredients from the bag: any material at the asked rarity or above serves.":
     "Elige una poción en Recetas y va al fuego. Elige dos ingredientes diferentes de la bolsa: cualquier material en la rareza pedida o superior sirve.",
   "Recipes": "Recetas",

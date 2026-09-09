@@ -75,6 +75,11 @@ export const MINING_RESET_HOUR_UTC = 9;
 export const FORGE_TICKS = 5;
 export const FORGE_BASE_MS = 5000;
 export const FORGE_MS_PER_LEVEL = 10;
+// The cauldron takes its own honest lap, the floor the server holds a landing
+// against, the same way the anvil holds FORGE_BASE_MS.
+export const ALCHEMY_TICKS = 5;
+export const ALCHEMY_TICK_MS = 1000;
+export const ALCHEMY_CYCLE_MS = ALCHEMY_TICKS * ALCHEMY_TICK_MS;
 export const ACTIVITY_BEAT_MAX =
-  256 + TRAINING_TICKS_MAX + MINING_TICKS_MAX + FORGE_TICKS + 8;
+  256 + TRAINING_TICKS_MAX + MINING_TICKS_MAX + FORGE_TICKS + ALCHEMY_TICKS + 8;
 export const ACTIVITY_LAPS_MAX = TRAINING_TICKS_MAX;

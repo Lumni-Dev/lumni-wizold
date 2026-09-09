@@ -1,4 +1,4 @@
-export type ActivityKind = "hunt" | "train" | "mine" | "forge" | "rest";
+export type ActivityKind = "hunt" | "train" | "mine" | "forge" | "alchemy" | "rest";
 
 export interface Activity {
   kind: ActivityKind;
@@ -11,7 +11,14 @@ export interface Activity {
   cooldownUntil?: string;
 }
 
-export const ACTIVITY_KINDS: readonly ActivityKind[] = ["hunt", "train", "mine", "forge", "rest"];
+export const ACTIVITY_KINDS: readonly ActivityKind[] = [
+  "hunt",
+  "train",
+  "mine",
+  "forge",
+  "alchemy",
+  "rest",
+];
 const KINDS: readonly string[] = ACTIVITY_KINDS;
 
 export type WorkActivityKind = Exclude<ActivityKind, "rest">;
@@ -21,12 +28,19 @@ export const WORK_ACTIVITY_LABELS: Record<WorkActivityKind, string> = {
   train: "Training in progress",
   mine: "Mining in progress",
   forge: "Forge in progress",
+  alchemy: "Cauldron in progress",
 };
 
 // Rest may be interrupted by the next job; hunt/train/mine/forge own the body
 // until the hunter stops them. Only one of those may run at a time.
 export function isWorkActivity(kind: string | null | undefined): kind is WorkActivityKind {
-  return kind === "hunt" || kind === "train" || kind === "mine" || kind === "forge";
+  return (
+    kind === "hunt" ||
+    kind === "train" ||
+    kind === "mine" ||
+    kind === "forge" ||
+    kind === "alchemy"
+  );
 }
 
 export function workActivityBlockReason(activity: Activity | null | undefined): string | null {
@@ -43,6 +57,7 @@ export const DOING_VERBS: Record<HunterDoing, string> = {
   train: "training",
   mine: "mining",
   forge: "forging",
+  alchemy: "brewing",
   rest: "resting",
   idle: "idle",
 };
