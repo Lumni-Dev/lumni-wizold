@@ -491,10 +491,12 @@ export const PT: Record<string, string> = {
     "Fabrica a mesma poção de novo enquanto o alforje tiver frascos e ingredientes. Desligado, cada clique enche um frasco e para.",
   "Choose a potion under Recipes and it goes on the fire. Pick two different ingredients from the bag: any material at the asked rarity or above serves.":
     "Escolha uma poção em Receitas e ela vai ao fogo. Escolha dois ingredientes diferentes do alforje: qualquer material na raridade pedida ou acima serve.",
+  "Choose a potion beside and it goes on the fire. Every brew burns its scroll and a flask, and each landed potion climbs the cauldron's own ladder.":
+    "Escolha uma poção ao lado e ela vai ao fogo. Cada fabricação queima o pergaminho dela e um frasco, e cada poção pronta sobe a escada do próprio caldeirão.",
+  "What the cauldron can fill, each opened by its own level, and the scroll it burns is named beside.":
+    "O que o caldeirão pode encher, cada uma aberta pelo nível dele, e o pergaminho que ela queima é nomeado ao lado.",
   "Recipes": "Receitas",
   "Scrolls": "Pergaminhos",
-  "Choose a scroll beside and it goes on the fire. Every brew burns the scroll and a flask, and each landed potion climbs the cauldron's own ladder.":
-    "Escolha um pergaminho ao lado e ele vai ao fogo. Cada fabricação queima o pergaminho e um frasco, e cada poção pronta sobe a escada do próprio caldeirão.",
   "The rituals the market sells, each opened by the cauldron's level and burned when it works.":
     "Os rituais que o mercado vende, cada um aberto pelo nível do caldeirão e queimado quando ele trabalha.",
   "The flask and the scrolls the cauldron spends, all sold at the market.":

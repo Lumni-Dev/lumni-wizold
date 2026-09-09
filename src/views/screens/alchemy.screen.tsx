@@ -168,7 +168,7 @@ export function AlchemyScreen() {
               <h2 className="heading text-[11px] text-ink">{t("Cauldron")}</h2>
               <p className="text-xs text-ink-faint">
                 {t(
-                  "Choose a scroll beside and it goes on the fire. Every brew burns the scroll and a flask, and each landed potion climbs the cauldron's own ladder.",
+                  "Choose a potion beside and it goes on the fire. Every brew burns its scroll and a flask, and each landed potion climbs the cauldron's own ladder.",
                 )}
               </p>
             </div>
@@ -296,10 +296,10 @@ export function AlchemyScreen() {
 
           <div className="flex flex-col border-t border-edge md:border-t-0">
             <div className="space-y-1 px-4 py-3">
-              <h2 className="heading text-[11px] text-ink">{t("Scrolls")}</h2>
+              <h2 className="heading text-[11px] text-ink">{t("Potions")}</h2>
               <p className="text-xs text-ink-faint">
                 {t(
-                  "The rituals the market sells, each opened by the cauldron's level and burned when it works.",
+                  "What the cauldron can fill, each opened by its own level, and the scroll it burns is named beside.",
                 )}
               </p>
             </div>
@@ -312,29 +312,24 @@ export function AlchemyScreen() {
                       key={row.recipe.potionId}
                       divided
                       artSize="compact"
-                      art={<ItemArtFill item={row.scroll ?? row.potion} />}
-                      title={row.scroll?.name ?? row.potion.name}
+                      art={<ItemArtFill item={row.potion} />}
+                      title={row.potion.name}
                       description={
                         row.unlocked
                           ? "+" + formatNumber(view.effort) + " alchemy experience"
                           : "Requires alchemy LV. " + formatNumber(row.recipe.requiredLevel)
                       }
                       trailing={
-                        <>
-                          <span className="shrink-0 self-center font-mono text-[11px] text-ink-faint">
-                            x{formatNumber(row.scrolls)}
-                          </span>
-                          <span
-                            className={cn(
-                              "grid h-4 w-4 shrink-0 place-items-center self-center rounded-full border",
-                              isSelected ? "border-ember" : "border-edge-strong",
-                            )}
-                          >
-                            {isSelected ? (
-                              <span className="h-2 w-2 rounded-full bg-ember" />
-                            ) : null}
-                          </span>
-                        </>
+                        <span
+                          className={cn(
+                            "grid h-4 w-4 shrink-0 place-items-center self-center rounded-full border",
+                            isSelected ? "border-ember" : "border-edge-strong",
+                          )}
+                        >
+                          {isSelected ? (
+                            <span className="h-2 w-2 rounded-full bg-ember" />
+                          ) : null}
+                        </span>
                       }
                       pressed={isSelected}
                       disabled={!row.unlocked || activeId !== null}
