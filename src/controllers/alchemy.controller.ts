@@ -31,6 +31,9 @@ export interface AlchemyView {
   progress: number;
   needed: number;
   maxLevel: number;
+  // What one landed brew pays the ladder. It answers to the brewer's level,
+  // not to the ritual, exactly as a mining strike does.
+  effort: number;
 }
 
 export function listAlchemy(state: GameState): AlchemyView {
@@ -55,6 +58,7 @@ export function listAlchemy(state: GameState): AlchemyView {
     progress: state.alchemy.progress,
     needed: alchemyNeeded(level),
     maxLevel: ALCHEMY_MAX_LEVEL,
+    effort: alchemyEffort(level),
   };
 }
 

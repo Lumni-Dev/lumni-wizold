@@ -1374,6 +1374,12 @@ const RULES: readonly PatternRule[] = [
   { pattern: /^Only (Lumni|Luna)$/, en: "Only $1", pt: "Apenas $1", es: "Solo $1" },
   { pattern: /^Requires LV\. (\d+)$/, en: "Requires LV. $1", pt: "Requer NV. $1", es: "Requiere NV. $1" },
   {
+    pattern: /^\+(.+) alchemy experience$/,
+    en: "+$1 alchemy experience",
+    pt: "+$1 de experiência de alquimia",
+    es: "+$1 de experiencia de alquimia",
+  },
+  {
     pattern: /^Requires alchemy LV\. (\d+)$/,
     en: "Requires alchemy LV. $1",
     pt: "Requer alquimia NV. $1",
