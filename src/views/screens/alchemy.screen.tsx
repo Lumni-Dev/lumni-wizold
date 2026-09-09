@@ -2,11 +2,7 @@
 
 import { useState, useSyncExternalStore } from "react";
 import { useGame } from "@/controllers/game.context";
-import {
-  listAlchemy,
-  listBrewMaterials,
-  type AlchemyRow,
-} from "@/controllers/alchemy.controller";
+import { listAlchemy, listBrewMaterials } from "@/controllers/alchemy.controller";
 import { ACTIVITY_WAIT_LABEL, useActivityLock } from "@/controllers/use-activity-lock";
 import { useVisibleActivity } from "@/controllers/use-visible-activity";
 import { useT } from "@/controllers/use-locale";
@@ -34,21 +30,6 @@ import { Tag } from "../components/tag";
 import { PageHeader } from "../layout/page-header";
 
 const EMPTY_PICKS: BrewPicks = { first: "", second: "" };
-
-function requirementLine(row: AlchemyRow, t: (text: string) => string): string {
-  const { first, second } = row.recipe;
-  return (
-    "x" +
-    first.quantity +
-    " " +
-    t(RARITY_LABEL[first.rarity]) +
-    "+ · x" +
-    second.quantity +
-    " " +
-    t(RARITY_LABEL[second.rarity]) +
-    "+"
-  );
-}
 
 export function AlchemyScreen() {
   const { state, character, setActivity } = useGame();
@@ -306,7 +287,7 @@ export function AlchemyScreen() {
                       }
                       description={
                         row.unlocked
-                          ? requirementLine(row, t)
+                          ? undefined
                           : "Requires LV. " + formatNumber(row.potion.minLevel)
                       }
                       trailing={
