@@ -974,7 +974,10 @@ export function ActivityEngine() {
           beat += 1;
           syncProgressRef.current({ beat, cooldownUntil: null });
           push(null);
-          if (beat < ALCHEMY_TICKS) return;
+          if (beat < ALCHEMY_TICKS) {
+            playSound("brew");
+            return;
+          }
           stopBar?.();
           stopBar = null;
           const settle = () => {

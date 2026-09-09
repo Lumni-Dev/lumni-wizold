@@ -24,6 +24,7 @@ const SOURCES = {
   mine: "/assets/sounds/craft/mine.wav",
   vein: "/assets/sounds/craft/vein.mp3",
   potion: "/assets/sounds/craft/potion.mp3",
+  brew: "/assets/sounds/craft/brew.mp3",
   equip: "/assets/sounds/craft/equip.mp3",
   discard: "/assets/sounds/craft/discard.mp3",
   buy: "/assets/sounds/craft/buy.ogg",

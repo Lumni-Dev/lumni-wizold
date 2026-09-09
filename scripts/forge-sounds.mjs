@@ -202,6 +202,7 @@ const FOLDERS = {
   defeat: "combat",
   forge: "craft",
   potion: "craft",
+  brew: "craft",
   equip: "craft",
   discard: "craft",
   growl: "wolf",
@@ -534,6 +535,45 @@ const RECIPES = {
       }
       mix(out, osc(0.3, { freq: 3120, gain: perc(0.001, 0.06) }), { at: 0.52, gain: 0.16 });
       mix(out, osc(0.3, { freq: 4680, gain: perc(0.001, 0.04) }), { at: 0.52, gain: 0.1 });
+      return out;
+    },
+  },
+
+  // The cauldron's own beat: liquid poured over a low gurgle, bubbles rising
+  // through it, and the glass answering at the end.
+  brew: {
+    peak: 0.5,
+    format: "mp3",
+    forge() {
+      const out = make(1.05);
+      mix(
+        out,
+        shape(
+          filter(noise(0.72), { cutoff: glide(680, 1460, 0.6), q: 1.3, mode: "bp" }),
+          swell(0.09, 0.32, 0.28),
+        ),
+        { gain: 0.34 },
+      );
+      mix(out, osc(0.7, { freq: glide(126, 88, 0.62), gain: perc(0.05, 0.34) }), { gain: 0.16 });
+      for (const [index, start] of [0.07, 0.21, 0.33, 0.46, 0.6, 0.73].entries()) {
+        const rise = 360 + index * 58;
+        mix(out, osc(0.09, { freq: glide(rise, rise * 2.15, 0.07), gain: perc(0.004, 0.028) }), {
+          at: start,
+          gain: 0.3,
+        });
+        mix(
+          out,
+          shape(
+            filter(noise(0.05), { cutoff: 1150 + index * 190, q: 6.5, mode: "bp" }),
+            perc(0.003, 0.018),
+          ),
+          { at: start, gain: 0.22 },
+        );
+      }
+      mix(out, bell(0.34, 1320, { partials: [1, 2.42], decays: [0.5, 0.2] }), {
+        at: 0.84,
+        gain: 0.26,
+      });
       return out;
     },
   },
