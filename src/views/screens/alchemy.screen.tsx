@@ -26,7 +26,6 @@ import { EMPTY_FLASK } from "@/models/data/consumables";
 import { ArtRowButton, List, RowText } from "../components/list";
 import { summarizeEffect } from "../presenters/item.presenter";
 import { Select } from "../components/select";
-import { Tag } from "../components/tag";
 import { PageHeader } from "../layout/page-header";
 
 const EMPTY_PICKS: BrewPicks = { first: "", second: "" };
@@ -162,7 +161,6 @@ export function AlchemyScreen() {
       <PageHeader
         title="Alchemy"
         description="The cauldron turns the hunt's spoils into the market's own potions: one empty flask, two different ingredients, and the size decides how rich they must be. Brewing always costs less than the shelf, that is the pay for hunting the parts."
-        action={<Tag tone="neutral">{"Empty flasks: " + formatNumber(view.flasks)}</Tag>}
       />
 
       <Card height="content" tone={running || waiting ? "highlighted" : "default"}>
@@ -343,11 +341,7 @@ export function AlchemyScreen() {
                       divided
                       artSize="compact"
                       art={<ItemArtFill item={row.scroll ?? row.potion} />}
-                      title={
-                        <span className={cn(isSelected ? "text-ember" : undefined)}>
-                          {t(row.scroll?.name ?? row.potion.name)}
-                        </span>
-                      }
+                      title={row.scroll?.name ?? row.potion.name}
                       description={
                         row.unlocked
                           ? undefined
@@ -371,8 +365,9 @@ export function AlchemyScreen() {
                         </>
                       }
                       pressed={isSelected}
-                      disabled={activeId !== null}
-                      onClick={() => setSelected(row.recipe.potionId)}
+                      disabled={!row.unlocked || activeId !== null}
+                      onClick={() => row.unlocked && setSelected(row.recipe.potionId)}
+                      className={cn(!row.unlocked && "opacity-60")}
                     />
                   );
                 })}

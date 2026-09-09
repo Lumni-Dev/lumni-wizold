@@ -1397,6 +1397,13 @@ const RULES: readonly PatternRule[] = [
   { pattern: /^Empty flasks: (\d[\d.,]*)$/, en: "Empty flasks: $1", pt: "Frascos vazios: $1", es: "Frascos vacíos: $1" },
   { pattern: /^(.+) \(x(\d[\d.,]*)\)$/, en: "$1 (x$2)", pt: "$1 (x$2)", es: "$1 (x$2)" },
   {
+    pattern:
+      /^(.+) brewed: (.+) x(\d+), (.+) x(\d+), one scroll and one empty flask spent\. Alchemy reached LV\. (\d+)\.$/,
+    en: "$1 brewed: $2 x$3, $4 x$5, one scroll and one empty flask spent. Alchemy reached LV. $6.",
+    pt: "$1 fabricada: $2 x$3, $4 x$5, um pergaminho e um frasco vazio gastos. Alquimia chegou ao NV. $6.",
+    es: "$1 fabricada: $2 x$3, $4 x$5, un pergamino y un frasco vacío gastados. La alquimia llegó al NV. $6.",
+  },
+  {
     pattern: /^(.+) brewed: (.+) x(\d+), (.+) x(\d+), one scroll and one empty flask spent\.$/,
     en: "$1 brewed: $2 x$3, $4 x$5, one scroll and one empty flask spent.",
     pt: "$1 fabricada: $2 x$3, $4 x$5, um pergaminho e um frasco vazio gastos.",
