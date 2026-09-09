@@ -178,7 +178,7 @@ export function AlchemyScreen() {
                 label={"Alchemy (LV. " + formatNumber(view.level) + "/" + formatNumber(view.maxLevel) + ")"}
                 current={view.level >= view.maxLevel ? view.needed : view.progress}
                 maximum={view.needed}
-                tone="tide"
+                tone="experience"
                 wraps
               />
             </div>
