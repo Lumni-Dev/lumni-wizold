@@ -3,6 +3,7 @@ import { noAutomation, type Automation } from "./automation";
 import { emptyEquipment, type Equipment, type InventorySlot } from "./item";
 import type { Character } from "./character";
 import { initialWallet, type BazaarListing, type Wallet } from "./bazaar";
+import { initialAlchemy, type AlchemyState } from "./alchemy";
 import { initialMining, type MiningState } from "./mining";
 import type { PackMate } from "./pack";
 import type { Pet } from "./pet";
@@ -13,6 +14,7 @@ export interface GameState {
   character: Character | null;
   pet: Pet | null;
   mining: MiningState;
+  alchemy: AlchemyState;
   bazaarListings: BazaarListing[];
   bazaarPurchases: Record<string, number>;
   bazaarFinds: string[];
@@ -31,6 +33,7 @@ export function initialState(): GameState {
     character: null,
     pet: null,
     mining: initialMining(),
+    alchemy: initialAlchemy(),
     bazaarListings: [],
     bazaarPurchases: {},
     bazaarFinds: [],

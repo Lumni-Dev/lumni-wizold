@@ -1,11 +1,13 @@
 import { EMPTY_FLASK_ID } from "@/models/data/consumables";
 import {
+  ALCHEMY_MAX_LEVEL,
   ALCHEMY_RECIPES,
   alchemyRecipeOf,
   meetsRarityFloor,
   scrollIdFor,
   type AlchemyRecipe,
 } from "@/models/data/alchemy";
+import { alchemyEffort, alchemyNeeded, applyAlchemyProgress } from "@/models/rules/alchemy";
 import { findItem } from "@/models/data/items";
 import type { GameState } from "@/models/entities/game-state";
 import type { Item, Rarity } from "@/models/entities/item";
@@ -25,10 +27,14 @@ export interface AlchemyRow {
 export interface AlchemyView {
   rows: AlchemyRow[];
   flasks: number;
+  level: number;
+  progress: number;
+  needed: number;
+  maxLevel: number;
 }
 
 export function listAlchemy(state: GameState): AlchemyView {
-  const level = state.character?.level ?? 1;
+  const level = state.alchemy.level;
   const rows: AlchemyRow[] = [];
   for (const recipe of ALCHEMY_RECIPES) {
     const potion = findItem(recipe.potionId);
@@ -39,10 +45,17 @@ export function listAlchemy(state: GameState): AlchemyView {
       potion,
       scroll: findItem(scrollId),
       scrolls: countInInventory(state.inventory, scrollId, 0),
-      unlocked: level >= potion.minLevel,
+      unlocked: level >= recipe.requiredLevel,
     });
   }
-  return { rows, flasks: countInInventory(state.inventory, EMPTY_FLASK_ID, 0) };
+  return {
+    rows,
+    flasks: countInInventory(state.inventory, EMPTY_FLASK_ID, 0),
+    level,
+    progress: state.alchemy.progress,
+    needed: alchemyNeeded(level),
+    maxLevel: ALCHEMY_MAX_LEVEL,
+  };
 }
 
 export interface BrewMaterialOption {
@@ -101,8 +114,9 @@ export function brewPotion(
   const recipe = alchemyRecipeOf(potionId);
   const potion = findItem(potionId);
   if (!recipe || !potion) return failure(state, "That potion is not brewed here.");
-  if (character.level < potion.minLevel) {
-    return failure(state, potion.name + " demands LV. " + potion.minLevel + ".");
+  // The cauldron answers to its own ladder, never to the hunter's level.
+  if (state.alchemy.level < recipe.requiredLevel) {
+    return failure(state, potion.name + " demands alchemy LV. " + recipe.requiredLevel + ".");
   }
   if (firstId === secondId) {
     return failure(state, "The cauldron asks two different ingredients.");
@@ -128,7 +142,8 @@ export function brewPotion(
   inventory = removeFromInventory(inventory, secondId, recipe.second.quantity, 0);
   inventory = addToInventory(inventory, potionId, 1, 0);
 
-  const next: GameState = { ...state, inventory };
+  const climbed = applyAlchemyProgress(state.alchemy, alchemyEffort(state.alchemy.level));
+  const next: GameState = { ...state, inventory, alchemy: climbed.alchemy };
   const message =
     potion.name +
     " brewed: " +
@@ -139,6 +154,7 @@ export function brewPotion(
     second.item.name +
     " x" +
     recipe.second.quantity +
-    ", one scroll and one empty flask spent.";
+    ", one scroll and one empty flask spent." +
+    (climbed.levelsGained > 0 ? " Alchemy reached LV. " + climbed.alchemy.level + "." : "");
   return success(addLog(next, "inventory", message), message);
 }

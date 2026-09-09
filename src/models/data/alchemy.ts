@@ -33,6 +33,10 @@ export interface AlchemyRecipe {
   potionId: string;
   kind: PotionKind;
   size: PotionSize;
+  // What the cauldron's own ladder must reach for this ritual to work. The
+  // fury line always sits a step above its health twin: it is the flask a
+  // long endgame never stops needing.
+  requiredLevel: number;
   first: AlchemyIngredient;
   second: AlchemyIngredient;
 }
@@ -42,45 +46,58 @@ export const ALCHEMY_RECIPES: readonly AlchemyRecipe[] = [
     potionId: "health-potion-small",
     kind: "health",
     size: "small",
+    requiredLevel: 1,
     first: { rarity: "common", quantity: 2 },
     second: { rarity: "common", quantity: 1 },
-  },
-  {
-    potionId: "health-potion-medium",
-    kind: "health",
-    size: "medium",
-    first: { rarity: "uncommon", quantity: 2 },
-    second: { rarity: "uncommon", quantity: 1 },
-  },
-  {
-    potionId: "health-potion-large",
-    kind: "health",
-    size: "large",
-    first: { rarity: "rare", quantity: 1 },
-    second: { rarity: "rare", quantity: 1 },
   },
   {
     potionId: "rage-potion-small",
     kind: "rage",
     size: "small",
+    requiredLevel: 5,
     first: { rarity: "uncommon", quantity: 4 },
     second: { rarity: "uncommon", quantity: 3 },
+  },
+  {
+    potionId: "health-potion-medium",
+    kind: "health",
+    size: "medium",
+    requiredLevel: 15,
+    first: { rarity: "uncommon", quantity: 2 },
+    second: { rarity: "uncommon", quantity: 1 },
   },
   {
     potionId: "rage-potion-medium",
     kind: "rage",
     size: "medium",
+    requiredLevel: 25,
     first: { rarity: "rare", quantity: 2 },
     second: { rarity: "rare", quantity: 2 },
+  },
+  {
+    potionId: "health-potion-large",
+    kind: "health",
+    size: "large",
+    requiredLevel: 40,
+    first: { rarity: "rare", quantity: 1 },
+    second: { rarity: "rare", quantity: 1 },
   },
   {
     potionId: "rage-potion-large",
     kind: "rage",
     size: "large",
+    requiredLevel: 60,
     first: { rarity: "epic", quantity: 1 },
     second: { rarity: "rare", quantity: 2 },
   },
 ];
+
+// The ceiling is the deepest ritual: past it there is nothing left to open,
+// which is why it is read off the table instead of written by hand.
+export const ALCHEMY_MAX_LEVEL = ALCHEMY_RECIPES.reduce(
+  (deepest, recipe) => Math.max(deepest, recipe.requiredLevel),
+  1,
+);
 
 // Every recipe is written on a scroll the market sells, spent with the flask
 // at each brew: the ritual is the parchment, and buying it is what opens the

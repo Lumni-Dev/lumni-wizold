@@ -3,6 +3,7 @@ import { BASE_ATTRIBUTE_VALUE, STARTING_BRONZE, STATE_VERSION } from "@/shared/c
 import { generateId } from "@/shared/utils/id";
 import { addAttributes, type Attributes } from "../entities/attribute";
 import { initialWallet } from "../entities/bazaar";
+import { initialAlchemy } from "../entities/alchemy";
 import { initialMining } from "../entities/mining";
 import { emptyEquipment, type InventorySlot } from "../entities/item";
 import type { GameState } from "../entities/game-state";
@@ -70,6 +71,7 @@ export function createRun(name: string, gender: Gender): GameState {
     character,
     pet: null,
     mining: initialMining(),
+    alchemy: initialAlchemy(),
     bazaarListings: [],
     bazaarPurchases: {},
     bazaarFinds: [],

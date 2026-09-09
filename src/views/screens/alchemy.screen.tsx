@@ -92,7 +92,7 @@ export function AlchemyScreen() {
   const reason = !chosenRow
     ? "No potion to brew."
     : !chosenRow.unlocked
-      ? "Requires LV. " + formatNumber(chosenRow.potion.minLevel)
+      ? "Requires alchemy LV. " + formatNumber(chosenRow.recipe.requiredLevel)
       : chosenRow.scrolls < 1
         ? "No scroll for this potion: the market sells them."
         : view.flasks < 1
@@ -146,6 +146,25 @@ export function AlchemyScreen() {
       <Card height="content" tone={running || waiting ? "highlighted" : "default"}>
         <div className="grid grid-cols-1 md:grid-cols-2 md:divide-x md:divide-edge">
           <div className="flex flex-col divide-y divide-edge">
+            <div className="space-y-1 px-4 py-3">
+              <h2 className="heading text-[11px] text-ink">{t("Cauldron")}</h2>
+              <p className="text-xs text-ink-faint">
+                {t(
+                  "Choose a scroll beside and it goes on the fire. Every brew burns the scroll and a flask, and each landed potion climbs the cauldron's own ladder.",
+                )}
+              </p>
+            </div>
+
+            <div className="space-y-2 px-4 py-3">
+              <Bar
+                label={"Alchemy (LV. " + formatNumber(view.level) + "/" + formatNumber(view.maxLevel) + ")"}
+                current={view.level >= view.maxLevel ? view.needed : view.progress}
+                maximum={view.needed}
+                tone="tide"
+                wraps
+              />
+            </div>
+
             {chosenRow ? (
               <>
                 <div className="flex items-stretch">
@@ -167,7 +186,8 @@ export function AlchemyScreen() {
                           ? summarizeEffect(chosenRow.potion)
                               .map((effect) => t(effect))
                               .join(", ")
-                          : "Requires LV. " + formatNumber(chosenRow.potion.minLevel)
+                          : "Requires alchemy LV. " +
+                            formatNumber(chosenRow.recipe.requiredLevel)
                       }
                     />
                   </div>
@@ -265,9 +285,12 @@ export function AlchemyScreen() {
           </div>
 
           <div className="flex flex-col border-t border-edge md:border-t-0">
-            <div className="px-4 py-3">
-              <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                {t("Scrolls")}
+            <div className="space-y-1 px-4 py-3">
+              <h2 className="heading text-[11px] text-ink">{t("Scrolls")}</h2>
+              <p className="text-xs text-ink-faint">
+                {t(
+                  "The rituals the market sells, each opened by the cauldron's level and burned when it works.",
+                )}
               </p>
             </div>
             <div className="relative md:min-h-0 md:flex-1">
@@ -288,7 +311,7 @@ export function AlchemyScreen() {
                       description={
                         row.unlocked
                           ? undefined
-                          : "Requires LV. " + formatNumber(row.potion.minLevel)
+                          : "Requires alchemy LV. " + formatNumber(row.recipe.requiredLevel)
                       }
                       trailing={
                         <>

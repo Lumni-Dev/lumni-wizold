@@ -15,6 +15,8 @@ import type { Attributes } from "../entities/attribute";
 import type { Character } from "../entities/character";
 import { initialWallet, type BazaarListing } from "../entities/bazaar";
 import { emptyEquipment, EQUIPMENT_SLOTS, type EquipmentSlot } from "../entities/item";
+import { initialAlchemy } from "../entities/alchemy";
+import { ALCHEMY_MAX_LEVEL } from "../data/alchemy";
 import { initialMining } from "../entities/mining";
 import { MINING_MAX_LEVEL } from "../data/ores";
 import { initialState, type GameState } from "../entities/game-state";
@@ -239,6 +241,7 @@ function normalize(data: Partial<GameState>): GameState {
     },
   );
   const mining = data.mining as Partial<GameState["mining"]> | undefined;
+  const alchemy = data.alchemy as Partial<GameState["alchemy"]> | undefined;
   const state: GameState = {
     ...base,
     ...data,
@@ -253,6 +256,13 @@ function normalize(data: Partial<GameState>): GameState {
             count: Math.max(0, finiteInt(mining.count, 0)),
           }
         : initialMining(),
+    alchemy:
+      typeof alchemy?.level === "number"
+        ? {
+            level: clamp(finiteInt(alchemy.level, 1), 1, ALCHEMY_MAX_LEVEL),
+            progress: Math.max(0, finiteInt(alchemy.progress, 0)),
+          }
+        : initialAlchemy(),
     bazaarListings: Array.isArray(data.bazaarListings)
       ? normalizeListings(data.bazaarListings)
       : [],

@@ -493,6 +493,10 @@ export const PT: Record<string, string> = {
     "Escolha uma poção em Receitas e ela vai ao fogo. Escolha dois ingredientes diferentes do alforje: qualquer material na raridade pedida ou acima serve.",
   "Recipes": "Receitas",
   "Scrolls": "Pergaminhos",
+  "Choose a scroll beside and it goes on the fire. Every brew burns the scroll and a flask, and each landed potion climbs the cauldron's own ladder.":
+    "Escolha um pergaminho ao lado e ele vai ao fogo. Cada fabricação queima o pergaminho e um frasco, e cada poção pronta sobe a escada do próprio caldeirão.",
+  "The rituals the market sells, each opened by the cauldron's level and burned when it works.":
+    "Os rituais que o mercado vende, cada um aberto pelo nível do caldeirão e queimado quando ele trabalha.",
   "The flask and the scrolls the cauldron spends, all sold at the market.":
     "O frasco e os pergaminhos que o caldeirão gasta, todos vendidos no mercado.",
   "Scroll": "Pergaminho",

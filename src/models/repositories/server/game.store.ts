@@ -219,6 +219,10 @@ export async function loadGame(
       windowStart: stamp(row.mining_window_start),
       count: int(row.mining_count),
     },
+    alchemy: {
+      level: int(row.alchemy_level) || 1,
+      progress: int(row.alchemy_progress),
+    },
     bazaarListings: listings.rows.map(
       (entry): BazaarListing => ({
         id: entry.id,
@@ -321,7 +325,11 @@ export async function saveGame(
 ): Promise<void> {
   const character = after.character;
   if (!character) return;
-  if (character === before.character && after.mining === before.mining) {
+  if (
+    character === before.character &&
+    after.mining === before.mining &&
+    after.alchemy === before.alchemy
+  ) {
     await savePieces(client, characterId, before, after);
     await bumpRosterRevision(client);
     return;
@@ -338,7 +346,8 @@ export async function saveGame(
        renamed_at = $27, transformed_at = $28,
        mining_window_start = $29, mining_count = $30,
        fury_until = $31, vip_until = $32,
-       vip_subscription_id = $33, vip_canceling = $34
+       vip_subscription_id = $33, vip_canceling = $34,
+       alchemy_level = $35, alchemy_progress = $36
      where id = $1`,
     [
       characterId,
@@ -375,6 +384,8 @@ export async function saveGame(
       character.vipUntil ?? null,
       character.vipSubscriptionId ?? null,
       character.vipCanceling ?? false,
+      after.alchemy.level,
+      after.alchemy.progress,
     ],
   );
   await savePieces(client, characterId, before, after);
