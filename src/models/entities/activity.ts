@@ -43,8 +43,15 @@ export function isWorkActivity(kind: string | null | undefined): kind is WorkAct
   );
 }
 
+// The lock is about a job that is RUNNING, never about one parked. A paused
+// job is waiting for a resource it cannot fetch by itself: the forge waits for
+// fragments the mine digs, the training waits for the bronze the hunt pays. If
+// the pause kept the game locked, every button in the game read "Wait..." and
+// the only door out was the floating dock, which hides itself on the job's own
+// page, so the forge with no fragments waited forever. Parked, it blocks
+// nothing: starting anything else simply takes the one slot over.
 export function workActivityBlockReason(activity: Activity | null | undefined): string | null {
-  if (!activity || !isWorkActivity(activity.kind)) return null;
+  if (!activity || !isWorkActivity(activity.kind) || activity.paused === true) return null;
   return WORK_ACTIVITY_LABELS[activity.kind] + ": stop it before starting another.";
 }
 

@@ -2667,6 +2667,18 @@ sec("tavern");
     ok("old activity becomes idle", entActivity.resolveDoing("hunt", stale) === "idle");
     ok("no activity is idle", entActivity.resolveDoing(null, null) === "idle");
     ok(
+      "a running job locks the others",
+      entActivity.workActivityBlockReason({ kind: "forge", id: "gold-claw" }) !== null,
+    );
+    ok(
+      "a parked job locks nothing",
+      entActivity.workActivityBlockReason({ kind: "forge", id: "gold-claw", paused: true }) === null,
+    );
+    ok(
+      "rest never locks",
+      entActivity.workActivityBlockReason({ kind: "rest" }) === null,
+    );
+    ok(
       "the hunt phrase",
       entActivity.describeDoing("Luna", "hunt") === "Luna is hunting",
     );
