@@ -112,7 +112,9 @@ export function AlchemyScreen() {
     ? "No potion to brew."
     : !chosenRow.unlocked
       ? "Requires LV. " + formatNumber(chosenRow.potion.minLevel)
-      : view.flasks < 1
+      : chosenRow.scrolls < 1
+        ? "No scroll for this potion: the market sells them."
+        : view.flasks < 1
         ? "No empty flask in the bag: the market sells them."
         : !firstPick || !secondPick
           ? "Choose the two ingredients."
@@ -188,6 +190,15 @@ export function AlchemyScreen() {
                       }
                     />
                   </div>
+                </div>
+
+                <div className="flex items-center justify-between gap-3 px-4 py-3">
+                  <span className="min-w-0 truncate text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                    {t(chosenRow.scroll?.name ?? "Scroll")}
+                  </span>
+                  <span className="shrink-0 font-mono text-[11px] text-ink-soft">
+                    {formatNumber(chosenRow.scrolls) + " / 1"}
+                  </span>
                 </div>
 
                 <div className="flex items-center justify-between gap-3 px-4 py-3">
@@ -275,7 +286,7 @@ export function AlchemyScreen() {
           <div className="flex flex-col border-t border-edge md:border-t-0">
             <div className="px-4 py-3">
               <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                {t("Recipes")}
+                {t("Scrolls")}
               </p>
             </div>
             <div className="relative md:min-h-0 md:flex-1">
@@ -290,7 +301,7 @@ export function AlchemyScreen() {
                       art={<ItemArtFill item={row.potion} />}
                       title={
                         <span className={cn(isSelected ? "text-ember" : undefined)}>
-                          {t(row.potion.name)}
+                          {t(row.scroll?.name ?? row.potion.name)}
                         </span>
                       }
                       description={
@@ -299,14 +310,21 @@ export function AlchemyScreen() {
                           : "Requires LV. " + formatNumber(row.potion.minLevel)
                       }
                       trailing={
-                        <span
-                          className={cn(
-                            "grid h-4 w-4 shrink-0 place-items-center self-center rounded-full border",
-                            isSelected ? "border-ember" : "border-edge-strong",
-                          )}
-                        >
-                          {isSelected ? <span className="h-2 w-2 rounded-full bg-ember" /> : null}
-                        </span>
+                        <>
+                          <span className="shrink-0 self-center font-mono text-[11px] text-ink-faint">
+                            x{formatNumber(row.scrolls)}
+                          </span>
+                          <span
+                            className={cn(
+                              "grid h-4 w-4 shrink-0 place-items-center self-center rounded-full border",
+                              isSelected ? "border-ember" : "border-edge-strong",
+                            )}
+                          >
+                            {isSelected ? (
+                              <span className="h-2 w-2 rounded-full bg-ember" />
+                            ) : null}
+                          </span>
+                        </>
                       }
                       pressed={isSelected}
                       disabled={activeId !== null}

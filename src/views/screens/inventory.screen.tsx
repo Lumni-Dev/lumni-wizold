@@ -187,8 +187,10 @@ export function InventoryScreen() {
           {onPage.map(({ item, quantity, enhancement }) => {
             const levelTooLow = character.level < item.minLevel;
             // A flask on the potion shelf that names no kind restores nothing:
-            // it is the vessel the cauldron fills, so it offers the cauldron.
-            const vessel = item.category === "potion" && item.potion === undefined;
+            // it is the vessel the cauldron fills, and an instrument is the
+            // ritual it burns, so both offer the cauldron instead of a drink.
+            const vessel =
+              (item.category === "potion" && item.potion === undefined) || item.category === "tool";
             const consumable = (item.category === "potion" && !vessel) || item.category === "pet";
             const sellable = !isForgeMaterial(item);
             const fragment = !sellable;

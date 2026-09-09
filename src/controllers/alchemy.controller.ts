@@ -3,6 +3,7 @@ import {
   ALCHEMY_RECIPES,
   alchemyRecipeOf,
   meetsRarityFloor,
+  scrollIdFor,
   type AlchemyRecipe,
 } from "@/models/data/alchemy";
 import { findItem } from "@/models/data/items";
@@ -16,6 +17,8 @@ import { addLog } from "./log.controller";
 export interface AlchemyRow {
   recipe: AlchemyRecipe;
   potion: Item;
+  scroll: Item | undefined;
+  scrolls: number;
   unlocked: boolean;
 }
 
@@ -30,7 +33,14 @@ export function listAlchemy(state: GameState): AlchemyView {
   for (const recipe of ALCHEMY_RECIPES) {
     const potion = findItem(recipe.potionId);
     if (!potion) continue;
-    rows.push({ recipe, potion, unlocked: level >= potion.minLevel });
+    const scrollId = scrollIdFor(recipe.potionId);
+    rows.push({
+      recipe,
+      potion,
+      scroll: findItem(scrollId),
+      scrolls: countInInventory(state.inventory, scrollId, 0),
+      unlocked: level >= potion.minLevel,
+    });
   }
   return { rows, flasks: countInInventory(state.inventory, EMPTY_FLASK_ID, 0) };
 }
@@ -107,7 +117,13 @@ export function brewPotion(
     return failure(state, "No empty flask in the bag: the market sells them.");
   }
 
+  const scrollId = scrollIdFor(potionId);
+  if (countInInventory(state.inventory, scrollId, 0) < 1) {
+    return failure(state, "No scroll for this potion: the market sells them.");
+  }
+
   let inventory = removeFromInventory(state.inventory, EMPTY_FLASK_ID, 1, 0);
+  inventory = removeFromInventory(inventory, scrollId, 1, 0);
   inventory = removeFromInventory(inventory, firstId, recipe.first.quantity, 0);
   inventory = removeFromInventory(inventory, secondId, recipe.second.quantity, 0);
   inventory = addToInventory(inventory, potionId, 1, 0);
@@ -123,6 +139,6 @@ export function brewPotion(
     second.item.name +
     " x" +
     recipe.second.quantity +
-    " and one empty flask spent.";
+    ", one scroll and one empty flask spent.";
   return success(addLog(next, "inventory", message), message);
 }

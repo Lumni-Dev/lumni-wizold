@@ -3,7 +3,7 @@ import type { Gender } from "./character";
 
 export type EquipmentSlot = "claw" | "helmet" | "armor" | "pants" | "boots" | "ring" | "necklace";
 
-export type ItemCategory = EquipmentSlot | "potion" | "material" | "pet";
+export type ItemCategory = EquipmentSlot | "potion" | "material" | "pet" | "tool";
 
 export type Rarity = "common" | "uncommon" | "rare" | "epic" | "legendary";
 
@@ -109,6 +109,7 @@ export const CATEGORY_LABEL: Record<ItemCategory, string> = {
   potion: "Potion",
   material: "Material",
   pet: "Companion",
+  tool: "Instrument",
 };
 
 export const CATEGORY_PLURAL: Record<ItemCategory, string> = {
@@ -122,11 +123,13 @@ export const CATEGORY_PLURAL: Record<ItemCategory, string> = {
   potion: "Potions",
   material: "Materials",
   pet: "Companion",
+  tool: "Instruments",
 };
 
 export const ITEM_CATEGORIES: readonly ItemCategory[] = [
   ...EQUIPMENT_SLOTS,
   "potion",
+  "tool",
   "pet",
   "material",
 ];

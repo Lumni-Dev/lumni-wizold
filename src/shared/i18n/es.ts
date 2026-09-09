@@ -492,6 +492,22 @@ export const ES: Record<string, string> = {
   "Choose a potion under Recipes and it goes on the fire. Pick two different ingredients from the bag: any material at the asked rarity or above serves.":
     "Elige una poción en Recetas y va al fuego. Elige dos ingredientes diferentes de la bolsa: cualquier material en la rareza pedida o superior sirve.",
   "Recipes": "Recetas",
+  "Scrolls": "Pergaminos",
+  "The flask and the scrolls the cauldron spends, all sold at the market.":
+    "El frasco y los pergaminos que el caldero gasta, todos vendidos en el mercado.",
+  "Scroll": "Pergamino",
+  "Instrument": "Instrumento",
+  "Instruments": "Instrumentos",
+  "Small Health Scroll": "Pergamino de Vida Pequeña",
+  "Medium Health Scroll": "Pergamino de Vida Media",
+  "Large Health Scroll": "Pergamino de Vida Grande",
+  "Small Fury Scroll": "Pergamino de Furia Pequeña",
+  "Medium Fury Scroll": "Pergamino de Furia Media",
+  "Large Fury Scroll": "Pergamino de Furia Grande",
+  "The ritual written by a hand long gone: what goes into the cauldron, in what measure, and in what order. The parchment burns with the brew.":
+    "El ritual escrito por una mano que ya no está: qué va al caldero, en qué medida y en qué orden. El pergamino arde con la fabricación.",
+  "No scroll for this potion: the market sells them.":
+    "Ningún pergamino de esta poción: el mercado los vende.",
   "What the cauldron knows. The market sells the same potions, always dearer than brewing them.":
     "Lo que el caldero conoce. El mercado vende las mismas pociones, siempre más caras que fabricarlas.",
   "Nothing to brew": "Nada para fabricar",

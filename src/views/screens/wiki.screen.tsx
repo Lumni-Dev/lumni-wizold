@@ -55,6 +55,7 @@ const FIXED_TABS: readonly { key: string; label: string }[] = [
   { key: "fragmentos", label: "Fragments" },
   { key: "itens", label: "Items" },
   { key: "pocoes", label: "Potions" },
+  { key: "instrumentos", label: "Instruments" },
 ];
 
 interface WikiEquipmentEntry {
@@ -85,6 +86,8 @@ const WIKI_ITEMS: readonly Item[] = [
 ];
 
 const WIKI_POTIONS: readonly Item[] = itemsOfCategory("potion");
+
+const WIKI_TOOLS: readonly Item[] = itemsOfCategory("tool");
 
 function wikiItemDescription(item: Item): string {
   const effects = summarizeEffect(item);
@@ -147,6 +150,13 @@ export function WikiScreen() {
       wanted === ""
         ? WIKI_POTIONS
         : WIKI_POTIONS.filter((item) => normalizeText(item.name).includes(wanted)),
+    [wanted],
+  );
+  const tools = useMemo(
+    () =>
+      wanted === ""
+        ? WIKI_TOOLS
+        : WIKI_TOOLS.filter((item) => normalizeText(item.name).includes(wanted)),
     [wanted],
   );
 
@@ -458,6 +468,26 @@ export function WikiScreen() {
             title="Potions"
             description={WIKI_POTIONS.length + " health and fury potions sold at the market."}
             items={potions}
+          >
+            {(pageItems) =>
+              pageItems.map((item) => (
+                <ListRow key={item.id} art={<ItemArtFill item={item} />}>
+                  <RowText title={item.name} description={wikiItemDescription(item)} />
+                  <span className="shrink-0 font-mono text-[11px] text-ink-faint">
+                    {formatBronze(marketPriceOf(item, level))}
+                  </span>
+                </ListRow>
+              ))
+            }
+          </WikiPaginatedPanel>
+        ) : null}
+
+        {shows("instrumentos", tools.length > 0) ? (
+          <WikiPaginatedPanel
+            id="instrumentos"
+            title="Instruments"
+            description="The flask and the scrolls the cauldron spends, all sold at the market."
+            items={tools}
           >
             {(pageItems) =>
               pageItems.map((item) => (

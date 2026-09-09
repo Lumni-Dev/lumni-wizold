@@ -82,6 +82,15 @@ export const ALCHEMY_RECIPES: readonly AlchemyRecipe[] = [
   },
 ];
 
+// Every recipe is written on a scroll the market sells, spent with the flask
+// at each brew: the ritual is the parchment, and buying it is what opens the
+// potion to the cauldron.
+export const SCROLL_PRICE = 10;
+
+export function scrollIdFor(potionId: string): string {
+  return "scroll-" + potionId;
+}
+
 const RECIPE_INDEX = new Map(ALCHEMY_RECIPES.map((recipe) => [recipe.potionId, recipe]));
 
 export function alchemyRecipeOf(potionId: string): AlchemyRecipe | undefined {
