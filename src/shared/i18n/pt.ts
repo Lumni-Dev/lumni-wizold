@@ -1117,7 +1117,6 @@ export const PT: Record<string, string> = {
   "Resend code": "Reenviar código",
   "Birth date": "Data de nascimento",
   "Enter with Google": "Entrar com Google",
-  "The door is the Google account: no new password to remember. On the first entry the birth date is kept, and after that the button is enough.": "A porta é a conta Google: nada de senha nova para lembrar. Na primeira entrada a data de nascimento fica guardada, e nas seguintes basta o botão.",
   "Reactivate": "Reativar",
   "Cancel renewal": "Cancelar renovação",
   "Enable VIP for": "Ativar VIP por",

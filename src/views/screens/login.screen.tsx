@@ -382,12 +382,6 @@ export function LoginScreen() {
                       {t("Enter with Google")}
                     </Button>
                   )}
-
-                  <p className="landing-hero-shadow-text text-xs leading-relaxed text-ink-faint">
-                    {t(
-                      "The door is the Google account: no new password to remember. On the first entry the birth date is kept, and after that the button is enough.",
-                    )}
-                  </p>
                 </>
               )}
             </div>

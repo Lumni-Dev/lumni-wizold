@@ -5,13 +5,13 @@ import { api } from "@/controllers/api.client";
 import { useGame } from "@/controllers/game.context";
 import { useT } from "@/controllers/use-locale";
 import { listPacks } from "@/controllers/store.controller";
-import { findPack } from "@/models/data/store-packs";
+import { findPack, type StorePack } from "@/models/data/store-packs";
 import { hasVipSubscription, isVip, VIP_PRICE_CENTS, VIP_TRIAL_DAYS } from "@/models/rules/vip";
 import { formatDay, formatNumber, formatReais, formatBronze } from "@/shared/utils/format";
 import { Button } from "../components/button";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
 import { ConfirmDialog } from "../components/confirm-dialog";
-import { PackIcon } from "../components/pack-icon";
+import { PackBanner, PackIcon, usePackArt } from "../components/pack-icon";
 import { DataRow } from "../components/data-row";
 import { EmptyState } from "../components/empty-state";
 import { List, ListRow, RowText } from "../components/list";
@@ -155,33 +155,7 @@ export function StoreScreen() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {offers.map(({ pack, bronze }) => (
-          <Card
-            key={pack.id}
-            height="fill"
-            interactive
-            tone={pack.highlight ? "highlighted" : "default"}
-          >
-            <CardHeader>
-              <PackIcon pack={pack} size="huge" />
-              <RowText title={pack.name} label="WCoin pack" />
-            </CardHeader>
-
-            <CardBody>
-              <p className="text-xs leading-relaxed text-ink-soft">{t(pack.description)}</p>
-            </CardBody>
-
-            <List className="border-t border-edge">
-              <DataRow label="You receive" value={formatBronze(bronze)} />
-              <DataRow label="Price" value={formatReais(pack.priceCents)} />
-            </List>
-
-            <CardFooter>
-              <span />
-              <Button variant="primary" onClick={() => buyPack(pack.id)}>
-                Buy
-              </Button>
-            </CardFooter>
-          </Card>
+          <PackCard key={pack.id} pack={pack} bronze={bronze} onBuy={buyPack} />
         ))}
       </div>
 
@@ -245,5 +219,49 @@ export function StoreScreen() {
         }}
       />
     </>
+  );
+}
+
+// One offer, wearing the game's own card: the drawing on top, edge to edge,
+// then the identity strip, the description, the two numbers and the action.
+// The icon frame only shows up when the pouch has no art on disk, which is
+// what every other card in the game falls back to as well.
+function PackCard({
+  pack,
+  bronze,
+  onBuy,
+}: {
+  pack: StorePack;
+  bronze: number;
+  onBuy: (id: string) => void;
+}) {
+  const t = useT();
+  const drawn = Boolean(usePackArt(pack));
+
+  return (
+    <Card height="fill" interactive tone={pack.highlight ? "highlighted" : "default"}>
+      {drawn ? <PackBanner pack={pack} /> : null}
+
+      <CardHeader>
+        {drawn ? null : <PackIcon pack={pack} />}
+        <RowText title={pack.name} label="WCoin pack" />
+      </CardHeader>
+
+      <CardBody>
+        <p className="text-xs leading-relaxed text-ink-soft">{t(pack.description)}</p>
+      </CardBody>
+
+      <List className="border-t border-edge">
+        <DataRow label="You receive" value={formatBronze(bronze)} />
+        <DataRow label="Price" value={formatReais(pack.priceCents)} />
+      </List>
+
+      <CardFooter>
+        <span />
+        <Button variant="primary" onClick={() => onBuy(pack.id)}>
+          Buy
+        </Button>
+      </CardFooter>
+    </Card>
   );
 }
