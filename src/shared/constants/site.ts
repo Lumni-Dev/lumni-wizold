@@ -20,3 +20,6 @@ export const TAVERN_MUG_PNG_PATH = "/assets/ui/tavern-mug.png?v=" + TAVERN_MUG_V
 
 export const ARENA_SCENE_VERSION = "2";
 export const ARENA_SCENE_PATH = "/assets/ui/arena.webp?v=" + ARENA_SCENE_VERSION;
+
+export const ARENA_VIDEO_VERSION = "1";
+export const ARENA_VIDEO_PATH = "/assets/ui/arena.mp4?v=" + ARENA_VIDEO_VERSION;

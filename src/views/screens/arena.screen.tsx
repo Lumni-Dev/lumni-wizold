@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { api } from "@/controllers/api.client";
 import { ACTIVITY_WAIT_LABEL, useActivityLock } from "@/controllers/use-activity-lock";
 import { useT } from "@/controllers/use-locale";
@@ -21,15 +21,17 @@ import { CRITICAL_CHANCE_CAP, DODGE_CHANCE_CAP, type DerivedStats } from "@/mode
 import { canPetFight, isPetActive, petLevelOf, petMaxEnergy } from "@/models/rules/pet";
 import { playSound } from "@/controllers/sound";
 import { HUNT_APPROACH_TICKS, HUNT_TICK_MS } from "@/shared/constants/game";
-import { ARENA_SCENE_PATH } from "@/shared/constants/site";
+import { ARENA_SCENE_PATH, ARENA_VIDEO_PATH } from "@/shared/constants/site";
 import { ICON_FRAME_INSET } from "@/shared/constants/ui";
 import { cn } from "@/shared/utils/class-names";
 import { formatDay, formatFraction, formatNumber, formatBronze } from "@/shared/utils/format";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
 import { displayNick } from "@/shared/utils/text";
+import { backgroundRepository } from "@/models/repositories/background.repository";
 import { emphasizeDamage, narrationOf, type NarrationLine } from "../presenters/hunt.presenter";
 import { ArenaDuelOverlay } from "../components/arena-duel-overlay";
 import { ArtImage } from "../components/art-image";
+import { ArtVideo } from "../components/art-video";
 import { Bar } from "../components/bar";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
 import { Button } from "../components/button";
@@ -150,6 +152,11 @@ export function ArenaScreen() {
   } = useGame();
   const { locked, reason: lockReason } = useActivityLock();
   const t = useT();
+  const animatedArt = useSyncExternalStore(
+    backgroundRepository.subscribe,
+    backgroundRepository.enabled,
+    backgroundRepository.serverSnapshot,
+  );
   const waitLabel = locked ? ACTIVITY_WAIT_LABEL : "";
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -453,7 +460,11 @@ export function ArenaScreen() {
           className={cn(shaking && "card-shake")}
         >
           <div className="relative aspect-[21/9] w-full overflow-hidden border-b border-edge">
-            <ArtImage source={ARENA_SCENE_PATH} />
+            {animatedArt ? (
+              <ArtVideo source={ARENA_VIDEO_PATH} poster={ARENA_SCENE_PATH} />
+            ) : (
+              <ArtImage source={ARENA_SCENE_PATH} />
+            )}
             <ArenaDuelOverlay
               gender={character.gender}
               rivalGender={fighting.hunter.gender}
