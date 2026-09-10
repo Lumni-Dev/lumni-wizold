@@ -197,7 +197,7 @@ export function TrainingScreen() {
                 {row ? (
                   <div className="border-t border-edge px-4 py-3">
                     <Bar
-                      label={"Experience (LV. " + formatNumber(row.value) + "/1000)"}
+                      label="Experience"
                       current={row.progress}
                       maximum={row.needed}
                       tone="experience"
@@ -301,7 +301,7 @@ export function TrainingScreen() {
 
               <div className="border-t border-edge px-4 py-3">
                 <Bar
-                  label={"Companion - Experience (LV. " + formatNumber(petTraining.level) + "/1000)"}
+                  label="Companion - Experience"
                   current={petTraining.progress}
                   maximum={petTraining.needed}
                   tone="experience"
