@@ -379,7 +379,7 @@ export const BASE: Record<string, string> = {
   "A poção de vida recupera uma fatia da vida máxima na hora. Repousar faz o mesmo de graça, aos poucos.":
     "The health potion restores a slice of max health at once. Resting does the same for free, little by little.",
   "Modo Fúria dá +10 em cada atributo enquanto durar. Na lua cheia o céu liga sozinho; fora dela, beba a poção.":
-    "Fury Mode gives +10 to every attribute while it lasts. On the full moon the sky turns it on by itself; outside it, drink the potion.",
+    "Fury Mode lifts every attribute while it lasts, as deep as the flask you drink. On the full moon the sky turns it on by itself; outside it, drink the potion.",
   "Sem poção de vida": "No health potion",
   "Sem poção de fúria": "No fury potion",
   "A lua cheia já mantém você em fúria.": "The full moon already keeps you in fury.",

@@ -64,7 +64,10 @@ import { BAZAAR_LISTING_DAYS, initialWallet } from "../entities/bazaar";
 import { enhancementCost } from "../rules/forge";
 import { experienceForLevel } from "../rules/progression";
 import { MOON_PHASES, SYNODIC_MONTH_DAYS } from "../rules/moon";
-import { FURY_ATTRIBUTE_BONUS } from "@/shared/constants/game";
+import {
+  FURY_ATTRIBUTE_BONUS_BY_SIZE,
+  FURY_MOON_ATTRIBUTE_BONUS,
+} from "@/shared/constants/game";
 import { miningNeeded } from "../rules/mining";
 import { criticalMultiplierOf } from "../rules/combat";
 import { VIP_DAYS, VIP_PRICE_CENTS, VIP_TRIAL_DAYS } from "../rules/vip";
@@ -88,6 +91,13 @@ function setRequirementsLine(): string {
   return "Sets, one per hunting band: " + parts.join(", ") + ".";
 }
 
+// The three flasks, written out of the table so the page can never promise a
+// fury the potion does not lend.
+function furySizeLine(): string {
+  const bonus = FURY_ATTRIBUTE_BONUS_BY_SIZE;
+  return "small +" + bonus.small + ", medium +" + bonus.medium + ", large +" + bonus.large;
+}
+
 function moonLines(): string[] {
   return MOON_PHASES.map((phase) => {
     const perks: string[] = [];
@@ -98,7 +108,7 @@ function moonLines(): string[] {
     if (training > 0) perks.push("+" + training + "% training progress");
     if (mining > 0) perks.push("+" + mining + "% mining experience");
     if (phase.key === "full") {
-      perks.push("Fury Mode on (+" + FURY_ATTRIBUTE_BONUS + " to every attribute)");
+      perks.push("Fury Mode on (+" + FURY_MOON_ATTRIBUTE_BONUS + " to every attribute)");
     }
     return phase.label + ": " + (perks.length > 0 ? perks.join(", ") + "." : "no bonus.");
   });
@@ -214,14 +224,16 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
   {
     id: "fury",
     title: "Fury",
-    summary: "Fury Mode: a paid potion or the full moon, +10 to every attribute for a while.",
+    summary: "Fury Mode: a paid potion or the full moon, every attribute lifted for a while.",
     lines: [
       "There is no transformation: you hunt, train and duel straight away, as you are.",
-      "Fury Mode gives +" +
-        FURY_ATTRIBUTE_BONUS +
-        " to each attribute while it lasts; the gain shows in the sheet's Fury column and lifts damage, dodge, critical and the chance of a second blow at once. The health bar still rises only with the level.",
+      "Fury Mode lifts each attribute while it lasts, as deep as the flask that lit it (" +
+        furySizeLine() +
+        "); the gain shows in the sheet's Fury column and lifts damage, dodge, critical and the chance of a second blow at once. The health bar still rises only with the level.",
       "The fury potion gives no health back. Duration is the flask's size (small 2.5 minutes, medium 5, large 7.5) plus the same Willpower stretch on every flask, up to 5 minutes, with half of that already at 250 Willpower. Drinking again restarts the clock full.",
-      "On the full moon the sky keeps Fury Mode on by itself while the phase lasts; the potion is disabled during that window, because the sky is already doing that work.",
+      "On the full moon the sky pours the middle flask by itself, +" +
+        FURY_MOON_ATTRIBUTE_BONUS +
+        " while the phase lasts; the potion is disabled during that window, because the sky is already doing that work.",
       "It is a paid shortcut to a window of strength: save the potion for a hard band or a duel you do not want to lose, outside the full moon.",
     ],
   },
@@ -237,7 +249,7 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
         " days, so each phase lasts about a week.",
       "Each phase pays in one corner: the waxing moon pays more on the hunt and in the yard, the new moon pays more in the mine, and the waning moon gives no bonus at all.",
       "The full moon gives no bonus through the Moon column: it turns on Fury Mode (+" +
-        FURY_ATTRIBUTE_BONUS +
+        FURY_MOON_ATTRIBUTE_BONUS +
         " to every attribute) while the phase lasts, about " +
         (SYNODIC_MONTH_DAYS / 8).toFixed(1) +
         " days.",
@@ -275,8 +287,10 @@ export const WIKI_TOPICS: readonly WikiTopic[] = [
     lines: [
       "Five numbers and nothing else: Strength, Agility, Endurance, Instinct and Willpower. Damage = Strength² ÷ (Strength + target's Endurance), with 10% of spread on Strength.",
       "Willpower does not enter the fight's math: it stretches the fury potion by the same flat bonus on every flask and speeds up health recovery outside combat. Fury is what adds +" +
-        FURY_ATTRIBUTE_BONUS +
-        " to every attribute while it lasts, and the more Willpower, the longer each flask runs.",
+        FURY_ATTRIBUTE_BONUS_BY_SIZE.small +
+        " to +" +
+        FURY_ATTRIBUTE_BONUS_BY_SIZE.large +
+        " to every attribute while it lasts, by the flask, and the more Willpower, the longer each flask runs.",
       "Whoever has more Agility starts. Dodge climbs toward 35% and critical toward 45%. A lead in Agility can land a second blow in the same cycle, capped at 12%.",
       "A critical multiplies by " +
         criticalMultiplierOf().toFixed(2) +

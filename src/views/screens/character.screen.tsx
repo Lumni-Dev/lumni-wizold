@@ -223,7 +223,7 @@ export function CharacterScreen() {
 
           <Panel
             title="Fury"
-            description="Fury Mode gives +10 to every attribute while it lasts. On the full moon the sky turns it on by itself; outside it, drink the potion."
+            description="Fury Mode lifts every attribute while it lasts, as deep as the flask you drink. On the full moon the sky turns it on by itself; outside it, drink the potion."
             padding="none"
           >
             {furyPotions.length === 0 ? (
@@ -242,7 +242,7 @@ export function CharacterScreen() {
                     quantity={quantity}
                     description={
                       "+" +
-                      formatNumber(FURY.attributeBonus) +
+                      formatNumber(item.effect.furyBonus ?? FURY.moonAttributeBonus) +
                       " to every attribute for " +
                       furyDurationCopy(item.effect.furyMinutes ?? 0, willpower)
                     }

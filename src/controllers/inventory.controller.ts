@@ -11,6 +11,7 @@ import { failure, success, type Result } from "@/models/entities/result";
 import { furyDurationMs, furyWillpowerExtraMs, isFullMoon } from "@/models/rules/moon";
 import { rollHealthPotionHeal } from "@/models/rules/potion";
 import { deriveStats } from "@/models/rules/stats";
+import { FURY_MOON_ATTRIBUTE_BONUS } from "@/shared/constants/game";
 import { formatFuryDuration } from "@/shared/utils/format";
 import { defaultRandom, type Random } from "@/shared/utils/random";
 import { syncCharacter, updateCharacter } from "./character.controller";
@@ -203,14 +204,23 @@ export function consumeItem(
     const willpower = derived.totalAttributes.willpower - derived.sources.fury.willpower;
     const lastingMs = furyDurationMs(furyMinutes, willpower);
     const until = new Date(Date.now() + lastingMs).toISOString();
+    // The flask says how deep it goes; the character carries that number for as
+    // long as the clock runs, so a small glass never lends a large one's fury.
+    const furyBonus = item.effect.furyBonus ?? FURY_MOON_ATTRIBUTE_BONUS;
     const consumed: GameState = {
       ...state,
       inventory: removeFromInventory(state.inventory, itemId, 1),
     };
-    const next = updateCharacter(consumed, (current) => ({ ...current, furyUntil: until }));
+    const next = updateCharacter(consumed, (current) => ({
+      ...current,
+      furyUntil: until,
+      furyBonus,
+    }));
     const message =
       item.name +
-      " consumed: +10 to all attributes for " +
+      " consumed: +" +
+      furyBonus +
+      " to all attributes for " +
       formatFuryDuration(furyMinutes, furyWillpowerExtraMs(willpower)) +
       ".";
     return success(addLog(syncCharacter(next), "inventory", message), message);

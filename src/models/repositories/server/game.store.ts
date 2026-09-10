@@ -76,6 +76,14 @@ const stamp = (value: unknown): string | undefined => {
 };
 const textId = (value: unknown): string | undefined =>
   typeof value === "string" && value.length > 0 ? value : undefined;
+// A column that may simply not be there yet, like the fury a save from before
+// the flask sizes never recorded: null reads as absent, never as zero, so the
+// rules can tell "no size" from "no fury".
+const optionalInt = (value: unknown): number | undefined => {
+  if (value === null || value === undefined) return undefined;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? Math.max(0, Math.round(parsed)) : undefined;
+};
 interface CharacterRow {
   id: string;
   user_id: string;
@@ -114,6 +122,7 @@ function rowToCharacter(row: CharacterRow): Character {
     createdAt: iso(row.created_at),
     renamedAt: stamp(row.renamed_at),
     furyUntil: stamp(row.fury_until),
+    furyBonus: optionalInt(row.fury_bonus),
     vipUntil: stamp(row.vip_until),
     vipSubscriptionId: textId(row.vip_subscription_id),
     vipCanceling: row.vip_canceling === true,
@@ -345,7 +354,8 @@ export async function saveGame(
        mining_window_start = $29, mining_count = $30,
        fury_until = $31, vip_until = $32,
        vip_subscription_id = $33, vip_canceling = $34,
-       alchemy_level = $35, alchemy_progress = $36
+       alchemy_level = $35, alchemy_progress = $36,
+       fury_bonus = $37
      where id = $1`,
     [
       characterId,
@@ -384,6 +394,7 @@ export async function saveGame(
       character.vipCanceling ?? false,
       after.alchemy.level,
       after.alchemy.progress,
+      character.furyBonus ?? null,
     ],
   );
   await savePieces(client, characterId, before, after);

@@ -183,15 +183,26 @@ sec("stats");
       ok("sources add to the total (" + key + ")", sourceSum(key) === t[key]);
     }
     ok("without buff, the fury source is zero LV " + level, derived.sources.fury.strength === 0);
-    const buffed = stats.deriveStatsOf(
+    for (const size of ["small", "medium", "large"]) {
+      const bonus = CONST.FURY_ATTRIBUTE_BONUS_BY_SIZE[size];
+      const buffed = stats.deriveStatsOf(
+        { level, attributes: attrs, furyActive: true, furyBonus: bonus },
+        entItem.emptyEquipment(),
+      );
+      ok(
+        "the " + size + " flask adds +" + bonus + " em todos NV " + level,
+        ["strength", "agility", "endurance", "instinct", "willpower"].every(
+          (key) => buffed.sources.fury[key] === bonus,
+        ),
+      );
+    }
+    const sizeless = stats.deriveStatsOf(
       { level, attributes: attrs, furyActive: true },
       entItem.emptyEquipment(),
     );
     ok(
-      "the fury buff adds +" + CONST.FURY_ATTRIBUTE_BONUS + " em todos NV " + level,
-      ["strength", "agility", "endurance", "instinct", "willpower"].every(
-        (key) => buffed.sources.fury[key] === CONST.FURY_ATTRIBUTE_BONUS,
-      ),
+      "a flask with no size recorded lends the moon's own bonus LV " + level,
+      sizeless.sources.fury.strength === CONST.FURY_MOON_ATTRIBUTE_BONUS,
     );
   }
   const attrs = { strength: 10, agility: 10, endurance: 10, instinct: 10, willpower: 10 };
@@ -209,10 +220,10 @@ sec("stats");
   for (const key of Object.keys(attrs)) {
     ok(
       "the full moon turns fury on in " + key,
-      underFull.sources.fury[key] === CONST.FURY_ATTRIBUTE_BONUS &&
+      underFull.sources.fury[key] === CONST.FURY_MOON_ATTRIBUTE_BONUS &&
         underFull.sources.moon[key] === 0 &&
         underFull.totalAttributes[key] ===
-          underNew.totalAttributes[key] + CONST.FURY_ATTRIBUTE_BONUS,
+          underNew.totalAttributes[key] + CONST.FURY_MOON_ATTRIBUTE_BONUS,
     );
   }
   const state = baseState({ level: 1 });
@@ -1988,10 +1999,32 @@ sec("character");
   const buffedStats = stats.deriveStats(drank.state.character, drank.state.equipment, null);
   const plainStats = stats.deriveStats(state.character, state.equipment, null);
   ok(
-    "the buff lifts Strength by " + CONST.FURY_ATTRIBUTE_BONUS,
+    "the small flask lifts Strength by " + CONST.FURY_ATTRIBUTE_BONUS_BY_SIZE.small,
     buffedStats.totalAttributes.strength ===
-      plainStats.totalAttributes.strength + CONST.FURY_ATTRIBUTE_BONUS,
+      plainStats.totalAttributes.strength + CONST.FURY_ATTRIBUTE_BONUS_BY_SIZE.small,
   );
+  // Every flask lends its own fury, and the character remembers which glass is
+  // running: without that the deepest potion would be the only one worth buying
+  // or, worse, the smallest would lend the largest's bonus after a reload.
+  let deeper = 0;
+  for (const size of ["small", "medium", "large"]) {
+    const bonus = CONST.FURY_ATTRIBUTE_BONUS_BY_SIZE[size];
+    const potion = items.findItem("rage-potion-" + size);
+    ok("the " + size + " flask declares +" + bonus, potion.effect.furyBonus === bonus);
+    const sip = inventoryCtrl.consumeItem(
+      { ...state, inventory: [{ itemId: potion.id, quantity: 1, enhancement: 0 }] },
+      potion.id,
+    );
+    ok("the " + size + " flask is drinkable", sip.ok === true, sip.message);
+    ok("the " + size + " flask records its fury", sip.state.character.furyBonus === bonus);
+    ok(
+      "the " + size + " flask lends exactly what it declared",
+      stats.deriveStats(sip.state.character, sip.state.equipment, null).sources.fury.strength ===
+        bonus,
+    );
+    ok("a bigger flask never lends less", bonus > deeper);
+    deeper = bonus;
+  }
   ok("the fury potion returns no health", drank.state.character.health === state.character.health);
   const withTwo = {
     ...state,

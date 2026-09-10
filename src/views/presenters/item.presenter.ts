@@ -3,7 +3,7 @@ import { CATEGORY_LABEL, type Item } from "@/models/entities/item";
 import { isForgeMaterial } from "@/models/rules/bazaar";
 import { enhancedEffect, exactEnhancedValue } from "@/models/rules/forge";
 import { furyWillpowerExtraMs } from "@/models/rules/moon";
-import { FURY_ATTRIBUTE_BONUS } from "@/shared/constants/game";
+import { FURY_MOON_ATTRIBUTE_BONUS } from "@/shared/constants/game";
 import { FURY } from "@/shared/constants/tuning/fury";
 import { formatFraction, formatFuryClock, formatFuryDuration, formatMinutesLabel } from "@/shared/utils/format";
 
@@ -43,7 +43,7 @@ export function summarizeEffect(item: Item, enhancement = 0, willpower?: number)
   if (effect.petEnergyRatio) lines.push(percent(effect.petEnergyRatio) + " of the companion's energy");
   if (effect.healthRatio) lines.push(percent(effect.healthRatio) + " of the health");
   if (effect.furyMinutes) {
-    lines.push("+" + FURY_ATTRIBUTE_BONUS + " to all attributes");
+    lines.push("+" + (effect.furyBonus ?? FURY_MOON_ATTRIBUTE_BONUS) + " to all attributes");
     lines.push(formatMinutesLabel(effect.furyMinutes) + " long");
     if (willpower !== undefined) {
       const stretch = furyWillpowerExtraMs(willpower);

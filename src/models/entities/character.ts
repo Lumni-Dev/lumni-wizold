@@ -48,6 +48,10 @@ export interface Character {
   createdAt: string;
   renamedAt?: string;
   furyUntil?: string;
+  // What the flask now running lit. Absent on a save from before the sizes,
+  // which reads back as the moon's own bonus, the flat value it was drunk
+  // under.
+  furyBonus?: number;
   vipUntil?: string;
   vipSubscriptionId?: string;
   vipCanceling?: boolean;

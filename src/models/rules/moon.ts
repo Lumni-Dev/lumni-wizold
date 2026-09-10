@@ -1,4 +1,5 @@
 import {
+  FURY_MOON_ATTRIBUTE_BONUS,
   FURY_WILLPOWER_EXTRA_MINUTES,
   FURY_WILLPOWER_MAX_BONUS,
   FURY_WILLPOWER_SCALE,
@@ -120,6 +121,7 @@ function currentMoon(now = Date.now()): MoonState {
 
 export interface FuryCarrier {
   furyUntil?: string;
+  furyBonus?: number;
 }
 
 export function moonPhaseKey(moonPhase?: MoonPhaseKey, now = Date.now()): MoonPhaseKey {
@@ -178,6 +180,23 @@ export function furyRemainingMs(
 ): number {
   const potion = potionFuryRemainingMs(character, now);
   const sky = isFullMoon(moonPhase, now) ? fullMoonRemainingMs(now) : 0;
+  return Math.max(potion, sky);
+}
+
+// How deep the fury runs right now. The flask that lit it says so, and a save
+// from before the sizes reads back as the moon's own bonus, which is the flat
+// value every flask used to lend. The sky pours its own glass, so with both on
+// at once the deeper one wins instead of the two adding up.
+export function furyAttributeBonus(
+  character: FuryCarrier,
+  moonPhase?: MoonPhaseKey,
+  now = Date.now(),
+): number {
+  const potion =
+    potionFuryRemainingMs(character, now) > 0
+      ? Math.max(0, Math.round(character.furyBonus ?? FURY_MOON_ATTRIBUTE_BONUS))
+      : 0;
+  const sky = isFullMoon(moonPhase, now) ? FURY_MOON_ATTRIBUTE_BONUS : 0;
   return Math.max(potion, sky);
 }
 

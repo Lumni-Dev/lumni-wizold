@@ -32,7 +32,8 @@ import {
   STARTING_BRONZE,
   TRAINING_TICKS_MAX,
   TRAINING_TICKS_MIN,
-  FURY_ATTRIBUTE_BONUS,
+  FURY_ATTRIBUTE_BONUS_BY_SIZE,
+  FURY_MOON_ATTRIBUTE_BONUS,
 } from "@/shared/constants/game";
 import { SITE_EMAIL } from "@/shared/constants/site";
 import { SPECIES_LABEL, SPECIES_ORDER } from "../entities/creature";
@@ -103,6 +104,18 @@ function setRequirementsLineEs(): string {
   return "Conjuntos, uno por franja de caza: " + parts.join(", ") + ".";
 }
 
+// The three flasks in each tongue, read out of the same table the English page
+// reads, so no locale can promise a fury the potion does not lend.
+function furySizeLinePt(): string {
+  const bonus = FURY_ATTRIBUTE_BONUS_BY_SIZE;
+  return "pequena +" + bonus.small + ", média +" + bonus.medium + ", grande +" + bonus.large;
+}
+
+function furySizeLineEs(): string {
+  const bonus = FURY_ATTRIBUTE_BONUS_BY_SIZE;
+  return "pequeña +" + bonus.small + ", media +" + bonus.medium + ", grande +" + bonus.large;
+}
+
 function moonLinesPt(): string[] {
   return MOON_PHASES.map((phase) => {
     const perks: string[] = [];
@@ -113,7 +126,7 @@ function moonLinesPt(): string[] {
     if (training > 0) perks.push("+" + training + "% de progresso no treino");
     if (mining > 0) perks.push("+" + mining + "% de experiência de mineração");
     if (phase.key === "full") {
-      perks.push("Modo Fúria ativo (+" + FURY_ATTRIBUTE_BONUS + " em todos os atributos)");
+      perks.push("Modo Fúria ativo (+" + FURY_MOON_ATTRIBUTE_BONUS + " em todos os atributos)");
     }
     return translate(phase.label, "pt") + ": " + (perks.length > 0 ? perks.join(", ") + "." : "sem bônus.");
   });
@@ -129,7 +142,7 @@ function moonLinesEs(): string[] {
     if (training > 0) perks.push("+" + training + "% de progreso en el entrenamiento");
     if (mining > 0) perks.push("+" + mining + "% de experiencia de minería");
     if (phase.key === "full") {
-      perks.push("Modo Furia activo (+" + FURY_ATTRIBUTE_BONUS + " a todos los atributos)");
+      perks.push("Modo Furia activo (+" + FURY_MOON_ATTRIBUTE_BONUS + " a todos los atributos)");
     }
     return translate(phase.label, "es") + ": " + (perks.length > 0 ? perks.join(", ") + "." : "sin bono.");
   });
@@ -280,14 +293,16 @@ function ptTopics(): readonly WikiTopic[] {
     {
       id: "fury",
       title: "Fúria",
-      summary: "Modo Fúria: poção paga ou lua cheia, +10 em todos os atributos por um tempo.",
+      summary: "Modo Fúria: poção paga ou lua cheia, todos os atributos levantados por um tempo.",
       lines: [
         "Não existe transformação: você caça, treina e duela direto, do jeito que está.",
-        "Modo Fúria dá +" +
-          FURY_ATTRIBUTE_BONUS +
-          " em cada atributo enquanto durar; o ganho aparece na coluna Fúria da ficha e levanta dano, esquiva, crítico e a chance de um segundo golpe de uma vez. A barra de vida continua subindo só com o nível.",
+        "Modo Fúria levanta cada atributo enquanto durar, tão fundo quanto o frasco que o acendeu (" +
+          furySizeLinePt() +
+          "); o ganho aparece na coluna Fúria da ficha e levanta dano, esquiva, crítico e a chance de um segundo golpe de uma vez. A barra de vida continua subindo só com o nível.",
         "A poção de fúria não devolve vida. A duração é o tamanho do frasco (pequena 2,5 minutos, média 5, grande 7,5) mais o mesmo estirão de Vontade em todo frasco, até 5 minutos, com metade disso já em 250 de Vontade. Beber de novo reinicia o relógio cheio.",
-        "Na lua cheia o céu mantém o Modo Fúria ativo sozinho enquanto durar a fase; a poção fica desabilitada nesse período, porque o céu já faz esse trabalho.",
+        "Na lua cheia o céu serve o frasco médio sozinho, +" +
+          FURY_MOON_ATTRIBUTE_BONUS +
+          " enquanto durar a fase; a poção fica desabilitada nesse período, porque o céu já faz esse trabalho.",
         "É um atalho pago para uma janela de força: guarde a poção para uma banda dura ou um duelo que você não quer perder, fora da lua cheia.",
       ],
     },
@@ -301,7 +316,7 @@ function ptTopics(): readonly WikiTopic[] {
         "O mês lunar tem " + decimal(SYNODIC_MONTH_DAYS.toFixed(2), "pt") + " dias, então cada fase dura cerca de uma semana.",
         "Cada fase paga em um canto: a crescente rende mais na caça e no treino, a nova rende mais na mina, e a minguante não dá bônus algum.",
         "A lua cheia não dá bônus pela coluna Lua: ela liga o Modo Fúria (+" +
-          FURY_ATTRIBUTE_BONUS +
+          FURY_MOON_ATTRIBUTE_BONUS +
           " em todos os atributos) enquanto durar a fase, cerca de " +
           decimal((SYNODIC_MONTH_DAYS / 8).toFixed(1), "pt") +
           " dias.",
@@ -339,8 +354,10 @@ function ptTopics(): readonly WikiTopic[] {
       lines: [
         "Cinco números e só: Força, Agilidade, Resistência, Instinto e Vontade. Dano = Força² ÷ (Força + Resistência do alvo), com 10% de variação na Força.",
         "A Vontade não entra na conta da luta: ela estica a poção de fúria com o mesmo bônus fixo em todo frasco e acelera a recuperação de vida fora do combate. A fúria é que soma +" +
-          FURY_ATTRIBUTE_BONUS +
-          " em todos os atributos enquanto dura, e quanto mais Vontade, mais tempo cada frasco rende.",
+          FURY_ATTRIBUTE_BONUS_BY_SIZE.small +
+          " a +" +
+          FURY_ATTRIBUTE_BONUS_BY_SIZE.large +
+          " em todos os atributos enquanto dura, pelo frasco, e quanto mais Vontade, mais tempo cada frasco rende.",
         "Quem tem mais Agilidade começa. A esquiva sobe rumo a 35% e o crítico rumo a 45%. Uma vantagem de Agilidade pode render um segundo golpe no mesmo ciclo, com teto de 12%.",
         "Crítico multiplica por " + critical("pt") + ", fixo. A luta corre até um dos lados cair.",
       ],
@@ -717,14 +734,16 @@ function esTopics(): readonly WikiTopic[] {
     {
       id: "fury",
       title: "Furia",
-      summary: "Modo Furia: poción pagada o luna llena, +10 a todos los atributos por un tiempo.",
+      summary: "Modo Furia: poción pagada o luna llena, todos los atributos levantados por un tiempo.",
       lines: [
         "No existe transformación: cazas, entrenas y duelas directo, tal como estás.",
-        "El Modo Furia da +" +
-          FURY_ATTRIBUTE_BONUS +
-          " a cada atributo mientras dura; la ganancia aparece en la columna Furia de la ficha y levanta daño, esquiva, crítico y la probabilidad de un segundo golpe a la vez. La barra de vida sigue subiendo solo con el nivel.",
+        "El Modo Furia levanta cada atributo mientras dura, tan hondo como el frasco que lo encendió (" +
+          furySizeLineEs() +
+          "); la ganancia aparece en la columna Furia de la ficha y levanta daño, esquiva, crítico y la probabilidad de un segundo golpe a la vez. La barra de vida sigue subiendo solo con el nivel.",
         "La poción de furia no devuelve vida. La duración es el tamaño del frasco (pequeña 2,5 minutos, media 5, grande 7,5) más el mismo tramo de Voluntad en cada frasco, hasta 5 minutos, con la mitad de eso ya a 250 de Voluntad. Beber de nuevo reinicia el reloj lleno.",
-        "En luna llena el cielo mantiene el Modo Furia activo solo mientras dure la fase; la poción queda deshabilitada en ese período, porque el cielo ya hace ese trabajo.",
+        "En luna llena el cielo sirve el frasco medio solo, +" +
+          FURY_MOON_ATTRIBUTE_BONUS +
+          " mientras dure la fase; la poción queda deshabilitada en ese período, porque el cielo ya hace ese trabajo.",
         "Es un atajo pagado hacia una ventana de fuerza: guarda la poción para una franja dura o un duelo que no quieres perder, fuera de la luna llena.",
       ],
     },
@@ -738,7 +757,7 @@ function esTopics(): readonly WikiTopic[] {
         "El mes lunar tiene " + SYNODIC_MONTH_DAYS.toFixed(2) + " días, así que cada fase dura cerca de una semana.",
         "Cada fase paga en un rincón: la creciente rinde más en la caza y el entrenamiento, la nueva rinde más en la mina, y la menguante no da bono alguno.",
         "La luna llena no da bono por la columna Luna: enciende el Modo Furia (+" +
-          FURY_ATTRIBUTE_BONUS +
+          FURY_MOON_ATTRIBUTE_BONUS +
           " a todos los atributos) mientras dura la fase, cerca de " +
           (SYNODIC_MONTH_DAYS / 8).toFixed(1) +
           " días.",
@@ -776,8 +795,10 @@ function esTopics(): readonly WikiTopic[] {
       lines: [
         "Cinco números y nada más: Fuerza, Agilidad, Resistencia, Instinto y Voluntad. Daño = Fuerza² ÷ (Fuerza + Resistencia del objetivo), con 10% de variación en la Fuerza.",
         "La Voluntad no entra en la cuenta de la pelea: estira la poción de furia con el mismo bono fijo en cada frasco y acelera la recuperación de vida fuera del combate. La furia es la que suma +" +
-          FURY_ATTRIBUTE_BONUS +
-          " a todos los atributos mientras dura, y a más Voluntad, más tiempo rinde cada frasco.",
+          FURY_ATTRIBUTE_BONUS_BY_SIZE.small +
+          " a +" +
+          FURY_ATTRIBUTE_BONUS_BY_SIZE.large +
+          " a todos los atributos mientras dura, por el frasco, y a más Voluntad, más tiempo rinde cada frasco.",
         "Quien tiene más Agilidad empieza. La esquiva sube hacia el 35% y el crítico hacia el 45%. Una ventaja de Agilidad puede dar un segundo golpe en el mismo ciclo, con tope del 12%.",
         "El crítico multiplica por " + critical("es") + ", fijo. La pelea corre hasta que un lado cae.",
       ],

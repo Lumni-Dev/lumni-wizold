@@ -3,7 +3,7 @@
 import { Moon } from "lucide-react";
 import { useGame } from "@/controllers/game.context";
 import { useT } from "@/controllers/use-locale";
-import { FURY_ATTRIBUTE_BONUS } from "@/shared/constants/game";
+import { FURY_MOON_ATTRIBUTE_BONUS } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
 import { Tooltip } from "./tooltip";
 
@@ -20,7 +20,7 @@ export function MoonTracker({
   const xpBonus = Math.round(moon.phase.experienceBonus * 100);
   const trainingBonus = Math.round(moon.phase.trainingBonus * 100);
   const miningBonus = Math.round(moon.phase.miningBonus * 100);
-  const furyBonus = moon.phase.key === "full" ? FURY_ATTRIBUTE_BONUS : 0;
+  const furyBonus = moon.phase.key === "full" ? FURY_MOON_ATTRIBUTE_BONUS : 0;
   const perks: string[] = [];
   if (xpBonus > 0) perks.push(t("+" + xpBonus + "% hunt experience"));
   if (trainingBonus > 0) perks.push(t("+" + trainingBonus + "% in training"));

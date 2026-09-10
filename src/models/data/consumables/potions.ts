@@ -70,15 +70,18 @@ export const POTIONS: readonly Item[] = [
     id: "rage-potion-" + tier.size,
     name: SIZE_LABEL[tier.size] + " Fury Potion",
     description:
-      "It gives nothing back to the body: it lights the beast from within. While it " +
-      "lasts, +10 to every attribute, and how long it lasts depends on the flask's size and your Willpower.",
+      "It gives nothing back to the body: it lights the beast from within. How deep " +
+      "the fury runs and how long it lasts both come from the flask's size, and your Willpower stretches the clock.",
     category: "potion" as const,
     rarity: tier.rarity,
     price: tier.price,
     minLevel: tier.minLevel,
     stackable: true,
     inMarket: true,
-    effect: { furyMinutes: FURY.durationMinutesBySize[tier.size] },
+    effect: {
+      furyMinutes: FURY.durationMinutesBySize[tier.size],
+      furyBonus: FURY.attributeBonusBySize[tier.size],
+    },
     potion: "rage" as const,
     size: tier.size,
   })),

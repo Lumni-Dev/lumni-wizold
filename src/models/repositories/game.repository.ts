@@ -52,6 +52,14 @@ function text(value: unknown, fallback: string): string {
 function stamp(value: unknown): string | undefined {
   return typeof value === "string" ? value : undefined;
 }
+// Absent is a real answer here, not zero: a save from before the flask sizes
+// carries no fury bonus, and the rules read that as the moon's own value, the
+// flat bonus every flask used to lend.
+function optionalCount(value: unknown): number | undefined {
+  return typeof value === "number" && Number.isFinite(value)
+    ? Math.max(0, Math.round(value))
+    : undefined;
+}
 function fillAttributes(shape: Partial<Attributes> | undefined, fallback: number): Attributes {
   return {
     strength: finiteInt(shape?.strength, fallback),
@@ -83,6 +91,7 @@ function normalizeCharacter(character: Character): Character {
     createdAt: text(character.createdAt, new Date().toISOString()),
     renamedAt: stamp(character.renamedAt),
     furyUntil: stamp(character.furyUntil),
+    furyBonus: optionalCount(character.furyBonus),
     vipUntil: stamp(character.vipUntil),
     vipSubscriptionId: stamp(character.vipSubscriptionId),
     vipCanceling: character.vipCanceling === true ? true : undefined,

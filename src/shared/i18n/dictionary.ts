@@ -523,9 +523,9 @@ const RULES: readonly PatternRule[] = [
     es: "$1 consumida: +$2 de vida.",
   },
   {
-    pattern: /^(.+) consumida: \+10 em todos os atributos por (.+)\.$/,
-    en: "$1 consumed: +10 to all attributes for $2.",
-    es: "$1 consumida: +10 a todos los atributos por $2.",
+    pattern: /^(.+) consumida: \+(\d+) em todos os atributos por (.+)\.$/,
+    en: "$1 consumed: +$2 to all attributes for $3.",
+    es: "$1 consumida: +$2 a todos los atributos por $3.",
   },
   { pattern: /^Nada equipado em (.+)\.$/, en: "Nothing equipped on the $1.", es: "Nada equipado en $1." },
   { pattern: /^Nada a recuperar com (.+)\.$/, en: "Nothing to restore with $1.", es: "Nada que recuperar con $1." },
@@ -1241,10 +1241,10 @@ const RULES: readonly PatternRule[] = [
     es: "$1 consumida: +$2 de vida.",
   },
   {
-    pattern: /^(.+) consumed: \+10 to all attributes for (.+)\.$/,
-    en: "$1 consumed: +10 to all attributes for $2.",
-    pt: "$1 consumida: +10 em todos os atributos por $2.",
-    es: "$1 consumida: +10 a todos los atributos por $2.",
+    pattern: /^(.+) consumed: \+(\d+) to all attributes for (.+)\.$/,
+    en: "$1 consumed: +$2 to all attributes for $3.",
+    pt: "$1 consumida: +$2 em todos os atributos por $3.",
+    es: "$1 consumida: +$2 a todos los atributos por $3.",
   },
   {
     pattern: /^You do not have that many (.+)\.$/,

@@ -21,6 +21,10 @@ export interface ItemEffect {
   petEnergyRatio?: number;
   healthRatio?: number;
   furyMinutes?: number;
+  // How deep the flask lights the beast: the fury bonus it lends to every
+  // attribute while it lasts. It rides with the item, so a size is a row of
+  // the potion table and never a branch in the rules.
+  furyBonus?: number;
 }
 
 export interface Item {

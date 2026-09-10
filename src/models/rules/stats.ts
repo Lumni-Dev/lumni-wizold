@@ -1,7 +1,7 @@
 import {
   BASE_ATTRIBUTE_VALUE,
   BASE_VITAL,
-  FURY_ATTRIBUTE_BONUS,
+  FURY_MOON_ATTRIBUTE_BONUS,
   HEALTH_PER_ENDURANCE,
 } from "@/shared/constants/game";
 import { healthPerLevelFor } from "@/shared/constants/tuning/vitals";
@@ -12,7 +12,7 @@ import type { Character, Gender } from "../entities/character";
 import type { Pet } from "../entities/pet";
 import { findItem } from "../data/items";
 import { enhancedEffect } from "./forge";
-import { isFullMoon, isFuryActive, type MoonPhaseKey } from "./moon";
+import { isFullMoon, potionFuryRemainingMs, type MoonPhaseKey } from "./moon";
 import { petBonus } from "./pet";
 import { experienceForLevel } from "./progression";
 
@@ -61,14 +61,14 @@ function criticalOf(instinct: number): number {
   return Math.round(criticalExactOf(instinct));
 }
 
-function furyAttributes(active: boolean): Attributes {
-  if (!active) return emptyAttributes();
+function furyAttributes(bonus: number): Attributes {
+  if (bonus <= 0) return emptyAttributes();
   return {
-    strength: FURY_ATTRIBUTE_BONUS,
-    agility: FURY_ATTRIBUTE_BONUS,
-    endurance: FURY_ATTRIBUTE_BONUS,
-    instinct: FURY_ATTRIBUTE_BONUS,
-    willpower: FURY_ATTRIBUTE_BONUS,
+    strength: bonus,
+    agility: bonus,
+    endurance: bonus,
+    instinct: bonus,
+    willpower: bonus,
   };
 }
 
@@ -93,6 +93,10 @@ export interface StatSubject {
   attributes: Attributes;
   gender?: Gender;
   furyActive?: boolean;
+  // How deep the running flask lit the beast. Absent while the fury is on, it
+  // reads as the moon's own bonus, so a hunter handed over without a size,
+  // the arena's rival and the ranking sheet, is never left lending nothing.
+  furyBonus?: number;
   petAttributes?: Attributes;
 }
 
@@ -103,7 +107,10 @@ export function deriveStats(
   moonPhase?: MoonPhaseKey,
   now = Date.now(),
 ): DerivedStats {
-  const furyActive = isFuryActive(character, moonPhase, now);
+  // Only the flask travels as furyActive: the sky is read again below, by the
+  // phase alone, so a stale bonus left by an expired potion can never ride a
+  // full moon.
+  const furyActive = potionFuryRemainingMs(character, now) > 0;
   return deriveStatsOf(
     { ...character, furyActive, petAttributes: petBonus(pet) },
     equipment,
@@ -120,7 +127,10 @@ export function deriveStatsOf(
   const equipped = equipmentAttributes(equipment);
   const pet = subject.petAttributes ?? emptyAttributes();
   const moon = emptyAttributes();
-  const fury = furyAttributes(subject.furyActive === true || isFullMoon(moonPhase));
+  const potionBonus =
+    subject.furyActive === true ? subject.furyBonus ?? FURY_MOON_ATTRIBUTE_BONUS : 0;
+  const skyBonus = isFullMoon(moonPhase) ? FURY_MOON_ATTRIBUTE_BONUS : 0;
+  const fury = furyAttributes(Math.max(potionBonus, skyBonus));
 
   const total = [equipped, pet, moon, fury].reduce(addAttributes, trained);
 
