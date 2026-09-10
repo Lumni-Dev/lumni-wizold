@@ -36,7 +36,6 @@ import { cn } from "@/shared/utils/class-names";
 import { displayNick, sanitizeName, sanitizeRoomSearch } from "@/shared/utils/text";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
 import { ActionIcon } from "../components/app-icon";
-import { AiAuditNotice } from "../components/ai-audit-notice";
 import { Button } from "../components/button";
 import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
 import { Chip } from "../components/chip";
@@ -579,7 +578,6 @@ export function TavernScreen() {
                   setRoomName(sanitizeName(event.target.value, ROOM_NAME_MAX_LENGTH))
                 }
               />
-              <AiAuditNotice />
               <Field
                 label={hideName ? "Password" : "Password (optional)"}
                 type="password"
@@ -696,7 +694,6 @@ export function TavernScreen() {
                 hint="Whoever sits at a table now answers first, then the ranking board."
                 onChange={(event) => setNick(sanitizeName(event.target.value, NAME_MAX_LENGTH))}
               />
-              <AiAuditNotice />
               <Tooltip block label={pack.length >= MAX_PACK ? "The pack is full" : ""}>
                 <Button
                   type="submit"

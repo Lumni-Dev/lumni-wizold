@@ -23,7 +23,6 @@ import { BRAND_LOGO_PNG_PATH, BRAND_LOGO_WEBP_PATH } from "@/shared/constants/si
 import { formatNumber, formatBronze, formatReais, formatDay } from "@/shared/utils/format";
 import { sanitizeName } from "@/shared/utils/text";
 import { Button } from "../components/button";
-import { AiAuditNotice } from "../components/ai-audit-notice";
 import { Chip } from "../components/chip";
 import { ChipTabs } from "../components/chip-tabs";
 import { ConfirmDialog } from "../components/confirm-dialog";
@@ -113,7 +112,7 @@ export function SettingsScreen() {
         ...Object.values(art.training),
         ...Object.values(art.territories),
         ...Object.values(art.creatures),
-        ...Object.values(art.pets),
+        ...(art.pet ? [art.pet] : []),
         ...Object.values(art.genders),
         ...Object.values(art.packs),
       ];
@@ -424,7 +423,6 @@ export function SettingsScreen() {
                 }
                 onChange={(event) => setNewName(sanitizeName(event.target.value, NAME_MAX_LENGTH))}
               />
-              <AiAuditNotice />
               <Button
                 type="submit"
                 variant="primary"

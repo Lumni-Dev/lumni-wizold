@@ -8,12 +8,12 @@ import { validateName } from "@/controllers/character.controller";
 import { GENDERS, type Gender } from "@/models/entities/character";
 import { GAME_NAME, GAME_TAGLINE, NAME_MAX_LENGTH } from "@/shared/constants/game";
 import { sanitizeName } from "@/shared/utils/text";
-import { cn } from "@/shared/utils/class-names";
 import { Button } from "../components/button";
-import { AiAuditNotice } from "../components/ai-audit-notice";
+import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
 import { Field } from "../components/field";
-import { CornerAccents } from "../components/corner-accents";
-import { GenderIcon } from "../components/gender-icon";
+import { GenderArtFill } from "../components/gender-icon";
+import { RowText } from "../components/list";
+import { Panel } from "../components/panel";
 import { Tag } from "../components/tag";
 import { Toast } from "../layout/toast";
 
@@ -66,12 +66,12 @@ export function CharacterCreationScreen() {
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4 md:p-8">
-      <div className="w-full max-w-3xl">
-        <header className="mb-6 space-y-2 text-center">
+      <div className="w-full max-w-3xl space-y-6">
+        <header className="space-y-2 text-center">
           <p className="font-logo text-lg uppercase tracking-[0.22em] text-highlight">
             {GAME_NAME}
           </p>
-          <p className="mt-2 text-[11px] uppercase tracking-[0.24em] text-ink-faint">
+          <p className="text-[11px] uppercase tracking-[0.24em] text-ink-faint">
             {t(GAME_TAGLINE)}
           </p>
           <p className="mx-auto max-w-md text-xs leading-relaxed text-ink-soft">
@@ -79,12 +79,8 @@ export function CharacterCreationScreen() {
           </p>
         </header>
 
-        <form
-          onSubmit={submit}
-          className="relative h-fit space-y-6 rounded-lg border border-edge bg-surface/80 p-4 md:p-8"
-        >
-          <fieldset className="space-y-2">
-            <legend className="heading text-[11px] text-ink">{t("Name")}</legend>
+        <form onSubmit={submit} className="space-y-6">
+          <Panel title="Name">
             <Field
               value={name}
               onChange={(event) => setName(sanitizeName(event.target.value, NAME_MAX_LENGTH))}
@@ -92,12 +88,13 @@ export function CharacterCreationScreen() {
               placeholder="What the pack will call you"
               autoComplete="off"
             />
-            <AiAuditNotice />
-          </fieldset>
+          </Panel>
 
-          <fieldset className="space-y-2">
-            <legend className="heading text-[11px] text-ink">{t("Bloodline")}</legend>
-            <div className="grid grid-cols-1 items-start gap-3 sm:grid-cols-2">
+          <Panel
+            title="Bloodline"
+            description="The choice sets only the starting lean. Every attribute stays trainable."
+          >
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {GENDERS.map((definition) => {
                 const chosen = gender === definition.key;
                 return (
@@ -106,34 +103,30 @@ export function CharacterCreationScreen() {
                     type="button"
                     onClick={() => setGender(definition.key)}
                     aria-pressed={chosen}
-                    className={cn(
-                      "flex h-fit flex-col gap-3 rounded-md border p-4 text-left transition-colors",
-                      chosen
-                        ? "border-ink-faint bg-surface-high"
-                        : "border-edge bg-surface-high/40 hover:border-edge-strong",
-                    )}
+                    className="h-full text-left"
                   >
-                    <div className="flex items-center gap-3">
-                      <GenderIcon gender={definition.key} size="large" />
-                      <div>
-                        <p className="text-sm text-ink">{t(definition.label)}</p>
-                        <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                          {t(definition.title)}
+                    <Card
+                      height="fill"
+                      interactive
+                      tone={chosen ? "highlighted" : "default"}
+                    >
+                      <CardHeader art={<GenderArtFill gender={definition.key} />}>
+                        <RowText title={definition.label} label={definition.title} />
+                      </CardHeader>
+                      <CardBody>
+                        <p className="text-xs leading-relaxed text-ink-faint">
+                          {t(definition.description)}
                         </p>
-                      </div>
-                    </div>
-                    <p className="text-xs leading-relaxed text-ink-faint">
-                      {t(definition.description)}
-                    </p>
-                    <Tag tone="neutral">{definition.bonusLabel}</Tag>
+                      </CardBody>
+                      <CardFooter>
+                        <Tag tone="neutral">{definition.bonusLabel}</Tag>
+                      </CardFooter>
+                    </Card>
                   </button>
                 );
               })}
             </div>
-            <p className="text-[11px] text-ink-faint">
-              {t("The choice sets only the starting lean. Every attribute stays trainable.")}
-            </p>
-          </fieldset>
+          </Panel>
 
           {error ? <p className="text-xs text-ink-soft">{error}</p> : null}
 
@@ -147,7 +140,6 @@ export function CharacterCreationScreen() {
           >
             Start the first night
           </Button>
-          <CornerAccents inside />
         </form>
       </div>
 

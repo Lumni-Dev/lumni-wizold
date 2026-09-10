@@ -5,7 +5,6 @@ import { translate } from "@/shared/i18n/dictionary";
 import { EMPTY_ART, type ArtManifest } from "../entities/art";
 import { ATTRIBUTES } from "../entities/attribute";
 import { GENDERS } from "../entities/character";
-import { PETS } from "../entities/pet";
 import { EQUIPMENT_SLOTS } from "../entities/item";
 import { ITEMS } from "../data/items";
 import { STORE_PACKS } from "../data/store-packs";
@@ -265,21 +264,8 @@ function collectGenders(files: FoundFile[]): Record<string, string> {
   return art;
 }
 
-function collectPets(files: FoundFile[]): Record<string, string> {
-  const art: Record<string, string> = {};
-
-  for (const file of files) {
-    const words = normalize(file.name).split("-");
-    const definition = PETS.find(
-      (pet) =>
-        words.includes(pet.key) ||
-        words.includes(normalize(pet.label)) ||
-        words.includes(inPt(pet.label)),
-    );
-    if (definition) art[definition.key] = file.url;
-  }
-
-  return art;
+function collectPet(files: FoundFile[]): string | undefined {
+  return files[0]?.url;
 }
 
 function collectPacks(files: FoundFile[]): Record<string, string> {
@@ -369,7 +355,7 @@ export async function scanArtManifestFromDisk(): Promise<ArtManifest> {
     territories: collectTerritories(hunt),
     territoryVideos: collectTerritories(huntVideos),
     creatures: collectCreatures(creatures),
-    pets: collectPets(pets),
+    pet: collectPet(pets),
     genders: collectGenders(genders),
     packs: collectPacks(packs),
     emptySlots: collectEmptySlots(emptySlots),

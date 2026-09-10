@@ -9,7 +9,6 @@ import { isInPack } from "@/controllers/pack.controller";
 import { profileOf } from "@/controllers/ranking.controller";
 import { findGender } from "@/models/entities/character";
 import type { Hunter } from "@/models/entities/ranking";
-import { findPet } from "@/models/entities/pet";
 import { restRecoveryRatio } from "@/controllers/character.controller";
 import { criticalMultiplierOf, EXTRA_STRIKE_CAP, extraStrikeChanceExact } from "@/models/rules/combat";
 import { CRITICAL_CHANCE_CAP, DODGE_CHANCE_CAP } from "@/models/rules/stats";
@@ -23,7 +22,8 @@ import { DataRow } from "../components/data-row";
 import { EmptyState } from "../components/empty-state";
 import { CardHeader } from "../components/card";
 import { GenderArtFill } from "../components/gender-icon";
-import { PetSheetHeader } from "../components/pet-icon";
+import { PetArtFill } from "../components/pet-icon";
+import { PET_TITLE } from "@/models/entities/pet";
 import { List, ListRow } from "../components/list";
 import { AttributesPanel } from "../components/attributes-panel";
 import { EquipmentPanel } from "../components/equipment-panel";
@@ -74,7 +74,6 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
 
   const { hunter, isPlayer, positions, boardSize, stats, gear } = profile;
   const best = positions.reduce((first, next) => (next.position < first.position ? next : first));
-  const wolf = hunter.pet ? findPet(hunter.pet.gender) : null;
   const genderDefinition = findGender(hunter.gender);
   const strength = stats.totalAttributes.strength;
   const endurance = stats.totalAttributes.endurance;
@@ -199,16 +198,20 @@ export function RankingProfileScreen({ hunterId }: { hunterId: string }) {
 
           <Panel
             title="Companion"
-            description="Only what the wolf itself reveals: bloodline and training."
+            description="Only what the wolf itself reveals: level and training."
             padding="none"
           >
-            {wolf && hunter.pet ? (
+            {hunter.pet ? (
               <>
-                <PetSheetHeader gender={hunter.pet.gender}>
-                  <p className="truncate text-sm text-ink">{hunter.pet.name}</p>
-                </PetSheetHeader>
+                <CardHeader art={<PetArtFill />}>
+                  <div className="min-w-0 space-y-1">
+                    <p className="min-w-0 truncate text-sm text-ink">{hunter.pet.name}</p>
+                    <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                      {t(PET_TITLE)}
+                    </p>
+                  </div>
+                </CardHeader>
                 <List>
-                  <DataRow label="Sex" value={wolf.label} />
                   <DataRow
                     label="Level"
                     value={formatNumber(hunter.pet.level) + " / " + formatNumber(PET_MAX_LEVEL)}

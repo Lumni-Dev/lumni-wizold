@@ -6,7 +6,7 @@ import type { Character, Gender } from "../../entities/character";
 import { initialState, type GameState } from "../../entities/game-state";
 import type { LogEntry, LogKind } from "../../entities/log-entry";
 import type { PackMate } from "../../entities/pack";
-import type { Pet, PetGender } from "../../entities/pet";
+import type { Pet } from "../../entities/pet";
 import { fillAutomation } from "../../entities/automation";
 import { isActivityKind, type Activity, type ActivityKind } from "../../entities/activity";
 import { bumpRosterRevision } from "./roster.store";
@@ -205,7 +205,6 @@ export async function loadGame(
       ? ({
           id: petRow.id,
           name: petRow.name,
-          gender: petRow.gender as PetGender,
           energy: int(petRow.energy),
           active: petRow.active !== false,
           level: int(petRow.level) || 1,
@@ -473,15 +472,14 @@ async function savePet(
 ): Promise<void> {
   if (after.pet) {
     await client.query(
-      `insert into pets (id, character_id, name, gender, energy, active, level, training_progress, adopted_at)
-       values ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      `insert into pets (id, character_id, name, energy, active, level, training_progress, adopted_at)
+       values ($1, $2, $3, $4, $5, $6, $7, $8)
        on conflict (character_id) do update set
-         name = $3, gender = $4, energy = $5, active = $6, level = $7, training_progress = $8`,
+         name = $3, energy = $4, active = $5, level = $6, training_progress = $7`,
       [
         after.pet.id,
         characterId,
         after.pet.name,
-        after.pet.gender,
         after.pet.energy,
         after.pet.active !== false,
         after.pet.level ?? 1,

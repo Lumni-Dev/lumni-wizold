@@ -260,7 +260,7 @@ export function TrainingScreen() {
               interactive={petActive || petReady}
               tone={petActive ? "highlighted" : "default"}
             >
-              <CardHeader art={<PetArtFill gender={petTraining.pet.gender} />}>
+              <CardHeader art={<PetArtFill />}>
                 <RowText
                   title="Companion"
                   label="Companion training"

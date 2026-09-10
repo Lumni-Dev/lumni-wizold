@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useGame } from "@/controllers/game.context";
 import { useT } from "@/controllers/use-locale";
 import { detailInventory } from "@/controllers/inventory.controller";
-import { PETS, findPet, type PetGender } from "@/models/entities/pet";
+import { PET_DESCRIPTION, PET_TITLE } from "@/models/entities/pet";
 import { ATTRIBUTES } from "@/models/entities/attribute";
 import {
   isPetActive,
@@ -29,12 +29,11 @@ import { formatNumber, formatBronze } from "@/shared/utils/format";
 import { sanitizeName } from "@/shared/utils/text";
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
-import { AiAuditNotice } from "../components/ai-audit-notice";
-import { Card, CardBody, CardFooter, CardHeader } from "../components/card";
+import { Card, CardArt, CardBody, CardHeader, CardStack } from "../components/card";
 import { RowText } from "../components/list";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { Field } from "../components/field";
-import { PetArtFill, PetSheetHeader } from "../components/pet-icon";
+import { PetArtFill, PetKennelArt } from "../components/pet-icon";
 import { List, ListRow } from "../components/list";
 import { SupplyRow } from "../components/supply-row";
 import { Panel } from "../components/panel";
@@ -46,7 +45,6 @@ import { PageHeader } from "../layout/page-header";
 function Kennel({ bronze, level }: { bronze: number; level: number }) {
   const { adoptPet } = useGame();
   const t = useT();
-  const [gender, setGender] = useState<PetGender>("male");
   const [name, setName] = useState("");
   const [confirming, setConfirming] = useState(false);
 
@@ -56,88 +54,59 @@ function Kennel({ bronze, level }: { bronze: number; level: number }) {
 
   return (
     <>
-      <div className="grid grid-cols-1 items-start gap-6 sm:grid-cols-2">
-        {PETS.map((definition) => {
-          const chosen = definition.key === gender;
+      <Card layout="row">
+        <CardArt>
+          <PetKennelArt />
+        </CardArt>
 
-          return (
-            <Card
-              key={definition.key}
-              height="fill"
-              tone={chosen ? "highlighted" : "default"}
-              interactive={!chosen}
+        <CardStack>
+          <CardHeader>
+            <RowText title="Companion" label={PET_TITLE} />
+          </CardHeader>
+
+          <CardBody>
+            <p className="text-xs leading-relaxed text-ink-faint">{t(PET_DESCRIPTION)}</p>
+
+            <form
+              className="space-y-3"
+              onSubmit={(event) => {
+                event.preventDefault();
+                if (oldEnough && name.trim().length > 0) setConfirming(true);
+              }}
             >
-              <CardHeader art={<PetArtFill gender={definition.key} />}>
-                <RowText title={definition.label} label={definition.title} />
-              </CardHeader>
-
-              <CardBody>
-                <p className="text-xs leading-relaxed text-ink-faint">{t(definition.description)}</p>
-              </CardBody>
-
-              <CardFooter>
-                <span className="text-[11px] text-ink-faint">
-                  {chosen ? "Chosen" : "Available"}
-                </span>
-                <Button
-                  variant={chosen ? "secondary" : "outline"}
-                  onClick={() => setGender(definition.key)}
-                >
-                  {chosen ? "Chosen" : "Choose"}
-                </Button>
-              </CardFooter>
-            </Card>
-          );
-        })}
-      </div>
-
-      <Panel
-        title="Adoption"
-        description={
-          "The name is given at the door; changing it later costs " +
-          formatBronze(petRenamePrice(level)) +
-          " at the kennel. Adoption asks for LV " +
-          PET_MIN_LEVEL +
-          " and costs " +
-          formatBronze(price) +
-          "."
-        }
-      >
-        <form
-          className="space-y-3"
-          onSubmit={(event) => {
-            event.preventDefault();
-            if (oldEnough && name.trim().length > 0) setConfirming(true);
-          }}
-        >
-          <Field
-            label={gender === "male" ? "The male's name" : "The female's name"}
-            value={name}
-            maxLength={NAME_MAX_LENGTH}
-            placeholder="What you will call him for the rest of the run"
-            autoComplete="off"
-            onChange={(event) => setName(sanitizeName(event.target.value, NAME_MAX_LENGTH))}
-          />
-          <AiAuditNotice />
-          {!oldEnough ? (
-            <p className="text-[11px] text-ink-faint">
-              {t("The wolf only hunts beside a LV " + PET_MIN_LEVEL + " or higher.")}
-            </p>
-          ) : null}
-          <Button
-            type="submit"
-            variant="primary"
-            fullWidth
-            disabled={!oldEnough || !affordable || name.trim().length === 0}
-          >
-            {!oldEnough
-              ? "Requires LV " + PET_MIN_LEVEL
-              : affordable
-                ? "Adopt for " + formatBronze(price)
-                : formatBronze(price - bronze) + " short"}
-          </Button>
-        </form>
-      </Panel>
+              <Field
+                label="Companion's name"
+                value={name}
+                maxLength={NAME_MAX_LENGTH}
+                placeholder="What you will call it for the rest of the run"
+                autoComplete="off"
+                onChange={(event) => setName(sanitizeName(event.target.value, NAME_MAX_LENGTH))}
+              />
+              <p className="text-[11px] text-ink-faint">
+                {t(
+                  oldEnough
+                    ? "The name is given at the door; changing it later costs " +
+                        formatBronze(petRenamePrice(level)) +
+                        " at the kennel."
+                    : "The wolf only hunts beside a LV " + PET_MIN_LEVEL + " or higher.",
+                )}
+              </p>
+              <Button
+                type="submit"
+                variant="primary"
+                fullWidth
+                disabled={!oldEnough || !affordable || name.trim().length === 0}
+              >
+                {!oldEnough
+                  ? "Requires LV " + PET_MIN_LEVEL
+                  : affordable
+                    ? "Adopt for " + formatBronze(price)
+                    : formatBronze(price - bronze) + " short"}
+              </Button>
+            </form>
+          </CardBody>
+        </CardStack>
+      </Card>
 
       <ConfirmDialog
         open={confirming}
@@ -148,11 +117,11 @@ function Kennel({ bronze, level }: { bronze: number; level: number }) {
           formatBronze(petRenamePrice(level)) +
           " at the kennel."
         }
-        detail={findPet(gender).label + " - " + name.trim() + " - " + formatBronze(price)}
+        detail={name.trim() + " - " + formatBronze(price)}
         confirmLabel="Adopt"
         onCancel={() => setConfirming(false)}
         onConfirm={async () => {
-          await adoptPet(gender, name);
+          await adoptPet(name);
           setName("");
           setConfirming(false);
         }}
@@ -187,7 +156,6 @@ export function PetScreen() {
     );
   }
 
-  const definition = findPet(pet.gender);
   const active = isPetActive(pet);
 
   const level = petLevelOf(pet);
@@ -208,36 +176,46 @@ export function PetScreen() {
       />
 
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
-        <Panel title="Companion" padding="none" className="lg:col-span-1">
-          <PetSheetHeader gender={pet.gender}>
-            <div className="min-w-0">
-              <p className="truncate text-sm text-ink">{pet.name}</p>
-              <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                {definition.title}
-              </p>
-            </div>
-          </PetSheetHeader>
+        <div className="space-y-6 lg:col-span-1">
+          <Panel title="Sheet" padding="none">
+            <CardHeader art={<PetArtFill />}>
+              <div className="min-w-0 space-y-1">
+                <p className="min-w-0 truncate text-sm text-ink">{pet.name}</p>
+                <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                  {t(PET_TITLE)}
+                </p>
+              </div>
+            </CardHeader>
 
-          <List>
-            <DataRow label="Sex" value={definition.label} />
-            <DataRow
-              label="Level"
-              value={formatNumber(petLevelOf(pet)) + " / " + formatNumber(PET_MAX_LEVEL)}
-            />
-            <DataRow
-              label="Energy"
-              value={formatNumber(pet.energy) + " / " + formatNumber(maxEnergy)}
-            />
-            <DataRow label="On the hunt" value={active ? "Yes" : "No"} />
-            {lending.map((attribute) => (
+            <List>
               <DataRow
-                key={attribute.key}
-                label={attribute.name}
-                value={"+" + formatNumber(lends[attribute.key])}
+                label="Level"
+                value={formatNumber(petLevelOf(pet)) + " / " + formatNumber(PET_MAX_LEVEL)}
               />
-            ))}
-          </List>
-        </Panel>
+              <DataRow
+                label="Energy"
+                value={formatNumber(pet.energy) + " / " + formatNumber(maxEnergy)}
+              />
+              <DataRow label="On the hunt" value={active ? "Yes" : "No"} />
+            </List>
+          </Panel>
+
+          <Panel
+            title="Bonus"
+            description="What the wolf lends while it hunts at your side."
+            padding="none"
+          >
+            <List>
+              {lending.map((attribute) => (
+                <DataRow
+                  key={attribute.key}
+                  label={attribute.name}
+                  value={"+" + formatNumber(lends[attribute.key])}
+                />
+              ))}
+            </List>
+          </Panel>
+        </div>
 
         <div className="space-y-6 lg:col-span-2">
           <Panel
@@ -348,13 +326,12 @@ export function PetScreen() {
                 label="New name"
                 value={newPetName}
                 maxLength={NAME_MAX_LENGTH}
-                placeholder="What the pack will call him"
+                placeholder="What the pack will call it"
                 autoComplete="off"
                 onChange={(event) =>
                   setNewPetName(sanitizeName(event.target.value, NAME_MAX_LENGTH))
                 }
               />
-              <AiAuditNotice />
               <Button
                 type="submit"
                 variant="primary"
@@ -382,7 +359,7 @@ export function PetScreen() {
           >
             <p className="text-xs leading-relaxed text-ink-faint">
               {t(
-                "Releasing returns no WCoin: adopting is a commitment. Afterwards another can be adopted at the kennel, of either bloodline, and the name is freed to use again. This one is what does not come back.",
+                "Releasing returns no WCoin: adopting is a commitment. Afterwards another can be adopted at the kennel, and the name is freed to use again. This one is what does not come back.",
               )}
             </p>
           </Panel>

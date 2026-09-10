@@ -1,11 +1,9 @@
 import type { AttributeKey, Attributes } from "./attribute";
 import type { Gender } from "./character";
 import type { Equipment } from "./item";
-import type { PetGender } from "./pet";
 
 export interface HunterPet {
   name: string;
-  gender: PetGender;
   level: number;
   energy: number;
   active: boolean;

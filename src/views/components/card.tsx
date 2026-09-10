@@ -111,15 +111,19 @@ export function CardHeader({
 export function CardArt({ children, className }: { children: ReactNode; className?: string }) {
   const tone = useCardTone();
 
+  // The drawing is taken out of the flow so it never sets the row's height: the
+  // text column beside it decides that. The width is a share of the card with a
+  // ceiling, because a fraction alone leaves the drawing floating in dead air on
+  // a wide screen; capped, the column hugs the art and the text takes the rest.
   return (
     <div
       className={cn(
-        "flex w-2/5 shrink-0 items-center justify-center overflow-hidden",
+        "relative w-2/5 max-w-[20rem] shrink-0 overflow-hidden",
         tone !== "empty" && "border-r border-edge",
         className,
       )}
     >
-      {children}
+      <span className="absolute inset-0 flex items-center justify-center p-4">{children}</span>
     </div>
   );
 }

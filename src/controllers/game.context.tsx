@@ -17,7 +17,7 @@ import { isVip } from "@/models/rules/vip";
 import type { EquipmentSlot } from "@/models/entities/item";
 import { initialState, type GameState } from "@/models/entities/game-state";
 import type { Character, Gender } from "@/models/entities/character";
-import type { Pet, PetGender } from "@/models/entities/pet";
+import type { Pet } from "@/models/entities/pet";
 import type { PackInvite } from "@/models/entities/pack";
 import type { PresenceStatus } from "@/models/entities/presence";
 import { moonRepository } from "@/models/repositories/moon.repository";
@@ -150,7 +150,7 @@ interface GameContextValue {
     itemId: string,
     enhancement?: number,
   ) => Promise<{ message: string; raised: boolean } | "retry" | null>;
-  adoptPet: (gender: PetGender, name: string) => Promise<void>;
+  adoptPet: (name: string) => Promise<void>;
   releasePet: () => Promise<void>;
   setAutomation: (key: AutomationKey, on: boolean) => void;
   invite: (person: TavernIdentity) => Promise<boolean>;
@@ -1189,8 +1189,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
         }
         return { message: answer.message, raised: answer.data?.raised === true };
       },
-      adoptPet: async (gender, name) => {
-        await act("POST", "/api/pet/adopt", { gender, name }, "Companion", () => {
+      adoptPet: async (name) => {
+        await act("POST", "/api/pet/adopt", { name }, "Companion", () => {
           playSound("buy");
           playSound("howl", 240);
         });

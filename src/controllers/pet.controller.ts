@@ -3,7 +3,7 @@ import { formatBronze } from "@/shared/utils/format";
 import { generateId } from "@/shared/utils/id";
 import { findItem } from "@/models/data/items";
 import type { GameState } from "@/models/entities/game-state";
-import type { Pet, PetGender } from "@/models/entities/pet";
+import type { Pet } from "@/models/entities/pet";
 import { failure, success, type Result } from "@/models/entities/result";
 import {
   growPet,
@@ -27,7 +27,7 @@ import { capitalizeName, syncCharacter, validateName } from "./character.control
 import { countInInventory, removeFromInventory } from "./inventory.controller";
 import { addLog } from "./log.controller";
 
-export function adoptPet(state: GameState, gender: PetGender, name: string): Result {
+export function adoptPet(state: GameState, name: string): Result {
   const character = state.character;
   if (!character) return failure(state, "No active character.");
   if (state.pet) return failure(state, "The companion already walks with you.");
@@ -45,7 +45,6 @@ export function adoptPet(state: GameState, gender: PetGender, name: string): Res
   const pet: Pet = {
     id: generateId("pet"),
     name: capitalizeName(name),
-    gender,
     energy: petMaxEnergy(1),
     active: true,
     adoptedAt: new Date().toISOString(),

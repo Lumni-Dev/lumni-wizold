@@ -52,7 +52,6 @@ function playerAsHunter(state: GameState): Hunter | null {
     pet: state.pet
       ? {
           name: state.pet.name,
-          gender: state.pet.gender,
           level: state.pet.level ?? 1,
           energy: state.pet.energy,
           active: state.pet.active !== false,

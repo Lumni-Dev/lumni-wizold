@@ -5,7 +5,7 @@ export interface ArtManifest {
   territories: Record<string, string>;
   territoryVideos: Record<string, string>;
   creatures: Record<string, string>;
-  pets: Record<string, string>;
+  pet: string | undefined;
   genders: Record<string, string>;
   packs: Record<string, string>;
   emptySlots: Record<string, string>;
@@ -18,7 +18,7 @@ export const EMPTY_ART: ArtManifest = {
   territories: {},
   territoryVideos: {},
   creatures: {},
-  pets: {},
+  pet: undefined,
   genders: {},
   packs: {},
   emptySlots: {},

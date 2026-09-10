@@ -1,6 +1,5 @@
 import type { PoolClient } from "pg";
 import { emptyEquipment, type Equipment, type EquipmentSlot } from "@/models/entities/item";
-import type { PetGender } from "@/models/entities/pet";
 import type { Hunter, HunterPet } from "@/models/entities/ranking";
 import type { TavernIdentity } from "@/models/entities/tavern";
 
@@ -9,7 +8,7 @@ export async function loadHunters(client: PoolClient): Promise<Hunter[]> {
     "select c.* from characters c join users u on u.id = c.user_id where u.banished = false",
   );
   const pets = await client.query(
-    "select character_id, name, gender, level, energy, active from pets",
+    "select character_id, name, level, energy, active from pets",
   );
   const equipped = await client.query(
     "select character_id, slot, item_id, enhancement from equipped_items",
@@ -18,7 +17,6 @@ export async function loadHunters(client: PoolClient): Promise<Hunter[]> {
   for (const row of pets.rows) {
     petBy.set(row.character_id, {
       name: row.name,
-      gender: row.gender as PetGender,
       level: Number(row.level),
       energy: Number(row.energy),
       active: row.active !== false,
