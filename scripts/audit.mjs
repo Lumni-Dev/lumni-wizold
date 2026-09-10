@@ -1836,6 +1836,31 @@ sec("inventory and market");
     "swapping for the same piece preserves",
     swapped.ok && inventoryCtrl.countInInventory(swapped.state.inventory, "bronze-claw") === 1,
   );
+  // The body is closed while a job runs, and the refusal is the use case's own,
+  // not the screen's: the route hands the server's job slot in, so a tab that
+  // hides its dock meets the same wall.
+  ok(
+    "taking gear off mid-job is refused",
+    dressed.ok && inventoryCtrl.unequipItem(dressed.state, "claw", { kind: "hunt" }).ok === false,
+  );
+  ok(
+    "the refusal names the job",
+    dressed.ok &&
+      inventoryCtrl.unequipItem(dressed.state, "claw", { kind: "mine" }).message ===
+        entActivity.gearChangeBlockReason({ kind: "mine" }),
+  );
+  ok(
+    "the piece stays on the body when refused",
+    dressed.ok &&
+      inventoryCtrl.unequipItem(dressed.state, "claw", { kind: "hunt" }).state.equipment.claw
+        ?.itemId === "bronze-claw",
+  );
+  for (const parked of [{ kind: "forge", paused: true }, { kind: "rest" }, null, undefined]) {
+    ok(
+      "a job that owns no lap lets the gear move",
+      dressed.ok && inventoryCtrl.unequipItem(dressed.state, "claw", parked).ok === true,
+    );
+  }
   const potion = inventoryCtrl.consumeItem(
     { ...state, inventory: [{ itemId: "health-potion-small", quantity: 1, enhancement: 0 }] },
     "health-potion-small",
@@ -2710,6 +2735,25 @@ sec("tavern");
     ok(
       "rest never locks",
       entActivity.workActivityBlockReason({ kind: "rest" }) === null,
+    );
+    for (const kind of ["hunt", "train", "mine", "forge", "alchemy"]) {
+      ok(
+        "a running " + kind + " closes the body",
+        entActivity.gearChangeBlockReason({ kind }) !== null,
+      );
+    }
+    ok(
+      "a parked job leaves the body open",
+      entActivity.gearChangeBlockReason({ kind: "forge", paused: true }) === null,
+    );
+    ok(
+      "resting leaves the body open",
+      entActivity.gearChangeBlockReason({ kind: "rest" }) === null,
+    );
+    ok(
+      "no job leaves the body open",
+      entActivity.gearChangeBlockReason(null) === null &&
+        entActivity.gearChangeBlockReason(undefined) === null,
     );
     ok(
       "the hunt phrase",

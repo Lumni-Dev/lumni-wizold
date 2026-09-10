@@ -1454,6 +1454,12 @@ const RULES: readonly PatternRule[] = [
     es: "$1: párala antes de empezar otra.",
   },
   {
+    pattern: /^(.+): stop it before taking gear off\.$/,
+    en: "$1: stop it before taking gear off.",
+    pt: "$1: pare antes de tirar o equipamento.",
+    es: "$1: párala antes de quitarte el equipo.",
+  },
+  {
     pattern: /^(.+?)( strikes | strikes again | bites | sinks its claws into | sinks its teeth into | batters | tears the flank of | tears into | shreds | rips open | hits | hits again | mauls | lunges at | flashes a second blow at | lunges twice into | lunges a second time at )(.+) dealing (\d+) critical damage\.$/,
     en: "$1$2$3 dealing $4 critical damage.",
     pt: "$1$2$3 causando $4 de dano crítico.",

@@ -55,6 +55,16 @@ export function workActivityBlockReason(activity: Activity | null | undefined): 
   return WORK_ACTIVITY_LABELS[activity.kind] + ": stop it before starting another.";
 }
 
+// The body may not be rearranged mid-job. A running job was started against
+// the gear the hunter was wearing, and every lap of it reads that body again:
+// pulling a claw off between two beats leaves the report and the sheet
+// disagreeing about who did the work. Same shape as the block above, so a
+// parked job and a rest, which own no lap, let the gear move freely.
+export function gearChangeBlockReason(activity: Activity | null | undefined): string | null {
+  if (!activity || !isWorkActivity(activity.kind) || activity.paused === true) return null;
+  return WORK_ACTIVITY_LABELS[activity.kind] + ": stop it before taking gear off.";
+}
+
 export type HunterDoing = ActivityKind | "idle";
 
 export const ACTIVITY_STALE_MS = 60000;

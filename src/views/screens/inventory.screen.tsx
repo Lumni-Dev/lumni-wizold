@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useGame } from "@/controllers/game.context";
+import { ACTIVITY_WAIT_LABEL, useGearLock } from "@/controllers/use-activity-lock";
 import { useT } from "@/controllers/use-locale";
 import { detailInventory } from "@/controllers/inventory.controller";
 import { findItem } from "@/models/data/items";
@@ -33,6 +34,7 @@ import { ItemArtFill, EmptySlotArt } from "../components/item-icon";
 import { RowText } from "../components/list";
 import { Tag } from "../components/tag";
 import { Panel } from "../components/panel";
+import { Tooltip } from "../components/tooltip";
 import { EmptyState } from "../components/empty-state";
 import { PageHeader } from "../layout/page-header";
 
@@ -41,6 +43,7 @@ const PAGE_SIZE = 8;
 export function InventoryScreen() {
   const router = useRouter();
   const { state, character, equipItem, unequipItem, consumeItem } = useGame();
+  const { locked: gearLocked, reason: gearLockReason } = useGearLock();
   const t = useT();
   const [filter, setFilter] = useState<CategoryFilter>("all");
   const [set, setSet] = useState<SetFilter>("all");
@@ -131,13 +134,19 @@ export function InventoryScreen() {
                 {item ? (
                   <CardFooter>
                     <span className="text-[11px] text-ink-faint">{t("Equipped")}</span>
-                    <Button
-                      variant="primary"
-                      onClick={() => unequipItem(slot)}
-                      disabled={lockSecs > 0}
-                    >
-                      {lockSecs > 0 ? "Take off (" + lockSecs + ")" : "Take off"}
-                    </Button>
+                    <Tooltip label={gearLockReason}>
+                      <Button
+                        variant="primary"
+                        onClick={() => unequipItem(slot)}
+                        disabled={lockSecs > 0 || gearLocked}
+                      >
+                        {gearLocked
+                          ? ACTIVITY_WAIT_LABEL
+                          : lockSecs > 0
+                            ? "Take off (" + lockSecs + ")"
+                            : "Take off"}
+                      </Button>
+                    </Tooltip>
                   </CardFooter>
                 ) : null}
               </Card>

@@ -1,4 +1,5 @@
 import { findItem, lineageName, servesLineage } from "@/models/data/items";
+import { gearChangeBlockReason, type Activity } from "@/models/entities/activity";
 import type { GameState } from "@/models/entities/game-state";
 import {
   isEquippable,
@@ -163,7 +164,19 @@ export function equipItem(state: GameState, itemId: string, enhancement = 0): Re
   return success(addLog(syncCharacter(next), "inventory", message), message);
 }
 
-export function unequipItem(state: GameState, slot: EquipmentSlot): Result {
+// The activity is handed in rather than read off the state, because the job
+// slot never lived in GameState: the route reads it from its own table inside
+// the same transaction, and the client passes the slot it is running. A caller
+// with nothing to hand in, the audit bench and a read-only derivation, keeps
+// the old behaviour.
+export function unequipItem(
+  state: GameState,
+  slot: EquipmentSlot,
+  activity?: Activity | null,
+): Result {
+  const busy = gearChangeBlockReason(activity);
+  if (busy) return failure(state, busy);
+
   const piece = state.equipment[slot];
   if (!piece) return failure(state, "Nothing equipped on the " + SLOT_LABEL[slot].toLowerCase() + ".");
 
