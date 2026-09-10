@@ -69,5 +69,7 @@ export function PetKennelArt() {
     );
   }
 
-  return <IconArt source={source} fit="contain" />;
+  // The kennel drawing is the offer itself, already filling half the card, so it
+  // carries no zoom: there is nothing closer to look at.
+  return <IconArt source={source} fit="contain" zoom={false} />;
 }
