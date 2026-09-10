@@ -1855,10 +1855,30 @@ sec("inventory and market");
       inventoryCtrl.unequipItem(dressed.state, "claw", { kind: "hunt" }).state.equipment.claw
         ?.itemId === "bronze-claw",
   );
+  ok(
+    "putting gear on mid-job is refused",
+    inventoryCtrl.equipItem(bought.state, "bronze-claw", 0, { kind: "hunt" }).ok === false,
+  );
+  ok(
+    "the refusal of the piece going on names the job",
+    inventoryCtrl.equipItem(bought.state, "bronze-claw", 0, { kind: "alchemy" }).message ===
+      entActivity.gearChangeBlockReason({ kind: "alchemy" }),
+  );
+  ok(
+    "the piece stays in the bag when refused",
+    inventoryCtrl.countInInventory(
+      inventoryCtrl.equipItem(bought.state, "bronze-claw", 0, { kind: "hunt" }).state.inventory,
+      "bronze-claw",
+    ) === 1,
+  );
   for (const parked of [{ kind: "forge", paused: true }, { kind: "rest" }, null, undefined]) {
     ok(
       "a job that owns no lap lets the gear move",
       dressed.ok && inventoryCtrl.unequipItem(dressed.state, "claw", parked).ok === true,
+    );
+    ok(
+      "a job that owns no lap lets the gear go on",
+      inventoryCtrl.equipItem(bought.state, "bronze-claw", 0, parked).ok === true,
     );
   }
   const potion = inventoryCtrl.consumeItem(

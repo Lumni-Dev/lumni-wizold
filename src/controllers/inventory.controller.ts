@@ -126,7 +126,18 @@ export function gainItems(
   );
 }
 
-export function equipItem(state: GameState, itemId: string, enhancement = 0): Result {
+// The activity is handed in for the same reason it is handed to `unequipItem`
+// below: the job slot never lived in GameState, so the route reads it from its
+// own table inside the transaction it already locked.
+export function equipItem(
+  state: GameState,
+  itemId: string,
+  enhancement = 0,
+  activity?: Activity | null,
+): Result {
+  const busy = gearChangeBlockReason(activity);
+  if (busy) return failure(state, busy);
+
   const character = state.character;
   if (!character) return failure(state, "No active character.");
 
@@ -164,11 +175,8 @@ export function equipItem(state: GameState, itemId: string, enhancement = 0): Re
   return success(addLog(syncCharacter(next), "inventory", message), message);
 }
 
-// The activity is handed in rather than read off the state, because the job
-// slot never lived in GameState: the route reads it from its own table inside
-// the same transaction, and the client passes the slot it is running. A caller
-// with nothing to hand in, the audit bench and a read-only derivation, keeps
-// the old behaviour.
+// The other half of the closed body. A caller with nothing to hand in, the
+// audit bench and a read-only derivation, keeps the old behaviour.
 export function unequipItem(
   state: GameState,
   slot: EquipmentSlot,

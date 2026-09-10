@@ -245,15 +245,16 @@ export function InventoryScreen() {
 
             if (isEquippable(item)) {
               actions.push(
-                <Button
-                  key="equip"
-                  variant="primary"
-                  fullWidth
-                  onClick={() => handleEquip(item.id, item.category, enhancement)}
-                  disabled={levelTooLow}
-                >
-                  Equip
-                </Button>,
+                <Tooltip key="equip" label={gearLocked && !levelTooLow ? gearLockReason : ""}>
+                  <Button
+                    variant="primary"
+                    fullWidth
+                    onClick={() => handleEquip(item.id, item.category, enhancement)}
+                    disabled={levelTooLow || gearLocked}
+                  >
+                    {gearLocked ? ACTIVITY_WAIT_LABEL : "Equip"}
+                  </Button>
+                </Tooltip>,
               );
             }
 
