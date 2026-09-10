@@ -29,7 +29,7 @@ import { formatNumber, formatBronze } from "@/shared/utils/format";
 import { sanitizeName } from "@/shared/utils/text";
 import { Bar } from "../components/bar";
 import { Button } from "../components/button";
-import { Card, CardArt, CardBody, CardHeader, CardStack } from "../components/card";
+import { Card, CardArt, CardBody, CardFooter, CardHeader, CardStack } from "../components/card";
 import { RowText } from "../components/list";
 import { ConfirmDialog } from "../components/confirm-dialog";
 import { Field } from "../components/field";
@@ -64,16 +64,16 @@ function Kennel({ bronze, level }: { bronze: number; level: number }) {
             <RowText title="Companion" label={PET_TITLE} />
           </CardHeader>
 
-          <CardBody>
-            <p className="text-xs leading-relaxed text-ink-faint">{t(PET_DESCRIPTION)}</p>
+          <form
+            className="flex flex-1 flex-col"
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (oldEnough && name.trim().length > 0) setConfirming(true);
+            }}
+          >
+            <CardBody>
+              <p className="text-xs leading-relaxed text-ink-faint">{t(PET_DESCRIPTION)}</p>
 
-            <form
-              className="space-y-3"
-              onSubmit={(event) => {
-                event.preventDefault();
-                if (oldEnough && name.trim().length > 0) setConfirming(true);
-              }}
-            >
               <Field
                 label="Companion's name"
                 value={name}
@@ -91,6 +91,9 @@ function Kennel({ bronze, level }: { bronze: number; level: number }) {
                     : "The wolf only hunts beside a LV " + PET_MIN_LEVEL + " or higher.",
                 )}
               </p>
+            </CardBody>
+
+            <CardFooter>
               <Button
                 type="submit"
                 variant="primary"
@@ -103,8 +106,8 @@ function Kennel({ bronze, level }: { bronze: number; level: number }) {
                     ? "Adopt for " + formatBronze(price)
                     : formatBronze(price - bronze) + " short"}
               </Button>
-            </form>
-          </CardBody>
+            </CardFooter>
+          </form>
         </CardStack>
       </Card>
 
