@@ -79,7 +79,7 @@ function Fighter({
           label="Health"
           current={left}
           maximum={maximum}
-          tone={left > maximum / 2 ? "blood" : "ember"}
+          tone="blood"
           delta={lost > 0 ? "-" + formatNumber(lost) : undefined}
         />
       </div>

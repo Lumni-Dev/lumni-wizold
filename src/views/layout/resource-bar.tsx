@@ -28,7 +28,7 @@ export function ResourceBar() {
   return (
     <header className="relative">
       <div className="overflow-hidden rounded-lg border border-edge bg-surface/40 backdrop-blur">
-      <div className="flex w-full flex-col gap-3 px-4 py-3 md:px-6 md:py-4 lg:h-[74px] lg:flex-row lg:items-center">
+      <div className="flex w-full flex-col gap-3 p-4 lg:h-[74px] lg:flex-row lg:items-center">
         <div className="grid grid-cols-1 flex-1 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           <Bar
             label={
