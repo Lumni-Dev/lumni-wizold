@@ -203,6 +203,17 @@
   text-transform: uppercase;
 }
 
+/* The collapsed aside is a narrow rail of icon squares: a scrollbar there would
+   eat a third of its width and push every square off centre, so the icons
+   scroll without one. */
+@utility rail-scroll {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 
 @utility slot-well {
   background-color: var(--color-base);

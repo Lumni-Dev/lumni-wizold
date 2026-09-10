@@ -29,8 +29,8 @@ import { NavIcon } from "../components/app-icon";
 // the menu answers with the same colour the game uses for "this is the action".
 function asideRow(active: boolean, collapsed: boolean, highlighted = false): string {
   return cn(
-    "relative flex " + CONTROL_HEIGHT + " w-full items-center rounded-md transition-colors",
-    collapsed ? "justify-center" : "gap-3 px-2.5",
+    "relative flex " + CONTROL_HEIGHT + " items-center rounded-md transition-colors",
+    collapsed ? "mx-auto w-8 justify-center" : "w-full gap-3 px-2.5",
     active
       ? "bg-ember text-base shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)] hover:brightness-110"
       : cn(
@@ -46,7 +46,7 @@ function Brand({ collapsed }: { collapsed: boolean }) {
     <Link
       href="/character"
       className={cn(
-        "flex h-[74px] shrink-0 items-center gap-3",
+        "flex h-[74px] shrink-0 items-center gap-3 border-b border-edge",
         collapsed ? "justify-center px-0" : "px-4",
       )}
     >
@@ -215,13 +215,16 @@ export function Sidebar({
     <aside
       className={cn(
         "sticky top-2.5 my-2.5 ml-2.5 hidden h-[calc(100svh-1.25rem)] shrink-0 transition-[width] duration-200 lg:block",
-        collapsed ? "w-14" : "w-56",
+        collapsed ? "w-16" : "w-56",
       )}
     >
       <div className="flex h-full w-full flex-col overflow-hidden rounded-lg border border-edge bg-surface/40 backdrop-blur">
       <Brand collapsed={collapsed} />
 
-      <nav className="flex-1 overflow-y-auto p-3 pt-0" aria-label={t("Game pages")}>
+      <nav
+        className={cn("flex-1 overflow-y-auto p-3", collapsed && "rail-scroll")}
+        aria-label={t("Game pages")}
+      >
         <ul className="space-y-1">
           {NAVIGATION.map((item) => (
             <li key={item.href}>
@@ -253,6 +256,9 @@ export function Sidebar({
           active={pathname === SETTINGS_LINK.href}
           collapsed={collapsed}
         />
+      </div>
+
+      <div className="border-t border-edge p-3">
         <CollapseButton collapsed={collapsed} />
       </div>
       </div>

@@ -31,7 +31,7 @@ export function MoonTracker({
   if (iconOnly) {
     return (
       <Tooltip block label={t(moon.phase.label) + ": " + bonusLine}>
-        <div className="flex h-8 items-center justify-center rounded-md text-ink-soft transition-colors hover:bg-surface/70">
+        <div className="mx-auto flex h-8 w-8 items-center justify-center rounded-md text-ink-soft transition-colors hover:bg-surface/70">
           <Moon aria-hidden strokeWidth={1.75} className="h-4 w-4" />
         </div>
       </Tooltip>

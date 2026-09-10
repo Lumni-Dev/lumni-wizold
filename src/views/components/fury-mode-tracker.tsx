@@ -16,8 +16,8 @@ export function FuryModeTracker({ iconOnly = false }: { iconOnly?: boolean }) {
   if (iconOnly) {
     return (
       <Tooltip block label={t("Fury Mode") + ": " + formatFuryClock(remaining)}>
-        <FuryRingFrame className="block w-full" animationKey={furyUntil || "sky"}>
-          <div className="flex h-8 w-full items-center justify-center">
+        <FuryRingFrame className="mx-auto block w-8" animationKey={furyUntil || "sky"}>
+          <div className="flex h-8 w-8 items-center justify-center">
             <Flame aria-hidden strokeWidth={1.75} className="fury-glow-icon h-4 w-4" />
           </div>
         </FuryRingFrame>
