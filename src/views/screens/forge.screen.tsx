@@ -20,7 +20,6 @@ import { totalExperience } from "@/models/rules/progression";
 import {
   FORGE_TICKS,
   MAX_ENHANCEMENT,
-  MINING_RESET_HOUR,
   MINING_TICKS_MAX,
 } from "@/shared/constants/game";
 import { cn } from "@/shared/utils/class-names";
@@ -49,8 +48,6 @@ function formatCountdown(ms: number): string {
   if (hours > 0) return minutes > 0 ? hours + "h " + minutes + "min" : hours + "h";
   return minutes + "min";
 }
-
-const RESET_LABEL = String(MINING_RESET_HOUR).padStart(2, "0") + ":00";
 
 function pieceKey(itemId: string, level: number): string {
   return itemId + "@" + level;
@@ -279,7 +276,7 @@ export function ForgeScreen() {
                   deltaTone="tide"
                 />
                 <p className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-                  {t("Resets at " + RESET_LABEL + ", " + formatCountdown(miningResetLeft) + " left")}
+                  {t("Reset in " + formatCountdown(miningResetLeft) + ".")}
                 </p>
               </ListRow>
               <ListRow layout="column">
