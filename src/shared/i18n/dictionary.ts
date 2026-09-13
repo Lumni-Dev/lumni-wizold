@@ -1560,6 +1560,8 @@ const RULES: readonly PatternRule[] = [
   { pattern: /^(\d[\d.,]*) of (\d+) on$/, en: "$1 of $2 on", pt: "$1 de $2 ativadas", es: "$1 de $2 activadas" },
   { pattern: /^(.+) - (\d[\d.,]*) of (\d[\d.,]*)$/, en: "$1 - $2 of $3", pt: "$1 - $2º de $3", es: "$1 - $2º de $3" },
   { pattern: /^\+(\d+)% hunt experience$/, en: "+$1% hunt experience", pt: "+$1% de experiência na caça", es: "+$1% de experiencia de caza" },
+  { pattern: /^\+(\d+)% in training$/, en: "+$1% in training", pt: "+$1% no treino", es: "+$1% en el entrenamiento" },
+  { pattern: /^\+(\d+)% in mining$/, en: "+$1% in mining", pt: "+$1% na mineração", es: "+$1% en la minería" },
   { pattern: /^\+(\d[\d.,]*) to every attribute for (.+)$/, en: "+$1 to every attribute for $2", pt: "+$1 em cada atributo por $2", es: "+$1 a cada atributo por $2" },
   { pattern: /^Victory over (.+)$/, en: "Victory over $1", pt: "Vitória sobre $1", es: "Victoria sobre $1" },
   { pattern: /^Defeat to (.+)$/, en: "Defeat to $1", pt: "Derrota para $1", es: "Derrota ante $1" },
