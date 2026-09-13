@@ -47,7 +47,7 @@ export function MoonTracker({
             <p className="truncate text-[10px] uppercase tracking-[0.16em] text-ink">
               {t(moon.phase.label)}
             </p>
-            <p className="truncate text-[10px] text-ink-faint">{bonusLine}</p>
+            <p className="text-[10px] text-ink-faint">{bonusLine}</p>
           </div>
         </div>
       </Tooltip>
