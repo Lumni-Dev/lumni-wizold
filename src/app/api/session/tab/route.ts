@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { withTransaction } from "@/models/repositories/server/database";
 import { asText, bad, readBody, refuseAbuse, sessionIsLive } from "../../_lib/api";
 import { sessionClaims } from "../../_lib/session";
-
-const TAB_STALE_MS = 25_000;
+import { TAB_STALE_MS } from "@/shared/constants/polling";
 
 export async function POST(request: Request) {
   const refused = refuseAbuse(request);

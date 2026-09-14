@@ -1,16 +1,11 @@
 import { NextResponse } from "next/server";
 import { GAME_VERSION } from "@/shared/constants/version";
-import { clientIp, refuseAbuse } from "../_lib/api";
-import { rateLimit } from "../_lib/rate-limit";
 
-export async function GET(request: Request) {
-  const refused = refuseAbuse(request);
-  if (refused) return refused;
-  if (!rateLimit("version:" + clientIp(request), 60, 60000).allowed) {
-    return NextResponse.json({ ok: false, message: "Slow down." }, { status: 429 });
-  }
-  return NextResponse.json(
-    { version: GAME_VERSION },
-    { headers: { "Cache-Control": "no-store, max-age=0" } },
-  );
+// Rendered once at build and served from the CDN: the version never changes
+// inside a deployment, and polling it used to invoke a function every minute
+// per open tab.
+export const dynamic = "force-static";
+
+export function GET() {
+  return NextResponse.json({ version: GAME_VERSION });
 }

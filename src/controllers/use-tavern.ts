@@ -12,8 +12,9 @@ import {
 } from "./tavern-stream";
 import * as tavernController from "./tavern.controller";
 import type { RoomSummary } from "./tavern.controller";
+import { TAVERN_ROOM_HEARTBEAT_MS } from "@/shared/constants/polling";
 
-const HEARTBEAT_MS = 12000;
+const HEARTBEAT_MS = TAVERN_ROOM_HEARTBEAT_MS;
 
 let heartbeatHolders = 0;
 let heartbeatTimer = 0;

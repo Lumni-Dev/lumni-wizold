@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { PresenceStatus } from "@/models/entities/presence";
-import { PRESENCE_POLL_MS } from "@/models/rules/presence";
-import { api } from "./api.client";
+import { refreshPackPresence, subscribePackPresence } from "./pack-presence.poll";
 
 export interface PackPresenceView {
   statuses: Record<string, PresenceStatus>;
@@ -20,33 +19,17 @@ export function usePackPresence(mateIds: string[], enabled: boolean): PackPresen
   useEffect(() => {
     if (!watching) return;
 
-    let alive = true;
-    const load = async () => {
-      const answer = await api<{
-        mates: { id: string; status: PresenceStatus; vip?: boolean }[];
-      }>("GET", "/api/pack/presence");
-      if (!alive || !answer.ok || !answer.data) return;
+    const stop = subscribePackPresence((mates) => {
       const statuses: Record<string, PresenceStatus> = {};
       const vips: Record<string, boolean> = {};
-      for (const mate of answer.data.mates) {
+      for (const mate of mates) {
         statuses[mate.id] = mate.status;
         vips[mate.id] = mate.vip === true;
       }
       setPresence({ statuses, vips });
-    };
-
-    void load();
-    const timer = window.setInterval(() => void load(), PRESENCE_POLL_MS);
-    const onVisible = () => {
-      if (document.visibilityState === "visible") void load();
-    };
-    document.addEventListener("visibilitychange", onVisible);
-
-    return () => {
-      alive = false;
-      window.clearInterval(timer);
-      document.removeEventListener("visibilitychange", onVisible);
-    };
+    });
+    refreshPackPresence();
+    return stop;
   }, [watching, roster]);
 
   return watching ? presence : NOBODY;

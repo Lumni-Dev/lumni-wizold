@@ -38,6 +38,7 @@ import {
   REST_TICK_MS,
 } from "@/shared/constants/game";
 import { GAME_VERSION, VERSION_POLL_MS } from "@/shared/constants/version";
+import { BAZAAR_SETTLE_MS } from "@/shared/constants/polling";
 import { DEMO_LIMIT_MESSAGE, isDemoAction, type DemoAction } from "@/shared/constants/demo";
 import { formatReais } from "@/shared/utils/format";
 import { petLevelOf, petMaxEnergy } from "@/models/rules/pet";
@@ -450,12 +451,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
       pendingProgressRef.current = patch;
       const boundary =
         patch.beat === 0 || (patch.cooldownUntil !== undefined && patch.cooldownUntil !== null);
-      if (boundary) {
-        flushProgress();
-        return;
-      }
-      if (progressFlushRef.current) window.clearTimeout(progressFlushRef.current);
-      progressFlushRef.current = window.setTimeout(flushProgress, 3000);
+      // Mid-lap beats stay local (activity stash, mirror tabs) and reach the
+      // server only at a lap boundary or on unload: every 3s used to cost a
+      // function invocation per beat, the single biggest request source.
+      if (boundary) flushProgress();
     },
     [flushProgress],
   );
@@ -836,7 +835,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         playSound("sell");
       }
     };
-    const timer = window.setInterval(() => void settle(), 60000);
+    const timer = window.setInterval(() => void settle(), BAZAAR_SETTLE_MS);
     return () => window.clearInterval(timer);
   }, [ready, authenticated, request, announce]);
   const value = useMemo<GameContextValue>(() => {

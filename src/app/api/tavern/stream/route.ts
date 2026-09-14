@@ -4,11 +4,12 @@ import { bad, refuseAbuse, sessionIsLive } from "../../_lib/api";
 import { buildTavernBoard } from "../../_lib/tavern-board";
 import { subscribeTavernRevision } from "../../_lib/tavern-bus";
 import { rateLimit } from "../../_lib/rate-limit";
+import { TAVERN_STREAM_POLL_MS } from "@/shared/constants/polling";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const POLL_MS = 5000;
+const POLL_MS = TAVERN_STREAM_POLL_MS;
 const PING_MS = 15000;
 // Vercel kills the invocation at its 300s ceiling and logs the kill as a
 // runtime timeout, so the stream retires itself first: a clean close lands in

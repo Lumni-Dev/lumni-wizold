@@ -5,6 +5,7 @@ import type { RoomSummary } from "./tavern.controller";
 import type { TavernIdentity } from "@/models/entities/tavern";
 import type { TavernUserState } from "@/models/entities/tavern";
 import { tavernUserStore } from "./tavern-user.store";
+import { TAVERN_FALLBACK_POLL_MS } from "@/shared/constants/polling";
 
 export interface TavernBoardPayload {
   identity: TavernIdentity | null;
@@ -54,10 +55,12 @@ function disconnect() {
 
 function ensureFallback() {
   if (fallbackTimer) return;
+  // The poll covers the stream only while it is down; with the SSE open the
+  // board already arrives pushed, so polling beside it was pure duplicate load.
   fallbackTimer = window.setInterval(() => {
-    if (listeners.size === 0) return;
+    if (listeners.size === 0 || source) return;
     void fallbackPoll();
-  }, 30000);
+  }, TAVERN_FALLBACK_POLL_MS);
 }
 
 export function subscribeTavernBoard(listener: BoardListener): () => void {

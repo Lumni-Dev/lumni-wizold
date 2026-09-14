@@ -1,9 +1,10 @@
 "use client";
 
 import { api } from "./api.client";
+import { TAB_HEARTBEAT_MS } from "@/shared/constants/polling";
 
 const CHANNEL = "wizold-single-tab";
-const HEARTBEAT_MS = 8000;
+const HEARTBEAT_MS = TAB_HEARTBEAT_MS;
 
 type TabStatus = "pending" | "active" | "blocked";
 
