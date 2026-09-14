@@ -1509,4 +1509,10 @@ export const PT: Record<string, string> = {
     "Cada conta pode experimentar cada atividade um número limitado de vezes:",
   "You reached the limit for this activity. Thanks for trying the game.":
     "Você chegou ao limite desta atividade. Obrigado por experimentar o jogo.",
+
+  // Idle gate
+  "Session on hold": "Sessão em espera",
+  "Continue": "Continuar",
+  "Nothing was lost: the run is saved on the server and continues where it stopped.":
+    "Nada se perdeu: a partida está salva no servidor e continua de onde parou.",
 };

@@ -3,6 +3,7 @@ import { GameProvider } from "@/controllers/game.context";
 import { rootMetadata } from "@/shared/seo/metadata";
 import { Shield } from "@/views/layout/shield";
 import { UpdateGate } from "@/views/components/update-gate";
+import { IdleGate } from "@/views/components/idle-gate";
 import { Geist_Mono, Inter, Orbitron } from "next/font/google";
 import "./globals.css";
 
@@ -21,10 +22,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         }
       >
         <Shield />
-        <GameProvider>
-          <UpdateGate />
-          {children}
-        </GameProvider>
+        <IdleGate>
+          <GameProvider>
+            <UpdateGate />
+            {children}
+          </GameProvider>
+        </IdleGate>
       </body>
     </html>
   );

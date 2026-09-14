@@ -2,6 +2,7 @@
 
 import { api } from "./api.client";
 import { TAB_HEARTBEAT_MS } from "@/shared/constants/polling";
+import { isSleeping } from "./idle.store";
 
 const CHANNEL = "wizold-single-tab";
 const HEARTBEAT_MS = TAB_HEARTBEAT_MS;
@@ -34,6 +35,7 @@ async function claim(force: boolean): Promise<boolean | null> {
 }
 
 function beat(): void {
+  if (isSleeping()) return;
   void claim(false).then((mine) => {
     if (mine === null) return;
     setStatus(mine ? "active" : "blocked");

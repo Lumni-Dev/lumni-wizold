@@ -16,6 +16,11 @@ interface PatternRule {
 // rule for the English side and translate to pt/es by exact key.
 const RULES: readonly PatternRule[] = [
   {
+    pattern: /^The game went to sleep after (\d+) minutes without anyone touching it, to spare the server\.$/,
+    pt: "O jogo adormeceu depois de $1 minutos sem ninguém mexer, para poupar o servidor.",
+    es: "El juego se durmió tras $1 minutos sin que nadie lo tocara, para cuidar el servidor.",
+  },
+  {
     pattern: /^Experiência \(NV\. (.+)\)$/,
     en: "Experience (LV. $1)",
     es: "Experiencia (NV. $1)",
