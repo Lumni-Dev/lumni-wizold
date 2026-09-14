@@ -7,12 +7,15 @@ import { failure } from "@/models/entities/result";
 import { HUNT_TICK_MS } from "@/shared/constants/game";
 import * as arenaController from "@/controllers/arena.controller";
 import { asText, withGame } from "../../_lib/api";
+import { demoGate, spendDemo } from "../../_lib/demo";
 
 export async function POST(request: Request) {
   return withGame(request, async (state, body, context) => {
     const { activity } = await readActivity(context.client, context.characterId);
     const blocked = workActivityBlockReason(activity);
     if (blocked) return failure(state, blocked);
+    const demo = await demoGate(context.client, context.userId, state, "fight");
+    if (demo) return demo;
     if ((await cooldownLeft(context.client, context.characterId, "arena")) > 0) {
       return failure(state, "");
     }
@@ -28,6 +31,7 @@ export async function POST(request: Request) {
         "arena",
         landed.data.combat.rounds.length * HUNT_TICK_MS,
       );
+      await spendDemo(context.client, context.userId, "fight");
       if (state.character) {
         const { combat, hunter, spoils } = landed.data;
         await recordArenaDuel(context.client, {

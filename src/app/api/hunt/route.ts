@@ -4,8 +4,11 @@ import { cooldownLeft, setCooldown } from "@/models/repositories/server/action-c
 import { interruptRest } from "@/models/repositories/server/game.store";
 import { HUNT_TICK_MS } from "@/shared/constants/game";
 import { asText, withGame } from "../_lib/api";
+import { demoGate, spendDemo } from "../_lib/demo";
 export async function POST(request: Request) {
   return withGame(request, async (state, body, context) => {
+    const demo = await demoGate(context.client, context.userId, state, "hunt");
+    if (demo) return demo;
     if ((await cooldownLeft(context.client, context.characterId, "hunt")) > 0) {
       return failure(state, "");
     }
@@ -25,6 +28,7 @@ export async function POST(request: Request) {
         "hunt",
         landed.data.combat.rounds.length * HUNT_TICK_MS,
       );
+      await spendDemo(context.client, context.userId, "hunt");
     }
     return landed;
   });

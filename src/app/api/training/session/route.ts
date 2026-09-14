@@ -4,8 +4,11 @@ import { cooldownLeft, setCooldown } from "@/models/repositories/server/action-c
 import { interruptRest } from "@/models/repositories/server/game.store";
 import { TRAINING_TICKS_MIN, TRAINING_TICK_MS } from "@/shared/constants/game";
 import { asText, withGame } from "../../_lib/api";
+import { demoGate, spendDemo } from "../../_lib/demo";
 export async function POST(request: Request) {
   return withGame(request, async (state, body, context) => {
+    const demo = await demoGate(context.client, context.userId, state, "train");
+    if (demo) return demo;
     if ((await cooldownLeft(context.client, context.characterId, "train")) > 0) {
       return failure(state, "");
     }
@@ -18,6 +21,7 @@ export async function POST(request: Request) {
         "train",
         TRAINING_TICKS_MIN * TRAINING_TICK_MS,
       );
+      await spendDemo(context.client, context.userId, "train");
     }
     return result;
   });

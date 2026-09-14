@@ -38,6 +38,7 @@ import {
   REST_TICK_MS,
 } from "@/shared/constants/game";
 import { GAME_VERSION, VERSION_POLL_MS } from "@/shared/constants/version";
+import { DEMO_LIMIT_MESSAGE, isDemoAction, type DemoAction } from "@/shared/constants/demo";
 import { formatReais } from "@/shared/utils/format";
 import { petLevelOf, petMaxEnergy } from "@/models/rules/pet";
 import { deriveStats, type DerivedStats } from "@/models/rules/stats";
@@ -168,6 +169,9 @@ interface GameContextValue {
   updateAvailable: boolean;
   updateVersion: string | null;
   applyUpdate: () => void;
+  // Demo mode (GAME_MODE=demo): the action whose allowance ran out, or null.
+  demoLimit: DemoAction | null;
+  dismissDemoLimit: () => void;
 }
 const GameContext = createContext<GameContextValue | null>(null);
 function subscribeToClient() {
@@ -230,6 +234,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [activity, setActivityState] = useState<Activity | null>(null);
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [updateVersion, setUpdateVersion] = useState<string | null>(null);
+  const [demoLimit, setDemoLimit] = useState<DemoAction | null>(null);
+  const dismissDemoLimit = useCallback(() => setDemoLimit(null), []);
   const [furyNow, setFuryNow] = useState(0);
   const noticeCounter = useRef(0);
   const NOTICE_STACK = 4;
@@ -260,6 +266,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
   );
   const announce = useCallback(
     (text: string, ok: boolean, source: string, dot?: PresenceStatus, local = false) => {
+      // The demo limit speaks through its own modal, never a toast.
+      if (text === DEMO_LIMIT_MESSAGE) return 0;
       const id = pushNotice(text, ok, source, dot, !local);
       if (!local) activitySync.publishNotice({ text, ok, source, dot, id });
     },
@@ -520,6 +528,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
           return answer;
         }
         if (typeof answer.tutorial === "boolean") setTutorial(answer.tutorial);
+        if (!answer.ok && answer.message === DEMO_LIMIT_MESSAGE) {
+          const block = answer.data as { demoLimit?: unknown } | null;
+          if (isDemoAction(block?.demoLimit)) setDemoLimit(block.demoLimit);
+        }
         if (answer.state) {
           const seq = ++mintRef.current;
           const incoming = answer.state;
@@ -1295,6 +1307,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
       updateAvailable,
       updateVersion,
       applyUpdate,
+      demoLimit,
+      dismissDemoLimit,
     };
   }, [
     state,
@@ -1308,6 +1322,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
     updateAvailable,
     updateVersion,
     applyUpdate,
+    demoLimit,
+    dismissDemoLimit,
     dismissNotice,
     announce,
     act,

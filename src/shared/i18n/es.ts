@@ -1496,4 +1496,17 @@ export const ES: Record<string, string> = {
   "Bonus": "Bonificación",
   "What the wolf lends while it hunts at your side.":
     "Lo que el lobo presta mientras caza a tu lado.",
+
+  // Demo mode
+  "Project demonstration": "Demostración del proyecto",
+  "Close Project demonstration": "Cerrar Demostración del proyecto",
+  "Forges": "Forjas",
+  "Training sessions": "Entrenamientos",
+  "Arena fights": "Peleas en la arena",
+  "Wizold is a portfolio project, open only as a demonstration.":
+    "Wizold es un proyecto de portafolio, abierto solo como demostración.",
+  "Every account can try each activity a limited number of times:":
+    "Cada cuenta puede probar cada actividad un número limitado de veces:",
+  "You reached the limit for this activity. Thanks for trying the game.":
+    "Llegaste al límite de esta actividad. Gracias por probar el juego.",
 };
