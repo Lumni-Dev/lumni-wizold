@@ -32,6 +32,7 @@ import {
 } from "@/models/entities/tavern";
 import { isVip } from "@/models/rules/vip";
 import { NAME_MAX_LENGTH } from "@/shared/constants/game";
+import { TAVERN_INVITES_POLL_MS } from "@/shared/constants/polling";
 import { cn } from "@/shared/utils/class-names";
 import { displayNick, sanitizeName, sanitizeRoomSearch } from "@/shared/utils/text";
 import { clampPage, pageCount, pageOf } from "@/shared/utils/pagination";
@@ -185,7 +186,7 @@ export function TavernScreen() {
   }, []);
   useEffect(() => {
     refreshInvites();
-    const timer = window.setInterval(refreshInvites, 10000);
+    const timer = window.setInterval(refreshInvites, TAVERN_INVITES_POLL_MS);
     return () => window.clearInterval(timer);
   }, [refreshInvites]);
 

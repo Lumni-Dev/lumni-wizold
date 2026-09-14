@@ -40,6 +40,7 @@ import {
 import { GAME_VERSION, VERSION_POLL_MS } from "@/shared/constants/version";
 import { BAZAAR_SETTLE_MS } from "@/shared/constants/polling";
 import { DEMO_LIMIT_MESSAGE, isDemoAction, type DemoAction } from "@/shared/constants/demo";
+import { blockDemo, clearDemoBlocks } from "./demo-limit.store";
 import { formatReais } from "@/shared/utils/format";
 import { petLevelOf, petMaxEnergy } from "@/models/rules/pet";
 import { deriveStats, type DerivedStats } from "@/models/rules/stats";
@@ -523,13 +524,17 @@ export function GameProvider({ children }: { children: ReactNode }) {
         if (answer.status === 401) {
           setAuthenticated(false);
           clearSession();
+          clearDemoBlocks();
           setTutorial(true);
           return answer;
         }
         if (typeof answer.tutorial === "boolean") setTutorial(answer.tutorial);
         if (!answer.ok && answer.message === DEMO_LIMIT_MESSAGE) {
           const block = answer.data as { demoLimit?: unknown } | null;
-          if (isDemoAction(block?.demoLimit)) setDemoLimit(block.demoLimit);
+          if (isDemoAction(block?.demoLimit)) {
+            blockDemo(block.demoLimit);
+            setDemoLimit(block.demoLimit);
+          }
         }
         if (answer.state) {
           const seq = ++mintRef.current;
@@ -631,6 +636,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         markSession();
       } else {
         clearSession();
+        clearDemoBlocks();
       }
       if (typeof answer.tutorial === "boolean") setTutorial(answer.tutorial);
       if (answer.state) applyState(answer.state, ++mintRef.current);
@@ -952,6 +958,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         setActivity(null);
         setAuthenticated(false);
         clearSession();
+        clearDemoBlocks();
         disableGoogleAutoSelect();
         setTutorial(true);
       },
@@ -963,6 +970,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         setActivity(null);
         setAuthenticated(false);
         clearSession();
+        clearDemoBlocks();
         disableGoogleAutoSelect();
         setTutorial(true);
       },
@@ -974,6 +982,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
           setActivity(null);
           setAuthenticated(false);
           clearSession();
+          clearDemoBlocks();
           setTutorial(true);
         }
         return answer.ok;

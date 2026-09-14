@@ -37,6 +37,7 @@ import { formatNumber } from "@/shared/utils/format";
 import { hunterRetreated, hunterWon } from "@/models/rules/combat";
 import { narrationOf } from "@/views/presenters/hunt.presenter";
 import { rageFlaskToDrink } from "./automation.controller";
+import { isDemoBlocked } from "./demo-limit.store";
 import { requestAutomationPulse } from "./automation-pulse";
 import { isGameSound, playSound } from "./sound";
 import { useGame } from "./game.context";
@@ -404,7 +405,7 @@ export function ActivityEngine() {
         }
         if (result.kind === "stop") {
           setActivityRef.current(
-            autoRef.current.hunt
+            autoRef.current.hunt && !isDemoBlocked("hunt")
               ? { kind: "hunt", id: activeHunt, paused: true }
               : null,
           );
@@ -617,7 +618,7 @@ export function ActivityEngine() {
               syncProgressRef.current({ beat: 0, cooldownUntil: null, laps: 0 });
               if (!landed) {
                 setActivityRef.current(
-                  autoRef.current.train && resumable
+                  autoRef.current.train && resumable && !isDemoBlocked("train")
                     ? { kind: "train", id: activeExercise, paused: true }
                     : null,
                 );
@@ -857,7 +858,7 @@ export function ActivityEngine() {
               syncProgressRef.current({ beat: 0, cooldownUntil: null });
               if (!landed) {
                 setActivityRef.current(
-                  autoRef.current.forge
+                  autoRef.current.forge && !isDemoBlocked("forge")
                     ? { kind: "forge", id: activeItem, enhancement: level, paused: true }
                     : null,
                 );

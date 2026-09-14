@@ -23,5 +23,8 @@ export const TAVERN_ROOM_HEARTBEAT_MS = 60_000; // was 12_000
 export const TAVERN_STREAM_POLL_MS = 15_000; // was 5_000
 export const TAVERN_FALLBACK_POLL_MS = 30_000; // unchanged, but no longer runs beside the stream
 
+// Pack invites list on the tavern screen (GET /api/pack/invites).
+export const TAVERN_INVITES_POLL_MS = 60_000; // was 10_000
+
 // Bazaar settlement check (POST /api/state, a full load and save of the game).
 export const BAZAAR_SETTLE_MS = 300_000; // was 60_000
